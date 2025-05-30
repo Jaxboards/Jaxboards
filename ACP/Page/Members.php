@@ -443,18 +443,14 @@ final readonly class Members
         );
 
         // Sum post count on account being merged into.
-        $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid1);
-        $posts = $member->posts ?? 0;
+        $member1 = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid1);
+        $member2 = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid2);
 
-        $this->database->special(
-            'UPDATE %t SET `posts` = `posts` + ? WHERE `id`=?',
-            ['members'],
-            $posts,
-            $mid2,
-        );
+        $member2->posts += $member1->posts ?? 0;
+        $member2->update($this->database);
 
         // Delete the account.
-        $this->database->delete('members', Database::WHERE_ID_EQUALS, $mid1);
+        $member1->delete($this->database);
 
         // Update stats.
         $this->database->special(
