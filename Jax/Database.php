@@ -50,7 +50,6 @@ class Database
     public function __construct(
         private readonly ServiceConfig $serviceConfig,
         private readonly DebugLog $debugLog,
-        private readonly Date $date,
     ) {
         try {
             if ($serviceConfig->hasInstalled()) {
