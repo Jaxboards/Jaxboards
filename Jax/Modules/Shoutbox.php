@@ -103,7 +103,7 @@ final class Shoutbox
 
     public function formatShout(Shout $shout, ?Member $member): string
     {
-        $user = $member ? $this->template->meta(
+        $user = $member !== null ? $this->template->meta(
             'user-link',
             $member->id,
             $member->group_id,
@@ -148,18 +148,18 @@ final class Shoutbox
     {
         $shouts = Shout::selectMany(
             $this->database,
-            "ORDER BY `id` DESC LIMIT ?",
+            'ORDER BY `id` DESC LIMIT ?',
             $this->shoutlimit,
         );
 
         $members = Member::joinedOn(
             $this->database,
             $shouts,
-            static fn(Shout $shout) => $shout->uid,
+            static fn(Shout $shout): int => $shout->uid,
         );
 
         $shoutHTML = '';
-        foreach($shouts as $shout) {
+        foreach ($shouts as $shout) {
             $shoutHTML .= $this->formatShout($shout, $members[$shout->uid]);
         }
 
@@ -198,13 +198,13 @@ final class Shoutbox
             $this->database,
             'WHERE `id`>? ORDER BY `id` ASC LIMIT ?',
             $shoutboxId,
-            $this->shoutlimit
+            $this->shoutlimit,
         );
 
         $members = Member::joinedOn(
             $this->database,
             $shouts,
-            static fn(Shout $shout) => $shout->uid
+            static fn(Shout $shout): int => $shout->uid,
         );
 
         foreach ($shouts as $shout) {
@@ -268,7 +268,7 @@ final class Shoutbox
         $membersById = Member::joinedOn(
             $this->database,
             $shouts,
-            static fn(Shout $shout) => $shout->uid
+            static fn(Shout $shout): int => $shout->uid,
         );
 
         $shoutHTML = '';

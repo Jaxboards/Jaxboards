@@ -41,7 +41,7 @@ final class Date
      *                                     - "seconds" => true includes seconds in the date representation
      */
     public function smallDate(
-        string|int $timestamp,
+        int|string $timestamp,
         array $options = [],
     ): string {
         $autodate = $options['autodate'] ?? false;
