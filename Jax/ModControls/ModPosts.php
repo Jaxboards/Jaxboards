@@ -205,24 +205,13 @@ final readonly class ModPosts
      */
     private function fetchForumMods(Post $post): array
     {
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT `mods`
-                FROM %t
-                WHERE `id`=(
-                    SELECT `fid`
-                    FROM %t
-                    WHERE `id`=?
-                )
-                SQL,
-            ['forums', 'topics'],
-            $post->tid,
-        );
-        $mods = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $post->tid);
+        $forum = $topic
+            ? Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid)
+            : null;
 
-        return $mods
-            ? array_map(static fn($mid): int => (int) $mid, explode(',', (string) $mods['mods']))
+        return $forum->mods
+            ? array_map(static fn($mid): int => (int) $mid, explode(',', $forum->mods))
             : [];
     }
 
