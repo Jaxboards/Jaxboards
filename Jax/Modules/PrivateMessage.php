@@ -53,11 +53,11 @@ final readonly class PrivateMessage
     public function filter(): void
     {
         $enemies = $this->user->get()->enemies;
-        if (!$enemies) {
+        if ($enemies === '' || $enemies === '0') {
             return;
         }
 
-        $enemies = explode(',', (string) $enemies);
+        $enemies = explode(',', $enemies);
         $commands = explode(PHP_EOL, $this->session->get()->runonce);
         foreach ($commands as $index => $command) {
             $command = json_decode($command);

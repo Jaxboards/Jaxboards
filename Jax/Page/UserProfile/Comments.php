@@ -144,7 +144,7 @@ final readonly class Comments
         $activity->affected_uid = $member->id;
         $activity->date = $this->database->datetime();
         $activity->type = 'profile_comment';
-        $activity->uid = (int) $this->user->get()->id;
+        $activity->uid = $this->user->get()->id;
         $activity->insert($this->database);
 
         $profileComment = new ProfileComment();
@@ -184,7 +184,7 @@ final readonly class Comments
             'profile_comments',
             'WHERE `id`=? AND `from`=?',
             $deleteComment,
-            (int) $this->user->get()->id,
+            $this->user->get()->id,
         );
     }
 }

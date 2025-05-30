@@ -26,11 +26,13 @@ final class User
         ?Member $member = null,
         public ?Group $userPerms = null,
     ) {
-        if ($member === null) {
-            $guestMember = new Member();
-            $guestMember->group_id = Groups::Guest->value;
-            $this->member = $guestMember;
+        if ($member !== null) {
+            return;
         }
+
+        $guestMember = new Member();
+        $guestMember->group_id = Groups::Guest->value;
+        $this->member = $guestMember;
     }
 
     public function get(): Member

@@ -123,7 +123,7 @@ final class Post
      */
     private function upload(array $fileobj): string
     {
-        $uid = (int) $this->user->get()->id;
+        $uid = $this->user->get()->id;
 
         $size = (int) filesize($fileobj['tmp_name']);
         $hash = hash_file('sha512', $fileobj['tmp_name']) ?: 'hash_error';
@@ -426,7 +426,7 @@ final class Post
             $canmod = true;
         }
 
-        if ($this->user->get()->mod) {
+        if ($this->user->get()->mod !== 0) {
             $result = $this->database->special(
                 'SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id=?)',
                 ['forums', 'topics'],
@@ -585,7 +585,7 @@ final class Post
     private function createTopic(): void
     {
         $fid = $this->fid;
-        $uid = (int) $this->user->get()->id;
+        $uid = $this->user->get()->id;
         $postDate = $this->database->datetime();
 
         $inputPollChoices = $this->request->asString->post('pollchoices');
@@ -680,7 +680,7 @@ final class Post
         $this->session->act();
         $postData = $this->postData;
         $postDate = $this->database->datetime();
-        $uid = (int) $this->user->get()->id;
+        $uid = $this->user->get()->id;
 
         // Post validation
         $error = $this->validatePost($postData);
@@ -834,7 +834,7 @@ final class Post
 
         // Update statistics.
         if (!$fdata['nocount']) {
-            $this->user->set('posts', ((int) $this->user->get()->posts) + 1);
+            $this->user->set('posts', $this->user->get()->posts + 1);
         }
 
         $stats = Stats::selectOne($this->database);

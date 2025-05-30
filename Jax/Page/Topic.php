@@ -629,7 +629,7 @@ final class Topic
             $canMod = true;
         }
 
-        if ($this->user->get()->mod) {
+        if ($this->user->get()->mod !== 0) {
             $result = $this->database->special(
                 <<<'SQL'
                     SELECT `mods`

@@ -498,8 +498,7 @@ final class Forum
         );
 
         return $timestamp <= (
-            max($this->topicsRead[$topic->id], $forumReadTime)
-            ?: $this->session->get()->read_date
+            (max($this->topicsRead[$topic->id], $forumReadTime) ?: $this->session->get()->read_date)
             ?: $this->user->get()->last_visit
         );
     }

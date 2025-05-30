@@ -119,7 +119,7 @@ final readonly class UCP
             }
         }
 
-        $ucpnotepad = (string) $this->user->get()->ucpnotepad;
+        $ucpnotepad = $this->user->get()->ucpnotepad;
 
         return ($error !== null ? $this->template->meta('error', $error) : '') . $this->template->meta(
             'ucp-index',
@@ -178,7 +178,7 @@ final readonly class UCP
 
         foreach ($fields as $field) {
             $checkboxes[] = '<input type="checkbox" title="' . $field . '" name="' . $field . '" '
-                . ($this->user->get($field) ? 'checked="checked"' : '') . '/>';
+                . ($this->user->get() ? 'checked="checked"' : '') . '/>';
         }
 
         $this->page->command('script', <<<'JS'
@@ -192,7 +192,7 @@ final readonly class UCP
 
     private function showSigSettings(): string
     {
-        $sig = (string) $this->user->get()->sig;
+        $sig = $this->user->get()->sig;
         $changeSig = $this->request->asString->post('changesig');
         if ($changeSig !== null) {
             $sig = $this->textFormatting->linkify($changeSig);
@@ -233,7 +233,7 @@ final readonly class UCP
 
             $verifiedPassword = password_verify(
                 (string) $currentPassword,
-                (string) $this->user->get()->pass,
+                $this->user->get()->pass,
             );
             if (!$verifiedPassword) {
                 $error = 'The password you entered is incorrect.';
@@ -289,7 +289,7 @@ final readonly class UCP
         }
 
         $email = $this->user->get()->email;
-        $emailSettings = (int) $this->user->get()->email_settings;
+        $emailSettings = $this->user->get()->email_settings;
         $notificationsChecked = ($emailSettings & 2) !== 0 ? 'checked' : '';
         $adminEmailsChecked = ($emailSettings & 1) !== 0 ? 'checked' : '';
 
@@ -327,7 +327,7 @@ final readonly class UCP
     private function showAvatarSettings(): string
     {
         $error = null;
-        $avatar = (string) $this->user->get()->avatar;
+        $avatar = $this->user->get()->avatar;
         $changedAvatar = $this->request->asString->post('changedava');
         if ($changedAvatar !== null) {
             if (
@@ -391,7 +391,7 @@ final readonly class UCP
 
         // Begin input checking.
         if ($data['display_name'] === '') {
-            $data['display_name'] = (string) $this->user->get()->name;
+            $data['display_name'] = $this->user->get()->name;
         }
 
         $badNameChars = $this->config->getSetting('badnamechars');
@@ -507,11 +507,11 @@ final readonly class UCP
 
         if ($data['display_name'] !== $this->user->get()->display_name) {
             $activity = new Activity();
-            $activity->arg1 = (string) $this->user->get()->display_name;
+            $activity->arg1 = $this->user->get()->display_name;
             $activity->arg2 = $data['display_name'];
             $activity->date = $this->database->datetime();
             $activity->type = 'profile_name_change';
-            $activity->uid = (int) $this->user->get()->id;
+            $activity->uid = $this->user->get()->id;
             $activity->insert($this->database);
         }
 
@@ -676,10 +676,10 @@ final readonly class UCP
             $this->getlocationforform(),
             $select,
             '<input type="checkbox" name="usewordfilter" title="Use Word Filter"'
-                . ($this->user->get()->nowordfilter ? '' : ' checked="checked"')
+                . ($this->user->get()->nowordfilter !== 0 ? '' : ' checked="checked"')
                 . ' />',
             '<input type="checkbox" name="wysiwyg" title="WYSIWYG Enabled"'
-                . ($this->user->get()->wysiwyg ? ' checked="checked"' : '')
+                . ($this->user->get()->wysiwyg !== 0 ? ' checked="checked"' : '')
                 . ' />',
         );
     }

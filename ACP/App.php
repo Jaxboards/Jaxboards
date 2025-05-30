@@ -52,7 +52,7 @@ final class App
             return;
         }
 
-        $this->page->append('username', (string) $this->user->get()->display_name);
+        $this->page->append('username', $this->user->get()->display_name);
         $this->page->append('title', $this->config->getSetting('boardname') . ' - ACP');
 
         $this->renderNav();

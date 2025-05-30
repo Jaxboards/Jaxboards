@@ -257,7 +257,7 @@ final readonly class ModPosts
         $lastPost = $this->fetchPost((int) end($pids));
 
         $topic = new Topic();
-        $topic->auth_id = (int) $this->user->get()->id;
+        $topic->auth_id = $this->user->get()->id;
         $topic->fid = $trashCanForum->id;
         $topic->lp_date = $this->database->datetime();
         $topic->lp_uid = $lastPost?->auth_id;

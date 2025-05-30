@@ -250,7 +250,7 @@ final readonly class App
             ),
         );
         $numMessages = 0;
-        if ($this->user->get()->id) {
+        if ($this->user->get()->id !== 0) {
             $numMessages = Message::count(
                 $this->database,
                 'WHERE `read`=0 AND `to`=?',
@@ -356,8 +356,8 @@ final readonly class App
         $this->template->addVar('groupid', (string) $this->user->get()->group_id);
         $this->template->addVar('userposts', (string) $this->user->get()->posts);
         $this->template->addVar('grouptitle', (string) $this->user->getPerm('title'));
-        $this->template->addVar('avatar', (string) $this->user->get()->avatar ?: $this->template->meta('default-avatar'));
-        $this->template->addVar('username', (string) $this->user->get()->display_name);
+        $this->template->addVar('avatar', $this->user->get()->avatar ?: $this->template->meta('default-avatar'));
+        $this->template->addVar('username', $this->user->get()->display_name);
         $this->template->addVar('userid', (string) $this->user->get()->id ?: '0');
 
         $this->page->append(

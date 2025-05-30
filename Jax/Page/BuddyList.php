@@ -108,12 +108,15 @@ final readonly class BuddyList
 
         $this->page->command('softurl');
         $contacts = '';
-        if ($this->user->get()->friends) {
+        if (
+            $this->user->get()->friends !== ''
+            && $this->user->get()->friends !== '0'
+        ) {
             $online = $this->database->getUsersOnline();
             $friends = Member::selectMany(
                 $this->database,
                 'WHERE `id` IN ? ORDER BY `name` ASC',
-                explode(',', (string) $this->user->get()->friends),
+                explode(',', $this->user->get()->friends),
             );
             foreach ($friends as $friend) {
                 $contacts .= $this->template->meta(
@@ -128,11 +131,14 @@ final readonly class BuddyList
             }
         }
 
-        if ($this->user->get()->enemies) {
+        if (
+            $this->user->get()->enemies !== ''
+            && $this->user->get()->enemies !== '0'
+        ) {
             $enemies = Member::selectMany(
                 $this->database,
                 'WHERE `id` IN ? ORDER BY `name` ASC',
-                explode(',', (string) $this->user->get()->enemies),
+                explode(',', $this->user->get()->enemies),
             );
             foreach ($enemies as $enemy) {
                 $contacts .= $this->template->meta(
@@ -172,14 +178,14 @@ final readonly class BuddyList
     private function addBuddy(int $uid): bool
     {
         $friends = array_filter(
-            explode(',', (string) $this->user->get()->friends),
+            explode(',', $this->user->get()->friends),
             static fn($friend): bool => (bool) $friend,
         );
         $error = null;
 
         if (
             $this->user->get()->enemies
-            && in_array((string) $uid, explode(',', (string) $this->user->get()->enemies), true)
+            && in_array((string) $uid, explode(',', $this->user->get()->enemies), true)
         ) {
             $this->unBlock($uid);
         }
@@ -209,7 +215,7 @@ final readonly class BuddyList
         $activity = new Activity();
         $activity->affected_uid = $uid;
         $activity->type = 'buddy_add';
-        $activity->uid = (int) $this->user->get()->id;
+        $activity->uid = $this->user->get()->id;
         $activity->insert($this->database);
 
         return true;
@@ -218,11 +224,11 @@ final readonly class BuddyList
     private function block(int $uid): bool
     {
         $error = null;
-        $enemies = $this->user->get()->enemies
-            ? explode(',', (string) $this->user->get()->enemies)
+        $enemies = $this->user->get()->enemies !== '' && $this->user->get()->enemies !== '0'
+            ? explode(',', $this->user->get()->enemies)
             : [];
-        $friends = $this->user->get()->friends
-            ? explode(',', (string) $this->user->get()->friends)
+        $friends = $this->user->get()->friends !== '' && $this->user->get()->friends !== '0'
+            ? explode(',', $this->user->get()->friends)
             : [];
 
         $isenemy = array_search((string) $uid, $enemies, true);
@@ -250,7 +256,7 @@ final readonly class BuddyList
 
     private function unBlock(int $uid): bool
     {
-        $enemies = explode(',', (string) $this->user->get()->enemies);
+        $enemies = explode(',', $this->user->get()->enemies);
         $id = array_search((string) $uid, $enemies, true);
         if ($id === false) {
             return false;
@@ -265,7 +271,7 @@ final readonly class BuddyList
 
     private function dropBuddy(int $uid): bool
     {
-        $friends = explode(',', (string) $this->user->get()->friends);
+        $friends = explode(',', $this->user->get()->friends);
         $id = array_search((string) $uid, $friends, true);
         if ($id === false) {
             return false;

@@ -81,13 +81,13 @@ final readonly class UserProfile
         return Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $userId);
     }
 
-    private function isUserInList(int $userId, string $listName): bool
+    private function isUserInList(int $userId): bool
     {
         return !$this->user->isGuest() && in_array(
             $userId,
             array_map(
                 static fn($userId): int => (int) $userId,
-                explode(',', (string) $this->user->get($listName)),
+                explode(',', (string) $this->user->get()),
             ),
             true,
         );
@@ -142,11 +142,11 @@ final readonly class UserProfile
                 HTML;
         }
 
-        $addContactLink = $this->isUserInList($member->id, 'friends')
+        $addContactLink = $this->isUserInList($member->id)
             ? "<a href='?act=buddylist&remove={$member->id}'>Remove Contact</a>"
             : "<a href='?act=buddylist&add={$member->id}'>Add Contact</a>";
 
-        $blockLink = $this->isUserInList($member->id, 'enemies')
+        $blockLink = $this->isUserInList($member->id)
             ? "<a href='?act=buddylist&unblock={$member->id}'>Unblock Contact</a>"
             : "<a href='?act=buddylist&block={$member->id}'>Block Contact</a>";
 

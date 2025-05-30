@@ -81,7 +81,7 @@ final readonly class TextFormatting
      */
     public function wordfilter(string $text): string
     {
-        if ($this->user->get()->nowordfilter) {
+        if ($this->user->get()->nowordfilter !== 0) {
             return $text;
         }
 
