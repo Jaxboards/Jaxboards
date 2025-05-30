@@ -15,7 +15,6 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function _\keyBy;
 use function array_map;
 use function ceil;
 use function htmlspecialchars;
@@ -420,19 +419,10 @@ final readonly class Inbox
             ? static fn(Message $message): ?int => $message->to
             : static fn(Message $message): ?int => $message->from;
 
-        $memberIds = array_map(
-            $view === 'sent'
-                ? static fn($message) => $message->to
-                : static fn($message) => $message->from,
+        $membersById = Member::joinedOn(
+            $this->database,
             $messages,
-        );
-        $membersById = keyBy(
-            Member::selectMany(
-                $this->database,
-                Database::WHERE_ID_IN,
-                $memberIds,
-            ),
-            static fn(Member $member): int => $member->id,
+            $getMessageMemberId
         );
 
         foreach ($messages as $message) {

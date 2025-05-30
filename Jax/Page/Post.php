@@ -23,7 +23,6 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function _\keyBy;
 use function array_filter;
 use function array_map;
 use function count;
@@ -344,18 +343,12 @@ final class Post
                 explode(',', (string) $this->session->getVar('multiquote')),
             );
 
-            $memberIds = array_filter(
-                array_map(static fn(ModelsPost $modelsPost): ?int => $modelsPost->auth_id, $posts),
-                static fn($memberId): bool => $memberId !== null,
-            );
+            var_dump($this->session->getVar('multiquote'));
 
-            $membersById = keyBy(
-                Member::selectMany(
-                    $this->database,
-                    Database::WHERE_ID_IN,
-                    $memberIds,
-                ),
-                static fn(Member $member): int => $member->id,
+            $membersById = Member::joinedOn(
+                $this->database,
+                $posts,
+                static fn(ModelsPost $modelsPost): ?int => $modelsPost->auth_id,
             );
 
             foreach ($posts as $post) {
@@ -363,7 +356,7 @@ final class Post
                 $postData .= "[quote={$authorName}]{$post->post}[/quote]" . PHP_EOL;
             }
 
-            $this->session->deleteVar('multiquote');
+            // $this->session->deleteVar('multiquote');
         }
 
         $uploadForm = $topicPerms['upload'] ? <<<'HTML'

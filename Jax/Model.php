@@ -8,6 +8,7 @@ use PDO;
 use PDOStatement;
 use ReflectionProperty;
 
+use function _\keyBy;
 use function array_map;
 
 abstract class Model
@@ -82,6 +83,29 @@ abstract class Model
         );
 
         return $stmt?->fetchAll(PDO::FETCH_CLASS, static::class) ?? [];
+    }
+
+    /**
+     * Given a list of $otherModels, fetches models with the ID given by $getId($otherModel)
+     *
+     * @return array<static> A map of models by ID (array key is ID)
+     */
+    public static function joinedOn(Database $database, array $otherModel, callable $getId): array
+    {
+        $primaryKey = static::PRIMARY_KEY;
+        $otherIds = array_filter(
+            array_map($getId, $otherModel),
+            static fn($otherId): bool => $otherId !== null,
+        );
+
+        return $otherIds !== [] ? keyBy(
+            static::selectMany(
+                $database,
+                "WHERE {$primaryKey} IN ?",
+                $otherIds,
+            ),
+            static fn($member): int => $member->{$primaryKey},
+        ) : $otherIds;
     }
 
     public function delete(Database $database): ?PDOStatement

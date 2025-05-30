@@ -420,24 +420,20 @@ final class Topic
                 explode(',', (string) $this->session->getVar('multiquote')),
             );
 
-            $members = keyBy(
-                Member::selectMany(
-                    $this->database,
-                    Database::WHERE_ID_IN,
-                    array_unique(array_map(static fn($post): ?int => $post->auth_id, $posts)),
-                ),
-                static fn($member) => $member->id,
+            $membersById = Member::joinedOn(
+                $this->database,
+                $posts,
+                static fn(Post $post): ?int => $post->auth_id,
             );
 
-
             foreach ($posts as $post) {
-                $prefilled .= '[quote=' . $members[$post->auth_id]->display_name . ']'
+                $prefilled .= '[quote=' . $membersById[$post->auth_id]->display_name . ']'
                     . $post->post
                     . '[/quote]'
                     . PHP_EOL;
             }
 
-            $this->session->deleteVar('multiquote');
+            // $this->session->deleteVar('multiquote');
         }
 
         $this->page->command(

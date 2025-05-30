@@ -22,7 +22,6 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function _\groupBy;
-use function _\keyBy;
 use function array_filter;
 use function array_flip;
 use function array_key_exists;
@@ -124,19 +123,13 @@ final class IDX
      */
     private function fetchLastPostMembers(array $forums): array
     {
-        $memberIds = array_filter(
-            array_map(static fn(Forum $forum): ?int => $forum->lp_uid, $forums),
-            static fn($memberId): bool => (bool) $memberId,
+        $members = Member::joinedOn(
+            $this->database,
+            $forums,
+            static fn(Forum $forum): ?int => $forum->lp_uid
         );
 
-        return $memberIds !== [] ? keyBy(
-            Member::selectMany(
-                $this->database,
-                Database::WHERE_ID_IN,
-                array_unique($memberIds),
-            ),
-            static fn(Member $member): int => $member->id,
-        ) : [];
+        return $members;
     }
 
     private function viewidx(): void

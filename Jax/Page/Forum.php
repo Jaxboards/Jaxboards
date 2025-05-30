@@ -20,7 +20,6 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function _\keyBy;
-use function array_filter;
 use function array_key_exists;
 use function array_map;
 use function array_merge;
@@ -372,23 +371,11 @@ final class Forum
             "% {$forum->id}",
         );
 
-        $lastPostAuthorIds = array_filter(
-            array_map(
-                static fn($modelsForum): ?int => $modelsForum->lp_uid,
-                $subforums,
-            ),
-            static fn($lpuid): bool => (bool) $lpuid,
+        $lastPostAuthors = Member::joinedOn(
+            $this->database,
+            $subforums,
+            static fn($modelsForum): ?int => $modelsForum->lp_uid,
         );
-
-        $lastPostAuthors = $lastPostAuthorIds !== [] ? keyBy(
-            Member::selectMany(
-                $this->database,
-                Database::WHERE_ID_IN,
-                $lastPostAuthorIds,
-            ),
-            static fn(Member $member): int => $member->id,
-        ) : [];
-
 
         // lp_date needs timestamp
         $rows = '';

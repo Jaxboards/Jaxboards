@@ -262,12 +262,14 @@ final readonly class ModTopics
         );
 
         if ($this->session->getVar('modtids')) {
-            $topics = Topic::selectMany(
-                $this->database,
-                Database::WHERE_ID_IN,
-                $this->getModTids(),
+            $topics = keyBy(
+                Topic::selectMany(
+                    $this->database,
+                    Database::WHERE_ID_IN,
+                    $this->getModTids(),
+                ),
+                static fn($topic) => $topic->id
             );
-            $topics = keyBy($topics, static fn($topic) => $topic->id);
 
             foreach ($topicIds as $topicId) {
                 if (!array_key_exists($topicId, $topics)) {
