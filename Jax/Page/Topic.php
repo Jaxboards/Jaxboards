@@ -153,14 +153,14 @@ final class Topic
      */
     private function fetchMembersById(array $memberIds): array
     {
-        return keyBy(
+        return $memberIds !== [] ? keyBy(
             Member::selectMany(
                 $this->database,
                 Database::WHERE_ID_IN,
                 array_unique($memberIds),
             ),
             static fn(Member $member): int => $member->id,
-        );
+        ) : [];
     }
 
     private function viewTopic(ModelsTopic $modelsTopic): void
