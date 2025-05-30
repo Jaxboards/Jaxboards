@@ -7,6 +7,7 @@ namespace Jax;
 use Carbon\Carbon;
 
 use function gmdate;
+use function is_string;
 use function round;
 
 final class Date
@@ -14,7 +15,6 @@ final class Date
     /**
      * Returns a span-wrapped date which is automatically converted to the user's timezone
      * on the client.
-     *
      */
     public function autoDate(null|int|string $date): string
     {

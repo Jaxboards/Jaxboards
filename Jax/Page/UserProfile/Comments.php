@@ -56,16 +56,16 @@ final readonly class Comments
 
         $comments = ProfileComment::selectMany(
             $this->database,
-            "WHERE `to`=?
+            'WHERE `to`=?
             ORDER BY id DESC
-            LIMIT 10",
-            $member->id
+            LIMIT 10',
+            $member->id,
         );
 
         $membersById = Member::joinedOn(
             $this->database,
             $comments,
-            static fn(ProfileComment $comment) => $comment->from
+            static fn(ProfileComment $profileComment): int => $profileComment->from,
         );
 
         if ($comments === []) {
