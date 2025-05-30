@@ -181,9 +181,6 @@ final class Session
 
     public function set(string $field, mixed $value): void
     {
-        if ($field === 'uid') {
-            throw new Error();
-        }
         $this->modelsSession->{$field} = $value;
         $this->changedData[$field] = $value;
     }
