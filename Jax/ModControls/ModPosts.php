@@ -206,7 +206,7 @@ final readonly class ModPosts
     private function fetchForumMods(Post $post): array
     {
         $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $post->tid);
-        $forum = $topic
+        $forum = $topic !== null
             ? Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid)
             : null;
 
