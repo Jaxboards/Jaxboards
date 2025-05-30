@@ -105,10 +105,15 @@ final class IDX
      */
     private function fetchIDXForums(): array
     {
-        return Forum::selectMany(
+        $forums = Forum::selectMany(
             $this->database,
             'WHERE `path` = "" '
             . 'ORDER BY `order`, `title` ASC',
+        );
+
+        return array_filter(
+            $forums,
+            fn($forum) => !$forum->perms || $this->user->getForumPerms($forum->perms)['view']
         );
     }
 
@@ -142,13 +147,7 @@ final class IDX
         $forums = $this->fetchIDXForums();
         $forumsByCatID = groupBy($forums, static fn(Forum $forum): ?int => $forum->cat_id);
 
-        // This while loop just grabs all of the data, displaying is done below.
         foreach ($forums as $forum) {
-            $perms = $this->user->getForumPerms($forum->perms);
-            if ($forum->perms && !$perms['view']) {
-                continue;
-            }
-
             // Store subforum details for later.
             if ($forum->path) {
                 preg_match('@\d+$@', (string) $forum->path, $match);
@@ -176,7 +175,7 @@ final class IDX
                 continue;
             }
 
-            foreach (explode(',', (string) $forum->mods) as $modId) {
+            foreach (explode(',', $forum->mods) as $modId) {
                 if ($modId === '') {
                     continue;
                 }
@@ -243,9 +242,9 @@ final class IDX
     {
         static $moderatorinfo = null;
 
-        if (!$moderatorinfo) {
+        if ($moderatorinfo === null) {
             $moderatorinfo = [];
-            $members = Member::selectMany($this->database, Database::WHERE_ID_IN, $this->mods);
+            $members = $this->mods !== [] ? Member::selectMany($this->database, Database::WHERE_ID_IN, $this->mods) : $this->mods;
             foreach ($members as $member) {
                 $moderatorinfo[$member->id] = $this->template->meta(
                     'user-link',
