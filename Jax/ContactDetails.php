@@ -32,24 +32,18 @@ final class ContactDetails
      * Given a user's profile, returns an associative array formatted as:
      * 'twitter' => ['https://twitter.com/jax', 'jax']
      *
-     * @param array<string,mixed>|Member $profile
-     *
      * @return array<string,array{string,string}>
      */
-    public function getContactLinks(array|Member $profile): array
+    public function getContactLinks(Member $profile): array
     {
-        $profileData = $profile instanceof Member
-            ? $profile->asArray()
-            : $profile;
-
         $contactFields = array_filter(
             Member::FIELDS,
-            static fn($field): bool => str_starts_with($field, 'contact') && $profileData[$field],
+            static fn($field): bool => str_starts_with($field, 'contact') && $profile->{$field},
         );
 
-        return array_reduce($contactFields, static function (array $links, $field) use ($profileData) {
+        return array_reduce($contactFields, static function (array $links, $field) use ($profile) {
             $type = mb_substr($field, 8);
-            $value = $profileData[$field];
+            $value = $profile->{$field};
             $href = sprintf(self::CONTACT_URLS[$type], $value);
             $links[$type] = [$href, $value];
 
