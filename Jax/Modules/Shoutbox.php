@@ -10,6 +10,7 @@ use Jax\Date;
 use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Models\Member;
 use Jax\Models\Shout;
 use Jax\Page;
 use Jax\Request;
@@ -78,12 +79,10 @@ final class Shoutbox
         }
     }
 
-    /**
-     * @param ?array<string,mixed> $shout
-     */
-    public function canDelete(?array $shout = null): bool
+    public function canDelete(Shout $shout): bool
     {
         $candelete = (bool) $this->user->getGroup()?->can_delete_shouts;
+
         if ($candelete) {
             return $candelete;
         }
@@ -93,8 +92,8 @@ final class Shoutbox
         }
 
         if (
-            isset($shout['uid'])
-            && $shout['uid'] === $this->user->get()->id
+            isset($shout->uid)
+            && $shout->uid === $this->user->get()->id
         ) {
             return true;
         }
@@ -102,31 +101,28 @@ final class Shoutbox
         return $candelete;
     }
 
-    /**
-     * @param array<string,mixed> $shout
-     */
-    public function formatShout(array $shout): string
+    public function formatShout(Shout $shout, ?Member $member): string
     {
-        $user = $shout['uid'] ? $this->template->meta(
+        $user = $member ? $this->template->meta(
             'user-link',
-            $shout['uid'],
-            $shout['group_id'],
-            $shout['display_name'],
+            $member->id,
+            $member->group_id,
+            $member->display_name,
         ) : 'Guest';
-        $avatarUrl = $shout['avatar'] ?: $this->template->meta('default-avatar');
+        $avatarUrl = $member->avatar ?: $this->template->meta('default-avatar');
         $avatar = $this->config->getSetting('shoutboxava')
             ? "<img src='{$avatarUrl}' class='avatar' alt='avatar' />" : '';
-        $deletelink = $this->template->meta('shout-delete', $shout['id']);
+        $deletelink = $this->template->meta('shout-delete', $shout->id);
         if (!$this->canDelete($shout)) {
             $deletelink = '';
         }
 
-        $message = $this->textFormatting->theWorksInline($shout['shout']);
+        $message = $this->textFormatting->theWorksInline($shout->shout);
         if (mb_substr($message, 0, 4) === '/me ') {
             return $this->template->meta(
                 'shout-action',
                 $this->date->smallDate(
-                    $shout['date'],
+                    $shout->date,
                     ['seconds' => true],
                 ),
                 $user,
@@ -140,7 +136,7 @@ final class Shoutbox
 
         return $this->template->meta(
             'shout',
-            $shout['date'],
+            $this->date->datetimeAsTimestamp($shout->date),
             $user,
             $message,
             $deletelink,
@@ -150,35 +146,24 @@ final class Shoutbox
 
     public function displayShoutbox(): void
     {
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT
-                    m.`avatar` AS `avatar`,
-                    m.`display_name` AS `display_name`,
-                    m.`group_id` AS `group_id`,
-                    s.`id` AS `id`,
-                    s.`shout` AS `shout`,
-                    s.`uid` AS `uid`,
-                    UNIX_TIMESTAMP(s.`date`) AS `date`
-                FROM %t s
-                LEFT JOIN %t m
-                    ON s.`uid`=m.`id`
-                ORDER BY s.`id` DESC LIMIT ?
-                SQL,
-            ['shouts', 'members'],
+        $shouts = Shout::selectMany(
+            $this->database,
+            "ORDER BY `id` DESC LIMIT ?",
             $this->shoutlimit,
         );
-        $shouts = '';
-        $first = 0;
-        while ($shout = $this->database->arow($result)) {
-            if (!$first) {
-                $first = $shout['id'];
-            }
 
-            $shouts .= $this->formatShout($shout);
+        $members = Member::joinedOn(
+            $this->database,
+            $shouts,
+            static fn(Shout $shout) => $shout->uid,
+        );
+
+        $shoutHTML = '';
+        foreach($shouts as $shout) {
+            $shoutHTML .= $this->formatShout($shout, $members[$shout->uid]);
         }
 
-        $this->session->addVar('sb_id', $first);
+        $this->session->addVar('sb_id', $shouts[0]->id ?? 0);
         $this->page->append(
             'SHOUTBOX',
             $this->template->meta(
@@ -189,7 +174,7 @@ final class Shoutbox
                 ),
                 $this->template->meta(
                     'shoutbox',
-                    $shouts,
+                    $shoutHTML,
                 ),
             ) . "<script type='text/javascript'>globalsettings.shoutlimit="
                 . $this->shoutlimit . ';globalsettings.sound_shout='
@@ -203,32 +188,28 @@ final class Shoutbox
         // This is a bit tricky, we're transversing the shouts
         // in reverse order, since they're shifted onto the list, not pushed.
         $last = 0;
-        $shoutboxId = $this->session->getVar('sb_id') ?: 0;
-        if ($shoutboxId) {
-            $result = $this->database->special(
-                <<<'SQL'
-                    SELECT
-                        m.`avatar` AS `avatar`,
-                        m.`display_name` AS `display_name`,
-                        m.`group_id` AS `group_id`,
-                        s.`id` AS `id`,
-                        s.`shout` AS `shout`,
-                        s.`uid` AS `uid`,
-                        UNIX_TIMESTAMP(s.`date`) AS `date`
-                    FROM %t s
-                    LEFT JOIN %t m
-                        ON s.`uid`=m.`id`
-                    WHERE s.`id`>?
-                    ORDER BY s.`id` ASC LIMIT ?
-                    SQL,
-                ['shouts', 'members'],
-                $shoutboxId,
-                $this->shoutlimit,
-            );
-            foreach ($this->database->arows($result) as $shout) {
-                $this->page->command('addshout', $this->formatShout($shout));
-                $last = (int) $shout['id'];
-            }
+        $shoutboxId = (int) $this->session->getVar('sb_id') ?: 0;
+
+        if ($shoutboxId === 0) {
+            return;
+        }
+
+        $shouts = Shout::selectMany(
+            $this->database,
+            'WHERE `id`>? ORDER BY `id` ASC LIMIT ?',
+            $shoutboxId,
+            $this->shoutlimit
+        );
+
+        $members = Member::joinedOn(
+            $this->database,
+            $shouts,
+            static fn(Shout $shout) => $shout->uid
+        );
+
+        foreach ($shouts as $shout) {
+            $this->page->command('addshout', $this->formatShout($shout, $members[$shout->uid]));
+            $last = (int) $shout->id;
         }
 
         // Update the sb_id variable if we selected shouts.
@@ -277,35 +258,29 @@ final class Shoutbox
             return;
         }
 
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT
-                    s.`id` AS `id`,
-                    s.`uid` AS `uid`,
-                    s.`shout` AS `shout`,
-                    UNIX_TIMESTAMP(s.`date`) AS `date`,
-                    m.`display_name` AS `display_name`,
-                    m.`group_id` AS `group_id`,
-                    m.`avatar` AS `avatar`
-                FROM %t s
-                LEFT JOIN %t m
-                ON s.`uid`=m.`id`
-                ORDER BY s.`id` DESC LIMIT ?,?
-                SQL,
-            ['shouts', 'members'],
+        $shouts = Shout::selectMany(
+            $this->database,
+            'ORDER BY `id` DESC LIMIT ?,?',
             $pagen * $perpage,
             $perpage,
         );
-        $shouts = '';
-        while ($shout = $this->database->arow($result)) {
-            $shouts .= $this->formatShout($shout);
+
+        $membersById = Member::joinedOn(
+            $this->database,
+            $shouts,
+            static fn(Shout $shout) => $shout->uid
+        );
+
+        $shoutHTML = '';
+        foreach ($shouts as $shout) {
+            $shoutHTML .= $this->formatShout($shout, $membersById[$shout->uid]);
         }
 
         $page = $this->template->meta(
             'box',
             '',
             'Shoutbox' . $pages,
-            '<div class="sbhistory">' . $shouts . '</div>',
+            '<div class="sbhistory">' . $shoutHTML . '</div>',
         );
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);

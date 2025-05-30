@@ -41,11 +41,15 @@ final class Date
      *                                     - "seconds" => true includes seconds in the date representation
      */
     public function smallDate(
-        int $timestamp,
+        string|int $timestamp,
         array $options = [],
     ): string {
         $autodate = $options['autodate'] ?? false;
         $seconds = $options['seconds'] ?? false;
+
+        if (is_string($timestamp)) {
+            $timestamp = $this->datetimeAsTimestamp($timestamp);
+        }
 
         $formattedDate = gmdate('g:i' . ($seconds ? ':s' : '') . 'a, n/j/y', $timestamp);
 
