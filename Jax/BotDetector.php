@@ -7,7 +7,7 @@ namespace Jax;
 use function mb_strtolower;
 use function str_contains;
 
-final class BotDetector
+final readonly class BotDetector
 {
     public const BOTS = [
         'AhrefsBot' => 'Ahrefs',
@@ -60,7 +60,7 @@ final class BotDetector
         'YandexBot' => 'Yandex',
     ];
 
-    public function __construct(private readonly Request $request) {}
+    public function __construct(private Request $request) {}
 
     public function getBotName(): ?string
     {
