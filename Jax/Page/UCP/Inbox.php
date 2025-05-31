@@ -434,7 +434,7 @@ final readonly class Inbox
 
             $dmessageOnchange = "RUN.stream.location('"
                 . '?act=ucp&what=inbox&flag=' . $message->id . "&tog='+" . '
-                (this.checked?1:0), 1)';
+                (this.checked?1:0), 2)';
             $html .= $this->template->meta(
                 'inbox-messages-row',
                 $message->read ? 'read' : 'unread',
