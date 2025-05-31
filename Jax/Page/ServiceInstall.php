@@ -7,7 +7,6 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\FileUtils;
 use Jax\IPAddress;
-use Jax\Models\Member;
 use Jax\Request;
 use Jax\ServiceConfig;
 use Service\Blueprint;
@@ -384,7 +383,8 @@ final readonly class ServiceInstall
             }
 
             // Don't forget to create the admin.
-            $this->database->insert('members',
+            $this->database->insert(
+                'members',
                 [
                     'id' => 1,
                     'display_name' => $adminUsername ?? '',
@@ -397,7 +397,7 @@ final readonly class ServiceInstall
                         (string) $adminPassword,
                         PASSWORD_DEFAULT,
                     ),
-                ]
+                ],
             );
 
             mkdir(dirname(__DIR__) . '/boards');
