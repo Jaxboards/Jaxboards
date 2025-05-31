@@ -166,26 +166,20 @@ export default {
     imtoggleoffline(a: string) {
         document.querySelector(`#im_${a}`)?.classList.add('offline');
     },
-    window(options) {
+    window(options: Window) {
         const existingWindow =
             options.id && document.getElementById(options.id);
+
         if (existingWindow) {
-            existingWindow.querySelector('.title').innerHTML = options.title;
-            existingWindow.querySelector('.content').innerHTML =
-                options.content;
             return;
         }
         const win = new Window();
         win.title = options.title;
         win.content = options.content;
-        win.minimizable = options.minimizable || 0;
+        win.minimizable = options.minimizable || false;
         win.animate = options.animate !== undefined ? options.animate : true;
-        win.resize = options.resize || false;
+        win.resize = options.resize || undefined;
         win.className = options.className || '';
-        if (options.onclose) {
-            // eslint-disable-next-line no-eval
-            win.onclose = eval(options.onclose);
-        }
         if (options.pos) win.pos = options.pos;
 
         const winElement = win.create();
@@ -193,26 +187,24 @@ export default {
         gracefulDegrade(winElement);
     },
     closewindow(windowSelector: string) {
-        const el = document.querySelector(windowSelector);
+        const el = document.querySelector<HTMLElement>(windowSelector);
         if (el) {
             Window.close(el);
         }
     },
-    onlinelist(users) {
+    onlinelist(users: Array<[number, number, string, string, string, number]) {
         const statusers = document.querySelector('#statusers');
         if (!statusers) {
             return;
         }
         users.forEach(
             ([memberId, groupId, status, name, tooltip, lastAction]) => {
-                let link = document.querySelector(
+                let link = document.querySelector<HTMLAnchorElement>(
                     `#statusers .user${memberId}`,
                 );
                 if (!link) {
                     link = document.createElement('a');
-                    if (!Number.isNaN(parseInt(memberId, 10))) {
-                        link.href = `?act=vu${memberId}`;
-                    }
+                    link.href = `?act=vu${memberId}`;
                     link.onclick = () => {
                         RUN.location(link.getAttribute('href'));
                     };
