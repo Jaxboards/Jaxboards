@@ -12,12 +12,13 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
 
-Jaxboards is PHP/MySQL forum software built sometime between 2007 and October 6,
-2010, and is semi-regularly maintained.
+Jaxboards is a _realtime_ forum software built on PHP/MySQL (originally in ~2010 on PHP4, and rebuilt in 2025 on PHP8).
 
-It's pretty full-featured and offers a unique experience when compared to other forum software, even today.
+All of the standard forum features (messaging, forums, topics, replies, online status) are all instant and highly responsive.
 
-It delivers outstanding performance and creating themes is relatively easy.
+As users interact with the forum, those changes are reflected to all other users without them refreshing.
+
+It delivers **outstanding** performance and creating themes is relatively easy.
 
 ## Getting Started
 
