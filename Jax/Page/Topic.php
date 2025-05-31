@@ -167,7 +167,7 @@ final class Topic
     {
         if (
             !$this->user->isGuest()
-            && $modelsTopic->lastPostDate > $this->user->get()->lastVisit
+            && $modelsTopic->lastPostDate > $this->date->datetimeAsTimestamp($this->user->get()->lastVisit)
         ) {
             $this->markRead($modelsTopic);
         }
