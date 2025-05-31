@@ -192,7 +192,7 @@ export default {
             Window.close(el);
         }
     },
-    onlinelist(users: Array<[number, number, string, string, string, number]) {
+    onlinelist(users: Array<[number, number, string, string, string, number]>) {
         const statusers = document.querySelector('#statusers');
         if (!statusers) {
             return;
