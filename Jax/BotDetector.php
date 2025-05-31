@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax;
 
 use function mb_strtolower;
 use function str_contains;
 
-class BotDetector {
-    public function __construct(private Request $request) {}
-
-    const BOTS = [
+final class BotDetector
+{
+    public const BOTS = [
         'AhrefsBot' => 'Ahrefs',
         'Amazonbot' => 'Amazon',
         'Applebot' => 'Applebot',
@@ -59,8 +60,11 @@ class BotDetector {
         'YandexBot' => 'Yandex',
     ];
 
-    public function getBotName() {
-        $userAgent = mb_strtolower($this->request->getUserAgent());
+    public function __construct(private readonly Request $request) {}
+
+    public function getBotName(): ?string
+    {
+        $userAgent = mb_strtolower((string) $this->request->getUserAgent());
 
         foreach (self::BOTS as $agentName => $friendlyName) {
             if (str_contains($userAgent, mb_strtolower($agentName))) {
