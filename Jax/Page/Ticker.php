@@ -14,6 +14,7 @@ use Jax\Page;
 use Jax\Request;
 use Jax\Session;
 use Jax\Template;
+use Jax\TextFormatting;
 use Jax\User;
 
 final class Ticker
@@ -27,6 +28,7 @@ final class Ticker
         private readonly Request $request,
         private readonly Session $session,
         private readonly Template $template,
+        private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
         $this->template->loadMeta('ticker');
@@ -154,7 +156,7 @@ final class Ticker
             $topic->id,
             $post->id,
             // Post id.
-            $topic->title,
+            $this->textFormatting->wordfilter($topic->title),
         );
     }
 }
