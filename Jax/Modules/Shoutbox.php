@@ -223,11 +223,11 @@ final class Shoutbox
     public function showAllShouts(): void
     {
         $perpage = 100;
-        $pagen = (int) $this->request->asString->both('page');
+        $pageNumber = (int) $this->request->asString->both('page');
         $pages = '';
         $page = '';
-        if ($pagen > 0) {
-            --$pagen;
+        if ($pageNumber > 0) {
+            --$pageNumber;
         }
 
         $numShouts = Shout::count($this->database) ?? 0;
@@ -240,13 +240,13 @@ final class Shoutbox
             $pages .= " &middot; Pages: <span class='pages'>";
             $pageArray = $this->jax->pages(
                 (int) ceil($numShouts / $perpage),
-                $pagen + 1,
+                $pageNumber + 1,
                 10,
             );
             foreach ($pageArray as $v) {
                 $pages .= '<a href="?module=shoutbox&page='
                     . $v . '"'
-                    . ($v + 1 === $pagen ? ' class="active"' : '')
+                    . ($v === ($pageNumber + 1) ? ' class="active"' : '')
                     . '>' . $v . '</a> ';
             }
 
@@ -261,7 +261,7 @@ final class Shoutbox
         $shouts = Shout::selectMany(
             $this->database,
             'ORDER BY `id` DESC LIMIT ?,?',
-            $pagen * $perpage,
+            $pageNumber * $perpage,
             $perpage,
         );
 
