@@ -229,7 +229,7 @@ final class Session
 
     public function clean(?int $uid): bool
     {
-        $timeago = Carbon::now('UTC')->getTimestamp() - $this->config->getSetting('timetologout');
+        $timeago = Carbon::now('UTC')->subSeconds($this->config->getSetting('timetologout') ?? 900)->getTimestamp();
         if (!is_numeric($uid) || $uid < 1) {
             $uid = null;
         } else {

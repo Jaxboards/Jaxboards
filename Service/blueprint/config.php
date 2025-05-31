@@ -9,6 +9,6 @@ $CFG = [
     'shoutbox' => '1',
     'shoutbox_num' => '10',
     'timetoidle' => '300',
-    'timetologout' => '600',
+    'timetologout' => '900',
     'usedisplayname' => '1',
 ];

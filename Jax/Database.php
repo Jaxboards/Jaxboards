@@ -370,7 +370,7 @@ class Database
     public function getUsersOnline(bool $canViewHiddenMembers = false): array
     {
         static $usersOnlineCache = null;
-        if ($usersOnlineCache) {
+        if ($usersOnlineCache !== null) {
             return $usersOnlineCache;
         }
 
@@ -402,9 +402,11 @@ class Database
                 ORDER BY s.`lastAction` ASC
                 SQL,
             ['session', 'members'],
-            $this->datetime(Carbon::now('UTC')->getTimestamp() - $this->serviceConfig->getSetting('timetologout')),
+            $this->datetime(Carbon::now('UTC')->subSeconds($this->serviceConfig->getSetting('timetologout') ?? 900)->getTimestamp()),
         );
+
         $today = gmdate('n j');
+
         while ($user = $this->arow($result)) {
             if ($user['hide']) {
                 if (!$canViewHiddenMembers) {
