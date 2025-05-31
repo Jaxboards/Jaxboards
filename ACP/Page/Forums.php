@@ -408,7 +408,7 @@ final readonly class Forums
                 'select-option.html',
                 [
                     'label' => $label,
-                    'selected' => $value === $forum?->show_sub ? 'selected="selected"' : '',
+                    'selected' => $value === $forum?->showSubForums ? 'selected="selected"' : '',
                     'value' => $value,
                 ],
             );
@@ -475,7 +475,7 @@ final readonly class Forums
             'forums/create-forum-moderators.html',
             [
                 'mod_list' => $modList,
-                'show_ledby' => $forum?->show_ledby
+                'showLedBy' => $forum?->showLedBy
                     ? 'checked="checked"' : '',
             ],
         );
@@ -552,7 +552,7 @@ final readonly class Forums
 
     private function applyFormData(?Forum $forum): Forum
     {
-        $sub = (int) $this->request->post('show_sub');
+        $sub = (int) $this->request->post('showSubForums');
         $orderby = (int) $this->request->post('orderby');
 
         $categories = $this->fetchAllCategories();
@@ -566,10 +566,10 @@ final readonly class Forums
         $forum->orderby = $orderby > 0 && $orderby <= 5 ? $orderby : 0;
         $forum->perms = $this->serializePermsFromInput();
         $forum->redirect = $this->request->asString->post('redirect') ?? '';
-        $forum->show_ledby = $this->request->asString->post('show_ledby')
+        $forum->showLedBy = $this->request->asString->post('showLedBy')
             ? 1
             : 0;
-        $forum->show_sub = $sub === 1 || $sub === 2 ? $sub : 0;
+        $forum->showSubForums = $sub === 1 || $sub === 2 ? $sub : 0;
         $forum->subtitle = $this->request->asString->post('description') ?? '';
         $forum->title = $this->request->asString->post('title') ?? '';
         $forum->trashcan = $this->request->asString->post('trashcan') ? 1 : 0;

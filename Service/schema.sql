@@ -354,7 +354,7 @@ CREATE TABLE `blueprint_shouts` (
 
 TRUNCATE `blueprint_shouts`;
 INSERT INTO `blueprint_shouts` (`id`, `uid`, `shout`, `date`, `ip`) VALUES
-(1,	NULL,	@WELCOME_TO_CHILIS,	null,	'');
+(1,	1,	@WELCOME_TO_CHILIS,	null,	'');
 
 DROP TABLE IF EXISTS `blueprint_skins`;
 CREATE TABLE `blueprint_skins` (

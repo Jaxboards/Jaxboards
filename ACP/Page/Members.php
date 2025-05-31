@@ -522,8 +522,8 @@ final readonly class Members
                 $this->database->update(
                     'forums',
                     [
-                        'lp_tid' => null,
-                        'lp_topic' => '',
+                        'lastPostTopic' => null,
+                        'lastPostTopicTitle' => '',
                         'lastPostUser' => null,
                     ],
                     'WHERE `lastPostUser`=?',

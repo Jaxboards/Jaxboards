@@ -384,19 +384,21 @@ final readonly class ServiceInstall
             }
 
             // Don't forget to create the admin.
-            $member = new Member();
-            $member->id = 1;
-            $member->displayName = $adminUsername ?? '';
-            $member->email = $adminEmail ?? '';
-            $member->groupID = 2;
-            $member->joinDate = $this->database->datetime();
-            $member->lastVisit = $this->database->datetime();
-            $member->name = $adminUsername ?? '';
-            $member->pass = password_hash(
-                (string) $adminPassword,
-                PASSWORD_DEFAULT,
+            $this->database->insert('members',
+                [
+                    'id' => 1,
+                    'display_name' => $adminUsername ?? '',
+                    'email' => $adminEmail ?? '',
+                    'group_id' => 2,
+                    'join_date' => $this->database->datetime(),
+                    'last_visit' => $this->database->datetime(),
+                    'name' => $adminUsername ?? '',
+                    'pass' => password_hash(
+                        (string) $adminPassword,
+                        PASSWORD_DEFAULT,
+                    ),
+                ]
             );
-            $member->insert($this->database);
 
             mkdir(dirname(__DIR__) . '/boards');
             $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $board);

@@ -64,7 +64,7 @@ final class Topic extends Model
 
     public int $locked = 0;
 
-    public string $date = '';
+    public ?string $date = '';
 
     public ?int $op = null;
 
