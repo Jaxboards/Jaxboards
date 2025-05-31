@@ -16,9 +16,6 @@ use Jax\Session;
 use Jax\Template;
 use Jax\User;
 
-use function _\keyBy;
-use function array_filter;
-
 final class Ticker
 {
     private int $maxticks = 60;
@@ -78,9 +75,9 @@ final class Ticker
     {
         $posts = Post::selectMany(
             $this->database,
-            "WHERE `id` > ?
+            'WHERE `id` > ?
             ORDER BY `id` DESC
-            LIMIT ?",
+            LIMIT ?',
             $lastTickId,
             $this->maxticks,
         );
@@ -88,19 +85,19 @@ final class Ticker
         $topics = Topic::joinedOn(
             $this->database,
             $posts,
-            static fn(Post $post) => $post->tid
+            static fn(Post $post): int => $post->tid,
         );
 
         $forums = Forum::joinedOn(
             $this->database,
             $topics,
-            static fn(Topic $topic) => $topic->fid,
+            static fn(Topic $topic): ?int => $topic->fid,
         );
 
         $members = Member::joinedOn(
             $this->database,
             $posts,
-            static fn(Post $post) => $post->auth_id, $posts,
+            static fn(Post $post): ?int => $post->auth_id,
         );
 
         $ticks = [];
