@@ -1,0 +1,66 @@
+<?php
+
+namespace tools;
+
+use DI\Container;
+use Jax\Database;
+use Jax\DebugLog;
+
+require('Jax/autoload.php');
+
+function error($message):string
+{
+    return "\033[31m{$message}\033[0m";
+}
+function success($message):string
+{
+    return "\033[32m{$message}\033[0m";
+}
+
+function getDBVersion(Database $database):int
+{
+    $statsResult = $database->select('*', 'stats');
+    $statsRow = $database->arow($statsResult);
+    return $statsRow['dbVersion'] ?? 0;
+}
+
+$migrations = array_reduce(
+    glob(__DIR__ . '/migrations/**/*.php') ?: [],
+    static function ($migrations, string $path) {
+        preg_match('/V(\\d+)/', $path, $match);
+        $migrations[(int) $match[1]] = pathinfo($path, PATHINFO_FILENAME);
+        return $migrations;
+    },
+    []
+);
+
+// Sort migrations to run them in order
+ksort($migrations);
+
+$container = new Container();
+
+$database = $container->get(Database::class);
+$dbVersion = getDBVersion($database);
+
+foreach ($migrations as $version => $migration) {
+    if ($version <= $dbVersion) {
+        continue;
+    }
+
+    $migrationClass = $container->get("tools\\migrations\\V{$version}\\{$migration}");
+
+    try {
+        $migrationClass->execute($database);
+    } catch(\PDOException $e) {
+        echo error("Error updating to V{$version}: {$e->getMessage()}");
+        exit;
+    }
+
+    // Update DB version
+    $database->update("stats", ['dbVersion' => $version]);
+}
+
+$debugLog = $container->get(DebugLog::class);
+echo implode(PHP_EOL, $debugLog->getLog());
+
+echo success("You are currently up to date! DB Version: " . getDBVersion($database));

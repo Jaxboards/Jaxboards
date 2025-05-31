@@ -20,8 +20,8 @@ final class Stats extends Model
         'most_members',
         'most_members_day',
         'last_register',
+        'dbVersion',
     ];
-
 
     public int $posts = 0;
 
@@ -34,4 +34,6 @@ final class Stats extends Model
     public int $most_members_day = 0;
 
     public int $last_register = 0;
+
+    public int $dbVersion = 0;
 }

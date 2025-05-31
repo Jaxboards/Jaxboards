@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Attribute;
 use PDO;
 use PDOStatement;
 use ReflectionProperty;
@@ -11,6 +12,17 @@ use ReflectionProperty;
 use function _\keyBy;
 use function array_filter;
 use function array_map;
+
+#[Attribute(Attribute::TARGET_PROPERTY)]
+class Field {
+    public function __construct(
+        public string $fieldName,
+        public string $type,
+        public bool $nullable,
+        public mixed $default
+    ) {
+    }
+}
 
 abstract class Model
 {

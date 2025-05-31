@@ -52,6 +52,7 @@
         "lint": [
             "@phpcs"
         ],
+        "migrations": "php tools/migrations.php",
         "parallel-lint": "parallel-lint --blame --exclude .git --exclude vendor --exclude node_modules --show-deprecated .",
         "parallel-lint-report": [
             "parallel-lint --exclude .git --exclude vendor --exclude node_modules --json --show-deprecated . > parallel-lint-report.json",
