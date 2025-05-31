@@ -14,14 +14,14 @@ use function array_filter;
 use function array_map;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Field {
+final class Field
+{
     public function __construct(
         public string $fieldName,
         public string $type,
         public bool $nullable,
-        public mixed $default
-    ) {
-    }
+        public mixed $default,
+    ) {}
 }
 
 abstract class Model

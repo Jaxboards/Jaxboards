@@ -1,37 +1,53 @@
 <?php
 
+declare(strict_types=1);
+
 namespace tools;
 
 use DI\Container;
 use Jax\Database;
 use Jax\DebugLog;
+use PDOException;
 
-require('Jax/autoload.php');
+use function array_reduce;
+use function glob;
+use function implode;
+use function ksort;
+use function pathinfo;
+use function preg_match;
 
-function error($message):string
+use const PATHINFO_FILENAME;
+use const PHP_EOL;
+
+require __DIR__ . '/Jax/autoload.php';
+
+function error($message): string
 {
     return "\033[31m{$message}\033[0m";
 }
-function success($message):string
+
+function success($message): string
 {
     return "\033[32m{$message}\033[0m";
 }
 
-function getDBVersion(Database $database):int
+function getDBVersion(Database $database): int
 {
     $statsResult = $database->select('*', 'stats');
     $statsRow = $database->arow($statsResult);
+
     return $statsRow['dbVersion'] ?? 0;
 }
 
 $migrations = array_reduce(
     glob(__DIR__ . '/migrations/**/*.php') ?: [],
     static function ($migrations, string $path) {
-        preg_match('/V(\\d+)/', $path, $match);
+        preg_match('/V(\d+)/', $path, $match);
         $migrations[(int) $match[1]] = pathinfo($path, PATHINFO_FILENAME);
+
         return $migrations;
     },
-    []
+    [],
 );
 
 // Sort migrations to run them in order
@@ -51,16 +67,17 @@ foreach ($migrations as $version => $migration) {
 
     try {
         $migrationClass->execute($database);
-    } catch(\PDOException $e) {
+    } catch (PDOException $e) {
         echo error("Error updating to V{$version}: {$e->getMessage()}");
+
         exit;
     }
 
     // Update DB version
-    $database->update("stats", ['dbVersion' => $version]);
+    $database->update('stats', ['dbVersion' => $version]);
 }
 
 $debugLog = $container->get(DebugLog::class);
 echo implode(PHP_EOL, $debugLog->getLog());
 
-echo success("You are currently up to date! DB Version: " . getDBVersion($database));
+echo success('You are currently up to date! DB Version: ' . getDBVersion($database));
