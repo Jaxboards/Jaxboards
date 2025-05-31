@@ -68,7 +68,7 @@ foreach ($migrations as $version => $migration) {
     try {
         $migrationClass->execute($database);
     } catch (PDOException $e) {
-        echo error("Error updating to V{$version}: {$e->getMessage()}");
+        echo error("Error updating to V{$version}: {$e->getMessage()}") . PHP_EOL;
 
         exit;
     }
@@ -80,4 +80,4 @@ foreach ($migrations as $version => $migration) {
 $debugLog = $container->get(DebugLog::class);
 echo implode(PHP_EOL, $debugLog->getLog());
 
-echo success('You are currently up to date! DB Version: ' . getDBVersion($database));
+echo success('You are currently up to date! DB Version: ' . getDBVersion($database)) . PHP_EOL;
