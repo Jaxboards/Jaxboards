@@ -10,6 +10,7 @@ use Jax\DebugLog;
 use PDOException;
 
 use function array_reduce;
+use function dirname;
 use function glob;
 use function implode;
 use function ksort;
@@ -20,6 +21,7 @@ use const PATHINFO_FILENAME;
 use const PHP_EOL;
 
 $jaxboardsRoot = dirname(__DIR__);
+
 require dirname(__DIR__) . '/Jax/autoload.php';
 
 function error($message): string
@@ -60,7 +62,7 @@ $database = $container->get(Database::class);
 $dbVersion = getDBVersion($database);
 
 foreach ($migrations as $version => $migration) {
-    echo "Checking: $version against $dbVersion" . PHP_EOL;
+    echo "Checking: {$version} against {$dbVersion}" . PHP_EOL;
 
     if ($version <= $dbVersion) {
         continue;

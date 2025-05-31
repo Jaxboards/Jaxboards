@@ -8,6 +8,8 @@ use Jax\Models\Member;
 
 use function array_filter;
 use function array_reduce;
+use function mb_strlen;
+use function mb_strtolower;
 use function mb_substr;
 use function sprintf;
 use function str_starts_with;
@@ -43,7 +45,7 @@ final class ContactDetails
         );
 
         return array_reduce($contactFields, static function (array $links, $field) use ($contactFieldPrefix, $member) {
-            $type = strtolower(mb_substr($field, strlen($contactFieldPrefix)));
+            $type = mb_strtolower(mb_substr($field, mb_strlen($contactFieldPrefix)));
             $value = $member->{$field};
             $href = sprintf(self::CONTACT_URLS[$type], $value);
             $links[$type] = [$href, $value];

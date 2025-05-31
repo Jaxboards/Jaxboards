@@ -11,9 +11,9 @@ final class UnderScoreToCamelCase
     public function execute(Database $database): void
     {
         $database->special(
-            "ALTER TABLE %t
-                CHANGE `affected_uid` `affectedUser` INT(10) UNSIGNED NULL DEFAULT NULL",
-            ['activity']
+            'ALTER TABLE %t
+                CHANGE `affected_uid` `affectedUser` INT(10) UNSIGNED NULL DEFAULT NULL',
+            ['activity'],
         );
 
         $database->special(
@@ -25,7 +25,7 @@ final class UnderScoreToCamelCase
                 CHANGE `lp_topic` `lastPostTopicTitle` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
                 CHANGE `show_sub` `showSubForums` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
                 CHANGE `show_ledby` `showLedBy` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0'",
-            ['forums']
+            ['forums'],
         );
 
         $database->special(
@@ -86,7 +86,7 @@ final class UnderScoreToCamelCase
                 CHANGE `can_view_shoutbox` `canViewShoutbox` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
                 CHANGE `can_view_stats` `canViewStats` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
                 CHANGE `can_view_fullprofile` `canViewFullProfile` TINYINT(3) UNSIGNED NOT NULL DEFAULT '1'",
-            ['member_groups']
+            ['member_groups'],
         );
 
         $database->special(
@@ -97,9 +97,9 @@ final class UnderScoreToCamelCase
         );
 
         $database->special(
-            "ALTER TABLE %t
+            'ALTER TABLE %t
                 CHANGE `auth_id` `author` INT(10) UNSIGNED NULL DEFAULT NULL,
-                CHANGE `edit_date` `editDate` DATETIME NULL DEFAULT NULL",
+                CHANGE `edit_date` `editDate` DATETIME NULL DEFAULT NULL',
             ['posts'],
         );
 
@@ -112,7 +112,7 @@ final class UnderScoreToCamelCase
                 CHANGE `buddy_list_cache` `buddyListCache` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
                 CHANGE `location_verbose` `locationVerbose` VARCHAR(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
                 CHANGE `read_date` `readDate` DATETIME NULL DEFAULT NULL",
-            ['session']
+            ['session'],
         );
 
         $database->special(
