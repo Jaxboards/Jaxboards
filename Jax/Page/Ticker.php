@@ -6,12 +6,17 @@ namespace Jax\Page;
 
 use Jax\Database;
 use Jax\Date;
+use Jax\Models\Forum;
+use Jax\Models\Member;
+use Jax\Models\Post;
+use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
 use Jax\Template;
 use Jax\User;
 
+use function _\keyBy;
 use function array_filter;
 
 final class Ticker
@@ -49,69 +54,73 @@ final class Ticker
         $this->session->set('location_verbose', 'Using the ticker!');
 
 
-        $ticks = '';
+        $ticksHTML = '';
         $first = 0;
+
         foreach ($this->fetchTicks() as $tick) {
             if (!$first) {
-                $first = $tick['id'];
+                $first = $tick[0]->id;
             }
 
-            $ticks .= $this->renderTick($tick);
+            $ticksHTML .= $this->renderTick($tick);
         }
 
         $this->session->addVar('tickid', $first);
-        $page = $this->template->meta('ticker', $ticks);
+        $page = $this->template->meta('ticker', $ticksHTML);
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
     }
 
     /**
-     * @param null|mixed $lastTickId
-     *
-     * @return array<int,array<string,mixed>>
+     * @return array<array{Post,Member,Topic,Member,Forum}>
      */
-    private function fetchTicks($lastTickId = null): array
+    private function fetchTicks(int $lastTickId = 0): array
     {
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT
-                    f.`perms` AS `perms`,
-                    f.`title` AS `ftitle`,
-                    m.`display_name` AS `display_name`,
-                    m.`group_id` AS `group_id`,
-                    m2.`display_name` AS `display_name2`,
-                    m2.`group_id` AS `group_id2`,
-                    p.`auth_id` AS `auth_id`,
-                    p.`id` AS `id`,
-                    p.`tid` AS `tid`,
-                    t.`auth_id` AS `auth_id2`,
-                    t.`fid` AS `fid`,
-                    t.`replies` AS `replies`,
-                    t.`title` AS `title`,
-                    UNIX_TIMESTAMP(p.`date`) AS `date`
-                FROM %t p
-                LEFT JOIN %t t
-                    ON t.`id`=p.`tid`
-                LEFT JOIN %t f
-                    ON f.`id`=t.`fid`
-                LEFT JOIN %t m
-                    ON p.`auth_id`=m.`id`
-                LEFT JOIN %t m2
-                    ON t.`auth_id`=m2.`id`
-                WHERE p.`id` > ?
-                ORDER BY p.`id` DESC
-                LIMIT ?
-                SQL,
-            ['posts', 'topics', 'forums', 'members', 'members'],
-            $lastTickId ?? 0,
+        $posts = Post::selectMany(
+            $this->database,
+            "WHERE `id` > ?
+            ORDER BY `id` DESC
+            LIMIT ?",
+            $lastTickId,
             $this->maxticks,
         );
 
-        return array_filter(
-            $this->database->arows($result),
-            // Filter out any ticks they don't have read access to
-            fn($tick): bool => (bool) $this->user->getForumPerms($tick['perms'])['read'],
+        $topics = Topic::joinedOn(
+            $this->database,
+            $posts,
+            static fn(Post $post) => $post->tid
         );
+
+        $forums = Forum::joinedOn(
+            $this->database,
+            $topics,
+            static fn(Topic $topic) => $topic->fid,
+        );
+
+        $members = Member::joinedOn(
+            $this->database,
+            $posts,
+            static fn(Post $post) => $post->auth_id, $posts,
+        );
+
+        $ticks = [];
+
+        foreach ($posts as $post) {
+            $topic = $topics[$post->tid];
+            $forum = $forums[$topic->fid];
+
+            if (!$this->user->getForumPerms($forum->perms)['read']) {
+                continue;
+            }
+
+            $ticks[] = [
+                $post,
+                $members[$post->auth_id],
+                $topic,
+            ];
+        }
+
+        return $ticks;
     }
 
     private function update(): void
@@ -130,32 +139,25 @@ final class Ticker
     }
 
     /**
-     * @param array<string,mixed> $tick
+     * @param array{Post,Member,Topic,Member,Forum} $tick
      */
     private function renderTick(array $tick): string
     {
+        [$post, $postAuthor, $topic] = $tick;
+
         return $this->template->meta(
             'ticker-tick',
-            $this->date->smallDate($tick['date'], ['autodate' => true]),
+            $this->date->smallDate($post->date, ['autodate' => true]),
             $this->template->meta(
                 'user-link',
-                $tick['auth_id'],
-                $tick['group_id'],
-                $tick['display_name'],
+                $postAuthor->id,
+                $postAuthor->group_id,
+                $postAuthor->display_name,
             ),
-            $tick['tid'],
-            $tick['id'],
+            $topic->id,
+            $post->id,
             // Post id.
-            $tick['title'],
-            $tick['fid'],
-            $tick['ftitle'],
-            $this->template->meta(
-                'user-link',
-                $tick['auth_id2'],
-                $tick['group_id2'],
-                $tick['display_name2'],
-            ),
-            $tick['replies'],
+            $topic->title,
         );
     }
 }
