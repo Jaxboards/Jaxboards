@@ -376,7 +376,8 @@ class Database
 
         $idletimeout = Carbon::now('UTC')
             ->subSeconds($this->serviceConfig->getSetting('timetoidle') ?? 300)
-            ->getTimestamp();
+            ->getTimestamp()
+        ;
 
         $usersOnlineCache = [];
 
