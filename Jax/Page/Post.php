@@ -45,8 +45,6 @@ use const PHP_EOL;
 
 final class Post
 {
-    private bool $canmod = false;
-
     private ?string $postData = null;
 
     private string $postpreview = '';
@@ -102,7 +100,7 @@ final class Post
             $this->postData .= "\n\n[attachment]{$attachmentId}[/attachment]";
         }
 
-        match (true) {
+        $error = match (true) {
             $submit === 'Preview' || $submit === 'Full Reply' => $this->previewPost(),
             (bool) $this->pid && $this->how === 'edit' => $this->editPost(),
             $this->how === 'newtopic' => $this->createTopic(),
@@ -111,6 +109,13 @@ final class Post
             (bool) $this->tid => $this->showPostForm(),
             default => $this->page->location('?'),
         };
+
+        if ($error !== null) {
+            $this->page->command('error', $error);
+            $this->page->append('PAGE', $this->page->error($error));
+            return;
+        }
+
     }
 
     /**
@@ -161,7 +166,7 @@ final class Post
         return (string) $fileRecord->id;
     }
 
-    private function previewPost(): void
+    private function previewPost(): ?string
     {
         $post = $this->postData ?? '';
         if (trim($post) !== '') {
@@ -175,9 +180,11 @@ final class Post
         }
 
         $this->page->command('update', 'post-preview', $post);
+
+        return null;
     }
 
-    private function showTopicForm(?Topic $topic = null): void
+    private function showTopicForm(?Topic $topic = null): ?string
     {
         $postData = $this->postData;
         $page = '<div id="post-preview">' . $this->postpreview . '</div>';
@@ -192,7 +199,7 @@ final class Post
         if ($forum === null) {
             $this->page->location('?');
 
-            return;
+            return null;
         }
 
         if ($topic === null) {
@@ -285,14 +292,16 @@ final class Post
         }
 
         $this->page->command('SCRIPT', "document.querySelector('#pollchoices').style.display='none'");
+
+        return null;
     }
 
-    private function showPostForm(): void
+    private function showPostForm(): ?string
     {
         $page = '';
         $tid = $this->tid;
         if ($this->request->isJSUpdate()) {
-            return;
+            return null;
         }
 
         if (!$this->user->isGuest() && $this->how === 'qreply') {
@@ -301,17 +310,12 @@ final class Post
 
         $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
         if ($topic === null) {
-            $this->page->append('PAGE', $this->template->meta(
-                'error',
-                "The topic you're attempting to reply in no longer exists.",
-            ));
-
-            return;
+            return "The topic you're attempting to reply in no longer exists.";
         }
 
         $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid);
         if ($forum === null) {
-            return;
+            return "The forum you're attempting to reply to no longer exists.";
         }
 
         $topic->title = $this->textFormatting->wordfilter($topic->title);
@@ -393,13 +397,13 @@ final class Post
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
         if (!$topicPerms['upload']) {
-            return;
+            $this->page->command('attachfiles');
         }
 
-        $this->page->command('attachfiles');
+        return null;
     }
 
-    private function canEdit(ModelsPost $modelsPost): bool
+    private function canEdit(Topic $topic, ModelsPost $modelsPost): bool
     {
         if (
             $modelsPost->auth_id
@@ -410,37 +414,27 @@ final class Post
             return true;
         }
 
-        return $this->canModerate($modelsPost->tid);
+        return $this->canModerate($topic);
     }
 
-    private function canModerate(int $tid): bool
+    private function canModerate(Topic $topic): bool
     {
-        if ($this->canmod) {
-            return $this->canmod;
-        }
-
-        $canmod = false;
         if ($this->user->getGroup()?->can_moderate) {
-            $canmod = true;
+            return  true;
         }
 
         if ($this->user->get()->mod !== 0) {
-            $result = $this->database->special(
-                'SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id=?)',
-                ['forums', 'topics'],
-                $tid,
-            );
-            $mods = $this->database->arow($result);
-            $this->database->disposeresult($result);
+            $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic);
+
             if (
-                $mods !== null
-                && in_array($this->user->get()->id, explode(',', (string) $mods['mods']))
+                $forum
+                && in_array((string) $this->user->get()->id, explode(',', $forum->mods), true)
             ) {
-                $canmod = true;
+                return true;
             }
         }
 
-        return $this->canmod = $canmod;
+        return false;
     }
 
     private function validatePost(?string $postData): ?string
@@ -524,63 +518,57 @@ final class Post
         return null;
     }
 
-    private function editPost(): void
+    private function editPost(): ?string
     {
         $pid = $this->pid;
-        $tid = $this->tid;
         $postData = $this->postData;
 
         $post = ModelsPost::selectOne($this->database, Database::WHERE_ID_EQUALS, $pid);
+        $topic = $post
+            ? Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $post->tid)
+            : null;
 
-        $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
         $isTopicPost = $topic && $post && $topic->op === $post->id;
 
-        $error = match (true) {
-            !$post => 'The post you are trying to edit does not exist.',
-            !$this->canEdit($post) => "You don't have permission to edit that post!",
-            default => null,
-        };
+        if ($post === null || $topic === null) {
+            return 'The post you are trying to edit does not exist.';
+        }
 
-        if ($error !== null) {
-            $this->page->command('error', $error);
-            $this->page->append('PAGE', $this->page->error($error));
-
-            return;
+        if (!$this->canEdit($topic, $post)) {
+            return "You don't have permission to edit that post!";
         }
 
         if ($this->request->post('submit') !== null) {
             // Update topic when editing topic
             $error = $this->updatePost($pid, $postData);
             if (!$error && $isTopicPost) {
-                $error = $this->updateTopic($tid);
+                $error = $this->updateTopic($post->tid);
             }
 
-            if (!$error) {
-                $this->page->location("?act=vt{$tid}&findpost={$pid}");
-
-                return;
+            if ($error !== null) {
+                return $error;
             }
+
+            $this->page->location("?act=vt{$post->tid}&findpost={$pid}");
+
+            return null;
         }
 
         if ($this->postData === null && $post) {
             $this->postData = $post->post;
         }
 
-        if ($error !== null) {
-            $this->page->command('error', $error);
-            $this->page->append('PAGE', $this->page->error($error));
-        }
-
         if ($isTopicPost) {
             $this->showTopicForm($topic);
 
-            return;
+            return null;
         }
 
         $this->showPostForm();
+        return null;
     }
 
-    private function createTopic(): void
+    private function createTopic(): ?string
     {
         $fid = $this->fid;
         $uid = $this->user->get()->id;
@@ -630,12 +618,13 @@ final class Post
         };
 
         if ($error !== null) {
+            // Handle error here so we can still show topic form
             $this->page->append('PAGE', $this->page->error($error));
             $this->page->command('error', $error);
             $this->page->command('enable', 'submitbutton');
             $this->showTopicForm();
 
-            return;
+            return null;
         }
 
         $topic = new Topic();
@@ -671,9 +660,10 @@ final class Post
         $topic->insert($this->database);
 
         $this->submitPost($topic->id, true);
+        return null;
     }
 
-    private function submitPost(int $tid, bool $newtopic = false): void
+    private function submitPost(int $tid, bool $newtopic = false): ?string
     {
         $this->session->act();
         $postData = $this->postData;
@@ -684,12 +674,13 @@ final class Post
         $error = $this->validatePost($postData);
 
         if ($error !== null) {
+            // Handle error here to show post form
             $this->page->append('PAGE', $this->page->error($error));
             $this->page->command('error', $error);
             $this->page->command('enable', 'submitbutton');
             $this->showPostForm();
 
-            return;
+            return null;
         }
 
         $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
@@ -698,11 +689,7 @@ final class Post
             : null;
 
         if ($topic === null || $forum === null) {
-            $error = "The topic you're trying to reply to does not exist.";
-            $this->page->append('PAGE', $this->page->error($error));
-            $this->page->command('error', $error);
-
-            return;
+            return "The topic you're trying to reply to does not exist.";
         }
 
         $forumPerms = $this->user->getForumPerms($forum->perms);
@@ -711,11 +698,7 @@ final class Post
             ($this->how !== 'newtopic' && !$forumPerms['reply'])
             || ($topic->locked && !$this->user->getGroup()?->can_override_locked_topics)
         ) {
-            $error = "You don't have permission to post here.";
-            $this->page->append('PAGE', $this->page->error($error));
-            $this->page->command('error', $error);
-
-            return;
+            return "You don't have permission to post here.";
         }
 
         // Actually PUT THE POST IN!
@@ -836,5 +819,7 @@ final class Post
         } else {
             $this->page->location('?act=vt' . $tid . '&getlast=1');
         }
+
+        return null;
     }
 }
