@@ -15,8 +15,11 @@ use Jax\Request;
 use Jax\Template;
 
 use function _\keyBy;
+use function array_filter;
 use function array_key_exists;
+use function array_map;
 use function ceil;
+use function implode;
 
 final class Members
 {
@@ -74,26 +77,27 @@ final class Members
         // fetch all groups
         $groups = keyBy(
             Group::selectMany($this->database),
-            static fn(Group $group) => $group->id,
+            static fn(Group $group): int => $group->id,
         );
 
-        $staffGroupIds = implode(',',
+        $staffGroupIds = implode(
+            ',',
             array_map(
-                static fn(Group $group) => $group->id,
+                static fn(Group $group): int => $group->id,
                 array_filter(
                     $groups,
-                    static fn(Group $group) => $group->can_access_acp === 1 || $group->can_moderate === 1
+                    static fn(Group $group): bool => $group->can_access_acp === 1 || $group->can_moderate === 1,
                 ),
-            )
+            ),
         );
-        $where = ($filter === 'staff' ? "WHERE group_id IN ($staffGroupIds)" : "");
+        $where = ($filter === 'staff' ? "WHERE group_id IN ({$staffGroupIds})" : '');
 
         $pages = '';
 
         $members = Member::selectMany(
             $this->database,
-            $where .
-            "ORDER BY {$sortby} {$sorthow}
+            $where
+            . "ORDER BY {$sortby} {$sorthow}
             LIMIT ?, ?",
             $this->pageNumber * $this->perpage,
             $this->perpage,
