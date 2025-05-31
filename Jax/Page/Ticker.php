@@ -155,7 +155,6 @@ final class Ticker
             ),
             $topic->id,
             $post->id,
-            // Post id.
             $this->textFormatting->wordfilter($topic->title),
         );
     }
