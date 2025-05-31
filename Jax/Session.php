@@ -13,14 +13,12 @@ use function base64_encode;
 use function ini_set;
 use function is_numeric;
 use function mb_strlen;
-use function mb_strtolower;
 use function mb_substr;
 use function mktime;
 use function openssl_random_pseudo_bytes;
 use function preg_replace_callback;
 use function serialize;
 use function session_start;
-use function str_contains;
 use function unserialize;
 
 final class Session
@@ -31,60 +29,6 @@ final class Session
     private array $vars = [];
 
     /**
-     * @var array<string,string>
-     */
-    private array $bots = [
-        'AhrefsBot' => 'Ahrefs',
-        'Amazonbot' => 'Amazon',
-        'Applebot' => 'Applebot',
-        'archive.org_bot' => 'Internet Archive',
-        'AwarioBot' => 'Awario',
-        'Baiduspider' => 'Baidu',
-        'Barkrowler' => 'Babbar.tech',
-        'Bingbot' => 'Bing',
-        'Bytespider' => 'Bytespider',
-        'CensysInspect' => 'CensysInspect',
-        'Centurybot' => 'Century',
-        'ChatGLM-Spider' => 'ChatGLM',
-        'ChatGPT-User' => 'ChatGPT',
-        'ClaudeBot' => 'ClaudeBot',
-        'Discordbot' => 'Discord',
-        'DotBot' => 'DotBot',
-        'DuckDuckBot' => 'DuckDuckGo',
-        'Expanse' => 'Expanse',
-        'facebookexternalhit' => 'Facebook',
-        'Friendly_Crawler' => 'FriendlyCrawler',
-        'Googlebot' => 'Google',
-        'GoogleOther' => 'GoogleOther',
-        'Google-Read-Aloud' => 'Google-Read-Aloud',
-        'GPTBot' => 'GPTBot',
-        'ia_archiver' => 'Internet Archive Alexa',
-        'ImagesiftBot' => 'Imagesift',
-        'linkdexbot' => 'Linkdex',
-        'Mail.RU_Bot' => 'Mail.RU',
-        'meta-externalagent' => 'Meta',
-        'mj12bot' => 'Majestic',
-        'MojeekBot' => 'Mojeek',
-        'OAI-SearchBot' => 'OpenAI',
-        'ows.eu' => 'Owler',
-        'PerplexityBot' => 'Perplexity',
-        'PetalBot' => 'PetalBot',
-        'Qwantbot' => 'Qwant',
-        'SemrushBot' => 'Semrush',
-        'SeznamBot' => 'Seznam',
-        'Sogou web spider' => 'Sogou',
-        'Teoma' => 'Ask.com',
-        'TikTokSpider' => 'TikTok',
-        'Turnitin' => 'Turnitin',
-        'Twitterbot' => 'Twitter',
-        'W3C_Validator' => 'W3C Validator',
-        'WhatsApp' => 'WhatsApp',
-        'Y!J-WSC' => 'Yahoo Japan',
-        'yahoo! slurp' => 'Yahoo',
-        'YandexBot' => 'Yandex',
-    ];
-
-    /**
      * @var array<string,mixed>
      */
     private array $changedData = [];
@@ -93,6 +37,7 @@ final class Session
 
     public function __construct(
         private readonly Config $config,
+        private readonly BotDetector $botDetector,
         private readonly IPAddress $ipAddress,
         private readonly Database $database,
         private readonly Request $request,
@@ -133,7 +78,7 @@ final class Session
 
     public function fetchSessionData(null|int|string $sid = null): void
     {
-        $botName = $this->getBotName();
+        $botName = $this->botDetector->getBotName();
         $sid = $botName ?? $sid;
 
         $session = null;
@@ -365,7 +310,7 @@ final class Session
 
     private function createSession(): void
     {
-        $botName = $this->getBotName();
+        $botName = $this->botDetector->getBotName();
         $sid = $botName;
 
         if (!$sid) {
@@ -391,17 +336,5 @@ final class Session
         $session->insert($this->database);
 
         $this->modelsSession = $session;
-    }
-
-    private function getBotName(): ?string
-    {
-        $userAgent = mb_strtolower((string) $this->request->getUserAgent());
-        foreach ($this->bots as $agentName => $friendlyName) {
-            if (str_contains($userAgent, mb_strtolower($agentName))) {
-                return $friendlyName;
-            }
-        }
-
-        return null;
     }
 }
