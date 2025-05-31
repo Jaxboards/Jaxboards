@@ -138,7 +138,7 @@ final class Ticker
     }
 
     /**
-     * @param array{Post,Member,Topic,Member,Forum} $tick
+     * @param array{Post,Member,Topic} $tick
      */
     private function renderTick(array $tick): string
     {
