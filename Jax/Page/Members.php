@@ -56,11 +56,11 @@ final class Members
     private function showmemberlist(): void
     {
         $fields = [
-            'display_name' => 'Name',
-            'group_id' => 'Group',
+            'displayName' => 'Name',
+            'groupID' => 'Group',
             'id' => 'ID',
             'posts' => 'Posts',
-            'join_date' => 'Join Date',
+            'joinDate' => 'Join Date',
         ];
 
         $page = '';
@@ -70,7 +70,7 @@ final class Members
         $sortByInput = $this->request->asString->both('sortby');
         $sortby = $sortByInput !== null && array_key_exists($sortByInput, $fields)
             ? $sortByInput
-            : 'display_name';
+            : 'displayName';
 
         $filter = $this->request->asString->get('filter');
 
@@ -86,11 +86,11 @@ final class Members
                 static fn(Group $group): int => $group->id,
                 array_filter(
                     $groups,
-                    static fn(Group $group): bool => $group->can_access_acp === 1 || $group->can_moderate === 1,
+                    static fn(Group $group): bool => $group->canAccessACP === 1 || $group->canModerate === 1,
                 ),
             ),
         );
-        $where = ($filter === 'staff' ? "WHERE group_id IN ({$staffGroupIds})" : '');
+        $where = ($filter === 'staff' ? "WHERE groupID IN ({$staffGroupIds})" : '');
 
         $pages = '';
 
@@ -108,7 +108,7 @@ final class Members
                 SELECT COUNT(m.`id`) AS `num_members`
                 FROM %t m
                 LEFT JOIN %t g
-                    ON g.id=m.group_id
+                    ON g.id=m.groupID
                 {$where}
 
                 EOT,
@@ -158,13 +158,13 @@ final class Members
                 $this->template->meta(
                     'user-link',
                     $member->id,
-                    $member->group_id,
-                    $member->display_name,
+                    $member->groupID,
+                    $member->displayName,
                 ),
-                $groups[$member->group_id]->title,
+                $groups[$member->groupID]->title,
                 $member->id,
                 $member->posts,
-                $this->date->autoDate($member->join_date),
+                $this->date->autoDate($member->joinDate),
                 $contactdetails,
             );
         }

@@ -65,34 +65,34 @@ final class Groups
     private function updatePerms(array $permsInput): void
     {
         $columns = [
-            'can_access_acp',
-            'can_post',
-            'can_edit_posts',
-            'can_add_comments',
-            'can_delete_comments',
-            'can_delete_own_posts',
-            'can_post_topics',
-            'can_edit_topics',
-            'can_view_board',
-            'can_view_offline_board',
-            'flood_control',
-            'can_override_locked_topics',
-            'can_view_shoutbox',
-            'can_shout',
-            'can_moderate',
-            'can_delete_shouts',
-            'can_delete_own_shouts',
-            'can_karma',
-            'can_im',
-            'can_pm',
-            'can_lock_own_topics',
-            'can_delete_own_topics',
-            'can_use_sigs',
-            'can_attach',
-            'can_poll',
-            'can_view_stats',
+            'canAccessACP',
+            'canPost',
+            'canEditPosts',
+            'canAddComments',
+            'canDeleteComments',
+            'canDeleteOwnPosts',
+            'canCreateTopics',
+            'canEditTopics',
+            'canViewBoard',
+            'canViewOfflineBoard',
+            'floodControl',
+            'canOverrideLockedTopics',
+            'canViewShoutbox',
+            'canShout',
+            'canModerate',
+            'canDeleteShouts',
+            'canDeleteOwnShouts',
+            'canKarma',
+            'canIM',
+            'canPM',
+            'canLockOwnTopics',
+            'canDeleteOwnTopics',
+            'canUseSignatures',
+            'canAttach',
+            'canPoll',
+            'canViewStats',
             'legend',
-            'can_view_fullprofile',
+            'canViewFullProfile',
         ];
 
         // Set anything not sent to 0.
@@ -121,7 +121,7 @@ final class Groups
         foreach ($permsInput as $groupId => $groupPermissions) {
             // Ensure admins can't remove their own access to the ACP :D
             if ($groupId === ConstantsGroups::Admin->value) {
-                $groupPermissions['can_access_acp'] = 1;
+                $groupPermissions['canAccessACP'] = 1;
             }
 
             if (!$groupId) {
@@ -222,54 +222,54 @@ final class Groups
 
         $permissionsChart = [
             'Global' => [
-                'can_access_acp' => 'Access ACP',
-                'can_moderate' => 'Global Moderator',
-                'can_view_board' => 'View Online Board',
-                'can_view_offline_board' => 'View Offline Board',
+                'canAccessACP' => 'Access ACP',
+                'canModerate' => 'Global Moderator',
+                'canViewBoard' => 'View Online Board',
+                'canViewOfflineBoard' => 'View Offline Board',
             ],
 
             'Members' => [
-                'can_karma' => '*Change Karma',
+                'canKarma' => '*Change Karma',
             ],
 
             'Posts' => [
-                'can_attach' => 'Attach files',
-                'can_delete_own_posts' => '*Delete Own Posts',
-                'can_edit_posts' => 'Edit',
-                'can_post' => 'Create',
-                'can_use_sigs' => '*Can have signatures',
+                'canAttach' => 'Attach files',
+                'canDeleteOwnPosts' => '*Delete Own Posts',
+                'canEditPosts' => 'Edit',
+                'canPost' => 'Create',
+                'canUseSignatures' => '*Can have signatures',
             ],
 
             'Private/Instant Messaging' => [
-                'can_im' => 'Can IM',
-                'can_pm' => 'Can PM',
+                'canIM' => 'Can IM',
+                'canPM' => 'Can PM',
             ],
 
             'Profiles' => [
-                'can_add_comments' => 'Add Comments',
-                'can_delete_comments' => '*Delete own Comments',
-                'can_view_fullprofile' => 'Can View Full Profile',
+                'canAddComments' => 'Add Comments',
+                'canDeleteComments' => '*Delete own Comments',
+                'canViewFullProfile' => 'Can View Full Profile',
             ],
 
             'Shoutbox' => [
-                'can_delete_own_shouts' => 'Delete Own Shouts',
-                'can_delete_shouts' => 'Delete All Shouts',
-                'can_shout' => 'Can Shout',
-                'can_view_shoutbox' => 'View Shoutbox',
+                'canDeleteOwnShouts' => 'Delete Own Shouts',
+                'canDeleteShouts' => 'Delete All Shouts',
+                'canShout' => 'Can Shout',
+                'canViewShoutbox' => 'View Shoutbox',
             ],
 
             'Statistics' => [
-                'can_view_stats' => 'View Board Stats',
+                'canViewStats' => 'View Board Stats',
                 'legend' => 'Display in Legend',
             ],
 
             'Topics' => [
-                'can_delete_own_topics' => '*Delete Own Topics',
-                'can_edit_topics' => 'Edit',
-                'can_lock_own_topics' => '*Lock Own Topics',
-                'can_override_locked_topics' => 'Post in locked topics',
-                'can_poll' => 'Add Polls',
-                'can_post_topics' => 'Create',
+                'canDeleteOwnTopics' => '*Delete Own Topics',
+                'canEditTopics' => 'Edit',
+                'canLockOwnTopics' => '*Lock Own Topics',
+                'canOverrideLockedTopics' => 'Post in locked topics',
+                'canPoll' => 'Add Polls',
+                'canCreateTopics' => 'Create',
             ],
         ];
         $permissionsTable = '';
@@ -290,7 +290,7 @@ final class Groups
                         [
                             'checked' => $group->{$field}
                                 ? 'checked="checked" ' : '',
-                            'group_id' => $groupId,
+                            'groupID' => $groupId,
                             'permission' => $field,
                         ],
                     );
@@ -404,9 +404,9 @@ final class Groups
             $this->database->update(
                 'members',
                 [
-                    'group_id' => 1,
+                    'groupID' => 1,
                 ],
-                'WHERE `group_id`=?',
+                'WHERE `groupID`=?',
                 $delete,
             );
         }

@@ -135,7 +135,7 @@ final readonly class FileManager
                     'linked_in' => array_key_exists($file->id, $linkedIn)
                         ? implode(', ', $linkedIn[$file->id]) : 'Not linked!',
                     'title' => $file->name,
-                    'username' => $members[$file->uid]->display_name,
+                    'username' => $members[$file->uid]->displayName,
                     'user_id' => $file->uid,
                 ],
             );

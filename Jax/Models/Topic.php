@@ -14,22 +14,22 @@ final class Topic extends Model
         'id',
         'title',
         'subtitle',
-        'lp_uid',
-        'lp_date',
+        'lastPostUser',
+        'lastPostDate',
         'fid',
-        'auth_id',
+        'author',
         'replies',
         'views',
         'pinned',
-        'poll_choices',
-        'poll_results',
-        'poll_q',
-        'poll_type',
+        'pollChoices',
+        'pollResults',
+        'pollQuestion',
+        'pollType',
         'summary',
         'locked',
         'date',
         'op',
-        'cal_event',
+        'calendarEvent',
     ];
 
     public int $id = 0;
@@ -38,13 +38,13 @@ final class Topic extends Model
 
     public string $subtitle = '';
 
-    public ?int $lp_uid = null;
+    public ?int $lastPostUser = null;
 
-    public ?string $lp_date = null;
+    public ?string $lastPostDate = null;
 
     public ?int $fid = null;
 
-    public ?int $auth_id = null;
+    public ?int $author = null;
 
     public int $replies = 0;
 
@@ -52,13 +52,13 @@ final class Topic extends Model
 
     public int $pinned = 0;
 
-    public string $poll_choices = '';
+    public string $pollChoices = '';
 
-    public string $poll_results = '';
+    public string $pollResults = '';
 
-    public string $poll_q = '';
+    public string $pollQuestion = '';
 
-    public string $poll_type = '';
+    public string $pollType = '';
 
     public string $summary = '';
 
@@ -68,5 +68,5 @@ final class Topic extends Model
 
     public ?int $op = null;
 
-    public int $cal_event = 0;
+    public int $calendarEvent = 0;
 }

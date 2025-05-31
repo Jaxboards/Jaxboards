@@ -12,7 +12,7 @@ final class Post extends Model
 
     public const FIELDS = [
         'id',
-        'auth_id',
+        'author',
         'post',
         'date',
         'showsig',
@@ -20,14 +20,14 @@ final class Post extends Model
         'tid',
         'newtopic',
         'ip',
-        'edit_date',
+        'editDate',
         'editby',
         'rating',
     ];
 
     public int $id = 0;
 
-    public ?int $auth_id = null;
+    public ?int $author = null;
 
     public string $post = '';
 
@@ -43,7 +43,7 @@ final class Post extends Model
 
     public string $ip = '';
 
-    public ?string $edit_date = null;
+    public ?string $editDate = null;
 
     public ?int $editby = null;
 

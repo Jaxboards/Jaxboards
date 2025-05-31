@@ -51,7 +51,7 @@ final class Shoutbox
     {
         if (
             !$this->config->getSetting('shoutbox')
-            || !$this->user->getGroup()?->can_view_shoutbox
+            || !$this->user->getGroup()?->canViewShoutbox
         ) {
             return;
         }
@@ -81,13 +81,13 @@ final class Shoutbox
 
     public function canDelete(Shout $shout): bool
     {
-        $candelete = (bool) $this->user->getGroup()?->can_delete_shouts;
+        $candelete = (bool) $this->user->getGroup()?->canDeleteShouts;
 
         if ($candelete) {
             return $candelete;
         }
 
-        if (!$this->user->getGroup()?->can_delete_own_shouts) {
+        if (!$this->user->getGroup()?->canDeleteOwnShouts) {
             return $candelete;
         }
 
@@ -106,8 +106,8 @@ final class Shoutbox
         $user = $member !== null ? $this->template->meta(
             'user-link',
             $member->id,
-            $member->group_id,
-            $member->display_name,
+            $member->groupID,
+            $member->displayName,
         ) : 'Guest';
         $avatarUrl = $member?->avatar ?: $this->template->meta('default-avatar');
         $avatar = $this->config->getSetting('shoutboxava')
@@ -177,8 +177,8 @@ final class Shoutbox
                     $shoutHTML,
                 ),
             ) . "<script type='text/javascript'>globalsettings.shoutlimit="
-                . $this->shoutlimit . ';globalsettings.sound_shout='
-                . ($this->user->get()->sound_shout !== 0 ? 1 : 0)
+                . $this->shoutlimit . ';globalsettings.soundShout='
+                . ($this->user->get()->soundShout !== 0 ? 1 : 0)
                 . '</script>',
         );
     }
@@ -313,7 +313,7 @@ final class Shoutbox
 
         $error = match (true) {
             $this->user->isGuest() => 'You must be logged in to shout!',
-            !$this->user->getGroup()?->can_shout => 'You do not have permission to shout!',
+            !$this->user->getGroup()?->canShout => 'You do not have permission to shout!',
             mb_strlen($shoutBody) > 300 => 'Shout must be less than 300 characters.',
             default => null,
         };

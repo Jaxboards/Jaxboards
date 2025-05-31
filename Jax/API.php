@@ -36,7 +36,7 @@ final readonly class API
     {
         $members = Member::selectMany(
             $this->database,
-            'WHERE `display_name` LIKE ? ORDER BY `display_name` LIMIT 10',
+            'WHERE `displayName` LIKE ? ORDER BY `displayName` LIMIT 10',
             htmlspecialchars(
                 str_replace('_', '\_', $this->request->asString->get('term') ?? ''),
                 ENT_QUOTES,
@@ -46,7 +46,7 @@ final readonly class API
         $list = [[], []];
         foreach ($members as $member) {
             $list[0][] = $member->id;
-            $list[1][] = $member->display_name;
+            $list[1][] = $member->displayName;
         }
 
         echo json_encode($list);

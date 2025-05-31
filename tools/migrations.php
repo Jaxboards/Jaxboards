@@ -19,7 +19,8 @@ use function preg_match;
 use const PATHINFO_FILENAME;
 use const PHP_EOL;
 
-require __DIR__ . '/Jax/autoload.php';
+$jaxboardsRoot = dirname(__DIR__);
+require dirname(__DIR__) . '/Jax/autoload.php';
 
 function error($message): string
 {
@@ -40,7 +41,7 @@ function getDBVersion(Database $database): int
 }
 
 $migrations = array_reduce(
-    glob(__DIR__ . '/migrations/**/*.php') ?: [],
+    glob($jaxboardsRoot . '/tools/migrations/**/*.php') ?: [],
     static function ($migrations, string $path) {
         preg_match('/V(\d+)/', $path, $match);
         $migrations[(int) $match[1]] = pathinfo($path, PATHINFO_FILENAME);
@@ -59,6 +60,8 @@ $database = $container->get(Database::class);
 $dbVersion = getDBVersion($database);
 
 foreach ($migrations as $version => $migration) {
+    echo "Checking: $version against $dbVersion" . PHP_EOL;
+
     if ($version <= $dbVersion) {
         continue;
     }

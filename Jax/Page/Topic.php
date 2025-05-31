@@ -167,7 +167,7 @@ final class Topic
     {
         if (
             !$this->user->isGuest()
-            && $modelsTopic->lp_date > $this->user->get()->last_visit
+            && $modelsTopic->lastPostDate > $this->user->get()->lastVisit
         ) {
             $this->markRead($modelsTopic);
         }
@@ -176,11 +176,11 @@ final class Topic
         $topicSubtitle = $this->textFormatting->wordfilter($modelsTopic->subtitle);
 
         $this->page->setPageTitle($topicTitle);
-        $this->session->set('location_verbose', "In topic '" . $topicTitle . "'");
+        $this->session->set('locationVerbose', "In topic '" . $topicTitle . "'");
 
         $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $modelsTopic->fid);
         $category = $forum !== null
-            ? Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->cat_id)
+            ? Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->category)
             : null;
         // Fix this to work with subforums.
         $this->page->setBreadCrumbs(
@@ -210,7 +210,7 @@ final class Topic
         $this->session->addVar('topic_lastpage', $this->pageNumber + 1 === $totalpages);
 
         // If it's a poll, put it in.
-        $poll = $modelsTopic->poll_type !== ''
+        $poll = $modelsTopic->pollType !== ''
             ? $this->poll->render($modelsTopic)
             : '';
 
@@ -246,7 +246,7 @@ final class Topic
             $forumPerms['reply']
             && (
                 !$modelsTopic->locked
-                || $this->user->getGroup()?->can_override_locked_topics
+                || $this->user->getGroup()?->canOverrideLockedTopics
             )
         ) {
             $buttons[1] = "<a href='?act=vt{$modelsTopic->id}&qreply=1'>" . $this->template->meta(
@@ -260,7 +260,7 @@ final class Topic
             $forumPerms['reply']
             && (
                 !$modelsTopic->locked
-                || $this->user->getGroup()?->can_override_locked_topics
+                || $this->user->getGroup()?->canOverrideLockedTopics
             )
         ) {
             $buttons[2] = "<a href='?act=post&tid={$modelsTopic->id}'>" . $this->template->meta(
@@ -282,7 +282,7 @@ final class Topic
                 continue;
             }
 
-            if (isset($user['is_bot']) && $user['is_bot']) {
+            if (isset($user['isBot']) && $user['isBot']) {
                 $usersonline .= '<a class="user' . $user['uid'] . '">' . $user['name'] . '</a>';
 
                 continue;
@@ -291,9 +291,9 @@ final class Topic
             $usersonline .= $this->template->meta(
                 'user-link',
                 $user['uid'],
-                $user['group_id'] . (
+                $user['groupID'] . (
                     $user['status'] === 'idle'
-                    ? " idle lastAction{$user['last_action']}"
+                    ? " idle lastAction{$user['lastAction']}"
                     : ''
                 ),
                 $user['name'],
@@ -361,7 +361,7 @@ final class Topic
 
         // Update users online list.
         $list = [];
-        $oldcache = array_flip(explode(',', $this->session->get()->users_online_cache));
+        $oldcache = array_flip(explode(',', $this->session->get()->usersOnlineCache));
         $newcache = [];
         foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
             if (!$user['uid']) {
@@ -377,7 +377,7 @@ final class Topic
             if (!isset($oldcache[$user['uid']])) {
                 $list[] = [
                     $user['uid'],
-                    $user['group_id'],
+                    $user['groupID'],
                     $user['status'] !== 'active'
                         ? $user['status']
                         : ($user['birthday'] && ($this->config->getSetting('birthdays') & 1)
@@ -385,7 +385,7 @@ final class Topic
                     $user['name'],
                     // don't display location, since we know we're in the topic
                     false,
-                    $user['last_action'],
+                    $user['lastAction'],
                 ];
 
                 continue;
@@ -404,7 +404,7 @@ final class Topic
             $this->page->command('setoffline', $oldcache);
         }
 
-        $this->session->set('users_online_cache', $newcache);
+        $this->session->set('usersOnlineCache', $newcache);
     }
 
     private function quickReplyForm(ModelsTopic $modelsTopic): void
@@ -423,11 +423,11 @@ final class Topic
             $membersById = Member::joinedOn(
                 $this->database,
                 $posts,
-                static fn(Post $post): ?int => $post->auth_id,
+                static fn(Post $post): ?int => $post->author,
             );
 
             foreach ($posts as $post) {
-                $prefilled .= '[quote=' . $membersById[$post->auth_id]->display_name . ']'
+                $prefilled .= '[quote=' . $membersById[$post->author]->displayName . ']'
                     . $post->post
                     . '[/quote]'
                     . PHP_EOL;
@@ -477,7 +477,7 @@ final class Topic
 
         $membersById = $this->fetchMembersById(
             array_merge(
-                array_map(static fn($post): int => $post->auth_id ?? 0, $posts),
+                array_map(static fn($post): int => $post->author ?? 0, $posts),
                 array_map(static fn($post): int => $post->editby ?? 0, $posts),
             ),
         );
@@ -496,10 +496,10 @@ final class Topic
             // Post rating content goes here.
             $postrating = $this->reactions->render($post);
 
-            $author = $post->auth_id ? $membersById[$post->auth_id] : null;
+            $author = $post->author ? $membersById[$post->author] : null;
             $editor = $post->editby ? $membersById[$post->editby] : null;
             $authorGroup = $author
-                ? Group::selectOne($this->database, Database::WHERE_ID_EQUALS, $author->group_id)
+                ? Group::selectOne($this->database, Database::WHERE_ID_EQUALS, $author->groupID)
                 : null;
             $postbuttons
                 // Adds the Edit button
@@ -528,19 +528,19 @@ final class Topic
                 $author ? $this->template->meta(
                     'user-link',
                     $author->id,
-                    $author->group_id,
-                    $author->display_name,
+                    $author->groupID,
+                    $author->displayName,
                 ) : 'Guest',
                 $author?->avatar ?: $this->template->meta('default-avatar'),
                 $author?->usertitle,
                 $author?->posts,
                 $this->template->meta(
                     'topic-status-'
-                        . (isset($usersonline[$post->auth_id])
-                            && $usersonline[$post->auth_id] ? 'online' : 'offline'),
+                        . (isset($usersonline[$post->author])
+                            && $usersonline[$post->author] ? 'online' : 'offline'),
                 ),
                 $authorGroup?->title,
-                $post->auth_id,
+                $post->author,
                 $postbuttons,
                 // ^10
                 $this->date->autoDate($post->date),
@@ -553,18 +553,18 @@ final class Topic
                 isset($author->sig) && $author->sig
                     ? $this->textFormatting->theWorks($author->sig)
                     : '',
-                $post->auth_id,
+                $post->author,
                 $editor ? $this->template->meta(
                     'topic-edit-by',
                     $this->template->meta(
                         'user-link',
                         $editor->id,
-                        $editor->group_id,
-                        $editor->display_name,
+                        $editor->groupID,
+                        $editor->displayName,
                     ),
-                    $this->date->autoDate($post->edit_date),
+                    $this->date->autoDate($post->editDate),
                 ) : '',
-                $this->user->getGroup()?->can_moderate
+                $this->user->getGroup()?->canModerate
                     ? '<a href="?act=modcontrols&amp;do=iptools&amp;ip='
                     . $this->ipAddress->asHumanReadable($post->ip) . '">' . $this->template->meta(
                         'topic-mod-ipbutton',
@@ -578,16 +578,16 @@ final class Topic
                 ++$topicPostCounter,
                 $postrating,
                 // 30 V
-                $author->contact_skype ?? '',
-                $author->contact_discord ?? '',
-                $author->contact_yim ?? '',
-                $author->contact_msn ?? '',
-                $author->contact_gtalk ?? '',
-                $author->contact_aim ?? '',
-                $author->contact_youtube ?? '',
-                $author->contact_steam ?? '',
-                $author->contact_twitter ?? '',
-                $author->contact_bluesky ?? '',
+                $author->contactSkype ?? '',
+                $author->contactDiscord ?? '',
+                $author->contactYIM ?? '',
+                $author->contactMSN ?? '',
+                $author->contactGoogleChat ?? '',
+                $author->contactAIM ?? '',
+                $author->contactYoutube ?? '',
+                $author->contactSteam ?? '',
+                $author->contactTwitter ?? '',
+                $author->contactBlueSky ?? '',
                 '',
                 '',
                 '',
@@ -606,11 +606,11 @@ final class Topic
             return true;
         }
 
-        return $post->auth_id
+        return $post->author
             && ($post->newtopic !== 0
-                ? $this->user->getGroup()?->can_edit_topics
-                : $this->user->getGroup()?->can_edit_posts)
-            && $post->auth_id === $this->user->get()->id;
+                ? $this->user->getGroup()?->canEditTopics
+                : $this->user->getGroup()?->canEditPosts)
+            && $post->author === $this->user->get()->id;
     }
 
     private function canModerate(ModelsTopic $modelsTopic): bool
@@ -621,7 +621,7 @@ final class Topic
         }
 
         $canMod = false;
-        if ($this->user->getGroup()?->can_moderate) {
+        if ($this->user->getGroup()?->canModerate) {
             $canMod = true;
         }
 
@@ -736,7 +736,7 @@ final class Topic
         $author = Member::selectOne(
             $this->database,
             Database::WHERE_ID_EQUALS,
-            $post->auth_id,
+            $post->author,
         );
 
         if ($this->request->both('qreply')) {
@@ -848,7 +848,7 @@ final class Topic
             Database::WHERE_ID_EQUALS,
             $modelsTopic->id,
         );
-        $authors = $this->fetchMembersById(array_map(static fn($post): int => $post->auth_id ?? 0, $posts));
+        $authors = $this->fetchMembersById(array_map(static fn($post): int => $post->author ?? 0, $posts));
 
         foreach ($posts as $post) {
             $rssFeed->additem(
@@ -857,7 +857,7 @@ final class Topic
                     'guid' => $post->id,
                     'link' => "{$boardURL}?act=vt{$modelsTopic->id}&amp;findpost={$post->id}",
                     'pubDate' => gmdate('r', $this->date->datetimeAsTimestamp($post->date)),
-                    'title' => $authors[$post->auth_id]->display_name . ':',
+                    'title' => $authors[$post->author]->displayName . ':',
                 ],
             );
         }

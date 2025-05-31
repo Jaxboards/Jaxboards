@@ -386,11 +386,11 @@ final readonly class ServiceInstall
             // Don't forget to create the admin.
             $member = new Member();
             $member->id = 1;
-            $member->display_name = $adminUsername ?? '';
+            $member->displayName = $adminUsername ?? '';
             $member->email = $adminEmail ?? '';
-            $member->group_id = 2;
-            $member->join_date = $this->database->datetime();
-            $member->last_visit = $this->database->datetime();
+            $member->groupID = 2;
+            $member->joinDate = $this->database->datetime();
+            $member->lastVisit = $this->database->datetime();
             $member->name = $adminUsername ?? '';
             $member->pass = password_hash(
                 (string) $adminPassword,

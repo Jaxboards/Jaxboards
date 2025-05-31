@@ -12,15 +12,15 @@ final class Forum extends Model
 
     public const FIELDS = [
         'id',
-        'cat_id',
+        'category',
         'title',
         'subtitle',
-        'lp_uid',
-        'lp_date',
-        'lp_tid',
-        'lp_topic',
+        'lastPostUser',
+        'lastPostDate',
+        'lastPostTopic',
+        'lastPostTopicTitle',
         'path',
-        'show_sub',
+        'showSubForums',
         'redirect',
         'topics',
         'posts',
@@ -31,29 +31,29 @@ final class Forum extends Model
         'redirects',
         'trashcan',
         'mods',
-        'show_ledby',
+        'showLedBy',
     ];
 
 
     public int $id = 0;
 
-    public ?int $cat_id = null;
+    public ?int $category = null;
 
     public string $title;
 
     public string $subtitle = '';
 
-    public ?int $lp_uid = null;
+    public ?int $lastPostUser = null;
 
-    public ?string $lp_date = null;
+    public ?string $lastPostDate = null;
 
-    public ?int $lp_tid = null;
+    public ?int $lastPostTopic = null;
 
-    public string $lp_topic = '';
+    public string $lastPostTopicTitle = '';
 
     public string $path = '';
 
-    public int $show_sub = 0;
+    public int $showSubForums = 0;
 
     public string $redirect = '';
 
@@ -75,5 +75,5 @@ final class Forum extends Model
 
     public string $mods = '';
 
-    public int $show_ledby = 0;
+    public int $showLedBy = 0;
 }

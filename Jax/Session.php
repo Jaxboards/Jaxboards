@@ -112,7 +112,7 @@ final class Session
     {
         $this->fetchSessionData($this->getPHPSessionValue('sid') ?? null);
 
-        if ($this->modelsSession->is_bot !== 0) {
+        if ($this->modelsSession->isBot !== 0) {
             return null;
         }
 
@@ -214,7 +214,7 @@ final class Session
 
     public function act(?string $location = null): void
     {
-        $this->set('last_action', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
+        $this->set('lastAction', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
         if (!$location) {
             return;
         }
@@ -234,7 +234,7 @@ final class Session
             $uid = null;
         } else {
             $result = $this->database->select(
-                'MAX(`last_action`) AS `last_action`',
+                'MAX(`lastAction`) AS `lastAction`',
                 'session',
                 'WHERE `uid`=?',
                 $uid,
@@ -244,7 +244,7 @@ final class Session
 
             $this->database->delete(
                 'session',
-                'WHERE `uid`=? AND `last_update`<?',
+                'WHERE `uid`=? AND `lastUpdate`<?',
                 $uid,
                 $this->database->datetime($timeago),
             );
@@ -255,14 +255,14 @@ final class Session
                 $this->database->datetime(),
             );
             if ($lastAction) {
-                $this->set('read_date', $lastAction['last_action']);
+                $this->set('readDate', $lastAction['lastAction']);
             }
         }
 
         $yesterday = mktime(0, 0, 0) ?: 0;
         $sessions = ModelsSession::selectMany(
             $this->database,
-            'WHERE `last_update`<?',
+            'WHERE `lastUpdate`<?',
             $this->database->datetime($yesterday),
         );
 
@@ -274,7 +274,7 @@ final class Session
             $this->database->update(
                 'members',
                 [
-                    'last_visit' => $session->last_action,
+                    'lastVisit' => $session->lastAction,
                 ],
                 Database::WHERE_ID_EQUALS,
                 $session->uid,
@@ -284,8 +284,8 @@ final class Session
         $this->database->delete(
             'session',
             <<<'SQL'
-                WHERE `last_update`<?
-                    OR (`uid` IS NULL AND `last_update`<?)
+                WHERE `lastUpdate`<?
+                    OR (`uid` IS NULL AND `lastUpdate`<?)
                 SQL,
             $this->database->datetime($yesterday),
             $this->database->datetime($timeago),
@@ -296,25 +296,25 @@ final class Session
 
     public function applyChanges(): void
     {
-        $this->set('last_update', $this->database->datetime());
+        $this->set('lastUpdate', $this->database->datetime());
 
         $changedData = $this->changedData;
 
-        if ($this->modelsSession->is_bot !== 0) {
+        if ($this->modelsSession->isBot !== 0) {
             // Bots tend to read a lot of content.
             $changedData['forumsread'] = '{}';
             $changedData['topicsread'] = '{}';
         }
 
         if (
-            $this->modelsSession->last_action === null
+            $this->modelsSession->lastAction === null
         ) {
-            $changedData['last_action'] = $this->database->datetime();
+            $changedData['lastAction'] = $this->database->datetime();
         }
 
-        if (mb_strlen($this->modelsSession->location_verbose) > 100) {
-            $changedData['location_verbose'] = mb_substr(
-                $this->modelsSession->location_verbose,
+        if (mb_strlen($this->modelsSession->locationVerbose) > 100) {
+            $changedData['locationVerbose'] = mb_substr(
+                $this->modelsSession->locationVerbose,
                 0,
                 100,
             );
@@ -378,9 +378,9 @@ final class Session
         $session = new ModelsSession();
         $session->id = $sid;
         $session->ip = $this->ipAddress->asBinary() ?? '';
-        $session->is_bot = $botName !== null ? 1 : 0;
-        $session->last_action = $actionTime;
-        $session->last_update = $actionTime;
+        $session->isBot = $botName !== null ? 1 : 0;
+        $session->lastAction = $actionTime;
+        $session->lastUpdate = $actionTime;
         $session->useragent = $this->request->getUserAgent() ?? '';
 
         $uid = $this->user->get()->id;

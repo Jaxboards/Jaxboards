@@ -58,7 +58,7 @@ final readonly class ModControls
     public function render(): void
     {
         if (
-            !$this->user->getGroup()?->can_moderate
+            !$this->user->getGroup()?->canModerate
             && !$this->user->get()->mod
         ) {
             $this->page->command('softurl');
@@ -141,7 +141,7 @@ final readonly class ModControls
 
     private function showModCP(string $cppage = ''): void
     {
-        if (!$this->user->getGroup()?->can_moderate) {
+        if (!$this->user->getGroup()?->canModerate) {
             return;
         }
 
@@ -154,7 +154,7 @@ final readonly class ModControls
 
     private function updateMember(): string
     {
-        $displayName = $this->request->asString->post('display_name');
+        $displayName = $this->request->asString->post('displayName');
         $mid = (int) $this->request->asString->post('mid');
         if (!$displayName) {
             return $this->template->meta('error', 'Display name is invalid.');
@@ -165,7 +165,7 @@ final readonly class ModControls
             [
                 'about' => $this->request->asString->post('about'),
                 'avatar' => $this->request->asString->post('avatar'),
-                'display_name' => $displayName,
+                'displayName' => $displayName,
                 'full_name' => $this->request->asString->post('full_name'),
                 'sig' => $this->request->asString->post('signature'),
             ],
@@ -206,7 +206,7 @@ final readonly class ModControls
         } else {
             $members = Member::selectMany(
                 $this->database,
-                'WHERE `display_name` LIKE ?',
+                'WHERE `displayName` LIKE ?',
                 $memberName . '%',
             );
             if (count($members) > 1) {
@@ -221,8 +221,8 @@ final readonly class ModControls
         }
 
         if (
-            $this->user->get()->group_id !== 2
-            || $member->group_id === 2
+            $this->user->get()->groupID !== 2
+            || $member->groupID === 2
             && ($this->user->get()->id !== 1
                 && $member->id !== $this->user->get()->id)
         ) {
@@ -258,7 +258,7 @@ final readonly class ModControls
                         HTML;
                 },
                 [
-                    ['Display Name', 'display_name', $member->display_name, 'text'],
+                    ['Display Name', 'displayName', $member->displayName, 'text'],
                     ['Avatar', 'avatar', $member->avatar, 'text'],
                     ['Full Name', 'full_name', $member->full_name, 'text'],
                     [
@@ -415,8 +415,8 @@ final readonly class ModControls
                 $content[] = $this->template->meta(
                     'user-link',
                     $member->id,
-                    $member->group_id,
-                    $member->display_name,
+                    $member->groupID,
+                    $member->displayName,
                 );
             }
 
@@ -444,8 +444,8 @@ final readonly class ModControls
                     $content .= $member ? $this->template->meta(
                         'user-link',
                         $member->id,
-                        $member->group_id,
-                        $member->display_name,
+                        $member->groupID,
+                        $member->displayName,
                     ) : '';
                     $content .= ': ' . $shout->shout . '<br>';
                 }

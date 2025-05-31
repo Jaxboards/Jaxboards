@@ -61,7 +61,7 @@ final readonly class ModTopics
             return;
         }
 
-        if (!$this->user->getGroup()?->can_moderate) {
+        if (!$this->user->getGroup()?->canModerate) {
             $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid);
 
             if (!$forum || $forum->mods === '') {

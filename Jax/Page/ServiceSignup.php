@@ -277,11 +277,11 @@ final readonly class ServiceSignup
 
         // Don't forget to create the admin.
         $member = new Member();
-        $member->display_name = $username;
+        $member->displayName = $username;
         $member->email = $email;
-        $member->group_id = 2;
-        $member->join_date = $this->database->datetime();
-        $member->last_visit = $this->database->datetime();
+        $member->groupID = 2;
+        $member->joinDate = $this->database->datetime();
+        $member->lastVisit = $this->database->datetime();
         $member->name = $username;
         $member->pass = password_hash($password, PASSWORD_DEFAULT);
         $member->insert($this->database);

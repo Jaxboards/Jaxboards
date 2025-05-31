@@ -18,8 +18,8 @@ final class Message extends Model
         'message',
         'read',
         'date',
-        'del_recipient',
-        'del_sender',
+        'deletedRecipient',
+        'deletedSender',
         'flag',
     ];
 
@@ -37,9 +37,9 @@ final class Message extends Model
 
     public ?string $date = null;
 
-    public int $del_recipient = 0;
+    public int $deletedRecipient = 0;
 
-    public int $del_sender = 0;
+    public int $deletedSender = 0;
 
     public int $flag = 0;
 }

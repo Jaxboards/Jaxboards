@@ -49,7 +49,7 @@ final readonly class Login
 
             $error = match (true) {
                 $user === null => 'The username/password supplied was incorrect',
-                !$this->user->getGroup()?->can_access_acp => 'You are not authorized to log in to the ACP',
+                !$this->user->getGroup()?->canAccessACP => 'You are not authorized to log in to the ACP',
                 default => null,
             };
 

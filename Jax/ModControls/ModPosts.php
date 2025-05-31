@@ -103,7 +103,7 @@ final readonly class ModPosts
      */
     private function canModPost(Post $post): bool
     {
-        if ($this->user->getGroup()?->can_moderate) {
+        if ($this->user->getGroup()?->canModerate) {
             return true;
         }
 
@@ -246,13 +246,13 @@ final readonly class ModPosts
         $lastPost = $this->fetchPost((int) end($pids));
 
         $topic = new Topic();
-        $topic->auth_id = $this->user->get()->id;
+        $topic->author = $this->user->get()->id;
         $topic->fid = $trashCanForum->id;
-        $topic->lp_date = $this->database->datetime();
-        $topic->lp_uid = $lastPost?->auth_id;
+        $topic->lastPostDate = $this->database->datetime();
+        $topic->lastPostUser = $lastPost?->author;
         $topic->op = $pids[0];
-        $topic->poll_q = '';
-        $topic->poll_choices = '';
+        $topic->pollQuestion = '';
+        $topic->pollChoices = '';
         $topic->replies = 0;
         $topic->title = $newTopicTitle;
         $topic->insert($this->database);

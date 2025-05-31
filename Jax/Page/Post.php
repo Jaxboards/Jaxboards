@@ -95,7 +95,7 @@ final class Post
             $this->postData = $postData;
         }
 
-        if ($fileData !== null && $this->user->getGroup()?->can_attach) {
+        if ($fileData !== null && $this->user->getGroup()?->canAttach) {
             $attachmentId = $this->upload($fileData);
             $this->postData .= "\n\n[attachment]{$attachmentId}[/attachment]";
         }
@@ -214,7 +214,7 @@ final class Post
             <label class="addpoll" for="addpoll">
                 Add a Poll
             </label>
-            <select name="poll_type" title="Add a poll"
+            <select name="pollType" title="Add a poll"
                 onchange="document.querySelector('#polloptions').style.display=this.value?'block':'none'">
             <option value="">No</option>
             <option value="single">Yes, single-choice</option>
@@ -350,11 +350,11 @@ final class Post
             $membersById = Member::joinedOn(
                 $this->database,
                 $posts,
-                static fn(ModelsPost $modelsPost): ?int => $modelsPost->auth_id,
+                static fn(ModelsPost $modelsPost): ?int => $modelsPost->author,
             );
 
             foreach ($posts as $post) {
-                $authorName = $membersById[$post->auth_id]->name ?? '';
+                $authorName = $membersById[$post->author]->name ?? '';
                 $postData .= "[quote={$authorName}]{$post->post}[/quote]" . PHP_EOL;
             }
 
@@ -406,10 +406,10 @@ final class Post
     private function canEdit(Topic $topic, ModelsPost $modelsPost): bool
     {
         if (
-            $modelsPost->auth_id
-            && ($modelsPost->newtopic !== 0 ? $this->user->getGroup()?->can_edit_topics
-                : $this->user->getGroup()?->can_edit_posts)
-            && $modelsPost->auth_id === $this->user->get()->id
+            $modelsPost->author
+            && ($modelsPost->newtopic !== 0 ? $this->user->getGroup()?->canEditTopics
+                : $this->user->getGroup()?->canEditPosts)
+            && $modelsPost->author === $this->user->get()->id
         ) {
             return true;
         }
@@ -419,7 +419,7 @@ final class Post
 
     private function canModerate(Topic $topic): bool
     {
-        if ($this->user->getGroup()?->can_moderate) {
+        if ($this->user->getGroup()?->canModerate) {
             return true;
         }
 
@@ -457,7 +457,7 @@ final class Post
             'posts',
             [
                 'editby' => $this->user->get()->id,
-                'edit_date' => $this->database->datetime(),
+                'editDate' => $this->database->datetime(),
                 'post' => $this->postData,
             ],
             Database::WHERE_ID_EQUALS,
@@ -587,7 +587,7 @@ final class Post
                 static fn($line): bool => trim($line) !== '',
             ),
         ) : [];
-        $pollType = $this->request->asString->post('poll_type');
+        $pollType = $this->request->asString->post('pollType');
 
         $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $fid);
 
@@ -629,18 +629,18 @@ final class Post
         }
 
         $topic = new Topic();
-        $topic->auth_id = $uid;
+        $topic->author = $uid;
         $topic->date = $postDate;
         $topic->fid = $fid;
-        $topic->lp_date = $postDate;
-        $topic->lp_uid = $uid;
-        $topic->poll_choices = $pollChoices !== []
+        $topic->lastPostDate = $postDate;
+        $topic->lastPostUser = $uid;
+        $topic->pollChoices = $pollChoices !== []
                     ? (json_encode($pollChoices) ?: '')
                     : '';
-        $topic->poll_q = $pollQuestion !== null
+        $topic->pollQuestion = $pollQuestion !== null
                     ? $this->textFormatting->blockhtml($pollQuestion)
                     : '';
-        $topic->poll_type = $pollType ?? '';
+        $topic->pollType = $pollType ?? '';
         $topic->replies = 0;
         $topic->subtitle = $this->textFormatting->blockhtml($topicDescription ?? '');
         $topic->summary = mb_substr(
@@ -698,14 +698,14 @@ final class Post
 
         if (
             ($this->how !== 'newtopic' && !$forumPerms['reply'])
-            || ($topic->locked && !$this->user->getGroup()?->can_override_locked_topics)
+            || ($topic->locked && !$this->user->getGroup()?->canOverrideLockedTopics)
         ) {
             return "You don't have permission to post here.";
         }
 
         // Actually PUT THE POST IN!
         $post = new ModelsPost();
-        $post->auth_id = $uid;
+        $post->author = $uid;
         $post->date = $postDate;
         $post->ip = $this->ipAddress->asBinary() ?? '';
         $post->newtopic = $newtopic ? 1 : 0;
@@ -742,7 +742,7 @@ final class Post
             $this->database->special(
                 <<<'SQL'
                     UPDATE %t
-                    SET `lp_uid` = ?, `lp_date` = ?, `replies` = `replies` + 1
+                    SET `lastPostUser` = ?, `lastPostDate` = ?, `replies` = `replies` + 1
                     WHERE `id`=?
                     SQL,
                 ['topics'],
@@ -765,10 +765,10 @@ final class Post
                 <<<'SQL'
                     UPDATE %t
                     SET
-                        `lp_uid`=?,
-                        `lp_tid`=?,
-                        `lp_topic`=?,
-                        `lp_date`=?,
+                        `lastPostUser`=?,
+                        `lastPostTopic`=?,
+                        `lastPostTopicTitle`=?,
+                        `lastPostDate`=?,
                         `topics`=`topics`+1
                     WHERE `id` IN ?
                     SQL,
@@ -784,10 +784,10 @@ final class Post
                 <<<'SQL'
                     UPDATE %t
                     SET
-                        `lp_uid`=?,
-                        `lp_tid`=?,
-                        `lp_topic`=?,
-                        `lp_date`=?,
+                        `lastPostUser`=?,
+                        `lastPostTopic`=?,
+                        `lastPostTopicTitle`=?,
+                        `lastPostDate`=?,
                         `posts`=`posts`+1
                     WHERE `id` IN ?
                     SQL,

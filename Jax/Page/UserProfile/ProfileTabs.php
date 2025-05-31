@@ -120,8 +120,8 @@ final readonly class ProfileTabs
                 $this->template->meta(
                     'user-link',
                     $friend->id,
-                    $friend->group_id,
-                    $friend->display_name,
+                    $friend->groupID,
+                    $friend->displayName,
                 ),
             );
         }
@@ -135,7 +135,7 @@ final readonly class ProfileTabs
 
         $posts = Post::selectMany(
             $this->database,
-            'WHERE `auth_id`=? AND `newtopic`=1
+            'WHERE `author`=? AND `newtopic`=1
             ORDER BY `id` DESC
             LIMIT 10',
             $member->id,
@@ -184,7 +184,7 @@ final readonly class ProfileTabs
 
         $posts = Post::selectMany(
             $this->database,
-            'WHERE auth_id = ?
+            'WHERE author = ?
             ORDER BY id DESC
             LIMIT 10',
             $member->id,

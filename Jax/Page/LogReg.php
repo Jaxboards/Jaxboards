@@ -78,7 +78,7 @@ final class LogReg
         $this->registering = true;
 
         $name = trim($this->request->asString->post('name') ?? '');
-        $dispname = trim($this->request->asString->post('display_name') ?? '');
+        $dispname = trim($this->request->asString->post('displayName') ?? '');
         $pass1 = $this->request->asString->post('pass1') ?? '';
         $pass2 = $this->request->asString->post('pass2') ?? '';
         $email = $this->request->asString->post('email') ?? '';
@@ -126,14 +126,14 @@ final class LogReg
         $name = $this->textFormatting->blockhtml($name);
         $member = Member::selectOne(
             $this->database,
-            'WHERE `name`=? OR `display_name`=?',
+            'WHERE `name`=? OR `displayName`=?',
             $name,
             $dispname,
         );
 
         $error = match (true) {
             $member?->name === $name => 'That username is taken!',
-            $member?->display_name === $dispname => 'That display name is already used by another member.',
+            $member?->displayName === $dispname => 'That display name is already used by another member.',
             default => null,
         };
 
@@ -145,14 +145,14 @@ final class LogReg
         }
 
         $newMember = new Member();
-        $newMember->display_name = $dispname;
+        $newMember->displayName = $dispname;
         $newMember->email = $email;
-        $newMember->group_id = $this->config->getSetting('membervalidation')
+        $newMember->groupID = $this->config->getSetting('membervalidation')
             ? 5
             : 1;
         $newMember->ip = $this->ipAddress->asBinary() ?? '';
-        $newMember->join_date = $this->database->datetime();
-        $newMember->last_visit = $this->database->datetime();
+        $newMember->joinDate = $this->database->datetime();
+        $newMember->lastVisit = $this->database->datetime();
         $newMember->name = $name;
         $newMember->pass = password_hash(
             $pass1,
@@ -175,7 +175,7 @@ final class LogReg
         ?string $password = null,
     ): void {
         if ($username && $password) {
-            if ($this->session->get()->is_bot !== 0) {
+            if ($this->session->get()->isBot !== 0) {
                 return;
             }
 

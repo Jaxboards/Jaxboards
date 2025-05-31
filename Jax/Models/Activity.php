@@ -16,7 +16,7 @@ final class Activity extends Model
         'arg1',
         'uid',
         'date',
-        'affected_uid',
+        'affectedUser',
         'tid',
         'pid',
         'arg2',
@@ -32,7 +32,7 @@ final class Activity extends Model
 
     public ?string $date = null;
 
-    public ?int $affected_uid = null;
+    public ?int $affectedUser = null;
 
     public ?int $tid = 0;
 

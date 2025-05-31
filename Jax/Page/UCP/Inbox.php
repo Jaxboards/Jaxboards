@@ -88,7 +88,7 @@ final readonly class Inbox
             $mid = (int) $this->request->asString->both('mid');
             $to = $this->request->asString->both('to');
             $udata = !$mid && $to
-                ? Member::selectOne($this->database, 'WHERE `display_name`=?', $to)
+                ? Member::selectOne($this->database, 'WHERE `displayName`=?', $to)
                 : Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
 
             $error = match (true) {
@@ -113,8 +113,8 @@ final readonly class Inbox
             // Put it into the table.
             $message = new Message();
             $message->date = $this->database->datetime();
-            $message->del_recipient = 0;
-            $message->del_sender = 0;
+            $message->deletedRecipient = 0;
+            $message->deletedSender = 0;
             $message->from = $this->user->get()->id;
             $message->message = $this->request->asString->post('message') ?? '';
             $message->read = 0;
@@ -128,7 +128,7 @@ final readonly class Inbox
             $cmd = json_encode(
                 [
                     'newmessage',
-                    'You have a new message from ' . $this->user->get()->display_name,
+                    'You have a new message from ' . $this->user->get()->displayName,
                     $message->id,
                 ],
             ) . PHP_EOL;
@@ -143,12 +143,12 @@ final readonly class Inbox
                 $udata->id,
             );
             // Send em an email!
-            if (($udata->email_settings & 2) !== 0) {
+            if (($udata->emailSettings & 2) !== 0) {
                 $this->jax->mail(
                     $udata->email,
-                    'PM From ' . $this->user->get()->display_name,
+                    'PM From ' . $this->user->get()->displayName,
                     "You are receiving this email because you've "
-                        . 'received a message from ' . $this->user->get()->display_name
+                        . 'received a message from ' . $this->user->get()->displayName
                         . ' on {BOARDLINK}.<br>'
                         . '<br>Please go to '
                         . "<a href='{BOARDURL}?act=ucp&what=inbox'>"
@@ -178,7 +178,7 @@ final readonly class Inbox
             if ($message !== null) {
                 $mid = $message->from;
                 $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
-                $mname = $member?->display_name;
+                $mname = $member?->displayName;
 
                 $msg = PHP_EOL . PHP_EOL . PHP_EOL
                     . '[quote=' . $mname . ']' . $message->message . '[/quote]';
@@ -193,7 +193,7 @@ final readonly class Inbox
         if (is_numeric($this->request->asString->get('mid'))) {
             $mid = (int) $this->request->asString->both('mid');
             $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
-            $mname = $member?->display_name;
+            $mname = $member?->displayName;
 
             if (!$mname) {
                 $mid = 0;
@@ -235,16 +235,16 @@ final readonly class Inbox
         $isSender = $message->from === $this->user->get()->id;
 
         if ($isRecipient) {
-            $message->del_recipient = 1;
+            $message->deletedRecipient = 1;
             $message->update($this->database);
         }
 
         if ($isSender) {
-            $message->del_sender = 1;
+            $message->deletedSender = 1;
             $message->update($this->database);
         }
 
-        if ($message->del_recipient && $message->del_sender) {
+        if ($message->deletedRecipient && $message->deletedSender) {
             $message->delete($this->database);
         }
 
@@ -272,11 +272,11 @@ final readonly class Inbox
     private function fetchMessageCount(?string $view = null): int
     {
         $criteria = match ($view) {
-            'sent' => 'WHERE `from`=? AND !`del_sender`',
+            'sent' => 'WHERE `from`=? AND !`deletedSender`',
             'flagged' => 'WHERE `to`=? AND `flag`=1',
             'unread' => 'WHERE `to`=? AND !`read`',
             'read' => 'WHERE `to`=? AND `read`=1',
-            default => 'WHERE `to`=? AND !`del_recipient`',
+            default => 'WHERE `to`=? AND !`deletedRecipient`',
         };
 
         return Message::count($this->database, $criteria, $this->user->get()->id) ?? 0;
@@ -288,9 +288,9 @@ final readonly class Inbox
     private function fetchMessages(string $view, int $pageNumber = 0): array
     {
         $criteria = match ($view) {
-            'sent' => 'WHERE `from`=? AND !del_sender',
+            'sent' => 'WHERE `from`=? AND !deletedSender',
             'flagged' => 'WHERE `to`=? AND flag=1',
-            default => 'WHERE `to`=? AND !del_recipient',
+            default => 'WHERE `to`=? AND !deletedRecipient',
         };
 
         return Message::selectMany(
@@ -372,7 +372,7 @@ final readonly class Inbox
             $otherMember !== null ? $this->template->meta(
                 'user-link',
                 $otherMember->id,
-                $otherMember->group_id,
+                $otherMember->groupID,
                 $otherMember->name,
             ) : '',
             $this->date->autoDate($message->date),
@@ -445,7 +445,7 @@ final readonly class Inbox
                     . 'class="switch flag" onchange="' . $dmessageOnchange . '" />',
                 $message->id,
                 $message->title,
-                $otherMember->display_name,
+                $otherMember->displayName,
                 $this->date->autoDate($message->date),
             );
         }

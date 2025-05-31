@@ -182,9 +182,9 @@ final class Search
             }
 
             if ($authorId !== 0) {
-                $postParams[] = 'p.`auth_id`=?';
+                $postParams[] = 'p.`author`=?';
                 $postValues[] = $authorId;
-                $topicParams[] = 't.`auth_id`=?';
+                $topicParams[] = 't.`author`=?';
                 $topicValues[] = $authorId;
             }
 

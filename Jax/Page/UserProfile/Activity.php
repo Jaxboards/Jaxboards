@@ -49,12 +49,12 @@ final readonly class Activity
             [
                 'description' => $member->usertitle,
                 'link' => "{$boardURL}?act=vu{$member->id}",
-                'title' => $member->display_name . "'s recent activity",
+                'title' => $member->displayName . "'s recent activity",
             ],
         );
         foreach ($this->fetchActivities($member->id) as $activity) {
-            $activity['name'] = $member->display_name;
-            $activity['group_id'] = $member->group_id;
+            $activity['name'] = $member->displayName;
+            $activity['groupID'] = $member->groupID;
             $parsed = $this->parseActivityRSS($activity);
             $rssFeed->additem(
                 [
@@ -78,13 +78,13 @@ final readonly class Activity
         $user = $this->template->meta(
             'user-link',
             $activity['uid'],
-            $activity['group_id'],
+            $activity['groupID'],
             $this->user->get()->id === $activity['uid'] ? 'You' : $activity['name'],
         );
         $otherguy = $this->template->meta(
             'user-link',
             $activity['aff_id'],
-            $activity['aff_group_id'],
+            $activity['aff_groupID'],
             $activity['aff_name'],
         );
 
@@ -104,12 +104,12 @@ final readonly class Activity
             'profile_name_change' => $this->template->meta(
                 'user-link',
                 $activity['uid'],
-                $activity['group_id'],
+                $activity['groupID'],
                 $activity['arg1'],
             ) . ' is now known as ' . $this->template->meta(
                 'user-link',
                 $activity['uid'],
-                $activity['group_id'],
+                $activity['groupID'],
                 $activity['arg2'],
             ) . ', ' . $date,
             'buddy_add' => $user . ' made friends with ' . $otherguy,
@@ -156,8 +156,8 @@ final readonly class Activity
         $tabHTML = '';
 
         foreach ($this->fetchActivities($member->id) as $activity) {
-            $activity['name'] = $member->display_name;
-            $activity['group_id'] = $member->group_id;
+            $activity['name'] = $member->displayName;
+            $activity['groupID'] = $member->groupID;
             $tabHTML .= $this->parseActivity($activity);
         }
 
@@ -183,16 +183,16 @@ final readonly class Activity
                     a.`arg1` AS `arg1`,
                     a.`uid` AS `uid`,
                     UNIX_TIMESTAMP(a.`date`) AS `date`,
-                    a.`affected_uid` AS `affected_uid`,
+                    a.`affectedUser` AS `affectedUser`,
                     a.`tid` AS `tid`,
                     a.`pid` AS `pid`,
                     a.`arg2` AS `arg2`,
-                    a.`affected_uid` AS `aff_id`,
-                    m.`display_name` AS `aff_name`,
-                    m.`group_id` AS `aff_group_id`
+                    a.`affectedUser` AS `aff_id`,
+                    m.`displayName` AS `aff_name`,
+                    m.`groupID` AS `aff_groupID`
                 FROM %t a
                 LEFT JOIN %t m
-                    ON a.`affected_uid`=m.`id`
+                    ON a.`affectedUser`=m.`id`
                 WHERE a.`uid`=?
                 ORDER BY a.`id` DESC
                 LIMIT ?

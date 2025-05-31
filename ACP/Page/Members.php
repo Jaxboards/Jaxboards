@@ -70,8 +70,8 @@ final readonly class Members
 
     private function showMain(): void
     {
-        $members = Member::selectMany($this->database, 'ORDER BY `display_name` ASC');
-        $groups = Group::joinedOn($this->database, $members, static fn(Member $member): int => $member->group_id);
+        $members = Member::selectMany($this->database, 'ORDER BY `displayName` ASC');
+        $groups = Group::joinedOn($this->database, $members, static fn(Member $member): int => $member->groupID);
 
         $rows = '';
         foreach ($members as $member) {
@@ -79,9 +79,9 @@ final readonly class Members
                 'members/show-main-row.html',
                 [
                     'avatar_url' => $member->avatar ?: self::DEFAULT_AVATAR,
-                    'group_title' => $groups[$member->group_id]->title,
+                    'group_title' => $groups[$member->groupID]->title,
                     'id' => $member->id,
-                    'title' => $member->display_name,
+                    'title' => $member->displayName,
                 ],
             );
         }
@@ -112,7 +112,7 @@ final readonly class Members
 
                 $members = Member::selectMany($this->database, Database::WHERE_ID_EQUALS, $memberId);
             } else {
-                $members = Member::selectMany($this->database, 'WHERE `display_name` LIKE ?', $name . '%');
+                $members = Member::selectMany($this->database, 'WHERE `displayName` LIKE ?', $name . '%');
             }
 
             $numMembers = count($members);
@@ -123,7 +123,7 @@ final readonly class Members
                         [
                             'avatar_url' => $member->avatar ?: self::DEFAULT_AVATAR,
                             'id' => $member->id,
-                            'title' => $member->display_name,
+                            'title' => $member->displayName,
                         ],
                     );
                 }
@@ -144,18 +144,18 @@ final readonly class Members
 
             $member = $members[0];
             if (
-                $member->group_id === Groups::Admin->value
+                $member->groupID === Groups::Admin->value
                 && $this->user->get()->id !== 1
                 && $this->user->get()->id !== $member->id
             ) {
                 $page = $this->page->error('You do not have permission to edit this profile. ');
             } else {
                 $page .= $this->jax->hiddenFormFields(['mid' => (string) $member->id]);
-                $page .= $this->inputText('Display Name:', 'display_name', $member->display_name);
+                $page .= $this->inputText('Display Name:', 'displayName', $member->displayName);
                 $page .= $this->inputText('Username:', 'name', $member->name);
                 $page .= $this->inputText('Real Name:', 'full_name', $member->full_name);
                 $page .= $this->inputText('Password:', 'password', '');
-                $page .= $this->getGroups($member->group_id);
+                $page .= $this->getGroups($member->groupID);
                 $page .= $this->heading('Profile Fields');
                 $page .= $this->inputText('User Title:', 'usertitle', $member->usertitle);
                 $page .= $this->inputText('Location:', 'location', $member->location);
@@ -166,16 +166,16 @@ final readonly class Members
                 $page .= $this->inputText('Email:', 'email', $member->email);
                 $page .= $this->textArea('UCP Notepad:', 'ucpnotepad', $member->ucpnotepad);
                 $page .= $this->heading('Contact Details');
-                $page .= $this->inputText('AIM:', 'contact_aim', $member->contact_aim);
-                $page .= $this->inputText('Bluesky:', 'contact_bluesky', $member->contact_bluesky);
-                $page .= $this->inputText('Discord:', 'contact_discord', $member->contact_discord);
-                $page .= $this->inputText('Google Chat:', 'contact_gtalk', $member->contact_gtalk);
-                $page .= $this->inputText('MSN:', 'contact_msn', $member->contact_msn);
-                $page .= $this->inputText('Skype:', 'contact_skype', $member->contact_skype);
-                $page .= $this->inputText('Steam:', 'contact_steam', $member->contact_steam);
-                $page .= $this->inputText('Twitter:', 'contact_twitter', $member->contact_twitter);
-                $page .= $this->inputText('YIM:', 'contact_yim', $member->contact_yim);
-                $page .= $this->inputText('YouTube:', 'contact_youtube', $member->contact_youtube);
+                $page .= $this->inputText('AIM:', 'contactAIM', $member->contactAIM);
+                $page .= $this->inputText('Bluesky:', 'contactBlueSky', $member->contactBlueSky);
+                $page .= $this->inputText('Discord:', 'contactDiscord', $member->contactDiscord);
+                $page .= $this->inputText('Google Chat:', 'contactGoogleChat', $member->contactGoogleChat);
+                $page .= $this->inputText('MSN:', 'contactMSN', $member->contactMSN);
+                $page .= $this->inputText('Skype:', 'contactSkype', $member->contactSkype);
+                $page .= $this->inputText('Steam:', 'contactSteam', $member->contactSteam);
+                $page .= $this->inputText('Twitter:', 'contactTwitter', $member->contactTwitter);
+                $page .= $this->inputText('YIM:', 'contactYIM', $member->contactYIM);
+                $page .= $this->inputText('YouTube:', 'contactYoutube', $member->contactYoutube);
                 $page .= $this->heading('System-Generated Variables');
                 $page .= $this->inputText('Post Count:', 'posts', (string) $member->posts);
                 $page = $this->page->parseTemplate(
@@ -199,7 +199,7 @@ final readonly class Members
         $memberId = (int) $this->request->asString->both('mid');
         $password = $this->request->asString->post('password');
 
-        if ($member->group_id === 2 && $this->user->get()->id !== 1) {
+        if ($member->groupID === 2 && $this->user->get()->id !== 1) {
             return $this->page->error(
                 'You do not have permission to edit this profile.',
             );
@@ -213,7 +213,7 @@ final readonly class Members
         }
 
         $stringFields = [
-            'display_name',
+            'displayName',
             'name',
             'full_name',
             'usertitle',
@@ -223,16 +223,16 @@ final readonly class Members
             'sig',
             'email',
             'ucpnotepad',
-            'contact_aim',
-            'contact_bluesky',
-            'contact_discord',
-            'contact_gtalk',
-            'contact_msn',
-            'contact_skype',
-            'contact_steam',
-            'contact_twitter',
-            'contact_yim',
-            'contact_youtube',
+            'contactAIM',
+            'contactBlueSky',
+            'contactDiscord',
+            'contactGoogleChat',
+            'contactMSN',
+            'contactSkype',
+            'contactSteam',
+            'contactTwitter',
+            'contactYIM',
+            'contactYoutube',
             'website',
         ];
         foreach ($stringFields as $stringField) {
@@ -246,11 +246,11 @@ final readonly class Members
 
         // Int fields
         $member->posts = (int) $this->request->asString->post('posts');
-        $member->group_id = (int) $this->request->asString->post('group_id');
+        $member->groupID = (int) $this->request->asString->post('groupID');
 
         // Make it so root admins can't get out of admin.
         if ($memberId === 1) {
-            $member->group_id = Groups::Admin->value;
+            $member->groupID = Groups::Admin->value;
         }
 
         $member->update($this->database);
@@ -274,7 +274,7 @@ final readonly class Members
 
         $member = Member::selectOne(
             $this->database,
-            'WHERE `name`=? OR `display_name`=?',
+            'WHERE `name`=? OR `displayName`=?',
             $username,
             $displayName,
         );
@@ -284,9 +284,9 @@ final readonly class Members
         }
 
         $member = new Member();
-        $member->display_name = $displayName;
-        $member->group_id = 1;
-        $member->last_visit = $this->database->datetime();
+        $member->displayName = $displayName;
+        $member->groupID = 1;
+        $member->lastVisit = $this->database->datetime();
         $member->name = $username;
         $member->pass = password_hash(
             $password,
@@ -379,9 +379,9 @@ final readonly class Members
         $this->database->update(
             'posts',
             [
-                'auth_id' => $mid2,
+                'author' => $mid2,
             ],
-            'WHERE `auth_id`=?',
+            'WHERE `author`=?',
             $mid1,
         );
         // Profile comments.
@@ -405,17 +405,17 @@ final readonly class Members
         $this->database->update(
             'topics',
             [
-                'auth_id' => $mid2,
+                'author' => $mid2,
             ],
-            'WHERE `auth_id`=?',
+            'WHERE `author`=?',
             $mid1,
         );
         $this->database->update(
             'topics',
             [
-                'lp_uid' => $mid2,
+                'lastPostUser' => $mid2,
             ],
-            'WHERE `lp_uid`=?',
+            'WHERE `lastPostUser`=?',
             $mid1,
         );
 
@@ -423,9 +423,9 @@ final readonly class Members
         $this->database->update(
             'forums',
             [
-                'lp_uid' => $mid2,
+                'lastPostUser' => $mid2,
             ],
-            'WHERE `lp_uid`=?',
+            'WHERE `lastPostUser`=?',
             $mid1,
         );
 
@@ -511,12 +511,12 @@ final readonly class Members
                 $this->database->delete('messages', 'WHERE `to`=?', $memberId);
                 $this->database->delete('messages', 'WHERE `from`=?', $memberId);
                 // Posts.
-                $this->database->delete('posts', 'WHERE `auth_id`=?', $memberId);
+                $this->database->delete('posts', 'WHERE `author`=?', $memberId);
                 // Profile comments.
                 $this->database->delete('profile_comments', 'WHERE `to`=?', $memberId);
                 $this->database->delete('profile_comments', 'WHERE `from`=?', $memberId);
                 // Topics.
-                $this->database->delete('topics', 'WHERE `auth_id`=?', $memberId);
+                $this->database->delete('topics', 'WHERE `author`=?', $memberId);
 
                 // Forums.
                 $this->database->update(
@@ -524,9 +524,9 @@ final readonly class Members
                     [
                         'lp_tid' => null,
                         'lp_topic' => '',
-                        'lp_uid' => null,
+                        'lastPostUser' => null,
                     ],
-                    'WHERE `lp_uid`=?',
+                    'WHERE `lastPostUser`=?',
                     $memberId,
                 );
 
@@ -603,15 +603,15 @@ final readonly class Members
 
         $members = Member::selectMany(
             $this->database,
-            'WHERE (?-UNIX_TIMESTAMP(`last_visit`))<?',
+            'WHERE (?-UNIX_TIMESTAMP(`lastVisit`))<?',
             Carbon::now('UTC')->getTimestamp(),
             60 * 60 * 24 * 31 * 6,
         );
         foreach ($members as $member) {
             $message = new Message();
             $message->date = $this->database->datetime();
-            $message->del_recipient = 0;
-            $message->del_sender = 0;
+            $message->deletedRecipient = 0;
+            $message->deletedSender = 0;
             $message->flag = 0;
             $message->from = $this->user->get()->id;
             $message->message = $messageBody;
@@ -668,14 +668,14 @@ final readonly class Members
             $this->database->update(
                 'members',
                 [
-                    'group_id' => 1,
+                    'groupID' => 1,
                 ],
                 Database::WHERE_ID_EQUALS,
                 $memberId,
             );
         }
 
-        $members = Member::selectMany($this->database, 'WHERE `group_id`=5');
+        $members = Member::selectMany($this->database, 'WHERE `groupID`=5');
         $page = '';
         foreach ($members as $member) {
             $page .= $this->page->parseTemplate(
@@ -684,8 +684,8 @@ final readonly class Members
                     'email_address' => $member->email,
                     'id' => $member->id,
                     'ip_address' => $this->ipAddress->asHumanReadable($member->ip),
-                    'join_date' => $member->join_date ?? '',
-                    'title' => $member->display_name,
+                    'joinDate' => $member->joinDate ?? '',
+                    'title' => $member->displayName,
                 ],
             );
         }

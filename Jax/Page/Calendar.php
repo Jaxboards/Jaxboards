@@ -62,7 +62,7 @@ final readonly class Calendar
         $daysInMonth = (int) $daysInMonth;
         $year = (int) $year;
 
-        $this->session->set('location_verbose', 'Checking out the calendar for ' . $monthName . ' ' . $year);
+        $this->session->set('locationVerbose', 'Checking out the calendar for ' . $monthName . ' ' . $year);
         $members = Member::selectMany(
             $this->database,
             'WHERE MONTH(`birthdate`)=? AND YEAR(`birthdate`)<?',
@@ -81,7 +81,7 @@ final readonly class Calendar
                 . 'title="%4$s years old!" data-use-tooltip="true">'
                 . '%3$s</a>',
                 $member->id,
-                $member->group_id,
+                $member->groupID,
                 $member->name,
                 $year - ($birthday->year ?? 0),
             );

@@ -115,7 +115,7 @@ final readonly class App
         // but the session variable has changed/been removed/not updated for some reason
         // this fixes it.
         if (
-            !$this->session->get()->is_bot
+            !$this->session->get()->isBot
             && $this->user->get()->id !== 0
             && $this->user->get()->id !== $this->session->get()->uid
         ) {
@@ -173,19 +173,19 @@ final readonly class App
     private function loadSkin(): void
     {
         $this->page->loadSkin(
-            $this->session->getVar('skin_id')
-            ?: $this->user->get()->skin_id,
+            $this->session->getVar('skinID')
+            ?: $this->user->get()->skinID,
         );
         $this->template->loadMeta('global');
 
 
         // Skin selector.
-        if ($this->request->both('skin_id') !== null) {
-            if (!$this->request->both('skin_id')) {
-                $this->session->deleteVar('skin_id');
+        if ($this->request->both('skinID') !== null) {
+            if (!$this->request->both('skinID')) {
+                $this->session->deleteVar('skinID');
                 $this->page->command('reload');
             } else {
-                $this->session->addVar('skin_id', $this->request->both('skin_id'));
+                $this->session->addVar('skinID', $this->request->both('skinID'));
                 if ($this->request->isJSAccess()) {
                     $this->page->command('reload');
                 }
@@ -193,7 +193,7 @@ final readonly class App
         }
 
         if (
-            !$this->session->getVar('skin_id')
+            !$this->session->getVar('skinID')
         ) {
             return;
         }
@@ -203,7 +203,7 @@ final readonly class App
             '<div class="success" '
             . 'style="position:fixed;bottom:0;left:0;width:100%;">'
             . 'Skin UCP setting being overridden. '
-            . '<a href="?skin_id=0">Revert</a></div>',
+            . '<a href="?skinID=0">Revert</a></div>',
         );
     }
 
@@ -215,7 +215,7 @@ final readonly class App
         );
 
         if (
-            $this->user->getGroup()?->can_moderate
+            $this->user->getGroup()?->canModerate
             || $this->user->get()->mod
         ) {
             $this->page->append(
@@ -245,9 +245,9 @@ final readonly class App
             'NAVIGATION',
             $this->template->meta(
                 'navigation',
-                $this->user->getGroup()?->can_moderate
+                $this->user->getGroup()?->canModerate
                 ? '<li><a href="?act=modcontrols&do=cp">Mod CP</a></li>' : '',
-                $this->user->getGroup()?->can_access_acp
+                $this->user->getGroup()?->canAccessACP
                 ? '<li><a href="./ACP/" target="_BLANK">ACP</a></li>' : '',
                 $this->config->getSetting('navlinks') ?? '',
             ),
@@ -296,11 +296,11 @@ final readonly class App
                 $this->template->meta(
                     'user-link',
                     $this->user->get()->id,
-                    $this->user->get()->group_id,
-                    $this->user->get()->display_name,
+                    $this->user->get()->groupID,
+                    $this->user->get()->displayName,
                 ),
                 $this->date->smallDate(
-                    $this->user->get()->last_visit,
+                    $this->user->get()->lastVisit,
                 ),
                 $numMessages,
             ),
@@ -333,20 +333,20 @@ final readonly class App
 
     private function setPageVars(): void
     {
-        $this->template->addVar('ismod', $this->user->getGroup()?->can_moderate ? 'true' : 'false');
+        $this->template->addVar('ismod', $this->user->getGroup()?->canModerate ? 'true' : 'false');
         $this->template->addVar('isguest', $this->user->isGuest() ? 'true' : 'false');
-        $this->template->addVar('isadmin', $this->user->getGroup()?->can_access_acp ? 'true' : 'false');
+        $this->template->addVar('isadmin', $this->user->getGroup()?->canAccessACP ? 'true' : 'false');
 
         $this->template->addVar(
             'modlink',
-            $this->user->getGroup()?->can_moderate
+            $this->user->getGroup()?->canModerate
                 ? $this->template->meta('modlink')
                 : '',
         );
 
         $this->template->addVar(
             'acplink',
-            $this->user->getGroup()?->can_access_acp
+            $this->user->getGroup()?->canAccessACP
                 ? $this->template->meta('acplink')
                 : '',
         );
@@ -356,22 +356,22 @@ final readonly class App
             return;
         }
 
-        $this->template->addVar('groupid', (string) $this->user->get()->group_id);
+        $this->template->addVar('groupid', (string) $this->user->get()->groupID);
         $this->template->addVar('userposts', (string) $this->user->get()->posts);
         $this->template->addVar('grouptitle', (string) $this->user->getGroup()?->title);
         $this->template->addVar('avatar', $this->user->get()->avatar ?: $this->template->meta('default-avatar'));
-        $this->template->addVar('username', $this->user->get()->display_name);
+        $this->template->addVar('username', $this->user->get()->displayName);
         $this->template->addVar('userid', (string) $this->user->get()->id ?: '0');
 
         $this->page->append(
             'SCRIPT',
             '<script>window.globalsettings='
             . json_encode([
-                'can_im' => $this->user->getGroup()?->can_im,
-                'groupid' => $this->user->get()->group_id,
-                'sound_im' => $this->user->get()->sound_im,
+                'canIM' => $this->user->getGroup()?->canIM,
+                'groupid' => $this->user->get()->groupID,
+                'soundIM' => $this->user->get()->soundIM,
                 'userid' => $this->user->get()->id,
-                'username' => $this->user->get()->display_name,
+                'username' => $this->user->get()->displayName,
                 'wysiwyg' => $this->user->get()->wysiwyg,
             ])
             . '</script>',

@@ -38,7 +38,7 @@ final readonly class Comments
 
         if (
             !$this->user->isGuest()
-            && $this->user->getGroup()?->can_add_comments
+            && $this->user->getGroup()?->canAddComments
         ) {
             $tabHTML .= $this->template->meta(
                 'userprofile-comment-form',
@@ -74,9 +74,9 @@ final readonly class Comments
 
         foreach ($comments as $comment) {
             $act = $this->request->asString->both('act');
-            $deleteLink = $this->user->getGroup()?->can_delete_comments
+            $deleteLink = $this->user->getGroup()?->canDeleteComments
                 && $comment->from === $this->user->get()->id
-                || $this->user->getGroup()?->can_moderate ? <<<HTML
+                || $this->user->getGroup()?->canModerate ? <<<HTML
                     <a href="?act={$act}&page=comments&del={$comment->id}" class="delete">[X]</a>
                     HTML
                 : '';
@@ -87,8 +87,8 @@ final readonly class Comments
                 $this->template->meta(
                     'user-link',
                     $fromMember->id,
-                    $fromMember->group_id,
-                    $fromMember->display_name,
+                    $fromMember->groupID,
+                    $fromMember->displayName,
                 ),
                 $fromMember->avatar ?: $this->template->meta('default-avatar'),
                 $this->date->autoDate($comment->date),
@@ -110,7 +110,7 @@ final readonly class Comments
         $error = null;
         if (
             $this->user->isGuest()
-            || !$this->user->getGroup()?->can_add_comments
+            || !$this->user->getGroup()?->canAddComments
         ) {
             $error = 'No permission to add comments!';
         }
@@ -122,7 +122,7 @@ final readonly class Comments
         }
 
         $activity = new Activity();
-        $activity->affected_uid = $member->id;
+        $activity->affectedUser = $member->id;
         $activity->date = $this->database->datetime();
         $activity->type = 'profile_comment';
         $activity->uid = $this->user->get()->id;
@@ -146,7 +146,7 @@ final readonly class Comments
         }
 
         // Moderators can delete any comment
-        if ($this->user->getGroup()?->can_moderate) {
+        if ($this->user->getGroup()?->canModerate) {
             $this->database->delete(
                 'profile_comments',
                 Database::WHERE_ID_EQUALS,
@@ -156,7 +156,7 @@ final readonly class Comments
             return;
         }
 
-        if (!$this->user->getGroup()?->can_delete_comments) {
+        if (!$this->user->getGroup()?->canDeleteComments) {
             return;
         }
 

@@ -127,7 +127,7 @@ final readonly class Forums
             $this->database->update(
                 'forums',
                 [
-                    'cat_id' => $cat,
+                    'category' => $cat,
                     'order' => $order,
                     'path' => preg_replace(
                         '@\s+@',
@@ -158,7 +158,7 @@ final readonly class Forums
                     'poll' => $this->checkbox(
                         $group->id,
                         'poll',
-                        $groupPerms['poll'] ?? $group->can_poll,
+                        $groupPerms['poll'] ?? $group->canPoll,
                     ),
                     'read' => $this->checkbox(
                         $group->id,
@@ -168,18 +168,18 @@ final readonly class Forums
                     'reply' => $this->checkbox(
                         $group->id,
                         'reply',
-                        $groupPerms['reply'] ?? $group->can_post,
+                        $groupPerms['reply'] ?? $group->canPost,
                     ),
                     'start' => $this->checkbox(
                         $group->id,
                         'start',
-                        $groupPerms['start'] ?? $group->can_post_topics,
+                        $groupPerms['start'] ?? $group->canCreateTopics,
                     ),
                     'title' => $group->title,
                     'upload' => $this->checkbox(
                         $group->id,
                         'upload',
-                        $groupPerms['upload'] ?? $group->can_attach,
+                        $groupPerms['upload'] ?? $group->canAttach,
                     ),
                     'view' => $this->checkbox(
                         $group->id,
@@ -281,7 +281,7 @@ final readonly class Forums
         $forums = $this->fetchAllForums();
         $forumsByCategory = array_map(
             static fn($forums): ForumTree => new ForumTree($forums),
-            groupBy($forums, static fn($forum) => $forum->cat_id),
+            groupBy($forums, static fn($forum) => $forum->category),
         );
 
         $categories = $this->fetchAllCategories();
@@ -463,7 +463,7 @@ final readonly class Forums
                     'forums/create-forum-moderators-mod.html',
                     [
                         'delete_link' => '?act=Forums&do=edit&edit=' . $fid . '&rmod=' . $member->id,
-                        'username' => $member->display_name,
+                        'username' => $member->displayName,
                     ],
                 );
             }
@@ -559,7 +559,7 @@ final readonly class Forums
 
         if ($forum === null) {
             $forum = new Forum();
-            $forum->cat_id = first($categories)->id;
+            $forum->category = first($categories)->id;
         }
 
         $forum->nocount = $this->request->asString->post('count') ? 0 : 1;
@@ -706,7 +706,7 @@ final readonly class Forums
     private function createCategory(?int $cid = null): void
     {
         $page = '';
-        $cid = $cid ?: (int) $this->request->asString->post('cat_id');
+        $cid = $cid ?: (int) $this->request->asString->post('category');
 
         $category = $cid !== 0
             ? Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $cid)
@@ -755,9 +755,9 @@ final readonly class Forums
                 $this->database->update(
                     'forums',
                     [
-                        'cat_id' => $moveTo,
+                        'category' => $moveTo,
                     ],
-                    'WHERE `cat_id`=?',
+                    'WHERE `category`=?',
                     $catId,
                 );
                 $this->database->delete(

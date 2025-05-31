@@ -40,7 +40,7 @@ final readonly class Poll
         return $this->template->meta(
             'box',
             " id='poll'",
-            $topic->poll_q,
+            $topic->pollQuestion,
             $this->renderPollHTML($topic),
         );
     }
@@ -55,10 +55,10 @@ final readonly class Poll
         }
 
         $choice = $this->request->both('choice');
-        $choices = json_decode($topic->poll_choices, true);
+        $choices = json_decode($topic->pollChoices, true);
         $numchoices = count($choices);
 
-        $results = $this->parsePollResults($topic->poll_results);
+        $results = $this->parsePollResults($topic->pollResults);
 
         // Results is now an array of arrays, the keys of the parent array
         // correspond to the choices while the arrays within the array
@@ -79,7 +79,7 @@ final readonly class Poll
             $error = 'You have already voted on this poll!';
         }
 
-        if ($topic->poll_type === 'multi') {
+        if ($topic->pollType === 'multi') {
             if (is_array($choice)) {
                 foreach ($choice as $c) {
                     if (is_numeric($c) && $c < $numchoices && $c >= 0) {
@@ -106,7 +106,7 @@ final readonly class Poll
         }
 
         if (is_array($choice)) {
-            if ($topic->poll_type === 'multi') {
+            if ($topic->pollType === 'multi') {
                 foreach ($choice as $c) {
                     $results[$c][] = $this->user->get()->id;
                 }
@@ -121,7 +121,7 @@ final readonly class Poll
                 ? implode(',', $results[$x]) : '';
         }
 
-        $topic->poll_results = implode(';', $presults);
+        $topic->pollResults = implode(';', $presults);
         $topic->update($this->database);
 
         $this->page->command(
@@ -136,13 +136,13 @@ final readonly class Poll
 
     private function renderPollHTML(Topic $topic): string
     {
-        $type = $topic->poll_type;
-        $choices = json_decode($topic->poll_choices);
+        $type = $topic->pollType;
+        $choices = json_decode($topic->pollChoices);
         if (!is_array($choices)) {
             $choices = [];
         }
 
-        $results = $topic->poll_results;
+        $results = $topic->pollResults;
 
         $usersvoted = [];
         $voted = false;

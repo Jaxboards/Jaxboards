@@ -213,7 +213,7 @@ final readonly class BuddyList
 
         $this->user->set('friends', implode(',', $friends));
         $activity = new Activity();
-        $activity->affected_uid = $uid;
+        $activity->affectedUser = $uid;
         $activity->type = 'buddy_add';
         $activity->uid = $this->user->get()->id;
         $activity->insert($this->database);

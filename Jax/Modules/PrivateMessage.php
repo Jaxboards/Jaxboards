@@ -95,7 +95,7 @@ final readonly class PrivateMessage
             return;
         }
 
-        if (!$this->user->getGroup()?->can_im) {
+        if (!$this->user->getGroup()?->canIM) {
             $this->page->command(
                 'error',
                 "You don't have permission to use this feature.",
@@ -110,7 +110,7 @@ final readonly class PrivateMessage
         $cmd = [
             'im',
             $uid,
-            $this->user->get()->display_name,
+            $this->user->get()->displayName,
             $instantMessage,
             $this->user->get()->id,
             Carbon::now('UTC')->getTimestamp(),
@@ -135,7 +135,7 @@ final readonly class PrivateMessage
             <<<'SQL'
                 UPDATE %t
                 SET `runonce`=CONCAT(`runonce`,?)
-                WHERE `uid`=? AND `last_update`>?
+                WHERE `uid`=? AND `lastUpdate`>?
                 SQL,
             ['session'],
             json_encode($cmd) . PHP_EOL,

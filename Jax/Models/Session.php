@@ -15,18 +15,18 @@ final class Session extends Model
         'uid',
         'ip',
         'vars',
-        'last_update',
-        'last_action',
+        'lastUpdate',
+        'lastAction',
         'runonce',
         'location',
-        'users_online_cache',
-        'is_bot',
-        'buddy_list_cache',
-        'location_verbose',
+        'usersOnlineCache',
+        'isBot',
+        'buddyListCache',
+        'locationVerbose',
         'useragent',
         'forumsread',
         'topicsread',
-        'read_date',
+        'readDate',
         'hide',
     ];
 
@@ -38,21 +38,21 @@ final class Session extends Model
 
     public string $vars = '';
 
-    public ?string $last_update = null;
+    public ?string $lastUpdate = null;
 
-    public ?string $last_action = null;
+    public ?string $lastAction = null;
 
     public string $runonce = '';
 
     public string $location = '';
 
-    public string $users_online_cache = '';
+    public string $usersOnlineCache = '';
 
-    public int $is_bot = 0;
+    public int $isBot = 0;
 
-    public string $buddy_list_cache = '';
+    public string $buddyListCache = '';
 
-    public string $location_verbose = '';
+    public string $locationVerbose = '';
 
     public string $useragent = '';
 
@@ -60,7 +60,7 @@ final class Session extends Model
 
     public string $topicsread = '{}';
 
-    public ?string $read_date = null;
+    public ?string $readDate = null;
 
     public int $hide = 0;
 }

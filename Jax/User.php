@@ -33,7 +33,7 @@ final class User
         }
 
         $guestMember = new Member();
-        $guestMember->group_id = Groups::Guest->value;
+        $guestMember->groupID = Groups::Guest->value;
 
         $this->member = $guestMember;
     }
@@ -100,7 +100,7 @@ final class User
 
         $groupId = match (true) {
             $this->isBanned() => Groups::Banned->value,
-            default => $this->member->group_id,
+            default => $this->member->groupID,
         };
 
         $group = Group::selectOne(
@@ -125,7 +125,7 @@ final class User
         // the bitflag as determined by the user's group.
         $parsedPerms = $this->jax->parseForumPerms($forumPerms);
 
-        $permFlags = $parsedPerms[$this->member->group_id] ?? null;
+        $permFlags = $parsedPerms[$this->member->groupID] ?? null;
 
         // Null $permFlags means to fall back to global permissions.
         if ($permFlags !== null) {
@@ -133,12 +133,12 @@ final class User
         }
 
         return [
-            'poll' => (bool) $this->getGroup()?->can_poll,
+            'poll' => (bool) $this->getGroup()?->canPoll,
             'read' => true,
             // There is no global "forum read" permission so default to assuming the user can read it
-            'reply' => (bool) $this->getGroup()?->can_post,
-            'start' => (bool) $this->getGroup()?->can_post_topics,
-            'upload' => (bool) $this->getGroup()?->can_attach,
+            'reply' => (bool) $this->getGroup()?->canPost,
+            'start' => (bool) $this->getGroup()?->canCreateTopics,
+            'upload' => (bool) $this->getGroup()?->canAttach,
             'view' => true,
             // There is no global "forum view" permission so default to assuming the user can see it
         ];
@@ -146,12 +146,12 @@ final class User
 
     public function isAdmin(): bool
     {
-        return $this->member->group_id === Groups::Admin->value;
+        return $this->member->groupID === Groups::Admin->value;
     }
 
     public function isBanned(): bool
     {
-        if ($this->member->group_id === Groups::Banned->value) {
+        if ($this->member->groupID === Groups::Banned->value) {
             return true;
         }
 
@@ -160,7 +160,7 @@ final class User
 
     public function isGuest(): bool
     {
-        return $this->member->group_id === Groups::Guest->value;
+        return $this->member->groupID === Groups::Guest->value;
     }
 
     /**

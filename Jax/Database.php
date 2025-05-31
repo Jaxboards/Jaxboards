@@ -387,19 +387,19 @@ class Database
                     s.`id` as `id`,
                     s.`uid` AS `uid`,
                     s.`location` AS `location`,
-                    s.`location_verbose` AS `location_verbose`,
+                    s.`locationVerbose` AS `locationVerbose`,
                     s.`hide` AS `hide`,
-                    s.`is_bot` AS `is_bot`,
-                    m.`display_name` AS `name`,
-                    m.`group_id` AS `group_id`,
+                    s.`isBot` AS `isBot`,
+                    m.`displayName` AS `name`,
+                    m.`groupID` AS `groupID`,
                     m.`birthdate` AS `birthdate`,
                     CONCAT(MONTH(m.`birthdate`),' ',DAY(m.`birthdate`)) AS `dob`,
-                    UNIX_TIMESTAMP(s.`last_action`) AS `last_action`,
-                    UNIX_TIMESTAMP(s.`last_update`) AS `last_update`
+                    UNIX_TIMESTAMP(s.`lastAction`) AS `lastAction`,
+                    UNIX_TIMESTAMP(s.`lastUpdate`) AS `lastUpdate`
                 FROM %t s
                 LEFT JOIN %t m ON s.`uid`=m.`id`
-                WHERE s.`last_update`>=?
-                ORDER BY s.`last_action` ASC
+                WHERE s.`lastUpdate`>=?
+                ORDER BY s.`lastAction` ASC
                 SQL,
             ['session', 'members'],
             $this->datetime(Carbon::now('UTC')->getTimestamp() - $this->serviceConfig->getSetting('timetologout')),
@@ -415,10 +415,10 @@ class Database
             }
 
             $user['birthday'] = ($user['dob'] === $today ? 1 : 0);
-            $user['status'] = $user['last_action'] < $idletimeout
+            $user['status'] = $user['lastAction'] < $idletimeout
                 ? 'idle'
                 : 'active';
-            if ($user['is_bot']) {
+            if ($user['isBot']) {
                 $user['name'] = $user['id'];
                 $user['uid'] = $user['id'];
             }
@@ -435,7 +435,7 @@ class Database
     {
         $topic = Topic::selectOne(
             $this,
-            'WHERE `fid`=? ORDER BY `lp_date` DESC LIMIT 1',
+            'WHERE `fid`=? ORDER BY `lastPostDate` DESC LIMIT 1',
             $forumId,
         );
 
@@ -445,10 +445,10 @@ class Database
             return;
         }
 
-        $forum->lp_date = $topic->lp_date;
-        $forum->lp_tid = $topic->id;
-        $forum->lp_topic = $topic->title;
-        $forum->lp_uid = $topic->lp_uid;
+        $forum->lastPostDate = $topic->lastPostDate;
+        $forum->lastPostTopic = $topic->id;
+        $forum->lastPostTopicTitle = $topic->title;
+        $forum->lastPostUser = $topic->lastPostUser;
         $forum->update($this);
     }
 

@@ -87,7 +87,7 @@ final class IDX
             $this->page->command('softurl');
             $this->session->set('forumsread', '{}');
             $this->session->set('topicsread', '{}');
-            $this->session->set('read_date', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
+            $this->session->set('readDate', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
         }
 
         if ($this->request->isJSUpdate()) {
@@ -126,18 +126,18 @@ final class IDX
         return Member::joinedOn(
             $this->database,
             $forums,
-            static fn(Forum $forum): ?int => $forum->lp_uid,
+            static fn(Forum $forum): ?int => $forum->lastPostUser,
         );
     }
 
     private function viewidx(): void
     {
-        $this->session->set('location_verbose', 'Viewing board index');
+        $this->session->set('locationVerbose', 'Viewing board index');
         $page = '';
 
         $forums = $this->fetchIDXForums();
         $lastPostMembers = $this->fetchLastPostMembers($forums);
-        $forumsByCatID = groupBy($forums, static fn(Forum $forum): ?int => $forum->cat_id);
+        $forumsByCatID = groupBy($forums, static fn(Forum $forum): ?int => $forum->category);
 
         foreach ($forums as $forum) {
             // Store subforum details for later.
@@ -159,7 +159,7 @@ final class IDX
             }
 
             // Store mod details for later.
-            if (!$forum->show_ledby) {
+            if (!$forum->showLedBy) {
                 continue;
             }
 
@@ -244,8 +244,8 @@ final class IDX
                 $moderatorinfo[$member->id] = $this->template->meta(
                     'user-link',
                     $member->id,
-                    $member->group_id,
-                    $member->display_name,
+                    $member->groupID,
+                    $member->displayName,
                 );
             }
         }
@@ -270,13 +270,13 @@ final class IDX
             $read = $this->isForumRead($forum);
             $subforumHTML = '';
             if (
-                $forum->show_sub >= 1
+                $forum->showSubForums >= 1
                 && isset($this->subforums[$forum->id])
             ) {
                 $subforumHTML = $this->subforums[$forum->id];
             }
 
-            if ($forum->show_sub === 2) {
+            if ($forum->showSubForums === 2) {
                 foreach ($this->getsubs($forum->id) as $i) {
                     $subforumHTML .= $this->subforums[$i];
                 }
@@ -321,7 +321,7 @@ final class IDX
                                 ),
                             ),
                         ) : '',
-                    $this->formatLastPost($forum, $lastPostMembers[$forum->lp_uid] ?? null),
+                    $this->formatLastPost($forum, $lastPostMembers[$forum->lastPostUser] ?? null),
                     $this->template->meta('idx-topics-count', $forum->topics),
                     $this->template->meta('idx-replies-count', $forum->posts),
                     $read ? 'read' : 'unread',
@@ -330,7 +330,7 @@ final class IDX
                             {$linkText}
                         </a>
                         HTML,
-                    $forum->show_ledby && $forum->mods
+                    $forum->showLedBy && $forum->mods
                         ? $this->template->meta(
                             'idx-ledby-wrapper',
                             $this->getmods($forum->mods),
@@ -350,12 +350,12 @@ final class IDX
         $result = $this->database->special(
             <<<'SQL'
                 SELECT
-                    UNIX_TIMESTAMP(MAX(s.`last_update`)) AS `last_update`,
+                    UNIX_TIMESTAMP(MAX(s.`lastUpdate`)) AS `lastUpdate`,
                     m.`id` AS `id`,
-                    m.`group_id` AS `group_id`,
-                    m.`display_name` AS `name`,
+                    m.`groupID` AS `groupID`,
+                    m.`displayName` AS `name`,
                     CONCAT(MONTH(m.`birthdate`),' ',DAY(m.`birthdate`)) AS `birthday`,
-                    UNIX_TIMESTAMP(MAX(s.`read_date`)) AS `read_date`,
+                    UNIX_TIMESTAMP(MAX(s.`readDate`)) AS `readDate`,
                     s.`hide` AS `hide`
                 FROM %t s
                 LEFT JOIN %t m
@@ -378,7 +378,7 @@ final class IDX
 
     private function getBoardStats(): string
     {
-        if (!$this->user->getGroup()?->can_view_stats) {
+        if (!$this->user->getGroup()?->canViewStats) {
             return '';
         }
 
@@ -399,13 +399,13 @@ final class IDX
             $birthdayClass = $user['birthday'] === $today
                 && $birthdaysEnabled ? 'birthday' : '';
             $lastOnline = $user['hide']
-                ? $user['read_date']
-                : $user['last_update'];
+                ? $user['readDate']
+                : $user['lastUpdate'];
             $lastOnlineDate = $this->date->relativeTime($lastOnline);
 
             return <<<HTML
                 <a href="?act=vu{$user['id']}"
-                    class="user{$user['id']} mgroup{$user['group_id']} {$birthdayClass}"
+                    class="user{$user['id']} mgroup{$user['groupID']} {$birthdayClass}"
                     title="Last online: {$lastOnlineDate}"
                     data-use-tooltip="true"
                     data-last-online="{$lastOnline}"
@@ -433,8 +433,8 @@ final class IDX
             $lastRegisteredMember !== null ? $this->template->meta(
                 'user-link',
                 $lastRegisteredMember->id,
-                $lastRegisteredMember->group_id,
-                $lastRegisteredMember->display_name,
+                $lastRegisteredMember->groupID,
+                $lastRegisteredMember->displayName,
             ) : '',
             $legend,
         );
@@ -457,9 +457,9 @@ final class IDX
             }
 
             $title = $this->textFormatting->blockhtml(
-                (string) $user['location_verbose'] ?: 'Viewing the board.',
+                (string) $user['locationVerbose'] ?: 'Viewing the board.',
             );
-            if (isset($user['is_bot']) && $user['is_bot']) {
+            if (isset($user['isBot']) && $user['isBot']) {
                 $html .= '<a class="user' . $user['uid'] . '" '
                     . 'title="' . $title . '" data-use-tooltip="true">'
                     . $user['name'] . '</a>';
@@ -470,10 +470,10 @@ final class IDX
                         . 'title="%4$s" data-use-tooltip="true">'
                         . '%3$s</a>',
                     $user['uid'],
-                    $user['group_id']
+                    $user['groupID']
                         . (
                             $user['status'] === 'idle'
-                            ? " idle lastAction{$user['last_action']}"
+                            ? " idle lastAction{$user['lastAction']}"
                             : ''
                         )
                         . ($user['birthday'] && $this->config->getSetting('birthdays') ? ' birthday' : ''),
@@ -490,37 +490,37 @@ final class IDX
     {
         $list = [];
         if (
-            $this->session->get()->users_online_cache !== ''
+            $this->session->get()->usersOnlineCache !== ''
         ) {
-            $oldcache = array_flip(explode(',', $this->session->get()->users_online_cache));
+            $oldcache = array_flip(explode(',', $this->session->get()->usersOnlineCache));
         }
 
         $useronlinecache = '';
         foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
-            $lastUpdateTS = $this->session->get()->last_update !== null
-                ? $this->date->datetimeAsTimestamp($this->session->get()->last_update)
+            $lastUpdateTS = $this->session->get()->lastUpdate !== null
+                ? $this->date->datetimeAsTimestamp($this->session->get()->lastUpdate)
                 : 0;
             $lastActionIdle = $lastUpdateTS - ($this->config->getSetting('timetoidle') ?? 300) - 30;
-            if (!$user['uid'] && !$user['is_bot']) {
+            if (!$user['uid'] && !$user['isBot']) {
                 continue;
             }
 
             if (
-                $user['last_action'] >= $lastUpdateTS
+                $user['lastAction'] >= $lastUpdateTS
                 || $user['status'] === 'idle'
-                && $user['last_action'] > $lastActionIdle
+                && $user['lastAction'] > $lastActionIdle
             ) {
                 $list[] = [
                     $user['uid'],
-                    $user['group_id'],
+                    $user['groupID'],
 
                     $user['status'] !== 'active'
                         ? $user['status']
                         : ($user['birthday'] && ($this->config->getSetting('birthdays') & 1)
                             ? ' birthday' : ''),
                     $user['name'],
-                    $user['location_verbose'],
-                    $user['last_action'],
+                    $user['locationVerbose'],
+                    $user['lastAction'],
                 ];
             }
 
@@ -535,7 +535,7 @@ final class IDX
             $this->page->command('setoffline', implode(',', array_flip($oldcache)));
         }
 
-        $this->session->set('users_online_cache', mb_substr($useronlinecache, 0, -1));
+        $this->session->set('usersOnlineCache', mb_substr($useronlinecache, 0, -1));
         if ($list === []) {
             return;
         }
@@ -563,7 +563,7 @@ final class IDX
             $this->page->command(
                 'update',
                 '#fid_' . $unreadForum->id . '_lastpost',
-                $this->formatLastPost($unreadForum, $lastPostMembers[$unreadForum->lp_uid] ?? null),
+                $this->formatLastPost($unreadForum, $lastPostMembers[$unreadForum->lastPostUser] ?? null),
                 '1',
             );
             $this->page->command(
@@ -583,16 +583,16 @@ final class IDX
     {
         return $this->template->meta(
             'idx-row-lastpost',
-            $forum->lp_tid,
-            $this->textFormatting->wordfilter($forum->lp_topic) ?: '- - - - -',
+            $forum->lastPostTopic,
+            $this->textFormatting->wordfilter($forum->lastPostTopicTitle) ?: '- - - - -',
             $member !== null ? $this->template->meta(
                 'user-link',
                 $member->id,
-                $member->group_id,
-                $member->display_name,
+                $member->groupID,
+                $member->displayName,
             ) : 'None',
-            $forum->lp_date !== null
-                ? $this->date->autoDate($forum->lp_date)
+            $forum->lastPostDate !== null
+                ? $this->date->autoDate($forum->lastPostDate)
                 : '- - - - -',
         );
     }
@@ -607,10 +607,10 @@ final class IDX
             $this->forumsread[$forum->id] = 0;
         }
 
-        return $this->date->datetimeAsTimestamp($forum->lp_date) < max(
+        return $this->date->datetimeAsTimestamp($forum->lastPostDate) < max(
             $this->forumsread[$forum->id],
-            $this->date->datetimeAsTimestamp($this->session->get()->read_date),
-            $this->date->datetimeAsTimestamp($this->user->get()->last_visit),
+            $this->date->datetimeAsTimestamp($this->session->get()->readDate),
+            $this->date->datetimeAsTimestamp($this->user->get()->lastVisit),
         );
     }
 }

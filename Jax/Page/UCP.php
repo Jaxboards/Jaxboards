@@ -56,7 +56,7 @@ final readonly class UCP
     {
         if (
             $this->user->isGuest()
-            || $this->user->get()->group_id === Groups::Banned->value
+            || $this->user->get()->groupID === Groups::Banned->value
         ) {
             $this->page->location('?');
 
@@ -122,7 +122,7 @@ final readonly class UCP
         return ($error !== null ? $this->template->meta('error', $error) : '') . $this->template->meta(
             'ucp-index',
             $this->jax->hiddenFormFields(['act' => 'ucp']),
-            $this->user->get()->display_name,
+            $this->user->get()->displayName,
             $this->user->get()->avatar ?: $this->template->meta('default-avatar'),
             trim($ucpnotepad) !== ''
                 ? $this->textFormatting->blockhtml($ucpnotepad) : 'Personal notes go here.',
@@ -139,14 +139,14 @@ final readonly class UCP
     private function showSoundSettings(): string
     {
         $fields = [
-            'sound_shout',
-            'sound_im',
-            'sound_pm',
-            'notify_pm',
-            'sound_postinmytopic',
-            'notify_postinmytopic',
-            'sound_postinsubscribedtopic',
-            'notify_postinsubscribedtopic',
+            'soundShout',
+            'soundIM',
+            'soundPM',
+            'notifyPM',
+            'soundPostInMyTopic',
+            'notifyPostInMyTopic',
+            'soundPostInSubscribedTopic',
+            'notifyPostInSubscribedTopic',
         ];
 
         if ($this->request->post('submit') !== null) {
@@ -279,7 +279,7 @@ final readonly class UCP
 
             $this->user->setBulk([
                 'email' => $this->request->asString->post('email'),
-                'email_settings' => ($notifications ? 2 : 0) + ($adminEmails ? 1 : 0),
+                'emailSettings' => ($notifications ? 2 : 0) + ($adminEmails ? 1 : 0),
             ]);
 
             return 'Email settings updated.'
@@ -287,7 +287,7 @@ final readonly class UCP
         }
 
         $email = $this->user->get()->email;
-        $emailSettings = $this->user->get()->email_settings;
+        $emailSettings = $this->user->get()->emailSettings;
         $notificationsChecked = ($emailSettings & 2) !== 0 ? 'checked' : '';
         $adminEmailsChecked = ($emailSettings & 1) !== 0 ? 'checked' : '';
 
@@ -365,17 +365,17 @@ final readonly class UCP
         // Insert the profile info into the database.
         $data = [
             'about' => $this->request->asString->post('about'),
-            'contact_aim' => $this->request->asString->post('con_aim'),
-            'contact_bluesky' => $this->request->asString->post('con_bluesky'),
-            'contact_discord' => $this->request->asString->post('con_discord'),
-            'contact_gtalk' => $this->request->asString->post('con_gtalk'),
-            'contact_msn' => $this->request->asString->post('con_msn'),
-            'contact_skype' => $this->request->asString->post('con_skype'),
-            'contact_steam' => $this->request->asString->post('con_steam'),
-            'contact_twitter' => $this->request->asString->post('con_twitter'),
-            'contact_yim' => $this->request->asString->post('con_yim'),
-            'contact_youtube' => $this->request->asString->post('con_youtube'),
-            'display_name' => trim((string) $this->request->asString->post('display_name')),
+            'contactAIM' => $this->request->asString->post('con_aim'),
+            'contactBlueSky' => $this->request->asString->post('con_bluesky'),
+            'contactDiscord' => $this->request->asString->post('con_discord'),
+            'contactGoogleChat' => $this->request->asString->post('con_gtalk'),
+            'contactMSN' => $this->request->asString->post('con_msn'),
+            'contactSkype' => $this->request->asString->post('con_skype'),
+            'contactSteam' => $this->request->asString->post('con_steam'),
+            'contactTwitter' => $this->request->asString->post('con_twitter'),
+            'contactYIM' => $this->request->asString->post('con_yim'),
+            'contactYoutube' => $this->request->asString->post('con_youtube'),
+            'displayName' => trim((string) $this->request->asString->post('displayName')),
             'dob_day' => (int) $this->request->asString->post('dob_day'),
             'dob_month' => (int) $this->request->asString->post('dob_month'),
             'dob_year' => (int) $this->request->asString->post('dob_year'),
@@ -388,22 +388,22 @@ final readonly class UCP
         ];
 
         // Begin input checking.
-        if ($data['display_name'] === '') {
-            $data['display_name'] = $this->user->get()->name;
+        if ($data['displayName'] === '') {
+            $data['displayName'] = $this->user->get()->name;
         }
 
         $badNameChars = $this->config->getSetting('badnamechars');
         if (
             $badNameChars
-            && preg_match($badNameChars, $data['display_name'])
+            && preg_match($badNameChars, $data['displayName'])
         ) {
             return 'Invalid characters in display name!';
         }
 
         $members = Member::selectMany(
             $this->database,
-            'WHERE `display_name` = ? AND `id`!=? LIMIT 1',
-            $data['display_name'],
+            'WHERE `displayName` = ? AND `id`!=? LIMIT 1',
+            $data['displayName'],
             $this->user->get()->id,
         );
         if ($members !== []) {
@@ -468,17 +468,17 @@ final readonly class UCP
 
         foreach (
             [
-                'contact_aim' => 'AIM username',
-                'contact_bluesky' => 'Bluesky username',
-                'contact_discord' => 'Discord username',
-                'contact_gtalk' => 'Google Chat username',
-                'contact_msn' => 'MSN username',
-                'contact_skype' => 'Skype username',
-                'contact_steam' => 'Steam username',
-                'contact_twitter' => 'Twitter username',
-                'contact_yim' => 'YIM username',
-                'contact_youtube' => 'YouTube username',
-                'display_name' => 'Display name',
+                'contactAIM' => 'AIM username',
+                'contactBlueSky' => 'Bluesky username',
+                'contactDiscord' => 'Discord username',
+                'contactGoogleChat' => 'Google Chat username',
+                'contactMSN' => 'MSN username',
+                'contactSkype' => 'Skype username',
+                'contactSteam' => 'Steam username',
+                'contactTwitter' => 'Twitter username',
+                'contactYIM' => 'YIM username',
+                'contactYoutube' => 'YouTube username',
+                'displayName' => 'Display name',
                 'full_name' => 'Full name',
                 'location' => 'Location',
                 'usertitle' => 'User Title',
@@ -493,7 +493,7 @@ final readonly class UCP
             }
 
             $data[$field] = $this->textFormatting->blockhtml($data[$field] ?? '');
-            $length = $field === 'display_name'
+            $length = $field === 'displayName'
                 ? 30
                 : ($field === 'location' ? 100 : 50);
             if (mb_strlen($data[$field]) <= $length) {
@@ -503,10 +503,10 @@ final readonly class UCP
             return "{$fieldLabel} must be less than {$length} characters.";
         }
 
-        if ($data['display_name'] !== $this->user->get()->display_name) {
+        if ($data['displayName'] !== $this->user->get()->displayName) {
             $activity = new Activity();
-            $activity->arg1 = $this->user->get()->display_name;
-            $activity->arg2 = $data['display_name'];
+            $activity->arg1 = $this->user->get()->displayName;
+            $activity->arg2 = $data['displayName'];
             $activity->date = $this->database->datetime();
             $activity->type = 'profile_name_change';
             $activity->uid = $this->user->get()->id;
@@ -597,23 +597,23 @@ final readonly class UCP
             $this->getlocationforform()
                 . $this->jax->hiddenFormFields(['submit' => 'true']),
             $this->user->get()->name,
-            $this->user->get()->display_name,
+            $this->user->get()->displayName,
             $this->user->get()->full_name,
             $this->user->get()->usertitle,
             $this->user->get()->about,
             $this->user->get()->location,
             $genderselect,
             $dobselect,
-            $this->user->get()->contact_skype,
-            $this->user->get()->contact_discord,
-            $this->user->get()->contact_yim,
-            $this->user->get()->contact_msn,
-            $this->user->get()->contact_gtalk,
-            $this->user->get()->contact_aim,
-            $this->user->get()->contact_youtube,
-            $this->user->get()->contact_steam,
-            $this->user->get()->contact_twitter,
-            $this->user->get()->contact_bluesky,
+            $this->user->get()->contactSkype,
+            $this->user->get()->contactDiscord,
+            $this->user->get()->contactYIM,
+            $this->user->get()->contactMSN,
+            $this->user->get()->contactGoogleChat,
+            $this->user->get()->contactAIM,
+            $this->user->get()->contactYoutube,
+            $this->user->get()->contactSteam,
+            $this->user->get()->contactTwitter,
+            $this->user->get()->contactBlueSky,
             $this->user->get()->website,
         );
     }
@@ -634,7 +634,7 @@ final readonly class UCP
 
         $this->user->setBulk([
             'nowordfilter' => $this->request->post('usewordfilter') ? 0 : 1,
-            'skin_id' => $skinId,
+            'skinID' => $skinId,
             'wysiwyg' => $this->request->post('wysiwyg') ? 1 : 0,
         ]);
 
@@ -652,7 +652,7 @@ final readonly class UCP
     private function showBoardSettings(): string
     {
         $error = null;
-        $skinId = $this->user->get()->skin_id;
+        $skinId = $this->user->get()->skinID;
         $page = '';
         if ($this->request->both('skin') !== null) {
             $error = $this->saveBoardSettings();
@@ -661,7 +661,7 @@ final readonly class UCP
             }
         }
 
-        $skins = $this->user->get()->group_id !== 2
+        $skins = $this->user->get()->groupID !== 2
             ? Skin::selectMany($this->database, 'WHERE `hidden`!=1 ORDER BY `title` ASC')
             : Skin::selectMany($this->database, 'ORDER BY `title` ASC');
         $select = '';

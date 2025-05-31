@@ -50,7 +50,7 @@ final class Ticker
 
     private function index(): void
     {
-        $this->session->set('location_verbose', 'Using the ticker!');
+        $this->session->set('locationVerbose', 'Using the ticker!');
 
 
         $ticksHTML = '';
@@ -99,7 +99,7 @@ final class Ticker
         $members = Member::joinedOn(
             $this->database,
             $posts,
-            static fn(Post $post): ?int => $post->auth_id,
+            static fn(Post $post): ?int => $post->author,
         );
 
         $ticks = [];
@@ -114,7 +114,7 @@ final class Ticker
 
             $ticks[] = [
                 $post,
-                $members[$post->auth_id],
+                $members[$post->author],
                 $topic,
             ];
         }
@@ -150,8 +150,8 @@ final class Ticker
             $this->template->meta(
                 'user-link',
                 $postAuthor->id,
-                $postAuthor->group_id,
-                $postAuthor->display_name,
+                $postAuthor->groupID,
+                $postAuthor->displayName,
             ),
             $topic->id,
             $post->id,

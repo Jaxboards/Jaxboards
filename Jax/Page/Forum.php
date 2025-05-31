@@ -181,7 +181,7 @@ final class Forum
         $orderby = match ($forum->orderby & ~1) {
             2 => 'id',
             4 => 'title',
-            default => 'lp_date',
+            default => 'lastPostDate',
         } . ' ' . (
             ($forum->orderby & 1) !== 0
                 ? 'ASC'
@@ -200,11 +200,11 @@ final class Forum
 
         $memberIds = array_merge(
             array_map(
-                static fn(Topic $topic): ?int => $topic->auth_id,
+                static fn(Topic $topic): ?int => $topic->author,
                 $topics,
             ),
             array_map(
-                static fn(Topic $topic): ?int => $topic->lp_uid,
+                static fn(Topic $topic): ?int => $topic->lastPostUser,
                 $topics,
             ),
         );
@@ -230,8 +230,8 @@ final class Forum
                 $pages = $this->template->meta('forum-topic-pages', $pages);
             }
 
-            $author = $membersById[$topic->auth_id];
-            $lastPostAuthor = $membersById[$topic->lp_uid] ?? null;
+            $author = $membersById[$topic->author];
+            $lastPostAuthor = $membersById[$topic->lastPostUser] ?? null;
 
             $read = $this->isTopicRead($topic, $fid);
             $rows .= $this->template->meta(
@@ -245,30 +245,30 @@ final class Forum
                 $this->template->meta(
                     'user-link',
                     $author->id,
-                    $author->group_id,
-                    $author->display_name,
+                    $author->groupID,
+                    $author->displayName,
                 ),
                 // 4
                 $topic->replies,
                 // 5
                 number_format($topic->views),
                 // 6
-                $topic->lp_date
-                    ? $this->date->autoDate($topic->lp_date)
+                $topic->lastPostDate
+                    ? $this->date->autoDate($topic->lastPostDate)
                     : '',
                 // 7
                 $lastPostAuthor ? $this->template->meta(
                     'user-link',
                     $lastPostAuthor->id,
-                    $lastPostAuthor->group_id,
-                    $lastPostAuthor->display_name,
+                    $lastPostAuthor->groupID,
+                    $lastPostAuthor->displayName,
                 ) : '',
                 // 8
                 ($topic->pinned ? 'pinned' : '') . ' ' . ($topic->locked ? 'locked' : ''),
                 // 9
                 $topic->summary ? $topic->summary . (mb_strlen((string) $topic->summary) > 45 ? '...' : '') : '',
                 // 10
-                $this->user->getGroup()?->can_moderate ? '<a href="?act=modcontrols&do=modt&tid='
+                $this->user->getGroup()?->canModerate ? '<a href="?act=modcontrols&do=modt&tid='
                     . $topic->id . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
                 // 11
                 $pages,
@@ -321,9 +321,9 @@ final class Forum
         $page .= $this->template->meta('forum-buttons-bottom', $forumbuttons);
 
         // Start building the nav path.
-        $category = Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->cat_id);
+        $category = Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->category);
         $breadCrumbs = $category !== null
-            ? ["?act=vc{$forum->cat_id}" => $category->title]
+            ? ["?act=vc{$forum->category}" => $category->title]
             : [];
 
         // Subforum breadcrumbs
@@ -368,10 +368,10 @@ final class Forum
         $lastPostAuthors = Member::joinedOn(
             $this->database,
             $subforums,
-            static fn($modelsForum): ?int => $modelsForum->lp_uid,
+            static fn($modelsForum): ?int => $modelsForum->lastPostUser,
         );
 
-        // lp_date needs timestamp
+        // lastPostDate needs timestamp
         $rows = '';
         foreach ($subforums as $subforum) {
             $forum->topics -= $subforum->topics;
@@ -380,12 +380,12 @@ final class Forum
                 continue;
             }
 
-            $lastPostAuthor = $subforum->lp_uid
-                ? $lastPostAuthors[$subforum->lp_uid]
+            $lastPostAuthor = $subforum->lastPostUser
+                ? $lastPostAuthors[$subforum->lastPostUser]
                 : null;
 
-            $lastPostDate = $subforum->lp_date
-                ? $this->date->autoDate($subforum->lp_date)
+            $lastPostDate = $subforum->lastPostDate
+                ? $this->date->autoDate($subforum->lastPostDate)
                 : '- - - - -';
 
             $rows .= $this->template->meta(
@@ -395,13 +395,13 @@ final class Forum
                 $subforum->subtitle,
                 $this->template->meta(
                     'forum-subforum-lastpost',
-                    $subforum->lp_tid,
-                    $subforum->lp_topic ?: '- - - - -',
+                    $subforum->lastPostTopic,
+                    $subforum->lastPostTopicTitle ?: '- - - - -',
                     $lastPostAuthor ? $this->template->meta(
                         'user-link',
-                        $subforum->lp_uid,
-                        $lastPostAuthor->group_id,
-                        $lastPostAuthor->display_name,
+                        $subforum->lastPostUser,
+                        $lastPostAuthor->groupID,
+                        $lastPostAuthor->displayName,
                     ) : 'None',
                     $lastPostDate,
                 ),
@@ -429,13 +429,13 @@ final class Forum
         $result = $this->database->special(
             <<<'SQL'
                 SELECT
-                    m.`display_name` AS `name`,
+                    m.`displayName` AS `name`,
                     COUNT(p.`id`) AS `replies`
                 FROM %t p
                 LEFT JOIN %t m
-                    ON p.`auth_id`=m.`id`
+                    ON p.`author`=m.`id`
                 WHERE `tid`=?
-                GROUP BY p.`auth_id`
+                GROUP BY p.`author`
                 ORDER BY `replies` DESC
                 SQL,
             ['posts', 'members'],
@@ -475,18 +475,18 @@ final class Forum
         }
 
         $timestamp = $this->date->datetimeAsTimestamp(
-            $topic->lp_date ?? $topic->date,
+            $topic->lastPostDate ?? $topic->date,
         );
 
         return $timestamp <= (
-            (max($this->topicsRead[$topic->id], $forumReadTime) ?: $this->session->get()->read_date)
-            ?: $this->user->get()->last_visit
+            (max($this->topicsRead[$topic->id], $forumReadTime) ?: $this->session->get()->readDate)
+            ?: $this->user->get()->lastVisit
         );
     }
 
     private function isForumRead(ModelsForum $modelsForum): bool
     {
-        if (!$modelsForum->lp_date) {
+        if (!$modelsForum->lastPostDate) {
             return true;
         }
 
@@ -496,10 +496,10 @@ final class Forum
         }
 
 
-        return $this->date->datetimeAsTimestamp($modelsForum->lp_date) <= (
+        return $this->date->datetimeAsTimestamp($modelsForum->lastPostDate) <= (
             $this->forumsRead[$modelsForum->id] ?? null
-            ?: $this->date->datetimeAsTimestamp($this->session->get()->read_date)
-            ?: $this->date->datetimeAsTimestamp($this->user->get()->last_visit)
+            ?: $this->date->datetimeAsTimestamp($this->session->get()->readDate)
+            ?: $this->date->datetimeAsTimestamp($this->user->get()->lastVisit)
         );
     }
 

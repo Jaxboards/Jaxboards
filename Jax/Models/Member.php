@@ -17,41 +17,41 @@ final class Member extends Model
         'email',
         'sig',
         'posts',
-        'group_id',
+        'groupID',
         'avatar',
         'usertitle',
-        'join_date',
-        'last_visit',
-        'contact_skype',
-        'contact_yim',
-        'contact_msn',
-        'contact_gtalk',
-        'contact_aim',
+        'joinDate',
+        'lastVisit',
+        'contactSkype',
+        'contactYIM',
+        'contactMSN',
+        'contactGoogleChat',
+        'contactAIM',
         'website',
         'birthdate',
         'about',
-        'display_name',
+        'displayName',
         'full_name',
-        'contact_steam',
+        'contactSteam',
         'location',
         'gender',
         'friends',
         'enemies',
-        'sound_shout',
-        'sound_im',
-        'sound_pm',
-        'sound_postinmytopic',
-        'sound_postinsubscribedtopic',
-        'notify_pm',
-        'notify_postinmytopic',
-        'notify_postinsubscribedtopic',
+        'soundShout',
+        'soundIM',
+        'soundPM',
+        'soundPostInMyTopic',
+        'soundPostInSubscribedTopic',
+        'notifyPM',
+        'notifyPostInMyTopic',
+        'notifyPostInSubscribedTopic',
         'ucpnotepad',
-        'skin_id',
-        'contact_twitter',
-        'contact_discord',
-        'contact_youtube',
-        'contact_bluesky',
-        'email_settings',
+        'skinID',
+        'contactTwitter',
+        'contactDiscord',
+        'contactYoutube',
+        'contactBlueSky',
+        'emailSettings',
         'nowordfilter',
         'ip',
         'mod',
@@ -70,25 +70,25 @@ final class Member extends Model
 
     public int $posts = 0;
 
-    public int $group_id = 0;
+    public int $groupID = 0;
 
     public string $avatar = '';
 
     public string $usertitle = '';
 
-    public ?string $join_date = null;
+    public ?string $joinDate = null;
 
-    public string $last_visit = '';
+    public string $lastVisit = '';
 
-    public string $contact_skype = '';
+    public string $contactSkype = '';
 
-    public string $contact_yim = '';
+    public string $contactYIM = '';
 
-    public string $contact_msn = '';
+    public string $contactMSN = '';
 
-    public string $contact_gtalk = '';
+    public string $contactGoogleChat = '';
 
-    public string $contact_aim = '';
+    public string $contactAIM = '';
 
     public string $website = '';
 
@@ -96,11 +96,11 @@ final class Member extends Model
 
     public string $about = '';
 
-    public string $display_name = '';
+    public string $displayName = '';
 
     public string $full_name = '';
 
-    public string $contact_steam = '';
+    public string $contactSteam = '';
 
     public string $location = '';
 
@@ -110,35 +110,35 @@ final class Member extends Model
 
     public string $enemies = '';
 
-    public int $sound_shout = 0;
+    public int $soundShout = 0;
 
-    public int $sound_im = 0;
+    public int $soundIM = 0;
 
-    public int $sound_pm = 0;
+    public int $soundPM = 0;
 
-    public int $sound_postinmytopic = 0;
+    public int $soundPostInMyTopic = 0;
 
-    public int $sound_postinsubscribedtopic = 0;
+    public int $soundPostInSubscribedTopic = 0;
 
-    public int $notify_pm = 0;
+    public int $notifyPM = 0;
 
-    public int $notify_postinmytopic = 0;
+    public int $notifyPostInMyTopic = 0;
 
-    public int $notify_postinsubscribedtopic = 0;
+    public int $notifyPostInSubscribedTopic = 0;
 
     public string $ucpnotepad = '';
 
-    public ?int $skin_id = null;
+    public ?int $skinID = null;
 
-    public string $contact_twitter = '';
+    public string $contactTwitter = '';
 
-    public string $contact_discord = '';
+    public string $contactDiscord = '';
 
-    public string $contact_youtube = '';
+    public string $contactYoutube = '';
 
-    public string $contact_bluesky = '';
+    public string $contactBlueSky = '';
 
-    public int $email_settings = 0;
+    public int $emailSettings = 0;
 
     public int $nowordfilter = 0;
 

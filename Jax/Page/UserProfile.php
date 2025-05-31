@@ -57,7 +57,7 @@ final readonly class UserProfile
         match (true) {
             !$profile => $this->showProfileError(),
             $this->didComeFromForum() => $this->showContactCard($profile),
-            (bool) $this->user->getGroup()?->can_view_fullprofile => $this->showFullProfile($profile),
+            (bool) $this->user->getGroup()?->canViewFullProfile => $this->showFullProfile($profile),
             default => $this->page->location('?'),
         };
     }
@@ -112,7 +112,7 @@ final readonly class UserProfile
         $contactDetails .= <<<"HTML"
             <div class="contact im">
                 <a href="javascript:void(0)"
-                    onclick="new IMWindow({$member->id},'{$member->display_name}')"
+                    onclick="new IMWindow({$member->id},'{$member->displayName}')"
                     >IM</a>
             </div>
             <div class="contact pm">
@@ -120,7 +120,7 @@ final readonly class UserProfile
             </div>
             HTML;
 
-        if ($this->user->getGroup()?->can_moderate) {
+        if ($this->user->getGroup()?->canModerate) {
             $ipReadable = $member->ip !== ''
                 ? $this->ipAddress->asHumanReadable($member->ip)
                 : '';
@@ -158,7 +158,7 @@ final readonly class UserProfile
                 'className' => 'contact-card',
                 'content' => $this->template->meta(
                     'userprofile-contact-card',
-                    $member->display_name,
+                    $member->displayName,
                     $member->avatar ?: $this->template->meta('default-avatar'),
                     $member->usertitle,
                     $member->id,
@@ -178,7 +178,7 @@ final readonly class UserProfile
 
         $this->page->setBreadCrumbs(
             [
-                "?act=vu{$member->id}&page=profile" => "{$member->display_name}'s profile",
+                "?act=vu{$member->id}&page=profile" => "{$member->displayName}'s profile",
             ],
         );
 
@@ -187,7 +187,7 @@ final readonly class UserProfile
         $birthday = $member->birthdate ?: 'N/A';
         $page = $this->template->meta(
             'userprofile-full-profile',
-            $member->display_name,
+            $member->displayName,
             $member->avatar ?: $this->template->meta('default-avatar'),
             $member->usertitle,
             $contactdetails,
@@ -196,11 +196,11 @@ final readonly class UserProfile
             $member->location,
             $birthday,
             $member->website !== '' ? "<a href='{$member->website}'>{$member->website}</a>" : 'N/A',
-            $member->join_date,
-            $member->last_visit,
+            $member->joinDate,
+            $member->lastVisit,
             $member->id,
             $member->posts,
-            $this->fetchGroupTitle($member->group_id),
+            $this->fetchGroupTitle($member->groupID),
             $tabs[0],
             $tabs[1],
             $tabs[2],
@@ -208,13 +208,13 @@ final readonly class UserProfile
             $tabs[4],
             $tabs[5],
             $tabHTML,
-            $this->user->getGroup()?->can_moderate
+            $this->user->getGroup()?->canModerate
                 ? "<a class='moderate' href='?act=modcontrols&do=emem&mid={$member->id}'>Edit</a>" : '',
         );
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
 
-        $this->session->set('location_verbose', "Viewing {$member->display_name}'s profile");
+        $this->session->set('locationVerbose', "Viewing {$member->displayName}'s profile");
     }
 
     private function showProfileError(): void

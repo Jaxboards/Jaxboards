@@ -52,7 +52,7 @@ final class App
             return;
         }
 
-        $this->page->append('username', $this->user->get()->display_name);
+        $this->page->append('username', $this->user->get()->displayName);
         $this->page->append('title', $this->config->getSetting('boardname') . ' - ACP');
 
         $this->renderNav();
@@ -118,7 +118,7 @@ final class App
             $this->user->login($adminUserId);
         }
 
-        return (bool) $this->user->getGroup()?->can_access_acp;
+        return (bool) $this->user->getGroup()?->canAccessACP;
     }
 
     private function renderNav(): void

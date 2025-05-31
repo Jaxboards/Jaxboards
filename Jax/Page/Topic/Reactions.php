@@ -90,8 +90,8 @@ final readonly class Reactions
                 $page .= '<li>' . $this->template->meta(
                     'user-link',
                     $mid,
-                    $mdata[$mid]->group_id,
-                    $mdata[$mid]->display_name,
+                    $mdata[$mid]->groupID,
+                    $mdata[$mid]->displayName,
                 ) . '</li>';
             }
 

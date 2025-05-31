@@ -50,7 +50,7 @@ final readonly class RecountStats
             <<<'SQL'
                 SELECT
                     p.`id` AS `id`,
-                    p.`auth_id` AS `auth_id`,
+                    p.`author` AS `author`,
                     p.`tid` AS `tid`,
                     t.`fid` AS `fid`
                 FROM %t p
@@ -89,11 +89,11 @@ final readonly class RecountStats
             }
 
             if ($countPostsInForum[$post['fid']]) {
-                if (!isset($stat['member_posts'][$post['auth_id']])) {
-                    $stat['member_posts'][$post['auth_id']] = 0;
+                if (!isset($stat['member_posts'][$post['author']])) {
+                    $stat['member_posts'][$post['author']] = 0;
                 }
 
-                ++$stat['member_posts'][$post['auth_id']];
+                ++$stat['member_posts'][$post['author']];
             }
 
             ++$stat['posts'];
