@@ -14,6 +14,7 @@ use Jax\Page;
 use Jax\Request;
 use Jax\Template;
 
+use function _\keyBy;
 use function array_key_exists;
 use function ceil;
 
@@ -63,33 +64,39 @@ final class Members
 
         $sorthow = $this->request->asString->both('how') === 'DESC'
             ? 'DESC' : 'ASC';
-        $where = '';
         $sortByInput = $this->request->asString->both('sortby');
         $sortby = $sortByInput !== null && array_key_exists($sortByInput, $fields)
             ? $sortByInput
             : 'display_name';
 
         $filter = $this->request->asString->get('filter');
-        if ($filter === 'staff') {
-            $sortby = 'g.`can_access_acp` DESC ,' . $sortby;
-            $where = 'WHERE g.`can_access_acp`=1 OR g.`can_moderate`=1';
-        }
+
+        // fetch all groups
+        $groups = keyBy(
+            Group::selectMany($this->database),
+            static fn(Group $group) => $group->id,
+        );
+
+        $staffGroupIds = implode(',',
+            array_map(
+                static fn(Group $group) => $group->id,
+                array_filter(
+                    $groups,
+                    static fn(Group $group) => $group->can_access_acp === 1 || $group->can_moderate === 1
+                ),
+            )
+        );
+        $where = ($filter === 'staff' ? "WHERE group_id IN ($staffGroupIds)" : "");
 
         $pages = '';
 
         $members = Member::selectMany(
             $this->database,
-            "{$where}
-            ORDER BY {$sortby} {$sorthow}
+            $where .
+            "ORDER BY {$sortby} {$sorthow}
             LIMIT ?, ?",
             $this->pageNumber * $this->perpage,
             $this->perpage,
-        );
-
-        $groups = Group::joinedOn(
-            $this->database,
-            $members,
-            static fn(Member $member): int => $member->group_id,
         );
 
         $nummemberquery = $this->database->special(
