@@ -166,7 +166,7 @@ final class Post
         return (string) $fileRecord->id;
     }
 
-    private function previewPost(): ?string
+    private function previewPost(): null
     {
         $post = $this->postData ?? '';
         if (trim($post) !== '') {
@@ -184,7 +184,7 @@ final class Post
         return null;
     }
 
-    private function showTopicForm(?Topic $topic = null): ?string
+    private function showTopicForm(?Topic $topic = null): null
     {
         $postData = $this->postData;
         $page = '<div id="post-preview">' . $this->postpreview . '</div>';
@@ -554,7 +554,7 @@ final class Post
             return null;
         }
 
-        if ($this->postData === null && $post) {
+        if ($this->postData === null) {
             $this->postData = $post->post;
         }
 
@@ -569,7 +569,7 @@ final class Post
         return null;
     }
 
-    private function createTopic(): ?string
+    private function createTopic(): null
     {
         $fid = $this->fid;
         $uid = $this->user->get()->id;

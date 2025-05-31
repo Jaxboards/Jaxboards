@@ -71,7 +71,7 @@ final class Ticker
     }
 
     /**
-     * @return array<array{Post,Member,Topic,Member,Forum}>
+     * @return list<array{Post,Member,Topic}>
      */
     private function fetchTicks(int $lastTickId = 0): array
     {
@@ -134,7 +134,7 @@ final class Ticker
             $this->page->command('tick', $this->renderTick($tick));
         }
 
-        $this->session->addVar('tickid', $ticks[0]['id']);
+        $this->session->addVar('tickid', $ticks[0][0]->id);
     }
 
     /**
@@ -146,7 +146,7 @@ final class Ticker
 
         return $this->template->meta(
             'ticker-tick',
-            $this->date->smallDate($post->date, ['autodate' => true]),
+            $post->date ? $this->date->smallDate($post->date, ['autodate' => true]) : '',
             $this->template->meta(
                 'user-link',
                 $postAuthor->id,
