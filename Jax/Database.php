@@ -374,7 +374,10 @@ class Database
             return $usersOnlineCache;
         }
 
-        $idletimeout = Carbon::now('UTC')->getTimestamp() - ($this->serviceConfig->getSetting('timetoidle') ?? 300);
+        $idletimeout = Carbon::now('UTC')
+            ->subSeconds($this->serviceConfig->getSetting('timetoidle') ?? 300)
+            ->getTimestamp();
+
         $usersOnlineCache = [];
 
         $result = $this->special(
