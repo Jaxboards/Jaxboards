@@ -113,9 +113,9 @@ final class Post
         if ($error !== null) {
             $this->page->command('error', $error);
             $this->page->append('PAGE', $this->page->error($error));
+
             return;
         }
-
     }
 
     /**
@@ -420,7 +420,7 @@ final class Post
     private function canModerate(Topic $topic): bool
     {
         if ($this->user->getGroup()?->can_moderate) {
-            return  true;
+            return true;
         }
 
         if ($this->user->get()->mod !== 0) {
@@ -524,7 +524,7 @@ final class Post
         $postData = $this->postData;
 
         $post = ModelsPost::selectOne($this->database, Database::WHERE_ID_EQUALS, $pid);
-        $topic = $post
+        $topic = $post !== null
             ? Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $post->tid)
             : null;
 
@@ -565,6 +565,7 @@ final class Post
         }
 
         $this->showPostForm();
+
         return null;
     }
 
@@ -660,6 +661,7 @@ final class Post
         $topic->insert($this->database);
 
         $this->submitPost($topic->id, true);
+
         return null;
     }
 
