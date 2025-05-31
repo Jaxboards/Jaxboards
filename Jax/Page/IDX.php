@@ -188,7 +188,7 @@ final class IDX
                 $category->title,
                 $this->buildTable(
                     $forumsByCatID[$category->id],
-                    $lastPostMembers
+                    $lastPostMembers,
                 ),
                 'cat_' . $category->id,
             );
@@ -259,7 +259,7 @@ final class IDX
     }
 
     /**
-     * @param array<Forum> $forums
+     * @param array<Forum>  $forums
      * @param array<Member> $lastPostMembers
      */
     private function buildTable(array $forums, array $lastPostMembers): string
