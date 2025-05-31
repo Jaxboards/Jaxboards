@@ -136,6 +136,7 @@ final class IDX
         $page = '';
 
         $forums = $this->fetchIDXForums();
+        $lastPostMembers = $this->fetchLastPostMembers($forums);
         $forumsByCatID = groupBy($forums, static fn(Forum $forum): ?int => $forum->cat_id);
 
         foreach ($forums as $forum) {
@@ -187,6 +188,7 @@ final class IDX
                 $category->title,
                 $this->buildTable(
                     $forumsByCatID[$category->id],
+                    $lastPostMembers
                 ),
                 'cat_' . $category->id,
             );
@@ -258,11 +260,11 @@ final class IDX
 
     /**
      * @param array<Forum> $forums
+     * @param array<Member> $lastPostMembers
      */
-    private function buildTable(array $forums): string
+    private function buildTable(array $forums, array $lastPostMembers): string
     {
         $table = '';
-        $lastPostMembers = $this->fetchLastPostMembers($forums);
 
         foreach ($forums as $forum) {
             $read = $this->isForumRead($forum);

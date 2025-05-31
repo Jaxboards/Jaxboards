@@ -67,10 +67,7 @@ final readonly class UCP
         $what = $this->request->asString->both('what');
 
         // Not a single settings page needs update functionality except inbox
-        if (
-            $this->request->isJSUpdate()
-            && !$this->request->hasPostData()
-        ) {
+        if ($this->request->isJSUpdate()) {
             return;
         }
 
@@ -85,6 +82,7 @@ final readonly class UCP
             'inbox' => $this->inbox->render(),
             default => $this->showMain(),
         };
+
 
         if (!$page) {
             return;

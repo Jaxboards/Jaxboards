@@ -24,6 +24,11 @@
     <rule ref="rulesets/cleancode.xml/UndefinedVariable" />
     <rule ref="rulesets/cleancode.xml/StaticAccess">
         <properties>
+            <property name="exceptions">
+                <value>
+                    \Carbon\Carbon
+                </value>
+            </property>
             <property name="ignorepattern">
                 <value>/^(selectOne|selectMany|count|joinedOn)$/</value>
             </property>
