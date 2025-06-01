@@ -12,6 +12,7 @@ use ReflectionProperty;
 use function _\keyBy;
 use function array_filter;
 use function array_map;
+use function array_unique;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Field
@@ -115,7 +116,7 @@ abstract class Model
             array_filter(
                 array_map($getId, $otherModel),
                 static fn($otherId): bool => $otherId !== null,
-            )
+            ),
         );
 
         return $otherIds !== [] ? keyBy(
