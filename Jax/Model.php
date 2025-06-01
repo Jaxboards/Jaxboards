@@ -111,9 +111,11 @@ abstract class Model
         callable $getId,
     ): array {
         $primaryKey = static::PRIMARY_KEY;
-        $otherIds = array_filter(
-            array_map($getId, $otherModel),
-            static fn($otherId): bool => $otherId !== null,
+        $otherIds = array_unique(
+            array_filter(
+                array_map($getId, $otherModel),
+                static fn($otherId): bool => $otherId !== null,
+            )
         );
 
         return $otherIds !== [] ? keyBy(
