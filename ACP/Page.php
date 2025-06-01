@@ -158,7 +158,7 @@ final class Page
         }
 
         return str_replace(
-            array_map(static fn($name): string => '{{ ' . mb_strtolower($name) . ' }}', array_keys($data)),
+            array_map(static fn($name): string => '{{ ' . $name . ' }}', array_keys($data)),
             array_map(static fn($content): string => "{$content}", $data),
             $template,
         ) . PHP_EOL;
