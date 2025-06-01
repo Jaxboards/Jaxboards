@@ -192,7 +192,7 @@ final readonly class Reactions
         $post->rating = json_encode($ratings) ?: $post->rating;
         $post->update($this->database);
 
-        $this->page->command('alert', $unrate ? 'Unrated!' : 'Rated!');
+        $this->page->command('update', "#reaction_p{$post->id}", $this->render($post));
     }
 
     private function getRatingSetting(): int

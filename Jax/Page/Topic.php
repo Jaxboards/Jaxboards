@@ -501,7 +501,9 @@ final class Topic
             $postBody = $this->textFormatting->theWorks($postBody);
 
             // Post rating content goes here.
-            $postrating = $this->reactions->render($post);
+            $postrating = "<div id='reaction_p{$post->id}'>" .
+                $this->reactions->render($post) .
+                "</div>";
 
             $author = $post->author ? $membersById[$post->author] : null;
             $editor = $post->editby ? $membersById[$post->editby] : null;
