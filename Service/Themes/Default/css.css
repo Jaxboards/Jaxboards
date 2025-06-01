@@ -213,7 +213,7 @@ textarea {
 
 #ucp label {
     display: inline-block;
-    width: 150px;
+    width: 120px;
 }
 
 #ucp .leftbar {
@@ -2139,7 +2139,6 @@ a.mgroup4 {
 .contact {
     background: url('icons/contact.png') no-repeat;
     padding-left: 20px;
-    padding-top: 3px;
 }
 /* stylelint-enable no-descending-specificity */
 
