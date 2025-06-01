@@ -209,6 +209,7 @@
         <element key="emoticons" value="emoticons"/>
         <element key="ACP" value="ACP"/>
         <element key="Service" value="Service"/>
+        <element key="tools" value="tools"/>
       </property>
     </properties>
   </rule>
