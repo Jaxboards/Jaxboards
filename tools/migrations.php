@@ -22,14 +22,14 @@ use const PHP_EOL;
 
 $jaxboardsRoot = dirname(__DIR__);
 
-require dirname(__DIR__) . '/Jax/autoload.php';
+require_once dirname(__DIR__) . '/Jax/autoload.php';
 
-function error($message): string
+function error(string $message): string
 {
     return "\033[31m{$message}\033[0m";
 }
 
-function success($message): string
+function success(string $message): string
 {
     return "\033[32m{$message}\033[0m";
 }
