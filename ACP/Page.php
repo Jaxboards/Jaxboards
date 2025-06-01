@@ -11,7 +11,6 @@ use function array_keys;
 use function array_map;
 use function file_get_contents;
 use function header;
-use function mb_strtolower;
 use function mb_substr;
 use function pathinfo;
 use function str_replace;
