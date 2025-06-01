@@ -485,7 +485,7 @@ final class Topic
         $groups = Group::joinedOn(
             $this->database,
             $membersById,
-            static fn(Member $member) => $member->groupID,
+            static fn(Member $member): int => $member->groupID,
         );
 
         $forumPerms = $this->fetchForumPermissions($modelsTopic);
