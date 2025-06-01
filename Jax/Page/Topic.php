@@ -482,6 +482,12 @@ final class Topic
             ),
         );
 
+        $groups = Group::joinedOn(
+            $this->database,
+            $membersById,
+            static fn(Member $member) => $member->groupID,
+        );
+
         $forumPerms = $this->fetchForumPermissions($modelsTopic);
 
         $rows = '';
@@ -499,7 +505,7 @@ final class Topic
             $author = $post->author ? $membersById[$post->author] : null;
             $editor = $post->editby ? $membersById[$post->editby] : null;
             $authorGroup = $author
-                ? Group::selectOne($this->database, Database::WHERE_ID_EQUALS, $author->groupID)
+                ? $groups[$author->groupID]
                 : null;
             $postbuttons
                 // Adds the Edit button
