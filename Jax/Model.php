@@ -117,6 +117,7 @@ abstract class Model
                 array_map($getId, $otherModel),
                 static fn($otherId): bool => $otherId !== null,
             ),
+            SORT_REGULAR
         );
 
         return $otherIds !== [] ? keyBy(

@@ -298,7 +298,7 @@ final readonly class ModTopics
         $fids = array_unique(array_map(
             static fn($topic): int => (int) $topic->fid,
             $topics,
-        ));
+        ), SORT_REGULAR);
 
         // Move all topics at once
         $this->database->update(

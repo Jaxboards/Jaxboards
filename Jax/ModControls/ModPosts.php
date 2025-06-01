@@ -136,7 +136,7 @@ final readonly class ModPosts
         $tids = array_unique(array_map(
             static fn($post): int => $post->id,
             $posts,
-        ));
+        ), SORT_REGULAR);
 
         if ($trashCanForum !== null) {
             $tids[] = $this->movePostsToTrashcan(
@@ -165,7 +165,7 @@ final readonly class ModPosts
                 static fn($topic): int => (int) $topic->fid,
                 $topics,
             ),
-        ));
+        ), SORT_REGULAR);
 
         array_map(fn($fid) => $this->database->fixForumLastPost($fid), $fids);
 

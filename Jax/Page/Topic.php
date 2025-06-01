@@ -157,7 +157,7 @@ final class Topic
             Member::selectMany(
                 $this->database,
                 Database::WHERE_ID_IN,
-                array_unique($memberIds),
+                array_unique($memberIds, SORT_REGULAR),
             ),
             static fn(Member $member): int => $member->id,
         ) : [];

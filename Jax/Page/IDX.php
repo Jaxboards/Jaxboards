@@ -177,7 +177,7 @@ final class IDX
         }
 
         // Remove duplicates
-        $this->mods = array_unique($this->mods);
+        $this->mods = array_unique($this->mods, SORT_REGULAR);
         $categories = Category::selectMany($this->database, 'ORDER BY `order`,`title` ASC');
         foreach ($categories as $category) {
             if (!array_key_exists($category->id, $forumsByCatID)) {
