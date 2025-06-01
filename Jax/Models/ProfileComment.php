@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Models;
 
-use Jax\Field;
 use Jax\Model;
 
 final class ProfileComment extends Model
