@@ -40,6 +40,8 @@ use function number_format;
 use function preg_match;
 use function sprintf;
 
+use const SORT_REGULAR;
+
 final class IDX
 {
     /**

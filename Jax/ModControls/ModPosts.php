@@ -23,6 +23,8 @@ use function implode;
 use function in_array;
 use function sort;
 
+use const SORT_REGULAR;
+
 final readonly class ModPosts
 {
     public function __construct(

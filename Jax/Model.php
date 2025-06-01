@@ -14,6 +14,8 @@ use function array_filter;
 use function array_map;
 use function array_unique;
 
+use const SORT_REGULAR;
+
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Field
 {
@@ -117,7 +119,7 @@ abstract class Model
                 array_map($getId, $otherModel),
                 static fn($otherId): bool => $otherId !== null,
             ),
-            SORT_REGULAR
+            SORT_REGULAR,
         );
 
         return $otherIds !== [] ? keyBy(

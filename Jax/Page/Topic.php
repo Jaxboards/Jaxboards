@@ -43,6 +43,7 @@ use function max;
 use function preg_match;
 
 use const PHP_EOL;
+use const SORT_REGULAR;
 
 final class Topic
 {

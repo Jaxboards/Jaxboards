@@ -23,6 +23,8 @@ use function explode;
 use function implode;
 use function in_array;
 
+use const SORT_REGULAR;
+
 final readonly class ModTopics
 {
     public function __construct(
