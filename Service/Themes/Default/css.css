@@ -2139,6 +2139,7 @@ a.mgroup4 {
 .contact {
     background: url('icons/contact.png') no-repeat;
     padding-left: 20px;
+    min-height: 16px;
 }
 /* stylelint-enable no-descending-specificity */
 
