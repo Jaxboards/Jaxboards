@@ -739,17 +739,10 @@ final class Post
         // Update last post info
         // for the topic.
         if (!$newtopic) {
-            $this->database->special(
-                <<<'SQL'
-                    UPDATE %t
-                    SET `lastPostUser` = ?, `lastPostDate` = ?, `replies` = `replies` + 1
-                    WHERE `id`=?
-                    SQL,
-                ['topics'],
-                $uid,
-                $postDate,
-                $tid,
-            );
+            $topic->lastPostUser = $uid;
+            $topic->lastPostDate = $postDate;
+            ++$topic->replies;
+            $topic->update($this->database);
         }
 
         // Do some magic to update the tree all the way up (for subforums).
@@ -757,7 +750,7 @@ final class Post
             ? explode(' ', $forum->path)
             : [];
         if (!in_array($topic->id, $path)) {
-            $path[] = $topic->id;
+            $path[] = $topic->fid;
         }
 
         if ($newtopic) {
