@@ -9,10 +9,13 @@ use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Models\Badge;
+use Jax\Models\BadgeAssociation;
+use Jax\Models\Member;
 use Jax\Models\Page as ModelsPage;
 use Jax\Request;
 use Jax\TextFormatting;
 
+use function _\keyBy;
 use function filter_var;
 use function is_string;
 use function mb_strlen;
@@ -287,6 +290,20 @@ final readonly class Settings
             $badge->insert($this->database);
         }
 
+        if ($submitButton === 'Grant Badge') {
+            $mid = (int) $this->request->asString->post('mid');
+            $badgeId = (int) $this->request->asString->post('badgeId');
+            $reason = $this->request->asString->post('reason') ?? '';
+            $count = (int) $this->request->asString->post('count');
+            $badgeAssociation = new BadgeAssociation();
+            $badgeAssociation->user = $mid;
+            $badgeAssociation->badge = $badgeId;
+            $badgeAssociation->reason = $reason;
+            $badgeAssociation->badgeCount = $count;
+            $badgeAssociation->awardDate = $this->database->datetime();
+            $badgeAssociation->insert($this->database);
+        }
+
         return $this->page->success('Data saved.');
     }
 
@@ -307,11 +324,23 @@ final readonly class Settings
             }
         }
 
-        $badges = Badge::selectMany($this->database);
+        $badges = keyBy(
+            Badge::selectMany($this->database),
+            static fn(Badge $badge) => $badge->id,
+        );
+        $grantedBadges = BadgeAssociation::selectMany(
+            $this->database,
+            'ORDER BY id DESC',
+        );
+        $grantedMembers = Member::joinedOn(
+            $this->database,
+            $grantedBadges,
+            static fn(BadgeAssociation $badgeAssociation) => $badgeAssociation->user,
+        );
 
-        $badgeRows = '';
+        $badgesList = '';
         foreach ($badges as $badge) {
-            $badgeRows .= $this->page->parseTemplate(
+            $badgesList .= $this->page->parseTemplate(
                 'settings/badges-row.html',
                 [
                     'badgeId' => $badge->id,
@@ -322,13 +351,45 @@ final readonly class Settings
             );
         }
 
-        $page .= $this->page->parseTemplate(
-            'settings/badges.html',
+        $badgeOptions = '';
+        foreach ($badges as $badge) {
+            $badgeOptions .= "<option data-image='{$badge->imagePath}' value='{$badge->id}'>{$badge->badgeTitle}</option>";
+        }
+
+        $grantedBadgesRows = '';
+        foreach ($grantedBadges as $grantedBadge) {
+            $badge = $badges[$grantedBadge->badge];
+            $member = $grantedMembers[$grantedBadge->user];
+
+            $grantedBadgesRows .= '<tr>'
+                . "<td><img src='{$badge->imagePath}'></td>"
+                . "<td>{$badge->badgeTitle}</td>"
+                . "<td>{$grantedBadge->reason}</td>"
+                . "<td>{$grantedBadge->badgeCount}</td>"
+                . "<td>{$member->displayName}</td>"
+                . '</tr>';
+        }
+
+        $this->page->addContentBox('Badges', $this->page->parseTemplate(
+            'settings/badges-enable.html',
             [
                 'badges_enabled' => $this->config->getSetting('badgesEnabled') ? ' checked' : '',
-                'badges' => $badgeRows,
             ],
-        );
-        $this->page->addContentBox('Badges', $page);
+        ));
+
+        $this->page->addContentBox('Manage Badges', $this->page->parseTemplate(
+            'settings/badges-list.html',
+            [
+                'badges' => $badgesList,
+            ],
+        ));
+
+        $this->page->addContentBox('Grant Badges', $this->page->parseTemplate(
+            'settings/badges-grant.html',
+            [
+                'options' => $badgeOptions,
+                'grantedBadges' => $grantedBadgesRows,
+            ],
+        ));
     }
 }
