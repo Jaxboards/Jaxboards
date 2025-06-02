@@ -14,7 +14,22 @@
     <br>
     (Max 10)
   </label>
-  <input type="text" id="sbnum" name="sbnum" class="slider" title="Number of shouts to show" value="{{ show_shouts }}" />
+  <input
+    type="range"
+    id="sbnum"
+    name="sbnum"
+    title="Number of shouts to show"
+    value="{{ show_shouts }}"
+    min="1"
+    max="10"
+    step="1"
+    list="markers"
+    />
+  <datalist id="markers">
+    <option value="1" label="1"></option>
+    <option value="5" label="5"></option>
+    <option value="10" label="10"></option>
+  </datalist>
   <br>
   <br>
   <label for="clear">

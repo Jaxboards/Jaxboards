@@ -12,22 +12,19 @@ final class Badge extends Model
 
     public const FIELDS = [
         'id',
-        'user',
-        'badge',
-        'badgeCount',
-        'reason',
-        'awardDate',
+        'imagePath',
+        'badgeTitle',
+        'displayOrder',
+        'description',
     ];
 
     public int $id = 0;
 
-    public int $user = 0;
+    public string $imagePath = '';
 
-    public int $badge = 0;
+    public string $badgeTitle = '';
 
-    public int $badgeCount = 0;
+    public int $displayOrder = 0;
 
-    public string $reason = '';
-
-    public string $awardDate = '';
+    public string $description = '';
 }

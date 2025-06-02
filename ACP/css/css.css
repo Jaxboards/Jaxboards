@@ -394,8 +394,14 @@ h2 {
     background-position: 0 -96px;
 }
 
-input.slider {
-    width: 30px;
+input[type="range"] {
+    width: 120px;
+}
+datalist {
+    display: flex;
+    justify-content: space-between;
+    width: 120px;
+    margin-left: 145px;
 }
 
 .news p {

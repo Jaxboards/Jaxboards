@@ -129,6 +129,7 @@ final class App
                 'global' => 'Global Settings',
                 'pages' => 'Custom Pages',
                 'shoutbox' => 'Shoutbox',
+                'badges' => 'Badges',
             ],
         );
         $this->addNavMenu(

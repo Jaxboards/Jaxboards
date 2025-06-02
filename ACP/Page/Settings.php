@@ -8,6 +8,7 @@ use ACP\Page;
 use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
+use Jax\Models\Badge;
 use Jax\Models\Page as ModelsPage;
 use Jax\Request;
 use Jax\TextFormatting;
@@ -37,11 +38,13 @@ final readonly class Settings
             'global' => 'Global Settings',
             'pages' => 'Custom Pages',
             'shoutbox' => 'Shoutbox',
+            'badges' => 'Badges',
         ]);
 
         match ($this->request->both('do')) {
             'pages' => $this->pages(),
             'shoutbox' => $this->shoutbox(),
+            'badges' => $this->badges(),
             default => $this->global(),
         };
     }
@@ -227,7 +230,6 @@ final readonly class Settings
         return $this->page->success('Data saved.');
     }
 
-    // Shoutbox.
     private function shoutbox(): void
     {
         $page = '';
@@ -254,5 +256,65 @@ final readonly class Settings
             ],
         );
         $this->page->addContentBox('Shoutbox', $page);
+    }
+
+    private function saveBadgeSettings(string $submitButton): string
+    {
+        if ($submitButton === 'Save') {
+            $this->config->write([
+                'badgesEnabled' => $this->request->post('badgesEnabled') ? 1 : 0,
+            ]);
+        }
+
+        if ($submitButton === 'Add Badge') {
+            $badge = new Badge();
+            $badge->imagePath = $this->request->asString->post('imagePath');
+            $badge->badgeTitle = $this->request->asString->post('badgeTitle');
+            $badge->description = $this->request->asString->post('description');
+            $badge->insert($this->database);
+        }
+
+        return $this->page->success('Data saved.');
+    }
+    private function badges(): void
+    {
+        $page = '';
+        $submitButton = $this->request->asString->post('submit');
+        if ($submitButton) {
+            $page .= $this->saveBadgeSettings($submitButton);
+        }
+
+
+        $delete = (int) $this->request->asString->both('d');
+        if ($this->request->both('d')) {
+            $badge = Badge::selectOne($this->database, Database::WHERE_ID_EQUALS, $delete);
+            if ($badge) {
+                $badge->delete($this->database);
+            }
+        }
+
+        $badges = Badge::selectMany($this->database);
+
+        $badgeRows = '';
+        foreach ($badges as $badge) {
+            $badgeRows .= $this->page->parseTemplate(
+                'settings/badges-row.html',
+                [
+                    'badgeId' => $badge->id,
+                    'imagePath' => $badge->imagePath,
+                    'badgeTitle' => $badge->badgeTitle,
+                    'description' => $badge->description,
+                ]
+            );
+        }
+
+        $page .= $this->page->parseTemplate(
+            'settings/badges.html',
+            [
+                'badges_enabled' => $this->config->getSetting('badgesEnabled') ? ' checked' : '',
+                'badges' => $badgeRows,
+            ],
+        );
+        $this->page->addContentBox('Badges', $page);
     }
 }

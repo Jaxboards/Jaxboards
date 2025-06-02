@@ -1,0 +1,28 @@
+<form method="post">
+  <label for="badgesEnabled">
+    Badges enabled:
+  </label>
+  <input {{ badges_enabled }} id="badgesEnabled" type="checkbox" name="badgesEnabled" class="switch yn"
+    title="Badges Enabled Toggle" />
+  <br>
+  <input type="submit" name="submit" value="Save" />
+  <br>
+  <br>
+  <table>
+    {{ badges }}
+    <tr>
+      <td>
+        <input type="text" name="imagePath" placeholder="Image URL">
+      </td>
+      <td>
+        <input type="text" name="badgeTitle" placeholder="Badge Title">
+      </td>
+      <td>
+        <input type="text" name="description" placeholder="Description">
+      </td>
+      <td>
+        <input type="submit" name="submit" value="Add Badge">
+      </td>
+    </tr>
+  </table>
+</form>

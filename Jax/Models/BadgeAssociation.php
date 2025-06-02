@@ -21,11 +21,13 @@ final class BadgeAssociation extends Model
 
     public int $id = 0;
 
-    public string $imagePath = '';
+    public int $user = 0;
 
-    public string $badgeTitle = '';
+    public int $badge = 0;
 
-    public int $displayOrder = 0;
+    public int $badgeCount = 0;
 
-    public string $description = '';
+    public string $reason = '';
+
+    public string $awardDate = '';
 }
