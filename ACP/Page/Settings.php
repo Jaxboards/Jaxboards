@@ -326,7 +326,7 @@ final readonly class Settings
 
         $badges = keyBy(
             Badge::selectMany($this->database),
-            static fn(Badge $badge) => $badge->id,
+            static fn(Badge $badge): int => $badge->id,
         );
         $grantedBadges = BadgeAssociation::selectMany(
             $this->database,
@@ -335,7 +335,7 @@ final readonly class Settings
         $grantedMembers = Member::joinedOn(
             $this->database,
             $grantedBadges,
-            static fn(BadgeAssociation $badgeAssociation) => $badgeAssociation->user,
+            static fn(BadgeAssociation $badgeAssociation): int => $badgeAssociation->user,
         );
 
         $badgesList = '';
