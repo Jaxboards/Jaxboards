@@ -749,7 +749,7 @@ final class Post
         $path = trim($forum->path) !== ''
             ? explode(' ', $forum->path)
             : [];
-        if (!in_array($topic->id, $path)) {
+        if (!in_array($topic->fid, $path)) {
             $path[] = $topic->fid;
         }
 
