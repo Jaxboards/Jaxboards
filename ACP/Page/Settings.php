@@ -276,6 +276,7 @@ final readonly class Settings
 
         return $this->page->success('Data saved.');
     }
+
     private function badges(): void
     {
         $page = '';
@@ -288,7 +289,7 @@ final readonly class Settings
         $delete = (int) $this->request->asString->both('d');
         if ($this->request->both('d')) {
             $badge = Badge::selectOne($this->database, Database::WHERE_ID_EQUALS, $delete);
-            if ($badge) {
+            if ($badge !== null) {
                 $badge->delete($this->database);
             }
         }
@@ -304,7 +305,7 @@ final readonly class Settings
                     'imagePath' => $badge->imagePath,
                     'badgeTitle' => $badge->badgeTitle,
                     'description' => $badge->description,
-                ]
+                ],
             );
         }
 
