@@ -358,6 +358,8 @@ class Database
             ),
         );
 
+        var_dump($newformat);
+
         // Put the format string back.
         return $this->query($newformat, ...$args);
     }
