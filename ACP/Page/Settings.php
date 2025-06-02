@@ -267,10 +267,24 @@ final readonly class Settings
         }
 
         if ($submitButton === 'Add Badge') {
+
+            $imagePath = $this->request->asString->post('imagePath');
+            $badgeTitle = $this->request->asString->post('badgeTitle');
+            $description = $this->request->asString->post('description');
+
+            if ($imagePath === '' || $badgeTitle === '') {
+                return $this->page->error('Image path and badge title are required');
+            }
+
+            if (!filter_var($imagePath, FILTER_VALIDATE_URL)) {
+                return $this->page->error('Image path must be a valid URL');
+            }
+
+
             $badge = new Badge();
-            $badge->imagePath = $this->request->asString->post('imagePath');
-            $badge->badgeTitle = $this->request->asString->post('badgeTitle');
-            $badge->description = $this->request->asString->post('description');
+            $badge->imagePath = $imagePath;
+            $badge->badgeTitle = $badgeTitle;
+            $badge->description = $description ?? '';
             $badge->insert($this->database);
         }
 
