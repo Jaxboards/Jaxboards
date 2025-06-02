@@ -267,9 +267,9 @@ final readonly class Settings
         }
 
         if ($submitButton === 'Add Badge') {
-            $imagePath = $this->request->asString->post('imagePath');
-            $badgeTitle = $this->request->asString->post('badgeTitle');
-            $description = $this->request->asString->post('description');
+            $imagePath = $this->request->asString->post('imagePath') ?? '';
+            $badgeTitle = $this->request->asString->post('badgeTitle') ?? '';
+            $description = $this->request->asString->post('description') ?? '';
 
             if ($imagePath === '' || $badgeTitle === '') {
                 return $this->page->error('Image path and badge title are required');
@@ -283,7 +283,7 @@ final readonly class Settings
             $badge = new Badge();
             $badge->imagePath = $imagePath;
             $badge->badgeTitle = $badgeTitle;
-            $badge->description = $description ?? '';
+            $badge->description = $description;
             $badge->insert($this->database);
         }
 
