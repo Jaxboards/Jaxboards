@@ -34,7 +34,7 @@ final class CreateBadgeTables
                 CONSTRAINT `badge_associations_ibfk_1` FOREIGN KEY (`user`) REFERENCES %t (`id`) ON DELETE CASCADE,
                 CONSTRAINT `badge_associations_ibfk_2` FOREIGN KEY (`badge`) REFERENCES %t (`id`) ON DELETE CASCADE
             )",
-            ['badge_assocations', 'members', 'badges'],
+            ['badge_associations', 'members', 'badges'],
         );
     }
 }
