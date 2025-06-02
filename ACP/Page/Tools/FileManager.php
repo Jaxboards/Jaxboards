@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ACP\Page\Tools;
 
 use ACP\Page;
-use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\FileUtils;
@@ -30,7 +29,6 @@ use const PATHINFO_EXTENSION;
 final readonly class FileManager
 {
     public function __construct(
-        private Config $config,
         private DomainDefinitions $domainDefinitions,
         private Database $database,
         private FileUtils $fileUtils,

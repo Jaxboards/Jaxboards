@@ -13,7 +13,6 @@ use function array_map;
 use function array_values;
 use function implode;
 use function in_array;
-use function is_array;
 use function is_string;
 use function pathinfo;
 use function preg_match;
@@ -65,7 +64,6 @@ final class BBCode
     public function __construct(
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
-        private readonly Config $config,
     ) {}
 
     public function toHTML(string $text): string
