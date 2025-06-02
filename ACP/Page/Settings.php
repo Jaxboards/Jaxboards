@@ -330,10 +330,18 @@ final readonly class Settings
 
 
         $delete = (int) $this->request->asString->both('d');
-        if ($this->request->both('d')) {
+        if ($delete) {
             $badge = Badge::selectOne($this->database, Database::WHERE_ID_EQUALS, $delete);
             if ($badge !== null) {
                 $badge->delete($this->database);
+            }
+        }
+
+        $ungrant = (int) $this->request->asString->both('ungrant');
+        if ($ungrant) {
+            $grant = BadgeAssociation::selectOne($this->database, Database::WHERE_ID_EQUALS, $ungrant);
+            if ($grant !== null) {
+                $grant->delete($this->database);
             }
         }
 
@@ -380,6 +388,7 @@ final readonly class Settings
                 . "<td>{$grantedBadge->reason}</td>"
                 . "<td>{$grantedBadge->badgeCount}</td>"
                 . "<td>{$member->displayName}</td>"
+                . "<td><a href='?act=Settings&do=badges&ungrant={$grantedBadge->id}' onclick='return confirm(\"Are you sure?\")'>Ungrant</a></td>"
                 . '</tr>';
         }
 
