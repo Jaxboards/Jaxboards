@@ -267,7 +267,6 @@ final readonly class Settings
         }
 
         if ($submitButton === 'Add Badge') {
-
             $imagePath = $this->request->asString->post('imagePath');
             $badgeTitle = $this->request->asString->post('badgeTitle');
             $description = $this->request->asString->post('description');
