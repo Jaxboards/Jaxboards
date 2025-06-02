@@ -165,14 +165,6 @@ a:visited {
     border-top: 1px solid #ccc;
 }
 
-.badwords .x {
-    visibility: hidden;
-}
-
-.badwords tr:hover .x {
-    visibility: visible;
-}
-
 .pages {
     min-width: 300px;
     border-collapse: collapse;
