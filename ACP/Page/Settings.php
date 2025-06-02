@@ -299,9 +299,11 @@ final readonly class Settings
             if ($count <= 0) {
                 return $this->page->error('Badge count must be >0');
             }
+
             if ($mid <= 0) {
                 return $this->page->error('Must select user to grant to');
             }
+
             if ($badgeId <= 0) {
                 return $this->page->error('Badge not selected');
             }
