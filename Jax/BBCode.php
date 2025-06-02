@@ -160,11 +160,9 @@ final class BBCode
         }
 
         $ext = pathinfo($file->name, PATHINFO_EXTENSION);
-        $imageExtensions = $this->config->getSetting('images') ?? [];
 
         if (
-            is_array($imageExtensions)
-            && !in_array($ext, $imageExtensions, true)
+            !in_array($ext, Jax::IMAGE_EXTENSIONS, true)
         ) {
             $ext = null;
         }

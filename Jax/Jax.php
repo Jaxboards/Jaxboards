@@ -20,6 +20,8 @@ final readonly class Jax
 {
     public const FORUM_PERMS_ORDER = ['upload', 'reply', 'start', 'read', 'view', 'poll'];
 
+    public const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
+
     public function __construct(
         private Config $config,
         private DomainDefinitions $domainDefinitions,

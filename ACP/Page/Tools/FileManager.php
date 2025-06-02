@@ -9,6 +9,7 @@ use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\FileUtils;
+use Jax\Jax;
 use Jax\Models\File;
 use Jax\Models\Member;
 use Jax\Models\Post;
@@ -121,7 +122,7 @@ final readonly class FileManager
         foreach ($files as $file) {
             $ext = pathinfo((string) $file->name, PATHINFO_EXTENSION);
 
-            $file->name = in_array($ext, $this->config->getSetting('images'), true) ? '<a href="'
+            $file->name = in_array($ext, Jax::IMAGE_EXTENSIONS, true) ? '<a href="'
                     . $this->domainDefinitions->getBoardPathUrl() . 'Uploads/' . $file->hash . '.' . $ext . '">'
                     . $file->name . '</a>' : '<a href="../?act=download&id='
                     . $file->id . '">' . $file->name . '</a>';

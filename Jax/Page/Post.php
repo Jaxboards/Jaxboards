@@ -9,6 +9,7 @@ use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\Hooks;
 use Jax\IPAddress;
+use Jax\Jax;
 use Jax\Models\Activity;
 use Jax\Models\File;
 use Jax\Models\Forum;
@@ -137,8 +138,7 @@ final class Post
 
         $ext = pathinfo((string) $fileobj['name'], PATHINFO_EXTENSION);
 
-        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
-        $imageExtension = in_array($ext, $this->config->getSetting('images') ?? $imageExtensions, true)
+        $imageExtension = in_array($ext, Jax::IMAGE_EXTENSIONS, true)
             ? ".{$ext}"
             : null;
 
