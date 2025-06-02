@@ -295,6 +295,17 @@ final readonly class Settings
             $badgeId = (int) $this->request->asString->post('badgeId');
             $reason = $this->request->asString->post('reason') ?? '';
             $count = (int) $this->request->asString->post('count');
+
+            if ($count <= 0) {
+                return $this->page->error('Badge count must be >0');
+            }
+            if ($mid <= 0) {
+                return $this->page->error('Must select user to grant to');
+            }
+            if ($badgeId <= 0) {
+                return $this->page->error('Badge not selected');
+            }
+
             $badgeAssociation = new BadgeAssociation();
             $badgeAssociation->user = $mid;
             $badgeAssociation->badge = $badgeId;
@@ -309,10 +320,10 @@ final readonly class Settings
 
     private function badges(): void
     {
-        $page = '';
+        $saveDataResult = '';
         $submitButton = $this->request->asString->post('submit');
         if ($submitButton) {
-            $page .= $this->saveBadgeSettings($submitButton);
+            $saveDataResult .= $this->saveBadgeSettings($submitButton);
         }
 
 
@@ -368,6 +379,10 @@ final readonly class Settings
                 . "<td>{$grantedBadge->badgeCount}</td>"
                 . "<td>{$member->displayName}</td>"
                 . '</tr>';
+        }
+
+        if ($saveDataResult !== '') {
+            $this->page->addContentBox('Save Data', $saveDataResult);
         }
 
         $this->page->addContentBox('Badges', $this->page->parseTemplate(
