@@ -109,7 +109,7 @@ final readonly class ProfileTabs
         }
 
         $badgesHTML = '<table class="badges">'
-            . '<tr><th>Badge</th><th>Reason</th><th>Award Date</th></tr>';
+            . '<tr><th></th><th>Reason</th><th>Award Date</th></tr>';
         foreach ($badgesPerMember[$member->id] as $badgeTuple) {
             $badgesHTML .= '<tr>'
                 . "<td><img src='{$badgeTuple->badge->imagePath}' title='{$badgeTuple->badge->badgeTitle}'></td>"
