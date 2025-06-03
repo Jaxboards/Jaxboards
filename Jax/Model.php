@@ -112,8 +112,11 @@ abstract class Model
         Database $database,
         array $otherModel,
         callable $getId,
+        ?string $key = null
     ): array {
-        $primaryKey = static::PRIMARY_KEY;
+        $primaryKey = static:: PRIMARY_KEY;
+        $key ??= $primaryKey;
+
         $otherIds = array_unique(
             array_filter(
                 array_map($getId, $otherModel),
@@ -125,7 +128,7 @@ abstract class Model
         return $otherIds !== [] ? keyBy(
             static::selectMany(
                 $database,
-                "WHERE {$primaryKey} IN ?",
+                "WHERE {$key} IN ?",
                 $otherIds,
             ),
             static fn($member): int => $member->{$primaryKey},

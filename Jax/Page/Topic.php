@@ -11,6 +11,8 @@ use Jax\Date;
 use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Models\Badge;
+use Jax\Models\BadgeAssociation;
 use Jax\Models\Category;
 use Jax\Models\Forum;
 use Jax\Models\Group;
@@ -408,6 +410,47 @@ final class Topic
         $this->session->set('usersOnlineCache', $newcache);
     }
 
+    /**
+     * @param array<Post> $posts
+     */
+    private function renderBadges(array $posts) {
+        $badgesPerAuthor = [];
+
+        if (!$this->config->get('badgesEnabled')) {
+            return $badgesPerAuthor;
+        }
+
+        $badgeAssociations = BadgeAssociation::joinedOn(
+            $this->database,
+            $posts,
+            static fn(Post $post) => $post->author,
+            'user',
+        );
+
+        $badges = Badge::joinedOn(
+            $this->database,
+            $badgeAssociations,
+            static fn(BadgeAssociation $badgeAssociation) => $badgeAssociation->badge
+        );
+
+        foreach ($badgeAssociations as $badgeAssociation) {
+            if (!array_key_exists($badgeAssociation->user, $badgesPerAuthor)) {
+                $badgesPerAuthor[$badgeAssociation->user] = '';
+            }
+
+            $badge = $badges[$badgeAssociation->badge];
+
+            $badgeSrc = $this->textFormatting->blockhtml($badge->imagePath);
+            $badgeDescription = $this->textFormatting->blockhtml($badge->description);
+
+            $badgesPerAuthor[$badgeAssociation->user] .= <<<HTML
+                <img src="{$badgeSrc}" title="{$badgeDescription}">
+                HTML;
+        }
+
+        return $badgesPerAuthor;
+    }
+
     private function quickReplyForm(ModelsTopic $modelsTopic): void
     {
         $prefilled = '';
@@ -490,6 +533,9 @@ final class Topic
         );
 
         $forumPerms = $this->fetchForumPermissions($modelsTopic);
+
+
+        $badgesPerAuthor = $this->renderBadges($posts, $membersById);
 
         $rows = '';
         foreach ($posts as $post) {
@@ -586,20 +632,8 @@ final class Topic
                 ) : '',
                 ++$topicPostCounter,
                 $postrating,
-                // 30 V
-                $author->contactSkype ?? '',
-                $author->contactDiscord ?? '',
-                $author->contactYIM ?? '',
-                $author->contactMSN ?? '',
-                $author->contactGoogleChat ?? '',
-                $author->contactAIM ?? '',
-                $author->contactYoutube ?? '',
-                $author->contactSteam ?? '',
-                $author->contactTwitter ?? '',
-                $author->contactBlueSky ?? '',
-                '',
-                '',
-                '',
+                // ^20
+                $badgesPerAuthor[$author->id] ?? '',
             );
             $lastpid = $post->id;
         }

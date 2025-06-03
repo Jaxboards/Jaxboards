@@ -351,7 +351,8 @@ final readonly class Settings
         );
         $grantedBadges = BadgeAssociation::selectMany(
             $this->database,
-            'ORDER BY id DESC',
+            'ORDER BY id DESC
+            LIMIT 10',
         );
         $grantedMembers = Member::joinedOn(
             $this->database,
