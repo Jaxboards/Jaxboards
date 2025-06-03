@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Config;
-use Jax\Model;
 use Jax\Database;
 use Jax\Models\Badge;
 use Jax\Models\BadgeAssociation;
