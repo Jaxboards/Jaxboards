@@ -108,11 +108,15 @@ final readonly class ProfileTabs
             return 'No badges yet!';
         }
 
-        $badgesHTML = '<table class="badges">'
-            . '<tr><th></th><th>Reason</th><th>Award Date</th></tr>';
+        $badgesHTML = '<table class="badges" style="width: 100%">';
         foreach ($badgesPerMember[$member->id] as $badgeTuple) {
             $badgesHTML .= '<tr>'
                 . "<td><img src='{$badgeTuple->badge->imagePath}' title='{$badgeTuple->badge->badgeTitle}'></td>"
+                . "<td>{$badgeTuple->badge->badgeTitle}</td>"
+                . "<td>{$badgeTuple->badge->description}</td>"
+                . '</tr>'
+                . '<tr>'
+                . "<td>Awarded for:</td>"
                 . "<td>{$badgeTuple->badgeAssociation->reason}</td>"
                 . "<td>{$this->date->autodate($badgeTuple->badgeAssociation->awardDate)}</td>"
                 . '</tr>';
