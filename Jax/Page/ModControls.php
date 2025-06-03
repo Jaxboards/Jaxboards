@@ -167,11 +167,11 @@ final readonly class ModControls
             return $this->page->error('That user does not exist');
         }
 
-        $member->about = $this->request->asString->post('about');
-        $member->avatar = $this->request->asString->post('avatar');
+        $member->about = $this->request->asString->post('about') ?? '';
+        $member->avatar = $this->request->asString->post('avatar') ?? '';
         $member->displayName = $displayName;
-        $member->full_name = $this->request->asString->post('full_name');
-        $member->sig = $this->request->asString->post('signature');
+        $member->full_name = $this->request->asString->post('full_name') ?? '';
+        $member->sig = $this->request->asString->post('signature') ?? '';
         $member->update($this->database);
 
         return $this->template->meta('success', 'Profile information saved.');

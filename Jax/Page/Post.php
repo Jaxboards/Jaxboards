@@ -455,7 +455,7 @@ final class Post
 
         $modelsPost->editby = $this->user->get()->id;
         $modelsPost->editDate = $this->database->datetime();
-        $modelsPost->post = $this->postData;
+        $modelsPost->post = $this->postData ?? '';
         $modelsPost->update($this->database);
 
         $this->page->command(

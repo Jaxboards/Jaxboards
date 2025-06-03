@@ -26,6 +26,7 @@ final readonly class Badges
     }
 
     /**
+     * @param array<Model> $otherModels
      * @return array<array<object{badge:Badge,badgeAssociation:BadgeAssociation}>>
      */
     public function fetchBadges(array $otherModels, callable $getUserId): array

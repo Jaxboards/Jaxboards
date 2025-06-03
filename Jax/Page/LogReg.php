@@ -319,6 +319,8 @@ final class LogReg
 
         $pass1 = $this->request->asString->post('pass1');
         $pass2 = $this->request->asString->post('pass2');
+        $user = $this->request->asString->post('user');
+
 
         if ($tokenId) {
             $token = Token::selectOne(
@@ -381,11 +383,9 @@ final class LogReg
                 );
             }
         } else {
-            $user = $this->request->asString->post('user');
             if ($user) {
                 $member = Member::selectOne(
                     $this->database,
-                    'members',
                     'WHERE `name`=?',
                     $user,
                 );

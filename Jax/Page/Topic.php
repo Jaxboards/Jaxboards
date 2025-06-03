@@ -620,7 +620,7 @@ final class Topic
                 ++$topicPostCounter,
                 $postrating,
                 // ^20
-                $badgesPerAuthor[$author->id] ?? '',
+                $badgesPerAuthor[$author?->id] ?? '',
             );
             $lastpid = $post->id;
         }
