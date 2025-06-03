@@ -12,12 +12,12 @@ use Jax\TextFormatting;
 
 use function array_key_exists;
 
-final class Badges
+final readonly class Badges
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Database $database,
-        private readonly TextFormatting $textFormatting,
+        private Config $config,
+        private Database $database,
+        private TextFormatting $textFormatting,
     ) {}
 
     public function isEnabled(): bool

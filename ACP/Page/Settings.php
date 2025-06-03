@@ -411,15 +411,16 @@ final readonly class Settings
             ],
         ));
 
-        if ($badges !== []) {
-            $this->page->addContentBox('Grant Badges', $this->page->parseTemplate(
-                'settings/badges-grant.html',
-                [
-                    'options' => $badgeOptions,
-                    'grantedBadges' => $grantedBadgesRows,
-                ],
-            ));
+        if ($badges === []) {
+            return;
         }
 
+        $this->page->addContentBox('Grant Badges', $this->page->parseTemplate(
+            'settings/badges-grant.html',
+            [
+                'options' => $badgeOptions,
+                'grantedBadges' => $grantedBadgesRows,
+            ],
+        ));
     }
 }
