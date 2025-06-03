@@ -116,7 +116,7 @@ final readonly class ProfileTabs
                 . "<td>{$badgeTuple->badge->description}</td>"
                 . '</tr>'
                 . '<tr>'
-                . "<td>Awarded for:</td>"
+                . '<td>Awarded for:</td>'
                 . "<td>{$badgeTuple->badgeAssociation->reason}</td>"
                 . "<td>{$this->date->autodate($badgeTuple->badgeAssociation->awardDate)}</td>"
                 . '</tr>';
