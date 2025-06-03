@@ -112,9 +112,9 @@ abstract class Model
         Database $database,
         array $otherModel,
         callable $getId,
-        ?string $key = null
+        ?string $key = null,
     ): array {
-        $primaryKey = static:: PRIMARY_KEY;
+        $primaryKey = static::PRIMARY_KEY;
         $key ??= $primaryKey;
 
         $otherIds = array_unique(

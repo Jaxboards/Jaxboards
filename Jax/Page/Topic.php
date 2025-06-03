@@ -31,6 +31,7 @@ use Jax\User;
 
 use function _\keyBy;
 use function array_flip;
+use function array_key_exists;
 use function array_map;
 use function array_merge;
 use function array_unique;
@@ -412,25 +413,28 @@ final class Topic
 
     /**
      * @param array<Post> $posts
+     *
+     * @return array<string>
      */
-    private function renderBadges(array $posts) {
+    private function renderBadges(array $posts): array
+    {
         $badgesPerAuthor = [];
 
-        if (!$this->config->get('badgesEnabled')) {
+        if (!$this->config->get()) {
             return $badgesPerAuthor;
         }
 
         $badgeAssociations = BadgeAssociation::joinedOn(
             $this->database,
             $posts,
-            static fn(Post $post) => $post->author,
+            static fn(Post $post): ?int => $post->author,
             'user',
         );
 
         $badges = Badge::joinedOn(
             $this->database,
             $badgeAssociations,
-            static fn(BadgeAssociation $badgeAssociation) => $badgeAssociation->badge
+            static fn(BadgeAssociation $badgeAssociation): int => $badgeAssociation->badge,
         );
 
         foreach ($badgeAssociations as $badgeAssociation) {
@@ -535,7 +539,7 @@ final class Topic
         $forumPerms = $this->fetchForumPermissions($modelsTopic);
 
 
-        $badgesPerAuthor = $this->renderBadges($posts, $membersById);
+        $badgesPerAuthor = $this->renderBadges($posts);
 
         $rows = '';
         foreach ($posts as $post) {
