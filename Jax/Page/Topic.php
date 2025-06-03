@@ -420,7 +420,7 @@ final class Topic
     {
         $badgesPerAuthor = [];
 
-        if (!$this->config->get()) {
+        if (!$this->config->getSetting('badgesEnabled')) {
             return $badgesPerAuthor;
         }
 
@@ -537,7 +537,6 @@ final class Topic
         );
 
         $forumPerms = $this->fetchForumPermissions($modelsTopic);
-
 
         $badgesPerAuthor = $this->renderBadges($posts);
 
