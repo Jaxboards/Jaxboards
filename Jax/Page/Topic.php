@@ -431,7 +431,7 @@ final class Topic
 
             foreach ($badgeTuples as $badgeTuple) {
                 $badgesPerAuthorHTML[$authorId] .= <<<HTML
-                    <img src="{$badgeTuple->badge->imagePath}" title="{$badgeTuple->badge->description}">
+                    <img src="{$badgeTuple->badge->imagePath}" title="{$badgeTuple->badge->badgeTitle}">
                     HTML;
             }
         }
