@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Page\UserProfile;
 
+use Jax\Config;
 use Jax\Database;
 use Jax\Date;
 use Jax\Models\Forum;
@@ -11,6 +12,7 @@ use Jax\Models\Member;
 use Jax\Models\Post;
 use Jax\Models\Topic;
 use Jax\Page;
+use Jax\Page\Badges;
 use Jax\Request;
 use Jax\Template;
 use Jax\TextFormatting;
@@ -23,17 +25,15 @@ use function ucwords;
 
 final readonly class ProfileTabs
 {
-    private const TABS = [
-        'about',
-        'activity',
-        'posts',
-        'topics',
-        'comments',
-        'friends',
-    ];
+    /**
+     * @var array<string>
+     */
+    private array $tabs;
 
     public function __construct(
         private Activity $activity,
+        private Badges $badges,
+        private Config $config,
         private Comments $comments,
         private Database $database,
         private Date $date,
@@ -42,7 +42,22 @@ final readonly class ProfileTabs
         private Template $template,
         private TextFormatting $textFormatting,
         private User $user,
-    ) {}
+    ) {
+        $tabs = [
+            'about',
+            'activity',
+            'posts',
+            'topics',
+            'comments',
+            'friends',
+        ];
+
+        if ($this->badges->isEnabled()) {
+            $tabs[] = 'badges';
+        }
+
+        $this->tabs = $tabs;
+    }
 
     /**
      * @return list{list<string>,string}
@@ -50,7 +65,7 @@ final readonly class ProfileTabs
     public function render(Member $member): array
     {
         $page = $this->request->both('page');
-        $selectedTab = in_array($page, self::TABS, true) ? $page : 'activity';
+        $selectedTab = in_array($page, $this->tabs, true) ? $page : 'activity';
 
         $tabHTML = match ($selectedTab) {
             'posts' => $this->showTabPosts($member),
@@ -58,6 +73,7 @@ final readonly class ProfileTabs
             'about' => $this->showTabAbout($member),
             'friends' => $this->showTabFriends($member),
             'comments' => $this->comments->render($member),
+            'badges' => $this->showTabBadges($member),
             default => $this->activity->render($member),
         };
 
@@ -71,7 +87,7 @@ final readonly class ProfileTabs
                     <a href="?act=vu{$profileId}&page={$tab}" {$active}>{$uppercase}</a>
                     HTML;
             },
-            self::TABS,
+            $this->tabs,
         );
 
         $this->page->command('update', 'pfbox', $tabHTML);
@@ -222,5 +238,30 @@ final readonly class ProfileTabs
         }
 
         return $tabHTML;
+    }
+
+    public function showTabBadges(Member $member): string
+    {
+        if (!$this->badges->isEnabled()) {
+            $this->page->location("?act=vu{$member->id}");
+            return '';
+        }
+
+        $badgesPerMember = $this->badges->fetchBadges([$member], static fn(Member $member) => $member->id);
+
+        if (!array_key_exists($member->id, $badgesPerMember)) {
+            return "No badges yet!";
+        }
+
+        $badgesHTML = '<table class="badges">'
+            . '<tr><th>Badge</th><th>Reason</th><th>Award Date</th></tr>';
+        foreach ($badgesPerMember[$member->id] as $badgeTuple) {
+            $badgesHTML .= "<tr>"
+                . "<td><img src='{$badgeTuple->badge->imagePath}' title={$badgeTuple->badge->description}></td>"
+                . "<td>{$badgeTuple->badgeAssociation->reason}</td>"
+                . "<td>{$this->date->autodate($badgeTuple->badgeAssociation->awardDate)}</td>"
+                . "</tr>";
+        }
+        return $badgesHTML . '</table>';
     }
 }

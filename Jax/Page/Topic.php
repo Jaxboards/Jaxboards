@@ -57,6 +57,7 @@ final class Topic
     private int $firstPostID = 0;
 
     public function __construct(
+        private readonly Badges $badges,
         private readonly Config $config,
         private readonly Database $database,
         private readonly Date $date,
@@ -418,41 +419,25 @@ final class Topic
      */
     private function renderBadges(array $posts): array
     {
-        $badgesPerAuthor = [];
-
-        if (!$this->config->getSetting('badgesEnabled')) {
-            return $badgesPerAuthor;
+        if (!$this->badges->isEnabled()) {
+            return [];
         }
 
-        $badgeAssociations = BadgeAssociation::joinedOn(
-            $this->database,
-            $posts,
-            static fn(Post $post): ?int => $post->author,
-            'user',
-        );
+        $badgesPerAuthor = $this->badges->fetchBadges($posts, static fn(Post $post): ?int => $post->author);
+        $badgesPerAuthorHTML = [];
 
-        $badges = Badge::joinedOn(
-            $this->database,
-            $badgeAssociations,
-            static fn(BadgeAssociation $badgeAssociation): int => $badgeAssociation->badge,
-        );
-
-        foreach ($badgeAssociations as $badgeAssociation) {
-            if (!array_key_exists($badgeAssociation->user, $badgesPerAuthor)) {
-                $badgesPerAuthor[$badgeAssociation->user] = '';
+        foreach ($badgesPerAuthor as $authorId => $badgeTuples) {
+            if (!array_key_exists($authorId, $badgesPerAuthorHTML)) {
+                $badgesPerAuthorHTML[$authorId] = '';
             }
 
-            $badge = $badges[$badgeAssociation->badge];
-
-            $badgeSrc = $this->textFormatting->blockhtml($badge->imagePath);
-            $badgeDescription = $this->textFormatting->blockhtml($badge->description);
-
-            $badgesPerAuthor[$badgeAssociation->user] .= <<<HTML
-                <img src="{$badgeSrc}" title="{$badgeDescription}">
-                HTML;
+            foreach ($badgeTuples as $badgeTuple) {
+                $badgesPerAuthorHTML[$authorId] .= <<<HTML
+                    <img src="{$badgeTuple->badge->imagePath}" title="{$badgeTuple->badge->description}">
+                    HTML;
+            }
         }
-
-        return $badgesPerAuthor;
+        return $badgesPerAuthorHTML;
     }
 
     private function quickReplyForm(ModelsTopic $modelsTopic): void

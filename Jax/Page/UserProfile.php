@@ -201,12 +201,7 @@ final readonly class UserProfile
             $member->id,
             $member->posts,
             $this->fetchGroupTitle($member->groupID),
-            $tabs[0],
-            $tabs[1],
-            $tabs[2],
-            $tabs[3],
-            $tabs[4],
-            $tabs[5],
+            implode('', $tabs),
             $tabHTML,
             $this->user->getGroup()?->canModerate
                 ? "<a class='moderate' href='?act=modcontrols&do=emem&mid={$member->id}'>Edit</a>" : '',
