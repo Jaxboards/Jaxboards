@@ -26,17 +26,16 @@ final readonly class Badges
     }
 
     /**
-     * @param array<Model> $otherModels
+     * @param array<int> $userIds
      *
      * @return array<array<object{badge:Badge,badgeAssociation:BadgeAssociation}>>
      */
-    public function fetchBadges(array $otherModels, callable $getUserId): array
+    public function fetchBadges(array $userIds): array
     {
-        $badgeAssociations = BadgeAssociation::joinedOn(
+        $badgeAssociations = BadgeAssociation::selectMany(
             $this->database,
-            $otherModels,
-            $getUserId,
-            'user',
+            'WHERE user IN ?',
+            $userIds
         );
 
         $badges = Badge::joinedOn(

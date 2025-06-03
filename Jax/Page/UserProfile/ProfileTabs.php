@@ -102,7 +102,7 @@ final readonly class ProfileTabs
             return '';
         }
 
-        $badgesPerMember = $this->badges->fetchBadges([$member], static fn(Member $member): int => $member->id);
+        $badgesPerMember = $this->badges->fetchBadges([$member->id]);
 
         if (!array_key_exists($member->id, $badgesPerMember)) {
             return 'No badges yet!';
