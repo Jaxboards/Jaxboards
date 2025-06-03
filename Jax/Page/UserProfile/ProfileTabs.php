@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Page\UserProfile;
 
-use Jax\Config;
 use Jax\Database;
 use Jax\Date;
 use Jax\Models\Forum;
@@ -18,6 +17,7 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function array_key_exists;
 use function array_map;
 use function explode;
 use function in_array;
@@ -33,7 +33,6 @@ final readonly class ProfileTabs
     public function __construct(
         private Activity $activity,
         private Badges $badges,
-        private Config $config,
         private Comments $comments,
         private Database $database,
         private Date $date,
@@ -93,6 +92,33 @@ final readonly class ProfileTabs
         $this->page->command('update', 'pfbox', $tabHTML);
 
         return [$tabs, $tabHTML];
+    }
+
+    public function showTabBadges(Member $member): string
+    {
+        if (!$this->badges->isEnabled()) {
+            $this->page->location("?act=vu{$member->id}");
+
+            return '';
+        }
+
+        $badgesPerMember = $this->badges->fetchBadges([$member], static fn(Member $member): int => $member->id);
+
+        if (!array_key_exists($member->id, $badgesPerMember)) {
+            return 'No badges yet!';
+        }
+
+        $badgesHTML = '<table class="badges">'
+            . '<tr><th>Badge</th><th>Reason</th><th>Award Date</th></tr>';
+        foreach ($badgesPerMember[$member->id] as $badgeTuple) {
+            $badgesHTML .= '<tr>'
+                . "<td><img src='{$badgeTuple->badge->imagePath}' title={$badgeTuple->badge->description}></td>"
+                . "<td>{$badgeTuple->badgeAssociation->reason}</td>"
+                . "<td>{$this->date->autodate($badgeTuple->badgeAssociation->awardDate)}</td>"
+                . '</tr>';
+        }
+
+        return $badgesHTML . '</table>';
     }
 
     private function showTabAbout(Member $member): string
@@ -238,30 +264,5 @@ final readonly class ProfileTabs
         }
 
         return $tabHTML;
-    }
-
-    public function showTabBadges(Member $member): string
-    {
-        if (!$this->badges->isEnabled()) {
-            $this->page->location("?act=vu{$member->id}");
-            return '';
-        }
-
-        $badgesPerMember = $this->badges->fetchBadges([$member], static fn(Member $member) => $member->id);
-
-        if (!array_key_exists($member->id, $badgesPerMember)) {
-            return "No badges yet!";
-        }
-
-        $badgesHTML = '<table class="badges">'
-            . '<tr><th>Badge</th><th>Reason</th><th>Award Date</th></tr>';
-        foreach ($badgesPerMember[$member->id] as $badgeTuple) {
-            $badgesHTML .= "<tr>"
-                . "<td><img src='{$badgeTuple->badge->imagePath}' title={$badgeTuple->badge->description}></td>"
-                . "<td>{$badgeTuple->badgeAssociation->reason}</td>"
-                . "<td>{$this->date->autodate($badgeTuple->badgeAssociation->awardDate)}</td>"
-                . "</tr>";
-        }
-        return $badgesHTML . '</table>';
     }
 }

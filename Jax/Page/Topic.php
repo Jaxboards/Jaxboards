@@ -11,8 +11,6 @@ use Jax\Date;
 use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
-use Jax\Models\Badge;
-use Jax\Models\BadgeAssociation;
 use Jax\Models\Category;
 use Jax\Models\Forum;
 use Jax\Models\Group;
@@ -437,6 +435,7 @@ final class Topic
                     HTML;
             }
         }
+
         return $badgesPerAuthorHTML;
     }
 

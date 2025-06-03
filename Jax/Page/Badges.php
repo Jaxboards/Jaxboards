@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\Page;
 
 use Jax\Config;
@@ -8,22 +10,26 @@ use Jax\Models\Badge;
 use Jax\Models\BadgeAssociation;
 use Jax\TextFormatting;
 
-class Badges {
+use function array_key_exists;
+
+final class Badges
+{
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
         private readonly TextFormatting $textFormatting,
-    ){}
+    ) {}
 
-    public function isEnabled() {
+    public function isEnabled(): bool
+    {
         return (bool) $this->config->getSetting('badgesEnabled');
     }
 
     /**
-     * @param array<Model> $models
      * @return array<array<object{badge:Badge,badgeAssociation:BadgeAssociation}>>
      */
-    public function fetchBadges(array $otherModels, callable $getUserId) {
+    public function fetchBadges(array $otherModels, callable $getUserId): array
+    {
         $badgeAssociations = BadgeAssociation::joinedOn(
             $this->database,
             $otherModels,
