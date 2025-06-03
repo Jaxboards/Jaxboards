@@ -444,26 +444,21 @@ final class Post
         };
     }
 
-    private function updatePost(int $pid, ?string $postData): ?string
+    private function updatePost(ModelsPost $post, ?string $postData): ?string
     {
         $error = $this->validatePost($postData);
         if ($error) {
             return $error;
         }
 
-        $this->database->update(
-            'posts',
-            [
-                'editby' => $this->user->get()->id,
-                'editDate' => $this->database->datetime(),
-                'post' => $this->postData,
-            ],
-            Database::WHERE_ID_EQUALS,
-            $pid,
-        );
+        $post->editby = $this->user->get()->id;
+        $post->editDate = $this->database->datetime();
+        $post->post = $this->postData;
+        $post->update($this->database);
+
         $this->page->command(
             'update',
-            "#pid_{$pid} .post_content",
+            "#pid_{$post->id} .post_content",
             $this->textFormatting->theWorks($this->postData ?? ''),
         );
         $this->page->command('softurl');
@@ -471,15 +466,12 @@ final class Post
         return null;
     }
 
-    private function updateTopic(int $tid): ?string
+    private function updateTopic(Topic $topic): ?string
     {
-        $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
-
         $topicTitle = $this->request->asString->post('ttitle');
         $topicDesc = $this->request->asString->post('tdesc');
 
         $error = match (true) {
-            !$topic => "The topic you are trying to edit doesn't exist.",
             $topicTitle === null || trim($topicTitle) === '' => 'You must supply a topic title!',
             default => null,
         };
@@ -488,30 +480,23 @@ final class Post
             return $error;
         }
 
-        $this->database->update(
-            'topics',
-            [
-                'subtitle' => $this->textFormatting->blockhtml($topicDesc ?? ''),
-                'summary' => mb_substr(
-                    (string) preg_replace(
-                        '@\s+@',
-                        ' ',
-                        $this->textFormatting->wordfilter(
-                            $this->textFormatting->blockhtml(
-                                $this->textFormatting->textOnly(
-                                    $this->postData ?? '',
-                                ),
-                            ),
+        $topic->subtitle = $this->textFormatting->blockhtml($topicDesc ?? '');
+        $topic->summary = mb_substr(
+            (string) preg_replace(
+                '@\s+@',
+                ' ',
+                $this->textFormatting->wordfilter(
+                    $this->textFormatting->blockhtml(
+                        $this->textFormatting->textOnly(
+                            $this->postData ?? '',
                         ),
                     ),
-                    0,
-                    50,
                 ),
-                'title' => $this->textFormatting->blockhtml($topicTitle ?? ''),
-            ],
-            Database::WHERE_ID_EQUALS,
-            $tid,
+            ),
+            0,
+            50,
         );
+        $topic->update($this->database);
 
         return null;
     }
@@ -538,9 +523,9 @@ final class Post
 
         if ($this->request->post('submit') !== null) {
             // Update topic when editing topic
-            $error = $this->updatePost($pid, $postData);
+            $error = $this->updatePost($post, $postData);
             if (!$error && $isTopicPost) {
-                $error = $this->updateTopic($post->tid);
+                $error = $this->updateTopic($topic);
             }
 
             if ($error !== null) {
@@ -715,14 +700,8 @@ final class Post
 
         // Set op.
         if ($newtopic) {
-            $this->database->update(
-                'topics',
-                [
-                    'op' => $post->id,
-                ],
-                Database::WHERE_ID_EQUALS,
-                $tid,
-            );
+            $topic->op = $post->id;
+            $topic->update($this->database);
         }
 
         $activity = new Activity();

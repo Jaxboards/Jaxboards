@@ -156,29 +156,23 @@ final readonly class ModControls
     {
         $displayName = $this->request->asString->post('displayName');
         $mid = (int) $this->request->asString->post('mid');
+
+        $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
+
         if (!$displayName) {
-            return $this->template->meta('error', 'Display name is invalid.');
+            return $this->page->error('Display name is invalid.');
         }
 
-        $updateResult = $this->database->update(
-            'members',
-            [
-                'about' => $this->request->asString->post('about'),
-                'avatar' => $this->request->asString->post('avatar'),
-                'displayName' => $displayName,
-                'full_name' => $this->request->asString->post('full_name'),
-                'sig' => $this->request->asString->post('signature'),
-            ],
-            Database::WHERE_ID_EQUALS,
-            $mid,
-        );
-
-        if ($updateResult === null) {
-            return $this->template->meta(
-                'error',
-                'Error updating profile information.',
-            );
+        if ($member === null) {
+            return $this->page->error('That user does not exist');
         }
+
+        $member->about = $this->request->asString->post('about');
+        $member->avatar = $this->request->asString->post('avatar');
+        $member->displayName = $displayName;
+        $member->full_name = $this->request->asString->post('full_name');
+        $member->sig = $this->request->asString->post('signature');
+        $member->update($this->database);
 
         return $this->template->meta('success', 'Profile information saved.');
     }
@@ -202,7 +196,7 @@ final readonly class ModControls
         if ($memberId !== 0) {
             $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $memberId);
         } elseif (!$memberName) {
-            return $this->template->meta('error', 'Member name is a required field.');
+            return $this->page->error('Member name is a required field.');
         } else {
             $members = Member::selectMany(
                 $this->database,
@@ -210,14 +204,14 @@ final readonly class ModControls
                 $memberName . '%',
             );
             if (count($members) > 1) {
-                return $this->template->meta('error', 'Many users found!');
+                return $this->page->error('Many users found!');
             }
 
             $member = $members[0];
         }
 
         if (!$member) {
-            return $this->template->meta('error', 'No members found that matched the criteria.');
+            return $this->page->error('No members found that matched the criteria.');
         }
 
         if (
@@ -226,7 +220,7 @@ final readonly class ModControls
             && ($this->user->get()->id !== 1
                 && $member->id !== $this->user->get()->id)
         ) {
-            return $this->template->meta('error', 'You do not have permission to edit this profile.');
+            return $this->page->error('You do not have permission to edit this profile.');
         }
 
         $hiddenFormFields = $this->jax->hiddenFormFields(

@@ -333,28 +333,23 @@ final class LogReg
                 $pass1 && $pass2
             ) {
                 if ($pass1 === $pass2) {
-                    $this->database->update(
-                        'members',
-                        [
-                            'pass' => password_hash(
-                                $pass1,
-                                PASSWORD_DEFAULT,
-                            ),
-                        ],
+                    // Get member.
+                    $member = Member::selectOne(
+                        $this->database,
                         Database::WHERE_ID_EQUALS,
                         $token->uid,
                     );
+
+                    $member->pass = password_hash(
+                        $pass1,
+                        PASSWORD_DEFAULT,
+                    );
+                    $member->update($this->database);
+
                     // Delete all forgotpassword tokens for this user.
                     $this->database->delete(
                         'tokens',
                         "WHERE `uid`=? AND `type`='forgotpassword'",
-                        $token->uid,
-                    );
-
-                    // Get username.
-                    $member = Member::selectOne(
-                        $this->database,
-                        Database::WHERE_ID_EQUALS,
                         $token->uid,
                     );
 

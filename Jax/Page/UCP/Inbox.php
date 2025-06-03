@@ -357,12 +357,9 @@ final readonly class Inbox
         );
 
         if (!$message->read && $userIsRecipient) {
-            $this->database->update(
-                'messages',
-                ['read' => 1],
-                Database::WHERE_ID_EQUALS,
-                $message->id,
-            );
+            $message->read = 1;
+            $message->update($this->database);
+
             $this->page->command('update', 'num-messages', $this->fetchMessageCount('unread'));
         }
 

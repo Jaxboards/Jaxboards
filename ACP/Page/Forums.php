@@ -346,15 +346,10 @@ final readonly class Forums
         if ($rmod && $forum) {
             $exploded = explode(',', $forum->mods);
             unset($exploded[array_search($rmod, $exploded, true)]);
+
             $forum->mods = implode(',', $exploded);
-            $this->database->update(
-                'forums',
-                [
-                    'mods' => $forum->mods,
-                ],
-                Database::WHERE_ID_EQUALS,
-                $fid,
-            );
+            $forum->update($this->database);
+
             $this->updatePerForumModFlag();
             $this->page->location('?act=Forums&do=edit&edit=' . $fid);
 
@@ -749,7 +744,7 @@ final readonly class Forums
             $error === null
             && $this->request->post('submit') !== null
         ) {
-            if (!isset($categories[$moveTo])) {
+            if (!array_key_exists($moveTo, $categories)) {
                 $error = 'Invalid category to move forums to.';
             } else {
                 $this->database->update(
@@ -760,11 +755,9 @@ final readonly class Forums
                     'WHERE `category`=?',
                     $catId,
                 );
-                $this->database->delete(
-                    'categories',
-                    Database::WHERE_ID_EQUALS,
-                    $catId,
-                );
+
+                $categories[$catId]->delete($this->database);
+
                 $page .= $this->page->success('Category deleted!');
             }
         }
