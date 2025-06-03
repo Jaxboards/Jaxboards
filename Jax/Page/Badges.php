@@ -35,7 +35,7 @@ final readonly class Badges
         $badgeAssociations = BadgeAssociation::selectMany(
             $this->database,
             'WHERE user IN ?',
-            $userIds
+            $userIds,
         );
 
         $badges = Badge::joinedOn(
