@@ -444,21 +444,23 @@ final class Post
         };
     }
 
-    private function updatePost(ModelsPost $post, ?string $postData): ?string
-    {
+    private function updatePost(
+        ModelsPost $modelsPost,
+        ?string $postData,
+    ): ?string {
         $error = $this->validatePost($postData);
         if ($error) {
             return $error;
         }
 
-        $post->editby = $this->user->get()->id;
-        $post->editDate = $this->database->datetime();
-        $post->post = $this->postData;
-        $post->update($this->database);
+        $modelsPost->editby = $this->user->get()->id;
+        $modelsPost->editDate = $this->database->datetime();
+        $modelsPost->post = $this->postData;
+        $modelsPost->update($this->database);
 
         $this->page->command(
             'update',
-            "#pid_{$post->id} .post_content",
+            "#pid_{$modelsPost->id} .post_content",
             $this->textFormatting->theWorks($this->postData ?? ''),
         );
         $this->page->command('softurl');
