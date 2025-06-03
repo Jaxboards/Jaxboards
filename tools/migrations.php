@@ -62,11 +62,11 @@ $database = $container->get(Database::class);
 $dbVersion = getDBVersion($database);
 
 foreach ($migrations as $version => $migration) {
-    echo "Checking: {$version} against {$dbVersion}" . PHP_EOL;
-
     if ($version <= $dbVersion) {
         continue;
     }
+
+    echo "notice: migrating from v{$dbVersion} to v{$version}" . PHP_EOL;
 
     $migrationClass = $container->get("tools\\migrations\\V{$version}\\{$migration}");
 
