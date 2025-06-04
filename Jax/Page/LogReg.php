@@ -318,6 +318,7 @@ final class LogReg
         if ($token === null) {
             return 'This link has expired. Please try again.';
         }
+
         if ($pass1 === null || $pass2 === null) {
             return null;
         }
@@ -354,9 +355,7 @@ final class LogReg
         // registration redirects to the index.
         $this->registering = true;
 
-        if ($member !== null) {
-            $this->login($member->name, $pass1);
-        }
+        $this->login($member->name, $pass1);
 
         return null;
     }
@@ -385,7 +384,7 @@ final class LogReg
                             'id' => $tokenId,
                             'uid' => $uid ?? '',
                         ],
-                    )
+                    ),
                 );
         } else {
             if ($user) {
