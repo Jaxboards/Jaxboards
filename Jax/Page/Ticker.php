@@ -99,7 +99,7 @@ final class Ticker
         $members = Member::joinedOn(
             $this->database,
             $posts,
-            static fn(Post $post): ?int => $post->author,
+            static fn(Post $post): int => $post->author,
         );
 
         $ticks = [];

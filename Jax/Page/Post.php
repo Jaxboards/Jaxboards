@@ -348,7 +348,7 @@ final class Post
             $membersById = Member::joinedOn(
                 $this->database,
                 $posts,
-                static fn(ModelsPost $modelsPost): ?int => $modelsPost->author,
+                static fn(ModelsPost $modelsPost): int => $modelsPost->author,
             );
 
             foreach ($posts as $post) {

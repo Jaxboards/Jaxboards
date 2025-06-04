@@ -455,7 +455,7 @@ final class Topic
             $membersById = Member::joinedOn(
                 $this->database,
                 $posts,
-                static fn(Post $post): ?int => $post->author,
+                static fn(Post $post): int => $post->author,
             );
 
             foreach ($posts as $post) {
@@ -509,7 +509,7 @@ final class Topic
 
         $membersById = $this->fetchMembersById(
             array_merge(
-                array_map(static fn($post): int => $post->author ?? 0, $posts),
+                array_map(static fn($post): int => $post->author, $posts),
                 array_map(static fn($post): int => $post->editby ?? 0, $posts),
             ),
         );
@@ -868,7 +868,7 @@ final class Topic
             Database::WHERE_ID_EQUALS,
             $modelsTopic->id,
         );
-        $authors = $this->fetchMembersById(array_map(static fn($post): int => $post->author ?? 0, $posts));
+        $authors = $this->fetchMembersById(array_map(static fn($post): int => $post->author, $posts));
 
         foreach ($posts as $post) {
             $rssFeed->additem(
