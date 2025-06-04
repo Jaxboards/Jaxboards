@@ -810,10 +810,54 @@ textarea {
 /* stylelint-enable no-descending-specificity */
 
 /* stylelint-disable no-descending-specificity */
+
 .userprofile .contacts .contact .avatar img {
     max-width: 50px;
     max-height: 50px;
 }
+
+.userprofile .badge {
+    display: grid;
+    grid-template-columns: 50px 1fr 1fr;
+    grid-template-areas:
+        "badgeImage title awardDate"
+        "badgeImage description description"
+        "badgeImage reason reason";
+    border-bottom: 1px solid #000;
+    padding: 10px 5px;
+}
+
+.userprofile .badge .badgeTitle {
+    grid-area: title;
+    margin: 0;
+    /* font-weight: bold; */
+}
+
+.userprofile .badge .badgeImage {
+    grid-area: badgeImage;
+}
+
+.userprofile .badge .badgeImage img {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.userprofile .badge .description {
+    grid-area: description;
+}
+
+.userprofile .badge .awardDate {
+    grid-area: awardDate;
+    text-align: right;
+}
+
+.userprofile .badge .reason {
+    grid-area: reason;
+}
+
+
 /* stylelint-enable no-descending-specificity */
 
 /* Activity (global) */

@@ -72,7 +72,7 @@ final readonly class ProfileTabs
             'about' => $this->showTabAbout($member),
             'friends' => $this->showTabFriends($member),
             'comments' => $this->comments->render($member),
-            'badges' => $this->showTabBadges($member),
+            'badges' => $this->badges->showTabBadges($member),
             default => $this->activity->render($member),
         };
 
@@ -92,37 +92,6 @@ final readonly class ProfileTabs
         $this->page->command('update', 'pfbox', $tabHTML);
 
         return [$tabs, $tabHTML];
-    }
-
-    public function showTabBadges(Member $member): string
-    {
-        if (!$this->badges->isEnabled()) {
-            $this->page->location("?act=vu{$member->id}");
-
-            return '';
-        }
-
-        $badgesPerMember = $this->badges->fetchBadges([$member->id]);
-
-        if (!array_key_exists($member->id, $badgesPerMember)) {
-            return 'No badges yet!';
-        }
-
-        $badgesHTML = '<table class="badges" style="width: 100%">';
-        foreach ($badgesPerMember[$member->id] as $badgeTuple) {
-            $badgesHTML .= '<tr>'
-                . "<td><img src='{$badgeTuple->badge->imagePath}' title='{$badgeTuple->badge->badgeTitle}'></td>"
-                . "<td>{$badgeTuple->badge->badgeTitle}</td>"
-                . "<td>{$badgeTuple->badge->description}</td>"
-                . '</tr>'
-                . '<tr>'
-                . '<td>Awarded for:</td>'
-                . "<td>{$badgeTuple->badgeAssociation->reason}</td>"
-                . "<td>{$this->date->autodate($badgeTuple->badgeAssociation->awardDate)}</td>"
-                . '</tr>';
-        }
-
-        return $badgesHTML . '</table>';
     }
 
     private function showTabAbout(Member $member): string
