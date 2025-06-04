@@ -827,17 +827,16 @@ textarea {
     padding: 10px 5px;
 }
 
-.userprofile .badge .badgeTitle {
+.userprofile .badge .badge-title {
     grid-area: title;
     margin: 0;
-    /* font-weight: bold; */
 }
 
-.userprofile .badge .badgeImage {
+.userprofile .badge .badge-image {
     grid-area: badgeImage;
 }
 
-.userprofile .badge .badgeImage img {
+.userprofile .badge .badge-image img {
     position: relative;
     top: 50%;
     left: 50%;
@@ -848,7 +847,7 @@ textarea {
     grid-area: description;
 }
 
-.userprofile .badge .awardDate {
+.userprofile .badge .award-date {
     grid-area: awardDate;
     text-align: right;
 }
@@ -856,7 +855,6 @@ textarea {
 .userprofile .badge .reason {
     grid-area: reason;
 }
-
 
 /* stylelint-enable no-descending-specificity */
 

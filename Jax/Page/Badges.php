@@ -12,7 +12,6 @@ use Jax\Models\BadgeAssociation;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\TextFormatting;
-use PHP_CodeSniffer\Generators\HTML;
 
 use function array_key_exists;
 
@@ -88,15 +87,15 @@ final readonly class Badges
         foreach ($badgesPerMember[$member->id] as $badgeTuple) {
             $badgesHTML .= <<<HTML
                 <section class="badge">
-                        <div class="badgeImage">
+                        <div class="badge-image">
                             <img src='{$badgeTuple->badge->imagePath}' title='{$badgeTuple->badge->badgeTitle}'>
                         </div>
-                        <h3 class="badgeTitle">
+                        <h3 class="badge-title">
                             {$badgeTuple->badge->badgeTitle}
                         </h3>
                         <div class="description">{$badgeTuple->badge->description}</div>
                         <div class="reason">For: {$badgeTuple->badgeAssociation->reason}</div>
-                        <div class="awardDate">{$this->date->autodate($badgeTuple->badgeAssociation->awardDate)}</div>
+                        <div class="award-date">{$this->date->autodate($badgeTuple->badgeAssociation->awardDate)}</div>
                 </section>
                 HTML;
         }
