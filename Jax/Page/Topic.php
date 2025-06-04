@@ -650,36 +650,26 @@ final class Topic
             return $canMod;
         }
 
-        $canMod = false;
         if ($this->user->getGroup()?->canModerate) {
-            $canMod = true;
+            return $canMod = true;
         }
 
         if ($this->user->get()->mod !== 0) {
-            $result = $this->database->special(
-                <<<'SQL'
-                    SELECT `mods`
-                    FROM %t
-                    WHERE `id` = (
-                        SELECT `fid`
-                        FROM %t
-                        WHERE `id` = ?
-                    )
-                    SQL,
-                ['forums', 'topics'],
-                $modelsTopic->id,
+            $forum = Forum::selectOne(
+                $this->database,
+                Database::WHERE_ID_EQUALS,
+                $modelsTopic->fid,
             );
-            $mods = $this->database->arow($result);
-            $this->database->disposeresult($result);
+
             if (
-                $mods
-                && in_array($this->user->get()->id, explode(',', (string) $mods['mods']), true)
+                $forum !== null
+                && in_array((string) $this->user->get()->id, explode(',', $forum->mods), true)
             ) {
-                $canMod = true;
+                return $canMod = true;
             }
         }
 
-        return $canMod;
+        return $canMod = false;
     }
 
     private function quickEditPost(ModelsTopic $modelsTopic, int $pid): void
