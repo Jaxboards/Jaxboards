@@ -48,6 +48,7 @@ final class Session
         'ChatGLM-Spider' => 'ChatGLM',
         'ChatGPT-User' => 'ChatGPT',
         'ClaudeBot' => 'ClaudeBot',
+        'DataForSeoBot' => 'DataForSeo',
         'Discordbot' => 'Discord',
         'DotBot' => 'DotBot',
         'DuckDuckBot' => 'DuckDuckGo',
