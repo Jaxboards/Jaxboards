@@ -17,7 +17,6 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function array_key_exists;
 use function array_map;
 use function explode;
 use function in_array;

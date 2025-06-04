@@ -820,9 +820,9 @@ textarea {
     display: grid;
     grid-template-columns: 50px 1fr 1fr;
     grid-template-areas:
-        "badgeImage title awardDate"
-        "badgeImage description description"
-        "badgeImage reason reason";
+        'badgeImage title awardDate'
+        'badgeImage description description'
+        'badgeImage reason reason';
     border-bottom: 1px solid #000;
     padding: 10px 5px;
 }
