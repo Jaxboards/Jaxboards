@@ -27,7 +27,7 @@ final class Post extends Model
 
     public int $id = 0;
 
-    public ?int $author = null;
+    public int $author = 0;
 
     public string $post = '';
 

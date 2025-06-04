@@ -421,7 +421,7 @@ final class Topic
             return [];
         }
 
-        $badgesPerAuthor = $this->badges->fetchBadges(array_map(static fn(Post $post): ?int => $post->author, $posts));
+        $badgesPerAuthor = $this->badges->fetchBadges(array_map(static fn(Post $post): int => $post->author, $posts));
         $badgesPerAuthorHTML = [];
 
         foreach ($badgesPerAuthor as $authorId => $badgeTuples) {

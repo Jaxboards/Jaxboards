@@ -62,10 +62,7 @@ final class LogReg
             2 => $this->logout(),
             4 => $this->loginpopup(),
             5 => $this->toggleinvisible(),
-            6 => $this->forgotpassword(
-                $this->request->asString->both('uid'),
-                $this->request->asString->both('tokenId'),
-            ),
+            6 => $this->forgotpassword(),
             default => $this->login(
                 $this->request->asString->post('user'),
                 $this->request->asString->post('pass'),
@@ -307,71 +304,80 @@ final class LogReg
         $this->page->command('softurl');
     }
 
-    private function forgotpassword(
-        ?string $uid,
-        ?string $tokenId,
-    ): void {
+    private function forgotPasswordHasToken(string $tokenId): ?string
+    {
+        $token = Token::selectOne(
+            $this->database,
+            'WHERE `token`=? AND expires>=NOW()',
+            $tokenId,
+        );
+
+        $pass1 = $this->request->asString->post('pass1');
+        $pass2 = $this->request->asString->post('pass2');
+
+        if ($token === null) {
+            return 'This link has expired. Please try again.';
+        }
+        if ($pass1 === null || $pass2 === null) {
+            return null;
+        }
+
+        if ($pass1 !== $pass2) {
+            return 'The passwords did not match, please try again!';
+        }
+
+        // Get member.
+        $member = Member::selectOne(
+            $this->database,
+            Database::WHERE_ID_EQUALS,
+            $token->uid,
+        );
+
+        if ($member === null) {
+            return 'The associated account could not be found';
+        }
+
+        $member->pass = password_hash(
+            $pass1,
+            PASSWORD_DEFAULT,
+        );
+        $member->update($this->database);
+
+        // Delete all forgotpassword tokens for this user.
+        $this->database->delete(
+            'tokens',
+            "WHERE `uid`=? AND `type`='forgotpassword'",
+            $token->uid,
+        );
+
+        // Just making use of the way
+        // registration redirects to the index.
+        $this->registering = true;
+
+        if ($member !== null) {
+            $this->login($member->name, $pass1);
+        }
+
+        return null;
+    }
+
+    private function forgotpassword(): void
+    {
+        $uid = $this->request->asString->both('uid');
+        $tokenId = $this->request->asString->both('tokenId');
+
         $page = '';
 
         if ($this->request->isJSUpdate()) {
             return;
         }
 
-        $pass1 = $this->request->asString->post('pass1');
-        $pass2 = $this->request->asString->post('pass2');
         $user = $this->request->asString->post('user');
 
-
-        if ($tokenId) {
-            $token = Token::selectOne(
-                $this->database,
-                'WHERE `token`=? AND `expires`>=NOW()',
-                $tokenId,
-            );
-
-            if ($token === null) {
-                $page = $this->template->meta('error', 'This link has expired. Please try again.');
-            } elseif (
-                $pass1 && $pass2
-            ) {
-                if ($pass1 === $pass2) {
-                    // Get member.
-                    $member = Member::selectOne(
-                        $this->database,
-                        Database::WHERE_ID_EQUALS,
-                        $token->uid,
-                    );
-
-                    $member->pass = password_hash(
-                        $pass1,
-                        PASSWORD_DEFAULT,
-                    );
-                    $member->update($this->database);
-
-                    // Delete all forgotpassword tokens for this user.
-                    $this->database->delete(
-                        'tokens',
-                        "WHERE `uid`=? AND `type`='forgotpassword'",
-                        $token->uid,
-                    );
-
-                    // Just making use of the way
-                    // registration redirects to the index.
-                    $this->registering = true;
-
-                    if ($member !== null) {
-                        $this->login($member->name, $pass1);
-                    }
-
-                    return;
-                }
-
-                $page .= $this->template->meta(
-                    'error',
-                    'The passwords did not match, please try again!',
-                );
-            } else {
-                $page .= $this->template->meta(
+        if ($tokenId !== null && $tokenId !== '') {
+            $error = $this->forgotPasswordHasToken($tokenId);
+            $page .= ($error !== null ? $this->page->error($error) : '')
+                . $this->template->meta(
                     'forgot-password2-form',
                     $this->jax->hiddenFormFields(
                         [
@@ -379,9 +385,8 @@ final class LogReg
                             'id' => $tokenId,
                             'uid' => $uid ?? '',
                         ],
-                    ),
+                    )
                 );
-            }
         } else {
             if ($user) {
                 $member = Member::selectOne(
