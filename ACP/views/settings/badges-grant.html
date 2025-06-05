@@ -11,17 +11,9 @@
       <td id="badgeIcon">
       </td>
       <td>
-        <select id="badgeSelect" name="badgeId">
+        <better-select id="badgeSelect" name="badgeId">
             {{ options }}
-        </select>
-        <script>
-          const badgeSelect = document.querySelector('#badgeSelect');
-          badgeSelect.addEventListener('change', function () {
-              const src = this.options[this.selectedIndex].dataset.image;
-              document.querySelector('#badgeIcon').innerHTML = `<img src="${src}">`;
-          });
-          badgeSelect.dispatchEvent(new Event('change'));
-        </script>
+        </better-select>
       </td>
       <td>
         <input type="text" id="reason" name="reason" placeholder="Reason">

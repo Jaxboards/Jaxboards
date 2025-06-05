@@ -4,6 +4,7 @@ import { replaceSelection } from './JAX/selection';
 import sortableTree from './JAX/sortable-tree';
 import { onDOMReady } from './JAX/util';
 import AutoComplete from './components/auto-complete';
+import BetterSelect from './components/better-select';
 import Switch from './components/switch';
 
 function dropdownMenu(e) {
@@ -85,6 +86,7 @@ function gracefulDegrade() {
     // Initialize components
     AutoComplete.selector(document.body);
     Switch.selector(document.body);
+    BetterSelect.selector(document.body);
 
     // Makes editors capable of tabbing for indenting
     const editor = document.querySelector('.editor');

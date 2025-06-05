@@ -375,7 +375,7 @@ final readonly class Settings
 
         $badgeOptions = '';
         foreach ($badges as $badge) {
-            $badgeOptions .= "<option data-image='{$badge->imagePath}' value='{$badge->id}'>{$badge->badgeTitle}</option>";
+            $badgeOptions .= "<better-option image='{$badge->imagePath}' value='{$badge->id}'>{$badge->badgeTitle}</better-option>";
         }
 
         $grantedBadgesRows = '';
