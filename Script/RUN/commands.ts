@@ -30,8 +30,8 @@ export default {
     alert(message: string) {
         alert([message]);
     },
-    reload() {
-        window.location.reload();
+    reload(timeout: number = 0) {
+        setTimeout(() => window.location.reload(), timeout);
     },
     refreshdata() {
         RUN.stream.pollData(true);

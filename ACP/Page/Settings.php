@@ -69,6 +69,8 @@ final readonly class Settings
                 'boardoffline' => $this->request->post('boardoffline') !== null ? '0' : '1',
                 'offlinetext' => $this->request->post('offlinetext'),
                 'birthdays' => ($this->request->post('bicon') !== null ? 1 : 0),
+                'hcaptcha_sitekey' => $this->request->post('hcaptcha_sitekey') ?: '',
+                'hcaptcha_secret' => $this->request->post('hcaptcha_secret') ?: '',
             ]);
         }
 
@@ -110,6 +112,14 @@ final readonly class Settings
             'settings/birthday.html',
             [
                 'checked' => $this->config->getSetting('birthdays') !== 0 ? ' checked="checked"' : '',
+            ],
+        ));
+
+        $this->page->addContentBox('HCaptcha Setup', $this->page->parseTemplate(
+            'settings/hcaptcha.html',
+            [
+                'hcaptcha_secret' => $this->config->getSetting('hcaptcha_secret'),
+                'hcaptcha_sitekey' => $this->config->getSetting('hcaptcha_sitekey')
             ],
         ));
 

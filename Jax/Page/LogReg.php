@@ -70,26 +70,56 @@ final class LogReg
         };
     }
 
+    private function didPassCaptcha(): bool {
+        $hCaptchaSecret = $this->config->getSetting('hcaptcha_secret');
+
+        if (!$hCaptchaSecret) {
+            return true;
+        }
+
+        $data = array(
+            'secret' => $this->config->getSetting('hcaptcha_secret'),
+            'response' => $this->request->post('h-captcha-response')
+        );
+
+        $verify = curl_init();
+        curl_setopt($verify, CURLOPT_URL, "https://hcaptcha.com/siteverify");
+        curl_setopt($verify, CURLOPT_POST, true);
+        curl_setopt($verify, CURLOPT_POSTFIELDS, http_build_query($data));
+        curl_setopt($verify, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($verify);
+        $responseData = json_decode($response);
+
+        return (bool) $responseData->success;
+    }
+
     private function register(): void
     {
         $this->registering = true;
 
         $name = trim($this->request->asString->post('name') ?? '');
-        $dispname = trim($this->request->asString->post('displayName') ?? '');
+        $dispname = trim($this->request->asString->post('display_name') ?? '');
         $pass1 = $this->request->asString->post('pass1') ?? '';
         $pass2 = $this->request->asString->post('pass2') ?? '';
         $email = $this->request->asString->post('email') ?? '';
 
-
-        $page = $this->template->meta('register-form');
+        $hCaptchaSitekey = $this->config->getSetting('hcaptcha_sitekey');
+        $page = $this->template->meta('register-form', $hCaptchaSitekey);
 
         // Show registration form.
         if ($this->request->post('register') === null) {
-            if (!$this->request->isJSUpdate()) {
-                $this->page->command('update', 'page', $page);
+            if ($this->request->isJSUpdate()) {
+                return;
             }
 
             $this->page->append('PAGE', $page);
+
+            $this->page->command('update', 'page', $page);
+
+            // HCaptcha does not work with the ajax stuff, do a normal page load for this page
+            if ($this->request->isJSNewLocation()) {
+                $this->page->command('reload');
+            }
 
             return;
         }
@@ -97,6 +127,7 @@ final class LogReg
         // Validate input and actually register the user.
         $badNameChars = $this->config->getSetting('badnamechars');
         $error = match (true) {
+            !$this->didPassCaptcha() => "You did not pass the captcha. Are you a bot?",
             $this->ipAddress->isServiceBanned() => 'You have been banned from registration on all boards. If'
                 . ' you feel that this is in error, please contact the'
                 . ' administrator.',
@@ -114,7 +145,6 @@ final class LogReg
         if ($error !== null) {
             $this->page->command('alert', $error);
             $this->page->append('PAGE', $this->template->meta('error', $error));
-
             return;
         }
 

@@ -1,0 +1,14 @@
+<p>
+    This will add a captcha during new member registration. You will need to signup for an account with <a href="https://www.hcaptcha.com/">HCaptcha</a> to use this feature.
+</p>
+<label for="hcaptcha_sitekey">
+    HCaptcha Sitekey
+</label>
+<input type="text" id="hcaptcha_sitekey" name="hcaptcha_sitekey" value="{{ hcaptcha_sitekey }}">
+<br>
+<label for="hcaptcha_secret">
+    HCaptcha Secret
+</label>
+<input type="text" id="hcaptcha_secret" name="hcaptcha_secret" value="{{ hcaptcha_secret }}">
+<br>
+<input type="submit" value="Save" name="submit">
