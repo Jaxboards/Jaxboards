@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 export default class BetterSelect extends HTMLElement {
     shadow: ShadowRoot;
 
@@ -15,14 +16,21 @@ export default class BetterSelect extends HTMLElement {
 
     static formAssociated = true;
 
+    value: string;
+
     static selector() {
         customElements.define('better-select', BetterSelect);
-        customElements.define('better-option', HTMLElement);
+
+        customElements.define(
+            'better-option',
+            class BetterOption extends HTMLElement {},
+        );
     }
 
     constructor() {
         super();
 
+        this.value = this.getAttribute('value') ?? '';
         this.shadow = this.attachShadow({ mode: 'open' });
         this.internals = this.attachInternals();
         this.search = document.createElement('input');
@@ -100,8 +108,6 @@ export default class BetterSelect extends HTMLElement {
         const controlsId = `id-${Math.random()}`;
         results.setAttribute('id', controlsId);
         search.setAttribute('aria-controls', controlsId);
-
-        this.updateValue();
     }
 
     close() {
@@ -174,11 +180,12 @@ export default class BetterSelect extends HTMLElement {
         const selectedOptions = Array.from(
             this.querySelectorAll<HTMLElement>('better-option[selected]'),
         );
-        const value = selectedOptions
+        this.value = selectedOptions
             .map((option) => option.getAttribute('value'))
             .join(',');
         this.search.value = selectedOptions.at(-1)?.innerText ?? '';
-        this.internals.setFormValue(value);
+        this.internals.setFormValue(this.value);
+        this.dispatchEvent(new Event('change'));
     }
 
     // eslint-disable-next-line class-methods-use-this
