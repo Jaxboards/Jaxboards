@@ -96,6 +96,10 @@ export default class BetterSelect extends HTMLElement {
         this.updateValue();
     }
 
+    close() {
+        this.results.classList.remove('open');
+    }
+
     clear() {
         [
             ...Array.from(this.querySelectorAll('better-option[selected]')),
@@ -125,6 +129,7 @@ export default class BetterSelect extends HTMLElement {
                 button.onclick = () => {
                     if (!this.hasAttribute('multiple')) {
                         this.clear();
+                        this.close();
                     }
                     button.classList.toggle('selected');
                     betterOption.toggleAttribute(
