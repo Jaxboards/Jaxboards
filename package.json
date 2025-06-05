@@ -51,9 +51,9 @@
         "psalm": "composer-runner -- run-script --no-interaction psalm",
         "psalm-report": "composer-runner -- run-script --no-interaction psalm-report",
         "rector": "composer-runner -- run-script --no-interaction rector",
-        "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
-        "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
-        "stylelint-report": "stylelint \"./**/*.{c,sa,sc,le}ss\" --formatter json --output-file stylelint-report.json",
+        "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\" --ignore-path .gitignore",
+        "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\" --ignore-path .gitignore",
+        "stylelint-report": "stylelint \"./**/*.{c,sa,sc,le}ss\" --formatter json --output-file stylelint-report.json --ignore-path .gitignore",
         "prepare": "husky",
         "test": "composer-runner -- run-script test"
     },

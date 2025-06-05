@@ -1,18 +1,23 @@
 export default class BetterSelect extends HTMLElement {
     shadow: ShadowRoot;
+
     internals: ElementInternals;
 
     results: HTMLDivElement;
+
     search: HTMLInputElement;
+
     leaveHandler: (event: FocusEvent) => void;
+
     optionKeyboardHandler: (event: KeyboardEvent) => void;
+
     hiddenFormField: HTMLInputElement;
 
     static formAssociated = true;
 
     static selector() {
         customElements.define('better-select', BetterSelect);
-        customElements.define('better-option', BetterOption);
+        customElements.define('better-option', HTMLElement);
     }
 
     constructor() {
@@ -21,7 +26,6 @@ export default class BetterSelect extends HTMLElement {
         this.shadow = this.attachShadow({ mode: 'open' });
         this.internals = this.attachInternals();
         this.search = document.createElement('input');
-
 
         this.results = document.createElement('div');
         // This form field becomes the output
@@ -38,13 +42,15 @@ export default class BetterSelect extends HTMLElement {
             );
         };
 
-        this.optionKeyboardHandler = function (event) {
+        this.optionKeyboardHandler = function optionKeyboardHandler(event) {
             switch (event.key) {
                 case 'ArrowUp':
                     (this.previousElementSibling as HTMLButtonElement)?.focus();
                     break;
                 case 'ArrowDown':
                     (this.nextElementSibling as HTMLButtonElement).focus();
+                    break;
+                default:
                     break;
             }
         };
@@ -74,6 +80,8 @@ export default class BetterSelect extends HTMLElement {
                             '.results button:first-child',
                         )
                         ?.focus();
+                    break;
+                default:
                     break;
             }
         };
@@ -151,7 +159,9 @@ export default class BetterSelect extends HTMLElement {
                     button.appendChild(image);
                 }
 
-                const label = document.createTextNode(' ' + betterOption.innerText);
+                const label = document.createTextNode(
+                    ` ${betterOption.innerText}`,
+                );
                 button.appendChild(label);
                 button.onblur = this.leaveHandler;
 
@@ -161,14 +171,17 @@ export default class BetterSelect extends HTMLElement {
     }
 
     updateValue() {
-        const selectedOptions = Array.from(this.querySelectorAll<HTMLElement>('better-option[selected]'));
+        const selectedOptions = Array.from(
+            this.querySelectorAll<HTMLElement>('better-option[selected]'),
+        );
         const value = selectedOptions
-                .map((option) => option.getAttribute('value'))
-                .join(',');
+            .map((option) => option.getAttribute('value'))
+            .join(',');
         this.search.value = selectedOptions.at(-1)?.innerText ?? '';
         this.internals.setFormValue(value);
     }
 
+    // eslint-disable-next-line class-methods-use-this
     stylesheet() {
         const style = new CSSStyleSheet();
 
@@ -179,15 +192,8 @@ export default class BetterSelect extends HTMLElement {
             button img { vertical-align: middle; }
             .results { position: absolute; display: none; max-height: 400px; overflow: auto; }
             .results.open { display: block; }
-            .better-option { display: none; }
         `);
 
         return style;
-    }
-}
-
-class BetterOption extends HTMLElement {
-    constructor() {
-        super();
     }
 }
