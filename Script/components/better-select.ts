@@ -146,7 +146,7 @@ export default class BetterSelect extends HTMLElement {
                     button.appendChild(image);
                 }
 
-                const label = document.createTextNode(betterOption.innerText);
+                const label = document.createTextNode(' ' + betterOption.innerText);
                 button.appendChild(label);
                 button.onblur = this.leaveHandler;
 
