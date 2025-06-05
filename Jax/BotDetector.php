@@ -24,6 +24,7 @@ final readonly class BotDetector
         'ChatGLM-Spider' => 'ChatGLM',
         'ChatGPT-User' => 'ChatGPT',
         'ClaudeBot' => 'ClaudeBot',
+        'DataForSeoBot' => 'DataForSeo',
         'Discordbot' => 'Discord',
         'DotBot' => 'DotBot',
         'DuckDuckBot' => 'DuckDuckGo',
@@ -58,6 +59,7 @@ final readonly class BotDetector
         'Y!J-WSC' => 'Yahoo Japan',
         'yahoo! slurp' => 'Yahoo',
         'YandexBot' => 'Yandex',
+        'YandexRenderResourcesBot' => 'YandexRenders',
     ];
 
     public function __construct(private Request $request) {}
