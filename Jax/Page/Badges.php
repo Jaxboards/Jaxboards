@@ -11,7 +11,9 @@ use Jax\Models\Badge;
 use Jax\Models\BadgeAssociation;
 use Jax\Models\Member;
 use Jax\Page;
+use Jax\Request;
 use Jax\TextFormatting;
+use PHP_CodeSniffer\Generators\HTML;
 
 use function array_key_exists;
 
@@ -22,12 +24,21 @@ final readonly class Badges
         private Database $database,
         private Date $date,
         private Page $page,
+        private Request $request,
         private TextFormatting $textFormatting,
     ) {}
 
     public function isEnabled(): bool
     {
         return (bool) $this->config->getSetting('badgesEnabled');
+    }
+
+    public function render()
+    {
+        $badgeId = (int) $this->request->asString->get('badgeId');
+        if ($badgeId) {
+            $this->renderBadgeRecepients($badgeId);
+        }
     }
 
     /**
@@ -101,5 +112,19 @@ final readonly class Badges
         }
 
         return $badgesHTML . '</table>';
+    }
+
+    function renderBadgeRecepients(int $badgeId) {
+        $badge = Badge::selectOne($this->database, Database::WHERE_ID_EQUALS, $badgeId);
+
+        $page = $this->page->collapseBox(
+            "Badge: {$badge->badgeTitle}",
+            <<<HTML
+                You are viewing all of the people who have received this badge: <img src="{$badge->imagePath}">
+                HTML,
+        );
+
+        $this->page->append('PAGE', $page);
+        $this->page->command('update', 'page', $page);
     }
 }

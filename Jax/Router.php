@@ -7,6 +7,7 @@ namespace Jax;
 use DI\Container;
 use Jax\Models\Page as ModelsPage;
 use Jax\Page\Asteroids;
+use Jax\Page\Badges;
 use Jax\Page\BoardOffline;
 use Jax\Page\BuddyList;
 use Jax\Page\Calendar;
@@ -40,6 +41,7 @@ final class Router
     private array $staticRoutes = [
         '' => IDX::class,
         'asteroids' => Asteroids::class,
+        'badges' => Badges::class,
         'boardoffline' => BoardOffline::class,
         'buddylist' => BuddyList::class,
         'calendar' => Calendar::class,
