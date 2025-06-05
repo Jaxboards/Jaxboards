@@ -39,7 +39,7 @@ final readonly class Badges
             return;
         }
 
-        $this->renderBadgeRecepients($badgeId);
+        $this->renderBadgeRecipients($badgeId);
     }
 
     /**
@@ -115,7 +115,7 @@ final readonly class Badges
         return $badgesHTML . '</table>';
     }
 
-    public function renderBadgeRecepients(int $badgeId): void
+    public function renderBadgeRecipients(int $badgeId): void
     {
         $badge = Badge::selectOne($this->database, Database::WHERE_ID_EQUALS, $badgeId);
 
