@@ -137,18 +137,18 @@ final class LogReg
         // Validate input and actually register the user.
         $badNameChars = $this->config->getSetting('badnamechars');
         $error = match (true) {
-            !$this->didPassCaptcha() => 'You did not pass the captcha. Are you a bot?',
             $this->ipAddress->isServiceBanned() => 'You have been banned from registration on all boards. If'
-                . ' you feel that this is in error, please contact the'
-                . ' administrator.',
+            . ' you feel that this is in error, please contact the'
+            . ' administrator.',
             !$name || !$dispname => 'Name and display name required.',
             $pass1 !== $pass2 => 'The passwords do not match.',
             mb_strlen($dispname) > 30 || mb_strlen($name) > 30 => 'Display name and username must be under 30 characters.',
             ($badNameChars && preg_match($badNameChars, $name))
-                || $this->textFormatting->blockhtml($name) !== $name => 'Invalid characters in username!',
+            || $this->textFormatting->blockhtml($name) !== $name => 'Invalid characters in username!',
             $badNameChars && preg_match($badNameChars, $dispname) => 'Invalid characters in display name!',
             !filter_var($email, FILTER_VALIDATE_EMAIL) => "That isn't a valid email!",
             $this->ipAddress->isBanned() => 'You have been banned from registering on this board.',
+            !$this->didPassCaptcha() => 'You did not pass the captcha. Are you a bot?',
             default => null,
         };
 
