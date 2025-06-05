@@ -119,7 +119,7 @@ final readonly class Settings
             'settings/hcaptcha.html',
             [
                 'hcaptcha_secret' => $this->config->getSetting('hcaptcha_secret'),
-                'hcaptcha_sitekey' => $this->config->getSetting('hcaptcha_sitekey')
+                'hcaptcha_sitekey' => $this->config->getSetting('hcaptcha_sitekey'),
             ],
         ));
 

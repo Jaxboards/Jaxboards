@@ -21,7 +21,12 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function base64_encode;
+use function curl_exec;
+use function curl_init;
+use function curl_setopt;
 use function filter_var;
+use function http_build_query;
+use function json_decode;
 use function mb_strlen;
 use function mb_substr;
 use function openssl_random_pseudo_bytes;
@@ -32,6 +37,10 @@ use function session_destroy;
 use function session_unset;
 use function trim;
 
+use const CURLOPT_POST;
+use const CURLOPT_POSTFIELDS;
+use const CURLOPT_RETURNTRANSFER;
+use const CURLOPT_URL;
 use const FILTER_VALIDATE_EMAIL;
 use const PASSWORD_DEFAULT;
 
@@ -70,20 +79,21 @@ final class LogReg
         };
     }
 
-    private function didPassCaptcha(): bool {
+    private function didPassCaptcha(): bool
+    {
         $hCaptchaSecret = $this->config->getSetting('hcaptcha_secret');
 
         if (!$hCaptchaSecret) {
             return true;
         }
 
-        $data = array(
+        $data = [
             'secret' => $this->config->getSetting('hcaptcha_secret'),
-            'response' => $this->request->post('h-captcha-response')
-        );
+            'response' => $this->request->post('h-captcha-response'),
+        ];
 
         $verify = curl_init();
-        curl_setopt($verify, CURLOPT_URL, "https://hcaptcha.com/siteverify");
+        curl_setopt($verify, CURLOPT_URL, 'https://hcaptcha.com/siteverify');
         curl_setopt($verify, CURLOPT_POST, true);
         curl_setopt($verify, CURLOPT_POSTFIELDS, http_build_query($data));
         curl_setopt($verify, CURLOPT_RETURNTRANSFER, true);
@@ -127,7 +137,7 @@ final class LogReg
         // Validate input and actually register the user.
         $badNameChars = $this->config->getSetting('badnamechars');
         $error = match (true) {
-            !$this->didPassCaptcha() => "You did not pass the captcha. Are you a bot?",
+            !$this->didPassCaptcha() => 'You did not pass the captcha. Are you a bot?',
             $this->ipAddress->isServiceBanned() => 'You have been banned from registration on all boards. If'
                 . ' you feel that this is in error, please contact the'
                 . ' administrator.',
@@ -145,6 +155,7 @@ final class LogReg
         if ($error !== null) {
             $this->page->command('alert', $error);
             $this->page->append('PAGE', $this->template->meta('error', $error));
+
             return;
         }
 
