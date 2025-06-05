@@ -13,7 +13,6 @@ use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\TextFormatting;
-use PHP_CodeSniffer\Generators\HTML;
 
 use function array_key_exists;
 
@@ -33,12 +32,14 @@ final readonly class Badges
         return (bool) $this->config->getSetting('badgesEnabled');
     }
 
-    public function render()
+    public function render(): void
     {
         $badgeId = (int) $this->request->asString->get('badgeId');
-        if ($badgeId) {
-            $this->renderBadgeRecepients($badgeId);
+        if ($badgeId === 0) {
+            return;
         }
+
+        $this->renderBadgeRecepients($badgeId);
     }
 
     /**
@@ -114,7 +115,8 @@ final readonly class Badges
         return $badgesHTML . '</table>';
     }
 
-    function renderBadgeRecepients(int $badgeId) {
+    public function renderBadgeRecepients(int $badgeId): void
+    {
         $badge = Badge::selectOne($this->database, Database::WHERE_ID_EQUALS, $badgeId);
 
         $page = $this->page->collapseBox(
