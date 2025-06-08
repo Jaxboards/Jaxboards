@@ -67,6 +67,7 @@ final class Forum
     public function render(): void
     {
         $page = (int) $this->request->asString->both('page');
+        $replies = $this->request->asString->both('replies');
 
         if ($page > 0) {
             $this->pageNumber = $page - 1;
@@ -82,14 +83,14 @@ final class Forum
             return;
         }
 
-        if (is_numeric($this->request->both('replies'))) {
+        if (is_numeric($replies)) {
             if (!$this->request->isJSAccess()) {
                 $this->page->location('?');
 
                 return;
             }
 
-            $this->getReplySummary($this->request->both('replies'));
+            $this->getReplySummary((int) $replies);
 
             return;
         }
@@ -107,7 +108,6 @@ final class Forum
         }
 
         $page = '';
-        $rows = '';
         $table = '';
 
         $forum = ModelsForum::selectOne($this->database, Database::WHERE_ID_EQUALS, $fid);
@@ -138,16 +138,15 @@ final class Forum
             return;
         }
 
+        $this->setBreadCrumbs($forum);
+
         // NOW we can actually start building the page
         // subforums
         // right now, this loop also fixes the number of pages to show in a forum
         // parent forum - subforum topics = total topics
         // I'm fairly sure this is faster than doing
         // `SELECT count(*) FROM topics`... but I haven't benchmarked it.
-        $page .= $this->printSubforums($forum);
-
-        $rows = '';
-        $table = '';
+        $page .= $this->renderSubforums($forum);
 
         // Generate pages.
         $numpages = (int) ceil($forum->topics / $this->numperpage);
@@ -218,87 +217,17 @@ final class Forum
             static fn(Member $member): int => $member->id,
         ) : [];
 
-        $unread = false;
-        foreach ($topics as $topic) {
-            $pages = '';
-            if ($topic->replies > 9) {
-                foreach ($this->jax->pages((int) ceil(($topic->replies + 1) / 10), 1, 10) as $pageNumber) {
-                    $pages .= "<a href='?act=vt" . $topic->id
-                        . "&amp;page={$pageNumber}'>{$pageNumber}</a> ";
-                }
+        $rows = implode('',
+            array_map(fn($topic) => $this->renderForumRow($topic, $membersById), $topics)
+        );
 
-                $pages = $this->template->meta('forum-topic-pages', $pages);
-            }
-
-            $author = $membersById[$topic->author];
-            $lastPostAuthor = $membersById[$topic->lastPostUser] ?? null;
-
-            $read = $this->isTopicRead($topic, $fid);
-            $rows .= $this->template->meta(
-                'forum-row',
-                $topic->id,
-                // 1
-                $this->textFormatting->wordfilter($topic->title),
-                // 2
-                $this->textFormatting->wordfilter($topic->subtitle),
-                // 3
-                $this->template->meta(
-                    'user-link',
-                    $author->id,
-                    $author->groupID,
-                    $author->displayName,
-                ),
-                // 4
-                $topic->replies,
-                // 5
-                number_format($topic->views),
-                // 6
-                $topic->lastPostDate
-                    ? $this->date->autoDate($topic->lastPostDate)
-                    : '',
-                // 7
-                $lastPostAuthor ? $this->template->meta(
-                    'user-link',
-                    $lastPostAuthor->id,
-                    $lastPostAuthor->groupID,
-                    $lastPostAuthor->displayName,
-                ) : '',
-                // 8
-                ($topic->pinned ? 'pinned' : '') . ' ' . ($topic->locked ? 'locked' : ''),
-                // 9
-                $topic->summary ? $topic->summary . (mb_strlen((string) $topic->summary) > 45 ? '...' : '') : '',
-                // 10
-                $this->user->getGroup()?->canModerate ? '<a href="?act=modcontrols&do=modt&tid='
-                    . $topic->id . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
-                // 11
-                $pages,
-                // 12
-                $read ? 'read' : 'unread',
-                // 13
-                $read ? (
-                    $this->template->meta('topic-icon-read')
-                    ?: $this->template->meta('icon-read')
-                )
-                    : (
-                        $this->template->meta('topic-icon-unread')
-                        ?: $this->template->meta('icon-read')
-                    ),
-                // 14
-            );
-            if ($read) {
-                continue;
-            }
-
-            $unread = true;
-        }
-
-        // If they're on the first page and no topics
-        // were marked as unread, mark the whole forum as read
-        // since we don't care about pages past the first one.
-        if ($this->pageNumber === 0 && !$unread) {
+        // If they're on the first page and no topics are read,
+        // mark the whole forum as read
+        if ($this->pageNumber === 0 && array_all($topics, $this->isTopicRead(...))) {
             $this->markRead($fid);
         }
 
+        $table = '';
         if ($rows !== '') {
             $table = $this->template->meta('forum-table', $rows);
         } else {
@@ -320,6 +249,85 @@ final class Forum
         $page .= $this->template->meta('forum-pages-bottom', $forumpages);
         $page .= $this->template->meta('forum-buttons-bottom', $forumbuttons);
 
+        if ($this->request->isJSAccess()) {
+            $this->page->command('update', 'page', $page);
+        } else {
+            $this->page->append('PAGE', $page);
+        }
+    }
+
+    /**
+     * @param Member[] $membersById
+     */
+    private function renderForumRow(Topic $topic, array $membersById) {
+        $pages = '';
+        if ($topic->replies > 9) {
+            foreach ($this->jax->pages((int) ceil(($topic->replies + 1) / 10), 1, 10) as $pageNumber) {
+                $pages .= "<a href='?act=vt" . $topic->id
+                    . "&amp;page={$pageNumber}'>{$pageNumber}</a> ";
+            }
+
+            $pages = $this->template->meta('forum-topic-pages', $pages);
+        }
+
+        $author = $membersById[$topic->author];
+        $lastPostAuthor = $membersById[$topic->lastPostUser] ?? null;
+
+        $read = $this->isTopicRead($topic);
+        return $this->template->meta(
+            'forum-row',
+            $topic->id,
+            // 1
+            $this->textFormatting->wordfilter($topic->title),
+            // 2
+            $this->textFormatting->wordfilter($topic->subtitle),
+            // 3
+            $this->template->meta(
+                'user-link',
+                $author->id,
+                $author->groupID,
+                $author->displayName,
+            ),
+            // 4
+            $topic->replies,
+            // 5
+            number_format($topic->views),
+            // 6
+            $topic->lastPostDate
+                ? $this->date->autoDate($topic->lastPostDate)
+                : '',
+            // 7
+            $lastPostAuthor ? $this->template->meta(
+                'user-link',
+                $lastPostAuthor->id,
+                $lastPostAuthor->groupID,
+                $lastPostAuthor->displayName,
+            ) : '',
+            // 8
+            ($topic->pinned ? 'pinned' : '') . ' ' . ($topic->locked ? 'locked' : ''),
+            // 9
+            $topic->summary ? $topic->summary . (mb_strlen((string) $topic->summary) > 45 ? '...' : '') : '',
+            // 10
+            $this->user->getGroup()?->canModerate ? '<a href="?act=modcontrols&do=modt&tid='
+                . $topic->id . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
+            // 11
+            $pages,
+            // 12
+            $read ? 'read' : 'unread',
+            // 13
+            $read ? (
+                $this->template->meta('topic-icon-read')
+                ?: $this->template->meta('icon-read')
+            )
+                : (
+                    $this->template->meta('topic-icon-unread')
+                    ?: $this->template->meta('icon-read')
+                ),
+            // 14
+        );
+    }
+
+    private function setBreadCrumbs(ModelsForum $forum) {
         // Start building the nav path.
         $category = Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->category);
         $breadCrumbs = $category !== null
@@ -346,16 +354,11 @@ final class Forum
             }
         }
 
-        $breadCrumbs["?act=vf{$fid}"] = $forum->title;
+        $breadCrumbs["?act=vf{$forum->id}"] = $forum->title;
         $this->page->setBreadCrumbs($breadCrumbs);
-        if ($this->request->isJSAccess()) {
-            $this->page->command('update', 'page', $page);
-        } else {
-            $this->page->append('PAGE', $page);
-        }
     }
 
-    private function printSubforums(ModelsForum $forum): string
+    private function renderSubforums(ModelsForum $forum): string
     {
         $subforums = ModelsForum::selectMany(
             $this->database,
@@ -424,7 +427,7 @@ final class Forum
         ) : '';
     }
 
-    private function getReplySummary(string $tid): void
+    private function getReplySummary(int $tid): void
     {
         $result = $this->database->special(
             <<<'SQL'
@@ -456,7 +459,7 @@ final class Forum
         );
     }
 
-    private function isTopicRead(Topic $topic, int $fid): bool
+    private function isTopicRead(Topic $topic): bool
     {
         if ($this->topicsRead === []) {
             $this->topicsRead = $this->jax->parseReadMarkers($this->session->get()->topicsread);
@@ -465,8 +468,8 @@ final class Forum
         $forumReadTime = 0;
         if ($this->forumsRead === null) {
             $forumsRead = $this->jax->parseReadMarkers($this->session->get()->forumsread);
-            if (array_key_exists($fid, $forumsRead)) {
-                $forumReadTime = $forumsRead[$fid];
+            if (array_key_exists($topic->fid, $forumsRead)) {
+                $forumReadTime = $forumsRead[$topic->fid];
             }
         }
 
