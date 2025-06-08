@@ -221,7 +221,7 @@ final class Forum
             array_map(fn($topic) => $this->renderForumRow($topic, $membersById), $topics)
         );
 
-        // If they're on the first page and no topics are read,
+        // If they're on the first page and all topics are read
         // mark the whole forum as read
         if ($this->pageNumber === 0 && array_all($topics, $this->isTopicRead(...))) {
             $this->markRead($fid);
