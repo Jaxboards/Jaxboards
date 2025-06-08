@@ -20,6 +20,7 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function _\keyBy;
+use function array_all;
 use function array_key_exists;
 use function array_map;
 use function array_merge;
@@ -217,13 +218,17 @@ final class Forum
             static fn(Member $member): int => $member->id,
         ) : [];
 
-        $rows = implode('',
-            array_map(fn($topic) => $this->renderForumRow($topic, $membersById), $topics)
+        $rows = implode(
+            '',
+            array_map(fn($topic) => $this->renderForumRow($topic, $membersById), $topics),
         );
 
         // If they're on the first page and all topics are read
         // mark the whole forum as read
-        if ($this->pageNumber === 0 && array_all($topics, $this->isTopicRead(...))) {
+        if (
+            $this->pageNumber === 0
+            && array_all($topics, $this->isTopicRead(...))
+        ) {
             $this->markRead($fid);
         }
 
@@ -257,9 +262,10 @@ final class Forum
     }
 
     /**
-     * @param Member[] $membersById
+     * @param array<Member> $membersById
      */
-    private function renderForumRow(Topic $topic, array $membersById) {
+    private function renderForumRow(Topic $topic, array $membersById): string
+    {
         $pages = '';
         if ($topic->replies > 9) {
             foreach ($this->jax->pages((int) ceil(($topic->replies + 1) / 10), 1, 10) as $pageNumber) {
@@ -274,6 +280,7 @@ final class Forum
         $lastPostAuthor = $membersById[$topic->lastPostUser] ?? null;
 
         $read = $this->isTopicRead($topic);
+
         return $this->template->meta(
             'forum-row',
             $topic->id,
@@ -304,9 +311,9 @@ final class Forum
                 $lastPostAuthor->displayName,
             ) : '',
             // 8
-            ($topic->pinned ? 'pinned' : '') . ' ' . ($topic->locked ? 'locked' : ''),
+            ($topic->pinned !== 0 ? 'pinned' : '') . ' ' . ($topic->locked !== 0 ? 'locked' : ''),
             // 9
-            $topic->summary ? $topic->summary . (mb_strlen((string) $topic->summary) > 45 ? '...' : '') : '',
+            $topic->summary !== '' && $topic->summary !== '0' ? $topic->summary . (mb_strlen($topic->summary) > 45 ? '...' : '') : '',
             // 10
             $this->user->getGroup()?->canModerate ? '<a href="?act=modcontrols&do=modt&tid='
                 . $topic->id . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
@@ -327,7 +334,8 @@ final class Forum
         );
     }
 
-    private function setBreadCrumbs(ModelsForum $forum) {
+    private function setBreadCrumbs(ModelsForum $forum): void
+    {
         // Start building the nav path.
         $category = Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->category);
         $breadCrumbs = $category !== null
