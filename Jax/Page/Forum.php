@@ -220,7 +220,7 @@ final class Forum
 
         $rows = implode(
             '',
-            array_map(fn($topic) => $this->renderForumRow($topic, $membersById), $topics),
+            array_map(fn($topic): string => $this->renderForumRow($topic, $membersById), $topics),
         );
 
         // If they're on the first page and all topics are read
