@@ -131,7 +131,7 @@ final class Post
         $uid = $this->user->get()->id;
 
         $size = (int) filesize($fileobj['tmp_name']);
-        $hash = hash_file('sha512', $fileobj['tmp_name']) ?: 'hash_error';
+        $hash = hash_file('sha1', $fileobj['tmp_name']) ?: 'hash_error';
         $uploadPath = $this->domainDefinitions->getBoardPath() . '/Uploads/';
 
         $ext = pathinfo((string) $fileobj['name'], PATHINFO_EXTENSION);
