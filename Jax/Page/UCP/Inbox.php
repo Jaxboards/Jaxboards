@@ -353,7 +353,7 @@ final readonly class Inbox
         $otherMember = Member::selectOne(
             $this->database,
             Database::WHERE_ID_EQUALS,
-            $userIsRecipient ? $message->to : $message->from,
+            $userIsRecipient ? $message->from : $message->to,
         );
 
         if (!$message->read && $userIsRecipient) {
