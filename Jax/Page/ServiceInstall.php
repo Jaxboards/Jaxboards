@@ -400,7 +400,7 @@ final readonly class ServiceInstall
                 ],
             );
 
-            $jaxRoot = dirname(dirname(__DIR__));
+            $jaxRoot = dirname(__DIR__, 2);
             mkdir($jaxRoot . '/boards');
             $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), $jaxRoot . '/boards/' . $board);
         }
