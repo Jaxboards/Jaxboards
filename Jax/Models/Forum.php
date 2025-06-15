@@ -85,18 +85,18 @@ final class Forum extends Model
     #[Column(name: 'orderby', type: 'tinyint', unsigned: true, nullable: false, default: 0)]
     public int $orderby = 0;
 
-    #[Column(name: 'nocount', type: 'bool', nullable: false, default: 0)]
+    #[Column(name: 'nocount', type: 'bool')]
     public int $nocount = 0;
 
     #[Column(name: 'redirects', type: 'int', unsigned: true, nullable: false, default: 0)]
     public int $redirects = 0;
 
-    #[Column(name: 'trashcan', type: 'bool', nullable: false, default: 0)]
+    #[Column(name: 'trashcan', type: 'bool')]
     public int $trashcan = 0;
 
     #[Column(name: 'mods', type: 'string', length: 255, nullable: false, default: '')]
     public string $mods = '';
 
-    #[Column(name: 'showLedBy', type: 'bool', nullable: false, default: 0)]
+    #[Column(name: 'showLedBy', type: 'bool')]
     public int $showLedBy = 0;
 }
