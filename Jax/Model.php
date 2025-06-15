@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use Attribute;
 use PDO;
 use PDOStatement;
 use ReflectionProperty;
@@ -15,17 +14,6 @@ use function array_map;
 use function array_unique;
 
 use const SORT_REGULAR;
-
-#[Attribute(Attribute::TARGET_PROPERTY)]
-final class Field
-{
-    public function __construct(
-        public string $fieldName,
-        public string $type,
-        public bool $nullable,
-        public mixed $default,
-    ) {}
-}
 
 abstract class Model
 {
