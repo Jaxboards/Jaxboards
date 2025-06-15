@@ -30,16 +30,16 @@ final class Activity extends Model
     #[Column(name: 'date', type: 'datetime', default: null)]
     public ?string $date = null;
 
-    #[ForeignKey(table: 'members', field: 'id', onDelete: 'cascade')]
     #[Column(name: 'affectedUser', type: 'int', unsigned: true, default: null)]
+    #[ForeignKey(table: 'members', field: 'id', onDelete: 'cascade')]
     public ?int $affectedUser = null;
 
-    #[ForeignKey(table: 'topics', field: 'id', onDelete: 'cascade')]
     #[Column(name: 'tid', type: 'int', unsigned: true, default: null)]
+    #[ForeignKey(table: 'topics', field: 'id', onDelete: 'cascade')]
     public ?int $tid = 0;
 
-    #[ForeignKey(table: 'posts', field: 'id', onDelete: 'cascade')]
     #[Column(name: 'pid', type: 'int', unsigned: true, default: null)]
+    #[ForeignKey(table: 'posts', field: 'id', onDelete: 'cascade')]
     public ?int $pid = 0;
 
     #[Column(name: 'arg2', type: 'string', length: 255, nullable: false, default: '')]
