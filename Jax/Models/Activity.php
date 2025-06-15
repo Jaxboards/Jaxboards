@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Models;
 
 use Jax\Attributes\Column;
+use Jax\Attributes\PrimaryKey;
 use Jax\Model;
 
 final class Activity extends Model
@@ -23,6 +24,7 @@ final class Activity extends Model
         'arg2',
     ];
 
+    #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
     public int $id = 0;
 
