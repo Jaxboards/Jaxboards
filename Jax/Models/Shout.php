@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Jax\Models;
 
 use Jax\Attributes\Column;
+use Jax\Attributes\ForeignKey;
+use Jax\Attributes\Key;
 use Jax\Attributes\PrimaryKey;
 use Jax\Model;
 
@@ -17,6 +19,7 @@ final class Shout extends Model
     public int $id = 0;
 
     #[Column(name: 'uid', type: 'int', unsigned: true)]
+    #[ForeignKey(table: 'members', field: 'id', onDelete: 'cascade')]
     public int $uid = 0;
 
     #[Column(name: 'shout', type: 'string', length: 255, nullable: false)]
@@ -26,5 +29,6 @@ final class Shout extends Model
     public ?string $date = null;
 
     #[Column(name: 'ip', type: 'binary', length: 16, nullable: false, default: '')]
+    #[Key]
     public string $ip = '';
 }

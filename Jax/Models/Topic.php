@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Jax\Models;
 
 use Jax\Attributes\Column;
+use Jax\Attributes\ForeignKey;
+use Jax\Attributes\Key;
 use Jax\Attributes\PrimaryKey;
 use Jax\Model;
 
@@ -17,21 +19,26 @@ final class Topic extends Model
     public int $id = 0;
 
     #[Column(name: 'title', type: 'string', length: 255, nullable: false)]
+    #[Key(fulltext: true)]
     public string $title = '';
 
     #[Column(name: 'subtitle', type: 'string', length: 255, nullable: false)]
     public string $subtitle = '';
 
     #[Column(name: 'lastPostUser', type: 'int', unsigned: true)]
+    #[ForeignKey(table: 'members', field: 'id', onDelete: 'null')]
     public ?int $lastPostUser = null;
 
     #[Column(name: 'lastPostDate', type: 'datetime')]
+    #[Key]
     public ?string $lastPostDate = null;
 
     #[Column(name: 'fid', type: 'int', unsigned: true)]
+    #[ForeignKey(table: 'forums', field: 'id', onDelete: 'cascade')]
     public ?int $fid = null;
 
     #[Column(name: 'author', type: 'int', unsigned: true)]
+    #[ForeignKey(table: 'members', field: 'id', onDelete: 'null')]
     public ?int $author = null;
 
     #[Column(name: 'replies', type: 'int', unsigned: true, default: 0)]
@@ -65,8 +72,10 @@ final class Topic extends Model
     public ?string $date = '';
 
     #[Column(name: 'op', type: 'int', unsigned: true)]
+    #[ForeignKey(table: 'posts', field: 'id', onDelete: 'null')]
     public ?int $op = null;
 
     #[Column(name: 'calendarEvent', type: 'int', unsigned: true, nullable: false, default: 0)]
+    #[Key]
     public int $calendarEvent = 0;
 }

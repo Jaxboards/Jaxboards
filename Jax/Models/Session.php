@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Models;
 
 use Jax\Attributes\Column;
+use Jax\Attributes\ForeignKey;
 use Jax\Attributes\PrimaryKey;
 use Jax\Model;
 
@@ -17,6 +18,7 @@ final class Session extends Model
     public string $id = '';
 
     #[Column(name: 'uid', type: 'int', unsigned: true)]
+    #[ForeignKey(table: 'members', field: 'id', onDelete: 'cascade')]
     public ?int $uid = null;
 
     #[Column(name: 'ip', type: 'binary', length: 16, nullable: false, default: '')]

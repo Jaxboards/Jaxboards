@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Models;
 
 use Jax\Attributes\Column;
+use Jax\Attributes\ForeignKey;
 use Jax\Attributes\PrimaryKey;
 use Jax\Model;
 
@@ -17,9 +18,11 @@ final class Message extends Model
     public int $id = 0;
 
     #[Column(name: 'to', type: 'int', unsigned: true)]
+    #[ForeignKey(table: 'members', field: 'id', onDelete: 'null')]
     public ?int $to = null;
 
     #[Column(name: 'from', type: 'int', unsigned: true)]
+    #[ForeignKey(table: 'members', field: 'id', onDelete: 'null')]
     public ?int $from = null;
 
     #[Column(name: 'title', type: 'string', length: 255, nullable: false)]

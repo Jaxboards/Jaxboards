@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Jax\Models;
 
 use Jax\Attributes\Column;
+use Jax\Attributes\ForeignKey;
+use Jax\Attributes\Key;
 use Jax\Attributes\PrimaryKey;
 use Jax\Model;
 
@@ -20,9 +22,11 @@ final class File extends Model
     public string $name = '';
 
     #[Column(name: 'hash', type: 'string', length: 191, nullable: false)]
+    #[Key]
     public string $hash = '';
 
     #[Column(name: 'uid', type: 'int', unsigned: true, default: null)]
+    #[ForeignKey(table: 'members', field: 'id', onDelete: 'null')]
     public int $uid = 0;
 
     #[Column(name: 'size', type: 'int', unsigned: true, nullable: false, default: 0)]
@@ -31,6 +35,7 @@ final class File extends Model
     #[Column(name: 'downloads', unsigned: true, nullable: false, default: 0)]
     public int $downloads = 0;
 
+    #[Key]
     #[Column('ip', 'binary', length: 16, nullable: false, default: '')]
     public string $ip = '';
 }

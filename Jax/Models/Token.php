@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Jax\Models;
 
 use Jax\Attributes\Column;
+use Jax\Attributes\ForeignKey;
+use Jax\Attributes\Key;
 use Jax\Model;
 
 final class Token extends Model
@@ -20,8 +22,10 @@ final class Token extends Model
     public string $type = 'login';
 
     #[Column(name: 'uid', type: 'int', unsigned: true, nullable: false)]
+    #[ForeignKey(table: 'members', field: 'id', onDelete: 'cascade')]
     public int $uid = 0;
 
     #[Column(name: 'expires', type: 'datetime', nullable: false)]
+    #[Key]
     public string $expires = '';
 }

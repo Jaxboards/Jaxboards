@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Jax\Models;
 
 use Jax\Attributes\Column;
+use Jax\Attributes\ForeignKey;
+use Jax\Attributes\Key;
 use Jax\Attributes\PrimaryKey;
 use Jax\Model;
 
@@ -32,6 +34,7 @@ final class Member extends Model
     public int $posts = 0;
 
     #[Column(name: 'groupID', type: 'int', unsigned: true)]
+    #[ForeignKey(table: 'groups', field: 'id', onDelete: 'null')]
     public int $groupID = 0;
 
     #[Column(name: 'avatar', type: 'string', length: 255, nullable: false, default: '')]
@@ -71,6 +74,7 @@ final class Member extends Model
     public string $about = '';
 
     #[Column(name: 'displayName', type: 'string', length: 30, nullable: false, default: '')]
+    #[Key]
     public string $displayName = '';
 
     #[Column(name: 'full_name', type: 'string', length: 50, nullable: false, default: '')]

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Models;
 
 use Jax\Attributes\Column;
+use Jax\Attributes\ForeignKey;
 use Jax\Attributes\PrimaryKey;
 use Jax\Model;
 
@@ -17,6 +18,7 @@ final class Forum extends Model
     public int $id = 0;
 
     #[Column(name: 'category', type: 'int', unsigned: true, default: null)]
+    #[ForeignKey(table: 'categories', field: 'id', onDelete: 'null')]
     public ?int $category = null;
 
     #[Column(name: 'title', type: 'string', length: 255, nullable: false)]
@@ -26,12 +28,14 @@ final class Forum extends Model
     public string $subtitle = '';
 
     #[Column(name: 'lastPostUser', type: 'int', unsigned: true, default: null)]
+    #[ForeignKey(table: 'members', field: 'id', onDelete: 'null')]
     public ?int $lastPostUser = null;
 
     #[Column(name: 'lastPostDate', type: 'datetime', default: null)]
     public ?string $lastPostDate = null;
 
     #[Column(name: 'lastPostTopic', type: 'int', default: null)]
+    #[ForeignKey(table: 'topics', field: 'id', onDelete: 'null')]
     public ?int $lastPostTopic = null;
 
     #[Column(name: 'lastPostTopicTitle', type: 'string', length: 255, nullable: false, default: '')]

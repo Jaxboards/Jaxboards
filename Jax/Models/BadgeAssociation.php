@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Models;
 
 use Jax\Attributes\Column;
+use Jax\Attributes\ForeignKey;
 use Jax\Attributes\PrimaryKey;
 use Jax\Model;
 
@@ -17,9 +18,11 @@ final class BadgeAssociation extends Model
     public int $id = 0;
 
     #[Column(name: 'user', type: 'int', unsigned: true, nullable: false)]
+    #[ForeignKey(table: 'members', field: 'id', onDelete: 'cascade')]
     public int $user = 0;
 
     #[Column(name: 'badge', type: 'int', unsigned: true, nullable: false)]
+    #[ForeignKey(table: 'badges', field: 'id', onDelete: 'cascade')]
     public int $badge = 0;
 
     #[Column(name: 'badgeCount', type: 'smallint', nullable: false)]
