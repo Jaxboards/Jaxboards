@@ -9,7 +9,6 @@ use Exception;
 use Jax\Models\Forum;
 use Jax\Models\Topic;
 use PDO;
-use PDOException;
 use PDOStatement;
 
 use function array_keys;
