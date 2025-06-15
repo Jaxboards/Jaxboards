@@ -9,6 +9,7 @@ use Exception;
 use Jax\Models\Forum;
 use Jax\Models\Topic;
 use PDO;
+use PDOException;
 use PDOStatement;
 
 use function array_keys;
@@ -43,6 +44,8 @@ class Database
 
     public const DATE_TIME = 'Y-m-d H:i:s';
 
+    public string $driver = 'mysql';
+
     private PDO $pdo;
 
     private string $prefix = '';
@@ -75,10 +78,11 @@ class Database
         string $database = '',
         string $prefix = '',
     ): void {
-        $this->pdo = new PDO("mysql:host={$host};dbname={$database};charset=utf8mb4", $user, $password, []);
+        $additionalOptions = $this->driver === 'mysql' ? ';charset=utf8mb4' : '';
+        $this->pdo = new PDO($this->driver . ":host={$host};dbname={$database}" . $additionalOptions, $user, $password, []);
 
         // All datetimes are GMT for jaxboards
-        $this->pdo->query("SET time_zone = '+0:00'");
+        $this->pdo->query($this->driver === 'mysql' ? "SET time_zone = '+0:00'" : 'SET TIME ZONE "UTC"');
 
         $this->prefix = $prefix;
     }
@@ -95,7 +99,7 @@ class Database
 
     public function ftable(string $tableName): string
     {
-        return '`' . $this->prefix . $tableName . '`';
+        return $this->quoteIdentifier($this->prefix . $tableName);
     }
 
     public function affectedRows(?PDOStatement $pdoStatement): int
@@ -145,7 +149,7 @@ class Database
                 continue;
             }
 
-            $keys[] = "`{$key}`";
+            $keys[] = $this->quoteIdentifier($key);
             $values[] = $value;
         }
 
@@ -305,7 +309,12 @@ class Database
             }
         }
 
-        $pdoStmt->execute();
+        try {
+            $pdoStmt->execute();
+        } catch (PDOException $e) {
+            var_dump($compiledQueryString);
+            var_dump($e->getMessage());
+        }
 
         return $pdoStmt ?: null;
     }
@@ -331,6 +340,11 @@ class Database
     public function escape(string $string): string
     {
         return $this->pdo->quote($string);
+    }
+
+    public function quoteIdentifier($identifier) {
+        $quote = $this->driver === 'pgsql' ? '"' : '`';
+        return $quote . $identifier . $quote;
     }
 
     public function datetime(?int $timestamp = null): string

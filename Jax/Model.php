@@ -70,7 +70,7 @@ abstract class Model
     {
         $stmt = $database->select(
             array_map(
-                static fn($field): string => "`{$field}`",
+                $database->quoteIdentifier(...),
                 static::FIELDS,
             ),
             static::TABLE,
