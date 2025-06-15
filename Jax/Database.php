@@ -311,10 +311,7 @@ class Database
             }
         }
 
-        try {
-            $pdoStmt->execute();
-        } catch (PDOException) {
-        }
+        $pdoStmt->execute();
 
         return $pdoStmt ?: null;
     }
