@@ -78,7 +78,9 @@ class Database
         string $database = '',
         string $prefix = '',
     ): void {
-        $additionalOptions = $this->driver === 'mysql' ? ';charset=utf8mb4' : '';
+        $additionalOptions = $this->driver === 'mysql'
+            ? ';charset=utf8mb4'
+            : '';
         $this->pdo = new PDO($this->driver . ":host={$host};dbname={$database}" . $additionalOptions, $user, $password, []);
 
         // All datetimes are GMT for jaxboards
@@ -311,9 +313,7 @@ class Database
 
         try {
             $pdoStmt->execute();
-        } catch (PDOException $e) {
-            var_dump($compiledQueryString);
-            var_dump($e->getMessage());
+        } catch (PDOException) {
         }
 
         return $pdoStmt ?: null;
@@ -342,8 +342,10 @@ class Database
         return $this->pdo->quote($string);
     }
 
-    public function quoteIdentifier($identifier) {
+    public function quoteIdentifier(string $identifier): string
+    {
         $quote = $this->driver === 'pgsql' ? '"' : '`';
+
         return $quote . $identifier . $quote;
     }
 

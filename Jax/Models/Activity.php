@@ -12,8 +12,8 @@ final class Activity extends Model
 {
     public const TABLE = 'activity';
 
-    #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
+    #[PrimaryKey]
     public int $id = 0;
 
     #[Column(name: 'type', type: 'string', length: 20, nullable: false)]

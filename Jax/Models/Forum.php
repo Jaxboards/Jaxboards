@@ -12,8 +12,8 @@ final class Forum extends Model
 {
     public const TABLE = 'forums';
 
-    #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
+    #[PrimaryKey]
     public int $id = 0;
 
     #[Column(name: 'category', type: 'int', unsigned: true, default: null)]

@@ -12,8 +12,8 @@ final class Shout extends Model
 {
     public const TABLE = 'shouts';
 
-    #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
+    #[PrimaryKey]
     public int $id = 0;
 
     #[Column(name: 'uid', type: 'int', unsigned: true)]

@@ -12,8 +12,8 @@ final class Badge extends Model
 {
     public const TABLE = 'badges';
 
-    #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
+    #[PrimaryKey]
     public int $id = 0;
 
     #[Column(name: 'imagePath', type: 'string', length: 255, nullable: false)]

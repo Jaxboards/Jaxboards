@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\Attributes;
 
 use Attribute;
@@ -11,8 +13,8 @@ final class Column
         public string $name,
         public string $type,
         public int $length,
-        public bool $nullable = true,
         public mixed $default,
+        public bool $nullable = true,
         public bool $autoIncrement = false,
         public bool $unsigned = false,
     ) {}

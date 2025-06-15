@@ -12,8 +12,8 @@ final class Topic extends Model
 {
     public const TABLE = 'topics';
 
-    #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
+    #[PrimaryKey]
     public int $id = 0;
 
     #[Column(name: 'title', type: 'string', length: 255, nullable: false)]

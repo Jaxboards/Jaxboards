@@ -12,8 +12,8 @@ final class Session extends Model
 {
     public const TABLE = 'session';
 
-    #[PrimaryKey]
     #[Column(name: 'id', type: 'string', length: 191, nullable: false)]
+    #[PrimaryKey]
     public string $id = '';
 
     #[Column(name: 'uid', type: 'int', unsigned: true)]

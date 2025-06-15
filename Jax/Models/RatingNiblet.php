@@ -12,8 +12,8 @@ final class RatingNiblet extends Model
 {
     public const TABLE = 'ratingniblets';
 
-    #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
+    #[PrimaryKey]
     public int $id = 0;
 
     #[Column(name: 'img', type: 'string', length: 255, nullable: false)]

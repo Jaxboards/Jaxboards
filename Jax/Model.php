@@ -14,6 +14,7 @@ use ReflectionProperty;
 use function _\keyBy;
 use function array_filter;
 use function array_map;
+use function array_merge;
 use function array_unique;
 
 use const SORT_REGULAR;
@@ -37,19 +38,20 @@ abstract class Model
         $this->fromDatabase = true;
     }
 
-    public static function getFields() {
-        $reflection = new ReflectionClass(static::class);
+    public static function getFields()
+    {
+        $reflectionClass = new ReflectionClass(static::class);
         $attributes = array_merge(
             ...array_map(
-                fn(ReflectionProperty $property) => $property->getAttributes(Column::class),
-                $reflection->getProperties()
-            )
+                static fn(ReflectionProperty $reflectionProperty) => $reflectionProperty->getAttributes(Column::class),
+                $reflectionClass->getProperties(),
+            ),
         );
-        $fieldNames = array_map(
-            fn(ReflectionAttribute $attribute) => $attribute->getArguments()['name'],
-            $attributes
+
+        return array_map(
+            static fn(ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->getArguments()['name'],
+            $attributes,
         );
-        return $fieldNames;
     }
 
     /**

@@ -12,8 +12,8 @@ final class Member extends Model
 {
     public const TABLE = 'members';
 
-    #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
+    #[PrimaryKey]
     public int $id = 0;
 
     #[Column(name: 'name', type: 'string', length: 50, nullable: false)]
