@@ -12,8 +12,8 @@ final class Column
     public function __construct(
         public string $name,
         public string $type,
-        public int $length,
-        public mixed $default,
+        public mixed $default = null,
+        public int $length = 0,
         public bool $nullable = true,
         public bool $autoIncrement = false,
         public bool $unsigned = false,
