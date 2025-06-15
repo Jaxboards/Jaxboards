@@ -40,7 +40,7 @@ final class ContactDetails
     {
         $contactFieldPrefix = 'contact';
         $contactFields = array_filter(
-            Member::FIELDS,
+            Member::getFields(),
             static fn($field): bool => str_starts_with((string) $field, $contactFieldPrefix) && $member->{$field},
         );
 
