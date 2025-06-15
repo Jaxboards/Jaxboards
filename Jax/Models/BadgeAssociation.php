@@ -12,15 +12,6 @@ final class BadgeAssociation extends Model
 {
     public const TABLE = 'badge_associations';
 
-    public const FIELDS = [
-        'id',
-        'user',
-        'badge',
-        'badgeCount',
-        'reason',
-        'awardDate',
-    ];
-
     #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
     public int $id = 0;

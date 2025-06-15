@@ -12,11 +12,6 @@ final class Page extends Model
 {
     public const TABLE = 'pages';
 
-    public const FIELDS = [
-        'act',
-        'page',
-    ];
-
     public const PRIMARY_KEY = 'act';
 
     #[PrimaryKey]

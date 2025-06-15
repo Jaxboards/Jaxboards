@@ -12,14 +12,6 @@ final class Badge extends Model
 {
     public const TABLE = 'badges';
 
-    public const FIELDS = [
-        'id',
-        'imagePath',
-        'badgeTitle',
-        'displayOrder',
-        'description',
-    ];
-
     #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
     public int $id = 0;

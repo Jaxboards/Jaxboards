@@ -12,14 +12,6 @@ final class TextRule extends Model
 {
     public const TABLE = 'textrules';
 
-    public const FIELDS = [
-        'id',
-        'type',
-        'needle',
-        'replacement',
-        'enabled',
-    ];
-
     #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
     public int $id = 0;

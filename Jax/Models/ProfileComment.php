@@ -12,14 +12,6 @@ final class ProfileComment extends Model
 {
     public const TABLE = 'profile_comments';
 
-    public const FIELDS = [
-        'id',
-        'to',
-        'from',
-        'comment',
-        'date',
-    ];
-
     #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
     public int $id = 0;

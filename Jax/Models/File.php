@@ -12,16 +12,6 @@ final class File extends Model
 {
     public const TABLE = 'files';
 
-    public const FIELDS = [
-        'id',
-        'name',
-        'hash',
-        'uid',
-        'size',
-        'downloads',
-        'ip',
-    ];
-
     #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
     public int $id = 0;

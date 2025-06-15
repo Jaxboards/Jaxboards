@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Jax\Attributes\Column;
 use PDO;
 use PDOStatement;
+use ReflectionAttribute;
+use ReflectionClass;
 use ReflectionProperty;
 
 use function _\keyBy;
@@ -17,8 +20,6 @@ use const SORT_REGULAR;
 
 abstract class Model
 {
-    public const FIELDS = [];
-
     public const TABLE = '';
 
     public const PRIMARY_KEY = 'id';
@@ -34,6 +35,21 @@ abstract class Model
         }
 
         $this->fromDatabase = true;
+    }
+
+    public static function getFields() {
+        $reflection = new ReflectionClass(static::class);
+        $attributes = array_merge(
+            ...array_map(
+                fn(ReflectionProperty $property) => $property->getAttributes(Column::class),
+                $reflection->getProperties()
+            )
+        );
+        $fieldNames = array_map(
+            fn(ReflectionAttribute $attribute) => $attribute->getArguments()['name'],
+            $attributes
+        );
+        return $fieldNames;
     }
 
     /**
@@ -59,7 +75,7 @@ abstract class Model
         $stmt = $database->select(
             array_map(
                 $database->quoteIdentifier(...),
-                static::FIELDS,
+                static::getFields(),
             ),
             static::TABLE,
             ...$args,
@@ -80,7 +96,7 @@ abstract class Model
         $stmt = $database->select(
             array_map(
                 static fn($field): string => "`{$field}`",
-                static::FIELDS,
+                static::getFields(),
             ),
             static::TABLE,
             ...$args,
@@ -181,7 +197,7 @@ abstract class Model
     public function asArray(): array
     {
         $data = [];
-        foreach (static::FIELDS as $fieldName) {
+        foreach (static::getFields() as $fieldName) {
             $data[$fieldName] = $this->{$fieldName};
         }
 

@@ -12,40 +12,6 @@ final class Group extends Model
 {
     public const TABLE = 'member_groups';
 
-    public const FIELDS = [
-        'id',
-        'title',
-        'canPost',
-        'canEditPosts',
-        'canCreateTopics',
-        'canEditTopics',
-        'canAddComments',
-        'canDeleteComments',
-        'canViewBoard',
-        'canViewOfflineBoard',
-        'floodControl',
-        'canOverrideLockedTopics',
-        'icon',
-        'canShout',
-        'canModerate',
-        'canDeleteShouts',
-        'canDeleteOwnShouts',
-        'canKarma',
-        'canIM',
-        'canPM',
-        'canLockOwnTopics',
-        'canDeleteOwnTopics',
-        'canUseSignatures',
-        'canAttach',
-        'canDeleteOwnPosts',
-        'canPoll',
-        'canAccessACP',
-        'canViewShoutbox',
-        'canViewStats',
-        'legend',
-        'canViewFullProfile',
-    ];
-
     #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
     public int $id = 0;

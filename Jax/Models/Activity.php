@@ -12,18 +12,6 @@ final class Activity extends Model
 {
     public const TABLE = 'activity';
 
-    public const FIELDS = [
-        'id',
-        'type',
-        'arg1',
-        'uid',
-        'date',
-        'affectedUser',
-        'tid',
-        'pid',
-        'arg2',
-    ];
-
     #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
     public int $id = 0;

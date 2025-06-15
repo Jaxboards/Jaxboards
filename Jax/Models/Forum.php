@@ -12,30 +12,6 @@ final class Forum extends Model
 {
     public const TABLE = 'forums';
 
-    public const FIELDS = [
-        'id',
-        'category',
-        'title',
-        'subtitle',
-        'lastPostUser',
-        'lastPostDate',
-        'lastPostTopic',
-        'lastPostTopicTitle',
-        'path',
-        'showSubForums',
-        'redirect',
-        'topics',
-        'posts',
-        'order',
-        'perms',
-        'orderby',
-        'nocount',
-        'redirects',
-        'trashcan',
-        'mods',
-        'showLedBy',
-    ];
-
     #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
     public int $id = 0;

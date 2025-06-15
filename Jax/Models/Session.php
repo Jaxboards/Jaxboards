@@ -12,26 +12,6 @@ final class Session extends Model
 {
     public const TABLE = 'session';
 
-    public const FIELDS = [
-        'id',
-        'uid',
-        'ip',
-        'vars',
-        'lastUpdate',
-        'lastAction',
-        'runonce',
-        'location',
-        'usersOnlineCache',
-        'isBot',
-        'buddyListCache',
-        'locationVerbose',
-        'useragent',
-        'forumsread',
-        'topicsread',
-        'readDate',
-        'hide',
-    ];
-
     #[PrimaryKey]
     #[Column(name: 'id', type: 'string', length: 191, nullable: false)]
     public string $id = '';

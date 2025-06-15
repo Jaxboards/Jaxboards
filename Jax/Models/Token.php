@@ -11,13 +11,6 @@ final class Token extends Model
 {
     public const TABLE = 'tokens';
 
-    public const FIELDS = [
-        'token',
-        'type',
-        'uid',
-        'expires',
-    ];
-
     public const PRIMARY_KEY = 'token';
 
     #[Column(name: 'token', type: 'string', length: 191, nullable: false)]

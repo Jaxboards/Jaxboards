@@ -12,28 +12,6 @@ final class Topic extends Model
 {
     public const TABLE = 'topics';
 
-    public const FIELDS = [
-        'id',
-        'title',
-        'subtitle',
-        'lastPostUser',
-        'lastPostDate',
-        'fid',
-        'author',
-        'replies',
-        'views',
-        'pinned',
-        'pollChoices',
-        'pollResults',
-        'pollQuestion',
-        'pollType',
-        'summary',
-        'locked',
-        'date',
-        'op',
-        'calendarEvent',
-    ];
-
     #[PrimaryKey]
     #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
     public int $id = 0;
