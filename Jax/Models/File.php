@@ -32,10 +32,10 @@ final class File extends Model
     #[Column(name: 'size', type: 'int', unsigned: true, nullable: false, default: 0)]
     public int $size = 0;
 
-    #[Column(name: 'downloads', unsigned: true, nullable: false, default: 0)]
+    #[Column(name: 'downloads', type: 'int', unsigned: true, nullable: false, default: 0)]
     public int $downloads = 0;
 
-    #[Column('ip', 'binary', length: 16, nullable: false, default: '')]
+    #[Column(name: 'ip', type: 'binary', length: 16, nullable: false, default: '')]
     #[Key]
     public string $ip = '';
 }

@@ -16,7 +16,7 @@ final class Category extends Model
     #[PrimaryKey]
     public int $id = 0;
 
-    #[Column(name: 'title', type: 'string', lenght: 255, nullable: false)]
+    #[Column(name: 'title', type: 'string', length: 255, nullable: false)]
     public string $title = '';
 
     #[Column(name: 'order', type: 'int', unsigned: true, nullable: false, default: 0)]

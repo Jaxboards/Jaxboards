@@ -5,7 +5,25 @@ namespace Jax;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
+use Jax\Attributes\PrimaryKey;
+use Jax\Models\Activity;
+use Jax\Models\Category;
+use Jax\Models\File;
+use Jax\Models\Forum;
+use Jax\Models\Group;
+use Jax\Models\Member;
+use Jax\Models\Message;
+use Jax\Models\Page;
 use Jax\Models\Post;
+use Jax\Models\ProfileComment;
+use Jax\Models\RatingNiblet;
+use Jax\Models\Session;
+use Jax\Models\Shout;
+use Jax\Models\Skin;
+use Jax\Models\Stats;
+use Jax\Models\TextRule;
+use Jax\Models\Token;
+use Jax\Models\Topic;
 use ReflectionClass;
 
 class DatabaseUtils
@@ -14,10 +32,32 @@ class DatabaseUtils
         private Database $database,
     ) {}
 
+    // Roughly topologically sorted
+    const TABLES = [
+        Page::class,
+        Skin::class,
+        TextRule::class,
+        Category::class,
+        Group::class,
+        Member::class,
+        Token::class,
+        File::class,
+        Message::class,
+        Topic::class,
+        Post::class,
+        Forum::class,
+        Activity::class,
+        ProfileComment::class,
+        RatingNiblet::class,
+        Session::class,
+        Shout::class,
+        Stats::class,
+    ];
 
     public function createTableQueryFromModel(Model $modelClass)
     {
-        $tableName = $this->database->ftable($modelClass::TABLE);
+        $table = $modelClass::TABLE;
+        $tableQuoted = $this->database->ftable($table);
         $reflectionClass = new ReflectionClass($modelClass::class);
 
         $fields = [];
@@ -31,17 +71,11 @@ class DatabaseUtils
                 continue;
             }
 
-            $props = $columnAttributes[0]->newInstance();
+            $columnAttribute = $columnAttributes[0]->newInstance();
+            $fieldName = $this->database->quoteIdentifier($columnAttribute->name);
+            $fields[] = $this->fieldDefinition($columnAttribute);
 
-            $fieldName = $this->database->quoteIdentifier($props->name);
-            $type = $props->type;
-            $length = $props->length !== 0 ? "({$props->length})" : '';
-            $nullable = $props->nullable === false ? ' NOT NULL' : '';
-            $unsigned = $props->unsigned === true ? ' unsigned' : '';
-            $default = $props->default !== null ? " DEFAULT '{$props->default}'" : '';
-
-            $fields[] = "{$fieldName} {$type}{$length}{$unsigned}{$nullable}{$default}";
-
+            $primaryKeyAttributes = $reflectionProperty->getAttributes(PrimaryKey::class);
             $foreignKeyAttributes = $reflectionProperty->getAttributes(ForeignKey::class);
             $keyAttributes = $reflectionProperty->getAttributes(Key::class);
 
@@ -55,7 +89,12 @@ class DatabaseUtils
                     default => ''
                 };
                 $keys[] = "KEY {$fieldName} ({$fieldName})";
-                $constraints[] = "CONSTRAINT {$fieldName} FOREIGN KEY ({$fieldName}) REFERENCES $foreignTable ($foreignField){$onDelete}";
+                $constraintName = $this->database->quoteIdentifier("{$table}_fk_{$columnAttribute->name}");
+                $constraints[] = "CONSTRAINT {$constraintName} FOREIGN KEY ({$fieldName}) REFERENCES $foreignTable ($foreignField){$onDelete}";
+            }
+
+            if ($primaryKeyAttributes !== []) {
+                $keys[] = "PRIMARY KEY ({$fieldName})";
             }
 
             if ($keyAttributes !== []) {
@@ -67,7 +106,7 @@ class DatabaseUtils
 
         }
 
-        return "CREATE TABLE $tableName (" . PHP_EOL
+        return "CREATE TABLE $tableQuoted (" . PHP_EOL
             . '  ' . implode(',' . PHP_EOL . '  ', array_merge(
                 $fields,
                 $keys,
@@ -76,8 +115,52 @@ class DatabaseUtils
         ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
     }
 
+    private function fieldDefinition(Column $column) {
+        $fieldName = $this->database->quoteIdentifier($column->name);
+        $type = $column->type;
+
+        switch ($type) {
+            case 'bool':
+                $type = 'tinyint(1)';
+                $column->nullable = false;
+                $column->unsigned = true;
+                $column->default = 0;
+                break;
+
+            case 'string':
+                $type = 'varchar';
+
+            default:
+                break;
+        }
+
+        $length = $column->length !== 0 ? "({$column->length})" : '';
+        $nullable = $column->nullable === false ? ' NOT NULL' : '';
+        $autoIncrement = $column->autoIncrement ? ' AUTO_INCREMENT' : '';
+        $unsigned = $column->unsigned === true ? ' unsigned' : '';
+        $default = $column->default !== null ? " DEFAULT '{$column->default}'" : '';
+        return "{$fieldName} {$type}{$length}{$unsigned}{$nullable}{$autoIncrement}{$default}";
+    }
+
+    public function install()
+    {
+        $createTableQueries = [];
+
+        $header = <<<SQL
+            SET foreign_key_checks = 0;
+            SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
+            SET time_zone = '+00:00';
+            SQL;
+
+        foreach ($this::TABLES as $tableClass) {
+            $createTableQueries[] = $this->createTableQueryFromModel(new $tableClass);
+        }
+
+        return $header . implode(';' . PHP_EOL, $createTableQueries) .';';
+    }
+
     public function render()
     {
-        var_dump($this->createTableQueryFromModel(new Post()));
+        var_dump($this->install());
     }
 }

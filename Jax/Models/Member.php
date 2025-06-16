@@ -34,7 +34,7 @@ final class Member extends Model
     public int $posts = 0;
 
     #[Column(name: 'groupID', type: 'int', unsigned: true)]
-    #[ForeignKey(table: 'groups', field: 'id', onDelete: 'null')]
+    #[ForeignKey(table: 'member_groups', field: 'id', onDelete: 'null')]
     public int $groupID = 0;
 
     #[Column(name: 'avatar', type: 'string', length: 255, nullable: false, default: '')]
@@ -86,7 +86,7 @@ final class Member extends Model
     #[Column(name: 'location', type: 'string', length: 100, nullable: false, default: '')]
     public string $location = '';
 
-    #[Column(name: 'location', type: 'string', length: 10, nullable: false, default: '')]
+    #[Column(name: 'gender', type: 'string', length: 10, nullable: false, default: '')]
     public string $gender = '';
 
     #[Column(name: 'friends', type: 'text', nullable: false, default: '')]
