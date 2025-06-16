@@ -4,9 +4,7 @@ namespace Jax;
 
 use Jax\Attributes\Column;
 use Jax\Models\Post;
-use ReflectionAttribute;
 use ReflectionClass;
-use ReflectionProperty;
 
 class DatabaseUtils
 {
@@ -19,32 +17,26 @@ class DatabaseUtils
     {
         $tableName = $this->database->ftable($modelClass::TABLE);
         $reflectionClass = new ReflectionClass($modelClass::class);
-        $attributes = array_merge(
-            ...array_map(
-                static fn(ReflectionProperty $reflectionProperty) => $reflectionProperty->getAttributes(Column::class),
-                $reflectionClass->getProperties(),
-            ),
-        );
 
-        $fields = implode(',' . PHP_EOL, array_map(
-            function (ReflectionAttribute $reflectionAttribute) {
-                $props = $reflectionAttribute->getArguments();
-                var_dump($props);
+        $fields = [];
 
-                $name = $props['name'];
-                $type = $props['type'];
-                $length = array_key_exists('length', $props) &&$props['length'] !== 0 ? "({$props['length']})" : '';
-                $nullable = array_key_exists('nullable', $props) && $props['nullable'] === false ? ' NOT NULL' : '';
-                $unsigned = array_key_exists('unsigned', $props) && $props['unsigned'] === true ? ' unsigned' : '';
-                $default = array_key_exists('default', $props) && $props['default'] !== null ? " DEFAULT '{$props['default']}'" : '';
+        foreach ($reflectionClass->getProperties() as $reflectionProperty) {
+            $columnAttributes = $reflectionProperty->getAttributes(Column::class);
 
-                return "  `{$name}` {$type}{$length}{$unsigned}{$nullable}{$default}";
-            },
-            $attributes,
-        ));
+            $props = $columnAttributes[0]->newInstance();
+
+            $name = $props->name;
+            $type = $props->type;
+            $length = $props->length !== 0 ? "({$props->length})" : '';
+            $nullable = $props->nullable === false ? ' NOT NULL' : '';
+            $unsigned = $props->unsigned === true ? ' unsigned' : '';
+            $default = $props->default !== null ? " DEFAULT '{$props->default}'" : '';
+
+            $fields[] = "  `{$name}` {$type}{$length}{$unsigned}{$nullable}{$default}";
+        }
 
         return "CREATE TABLE $tableName (" . PHP_EOL
-            . $fields . PHP_EOL .
+            . implode(',' . PHP_EOL, $fields) . PHP_EOL .
         ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
     }
 
