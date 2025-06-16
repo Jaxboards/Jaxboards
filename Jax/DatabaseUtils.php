@@ -362,6 +362,7 @@ final readonly class DatabaseUtils
         $stats->most_members = 1;
         $stats->most_members_day = 1;
         $stats->last_register = 1;
+        $stats->dbVersion = 4;
         $stats->insert($this->database);
 
         $topic = new Topic();
