@@ -33,7 +33,7 @@ use function implode;
 
 use const PHP_EOL;
 
-final class DatabaseUtils
+final readonly class DatabaseUtils
 {
     public const TABLES = [
         Page::class,
@@ -57,7 +57,7 @@ final class DatabaseUtils
     ];
 
     // Roughly topologically sorted
-    public function __construct(private readonly Database $database) {}
+    public function __construct(private Database $database) {}
 
     public function createTableQueryFromModel(Model $model): string
     {
@@ -137,8 +137,6 @@ final class DatabaseUtils
 
         return $header . implode(';' . PHP_EOL, $createTableQueries) . ';';
     }
-
-    public function render(): void {}
 
     private function fieldDefinition(Column $column): string
     {
