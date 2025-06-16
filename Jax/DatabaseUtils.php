@@ -120,17 +120,17 @@ final readonly class DatabaseUtils
         . ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
     }
 
-    public function install()
+    public function install(): void
     {
         $queries = [
-            "SET foreign_key_checks = 0",
+            'SET foreign_key_checks = 0',
             "SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO'",
-            "SET time_zone = '+00:00'"
+            "SET time_zone = '+00:00'",
         ];
 
         foreach ($this::TABLES as $tableClass) {
-            $model = new $tableClass;
-            $queries[] = "DROP TABLE IF EXISTS " . $this->database->ftable($model::TABLE);
+            $model = new $tableClass();
+            $queries[] = 'DROP TABLE IF EXISTS ' . $this->database->ftable($model::TABLE);
             $queries[] = $this->createTableQueryFromModel($model);
         }
 
@@ -140,10 +140,10 @@ final readonly class DatabaseUtils
         }
 
         $this->insertInitialRecords();
-
     }
 
-    private function insertInitialRecords() {
+    private function insertInitialRecords(): void
+    {
         $category = new Category();
         $category->id = 1;
         $category->title = 'Category';
@@ -164,7 +164,7 @@ final readonly class DatabaseUtils
 
         $member = new Group();
         $member->id = 1;
-        $member->title = "Member";
+        $member->title = 'Member';
         $member->canPost = 1;
         $member->canEditPosts = 1;
         $member->canCreateTopics = 1;
@@ -175,7 +175,7 @@ final readonly class DatabaseUtils
         $member->canViewOfflineBoard = 0;
         $member->floodControl = 0;
         $member->canOverrideLockedTopics = 0;
-        $member->icon = "";
+        $member->icon = '';
         $member->canShout = 1;
         $member->canModerate = 0;
         $member->canDeleteShouts = 0;
@@ -198,7 +198,7 @@ final readonly class DatabaseUtils
 
         $admin = new Group();
         $admin->id = 2;
-        $admin->title = "Admin";
+        $admin->title = 'Admin';
         $admin->canPost = 1;
         $admin->canEditPosts = 1;
         $admin->canCreateTopics = 1;
@@ -209,7 +209,7 @@ final readonly class DatabaseUtils
         $admin->canViewOfflineBoard = 1;
         $admin->floodControl = 0;
         $admin->canOverrideLockedTopics = 1;
-        $admin->icon = "";
+        $admin->icon = '';
         $admin->canShout = 1;
         $admin->canModerate = 1;
         $admin->canDeleteShouts = 1;
@@ -232,7 +232,7 @@ final readonly class DatabaseUtils
 
         $guest = new Group();
         $guest->id = 3;
-        $guest->title = "Guest";
+        $guest->title = 'Guest';
         $guest->canPost = 0;
         $guest->canEditPosts = 0;
         $guest->canCreateTopics = 0;
@@ -243,7 +243,7 @@ final readonly class DatabaseUtils
         $guest->canViewOfflineBoard = 0;
         $guest->floodControl = 0;
         $guest->canOverrideLockedTopics = 0;
-        $guest->icon = "";
+        $guest->icon = '';
         $guest->canShout = 0;
         $guest->canModerate = 0;
         $guest->canDeleteShouts = 0;
@@ -266,7 +266,7 @@ final readonly class DatabaseUtils
 
         $banned = new Group();
         $banned->id = 4;
-        $banned->title = "Banned";
+        $banned->title = 'Banned';
         $banned->canPost = 0;
         $banned->canEditPosts = 0;
         $banned->canCreateTopics = 0;
@@ -277,7 +277,7 @@ final readonly class DatabaseUtils
         $banned->canViewOfflineBoard = 0;
         $banned->floodControl = 0;
         $banned->canOverrideLockedTopics = 0;
-        $banned->icon = "";
+        $banned->icon = '';
         $banned->canShout = 0;
         $banned->canModerate = 0;
         $banned->canDeleteShouts = 0;
@@ -300,7 +300,7 @@ final readonly class DatabaseUtils
 
         $validating = new Group();
         $validating->id = 5;
-        $validating->title = "Validating";
+        $validating->title = 'Validating';
         $validating->canPost = 0;
         $validating->canEditPosts = 0;
         $validating->canCreateTopics = 0;
@@ -311,7 +311,7 @@ final readonly class DatabaseUtils
         $validating->canViewOfflineBoard = 0;
         $validating->floodControl = 0;
         $validating->canOverrideLockedTopics = 0;
-        $validating->icon = "";
+        $validating->icon = '';
         $validating->canShout = 0;
         $validating->canModerate = 0;
         $validating->canDeleteShouts = 0;
@@ -335,7 +335,7 @@ final readonly class DatabaseUtils
         $post = new Post();
         $post->id = 1;
         $post->author = 1;
-        $post->post = <<<POST
+        $post->post = <<<'POST'
             Now, it's only a matter of time before you have everything set up.
             You'll find everything you need to get started in the ACP (link at the top).
 

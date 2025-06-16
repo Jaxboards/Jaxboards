@@ -21,14 +21,11 @@ use function gmdate;
 use function header;
 use function implode;
 use function mb_strlen;
-use function mb_substr;
 use function mkdir;
 use function parse_url;
 use function password_hash;
 use function preg_match;
 use function preg_replace;
-use function str_replace;
-use function trim;
 
 use const FILTER_VALIDATE_EMAIL;
 use const PASSWORD_DEFAULT;

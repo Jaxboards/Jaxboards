@@ -21,11 +21,8 @@ use function gmdate;
 use function header;
 use function mb_strlen;
 use function mb_strtolower;
-use function mb_substr;
 use function password_hash;
 use function preg_match;
-use function str_replace;
-use function trim;
 
 use const FILTER_VALIDATE_EMAIL;
 use const PASSWORD_DEFAULT;
