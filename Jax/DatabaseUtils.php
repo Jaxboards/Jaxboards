@@ -59,7 +59,10 @@ class DatabaseUtils
             }
 
             if ($keyAttributes !== []) {
-                $keys[] = "KEY {$fieldName} ({$fieldName})";
+                $keyAttribute = $keyAttributes[0]->newInstance();
+                $fulltext = $keyAttribute->fulltext ? 'FULLTEXT ' : '';
+
+                $keys[] = "{$fulltext}KEY {$fieldName} ({$fieldName})";
             }
 
         }
