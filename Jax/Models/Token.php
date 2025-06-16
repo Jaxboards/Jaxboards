@@ -7,6 +7,7 @@ namespace Jax\Models;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
+use Jax\Attributes\PrimaryKey;
 use Jax\Model;
 
 final class Token extends Model
@@ -14,6 +15,7 @@ final class Token extends Model
     public const TABLE = 'tokens';
 
     #[Column(name: 'token', type: 'string', length: 191, nullable: false)]
+    #[PrimaryKey]
     public string $token = '';
 
     #[Column(name: 'type', type: 'string', length: 20, nullable: false, default: 'login')]
