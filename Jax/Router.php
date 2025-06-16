@@ -46,7 +46,6 @@ final class Router
         'buddylist' => BuddyList::class,
         'calendar' => Calendar::class,
         'download' => Download::class,
-        'databaseutils' => DatabaseUtils::class,
         'earthbound' => Earthbound::class,
         'idx' => IDX::class,
         'katamari' => Katamari::class,

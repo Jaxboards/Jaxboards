@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Database;
+use Jax\DatabaseUtils;
 use Jax\FileUtils;
 use Jax\IPAddress;
+use Jax\Models\Member;
 use Jax\Request;
 use Jax\ServiceConfig;
 use Service\Blueprint;
@@ -83,6 +85,7 @@ final readonly class ServiceInstall
     public function __construct(
         private readonly Blueprint $blueprint,
         private readonly Database $database,
+        private readonly DatabaseUtils $databaseUtils,
         private readonly FileUtils $fileUtils,
         private readonly IPAddress $ipAddress,
         private readonly Request $request,
@@ -348,57 +351,22 @@ final readonly class ServiceInstall
                 $this->database->setPrefix($boardPrefix);
             }
 
-            // Create the directory and blueprint tables
-            // Import sql file and run it with php from this:
-            // https://stackoverflow.com/a/19752106
-            // It's not pretty or perfect but it'll work for our use case...
-            $query = '';
-            $lines = $this->blueprint->getSchema();
-            foreach ($lines as $line) {
-                // Skip comments.
-                if (mb_substr($line, 0, 2) === '--') {
-                    continue;
-                }
-
-                if ($line === '') {
-                    continue;
-                }
-
-                // Replace blueprint_ with board name.
-                $line = str_replace('blueprint_', $boardPrefix, $line);
-
-                // Add line to current query.
-                $query .= $line;
-
-                // If it has a semicolon at the end, it's the end of the query.
-                if (mb_substr(trim((string) $line), -1, 1) !== ';') {
-                    continue;
-                }
-
-                // Perform the query.
-                $result = $this->database->query($query);
-                $this->database->disposeresult($result);
-                // Reset temp variable to empty.
-                $query = '';
-            }
+            $this->databaseUtils->install();
 
             // Don't forget to create the admin.
-            $this->database->insert(
-                'members',
-                [
-                    'id' => 1,
-                    'display_name' => $adminUsername ?? '',
-                    'email' => $adminEmail ?? '',
-                    'group_id' => 2,
-                    'join_date' => $this->database->datetime(),
-                    'last_visit' => $this->database->datetime(),
-                    'name' => $adminUsername ?? '',
-                    'pass' => password_hash(
-                        (string) $adminPassword,
-                        PASSWORD_DEFAULT,
-                    ),
-                ],
+            $member = new Member();
+            $member->id = 1;
+            $member->displayName = $adminUsername ?? '';
+            $member->email = $adminEmail ?? '';
+            $member->groupID = 2;
+            $member->joinDate = $this->database->datetime();
+            $member->lastVisit = $this->database->datetime();
+            $member->name = $adminUsername ?? '';
+            $member->pass = password_hash(
+                (string) $adminPassword,
+                PASSWORD_DEFAULT,
             );
+            $member->insert($this->database);
 
             $jaxRoot = dirname(__DIR__, 2);
             mkdir($jaxRoot . '/boards');

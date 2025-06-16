@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Carbon\Carbon;
 use Jax\Database;
+use Jax\DatabaseUtils;
 use Jax\FileUtils;
 use Jax\IPAddress;
 use Jax\Models\Member;
@@ -41,6 +42,7 @@ final readonly class ServiceSignup
     public function __construct(
         private Blueprint $blueprint,
         private Database $database,
+        private DatabaseUtils $databaseUtils,
         private FileUtils $fileUtils,
         private IPAddress $ipAddress,
         private Request $request,
@@ -241,39 +243,7 @@ final readonly class ServiceSignup
         );
         $this->database->setPrefix($boardPrefix);
 
-        // Create the directory and blueprint tables
-        // Import sql file and run it with php from this:
-        // https://stackoverflow.com/a/19752106
-        // It's not pretty or perfect but it'll work for our use case...
-        $query = '';
-        $lines = $this->blueprint->getSchema();
-        foreach ($lines as $line) {
-            // Skip comments.
-            if (mb_substr($line, 0, 2) === '--') {
-                continue;
-            }
-
-            if ($line === '') {
-                continue;
-            }
-
-            // Replace blueprint_ with board name.
-            $line = str_replace('blueprint_', $boardPrefix, $line);
-
-            // Add line to current query.
-            $query .= $line;
-
-            // If it has a semicolon at the end, it's the end of the query.
-            if (mb_substr(trim((string) $line), -1, 1) !== ';') {
-                continue;
-            }
-
-            // Perform the query.
-            $result = $this->database->query($query);
-            $this->database->disposeresult($result);
-            // Reset temp variable to empty.
-            $query = '';
-        }
+        $this->databaseUtils->install();
 
         // Don't forget to create the admin.
         $member = new Member();

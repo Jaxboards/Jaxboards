@@ -6,11 +6,16 @@ namespace Jax\Models;
 
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
+use Jax\Attributes\PrimaryKey;
 use Jax\Model;
 
 final class Stats extends Model
 {
     public const TABLE = 'stats';
+
+    #[Column(name: 'id', type: 'int', unsigned: true, nullable: false)]
+    #[PrimaryKey]
+    public int $id = 0;
 
     #[Column(name: 'posts', type: 'int', unsigned: true, nullable: false, default: 0)]
     public int $posts = 0;
