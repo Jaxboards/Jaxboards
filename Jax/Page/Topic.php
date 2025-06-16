@@ -827,7 +827,7 @@ final class Topic
         foreach ($posts as $index => $post) {
             if ($post->id === $postId) {
                 $postId = $post->id;
-                $postPosition = $index;
+                $postPosition = $index + 1;
 
                 break;
             }
