@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use Jax\Attributes\Column;
+use Jax\Attributes\PrimaryKey;
 use PDO;
 use PDOStatement;
 use ReflectionAttribute;
@@ -23,19 +24,32 @@ abstract class Model
 {
     public const TABLE = '';
 
-    public const PRIMARY_KEY = 'id';
-
     private bool $fromDatabase = false;
 
     public function __construct()
     {
-        $primaryKey = static::PRIMARY_KEY;
+        $primaryKey = static::getPrimaryKey();
 
         if ($primaryKey !== '' && !$this->{$primaryKey}) {
             return;
         }
 
         $this->fromDatabase = true;
+    }
+
+    public static function getPrimaryKey()
+    {
+        $reflectionClass = new ReflectionClass(static::class);
+
+        foreach ($reflectionClass->getProperties() as $reflectionProperty) {
+            $maybePrimaryKeys = $reflectionProperty->getAttributes(PrimaryKey::class);
+            if ($maybePrimaryKeys !== []) {
+                [$column] = $reflectionProperty->getAttributes(Column::class);
+                return $column->newInstance()->name;
+            }
+        }
+
+        return '';
     }
 
     public static function getFields()
@@ -120,7 +134,7 @@ abstract class Model
         callable $getId,
         ?string $key = null,
     ): array {
-        $primaryKey = static::PRIMARY_KEY;
+        $primaryKey = static::getPrimaryKey();
         $key ??= $primaryKey;
 
         $otherIds = array_unique(
@@ -143,7 +157,7 @@ abstract class Model
 
     public function delete(Database $database): ?PDOStatement
     {
-        $primaryKey = static::PRIMARY_KEY;
+        $primaryKey = static::getPrimaryKey();
 
         return $database->delete(
             static::TABLE,
@@ -154,7 +168,7 @@ abstract class Model
 
     public function insert(Database $database): ?PDOStatement
     {
-        $primaryKey = static::PRIMARY_KEY;
+        $primaryKey = static::getPrimaryKey();
         $reflectionProperty = new ReflectionProperty(static::class, $primaryKey);
         $type = (string) $reflectionProperty->getType();
         $statement = $database->insert(static::TABLE, $this->asArray());
@@ -180,7 +194,7 @@ abstract class Model
 
     public function update(Database $database): ?PDOStatement
     {
-        $primaryKey = static::PRIMARY_KEY;
+        $primaryKey = static::getPrimaryKey();
         $data = $this->asArray();
 
         return $database->update(
@@ -188,7 +202,7 @@ abstract class Model
             $this->asArray(),
             ...($primaryKey !== '' ? [
                 "WHERE {$primaryKey}=?",
-                $data[static::PRIMARY_KEY],
+                $data[static::getPrimaryKey()],
             ] : []),
         );
     }

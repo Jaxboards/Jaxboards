@@ -12,8 +12,6 @@ final class Page extends Model
 {
     public const TABLE = 'pages';
 
-    public const PRIMARY_KEY = 'act';
-
     #[Column(name: 'act', type: 'string', length: 25, nullable: false)]
     #[PrimaryKey]
     public string $act = '';

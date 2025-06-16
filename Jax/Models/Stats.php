@@ -12,9 +12,6 @@ final class Stats extends Model
 {
     public const TABLE = 'stats';
 
-    // This table is a single row
-    public const PRIMARY_KEY = '';
-
     #[Column(name: 'posts', type: 'int', unsigned: true, nullable: false, default: 0)]
     public int $posts = 0;
 

@@ -13,8 +13,6 @@ final class Token extends Model
 {
     public const TABLE = 'tokens';
 
-    public const PRIMARY_KEY = 'token';
-
     #[Column(name: 'token', type: 'string', length: 191, nullable: false)]
     public string $token = '';
 
