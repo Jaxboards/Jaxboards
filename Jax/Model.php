@@ -45,6 +45,7 @@ abstract class Model
             $maybePrimaryKeys = $reflectionProperty->getAttributes(PrimaryKey::class);
             if ($maybePrimaryKeys !== []) {
                 [$column] = $reflectionProperty->getAttributes(Column::class);
+
                 return $column->newInstance()->name;
             }
         }
