@@ -7,6 +7,7 @@ namespace ACP\Page;
 use ACP\Page;
 use ACP\Page\Tools\FileManager;
 use Jax\Database;
+use Jax\DatabaseUtils;
 use Jax\DomainDefinitions;
 use Jax\FileUtils;
 use Jax\Request;
@@ -34,6 +35,7 @@ final readonly class Tools
 {
     public function __construct(
         private readonly Database $database,
+        private readonly DatabaseUtils $databaseUtils,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly FileUtils $fileUtils,
         private readonly Page $page,
@@ -74,8 +76,7 @@ final readonly class Tools
     {
         $dbPrefix = $this->database->getPrefix();
 
-        $result = $this->database->query("SHOW TABLES LIKE '{$dbPrefix}%%'");
-        $tables = array_map(static fn(array $row): string => (string) array_values($row)[0], $this->database->arows($result));
+        $models = DatabaseUtils::MODELS;
 
         $sqlFileLines = [
             "-- Jaxboards Backup {$dbPrefix} {$this->database->datetime()}",
@@ -83,29 +84,20 @@ final readonly class Tools
             'SET NAMES utf8mb4;',
             "SET time_zone = '+00:00';",
             'SET foreign_key_checks = 0;',
-            "SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';",
             '',
         ];
 
-        foreach ($tables as $table) {
-            $table = mb_substr($table, mb_strlen($dbPrefix));
-            $sqlFileLines[] = '-- ' . $table;
+        foreach ($models as $model) {
+            $tableName = $model::TABLE;
+            $sqlFileLines[] = '-- ' . $tableName;
             $sqlFileLines[] = '';
 
-            $result = $this->database->special(
-                'SHOW CREATE TABLE %t',
-                [$table],
-            );
-            $row = $this->database->arow($result);
-            $createTable = $row ? $row['Create Table'] : '';
-            $this->database->disposeresult($result);
-
-            $ftable = $this->database->ftable($table);
+            $ftable = $this->database->ftable($tableName);
             $sqlFileLines[] = "DROP TABLE IF EXISTS {$ftable};";
-            $sqlFileLines[] = "{$createTable};";
+            $sqlFileLines[] = $this->databaseUtils->createTableQueryFromModel(new $model);
 
             // Generate INSERTS with all row data
-            $select = $this->database->select('*', $table);
+            $select = $this->database->select('*', $tableName);
             foreach ($this->database->arows($select) as $row) {
                 $sqlFileLines[] = $this->database->buildInsertQuery($ftable, [$row]);
             }
