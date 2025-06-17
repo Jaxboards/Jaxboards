@@ -128,13 +128,13 @@ final readonly class DatabaseUtils
             "SET time_zone = '+00:00'",
         ];
 
-        foreach ($this::MODELS as $tableClass) {
-            $model = new $tableClass();
+        foreach ($this::MODELS as $modelClass) {
+            $model = new $modelClass();
             $queries[] = 'DROP TABLE IF EXISTS ' . $this->database->ftable($model::TABLE);
             $queries[] = $this->createTableQueryFromModel($model);
         }
 
-        // Create MODELS
+        // Create tables
         foreach ($queries as $query) {
             $this->database->query($query);
         }
