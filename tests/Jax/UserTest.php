@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use DI\Container;
+use Jax\Attributes\Column;
 use Jax\Constants\Groups;
 use Jax\Models\Group;
 use Jax\Models\Member;
@@ -27,6 +28,7 @@ use function base64_decode;
 #[UsesClass(IPAddress::class)]
 #[UsesClass(Jax::class)]
 #[UsesClass(Model::class)]
+#[UsesClass(Column::class)]
 #[UsesClass(ServiceConfig::class)]
 #[UsesFunction('\Jax\pathjoin')]
 final class UserTest extends TestCase
