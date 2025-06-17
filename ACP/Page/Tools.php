@@ -13,8 +13,6 @@ use Jax\FileUtils;
 use Jax\Request;
 use ZipArchive;
 
-use function array_map;
-use function array_values;
 use function class_exists;
 use function gmdate;
 use function header;
@@ -22,8 +20,6 @@ use function htmlspecialchars;
 use function implode;
 use function ini_get;
 use function is_readable;
-use function mb_strlen;
-use function mb_substr;
 use function readfile;
 use function sys_get_temp_dir;
 use function tempnam;
@@ -94,7 +90,7 @@ final readonly class Tools
 
             $ftable = $this->database->ftable($tableName);
             $sqlFileLines[] = "DROP TABLE IF EXISTS {$ftable};";
-            $sqlFileLines[] = $this->databaseUtils->createTableQueryFromModel(new $model) . ';';
+            $sqlFileLines[] = $this->databaseUtils->createTableQueryFromModel(new $model()) . ';';
 
             // Generate INSERTS with all row data
             $select = $this->database->select('*', $tableName);
