@@ -94,7 +94,7 @@ final readonly class Tools
 
             $ftable = $this->database->ftable($tableName);
             $sqlFileLines[] = "DROP TABLE IF EXISTS {$ftable};";
-            $sqlFileLines[] = $this->databaseUtils->createTableQueryFromModel(new $model);
+            $sqlFileLines[] = $this->databaseUtils->createTableQueryFromModel(new $model) . ';';
 
             // Generate INSERTS with all row data
             $select = $this->database->select('*', $tableName);
