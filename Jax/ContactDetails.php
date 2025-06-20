@@ -41,7 +41,7 @@ final class ContactDetails
         $contactFieldPrefix = 'contact';
         $contactFields = array_filter(
             Member::getFields(),
-            static fn($field): bool => str_starts_with((string) $field, $contactFieldPrefix) && $member->{$field},
+            static fn($field): bool => str_starts_with($field, $contactFieldPrefix) && $member->{$field},
         );
 
         return array_reduce($contactFields, static function (array $links, $field) use ($contactFieldPrefix, $member) {

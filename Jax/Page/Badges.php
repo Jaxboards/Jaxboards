@@ -119,7 +119,7 @@ final readonly class Badges
     {
         $badge = Badge::selectOne($this->database, Database::WHERE_ID_EQUALS, $badgeId);
 
-        if (!$badge) {
+        if ($badge === null) {
             return;
         }
 

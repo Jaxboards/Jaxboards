@@ -26,6 +26,7 @@ use function curl_init;
 use function curl_setopt;
 use function filter_var;
 use function http_build_query;
+use function is_string;
 use function json_decode;
 use function mb_strlen;
 use function mb_substr;
