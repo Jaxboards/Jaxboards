@@ -37,7 +37,7 @@ abstract class Model
         $this->fromDatabase = true;
     }
 
-    public static function getPrimaryKey()
+    public static function getPrimaryKey(): string
     {
         $reflectionClass = new ReflectionClass(static::class);
 
@@ -53,7 +53,10 @@ abstract class Model
         return '';
     }
 
-    public static function getFields()
+    /**
+     * @return array<string>
+     */
+    public static function getFields(): array
     {
         $reflectionClass = new ReflectionClass(static::class);
         $attributes = array_merge(

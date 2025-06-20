@@ -98,6 +98,10 @@ final class LogReg
         curl_setopt($verify, CURLOPT_POSTFIELDS, http_build_query($data));
         curl_setopt($verify, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($verify);
+        if (!is_string($response)) {
+            return false;
+        }
+
         $responseData = json_decode($response);
 
         return (bool) $responseData->success;

@@ -476,7 +476,7 @@ final class Forum
         $forumReadTime = 0;
         if ($this->forumsRead === null) {
             $forumsRead = $this->jax->parseReadMarkers($this->session->get()->forumsread);
-            if (array_key_exists($topic->fid, $forumsRead)) {
+            if ($topic->fid && array_key_exists($topic->fid, $forumsRead)) {
                 $forumReadTime = $forumsRead[$topic->fid];
             }
         }
