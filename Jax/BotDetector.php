@@ -47,6 +47,7 @@ final readonly class BotDetector
         'PerplexityBot' => 'Perplexity',
         'PetalBot' => 'PetalBot',
         'Qwantbot' => 'Qwant',
+        'scrapedia' => 'ByteDance-ImageSpider',
         'SemrushBot' => 'Semrush',
         'SeznamBot' => 'Seznam',
         'Sogou web spider' => 'Sogou',
