@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Carbon\Carbon;
 use Jax\Database;
+use Jax\Date;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
@@ -23,6 +24,7 @@ final readonly class Calendar
 {
     public function __construct(
         private Database $database,
+        private Date $date,
         private Page $page,
         private Request $request,
         private Session $session,
@@ -75,7 +77,7 @@ final readonly class Calendar
                 continue;
             }
 
-            $birthday = Carbon::createFromFormat('Y-m-d', $member->birthdate, 'UTC');
+            $birthday = $this->date->dateAsCarbon($member->birthdate);
             $birthdays[$birthday?->day][] = sprintf(
                 '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '
                 . 'title="%4$s years old!" data-use-tooltip="true">'

@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Jax\Config;
 use Jax\Constants\Groups;
 use Jax\Database;
+use Jax\Date;
 use Jax\Jax;
 use Jax\Models\Activity;
 use Jax\Models\Member;
@@ -41,6 +42,7 @@ final readonly class UCP
     public function __construct(
         private Config $config,
         private Database $database,
+        private Date $date,
         private Jax $jax,
         private Inbox $inbox,
         private Page $page,
@@ -410,61 +412,10 @@ final readonly class UCP
             return 'That display name is already in use.';
         }
 
-        $data['dob_year']
-            = $data['dob_year'] < 1 || $data['dob_year'] > (int) gmdate('Y')
-            ? null
-            : gmdate(
-                'Y',
-                Carbon::create($data['dob_year'], 1, 1)?->getTimestamp(),
-            );
-
-        $data['dob_month']
-            = $data['dob_month'] < 1 || $data['dob_month'] > 12
-            ? null : gmdate(
-                'm',
-                Carbon::create(2000, $data['dob_month'], 1)?->getTimestamp(),
-            );
-
-        $data['dob_day']
-            = $data['dob_day'] < 1
-            ? null : gmdate(
-                'd',
-                Carbon::create(2000, 1, $data['dob_day'])?->getTimestamp(),
-            );
-
-        // Is the date provided valid?
-        if ($data['dob_month'] && $data['dob_day']) {
-            // Feb 29th check for leap years
-            if ((int) $data['dob_month'] === 2) {
-                if (
-                    $data['dob_year'] > 0
-                    && gmdate('L', Carbon::create($data['dob_year'])?->getTimestamp())
-                ) {
-                    $daysInMonth = 29;
-                } elseif ($data['dob_year'] > 0) {
-                    $daysInMonth = 28;
-                } else {
-                    // If we don't know the year, we can
-                    // let it be a leap year.
-                    $daysInMonth = 29;
-                }
-            } else {
-                $daysInMonth = (int) gmdate(
-                    't',
-                    Carbon::create($data['dob_month'], 1)?->getTimestamp(),
-                );
-            }
-
-            if ($data['dob_day'] > $daysInMonth) {
-                return "That birth date doesn't exist!";
-            }
-        }
-
-        $data['birthdate'] = !$data['dob_year'] && !$data['dob_month']
-            ? null
-            : ($data['dob_year'] ?? '0000') . '-' . ($data['dob_month'] ?? '00') . '-' . ($data['dob_day'] ?? '00');
-
-        unset($data['dob_year'], $data['dob_month'], $data['dob_day']);
+        $data['birthdate'] = $data['dob_year'] || $data['dob_month'] ?
+            Carbon::create($data['dob_year'], $data['dob_month'] ?? 1, $data['dob_day'], 0, 0, 0, 'UTC')->format('Y-m-d H:i:s')
+            : null;
+        unset($data['dob_day'], $data['dob_month'], $data['dob_year']);
 
         foreach (
             [
@@ -564,7 +515,7 @@ final readonly class UCP
 
         $birthdate = $this->user->get()->birthdate;
         $birthdate = $birthdate !== null
-            ? Carbon::createFromFormat('Y-m-d', $birthdate, 'UTC')
+            ? $this->date->dateAsCarbon($birthdate)
             : null;
 
         foreach ($fullMonthNames as $index => $monthName) {
