@@ -278,30 +278,30 @@ final class Topic
 
         // Make the users online list.
         $usersonline = '';
-        foreach ($this->usersOnline->getUsersOnline() as $user) {
-            if (!$user->uid) {
+        foreach ($this->usersOnline->getUsersOnline() as $userOnline) {
+            if (!$userOnline->uid) {
                 continue;
             }
 
-            if ($user->location !== "vt{$modelsTopic->id}") {
+            if ($userOnline->location !== "vt{$modelsTopic->id}") {
                 continue;
             }
 
-            if (isset($user->isBot) && $user->isBot) {
-                $usersonline .= '<a class="user' . $user->uid . '">' . $user->name . '</a>';
+            if (isset($userOnline->isBot) && $userOnline->isBot) {
+                $usersonline .= '<a class="user' . $userOnline->uid . '">' . $userOnline->name . '</a>';
 
                 continue;
             }
 
             $usersonline .= $this->template->meta(
                 'user-link',
-                $user->uid,
-                $user->groupID . (
-                    $user->status === 'idle'
-                    ? " idle lastAction{$user->lastAction}"
+                $userOnline->uid,
+                $userOnline->groupID . (
+                    $userOnline->status === 'idle'
+                    ? " idle lastAction{$userOnline->lastAction}"
                     : ''
                 ),
-                $user->name,
+                $userOnline->name,
             );
         }
 
@@ -368,35 +368,35 @@ final class Topic
         $list = [];
         $oldcache = array_flip(explode(',', $this->session->get()->usersOnlineCache));
         $newcache = [];
-        foreach ($this->usersOnline->getUsersOnline() as $user) {
-            if (!$user->uid) {
+        foreach ($this->usersOnline->getUsersOnline() as $userOnline) {
+            if (!$userOnline->uid) {
                 continue;
             }
 
-            if ($user->location !== "vt{$modelsTopic->id}") {
+            if ($userOnline->location !== "vt{$modelsTopic->id}") {
                 continue;
             }
 
-            $newcache[] = $user->uid;
+            $newcache[] = $userOnline->uid;
 
-            if (!isset($oldcache[$user->uid])) {
+            if (!isset($oldcache[$userOnline->uid])) {
                 $list[] = [
-                    $user->uid,
-                    $user->groupID,
-                    $user->status !== 'active'
-                        ? $user->status
-                        : ($user->birthday && ($this->config->getSetting('birthdays') & 1)
+                    $userOnline->uid,
+                    $userOnline->groupID,
+                    $userOnline->status !== 'active'
+                        ? $userOnline->status
+                        : ($userOnline->birthday && ($this->config->getSetting('birthdays') & 1)
                             ? ' birthday' : ''),
-                    $user->name,
+                    $userOnline->name,
                     // don't display location, since we know we're in the topic
                     false,
-                    $user->lastAction,
+                    $userOnline->lastAction,
                 ];
 
                 continue;
             }
 
-            unset($oldcache[$user->uid]);
+            unset($oldcache[$userOnline->uid]);
         }
 
         if ($list !== []) {

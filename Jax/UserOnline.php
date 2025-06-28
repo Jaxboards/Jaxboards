@@ -31,4 +31,5 @@ final class UserOnline
 
     public int $uid;
 }
+
 // phpcs:enable
