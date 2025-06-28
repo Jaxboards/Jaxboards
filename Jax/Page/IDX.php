@@ -20,6 +20,7 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use Jax\UserOnline;
 use Jax\UsersOnline;
 
 use function _\groupBy;
@@ -371,21 +372,21 @@ final class IDX
         $today = gmdate('n j');
         $birthdaysEnabled = $this->config->getSetting('birthdays');
 
-        $userstoday = implode(', ', array_map(function (array $user) use ($today, $birthdaysEnabled): string {
-            $birthdayClass = $user['birthday'] === $today
+        $userstoday = implode(', ', array_map(function (UserOnline $user) use ($today, $birthdaysEnabled): string {
+            $birthdayClass = $user->birthday === $today
                 && $birthdaysEnabled ? 'birthday' : '';
-            $lastOnline = $user['hide']
-                ? $user['readDate']
-                : $user['lastUpdate'];
+            $lastOnline = $user->hide
+                ? $user->readDate
+                : $user->lastUpdate;
             $lastOnlineDate = $this->date->relativeTime($lastOnline);
 
             return <<<HTML
-                <a href="?act=vu{$user['uid']}"
-                    class="user{$user['uid']} mgroup{$user['groupID']} {$birthdayClass}"
+                <a href="?act=vu{$user->uid}"
+                    class="user{$user->uid} mgroup{$user->groupID} {$birthdayClass}"
                     title="Last online: {$lastOnlineDate}"
                     data-use-tooltip="true"
                     data-last-online="{$lastOnline}"
-                    >{$user['name']}</a>
+                    >{$user->name}</a>
                 HTML;
         }, $usersOnlineToday));
 
@@ -426,27 +427,27 @@ final class IDX
 
         foreach ($this->usersOnline->getUsersOnline() as $user) {
             $title = $this->textFormatting->blockhtml(
-                (string) $user['locationVerbose'] ?: 'Viewing the board.',
+                (string) $user->locationVerbose ?: 'Viewing the board.',
             );
-            if (isset($user['isBot']) && $user['isBot']) {
-                $html .= '<a class="user' . $user['uid'] . '" '
+            if ($user->isBot) {
+                $html .= '<a class="user' . $user->uid . '" '
                     . 'title="' . $title . '" data-use-tooltip="true">'
-                    . $user['name'] . '</a>';
+                    . $user->name . '</a>';
             } else {
                 ++$numMembers;
                 $html .= sprintf(
                     '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '
                         . 'title="%4$s" data-use-tooltip="true">'
                         . '%3$s</a>',
-                    $user['uid'],
-                    $user['groupID']
+                    $user->uid,
+                    $user->groupID
                         . (
-                            $user['status'] === 'idle'
-                            ? " idle lastAction{$user['lastAction']}"
+                            $user->status === 'idle'
+                            ? " idle lastAction{$user->lastAction}"
                             : ''
                         )
-                        . ($user['birthday'] && $this->config->getSetting('birthdays') ? ' birthday' : ''),
-                    $user['name'],
+                        . ($user->birthday && $this->config->getSetting('birthdays') ? ' birthday' : ''),
+                    $user->name,
                     $title,
                 );
             }
@@ -470,34 +471,34 @@ final class IDX
                 ? $this->date->datetimeAsTimestamp($this->session->get()->lastUpdate)
                 : 0;
             $lastActionIdle = $lastUpdateTS - ($this->config->getSetting('timetoidle') ?? 300) - 30;
-            if (!$user['uid'] && !$user['isBot']) {
+            if (!$user->uid && !$user->isBot) {
                 continue;
             }
 
             if (
-                $user['lastAction'] >= $lastUpdateTS
-                || $user['status'] === 'idle'
-                && $user['lastAction'] > $lastActionIdle
+                $user->lastAction >= $lastUpdateTS
+                || $user->status === 'idle'
+                && $user->lastAction > $lastActionIdle
             ) {
                 $list[] = [
-                    $user['uid'],
-                    $user['groupID'],
+                    $user->uid,
+                    $user->groupID,
 
-                    $user['status'] !== 'active'
-                        ? $user['status']
-                        : ($user['birthday'] && ($this->config->getSetting('birthdays') & 1)
+                    $user->status !== 'active'
+                        ? $user->status
+                        : ($user->birthday && ($this->config->getSetting('birthdays') & 1)
                             ? ' birthday' : ''),
-                    $user['name'],
-                    $user['locationVerbose'],
-                    $user['lastAction'],
+                    $user->name,
+                    $user->locationVerbose,
+                    $user->lastAction,
                 ];
             }
 
             if (isset($oldcache)) {
-                unset($oldcache[$user['uid']]);
+                unset($oldcache[$user->uid]);
             }
 
-            $useronlinecache .= $user['uid'] . ',';
+            $useronlinecache .= $user->uid . ',';
         }
 
         if (isset($oldcache) && $oldcache !== []) {
