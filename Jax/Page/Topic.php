@@ -379,7 +379,7 @@ final class Topic
 
             $newcache[] = $userOnline->uid;
 
-            if (!isset($oldcache[$userOnline->uid])) {
+            if (!array_key_exists($userOnline->uid, $oldcache)) {
                 $list[] = [
                     $userOnline->uid,
                     $userOnline->groupID,
@@ -580,8 +580,7 @@ final class Topic
                 $author?->posts,
                 $this->template->meta(
                     'topic-status-'
-                        . (isset($usersonline[$post->author])
-                            && $usersonline[$post->author] ? 'online' : 'offline'),
+                        . (array_key_exists($post->author, $usersonline) ? 'online' : 'offline'),
                 ),
                 $authorGroup?->title,
                 $post->author,

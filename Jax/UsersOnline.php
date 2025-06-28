@@ -121,7 +121,7 @@ final class UsersOnline
             $userOnline->status = $session->lastAction < $this->idleTimestamp
                     ? 'idle'
                     : 'active';
-            $userOnline->uid = $session->isBot ? $session->id : $session->uid;
+            $userOnline->uid = $uid;
 
             $usersOnline[$uid] = $userOnline;
         }

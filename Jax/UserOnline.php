@@ -29,7 +29,7 @@ final class UserOnline
 
     public string $status;
 
-    public int $uid;
+    public int|string|null $uid;
 }
 
 // phpcs:enable

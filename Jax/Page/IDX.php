@@ -369,12 +369,10 @@ final class IDX
 
         $usersOnlineToday = $this->usersOnline->getUsersOnlineToday();
 
-        $today = gmdate('n j');
         $birthdaysEnabled = $this->config->getSetting('birthdays');
 
-        $userstoday = implode(', ', array_map(function (UserOnline $userOnline) use ($today, $birthdaysEnabled): string {
-            $birthdayClass = $userOnline->birthday === $today
-                && $birthdaysEnabled ? 'birthday' : '';
+        $userstoday = implode(', ', array_map(function (UserOnline $userOnline) use ($birthdaysEnabled): string {
+            $birthdayClass = $userOnline->birthday && $birthdaysEnabled ? 'birthday' : '';
             $lastOnline = $userOnline->hide
                 ? $userOnline->readDate
                 : $userOnline->lastUpdate;
