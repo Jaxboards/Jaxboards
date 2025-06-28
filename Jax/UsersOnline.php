@@ -75,8 +75,10 @@ final class UsersOnline
                 continue;
             }
 
-            $birthday = $member->birthdate && $this->date->dateAsCarbon($member->birthdate)->format('n j') === $today ? 1 : 0;
-            $uid  = $session->isBot ? $session->id : $session->uid;
+            $birthday = $member->birthdate && $this->date->dateAsCarbon($member->birthdate)->format('n j') === $today
+                ? 1
+                : 0;
+            $uid = $session->isBot ? $session->id : $session->uid;
 
             $this->usersOnlineCache[$uid] = [
                 'birthday' => $birthday,

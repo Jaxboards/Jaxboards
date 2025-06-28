@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
-use Carbon\Carbon;
 use Jax\Database;
 use Jax\Date;
 use Jax\Models\Member;

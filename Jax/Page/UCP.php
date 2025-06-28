@@ -412,8 +412,8 @@ final readonly class UCP
             return 'That display name is already in use.';
         }
 
-        $data['birthdate'] = $data['dob_year'] || $data['dob_month'] ?
-            Carbon::create($data['dob_year'], $data['dob_month'] ?? 1, $data['dob_day'], 0, 0, 0, 'UTC')->format('Y-m-d H:i:s')
+        $data['birthdate'] = $data['dob_year'] || $data['dob_month']
+            ? Carbon::create($data['dob_year'], $data['dob_month'] ?? 1, $data['dob_day'], 0, 0, 0, 'UTC')->format('Y-m-d H:i:s')
             : null;
         unset($data['dob_day'], $data['dob_month'], $data['dob_year']);
 
