@@ -32,7 +32,6 @@ use function array_merge;
 use function array_unique;
 use function count;
 use function explode;
-use function gmdate;
 use function implode;
 use function max;
 use function mb_strlen;
@@ -372,7 +371,9 @@ final class IDX
         $birthdaysEnabled = $this->config->getSetting('birthdays');
 
         $userstoday = implode(', ', array_map(function (UserOnline $userOnline) use ($birthdaysEnabled): string {
-            $birthdayClass = $userOnline->birthday && $birthdaysEnabled ? 'birthday' : '';
+            $birthdayClass = $userOnline->birthday && $birthdaysEnabled
+                ? 'birthday'
+                : '';
             $lastOnline = $userOnline->hide
                 ? $userOnline->readDate
                 : $userOnline->lastUpdate;
