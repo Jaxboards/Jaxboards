@@ -13,6 +13,7 @@ use function gmdate;
 final class UsersOnline
 {
     private int $guestCount = 0;
+    private int $idleTimestamp;
 
     /**
      * @var array<array<int|string,null|int|string>>
@@ -25,6 +26,9 @@ final class UsersOnline
         private readonly User $user,
         private readonly ServiceConfig $serviceConfig,
     ) {
+        $this->idleTimestamp = Carbon::now('UTC')
+            ->subSeconds($this->serviceConfig->getSetting('timetoidle') ?? 300)
+            ->getTimestamp();
         $this->fetchUsersOnline();
     }
 
@@ -45,13 +49,6 @@ final class UsersOnline
 
     public function fetchUsersOnline(): void
     {
-        $idletimeout = Carbon::now('UTC')
-            ->subSeconds($this->serviceConfig->getSetting('timetoidle') ?? 300)
-            ->getTimestamp()
-        ;
-
-        $guestCount = 0;
-
         $sessions = Session::selectMany(
             $this->database,
             'WHERE lastUpdate>=? ORDER BY lastAction',
@@ -59,15 +56,41 @@ final class UsersOnline
         );
 
         $members = Member::joinedOn($this->database, $sessions, static fn(Session $session): ?int => $session->uid);
+        $userSessions = array_filter($sessions, fn(Session $session) => $session->uid);
+        $guestCount = count($sessions) - count($userSessions);
+
+        $this->guestCount = $guestCount;
+        $this->usersOnlineCache = $this->sessionsToUsersOnline($userSessions);
+    }
+
+    /**
+     * @return array<array<int|string,null|int|string>>
+     */
+    public function getUsersOnlineToday(): array
+    {
+        $sessions = Session::selectMany(
+            $this->database,
+            'WHERE uid AND hide = 0'
+        );
+
+        return $this->sessionsToUsersOnline($sessions);
+    }
+
+    /**
+     * @param array<Session> $sessions
+     * @return array<array<int|string,null|int|string>>
+     */
+    private function sessionsToUsersOnline(array $sessions): array
+    {
+        $members = Member::joinedOn($this->database, $sessions, static fn(Session $session): ?int => $session->uid);
 
         $today = gmdate('n j');
 
+        $usersOnline = [];
         foreach ($sessions as $session) {
             $member = $members[$session->uid] ?? null;
 
             if ($member === null) {
-                ++$guestCount;
-
                 continue;
             }
 
@@ -80,19 +103,23 @@ final class UsersOnline
                 : 0;
             $uid = $session->isBot ? $session->id : $session->uid;
 
-            $this->usersOnlineCache[$uid] = [
+            $usersOnline[$uid] = [
                 'birthday' => $birthday,
-                'uid' => $session->isBot ? $session->id : $session->uid,
-                'name' => ($session->hide ? '* ' : '') . ($session->isBot ? $session->id : $member->displayName),
-                'status' => $session->lastAction < $idletimeout
-                    ? 'idle'
-                    : 'active',
+                'groupID' => $member->groupID,
+                'hide' => $session->hide,
+                'lastUpdate' => $this->date->datetimeAsTimestamp($session->lastAction),
+                'lastUpdate' => $this->date->datetimeAsTimestamp($session->lastUpdate),
                 'location' => $session->location,
                 'locationVerbose' => $session->locationVerbose,
-                'groupID' => $member->groupID,
+                'name' => ($session->hide ? '* ' : '') . ($session->isBot ? $session->id : $member->displayName),
+                'readDate' => $this->date->datetimeAsTimestamp($session->readDate),
+                'status' => $session->lastAction < $this->idleTimestamp
+                    ? 'idle'
+                    : 'active',
+                'uid' => $session->isBot ? $session->id : $session->uid,
             ];
         }
 
-        $this->guestCount = $guestCount;
+        return $usersOnline;
     }
 }

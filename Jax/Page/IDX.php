@@ -346,34 +346,6 @@ final class IDX
         return $this->template->meta('idx-table', $table);
     }
 
-    /**
-     * @return array<array<string,mixed>>
-     */
-    private function fetchUsersOnlineToday(): array
-    {
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT
-                    UNIX_TIMESTAMP(MAX(s.`lastUpdate`)) AS `lastUpdate`,
-                    m.`id` AS `id`,
-                    m.`groupID` AS `groupID`,
-                    m.`displayName` AS `name`,
-                    CONCAT(MONTH(m.`birthdate`),' ',DAY(m.`birthdate`)) AS `birthday`,
-                    UNIX_TIMESTAMP(MAX(s.`readDate`)) AS `readDate`,
-                    s.`hide` AS `hide`
-                FROM %t s
-                LEFT JOIN %t m
-                    ON s.`uid`=m.`id`
-                WHERE s.`uid` AND s.`hide` = 0
-                GROUP BY m.`id`
-                ORDER BY `name`
-                SQL,
-            ['session', 'members'],
-        );
-
-        return $this->database->arows($result);
-    }
-
     private function update(): void
     {
         $this->updateStats();
@@ -394,7 +366,7 @@ final class IDX
             ? Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $stats->last_register)
             : null;
 
-        $usersOnlineToday = $this->fetchUsersOnlineToday();
+        $usersOnlineToday = $this->usersOnline->getUsersOnlineToday();
 
         $today = gmdate('n j');
         $birthdaysEnabled = $this->config->getSetting('birthdays');
@@ -408,8 +380,8 @@ final class IDX
             $lastOnlineDate = $this->date->relativeTime($lastOnline);
 
             return <<<HTML
-                <a href="?act=vu{$user['id']}"
-                    class="user{$user['id']} mgroup{$user['groupID']} {$birthdayClass}"
+                <a href="?act=vu{$user['uid']}"
+                    class="user{$user['uid']} mgroup{$user['groupID']} {$birthdayClass}"
                     title="Last online: {$lastOnlineDate}"
                     data-use-tooltip="true"
                     data-last-online="{$lastOnline}"
