@@ -15,7 +15,7 @@ final class UsersOnline
     private int $guestCount = 0;
 
     /**
-     * @var array<int,array<int|string,null|int|string>>
+     * @var array<array<int|string,null|int|string>>
      */
     private array $usersOnlineCache = [];
 
@@ -31,7 +31,7 @@ final class UsersOnline
     /**
      * Returns a map of all users online with keys being user ID.
      *
-     * @return array<int,array<int|string,null|int|string>>
+     * @return array<array<int|string,null|int|string>>
      */
     public function getUsersOnline(): array
     {
@@ -75,7 +75,7 @@ final class UsersOnline
                 continue;
             }
 
-            $birthday = $member->birthdate && $this->date->dateAsCarbon($member->birthdate)->format('n j') === $today
+            $birthday = $member->birthdate && $this->date->dateAsCarbon($member->birthdate)?->format('n j') === $today
                 ? 1
                 : 0;
             $uid = $session->isBot ? $session->id : $session->uid;

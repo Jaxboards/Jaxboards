@@ -71,7 +71,7 @@ final class Date
     public function datetimeAsTimestamp(?string $datetime): int
     {
         return $datetime
-            ? $this->datetimeAsCarbon($datetime)->getTimestamp() ?? 0
+            ? $this->datetimeAsCarbon($datetime)?->getTimestamp() ?? 0
             : 0;
     }
 
