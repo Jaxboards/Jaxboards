@@ -112,6 +112,7 @@ final class UsersOnline
                 'birthday' => $birthday,
                 'groupID' => $member->groupID,
                 'hide' => $session->hide,
+                'lastAction' => $this->date->datetimeAsTimestamp($session->lastAction),
                 'lastUpdate' => $this->date->datetimeAsTimestamp($session->lastUpdate),
                 'location' => $session->location,
                 'locationVerbose' => $session->locationVerbose,
