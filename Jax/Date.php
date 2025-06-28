@@ -58,14 +58,15 @@ final class Date
             : $formattedDate;
     }
 
-    public function datetimeAsCarbon(?string $datetime): Carbon {
+    public function datetimeAsCarbon(?string $datetime): Carbon
+    {
         return Carbon::createFromFormat('Y-m-d H:i:s', $datetime, 'UTC');
     }
 
     public function datetimeAsTimestamp(?string $datetime): int
     {
         return $datetime
-            ? $this->datetimeAsCarbon($datetime)?->getTimestamp() ?? 0
+            ? $this->datetimeAsCarbon($datetime)->getTimestamp() ?? 0
             : 0;
     }
 

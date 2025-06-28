@@ -8,7 +8,10 @@ use Carbon\Carbon;
 use Jax\Models\Member;
 use Jax\Models\Session;
 
-class UsersOnline {
+use function gmdate;
+
+final class UsersOnline
+{
     private int $guestCount = 0;
 
     /**
@@ -17,10 +20,10 @@ class UsersOnline {
     private array $usersOnlineCache = [];
 
     public function __construct(
-        private Database $database,
-        private Date $date,
-        private User $user,
-        private ServiceConfig $serviceConfig,
+        private readonly Database $database,
+        private readonly Date $date,
+        private readonly User $user,
+        private readonly ServiceConfig $serviceConfig,
     ) {
         $this->fetchUsersOnline();
     }
@@ -30,11 +33,13 @@ class UsersOnline {
      *
      * @return array<int,array<int|string,null|int|string>>
      */
-    public function getUsersOnline(): array {
+    public function getUsersOnline(): array
+    {
         return $this->usersOnlineCache;
     }
 
-    public function getGuestCount(): int {
+    public function getGuestCount(): int
+    {
         return $this->guestCount;
     }
 
@@ -50,10 +55,10 @@ class UsersOnline {
         $sessions = Session::selectMany(
             $this->database,
             'WHERE lastUpdate>=? ORDER BY lastAction',
-            $this->database->datetime(Carbon::now('UTC')->subSeconds($this->serviceConfig->getSetting('timetologout') ?? 900)->getTimestamp())
+            $this->database->datetime(Carbon::now('UTC')->subSeconds($this->serviceConfig->getSetting('timetologout') ?? 900)->getTimestamp()),
         );
 
-        $members = Member::joinedOn($this->database, $sessions, fn(Session $session) => $session->uid);
+        $members = Member::joinedOn($this->database, $sessions, static fn(Session $session): ?int => $session->uid);
 
         $today = gmdate('n j');
 
@@ -61,7 +66,8 @@ class UsersOnline {
             $member = $members[$session->uid] ?? null;
 
             if ($member === null) {
-                $guestCount++;
+                ++$guestCount;
+
                 continue;
             }
 
@@ -69,8 +75,10 @@ class UsersOnline {
                 continue;
             }
 
-            $birthday = $member->birthdate ? $this->date->datetimeAsCarbon($member->birthdate)->format('n j') : '';
-            $uid  = $session->isBot ? $session->id : $session->uid;
+            $birthday = $member->birthdate
+                ? $this->date->datetimeAsCarbon($member->birthdate)->format('n j')
+                : '';
+            $uid = $session->isBot ? $session->id : $session->uid;
 
             $this->usersOnlineCache[$uid] = [
                 'birthday' => ($birthday === $today ? 1 : 0),

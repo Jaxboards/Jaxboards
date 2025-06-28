@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use Carbon\Carbon;
 use Exception;
 use Jax\Models\Forum;
-use Jax\Models\Member;
-use Jax\Models\Session;
 use Jax\Models\Topic;
 use PDO;
 use PDOStatement;
@@ -52,7 +49,7 @@ class Database
     private string $prefix = '';
 
     public function __construct(
-        private readonly ServiceConfig $serviceConfig,
+        ServiceConfig $serviceConfig,
         private readonly DebugLog $debugLog,
     ) {
         try {

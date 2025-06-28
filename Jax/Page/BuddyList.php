@@ -16,6 +16,7 @@ use Jax\User;
 use Jax\UsersOnline;
 
 use function array_filter;
+use function array_key_exists;
 use function array_search;
 use function explode;
 use function implode;
