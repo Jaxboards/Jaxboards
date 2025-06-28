@@ -75,13 +75,12 @@ final class UsersOnline
                 continue;
             }
 
-            $birthday = $member->birthdate
-                ? $this->date->datetimeAsCarbon($member->birthdate)->format('n j')
-                : '';
-            $uid = $session->isBot ? $session->id : $session->uid;
+            $birthday = 0;
+            // $birthday = $member->birthdate && $this->date->datetimeAsCarbon($member->birthdate)->format('n j') === $today ? 1 : 0;
+            $uid  = $session->isBot ? $session->id : $session->uid;
 
             $this->usersOnlineCache[$uid] = [
-                'birthday' => ($birthday === $today ? 1 : 0),
+                'birthday' => $birthday,
                 'uid' => $session->isBot ? $session->id : $session->uid,
                 'name' => ($session->hide ? '* ' : '') . ($session->isBot ? $session->id : $member->displayName),
                 'status' => $session->lastAction < $idletimeout
