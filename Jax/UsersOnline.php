@@ -8,12 +8,15 @@ use Carbon\Carbon;
 use Jax\Models\Member;
 use Jax\Models\Session;
 
+use function array_filter;
+use function count;
 use function gmdate;
 
 final class UsersOnline
 {
     private int $guestCount = 0;
-    private int $idleTimestamp;
+
+    private readonly int $idleTimestamp;
 
     /**
      * @var array<array<int|string,null|int|string>>
@@ -28,7 +31,8 @@ final class UsersOnline
     ) {
         $this->idleTimestamp = Carbon::now('UTC')
             ->subSeconds($this->serviceConfig->getSetting('timetoidle') ?? 300)
-            ->getTimestamp();
+            ->getTimestamp()
+        ;
         $this->fetchUsersOnline();
     }
 
@@ -55,11 +59,12 @@ final class UsersOnline
             $this->database->datetime(Carbon::now('UTC')->subSeconds($this->serviceConfig->getSetting('timetologout') ?? 900)->getTimestamp()),
         );
 
-        $members = Member::joinedOn($this->database, $sessions, static fn(Session $session): ?int => $session->uid);
-        $userSessions = array_filter($sessions, fn(Session $session) => $session->uid);
+        Member::joinedOn($this->database, $sessions, static fn(Session $session): ?int => $session->uid);
+        $userSessions = array_filter($sessions, static fn(Session $session): ?int => $session->uid);
         $guestCount = count($sessions) - count($userSessions);
 
         $this->guestCount = $guestCount;
+
         $this->usersOnlineCache = $this->sessionsToUsersOnline($userSessions);
     }
 
@@ -70,7 +75,7 @@ final class UsersOnline
     {
         $sessions = Session::selectMany(
             $this->database,
-            'WHERE uid AND hide = 0'
+            'WHERE uid AND hide = 0',
         );
 
         return $this->sessionsToUsersOnline($sessions);
@@ -78,6 +83,7 @@ final class UsersOnline
 
     /**
      * @param array<Session> $sessions
+     *
      * @return array<array<int|string,null|int|string>>
      */
     private function sessionsToUsersOnline(array $sessions): array
@@ -107,7 +113,6 @@ final class UsersOnline
                 'birthday' => $birthday,
                 'groupID' => $member->groupID,
                 'hide' => $session->hide,
-                'lastUpdate' => $this->date->datetimeAsTimestamp($session->lastAction),
                 'lastUpdate' => $this->date->datetimeAsTimestamp($session->lastUpdate),
                 'location' => $session->location,
                 'locationVerbose' => $session->locationVerbose,
