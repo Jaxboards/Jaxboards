@@ -26,6 +26,7 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use Jax\UsersOnline;
 
 use function _\keyBy;
 use function array_flip;
@@ -70,6 +71,7 @@ final class Topic
         private readonly TextFormatting $textFormatting,
         private readonly Template $template,
         private readonly User $user,
+        private readonly UsersOnline $usersOnline,
     ) {
         $this->template->loadMeta('topic');
     }
@@ -276,7 +278,7 @@ final class Topic
 
         // Make the users online list.
         $usersonline = '';
-        foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
+        foreach ($this->usersOnline->getUsersOnline() as $user) {
             if (!$user['uid']) {
                 continue;
             }
@@ -366,7 +368,7 @@ final class Topic
         $list = [];
         $oldcache = array_flip(explode(',', $this->session->get()->usersOnlineCache));
         $newcache = [];
-        foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
+        foreach ($this->usersOnline->getUsersOnline() as $user) {
             if (!$user['uid']) {
                 continue;
             }
@@ -488,7 +490,7 @@ final class Topic
         ModelsTopic $modelsTopic,
         int $lastpid = 0,
     ): string {
-        $usersonline = $this->database->getUsersOnline();
+        $usersonline = $this->usersOnline->getUsersOnline();
         $this->config->getSetting('ratings') ?? 0;
 
         $topicPostCounter = $this->pageNumber * $this->numperpage;

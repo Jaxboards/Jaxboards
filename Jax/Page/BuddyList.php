@@ -13,6 +13,7 @@ use Jax\Request;
 use Jax\Session;
 use Jax\Template;
 use Jax\User;
+use Jax\UsersOnline;
 
 use function array_filter;
 use function array_search;
@@ -30,6 +31,7 @@ final readonly class BuddyList
         private readonly Request $request,
         private readonly Template $template,
         private readonly User $user,
+        private readonly UsersOnline $usersOnline,
     ) {
         $buddylist = $this->jax->hiddenFormFields(['act' => 'buddylist']);
         $this->template->addMeta(
@@ -112,7 +114,7 @@ final readonly class BuddyList
             $this->user->get()->friends !== ''
             && $this->user->get()->friends !== '0'
         ) {
-            $online = $this->database->getUsersOnline();
+            $online = $this->usersOnline->getUsersOnline();
             $friends = Member::selectMany(
                 $this->database,
                 'WHERE `id` IN ? ORDER BY `name` ASC',
@@ -123,18 +125,14 @@ final readonly class BuddyList
                     'buddylist-contact',
                     $friend->id,
                     $friend->name,
-                    isset($online[$friend->id]) && $online[$friend->id]
-                    ? 'online' : 'offline',
+                    array_key_exists($friend->id, $online) ? 'online' : 'offline',
                     $friend->avatar ?: $this->template->meta('default-avatar'),
                     $friend->usertitle,
                 );
             }
         }
 
-        if (
-            $this->user->get()->enemies !== ''
-            && $this->user->get()->enemies !== '0'
-        ) {
+        if ($this->user->get()->enemies !== '') {
             $enemies = Member::selectMany(
                 $this->database,
                 'WHERE `id` IN ? ORDER BY `name` ASC',

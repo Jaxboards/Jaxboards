@@ -7,6 +7,8 @@ namespace Jax;
 use Carbon\Carbon;
 use Exception;
 use Jax\Models\Forum;
+use Jax\Models\Member;
+use Jax\Models\Session;
 use Jax\Models\Topic;
 use PDO;
 use PDOStatement;
@@ -372,77 +374,6 @@ class Database
 
         // Put the format string back.
         return $this->query($newformat, ...$args);
-    }
-
-    /**
-     * Returns a map of all users online with keys being user ID.
-     *
-     * @return array<int,array<int|string,null|int|string>>
-     */
-    public function getUsersOnline(bool $canViewHiddenMembers = false): array
-    {
-        static $usersOnlineCache = null;
-        if ($usersOnlineCache !== null) {
-            return $usersOnlineCache;
-        }
-
-        $idletimeout = Carbon::now('UTC')
-            ->subSeconds($this->serviceConfig->getSetting('timetoidle') ?? 300)
-            ->getTimestamp()
-        ;
-
-        $usersOnlineCache = [];
-
-        $result = $this->special(
-            <<<'SQL'
-                SELECT
-                    s.`id` as `id`,
-                    s.`uid` AS `uid`,
-                    s.`location` AS `location`,
-                    s.`locationVerbose` AS `locationVerbose`,
-                    s.`hide` AS `hide`,
-                    s.`isBot` AS `isBot`,
-                    m.`displayName` AS `name`,
-                    m.`groupID` AS `groupID`,
-                    m.`birthdate` AS `birthdate`,
-                    CONCAT(MONTH(m.`birthdate`),' ',DAY(m.`birthdate`)) AS `dob`,
-                    UNIX_TIMESTAMP(s.`lastAction`) AS `lastAction`,
-                    UNIX_TIMESTAMP(s.`lastUpdate`) AS `lastUpdate`
-                FROM %t s
-                LEFT JOIN %t m ON s.`uid`=m.`id`
-                WHERE s.`lastUpdate`>=?
-                ORDER BY s.`lastAction` ASC
-                SQL,
-            ['session', 'members'],
-            $this->datetime(Carbon::now('UTC')->subSeconds($this->serviceConfig->getSetting('timetologout') ?? 900)->getTimestamp()),
-        );
-
-        $today = gmdate('n j');
-
-        while ($user = $this->arow($result)) {
-            if ($user['hide']) {
-                if (!$canViewHiddenMembers) {
-                    continue;
-                }
-
-                $user['name'] = '* ' . $user['name'];
-            }
-
-            $user['birthday'] = ($user['dob'] === $today ? 1 : 0);
-            $user['status'] = $user['lastAction'] < $idletimeout
-                ? 'idle'
-                : 'active';
-            if ($user['isBot']) {
-                $user['name'] = $user['id'];
-                $user['uid'] = $user['id'];
-            }
-
-            unset($user['id'], $user['dob']);
-
-            $usersOnlineCache[$user['uid']] = $user;
-        }
-
-        return $usersOnlineCache;
     }
 
     public function fixForumLastPost(int $forumId): void

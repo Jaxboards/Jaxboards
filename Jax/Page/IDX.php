@@ -20,6 +20,7 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use Jax\UsersOnline;
 
 use function _\groupBy;
 use function array_filter;
@@ -79,6 +80,7 @@ final class IDX
         private readonly TextFormatting $textFormatting,
         private readonly Template $template,
         private readonly User $user,
+        private readonly UsersOnline $usersOnline,
     ) {
         $this->template->loadMeta('idx');
     }
@@ -448,16 +450,9 @@ final class IDX
     private function getUsersOnlineList(): array
     {
         $html = '';
-        $guests = 0;
         $numMembers = 0;
 
-        foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
-            if ($user['uid'] === null || $user['uid'] === 0) {
-                ++$guests;
-
-                continue;
-            }
-
+        foreach ($this->usersOnline->getUsersOnline() as $user) {
             $title = $this->textFormatting->blockhtml(
                 (string) $user['locationVerbose'] ?: 'Viewing the board.',
             );
@@ -485,7 +480,7 @@ final class IDX
             }
         }
 
-        return [$html, $numMembers, $guests];
+        return [$html, $numMembers, $this->usersOnline->getGuestCount()];
     }
 
     private function updateStats(): void
@@ -498,7 +493,7 @@ final class IDX
         }
 
         $useronlinecache = '';
-        foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
+        foreach ($this->usersOnline->getUsersOnline() as $user) {
             $lastUpdateTS = $this->session->get()->lastUpdate !== null
                 ? $this->date->datetimeAsTimestamp($this->session->get()->lastUpdate)
                 : 0;
