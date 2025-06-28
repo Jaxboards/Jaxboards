@@ -21,7 +21,6 @@ final class UsersOnline
 
     public function __construct(
         private readonly Database $database,
-        private readonly Date $date,
         private readonly User $user,
         private readonly ServiceConfig $serviceConfig,
     ) {
@@ -60,7 +59,7 @@ final class UsersOnline
 
         $members = Member::joinedOn($this->database, $sessions, static fn(Session $session): ?int => $session->uid);
 
-        $today = gmdate('n j');
+        gmdate('n j');
 
         foreach ($sessions as $session) {
             $member = $members[$session->uid] ?? null;
@@ -77,7 +76,7 @@ final class UsersOnline
 
             $birthday = 0;
             // $birthday = $member->birthdate && $this->date->datetimeAsCarbon($member->birthdate)->format('n j') === $today ? 1 : 0;
-            $uid  = $session->isBot ? $session->id : $session->uid;
+            $uid = $session->isBot ? $session->id : $session->uid;
 
             $this->usersOnlineCache[$uid] = [
                 'birthday' => $birthday,
