@@ -59,7 +59,6 @@ final class UsersOnline
             $this->database->datetime(Carbon::now('UTC')->subSeconds($this->serviceConfig->getSetting('timetologout') ?? 900)->getTimestamp()),
         );
 
-        Member::joinedOn($this->database, $sessions, static fn(Session $session): ?int => $session->uid);
         $userSessions = array_filter($sessions, static fn(Session $session): ?int => $session->uid);
         $guestCount = count($sessions) - count($userSessions);
 
