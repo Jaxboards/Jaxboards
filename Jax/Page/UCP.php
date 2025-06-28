@@ -413,7 +413,7 @@ final readonly class UCP
         }
 
         $data['birthdate'] = $data['dob_year'] || $data['dob_month']
-            ? Carbon::create($data['dob_year'], $data['dob_month'] ?? 1, $data['dob_day'], 0, 0, 0, 'UTC')->format('Y-m-d H:i:s')
+            ? Carbon::create($data['dob_year'], $data['dob_month'], $data['dob_day'], 0, 0, 0, 'UTC')?->format('Y-m-d H:i:s')
             : null;
         unset($data['dob_day'], $data['dob_month'], $data['dob_year']);
 

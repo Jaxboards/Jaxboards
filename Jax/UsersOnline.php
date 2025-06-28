@@ -15,7 +15,7 @@ final class UsersOnline
     private int $guestCount = 0;
 
     /**
-     * @var array<string,mixed>
+     * @var array<int,array<int|string,null|int|string>>
      */
     private array $usersOnlineCache = [];
 
