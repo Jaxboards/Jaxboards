@@ -26,8 +26,6 @@ use function trim;
 
 final class Shoutbox
 {
-    public const TAG = true;
-
     private int $shoutlimit;
 
     public function __construct(
@@ -50,7 +48,8 @@ final class Shoutbox
     public function init(): void
     {
         if (
-            !$this->config->getSetting('shoutbox')
+            !$this->template->has('shoutbox')
+            || !$this->config->getSetting('shoutbox')
             || !$this->user->getGroup()?->canViewShoutbox
         ) {
             return;

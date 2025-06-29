@@ -147,14 +147,6 @@ final readonly class App
 
             $module = $this->container->get('Jax\Modules\\' . $moduleName);
 
-            if (
-                property_exists($module, 'TAG')
-                && $this->request->both('module') !== $moduleName
-                && !$this->template->has($moduleName)
-            ) {
-                continue;
-            }
-
             $module->init();
         }
     }
