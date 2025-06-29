@@ -18,7 +18,6 @@ use function json_encode;
 use function mb_strtolower;
 use function microtime;
 use function pathinfo;
-use function property_exists;
 use function round;
 
 use const JSON_OBJECT_AS_ARRAY;
