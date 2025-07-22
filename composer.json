@@ -3,7 +3,7 @@
         "classmap-authoritative": true,
         "optimize-autoloader": true,
         "platform": {
-            "composer": "2.8.9",
+            "composer": "2.8.10",
             "php": "8.2.12"
         },
         "allow-plugins": {
@@ -13,7 +13,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require-dev": {
-        "composer": "2.8.9",
+        "composer": "2.8.10",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
         "friendsofphp/php-cs-fixer": "^3.73",
         "php-parallel-lint/php-parallel-lint": "^1.4",

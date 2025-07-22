@@ -21,7 +21,7 @@
         "typescript-eslint": "^8.31.1"
     },
     "engines": {
-        "composer": "2.8.9",
+        "composer": "2.8.10",
         "node": "^22.14",
         "npm": "^10.9"
     },
