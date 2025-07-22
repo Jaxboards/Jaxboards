@@ -73,7 +73,7 @@ export default class DatePicker {
 
     // month should be 0 for jan, 11 for dec
     generate(iyear: number, imonth: number, iday: number) {
-        let date = new Date();
+        const date = new Date();
         const dp = this.getPicker();
         let row;
         let cell;
@@ -101,7 +101,6 @@ export default class DatePicker {
         const numdaysinmonth = new Date(year, month + 1, 0).getDate();
         const first = new Date(year, month, 1).getDay();
 
-        date = new Date(year, month, day);
         // generate the table now
         dp.innerHTML = ''; // clear
 
