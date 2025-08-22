@@ -18,6 +18,7 @@ final readonly class BotDetector
         'Baiduspider' => 'Baidu',
         'Barkrowler' => 'Babbar.tech',
         'Bingbot' => 'Bing',
+	'BLEXBot' => 'BLEXBot',
         'Bytespider' => 'Bytespider',
         'CensysInspect' => 'CensysInspect',
         'Centurybot' => 'Century',
