@@ -64,7 +64,7 @@ final class UsersOnline
 
         $this->guestCount = $guestCount;
 
-        $this->usersOnlineCache = $this->sessionsToUsersOnline($userSessions);
+        $this->usersOnlineCache = $this->sessionsToUsersOnline($sessions);
     }
 
     /**
@@ -95,22 +95,18 @@ final class UsersOnline
         foreach ($sessions as $session) {
             $member = $members[$session->uid] ?? null;
 
-            if ($member === null) {
-                continue;
-            }
-
             if ($session->hide && !$this->user->isAdmin()) {
                 continue;
             }
 
-            $birthday = $member->birthdate && $this->date->dateAsCarbon($member->birthdate)?->format('n j') === $today;
+            $birthday = $member?->birthdate && $this->date->dateAsCarbon($member->birthdate)?->format('n j') === $today;
             $uid = $session->isBot ? $session->id : $session->uid;
 
             $userOnline = new UserOnline();
 
             $userOnline->birthday = $birthday;
             $userOnline->isBot = (bool) $session->isBot;
-            $userOnline->groupID = $member->groupID;
+            $userOnline->groupID = $member?->groupID;
             $userOnline->hide = (bool) $session->hide;
             $userOnline->lastAction = $this->date->datetimeAsTimestamp($session->lastAction);
             $userOnline->lastUpdate = $this->date->datetimeAsTimestamp($session->lastUpdate);
