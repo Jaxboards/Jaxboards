@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use Carbon\Carbon;
+use Jax\Constants\Groups;
 use Jax\Models\Member;
 use Jax\Models\Session;
 
@@ -106,7 +107,7 @@ final class UsersOnline
 
             $userOnline->birthday = $birthday;
             $userOnline->isBot = (bool) $session->isBot;
-            $userOnline->groupID = $member?->groupID;
+            $userOnline->groupID = $member?->groupID ?? Groups::Guest->value;
             $userOnline->hide = (bool) $session->hide;
             $userOnline->lastAction = $this->date->datetimeAsTimestamp($session->lastAction);
             $userOnline->lastUpdate = $this->date->datetimeAsTimestamp($session->lastUpdate);
