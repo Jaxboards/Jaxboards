@@ -102,6 +102,9 @@ final class UsersOnline
 
             $birthday = $member?->birthdate && $this->date->dateAsCarbon($member->birthdate)?->format('n j') === $today;
             $uid = $session->isBot ? $session->id : $session->uid;
+            $name = ($session->isBot ? $session->id : $member->displayName);
+
+            if (!$name) continue;
 
             $userOnline = new UserOnline();
 
@@ -113,7 +116,7 @@ final class UsersOnline
             $userOnline->lastUpdate = $this->date->datetimeAsTimestamp($session->lastUpdate);
             $userOnline->location = $session->location;
             $userOnline->locationVerbose = $session->locationVerbose;
-            $userOnline->name = ($session->hide ? '* ' : '') . ($session->isBot ? $session->id : $member->displayName);
+            $userOnline->name = ($session->hide ? '* ' : '') . $name;
             $userOnline->readDate = $this->date->datetimeAsTimestamp($session->readDate);
             $userOnline->status = $session->lastAction < $this->idleTimestamp
                     ? 'idle'
