@@ -104,7 +104,9 @@ final class UsersOnline
             $uid = $session->isBot ? $session->id : $session->uid;
             $name = ($session->isBot ? $session->id : $member->displayName);
 
-            if (!$name) continue;
+            if (!$name) {
+                continue;
+            }
 
             $userOnline = new UserOnline();
 
