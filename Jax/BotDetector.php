@@ -20,6 +20,7 @@ final readonly class BotDetector
         'Bingbot' => 'Bing',
         'BLEXBot' => 'BLEXBot',
         'Bytespider' => 'Bytespider',
+	'CCBot' => 'Common Crawl',
         'CensysInspect' => 'CensysInspect',
         'Centurybot' => 'Century',
         'ChatGLM-Spider' => 'ChatGLM',
