@@ -52,7 +52,7 @@
 
     <testsuites>
         <testsuite name="Jax">
-            <directory>tests/Jax</directory>
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
 </phpunit>
