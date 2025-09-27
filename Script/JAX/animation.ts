@@ -122,7 +122,7 @@ class Animation {
         });
     }
 
-    then(
+    andThen(
         what: string | ((el: HTMLElement) => void),
         from = undefined,
         to = undefined,

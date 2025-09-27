@@ -145,7 +145,7 @@ export default {
                     tick = ticks[x];
                     new Animation(tick, 30, 500)
                         .add('opacity', '1', '0')
-                        .then((el: HTMLElement) => {
+                        .andThen((el: HTMLElement) => {
                             el.parentNode?.removeChild(el);
                         })
                         .play();
@@ -296,7 +296,7 @@ export default {
             if (prdiv.style.display !== 'none') {
                 new Animation(prdiv)
                     .add('height', '200px', '0px')
-                    .then(() => {
+                    .andThen(() => {
                         prdiv.style.display = 'none';
                     })
                     .play();

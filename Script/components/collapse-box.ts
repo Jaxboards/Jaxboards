@@ -30,7 +30,7 @@ export default class CollapseBox {
         if (style.height === '0px' && fullHeight) {
             new Animation(collapseContent, 5, 10, 0)
                 .add('height', '0px', fullHeight)
-                .then(() => {
+                .andThen(() => {
                     collapseBox.classList.remove('collapsed');
                 })
                 .play();
@@ -43,7 +43,7 @@ export default class CollapseBox {
             }
             new Animation(collapseContent, 5, 10, 0)
                 .add('height', fullHeight, '0px')
-                .then(() => {
+                .andThen(() => {
                     collapseBox.classList.add('collapsed');
                 })
                 .play();
