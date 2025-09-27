@@ -30,7 +30,9 @@ use function mb_strlen;
 use function mkdir;
 use function pathinfo;
 use function preg_match;
+use function realpath;
 use function rename;
+use function str_starts_with;
 use function unlink;
 
 use const PATHINFO_FILENAME;
