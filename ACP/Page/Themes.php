@@ -503,10 +503,15 @@ final readonly class Themes
             );
         }
 
+        $safeThemesPath = realpath($this->themesPath . $skinName);
+        if (!str_starts_with($safeThemesPath, $this->themesPath)) {
+            return 'Invalid skin name';
+        }
+
         mkdir($this->themesPath . $skinName, 0o777, true);
         copy(
             $this->domainDefinitions->getDefaultThemePath() . '/css.css',
-            $this->themesPath . $this->request->asString->post('skinname') . '/css.css',
+            $safeThemesPath . '/css.css',
         );
 
         $this->page->location('?act=Themes');
