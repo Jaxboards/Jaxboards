@@ -510,7 +510,7 @@ final readonly class Themes
             return 'Invalid skin name';
         }
 
-        mkdir($this->themesPath . $skinName, 0o777, true);
+        mkdir($safeThemesPath, 0o777, true);
         copy(
             $this->domainDefinitions->getDefaultThemePath() . '/css.css',
             $safeThemesPath . '/css.css',
