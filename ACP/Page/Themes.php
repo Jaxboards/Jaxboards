@@ -506,7 +506,7 @@ final readonly class Themes
         }
 
         $safeThemesPath = realpath($this->themesPath . $skinName);
-        if (!str_starts_with($safeThemesPath, $this->themesPath)) {
+        if (!$safeThemesPath || !str_starts_with($safeThemesPath, $this->themesPath)) {
             return 'Invalid skin name';
         }
 

@@ -102,7 +102,7 @@ final class UsersOnline
 
             $birthday = $member?->birthdate && $this->date->dateAsCarbon($member->birthdate)?->format('n j') === $today;
             $uid = $session->isBot ? $session->id : $session->uid;
-            $name = ($session->isBot ? $session->id : $member->displayName);
+            $name = ($session->isBot ? $session->id : $member?->displayName);
 
             if (!$name) {
                 continue;
@@ -112,7 +112,7 @@ final class UsersOnline
 
             $userOnline->birthday = $birthday;
             $userOnline->isBot = (bool) $session->isBot;
-            $userOnline->groupID = $member?->groupID ?? Groups::Guest->value;
+            $userOnline->groupID = $member->groupID ?? Groups::Guest->value;
             $userOnline->hide = (bool) $session->hide;
             $userOnline->lastAction = $this->date->datetimeAsTimestamp($session->lastAction);
             $userOnline->lastUpdate = $this->date->datetimeAsTimestamp($session->lastUpdate);
