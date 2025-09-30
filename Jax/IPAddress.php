@@ -137,7 +137,7 @@ final class IPAddress
         $row = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        return !isset($row['banned']) || $row['banned'] > 0;
+        return $row !== null && $row['banned'] > 0;
     }
 
     /**

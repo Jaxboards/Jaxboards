@@ -98,7 +98,7 @@ final class Groups
         // Set anything not sent to 0.
         foreach ($permsInput as $groupId => $groupPerms) {
             foreach ($columns as $column) {
-                if (!isset($groupPerms[$column])) {
+                if (!array_key_exists($column, $groupPerms)) {
                     $groupPerms[$column] = false;
                 }
 
@@ -110,7 +110,7 @@ final class Groups
         $columns = array_flip($columns);
         foreach ($permsInput as $groupId => $groupPerms) {
             foreach (array_keys($groupPerms) as $field) {
-                if (isset($columns[$field])) {
+                if (array_key_exists($field, $columns)) {
                     continue;
                 }
 
@@ -181,8 +181,7 @@ final class Groups
         ) {
             foreach ($groupList as $groupId) {
                 if (
-                    isset($permInput[$groupId])
-                    && $permInput[$groupId]
+                    array_key_exists($groupId, $permInput)
                 ) {
                     continue;
                 }

@@ -66,8 +66,7 @@ final readonly class Posting
             if (!$badword || !$replacement) {
                 $page .= $this->page->error('All fields required.');
             } elseif (
-                isset($badWords[$badword])
-                && $badWords[$badword]
+                array_key_exists($badword, $badWords)
             ) {
                 $page .= $this->page->error(
                     "'" . $badword . "' is already used.",

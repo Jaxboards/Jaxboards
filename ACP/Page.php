@@ -36,7 +36,7 @@ final class Page
 
     public function append(string $partName, string $content): void
     {
-        if (!isset($this->parts[$partName])) {
+        if (array_key_exists($partName, $this->parts)) {
             $this->parts[$partName] = '';
         }
 

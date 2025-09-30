@@ -287,7 +287,7 @@ final class Topic
                 continue;
             }
 
-            if (isset($userOnline->isBot) && $userOnline->isBot) {
+            if ($userOnline->isBot) {
                 $usersonline .= '<a class="user' . $userOnline->uid . '">' . $userOnline->name . '</a>';
 
                 continue;
@@ -593,7 +593,7 @@ final class Topic
                         >{$this->template->meta('topic-perma-button')}</a>
                     HTML,
                 $postBody,
-                isset($author->sig) && $author->sig
+                $author->sig
                     ? $this->textFormatting->theWorks($author->sig)
                     : '',
                 $post->author,

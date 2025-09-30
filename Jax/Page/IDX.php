@@ -275,7 +275,7 @@ final class IDX
             $subforumHTML = '';
             if (
                 $forum->showSubForums >= 1
-                && isset($this->subforums[$forum->id])
+                && array_key_exists($forum->id, $this->subforums)
             ) {
                 $subforumHTML = $this->subforums[$forum->id];
             }
@@ -458,6 +458,7 @@ final class IDX
     private function updateStats(): void
     {
         $list = [];
+        $oldcache = null;
         if (
             $this->session->get()->usersOnlineCache !== ''
         ) {
@@ -493,14 +494,14 @@ final class IDX
                 ];
             }
 
-            if (isset($oldcache)) {
+            if ($oldcache !== null) {
                 unset($oldcache[$userOnline->uid]);
             }
 
             $useronlinecache .= $userOnline->uid . ',';
         }
 
-        if (isset($oldcache) && $oldcache !== []) {
+        if ($oldcache !== null && $oldcache !== []) {
             $this->page->command('setoffline', implode(',', array_flip($oldcache)));
         }
 

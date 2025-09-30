@@ -198,8 +198,8 @@ final class Template
 
     public function metaExists(string $meta): bool
     {
-        return isset($this->userMetaDefs[$meta])
-            || isset($this->metaDefs[$meta]);
+        return array_key_exists($meta, $this->userMetaDefs)
+            || array_key_exists($meta, $this->metaDefs);
     }
 
     public function reset(string $part, string $content = ''): void

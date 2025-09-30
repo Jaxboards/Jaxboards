@@ -132,7 +132,7 @@ final class Session
     public function addVar(string $varName, mixed $value): void
     {
         if (
-            isset($this->vars[$varName])
+            array_key_exists($varName, $this->vars)
             && $this->vars[$varName] === $value
         ) {
             return;

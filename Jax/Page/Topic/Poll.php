@@ -117,7 +117,7 @@ final readonly class Poll
 
         $presults = [];
         for ($x = 0; $x < $numchoices; ++$x) {
-            $presults[$x] = isset($results[$x]) && $results[$x]
+            $presults[$x] = array_key_exists($x, $results) && $results[$x]
                 ? implode(',', $results[$x]) : '';
         }
 

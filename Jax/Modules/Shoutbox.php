@@ -91,8 +91,7 @@ final class Shoutbox
         }
 
         if (
-            isset($shout->uid)
-            && $shout->uid === $this->user->get()->id
+            $shout->uid === $this->user->get()->id
         ) {
             return true;
         }

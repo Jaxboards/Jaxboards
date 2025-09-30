@@ -67,13 +67,13 @@ final readonly class RecountStats
             'topic_posts' => [],
         ];
         foreach ($this->database->arows($result) as $post) {
-            if (!isset($stat['topic_posts'][$post['tid']])) {
-                if (!isset($stat['forum_topics'][$post['fid']])) {
+            if (!array_key_exists($post['tid'], $stat['topic_posts'])) {
+                if (!array_key_exists($post['fid'], $stat['forum_topics'])) {
                     $stat['forum_topics'][$post['fid']] = 0;
                 }
 
                 ++$stat['forum_topics'][$post['fid']];
-                if (!isset($stat['forum_posts'][$post['fid']])) {
+                if (!array_key_exists($post['fid'], $stat['forum_posts'])) {
                     $stat['forum_posts'][$post['fid']] = 0;
                 }
 
@@ -81,7 +81,7 @@ final readonly class RecountStats
                 $stat['topic_posts'][$post['tid']] = 0;
             } else {
                 ++$stat['topic_posts'][$post['tid']];
-                if (!isset($stat['forum_posts'][$post['fid']])) {
+                if (!array_key_exists($post['fid'], $stat['forum_posts'])) {
                     $stat['forum_posts'][$post['fid']] = 0;
                 }
 
@@ -89,7 +89,7 @@ final readonly class RecountStats
             }
 
             if ($countPostsInForum[$post['fid']]) {
-                if (!isset($stat['member_posts'][$post['author']])) {
+                if (!array_key_exists($post['author'], $stat['member_posts'])) {
                     $stat['member_posts'][$post['author']] = 0;
                 }
 

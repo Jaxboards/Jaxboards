@@ -125,7 +125,7 @@ final readonly class Reactions
                     {$nibletHTML}
                 </a>
                 HTML;
-            if (!isset($prating[$ratingNiblet->id])) {
+            if (!array_key_exists($ratingNiblet->id, $prating)) {
                 continue;
             }
 

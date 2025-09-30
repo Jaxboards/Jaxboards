@@ -589,6 +589,10 @@ final readonly class Forums
                 Database::WHERE_ID_EQUALS,
                 $forumId,
             );
+
+            $posts = 0;
+            $topics = 0;
+
             if ($moveTo !== 0) {
                 $updateStatement = $this->database->update(
                     'topics',
@@ -629,7 +633,7 @@ final readonly class Forums
                 )
                     . " {$topics} topics"
                     . (
-                        isset($posts) && $posts ? " and {$posts} posts" : ''
+                        $posts ? " and {$posts} posts" : ''
                     ),
                 default => 'This forum was empty, so no topics were moved.',
             };
