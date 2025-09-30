@@ -10,6 +10,7 @@ use Jax\Models\Forum;
 use Jax\Models\Member;
 use Jax\Request;
 
+use function array_key_exists;
 use function explode;
 
 final readonly class RecountStats

@@ -13,6 +13,7 @@ use Jax\Template;
 use Jax\User;
 
 use function array_filter;
+use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function count;

@@ -633,7 +633,7 @@ final readonly class Forums
                 )
                     . " {$topics} topics"
                     . (
-                        $posts ? " and {$posts} posts" : ''
+                        $posts !== 0 ? " and {$posts} posts" : ''
                     ),
                 default => 'This forum was empty, so no topics were moved.',
             };

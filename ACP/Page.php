@@ -7,6 +7,7 @@ namespace ACP;
 use Jax\DomainDefinitions;
 use Jax\Request;
 
+use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function file_get_contents;
