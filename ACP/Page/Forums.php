@@ -864,7 +864,7 @@ final readonly class Forums
         return $this->page->parseTemplate(
             'forums/create-forum-permissions-row-checkbox.html',
             [
-                'checked' => $this->page->checked($checked),
+                'checked' => $this->page->checked((bool) $checked),
                 'global' => $name === 'global'
                     ? 'onchange="globaltoggle(this.parentNode.parentNode,this.checked);"'
                     : '',
