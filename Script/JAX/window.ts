@@ -133,8 +133,8 @@ class Window {
                 .boundingBox(100, 100, Infinity, Infinity)
                 .addListener({
                     ondrag(a: DragSession) {
-                        const w = parseFloat(targ.style.width) + (a.dx ?? 0);
-                        const h = parseFloat(targ.style.height) + (a.dy ?? 0);
+                        const w = Number.parseFloat(targ.style.width) + (a.dx ?? 0);
+                        const h = Number.parseFloat(targ.style.height) + (a.dy ?? 0);
                         targ.style.width = `${w}px`;
                         if (w < windowContainer.clientWidth - 20) {
                             targ.style.width = `${windowContainer.clientWidth}px`;
@@ -254,7 +254,7 @@ class Window {
     getPosition(): string {
         if (!this.windowContainer) return '';
         const s = this.windowContainer.style;
-        return `tl ${parseFloat(s.left)} ${parseFloat(s.top)}`;
+        return `tl ${Number.parseFloat(s.left)} ${Number.parseFloat(s.top)}`;
     }
 }
 

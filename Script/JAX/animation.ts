@@ -94,7 +94,7 @@ class Animation {
         } else {
             t = to.match(/(\D*)(-?\d+)(\D*)/)!;
             t.shift();
-            fromParsed = parseFloat(from.match(/-?\d+/)?.[0] ?? '');
+            fromParsed = Number.parseFloat(from.match(/-?\d+/)?.[0] ?? '');
         }
         this.lineup[this.lineup.length - 1].push([
             what,
