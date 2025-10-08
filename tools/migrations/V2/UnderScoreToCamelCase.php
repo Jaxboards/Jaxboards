@@ -10,6 +10,16 @@ final class UnderScoreToCamelCase
 {
     public function execute(Database $database): void
     {
+        $this->fixForums($database);
+
+        $this->fixMembers($database);
+
+        $this->fixMemberGroups($database);
+
+        $this->fixTopics($database);
+
+        $this->fixSession($database);
+
         $database->special(
             'ALTER TABLE %t
                 CHANGE `affected_uid` `affectedUser`
@@ -17,6 +27,27 @@ final class UnderScoreToCamelCase
             ['activity'],
         );
 
+        $database->special(
+            "ALTER TABLE %t
+                CHANGE `del_recipient` `deletedRecipient`
+                    TINYINT(1) NOT NULL DEFAULT '0',
+                CHANGE `del_sender` `deletedSender`
+                    TINYINT(1) NOT NULL DEFAULT '0'",
+            ['messages'],
+        );
+
+        $database->special(
+            'ALTER TABLE %t
+                CHANGE `auth_id` `author`
+                    INT(10) UNSIGNED NULL DEFAULT NULL,
+                CHANGE `edit_date` `editDate`
+                    DATETIME NULL DEFAULT NULL',
+            ['posts'],
+        );
+    }
+
+    private function fixForums(Database $database): void
+    {
         $database->special(
             "ALTER TABLE %t
                 CHANGE `cat_id` `category`
@@ -35,7 +66,10 @@ final class UnderScoreToCamelCase
                     TINYINT(3) UNSIGNED NOT NULL DEFAULT '0'",
             ['forums'],
         );
+    }
 
+    private function fixMembers(Database $database): void
+    {
         $database->special(
             "ALTER TABLE %t
                 CHANGE `group_id` `groupID`
@@ -88,7 +122,10 @@ final class UnderScoreToCamelCase
                     CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL",
             ['members'],
         );
+    }
 
+    private function fixMemberGroups(Database $database): void
+    {
         $database->special(
             "ALTER TABLE %t
                 CHANGE `can_post` `canPost`
@@ -147,44 +184,10 @@ final class UnderScoreToCamelCase
                     TINYINT(3) UNSIGNED NOT NULL DEFAULT '1'",
             ['member_groups'],
         );
+    }
 
-        $database->special(
-            "ALTER TABLE %t
-                CHANGE `del_recipient` `deletedRecipient`
-                    TINYINT(1) NOT NULL DEFAULT '0',
-                CHANGE `del_sender` `deletedSender`
-                    TINYINT(1) NOT NULL DEFAULT '0'",
-            ['messages'],
-        );
-
-        $database->special(
-            'ALTER TABLE %t
-                CHANGE `auth_id` `author`
-                    INT(10) UNSIGNED NULL DEFAULT NULL,
-                CHANGE `edit_date` `editDate`
-                    DATETIME NULL DEFAULT NULL',
-            ['posts'],
-        );
-
-        $database->special(
-            "ALTER TABLE %t
-                CHANGE `last_update` `lastUpdate`
-                    DATETIME NULL DEFAULT NULL,
-                CHANGE `last_action` `lastAction`
-                    DATETIME NULL DEFAULT NULL,
-                CHANGE `users_online_cache` `usersOnlineCache` TEXT
-                    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-                CHANGE `is_bot` `isBot`
-                    TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
-                CHANGE `buddy_list_cache` `buddyListCache` TEXT
-                    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-                CHANGE `location_verbose` `locationVerbose` VARCHAR(128)
-                    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-                CHANGE `read_date` `readDate`
-                    DATETIME NULL DEFAULT NULL",
-            ['session'],
-        );
-
+    private function fixTopics(Database $database): void
+    {
         $database->special(
             "ALTER TABLE %t
                 CHANGE `lp_uid` `lastPostUser`
@@ -204,6 +207,28 @@ final class UnderScoreToCamelCase
                 CHANGE `cal_event` `calendarEvent`
                     INT(10) UNSIGNED NOT NULL DEFAULT '0'",
             ['topics'],
+        );
+    }
+
+    private function fixSession(Database $database): void
+    {
+        $database->special(
+            "ALTER TABLE %t
+                CHANGE `last_update` `lastUpdate`
+                    DATETIME NULL DEFAULT NULL,
+                CHANGE `last_action` `lastAction`
+                    DATETIME NULL DEFAULT NULL,
+                CHANGE `users_online_cache` `usersOnlineCache` TEXT
+                    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+                CHANGE `is_bot` `isBot`
+                    TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+                CHANGE `buddy_list_cache` `buddyListCache` TEXT
+                    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+                CHANGE `location_verbose` `locationVerbose` VARCHAR(128)
+                    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+                CHANGE `read_date` `readDate`
+                    DATETIME NULL DEFAULT NULL",
+            ['session'],
         );
     }
 }
