@@ -132,7 +132,9 @@ export function addIdleClock(element: HTMLAnchorElement) {
         return;
     }
     element.prepend(
-        emojiTime(Number.parseInt(lastActionClass.slice('lastAction'.length), 10)),
+        emojiTime(
+            Number.parseInt(lastActionClass.slice('lastAction'.length), 10),
+        ),
     );
     element.classList.remove(lastActionClass);
 }

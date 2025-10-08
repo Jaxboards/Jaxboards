@@ -50,7 +50,9 @@ export function updateDates() {
     });
     dateTitles.forEach((el) => {
         if (!el.title) {
-            el.title = smalldate(Number.parseInt(el.dataset.timestamp ?? '', 10));
+            el.title = smalldate(
+                Number.parseInt(el.dataset.timestamp ?? '', 10),
+            );
         }
     });
 }
