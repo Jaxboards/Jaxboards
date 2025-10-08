@@ -286,8 +286,8 @@ final readonly class Posting
         $page2 .= $this->page->parseTemplate(
             'posting/post-rating-settings.html',
             [
-                'ratings_anonymous' => ($ratingsettings & 2) !== 0 ? ' checked="checked"' : '',
-                'ratings_enabled' => ($ratingsettings & 1) !== 0 ? ' checked="checked"' : '',
+                'ratings_anonymous' => $this->page->checked(($ratingsettings & 2) !== 0),
+                'ratings_enabled' => $this->page->checked(($ratingsettings & 1) !== 0),
             ],
         );
         $table = $this->page->parseTemplate(

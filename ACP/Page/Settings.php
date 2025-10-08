@@ -100,8 +100,7 @@ final readonly class Settings
         $this->page->addContentBox('Board Online/Offline', $this->page->parseTemplate(
             'settings/boardname-board-offline.html',
             [
-                'board_offline_checked' => $this->config->getSetting('boardoffline')
-                    ? '' : ' checked="checked"',
+                'board_offline_checked' => $this->page->checked(!$this->config->getSetting('boardoffline')),
                 'board_offline_text' => $this->textFormatting->blockhtml(
                     $this->config->getSetting('offlinetext') ?? '',
                 ),
@@ -111,7 +110,7 @@ final readonly class Settings
         $this->page->addContentBox('Birthdays', $this->page->parseTemplate(
             'settings/birthday.html',
             [
-                'checked' => $this->config->getSetting('birthdays') !== 0 ? ' checked="checked"' : '',
+                'checked' => $this->page->checked($this->config->getSetting('birthdays') !== 0),
             ],
         ));
 
@@ -261,10 +260,8 @@ final readonly class Settings
         $page .= $this->page->parseTemplate(
             'settings/shoutbox.html',
             [
-                'shoutbox_avatar_checked' => $this->config->getSetting('shoutboxava')
-                ? ' checked="checked"' : '',
-                'shoutbox_checked' => $this->config->getSetting('shoutbox')
-                    ? ' checked="checked"' : '',
+                'shoutbox_avatar_checked' => $this->page->checked($this->config->getSetting('shoutboxava')),
+                'shoutbox_checked' => $this->page->checked($this->config->getSetting('shoutbox')),
                 'show_shouts' => $this->config->getSetting('shoutbox_num'),
             ],
         );

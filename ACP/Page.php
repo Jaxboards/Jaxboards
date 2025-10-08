@@ -44,6 +44,11 @@ final class Page
         $this->parts[$partName] .= $content;
     }
 
+    public function checked(bool $checked): string
+    {
+        return $checked ? ' checked="checked"' : '';
+    }
+
     /**
      * @param array<string,string> $links
      */

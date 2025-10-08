@@ -332,7 +332,7 @@ final readonly class Themes
                         ? $this->page->parseTemplate(
                             'themes/show-skin-index-css-row-custom.html',
                         ) : '',
-                    'default_checked' => $skin->default ? "checked='checked'" : '',
+                    'default_checked' => $this->page->checked($skin->default === 1),
                     'default_option' => $skin->custom ? '' : $this->page->parseTemplate(
                         'select-option.html',
                         [
@@ -347,7 +347,7 @@ final readonly class Themes
                             'id' => $skin->id,
                         ],
                     ) : '',
-                    'hidden_checked' => $skin->hidden ? 'checked="checked"' : '',
+                    'hidden_checked' => $this->page->checked($skin->hidden === 1),
                     'id' => $skin->id,
                     'title' => $skin->title,
                     'view_or_edit' => $skin->custom ? 'Edit' : 'View',

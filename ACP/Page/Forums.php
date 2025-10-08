@@ -435,14 +435,12 @@ final readonly class Forums
             'forums/create-forum.html',
             [
                 'description' => $forum ? $this->textFormatting->blockhtml($forum->subtitle) : '',
-                'count' => $forum?->nocount
-                    ? '' : ' checked="checked"',
+                'count' => $this->page->checked(!$forum?->nocount),
                 'order_by_options' => $orderByOptions,
                 'redirect_url' => $forum ? $this->textFormatting->blockhtml($forum->redirect) : '',
                 'subforum_options' => $subforumOptions,
                 'title' => $forum ? $this->textFormatting->blockhtml($forum->title) : '',
-                'trashcan' => $forum?->trashcan
-                    ? ' checked="checked"' : '',
+                'trashcan' => $this->page->checked($forum?->trashcan),
             ],
         );
 
@@ -470,8 +468,7 @@ final readonly class Forums
             'forums/create-forum-moderators.html',
             [
                 'mod_list' => $modList,
-                'showLedBy' => $forum?->showLedBy
-                    ? 'checked="checked"' : '',
+                'showLedBy' => $this->page->checked(!!$forum?->showLedBy),
             ],
         );
 
@@ -867,7 +864,7 @@ final readonly class Forums
         return $this->page->parseTemplate(
             'forums/create-forum-permissions-row-checkbox.html',
             [
-                'checked' => $checked ? 'checked="checked" ' : '',
+                'checked' => $this->page->checked($checked),
                 'global' => $name === 'global'
                     ? 'onchange="globaltoggle(this.parentNode.parentNode,this.checked);"'
                     : '',
