@@ -303,12 +303,12 @@ export default class Editor {
                 break;
             case 'insertorderedlist':
                 if (!this.mode) {
-                    bbcode = `[ol]${selection.replace(/(.+([\r\n]+|$))/gi, '*$1')}[/ol]`;
+                    bbcode = `[ol]${selection.replaceAll(/(.+([\r\n]+|$))/i, '*$1')}[/ol]`;
                 }
                 break;
             case 'insertunorderedlist':
                 if (!this.mode) {
-                    bbcode = `[ul]${selection.replace(/(.+([\r\n]+|$))/gi, '*$1')}[/ul]`;
+                    bbcode = `[ul]${selection.replaceAll(/(.+([\r\n]+|$))/i, '*$1')}[/ul]`;
                 }
                 break;
             case 'createlink':
