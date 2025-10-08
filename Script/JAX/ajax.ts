@@ -63,10 +63,7 @@ class Ajax {
 
     load(
         url: string,
-        { callback, data, method = 'POST', requestType = 1 }: AjaxSettings = {
-            method: 'POST',
-            requestType: 1,
-        },
+        { callback, data, method = 'POST', requestType = 1 }: AjaxSettings = {},
     ) {
         // requestType is an enum (1=update, 2=load new)
         let sendData = null;
