@@ -1,9 +1,9 @@
 import { FlatCompat } from '@eslint/eslintrc';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
-import path from 'path';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import tseslint from 'typescript-eslint';
-import { fileURLToPath } from 'url';
 
 // mimic CommonJS variables -- not needed if using CommonJS
 const __filename = fileURLToPath(import.meta.url);

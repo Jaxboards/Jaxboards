@@ -10,6 +10,7 @@ declare(strict_types=1);
  *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards on Github
  */
+
 // phpcs:disable SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable
 $CFG = json_decode(
     <<<'JSON'
@@ -28,7 +29,7 @@ $CFG = json_decode(
             "maxfilesize": 5242880,
             "postmaxsize": 50000,
             "prefix": "jaxboards",
-        	"service": false,
+            "service": false,
             "sql_db": "jaxboards",
             "sql_host": "127.0.0.1",
             "sql_username": "SQLUSER",
