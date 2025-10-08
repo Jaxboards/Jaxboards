@@ -133,8 +133,10 @@ class Window {
                 .boundingBox(100, 100, Infinity, Infinity)
                 .addListener({
                     ondrag(a: DragSession) {
-                        const w = Number.parseFloat(targ.style.width) + (a.dx ?? 0);
-                        const h = Number.parseFloat(targ.style.height) + (a.dy ?? 0);
+                        const w =
+                            Number.parseFloat(targ.style.width) + (a.dx ?? 0);
+                        const h =
+                            Number.parseFloat(targ.style.height) + (a.dy ?? 0);
                         targ.style.width = `${w}px`;
                         if (w < windowContainer.clientWidth - 20) {
                             targ.style.width = `${windowContainer.clientWidth}px`;
