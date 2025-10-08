@@ -440,7 +440,7 @@ final readonly class Forums
                 'redirect_url' => $forum ? $this->textFormatting->blockhtml($forum->redirect) : '',
                 'subforum_options' => $subforumOptions,
                 'title' => $forum ? $this->textFormatting->blockhtml($forum->title) : '',
-                'trashcan' => $this->page->checked($forum?->trashcan),
+                'trashcan' => $this->page->checked(!!$forum?->trashcan),
             ],
         );
 
