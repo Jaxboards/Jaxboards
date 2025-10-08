@@ -379,7 +379,7 @@ final readonly class Forums
                 }
             }
 
-            $error = $error ?? $this->upsertForum($forum);
+            $error ??= $this->upsertForum($forum);
             if ($error !== null) {
                 $page .= $this->page->error($error);
             } else {
