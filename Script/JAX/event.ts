@@ -26,9 +26,9 @@ function Event(e) {
     }
     if (typeof e.srcElement === 'undefined') e.srcElement = e.target;
     if (typeof e.pageY === 'undefined') {
-        e.pageY = e.clientY + (parseInt(dE.scrollTop || dB.scrollTop, 10) || 0);
+        e.pageY = e.clientY + (Number.parseInt(dE.scrollTop || dB.scrollTop, 10) || 0);
         e.pageX =
-            e.clientX + (parseInt(dE.scrollLeft || dB.scrollLeft, 10) || 0);
+            e.clientX + (Number.parseInt(dE.scrollLeft || dB.scrollLeft, 10) || 0);
     }
     e.cancel = () => {
         e.returnValue = false;

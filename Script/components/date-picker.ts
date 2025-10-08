@@ -59,7 +59,7 @@ export default class DatePicker {
 
         const [month, day, year] = this.element.value
             .split('/')
-            .map((s) => parseInt(s, 10));
+            .map((s) => Number.parseInt(s, 10));
         if (month && day && year) {
             this.selectedDate = [year, month - 1, day];
         } else this.selectedDate = undefined;

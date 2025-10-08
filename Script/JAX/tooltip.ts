@@ -6,7 +6,7 @@ export default function toolTip(el: HTMLElement) {
     const pos = getCoordinates(el);
     let title = el.getAttribute('title');
     if (el.dataset.lastOnline) {
-        const timestamp = parseInt(el.dataset.lastOnline ?? '', 10);
+        const timestamp = Number.parseInt(el.dataset.lastOnline ?? '', 10);
         title = `Last Online: ${date(timestamp)} ${emojiTime(timestamp)}`;
     }
     if (!title) return;

@@ -62,9 +62,11 @@ export function imageResizer(imgs: HTMLImageElement[]) {
             let imageHeight = naturalHeight;
             const style = getComputedStyle(img);
             const maxWidth =
-                parseInt(style.width, 10) || parseInt(style.maxWidth, 10);
+                Number.parseInt(style.width, 10) ||
+                Number.parseInt(style.maxWidth, 10);
             const maxHeight =
-                parseInt(style.height, 10) || parseInt(style.maxHeight, 10);
+                Number.parseInt(style.height, 10) ||
+                Number.parseInt(style.maxHeight, 10);
             if (maxWidth && imageWidth > maxWidth) p = maxWidth / imageWidth;
             if (maxHeight && imageHeight > maxHeight)
                 p2 = maxHeight / imageHeight;

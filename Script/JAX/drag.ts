@@ -70,8 +70,8 @@ class Drag {
             el,
             mx: event.pageX,
             my: event.pageY,
-            ex: parseInt(style.left, 10) || 0,
-            ey: parseInt(style.top, 10) || 0,
+            ex: Number.parseInt(style.left, 10) || 0,
+            ey: Number.parseInt(style.top, 10) || 0,
             info: { el, mx: 0, my: 0 },
             zIndex: el.style.zIndex,
         };

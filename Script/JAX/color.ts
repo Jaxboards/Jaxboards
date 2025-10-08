@@ -17,9 +17,9 @@ class Color {
             if (rgbMatch) {
                 rgbMatch.shift();
                 this.rgb = [
-                    parseFloat(rgbMatch[1]),
-                    parseFloat(rgbMatch[2]),
-                    parseFloat(rgbMatch[3]),
+                    Number.parseFloat(rgbMatch[1]),
+                    Number.parseFloat(rgbMatch[2]),
+                    Number.parseFloat(rgbMatch[3]),
                 ];
                 return;
             }
@@ -44,7 +44,7 @@ class Color {
 
                 this.rgb = [];
                 for (let x = 0; x < 3; x += 1) {
-                    this.rgb[x] = parseInt(
+                    this.rgb[x] = Number.parseInt(
                         colorToParse.slice(x * 2, (x + 1) * 2),
                         16,
                     );

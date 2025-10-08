@@ -109,7 +109,7 @@ export function smalldate(gmtUnixTimestamp: number) {
 export function emojiTime(unixTimestamp: number) {
     const time = fromUnixTimestamp(unixTimestamp);
 
-    return String.fromCharCode(
+    return String.fromCodePoint(
         0xd83d,
         0xdd50 +
             // the emoji start at 1:00 and end at 12:00
@@ -132,7 +132,7 @@ export function addIdleClock(element: HTMLAnchorElement) {
         return;
     }
     element.prepend(
-        emojiTime(parseInt(lastActionClass.slice('lastAction'.length), 10)),
+        emojiTime(Number.parseInt(lastActionClass.slice('lastAction'.length), 10)),
     );
     element.classList.remove(lastActionClass);
 }

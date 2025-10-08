@@ -40,7 +40,7 @@ export function updateDates() {
         return;
     }
     dates.forEach((el) => {
-        const timestamp = parseInt(el.getAttribute('title') ?? '', 10);
+        const timestamp = Number.parseInt(el.getAttribute('title') ?? '', 10);
         const parsed = el.classList.contains('smalldate')
             ? smalldate(timestamp)
             : date(timestamp);
@@ -50,7 +50,7 @@ export function updateDates() {
     });
     dateTitles.forEach((el) => {
         if (!el.title) {
-            el.title = smalldate(parseInt(el.dataset.timestamp ?? '', 10));
+            el.title = smalldate(Number.parseInt(el.dataset.timestamp ?? '', 10));
         }
     });
 }

@@ -263,7 +263,7 @@ export default {
     newmessage(message: string, fromMID: number) {
         let notification = document.querySelector('#notification');
         const num = document.querySelector<HTMLAnchorElement>('#num-messages');
-        if (num) num.innerHTML = `${parseInt(num.innerHTML, 10) + 1}`;
+        if (num) num.innerHTML = `${Number.parseInt(num.innerHTML, 10) + 1}`;
         if (!notification) {
             notification = document.createElement('div');
             notification.id = 'notification';

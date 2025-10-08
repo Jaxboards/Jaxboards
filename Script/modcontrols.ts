@@ -70,7 +70,7 @@ class ModControls {
             },
 
             modcontrols_move: (act: string) => {
-                const whichone = parseInt(act || this.whichone, 10);
+                const whichone = Number.parseInt(act || this.whichone, 10);
                 this.whichone = whichone;
                 window.addEventListener('pushstate', this.boundCheckLocation);
                 this.createModControls(
