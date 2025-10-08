@@ -440,7 +440,7 @@ final readonly class Forums
                 'redirect_url' => $forum ? $this->textFormatting->blockhtml($forum->redirect) : '',
                 'subforum_options' => $subforumOptions,
                 'title' => $forum ? $this->textFormatting->blockhtml($forum->title) : '',
-                'trashcan' => $this->page->checked(!!$forum?->trashcan),
+                'trashcan' => $this->page->checked((bool) $forum?->trashcan),
             ],
         );
 
@@ -468,7 +468,7 @@ final readonly class Forums
             'forums/create-forum-moderators.html',
             [
                 'mod_list' => $modList,
-                'showLedBy' => $this->page->checked(!!$forum?->showLedBy),
+                'showLedBy' => $this->page->checked((bool) $forum?->showLedBy),
             ],
         );
 

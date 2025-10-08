@@ -288,7 +288,7 @@ final class Groups
                     $groupColumns .= $this->page->parseTemplate(
                         'groups/show-permissions-permission-row-group-column.html',
                         [
-                            'checked' => $this->page->checked(!!$group->{$field}),
+                            'checked' => $this->page->checked((bool) $group->{$field}),
                             'groupID' => $groupId,
                             'permission' => $field,
                         ],

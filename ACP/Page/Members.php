@@ -656,7 +656,7 @@ final readonly class Members
         $page = $this->page->parseTemplate(
             'members/validation.html',
             [
-                'checked' => $this->page->checked(!!$this->config->getSetting('membervalidation')),
+                'checked' => $this->page->checked((bool) $this->config->getSetting('membervalidation')),
             ],
         );
         $this->page->addContentBox('Enable Member Validation', $page);
