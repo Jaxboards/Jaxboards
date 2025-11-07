@@ -11,7 +11,7 @@ final readonly class BotDetector
 {
     public const BOTS = [
         'AhrefsBot' => 'Ahrefs',
-	'AliyunSecBot' => 'AliyunSecBot',
+        'AliyunSecBot' => 'AliyunSecBot',
         'Amazonbot' => 'Amazon',
         'Applebot' => 'Applebot',
         'archive.org_bot' => 'Internet Archive',
