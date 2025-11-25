@@ -140,6 +140,7 @@ final class Forum
         }
 
         $this->setBreadCrumbs($forum);
+        $this->page->setPageTitle($forum->title);
 
         // NOW we can actually start building the page
         // subforums
