@@ -192,7 +192,6 @@ final class Page
     public function setPageTitle(string $title): void
     {
         $this->pageTitle = $title;
-        $this->template->reset('TITLE', $this->getPageTitle());
     }
 
     /**
