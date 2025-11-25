@@ -75,7 +75,6 @@ final class Router
         private readonly Request $request,
         private readonly Config $config,
         private readonly Container $container,
-        private readonly Database $database,
         private readonly Page $page,
         private readonly User $user,
     ) {}

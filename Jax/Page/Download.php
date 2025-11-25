@@ -21,7 +21,6 @@ use function readfile;
 final readonly class Download
 {
     public function __construct(
-        private Database $database,
         private DomainDefinitions $domainDefinitions,
         private Request $request,
     ) {}

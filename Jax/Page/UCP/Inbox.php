@@ -243,7 +243,7 @@ final readonly class Inbox
         }
 
         if ($message->deletedRecipient && $message->deletedSender) {
-            $message->delete($this->database);
+            $message->delete();
         }
 
         if (!$relocate) {

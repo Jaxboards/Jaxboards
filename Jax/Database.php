@@ -391,7 +391,7 @@ class Database
         $forum->lastPostTopic = $topic->id;
         $forum->lastPostTopicTitle = $topic->title;
         $forum->lastPostUser = $topic->lastPostUser;
-        $forum->update($this);
+        $forum->update();
     }
 
     /**

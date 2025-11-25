@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
-use Jax\Database;
 use Jax\Date;
 use Jax\Models\Member;
 use Jax\Page;
@@ -22,7 +21,6 @@ use function sprintf;
 final readonly class Calendar
 {
     public function __construct(
-        private Database $database,
         private Date $date,
         private Page $page,
         private Request $request,

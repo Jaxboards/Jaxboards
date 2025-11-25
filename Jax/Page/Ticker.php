@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
-use Jax\Database;
 use Jax\Date;
 use Jax\Models\Forum;
 use Jax\Models\Member;
@@ -22,7 +21,6 @@ final class Ticker
     private int $maxticks = 60;
 
     public function __construct(
-        private readonly Database $database,
         private readonly Date $date,
         private readonly Page $page,
         private readonly Request $request,

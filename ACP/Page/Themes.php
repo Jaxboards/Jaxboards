@@ -571,7 +571,7 @@ final readonly class Themes
             $this->fileUtils->removeDirectory($skindir);
         }
 
-        $skin->delete($this->database);
+        $skin->delete();
 
         // Make a random skin default if it's the default.
         if ($skin->default !== 0) {

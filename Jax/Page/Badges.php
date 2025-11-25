@@ -20,7 +20,6 @@ final readonly class Badges
 {
     public function __construct(
         private Config $config,
-        private Database $database,
         private Date $date,
         private Page $page,
         private Request $request,

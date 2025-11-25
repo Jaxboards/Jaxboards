@@ -31,7 +31,6 @@ final readonly class App
     public function __construct(
         private Config $config,
         private Container $container,
-        private Database $database,
         private Date $date,
         private DebugLog $debugLog,
         private DomainDefinitions $domainDefinitions,

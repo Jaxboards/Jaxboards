@@ -33,7 +33,6 @@ final readonly class ProfileTabs
         private Activity $activity,
         private Badges $badges,
         private Comments $comments,
-        private Database $database,
         private Date $date,
         private Page $page,
         private Request $request,

@@ -39,7 +39,6 @@ final readonly class ModControls
 {
     public function __construct(
         private Config $config,
-        private Database $database,
         private DomainDefinitions $domainDefinitions,
         private IPAddress $ipAddress,
         private Jax $jax,

@@ -27,7 +27,6 @@ final readonly class Reactions
     public function __construct(
         private Config $config,
         private Page $page,
-        private Database $database,
         private User $user,
         private Template $template,
     ) {}

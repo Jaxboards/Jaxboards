@@ -6,7 +6,6 @@ namespace Jax\Page;
 
 use DI\Container;
 use Jax\Config;
-use Jax\Database;
 use Jax\Models\TextRule;
 
 final class TextRules
@@ -36,7 +35,6 @@ final class TextRules
     public function __construct(
         private readonly Container $container,
         private readonly Config $config,
-        private readonly Database $database,
     ) {
         $this->getEmotePack();
         $this->fetchCustomRules();

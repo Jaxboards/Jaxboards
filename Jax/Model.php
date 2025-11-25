@@ -37,13 +37,6 @@ abstract class Model
         $this->fromDatabase = true;
     }
 
-    private static function getDatabase()
-    {
-        global $container;
-
-        return $container->get(Database::class);
-    }
-
     public static function getPrimaryKey(): string
     {
         $reflectionClass = new ReflectionClass(static::class);
@@ -147,7 +140,7 @@ abstract class Model
         callable $getId,
         ?string $key = null,
     ): array {
-        $database = static::getDatabase();
+        static::getDatabase();
         $primaryKey = static::getPrimaryKey();
         $key ??= $primaryKey;
 
@@ -166,6 +159,13 @@ abstract class Model
             ),
             static fn($member): int => $member->{$primaryKey},
         ) : $otherIds;
+    }
+
+    private static function getDatabase()
+    {
+        global $container;
+
+        return $container->get(Database::class);
     }
 
     public function delete(): ?PDOStatement
@@ -200,12 +200,12 @@ abstract class Model
 
     public function upsert(): ?PDOStatement
     {
-        $database = static::getDatabase();
+        static::getDatabase();
         if ($this->fromDatabase) {
-            return $this->update($database);
+            return $this->update();
         }
 
-        return $this->insert($database);
+        return $this->insert();
     }
 
     public function update(): ?PDOStatement

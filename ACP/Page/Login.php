@@ -6,7 +6,6 @@ namespace ACP\Page;
 
 use ACP\Page;
 use Jax\Config;
-use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\Models\Member;
 use Jax\Request;
@@ -19,7 +18,6 @@ final readonly class Login
 {
     public function __construct(
         private Config $config,
-        private Database $database,
         private DomainDefinitions $domainDefinitions,
         private Page $page,
         private Request $request,

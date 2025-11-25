@@ -25,7 +25,6 @@ use function in_array;
 final readonly class BuddyList
 {
     public function __construct(
-        private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Session $session,

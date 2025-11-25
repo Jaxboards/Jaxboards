@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Page\Topic;
 
-use Jax\Database;
 use Jax\Jax;
 use Jax\Models\Topic;
 use Jax\Page;
@@ -28,7 +27,6 @@ use function round;
 final readonly class Poll
 {
     public function __construct(
-        private Database $database,
         private Jax $jax,
         private Page $page,
         private Request $request,

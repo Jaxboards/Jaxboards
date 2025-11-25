@@ -39,7 +39,6 @@ final class Page
 
     public function __construct(
         private readonly Config $config,
-        private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly Request $request,
         private readonly Template $template,

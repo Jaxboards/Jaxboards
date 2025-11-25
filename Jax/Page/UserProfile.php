@@ -28,7 +28,6 @@ final readonly class UserProfile
 {
     public function __construct(
         private ContactDetails $contactDetails,
-        private Database $database,
         private IPAddress $ipAddress,
         private Page $page,
         private ProfileTabs $profileTabs,

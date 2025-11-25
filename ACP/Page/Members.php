@@ -453,7 +453,7 @@ final readonly class Members
         $member2->update();
 
         // Delete the account.
-        $member1->delete($this->database);
+        $member1->delete();
 
         // Update stats.
         $this->database->special(

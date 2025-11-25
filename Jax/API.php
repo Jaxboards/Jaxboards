@@ -18,7 +18,6 @@ use const ENT_QUOTES;
 final readonly class API
 {
     public function __construct(
-        private Database $database,
         private Request $request,
         private TextFormatting $textFormatting,
     ) {}

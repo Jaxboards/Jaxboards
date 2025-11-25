@@ -62,7 +62,6 @@ final class BBCode
     ];
 
     public function __construct(
-        private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
     ) {}
 
