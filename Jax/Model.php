@@ -140,7 +140,6 @@ abstract class Model
         callable $getId,
         ?string $key = null,
     ): array {
-        static::getDatabase();
         $primaryKey = static::getPrimaryKey();
         $key ??= $primaryKey;
 
@@ -200,7 +199,6 @@ abstract class Model
 
     public function upsert(): ?PDOStatement
     {
-        static::getDatabase();
         if ($this->fromDatabase) {
             return $this->update();
         }
