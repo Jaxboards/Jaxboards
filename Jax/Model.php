@@ -160,7 +160,7 @@ abstract class Model
         ) : $otherIds;
     }
 
-    private static function getDatabase()
+    public static function getDatabase(): Database
     {
         global $container;
 
