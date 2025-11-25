@@ -120,7 +120,7 @@ final class Topic
 
     private function fetchTopicData(int $tid): ?ModelsTopic
     {
-        $topic = ModelsTopic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
+        $topic = ModelsTopic::selectOne(Database::WHERE_ID_EQUALS, $tid);
 
         if ($topic === null) {
             return null;
@@ -142,7 +142,7 @@ final class Topic
             return $forumPerms;
         }
 
-        $forum = $forum ?: Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $modelsTopic->fid);
+        $forum = $forum ?: Forum::selectOne(Database::WHERE_ID_EQUALS, $modelsTopic->fid);
 
         if ($forum === null) {
             return [];
@@ -160,7 +160,6 @@ final class Topic
     {
         return $memberIds !== [] ? keyBy(
             Member::selectMany(
-                $this->database,
                 Database::WHERE_ID_IN,
                 array_unique($memberIds, SORT_REGULAR),
             ),
@@ -183,9 +182,9 @@ final class Topic
         $this->page->setPageTitle($topicTitle);
         $this->session->set('locationVerbose', "In topic '" . $topicTitle . "'");
 
-        $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $modelsTopic->fid);
+        $forum = Forum::selectOne(Database::WHERE_ID_EQUALS, $modelsTopic->fid);
         $category = $forum !== null
-            ? Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->category)
+            ? Category::selectOne(Database::WHERE_ID_EQUALS, $forum->category)
             : null;
         // Fix this to work with subforums.
         $this->page->setBreadCrumbs(
@@ -197,7 +196,7 @@ final class Topic
         );
 
         // Generate pages.
-        $postCount = Post::count($this->database, 'WHERE `tid`=?', $modelsTopic->id) ?? 0;
+        $postCount = Post::count('WHERE `tid`=?', $modelsTopic->id) ?? 0;
 
         $totalpages = (int) ceil($postCount / $this->numperpage);
         $pagelist = '';
@@ -324,7 +323,7 @@ final class Topic
 
         // Update view count.
         ++$modelsTopic->views;
-        $modelsTopic->update($this->database);
+        $modelsTopic->update();
 
         if ($this->request->isJSAccess()) {
             $this->page->command('update', 'page', $page);
@@ -449,13 +448,11 @@ final class Topic
             $this->session->getVar('multiquote')
         ) {
             $posts = Post::selectMany(
-                $this->database,
                 'WHERE `id` IN ?',
                 explode(',', (string) $this->session->getVar('multiquote')),
             );
 
             $membersById = Member::joinedOn(
-                $this->database,
                 $posts,
                 static fn(Post $post): int => $post->author,
             );
@@ -495,7 +492,6 @@ final class Topic
 
         $topicPostCounter = $this->pageNumber * $this->numperpage;
         $posts = Post::selectMany(
-            $this->database,
             'WHERE tid = ? AND id > ? '
             . 'ORDER BY `id` '
             . 'LIMIT ?,?',
@@ -517,7 +513,6 @@ final class Topic
         );
 
         $groups = Group::joinedOn(
-            $this->database,
             $membersById,
             static fn(Member $member): int => $member->groupID,
         );
@@ -657,7 +652,6 @@ final class Topic
 
         if ($this->user->get()->mod !== 0) {
             $forum = Forum::selectOne(
-                $this->database,
                 Database::WHERE_ID_EQUALS,
                 $modelsTopic->fid,
             );
@@ -682,7 +676,7 @@ final class Topic
         }
 
         $this->page->command('softurl');
-        $post = Post::selectOne($this->database, Database::WHERE_ID_EQUALS, $pid);
+        $post = Post::selectOne(Database::WHERE_ID_EQUALS, $pid);
 
         $hiddenfields = $this->jax->hiddenFormFields(
             [
@@ -741,7 +735,6 @@ final class Topic
         }
 
         $post = Post::selectOne(
-            $this->database,
             Database::WHERE_ID_EQUALS,
             $pid,
         );
@@ -755,7 +748,6 @@ final class Topic
         }
 
         $author = Member::selectOne(
-            $this->database,
             Database::WHERE_ID_EQUALS,
             $post->author,
         );
@@ -819,12 +811,12 @@ final class Topic
     private function findPost(ModelsTopic $modelsTopic, int $postId): void
     {
         $postPosition = null;
-        $post = Post::selectOne($this->database, Database::WHERE_ID_EQUALS, $postId);
+        $post = Post::selectOne(Database::WHERE_ID_EQUALS, $postId);
         if ($post === null) {
             return;
         }
 
-        $posts = Post::selectMany($this->database, 'WHERE tid=?', $post->tid);
+        $posts = Post::selectMany('WHERE tid=?', $post->tid);
         foreach ($posts as $index => $post) {
             if ($post->id === $postId) {
                 $postId = $post->id;
@@ -865,7 +857,6 @@ final class Topic
             ],
         );
         $posts = Post::selectMany(
-            $this->database,
             Database::WHERE_ID_EQUALS,
             $modelsTopic->id,
         );

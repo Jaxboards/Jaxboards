@@ -202,11 +202,11 @@ final class Page
     private function getSelectedSkin(?int $skinId): Skin
     {
         $skin = $skinId
-            ? Skin::selectOne($this->database, Database::WHERE_ID_EQUALS, $skinId)
+            ? Skin::selectOne(Database::WHERE_ID_EQUALS, $skinId)
             : null;
 
         // Couldn't find custom skin, get the default
-        $skin ??= Skin::selectOne($this->database, 'WHERE `default`=1 LIMIT 1');
+        $skin ??= Skin::selectOne('WHERE `default`=1 LIMIT 1');
 
         // We've exhausted all other ways of finding the right skin
         // Fallback to default

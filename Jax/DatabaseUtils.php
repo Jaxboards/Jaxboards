@@ -147,7 +147,7 @@ final readonly class DatabaseUtils
         $category = new Category();
         $category->id = 1;
         $category->title = 'Category';
-        $category->insert($this->database);
+        $category->insert();
 
         $forum = new Forum();
         $forum->id = 1;
@@ -160,7 +160,7 @@ final readonly class DatabaseUtils
         $forum->lastPostTopicTitle = 'Welcome to Jaxboards!';
         $forum->topics = 1;
         $forum->posts = 1;
-        $forum->insert($this->database);
+        $forum->insert();
 
         $member = new Group();
         $member->id = 1;
@@ -194,7 +194,7 @@ final readonly class DatabaseUtils
         $member->canViewStats = 1;
         $member->legend = 0;
         $member->canViewFullProfile = 0;
-        $member->insert($this->database);
+        $member->insert();
 
         $admin = new Group();
         $admin->id = 2;
@@ -228,7 +228,7 @@ final readonly class DatabaseUtils
         $admin->canViewStats = 1;
         $admin->legend = 0;
         $admin->canViewFullProfile = 0;
-        $admin->insert($this->database);
+        $admin->insert();
 
         $guest = new Group();
         $guest->id = 3;
@@ -262,7 +262,7 @@ final readonly class DatabaseUtils
         $guest->canViewStats = 1;
         $guest->legend = 0;
         $guest->canViewFullProfile = 0;
-        $guest->insert($this->database);
+        $guest->insert();
 
         $banned = new Group();
         $banned->id = 4;
@@ -296,7 +296,7 @@ final readonly class DatabaseUtils
         $banned->canViewStats = 0;
         $banned->legend = 0;
         $banned->canViewFullProfile = 0;
-        $banned->insert($this->database);
+        $banned->insert();
 
         $validating = new Group();
         $validating->id = 5;
@@ -330,7 +330,7 @@ final readonly class DatabaseUtils
         $validating->canViewStats = 1;
         $validating->legend = 0;
         $validating->canViewFullProfile = 0;
-        $validating->insert($this->database);
+        $validating->insert();
 
         $post = new Post();
         $post->id = 1;
@@ -343,7 +343,7 @@ final readonly class DatabaseUtils
             POST;
         $post->tid = 1;
         $post->newtopic = 1;
-        $post->insert($this->database);
+        $post->insert();
 
         $skin = new Skin();
         $skin->id = 1;
@@ -352,7 +352,7 @@ final readonly class DatabaseUtils
         $skin->custom = 0;
         $skin->wrapper = 'Default';
         $skin->default = 1;
-        $skin->insert($this->database);
+        $skin->insert();
 
         $stats = new Stats();
         $stats->id = 1;
@@ -363,7 +363,7 @@ final readonly class DatabaseUtils
         $stats->most_members_day = 1;
         $stats->last_register = 1;
         $stats->dbVersion = 4;
-        $stats->insert($this->database);
+        $stats->insert();
 
         $topic = new Topic();
         $topic->id = 1;
@@ -374,7 +374,7 @@ final readonly class DatabaseUtils
         $topic->author = 1;
         $topic->summary = " Now, it's only a matter of time";
         $topic->op = 1;
-        $topic->insert($this->database);
+        $topic->insert();
     }
 
     private function fieldDefinition(Column $column): string

@@ -42,7 +42,7 @@ final readonly class Login
             $user = $this->request->asString->post('user');
             $password = $this->request->asString->post('pass');
 
-            $member = Member::selectOne($this->database, 'WHERE `name`=?', $user);
+            $member = Member::selectOne('WHERE `name`=?', $user);
             $user = $member !== null
                 ? $this->user->login($member->id, $password)
                 : null;

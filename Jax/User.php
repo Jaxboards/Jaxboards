@@ -76,7 +76,6 @@ final class User
         }
 
         $user = Member::selectOne(
-            $this->database,
             Database::WHERE_ID_EQUALS,
             $uid,
         );
@@ -104,7 +103,6 @@ final class User
         };
 
         $group = Group::selectOne(
-            $this->database,
             Database::WHERE_ID_EQUALS,
             $groupId,
         );
@@ -175,7 +173,7 @@ final class User
         if (password_needs_rehash($member->pass, PASSWORD_DEFAULT)) {
             // Add the new hash.
             $member->pass = password_hash($pass, PASSWORD_DEFAULT);
-            $member->update($this->database);
+            $member->update();
         }
 
         return true;

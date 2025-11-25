@@ -123,7 +123,7 @@ final readonly class Poll
         }
 
         $topic->pollResults = implode(';', $presults);
-        $topic->update($this->database);
+        $topic->update();
 
         $this->page->command(
             'update',

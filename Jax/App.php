@@ -246,7 +246,6 @@ final readonly class App
         $numMessages = 0;
         if ($this->user->get()->id !== 0) {
             $numMessages = Message::count(
-                $this->database,
                 'WHERE `read`=0 AND `to`=?',
                 $this->user->get()->id,
             );

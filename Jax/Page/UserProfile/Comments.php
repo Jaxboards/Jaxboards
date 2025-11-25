@@ -55,7 +55,6 @@ final readonly class Comments
         }
 
         $comments = ProfileComment::selectMany(
-            $this->database,
             'WHERE `to`=?
             ORDER BY id DESC
             LIMIT 10',
@@ -63,7 +62,6 @@ final readonly class Comments
         );
 
         $membersById = Member::joinedOn(
-            $this->database,
             $comments,
             static fn(ProfileComment $profileComment): int => $profileComment->from,
         );
@@ -126,14 +124,14 @@ final readonly class Comments
         $activity->date = $this->database->datetime();
         $activity->type = 'profile_comment';
         $activity->uid = $this->user->get()->id;
-        $activity->insert($this->database);
+        $activity->insert();
 
         $profileComment = new ProfileComment();
         $profileComment->comment = $comment;
         $profileComment->date = $this->database->datetime();
         $profileComment->from = $this->user->get()->id;
         $profileComment->to = $member->id;
-        $profileComment->insert($this->database);
+        $profileComment->insert();
 
         return '';
     }

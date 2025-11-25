@@ -155,7 +155,7 @@ final readonly class Settings
             $page .= $this->page->error($error);
         }
 
-        $pages = ModelsPage::selectMany($this->database);
+        $pages = ModelsPage::selectMany();
         $table = '';
         foreach ($pages as $pageRecord) {
             $table .= $this->page->parseTemplate(
@@ -202,14 +202,14 @@ final readonly class Settings
     private function pagesEdit(string $pageurl): void
     {
         $page = '';
-        $pageRecord = ModelsPage::selectOne($this->database, 'WHERE `act`=?', $pageurl);
+        $pageRecord = ModelsPage::selectOne('WHERE `act`=?', $pageurl);
         $pageRecord ??= new ModelsPage();
 
         $pageContents = $this->request->asString->post('pagecontents');
         if ($pageContents !== null) {
             $pageRecord->page = $pageContents;
             $pageRecord->act = $pageurl;
-            $pageRecord->upsert($this->database);
+            $pageRecord->upsert();
 
             $page .= $this->page->success(
                 "Page saved. Preview <a href='/?act={$pageurl}'>here</a>",
@@ -294,7 +294,7 @@ final readonly class Settings
             $badge->imagePath = $imagePath;
             $badge->badgeTitle = $badgeTitle;
             $badge->description = $description;
-            $badge->insert($this->database);
+            $badge->insert();
         }
 
         if ($submitButton === 'Grant Badge') {
@@ -321,7 +321,7 @@ final readonly class Settings
             $badgeAssociation->reason = $reason;
             $badgeAssociation->badgeCount = $count;
             $badgeAssociation->awardDate = $this->database->datetime();
-            $badgeAssociation->insert($this->database);
+            $badgeAssociation->insert();
         }
 
         return $this->page->success('Data saved.');
@@ -338,31 +338,29 @@ final readonly class Settings
 
         $delete = (int) $this->request->asString->both('d');
         if ($delete !== 0) {
-            $badge = Badge::selectOne($this->database, Database::WHERE_ID_EQUALS, $delete);
+            $badge = Badge::selectOne(Database::WHERE_ID_EQUALS, $delete);
             if ($badge !== null) {
-                $badge->delete($this->database);
+                $badge->delete();
             }
         }
 
         $ungrant = (int) $this->request->asString->both('ungrant');
         if ($ungrant !== 0) {
-            $grant = BadgeAssociation::selectOne($this->database, Database::WHERE_ID_EQUALS, $ungrant);
+            $grant = BadgeAssociation::selectOne(Database::WHERE_ID_EQUALS, $ungrant);
             if ($grant !== null) {
-                $grant->delete($this->database);
+                $grant->delete();
             }
         }
 
         $badges = keyBy(
-            Badge::selectMany($this->database),
+            Badge::selectMany(),
             static fn(Badge $badge): int => $badge->id,
         );
         $grantedBadges = BadgeAssociation::selectMany(
-            $this->database,
             'ORDER BY id DESC
             LIMIT 10',
         );
         $grantedMembers = Member::joinedOn(
-            $this->database,
             $grantedBadges,
             static fn(BadgeAssociation $badgeAssociation): int => $badgeAssociation->user,
         );

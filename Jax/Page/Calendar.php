@@ -65,7 +65,6 @@ final readonly class Calendar
 
         $this->session->set('locationVerbose', 'Checking out the calendar for ' . $monthName . ' ' . $year);
         $members = Member::selectMany(
-            $this->database,
             'WHERE MONTH(`birthdate`)=? AND YEAR(`birthdate`)<?',
             $month,
             $year,

@@ -157,7 +157,6 @@ final class Groups
     private function fetchGroups(?array $groupIds): array
     {
         $groups = Group::selectMany(
-            $this->database,
             ($groupIds ? 'WHERE `id` IN ? ' : '') . 'ORDER BY `id` ASC',
             ...($groupIds ? [$groupIds] : []),
         );
@@ -335,14 +334,14 @@ final class Groups
         }
 
         $group = $gid
-            ? Group::selectOne($this->database, Database::WHERE_ID_EQUALS, $gid)
+            ? Group::selectOne(Database::WHERE_ID_EQUALS, $gid)
             : null;
         $group ??= new Group();
 
         $group->icon = $groupIcon ?? '';
         $group->title = $groupName ?? '';
 
-        $group->upsert($this->database);
+        $group->upsert();
 
         $this->page->addContentBox(
             $group->title . ' ' . ($gid ? 'edited' : 'created'),
@@ -370,7 +369,6 @@ final class Groups
         $group = null;
         if ($gid) {
             $group = Group::selectOne(
-                $this->database,
                 Database::WHERE_ID_EQUALS,
                 $gid,
             );
@@ -410,7 +408,7 @@ final class Groups
             );
         }
 
-        $groups = Group::selectMany($this->database, 'WHERE id>5');
+        $groups = Group::selectMany('WHERE id>5');
         $found = false;
         foreach ($groups as $group) {
             $found = true;

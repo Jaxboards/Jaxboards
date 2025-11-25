@@ -348,7 +348,7 @@ final readonly class Forums
             unset($exploded[array_search($rmod, $exploded, true)]);
 
             $forum->mods = implode(',', $exploded);
-            $forum->update($this->database);
+            $forum->update();
 
             $this->updatePerForumModFlag();
             $this->page->location('?act=Forums&do=edit&edit=' . $fid);
@@ -362,7 +362,7 @@ final readonly class Forums
             // Add per-forum moderator.
             $modId = (int) $this->request->asString->post('modid');
             if ($modId !== 0) {
-                $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $modId);
+                $member = Member::selectOne(Database::WHERE_ID_EQUALS, $modId);
                 if ($member !== null) {
                     $mods = $forum->mods !== ''
                         ? explode(',', $forum->mods)
@@ -446,7 +446,6 @@ final readonly class Forums
 
         if ($forum?->mods) {
             $members = Member::selectMany(
-                $this->database,
                 Database::WHERE_ID_IN,
                 explode(',', (string) $forum->mods),
             );
@@ -509,7 +508,7 @@ final readonly class Forums
         }
 
         $isNewForum = $forum->id === 0;
-        $forum->upsert($this->database);
+        $forum->upsert();
         if ($isNewForum) {
             $this->orderForums($forum->id);
         }
@@ -694,7 +693,7 @@ final readonly class Forums
         }
 
         $category->title = $categoryName;
-        $category->upsert($this->database);
+        $category->upsert();
 
         return null;
     }
@@ -705,7 +704,7 @@ final readonly class Forums
         $cid = $cid ?: (int) $this->request->asString->post('category');
 
         $category = $cid !== 0
-            ? Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $cid)
+            ? Category::selectOne(Database::WHERE_ID_EQUALS, $cid)
             : null;
         $category ??= new Category();
 
@@ -757,7 +756,7 @@ final readonly class Forums
                     $catId,
                 );
 
-                $categories[$catId]->delete($this->database);
+                $categories[$catId]->delete();
 
                 $page .= $this->page->success('Category deleted!');
             }
@@ -798,7 +797,7 @@ final readonly class Forums
      */
     private function fetchAllCategories(): array
     {
-        $categories = Category::selectMany($this->database, 'ORDER BY `order`,`id` ASC');
+        $categories = Category::selectMany('ORDER BY `order`,`id` ASC');
 
         return keyBy($categories, static fn($category) => $category->id);
     }
@@ -808,7 +807,7 @@ final readonly class Forums
      */
     private function fetchAllForums(): array
     {
-        $forums = Forum::selectMany($this->database, 'ORDER BY `order`,`title`');
+        $forums = Forum::selectMany('ORDER BY `order`,`title`');
 
         return keyBy($forums, static fn($forum) => $forum->id);
     }
@@ -818,7 +817,7 @@ final readonly class Forums
      */
     private function fetchAllGroups(): array
     {
-        return keyBy(Group::selectMany($this->database), static fn($group) => $group->id);
+        return keyBy(Group::selectMany(), static fn($group) => $group->id);
     }
 
     /*

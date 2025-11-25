@@ -41,7 +41,7 @@ final readonly class FileManager
         $page = '';
         $delete = (int) $this->request->asString->both('delete');
         if ($delete !== 0) {
-            $file = File::selectOne($this->database, Database::WHERE_ID_EQUALS, $delete);
+            $file = File::selectOne(Database::WHERE_ID_EQUALS, $delete);
             if ($file !== null) {
                 $ext = mb_strtolower(pathinfo($file->name, PATHINFO_EXTENSION));
                 if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'], true)) {
@@ -57,7 +57,7 @@ final readonly class FileManager
                         );
                 }
 
-                $file->delete($this->database);
+                $file->delete();
             }
         }
 
@@ -85,7 +85,6 @@ final readonly class FileManager
         }
 
         $posts = Post::selectMany(
-            $this->database,
             "WHERE MATCH (`post`) AGAINST ('attachment') "
             . "AND post LIKE '%[attachment]%'",
         );
@@ -108,10 +107,9 @@ final readonly class FileManager
             }
         }
 
-        $files = File::selectMany($this->database, 'ORDER BY size');
+        $files = File::selectMany('ORDER BY size');
 
         $members = Member::joinedOn(
-            $this->database,
             $files,
             static fn($file): int => $file->uid,
         );

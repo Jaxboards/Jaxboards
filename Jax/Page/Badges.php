@@ -50,13 +50,11 @@ final readonly class Badges
     public function fetchBadges(array $userIds): array
     {
         $badgeAssociations = BadgeAssociation::selectMany(
-            $this->database,
             'WHERE user IN ?',
             $userIds,
         );
 
         $badges = Badge::joinedOn(
-            $this->database,
             $badgeAssociations,
             static fn(BadgeAssociation $badgeAssociation): int => $badgeAssociation->badge,
         );
@@ -117,7 +115,7 @@ final readonly class Badges
 
     public function renderBadgeRecipients(int $badgeId): void
     {
-        $badge = Badge::selectOne($this->database, Database::WHERE_ID_EQUALS, $badgeId);
+        $badge = Badge::selectOne(Database::WHERE_ID_EQUALS, $badgeId);
 
         if ($badge === null) {
             return;

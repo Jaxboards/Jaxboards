@@ -70,8 +70,8 @@ final readonly class Members
 
     private function showMain(): void
     {
-        $members = Member::selectMany($this->database, 'ORDER BY `displayName` ASC');
-        $groups = Group::joinedOn($this->database, $members, static fn(Member $member): int => $member->groupID);
+        $members = Member::selectMany('ORDER BY `displayName` ASC');
+        $groups = Group::joinedOn($members, static fn(Member $member): int => $member->groupID);
 
         $rows = '';
         foreach ($members as $member) {
@@ -105,14 +105,14 @@ final readonly class Members
         $member = null;
         if ($memberId || $this->request->post('submit')) {
             if ($memberId !== 0) {
-                $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $memberId);
+                $member = Member::selectOne(Database::WHERE_ID_EQUALS, $memberId);
                 if ($this->request->post('savedata') && $member) {
                     $page = $this->updateMember($member);
                 }
 
-                $members = Member::selectMany($this->database, Database::WHERE_ID_EQUALS, $memberId);
+                $members = Member::selectMany(Database::WHERE_ID_EQUALS, $memberId);
             } else {
-                $members = Member::selectMany($this->database, 'WHERE `displayName` LIKE ?', $name . '%');
+                $members = Member::selectMany('WHERE `displayName` LIKE ?', $name . '%');
             }
 
             $numMembers = count($members);
@@ -253,7 +253,7 @@ final readonly class Members
             $member->groupID = Groups::Admin->value;
         }
 
-        $member->update($this->database);
+        $member->update();
 
         return $this->page->success('Profile data saved');
     }
@@ -273,7 +273,6 @@ final readonly class Members
         }
 
         $member = Member::selectOne(
-            $this->database,
             'WHERE `name`=? OR `displayName`=?',
             $username,
             $displayName,
@@ -293,7 +292,7 @@ final readonly class Members
             PASSWORD_DEFAULT,
         );
 
-        $result = $member->insert($this->database);
+        $result = $member->insert();
 
         if ($this->database->affectedRows($result) === 0) {
             return 'An error occurred while processing your request. ';
@@ -320,7 +319,7 @@ final readonly class Members
     private function getGroups(int $groupId = 0): string
     {
         $page = '';
-        $groups = Group::selectMany($this->database, 'ORDER BY `title` DESC');
+        $groups = Group::selectMany('ORDER BY `title` DESC');
         foreach ($groups as $group) {
             $page .= $this->page->parseTemplate(
                 'select-option.html',
@@ -342,8 +341,8 @@ final readonly class Members
 
     private function mergeMembers(int $mid1, int $mid2): ?string
     {
-        $member1 = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid1);
-        $member2 = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid2);
+        $member1 = Member::selectOne(Database::WHERE_ID_EQUALS, $mid1);
+        $member2 = Member::selectOne(Database::WHERE_ID_EQUALS, $mid2);
 
         if ($member1 === null || $member2 === null) {
             return 'Invalid input, or the accounts may already be merged';
@@ -451,7 +450,7 @@ final readonly class Members
 
         // Sum post count on account being merged into.
         $member2->posts += $member1->posts;
-        $member2->update($this->database);
+        $member2->update();
 
         // Delete the account.
         $member1->delete($this->database);
@@ -541,7 +540,7 @@ final readonly class Members
 
                 array_map(
                     fn($forum) => $this->database->fixForumLastPost($forum->id),
-                    Forum::selectMany($this->database),
+                    Forum::selectMany(),
                 );
 
                 // Update stats.
@@ -602,7 +601,6 @@ final readonly class Members
         }
 
         $members = Member::selectMany(
-            $this->database,
             'WHERE (?-UNIX_TIMESTAMP(`lastVisit`))<?',
             Carbon::now('UTC')->getTimestamp(),
             60 * 60 * 24 * 31 * 6,
@@ -618,7 +616,7 @@ final readonly class Members
             $message->read = 0;
             $message->title = $title;
             $message->to = $member->id;
-            $message->insert($this->database);
+            $message->insert();
         }
 
         $messageCount = count($members);
@@ -674,7 +672,7 @@ final readonly class Members
             );
         }
 
-        $members = Member::selectMany($this->database, 'WHERE `groupID`=5');
+        $members = Member::selectMany('WHERE `groupID`=5');
         $page = '';
         foreach ($members as $member) {
             $page .= $this->page->parseTemplate(

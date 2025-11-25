@@ -363,7 +363,7 @@ final readonly class ServiceInstall
                 (string) $adminPassword,
                 PASSWORD_DEFAULT,
             );
-            $member->insert($this->database);
+            $member->insert();
 
             $jaxRoot = dirname(__DIR__, 2);
             mkdir($jaxRoot . '/boards');

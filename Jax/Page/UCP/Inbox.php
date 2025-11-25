@@ -88,8 +88,8 @@ final readonly class Inbox
             $mid = (int) $this->request->asString->both('mid');
             $to = $this->request->asString->both('to');
             $udata = !$mid && $to
-                ? Member::selectOne($this->database, 'WHERE `displayName`=?', $to)
-                : Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
+                ? Member::selectOne('WHERE `displayName`=?', $to)
+                : Member::selectOne(Database::WHERE_ID_EQUALS, $mid);
 
             $error = match (true) {
                 !$udata => 'Invalid user!',
@@ -122,7 +122,7 @@ final readonly class Inbox
                 ? $this->textFormatting->blockhtml($title)
                 : '';
             $message->to = $udata->id;
-            $message->insert($this->database);
+            $message->insert();
 
             // Give them a notification.
             $cmd = json_encode(
@@ -168,7 +168,6 @@ final readonly class Inbox
         $msg = '';
         if ($messageid) {
             $message = Message::selectOne(
-                $this->database,
                 'WHERE (`to`=? OR `from`=?) AND `id`=?',
                 $this->user->get()->id,
                 $this->user->get()->id,
@@ -177,7 +176,7 @@ final readonly class Inbox
 
             if ($message !== null) {
                 $mid = $message->from;
-                $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
+                $member = Member::selectOne(Database::WHERE_ID_EQUALS, $mid);
                 $mname = $member?->displayName;
 
                 $msg = PHP_EOL . PHP_EOL . PHP_EOL
@@ -192,7 +191,7 @@ final readonly class Inbox
 
         if (is_numeric($this->request->asString->get('mid'))) {
             $mid = (int) $this->request->asString->both('mid');
-            $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
+            $member = Member::selectOne(Database::WHERE_ID_EQUALS, $mid);
             $mname = $member?->displayName;
 
             if (!$mname) {
@@ -222,7 +221,6 @@ final readonly class Inbox
     private function delete(int $messageId, bool $relocate = true): void
     {
         $message = Message::selectOne(
-            $this->database,
             Database::WHERE_ID_EQUALS,
             $messageId,
         );
@@ -236,12 +234,12 @@ final readonly class Inbox
 
         if ($isRecipient) {
             $message->deletedRecipient = 1;
-            $message->update($this->database);
+            $message->update();
         }
 
         if ($isSender) {
             $message->deletedSender = 1;
-            $message->update($this->database);
+            $message->update();
         }
 
         if ($message->deletedRecipient && $message->deletedSender) {
@@ -279,7 +277,7 @@ final readonly class Inbox
             default => 'WHERE `to`=? AND !`deletedRecipient`',
         };
 
-        return Message::count($this->database, $criteria, $this->user->get()->id) ?? 0;
+        return Message::count($criteria, $this->user->get()->id) ?? 0;
     }
 
     /**
@@ -294,7 +292,6 @@ final readonly class Inbox
         };
 
         return Message::selectMany(
-            $this->database,
             "{$criteria}
                 ORDER BY date DESC
                 LIMIT ?, ?",
@@ -309,7 +306,6 @@ final readonly class Inbox
         $this->page->command('softurl');
 
         $message = Message::selectOne(
-            $this->database,
             'WHERE `id`=? AND `to`=?',
             $messageId,
             $this->user->get()->id,
@@ -317,7 +313,7 @@ final readonly class Inbox
 
         if ($message !== null) {
             $message->flag = $this->request->both('tog') ? 1 : 0;
-            $message->update($this->database);
+            $message->update();
         }
 
         return null;
@@ -333,7 +329,6 @@ final readonly class Inbox
         }
 
         $message = Message::selectOne(
-            $this->database,
             'WHERE `id`=?
             ORDER BY `date` DESC',
             $messageid,
@@ -351,14 +346,13 @@ final readonly class Inbox
         }
 
         $otherMember = Member::selectOne(
-            $this->database,
             Database::WHERE_ID_EQUALS,
             $userIsRecipient ? $message->from : $message->to,
         );
 
         if (!$message->read && $userIsRecipient) {
             $message->read = 1;
-            $message->update($this->database);
+            $message->update();
 
             $this->page->command('update', 'num-messages', $this->fetchMessageCount('unread'));
         }
@@ -417,7 +411,6 @@ final readonly class Inbox
             : static fn(Message $message): ?int => $message->from;
 
         $membersById = Member::joinedOn(
-            $this->database,
             $messages,
             $getMessageMemberId,
         );

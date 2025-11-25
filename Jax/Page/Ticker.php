@@ -76,7 +76,6 @@ final class Ticker
     private function fetchTicks(int $lastTickId = 0): array
     {
         $posts = Post::selectMany(
-            $this->database,
             'WHERE `id` > ?
             ORDER BY `id` DESC
             LIMIT ?',
@@ -85,19 +84,16 @@ final class Ticker
         );
 
         $topics = Topic::joinedOn(
-            $this->database,
             $posts,
             static fn(Post $post): int => $post->tid,
         );
 
         $forums = Forum::joinedOn(
-            $this->database,
             $topics,
             static fn(Topic $topic): ?int => $topic->fid,
         );
 
         $members = Member::joinedOn(
-            $this->database,
             $posts,
             static fn(Post $post): int => $post->author,
         );

@@ -92,7 +92,7 @@ final class TextRules
 
     private function fetchCustomRules(): void
     {
-        $textRules = TextRule::selectMany($this->database);
+        $textRules = TextRule::selectMany();
         foreach ($textRules as $textRule) {
             if ($textRule->type === 'emote') {
                 $this->emotes[$textRule->needle] = $textRule->replacement;

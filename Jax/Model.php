@@ -37,6 +37,13 @@ abstract class Model
         $this->fromDatabase = true;
     }
 
+    private static function getDatabase()
+    {
+        global $container;
+
+        return $container->get(Database::class);
+    }
+
     public static function getPrimaryKey(): string
     {
         $reflectionClass = new ReflectionClass(static::class);
@@ -75,8 +82,9 @@ abstract class Model
     /**
      * @param mixed $args
      */
-    public static function count(Database $database, ...$args): ?int
+    public static function count(...$args): ?int
     {
+        $database = static::getDatabase();
         $stmt = $database->select(
             'COUNT(*) as `count`',
             static::TABLE,
@@ -90,8 +98,9 @@ abstract class Model
     /**
      * @param mixed $args
      */
-    public static function selectOne(Database $database, ...$args): ?static
+    public static function selectOne(...$args): ?static
     {
+        $database = static::getDatabase();
         $stmt = $database->select(
             array_map(
                 $database->quoteIdentifier(...),
@@ -111,8 +120,9 @@ abstract class Model
      *
      * @return array<int,static>
      */
-    public static function selectMany(Database $database, ...$args): array
+    public static function selectMany(...$args): array
     {
+        $database = static::getDatabase();
         $stmt = $database->select(
             array_map(
                 static fn($field): string => "`{$field}`",
@@ -133,11 +143,11 @@ abstract class Model
      * @return array<static> A map of models by ID (array key is ID)
      */
     public static function joinedOn(
-        Database $database,
         array $otherModel,
         callable $getId,
         ?string $key = null,
     ): array {
+        $database = static::getDatabase();
         $primaryKey = static::getPrimaryKey();
         $key ??= $primaryKey;
 
@@ -151,7 +161,6 @@ abstract class Model
 
         return $otherIds !== [] ? keyBy(
             static::selectMany(
-                $database,
                 "WHERE {$key} IN ?",
                 $otherIds,
             ),
@@ -159,8 +168,9 @@ abstract class Model
         ) : $otherIds;
     }
 
-    public function delete(Database $database): ?PDOStatement
+    public function delete(): ?PDOStatement
     {
+        $database = static::getDatabase();
         $primaryKey = static::getPrimaryKey();
 
         return $database->delete(
@@ -170,8 +180,9 @@ abstract class Model
         );
     }
 
-    public function insert(Database $database): ?PDOStatement
+    public function insert(): ?PDOStatement
     {
+        $database = static::getDatabase();
         $primaryKey = static::getPrimaryKey();
         $reflectionProperty = new ReflectionProperty(static::class, $primaryKey);
         $type = (string) $reflectionProperty->getType();
@@ -187,8 +198,9 @@ abstract class Model
         return $statement;
     }
 
-    public function upsert(Database $database): ?PDOStatement
+    public function upsert(): ?PDOStatement
     {
+        $database = static::getDatabase();
         if ($this->fromDatabase) {
             return $this->update($database);
         }
@@ -196,8 +208,9 @@ abstract class Model
         return $this->insert($database);
     }
 
-    public function update(Database $database): ?PDOStatement
+    public function update(): ?PDOStatement
     {
+        $database = static::getDatabase();
         $primaryKey = static::getPrimaryKey();
         $data = $this->asArray();
 

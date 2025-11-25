@@ -112,7 +112,6 @@ final readonly class ProfileTabs
         }
 
         return Member::selectMany(
-            $this->database,
             Database::WHERE_ID_IN,
             explode(',', $member->friends),
         );
@@ -148,7 +147,6 @@ final readonly class ProfileTabs
         $tabHTML = '';
 
         $posts = Post::selectMany(
-            $this->database,
             'WHERE `author`=? AND `newtopic`=1
             ORDER BY `id` DESC
             LIMIT 10',
@@ -156,13 +154,11 @@ final readonly class ProfileTabs
         );
 
         $topics = Topic::joinedOn(
-            $this->database,
             $posts,
             static fn(Post $post): int => $post->tid,
         );
 
         $forums = Forum::joinedOn(
-            $this->database,
             $topics,
             static fn(Topic $topic): ?int => $topic->fid,
         );
@@ -197,7 +193,6 @@ final readonly class ProfileTabs
         $tabHTML = '';
 
         $posts = Post::selectMany(
-            $this->database,
             'WHERE author = ?
             ORDER BY id DESC
             LIMIT 10',
@@ -205,13 +200,11 @@ final readonly class ProfileTabs
         );
 
         $topics = Topic::joinedOn(
-            $this->database,
             $posts,
             static fn(Post $post): int => $post->tid,
         );
 
         $forums = Forum::joinedOn(
-            $this->database,
             $topics,
             static fn(Topic $topic): ?int => $topic->fid,
         );

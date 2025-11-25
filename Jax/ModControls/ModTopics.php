@@ -56,7 +56,7 @@ final readonly class ModTopics
         $this->page->command('softurl');
 
         $topic = $tid !== 0
-            ? Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid)
+            ? Topic::selectOne(Database::WHERE_ID_EQUALS, $tid)
             : null;
 
         if ($topic === null) {
@@ -64,7 +64,7 @@ final readonly class ModTopics
         }
 
         if (!$this->user->getGroup()?->canModerate) {
-            $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid);
+            $forum = Forum::selectOne(Database::WHERE_ID_EQUALS, $topic->fid);
 
             if (!$forum || $forum->mods === '') {
                 return;
@@ -116,12 +116,11 @@ final readonly class ModTopics
 
         $forumIds = [];
 
-        $trashcan = Forum::selectOne($this->database, 'WHERE `trashcan`=1 LIMIT 1');
+        $trashcan = Forum::selectOne('WHERE `trashcan`=1 LIMIT 1');
 
         $trashcan = $trashcan->id ?? false;
 
         $topics = Topic::selectMany(
-            $this->database,
             Database::WHERE_ID_IN,
             $this->getModTids(),
         );
@@ -257,7 +256,6 @@ final readonly class ModTopics
         if ($this->session->getVar('modtids')) {
             $topics = keyBy(
                 Topic::selectMany(
-                    $this->database,
                     Database::WHERE_ID_IN,
                     $this->getModTids(),
                 ),
@@ -284,7 +282,6 @@ final readonly class ModTopics
     {
         $forumId = (int) $this->request->asString->post('id');
         $forum = Forum::selectOne(
-            $this->database,
             Database::WHERE_ID_EQUALS,
             $forumId,
         );
@@ -293,7 +290,6 @@ final readonly class ModTopics
         }
 
         $topics = Topic::selectMany(
-            $this->database,
             Database::WHERE_ID_IN,
             $this->getModTids(),
         );

@@ -109,7 +109,6 @@ final class IDX
     private function fetchIDXForums(): array
     {
         $forums = Forum::selectMany(
-            $this->database,
             'WHERE `path` = "" '
             . 'ORDER BY `order`, `title` ASC',
         );
@@ -128,7 +127,6 @@ final class IDX
     private function fetchLastPostMembers(array $forums): array
     {
         return Member::joinedOn(
-            $this->database,
             $forums,
             static fn(Forum $forum): ?int => $forum->lastPostUser,
         );
@@ -182,7 +180,7 @@ final class IDX
 
         // Remove duplicates
         $this->mods = array_unique($this->mods, SORT_REGULAR);
-        $categories = Category::selectMany($this->database, 'ORDER BY `order`,`title` ASC');
+        $categories = Category::selectMany('ORDER BY `order`,`title` ASC');
         foreach ($categories as $category) {
             if (!array_key_exists($category->id, $forumsByCatID)) {
                 continue;
@@ -242,7 +240,7 @@ final class IDX
         if ($moderatorinfo === null) {
             $moderatorinfo = [];
             $members = $this->mods !== []
-                ? Member::selectMany($this->database, Database::WHERE_ID_IN, $this->mods)
+                ? Member::selectMany(Database::WHERE_ID_IN, $this->mods)
                 : $this->mods;
             foreach ($members as $member) {
                 $moderatorinfo[$member->id] = $this->template->meta(
@@ -361,9 +359,9 @@ final class IDX
         $legend = '';
         $page = '';
 
-        $stats = Stats::selectOne($this->database);
+        $stats = Stats::selectOne();
         $lastRegisteredMember = $stats?->last_register !== null
-            ? Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $stats->last_register)
+            ? Member::selectOne(Database::WHERE_ID_EQUALS, $stats->last_register)
             : null;
 
         $usersOnlineToday = $this->usersOnline->getUsersOnlineToday();
@@ -390,7 +388,7 @@ final class IDX
         }, $usersOnlineToday));
 
         $usersonline = $this->getUsersOnlineList();
-        $groups = Group::selectMany($this->database, 'WHERE `legend`=1 ORDER BY `title`');
+        $groups = Group::selectMany('WHERE `legend`=1 ORDER BY `title`');
 
         foreach ($groups as $group) {
             $legend .= "<a href='?' class='mgroup {$group->id}'>{$group->title}</a> ";

@@ -131,7 +131,7 @@ final class Router
      */
     private function loadCustomPage(string $action): bool
     {
-        $page = ModelsPage::selectOne($this->database, 'WHERE `act`=?', $action);
+        $page = ModelsPage::selectOne('WHERE `act`=?', $action);
 
         if ($page !== null) {
             $bbCode = $this->container->get(BBCode::class);

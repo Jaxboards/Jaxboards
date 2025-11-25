@@ -151,12 +151,12 @@ final class Post
             $file->name = $fileobj['name'];
             $file->size = $size;
             $file->uid = $uid;
-            $file->insert($this->database);
+            $file->insert();
 
             return (string) $file->id;
         }
 
-        $fileRecord = File::selectOne($this->database, 'WHERE `hash`=?', $hash);
+        $fileRecord = File::selectOne('WHERE `hash`=?', $hash);
         if ($fileRecord === null) {
             return '';
         }
@@ -192,7 +192,7 @@ final class Post
 
         $isEditing = (bool) $topic;
 
-        $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $fid);
+        $forum = Forum::selectOne(Database::WHERE_ID_EQUALS, $fid);
 
         if ($forum === null) {
             $this->page->location('?');
@@ -306,12 +306,12 @@ final class Post
             $this->page->command('closewindow', '#qreply');
         }
 
-        $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
+        $topic = Topic::selectOne(Database::WHERE_ID_EQUALS, $tid);
         if ($topic === null) {
             return "The topic you're attempting to reply in no longer exists.";
         }
 
-        $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid);
+        $forum = Forum::selectOne(Database::WHERE_ID_EQUALS, $topic->fid);
         if ($forum === null) {
             return "The forum you're attempting to reply to no longer exists.";
         }
@@ -340,13 +340,11 @@ final class Post
             $postData = '';
 
             $posts = ModelsPost::selectMany(
-                $this->database,
                 Database::WHERE_ID_IN,
                 explode(',', (string) $this->session->getVar('multiquote')),
             );
 
             $membersById = Member::joinedOn(
-                $this->database,
                 $posts,
                 static fn(ModelsPost $modelsPost): int => $modelsPost->author,
             );
@@ -422,7 +420,7 @@ final class Post
         }
 
         if ($this->user->get()->mod !== 0) {
-            $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic);
+            $forum = Forum::selectOne(Database::WHERE_ID_EQUALS, $topic);
 
             if (
                 $forum
@@ -456,7 +454,7 @@ final class Post
         $modelsPost->editby = $this->user->get()->id;
         $modelsPost->editDate = $this->database->datetime();
         $modelsPost->post = $this->postData ?? '';
-        $modelsPost->update($this->database);
+        $modelsPost->update();
 
         $this->page->command(
             'update',
@@ -498,7 +496,7 @@ final class Post
             0,
             50,
         );
-        $topic->update($this->database);
+        $topic->update();
 
         return null;
     }
@@ -508,9 +506,9 @@ final class Post
         $pid = $this->pid;
         $postData = $this->postData;
 
-        $post = ModelsPost::selectOne($this->database, Database::WHERE_ID_EQUALS, $pid);
+        $post = ModelsPost::selectOne(Database::WHERE_ID_EQUALS, $pid);
         $topic = $post !== null
-            ? Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $post->tid)
+            ? Topic::selectOne(Database::WHERE_ID_EQUALS, $post->tid)
             : null;
 
         $isTopicPost = $topic && $post && $topic->op === $post->id;
@@ -574,7 +572,7 @@ final class Post
         ) : [];
         $pollType = $this->request->asString->post('pollType');
 
-        $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $fid);
+        $forum = Forum::selectOne(Database::WHERE_ID_EQUALS, $fid);
 
         $forumPerms = $forum !== null
             ? $this->user->getForumPerms($forum->perms)
@@ -643,7 +641,7 @@ final class Post
         );
         $topic->title = $this->textFormatting->blockhtml($topicTitle ?? '');
         $topic->views = 0;
-        $topic->insert($this->database);
+        $topic->insert();
 
         $this->submitPost($topic->id, true);
 
@@ -670,9 +668,9 @@ final class Post
             return null;
         }
 
-        $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
+        $topic = Topic::selectOne(Database::WHERE_ID_EQUALS, $tid);
         $forum = $topic !== null
-            ? Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid)
+            ? Forum::selectOne(Database::WHERE_ID_EQUALS, $topic->fid)
             : null;
 
         if ($topic === null || $forum === null) {
@@ -696,14 +694,14 @@ final class Post
         $post->newtopic = $newtopic ? 1 : 0;
         $post->post = $postData ?? '';
         $post->tid = $tid;
-        $post->insert($this->database);
+        $post->insert();
 
         $this->hooks->dispatch('post', $post);
 
         // Set op.
         if ($newtopic) {
             $topic->op = $post->id;
-            $topic->update($this->database);
+            $topic->update();
         }
 
         $activity = new Activity();
@@ -713,7 +711,7 @@ final class Post
         $activity->tid = $tid;
         $activity->type = $newtopic ? 'new_topic' : 'new_post';
         $activity->uid = $uid;
-        $activity->insert($this->database);
+        $activity->insert();
 
         // Update last post info
         // for the topic.
@@ -721,7 +719,7 @@ final class Post
             $topic->lastPostUser = $uid;
             $topic->lastPostDate = $postDate;
             ++$topic->replies;
-            $topic->update($this->database);
+            $topic->update();
         }
 
         // Do some magic to update the tree all the way up (for subforums).
@@ -777,14 +775,14 @@ final class Post
             $this->user->set('posts', $this->user->get()->posts + 1);
         }
 
-        $stats = Stats::selectOne($this->database);
+        $stats = Stats::selectOne();
         if ($stats !== null) {
             ++$stats->posts;
             if ($newtopic) {
                 ++$stats->topics;
             }
 
-            $stats->update($this->database);
+            $stats->update();
         }
 
         if ($this->how === 'qreply') {

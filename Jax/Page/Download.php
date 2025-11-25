@@ -33,14 +33,14 @@ final readonly class Download
 
     private function downloadFile(int $id): void
     {
-        $file = File::selectOne($this->database, Database::WHERE_ID_EQUALS, $id);
+        $file = File::selectOne(Database::WHERE_ID_EQUALS, $id);
 
         if ($file === null) {
             return;
         }
 
         ++$file->downloads;
-        $file->update($this->database);
+        $file->update();
 
         $ext = explode('.', $file->name);
         $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));

@@ -46,7 +46,7 @@ final readonly class Reactions
         }
 
         return $ratingNiblets = keyBy(
-            RatingNiblet::selectMany($this->database),
+            RatingNiblet::selectMany(),
             static fn($niblet) => $niblet->id,
         );
     }
@@ -58,7 +58,7 @@ final readonly class Reactions
         }
 
         $this->page->command('softurl');
-        $post = Post::selectOne($this->database, Database::WHERE_ID_EQUALS, $pid);
+        $post = Post::selectOne(Database::WHERE_ID_EQUALS, $pid);
 
         $ratings = $post !== null ? json_decode($post->rating, true) : [];
 
@@ -75,7 +75,7 @@ final readonly class Reactions
         }
 
         $mdata = keyBy(
-            Member::selectMany($this->database, Database::WHERE_ID_IN, $members),
+            Member::selectMany(Database::WHERE_ID_IN, $members),
             static fn($member) => $member->id,
         );
 
@@ -156,7 +156,7 @@ final readonly class Reactions
     {
         $this->page->command('softurl');
 
-        $post = Post::selectOne($this->database, Database::WHERE_ID_EQUALS, $postid);
+        $post = Post::selectOne(Database::WHERE_ID_EQUALS, $postid);
 
         $niblets = $this->fetchRatingNiblets();
         $ratings = [];
@@ -190,7 +190,7 @@ final readonly class Reactions
         }
 
         $post->rating = json_encode($ratings) ?: $post->rating;
-        $post->update($this->database);
+        $post->update();
 
         $this->page->command('update', "#reaction_p{$post->id}", $this->render($post));
     }

@@ -111,7 +111,7 @@ final class Forum
         $page = '';
         $table = '';
 
-        $forum = ModelsForum::selectOne($this->database, Database::WHERE_ID_EQUALS, $fid);
+        $forum = ModelsForum::selectOne(Database::WHERE_ID_EQUALS, $fid);
 
         if ($forum === null) {
             $this->page->location('?');
@@ -123,7 +123,7 @@ final class Forum
             $this->page->command('softurl');
 
             ++$forum->redirects;
-            $forum->update($this->database);
+            $forum->update();
 
             $this->page->location($forum->redirect);
 
@@ -190,7 +190,6 @@ final class Forum
         );
 
         $topics = Topic::selectMany(
-            $this->database,
             'WHERE `fid`=? '
             . "ORDER BY `pinned` DESC,{$orderby} "
             . 'LIMIT ?,? ',
@@ -212,7 +211,6 @@ final class Forum
 
         $membersById = $memberIds !== [] ? keyBy(
             Member::selectMany(
-                $this->database,
                 Database::WHERE_ID_IN,
                 $memberIds,
             ),
@@ -338,7 +336,7 @@ final class Forum
     private function setBreadCrumbs(ModelsForum $forum): void
     {
         // Start building the nav path.
-        $category = Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->category);
+        $category = Category::selectOne(Database::WHERE_ID_EQUALS, $forum->category);
         $breadCrumbs = $category !== null
             ? ["?act=vc{$forum->category}" => $category->title]
             : [];
@@ -346,7 +344,7 @@ final class Forum
         // Subforum breadcrumbs
         if ($forum->path !== '') {
             $path = array_map(static fn($fid): int => (int) $fid, explode(' ', $forum->path));
-            $forums = ModelsForum::selectMany($this->database, Database::WHERE_ID_IN, $path);
+            $forums = ModelsForum::selectMany(Database::WHERE_ID_IN, $path);
             // This has to be two steps because WHERE ID IN(1,2,3)
             // does not select records in the same order
             $forumTitles = array_reduce(
@@ -370,7 +368,6 @@ final class Forum
     private function renderSubforums(ModelsForum $forum): string
     {
         $subforums = ModelsForum::selectMany(
-            $this->database,
             'WHERE path=? OR path LIKE ? '
             . 'ORDER BY `order`',
             (string) $forum->id,
@@ -378,7 +375,6 @@ final class Forum
         );
 
         $lastPostAuthors = Member::joinedOn(
-            $this->database,
             $subforums,
             static fn($modelsForum): ?int => $modelsForum->lastPostUser,
         );

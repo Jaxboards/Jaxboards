@@ -126,10 +126,9 @@ final readonly class ModPosts
      */
     private function deletePosts(array $pids): bool
     {
-        $trashCanForum = Forum::selectOne($this->database, 'WHERE `trashcan`=1');
+        $trashCanForum = Forum::selectOne('WHERE `trashcan`=1');
 
         $posts = Post::selectMany(
-            $this->database,
             Database::WHERE_ID_IN,
             $pids,
         );
@@ -160,7 +159,7 @@ final readonly class ModPosts
 
         // Fix forum last post for all forums topics were in.
         // Add trashcan here too.
-        $topics = Topic::selectMany($this->database, Database::WHERE_ID_IN, $tids);
+        $topics = Topic::selectMany(Database::WHERE_ID_IN, $tids);
         $fids = array_unique(array_merge(
             $trashCanForum !== null ? [$trashCanForum->id] : [],
             array_map(
@@ -196,7 +195,6 @@ final readonly class ModPosts
     private function fetchPost(int $pid): ?Post
     {
         return Post::selectOne(
-            $this->database,
             Database::WHERE_ID_EQUALS,
             $pid,
         );
@@ -207,9 +205,9 @@ final readonly class ModPosts
      */
     private function fetchForumMods(Post $post): array
     {
-        $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $post->tid);
+        $topic = Topic::selectOne(Database::WHERE_ID_EQUALS, $post->tid);
         $forum = $topic !== null
-            ? Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid)
+            ? Forum::selectOne(Database::WHERE_ID_EQUALS, $topic->fid)
             : null;
 
         return $forum?->mods
@@ -257,7 +255,7 @@ final readonly class ModPosts
         $topic->pollChoices = '';
         $topic->replies = 0;
         $topic->title = $newTopicTitle;
-        $topic->insert($this->database);
+        $topic->insert();
 
         // Set the OP and move posts into the new topic
         $this->updatePosts([$pids[0]], ['newtopic' => 1]);

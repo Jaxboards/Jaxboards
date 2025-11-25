@@ -168,7 +168,6 @@ final class LogReg
         $dispname = $this->textFormatting->blockhtml($dispname);
         $name = $this->textFormatting->blockhtml($name);
         $member = Member::selectOne(
-            $this->database,
             'WHERE `name`=? OR `displayName`=?',
             $name,
             $dispname,
@@ -201,13 +200,13 @@ final class LogReg
             $pass1,
             PASSWORD_DEFAULT,
         );
-        $newMember->insert($this->database);
+        $newMember->insert();
 
-        $stats = Stats::selectOne($this->database);
+        $stats = Stats::selectOne();
         if ($stats !== null) {
             ++$stats->members;
             $stats->last_register = $newMember->id;
-            $stats->update($this->database);
+            $stats->update();
         }
 
         $this->login($name, $pass1);
@@ -223,7 +222,6 @@ final class LogReg
             }
 
             $member = Member::selectOne(
-                $this->database,
                 'WHERE `name`=?',
                 $username,
             );
@@ -243,7 +241,7 @@ final class LogReg
                 $token->token = $loginToken;
                 $token->type = 'login';
                 $token->uid = $this->user->get()->id;
-                $token->insert($this->database);
+                $token->insert();
 
                 $this->request->setCookie(
                     'utoken',
@@ -353,7 +351,6 @@ final class LogReg
     private function forgotPasswordHasToken(string $tokenId): ?string
     {
         $token = Token::selectOne(
-            $this->database,
             'WHERE `token`=? AND expires>=NOW()',
             $tokenId,
         );
@@ -375,7 +372,6 @@ final class LogReg
 
         // Get member.
         $member = Member::selectOne(
-            $this->database,
             Database::WHERE_ID_EQUALS,
             $token->uid,
         );
@@ -388,7 +384,7 @@ final class LogReg
             $pass1,
             PASSWORD_DEFAULT,
         );
-        $member->update($this->database);
+        $member->update();
 
         // Delete all forgotpassword tokens for this user.
         $this->database->delete(
@@ -435,7 +431,6 @@ final class LogReg
         } else {
             if ($user) {
                 $member = Member::selectOne(
-                    $this->database,
                     'WHERE `name`=?',
                     $user,
                 );
@@ -453,7 +448,7 @@ final class LogReg
                     $token->token = $forgotpasswordtoken;
                     $token->type = 'forgotpassword';
                     $token->uid = $member->id;
-                    $token->insert($this->database);
+                    $token->insert();
 
                     $link = $this->domainDefinitions->getBoardURL() . '?act=logreg6&uid='
                         . $member->id . '&tokenId=' . rawurlencode($forgotpasswordtoken);

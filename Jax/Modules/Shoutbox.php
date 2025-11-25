@@ -145,13 +145,11 @@ final class Shoutbox
     public function displayShoutbox(): void
     {
         $shouts = Shout::selectMany(
-            $this->database,
             'ORDER BY `id` DESC LIMIT ?',
             $this->shoutlimit,
         );
 
         $members = Member::joinedOn(
-            $this->database,
             $shouts,
             static fn(Shout $shout): int => $shout->uid,
         );
@@ -193,14 +191,12 @@ final class Shoutbox
         }
 
         $shouts = Shout::selectMany(
-            $this->database,
             'WHERE `id`>? ORDER BY `id` ASC LIMIT ?',
             $shoutboxId,
             $this->shoutlimit,
         );
 
         $members = Member::joinedOn(
-            $this->database,
             $shouts,
             static fn(Shout $shout): int => $shout->uid,
         );
@@ -228,7 +224,7 @@ final class Shoutbox
             --$pageNumber;
         }
 
-        $numShouts = Shout::count($this->database) ?? 0;
+        $numShouts = Shout::count() ?? 0;
 
         if ($numShouts > 1000) {
             $numShouts = 1000;
@@ -257,14 +253,12 @@ final class Shoutbox
         }
 
         $shouts = Shout::selectMany(
-            $this->database,
             'ORDER BY `id` DESC LIMIT ?,?',
             $pageNumber * $perpage,
             $perpage,
         );
 
         $membersById = Member::joinedOn(
-            $this->database,
             $shouts,
             static fn(Shout $shout): int => $shout->uid,
         );
@@ -286,7 +280,7 @@ final class Shoutbox
 
     public function deleteShout(int $delete): void
     {
-        $shout = Shout::selectOne($this->database, Database::WHERE_ID_EQUALS, $delete);
+        $shout = Shout::selectOne(Database::WHERE_ID_EQUALS, $delete);
         $candelete = !$this->user->isGuest() && $shout !== null && $this->canDelete($shout);
 
         if (!$candelete) {
@@ -328,7 +322,7 @@ final class Shoutbox
         $shout->ip = $this->ipAddress->asBinary() ?? '';
         $shout->shout = $shoutBody;
         $shout->uid = $this->user->get()->id;
-        $shout->insert($this->database);
+        $shout->insert();
 
         $this->hooks->dispatch('shout', $shout);
     }

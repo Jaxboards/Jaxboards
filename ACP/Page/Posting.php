@@ -48,14 +48,14 @@ final readonly class Posting
     {
         $page = '';
         $badWords = keyBy(
-            TextRule::selectMany($this->database, "WHERE `type`='badword'"),
+            TextRule::selectMany("WHERE `type`='badword'"),
             static fn($textRule) => $textRule->needle,
         );
 
         // Delete.
         $delete = $this->request->asString->get('d');
         if ($delete && array_key_exists($delete, $badWords)) {
-            $badWords[$delete]->delete($this->database);
+            $badWords[$delete]->delete();
             unset($badWords[$delete]);
         }
 
@@ -77,7 +77,7 @@ final readonly class Posting
                 $textRule->replacement = $replacement;
                 $textRule->type = 'badword';
                 $textRule->enabled = 1;
-                $textRule->insert($this->database);
+                $textRule->insert();
                 $badWords[$badword] = $textRule;
             }
         }
@@ -138,7 +138,7 @@ final readonly class Posting
 
         // Select emoticons.
         $emoticons = keyBy(
-            TextRule::selectMany($this->database, "WHERE `type`='emote'"),
+            TextRule::selectMany("WHERE `type`='emote'"),
             static fn($textRule) => $textRule->needle,
         );
 
@@ -157,7 +157,7 @@ final readonly class Posting
                 $textRule->needle = $emoticonNoHTML;
                 $textRule->replacement = $imageInput;
                 $textRule->type = 'emote';
-                $textRule->insert($this->database);
+                $textRule->insert();
                 $emoticons[$emoticonNoHTML] = $textRule;
             }
         }
@@ -246,14 +246,14 @@ final readonly class Posting
         $page = '';
         $page2 = '';
         $niblets = keyBy(
-            RatingNiblet::selectMany($this->database, 'ORDER BY `id` DESC'),
+            RatingNiblet::selectMany('ORDER BY `id` DESC'),
             static fn($niblet) => $niblet->id,
         );
 
         // Delete.
         $delete = (int) $this->request->asString->get('d');
         if ($delete !== 0) {
-            $niblets[$delete]->delete($this->database);
+            $niblets[$delete]->delete();
             unset($niblets[$delete]);
         }
 
@@ -267,7 +267,7 @@ final readonly class Posting
                 $ratingNiblet = new RatingNiblet();
                 $ratingNiblet->img = $img;
                 $ratingNiblet->title = $title;
-                $ratingNiblet->insert($this->database);
+                $ratingNiblet->insert();
 
                 $niblets[$ratingNiblet->id] = $ratingNiblet;
             }

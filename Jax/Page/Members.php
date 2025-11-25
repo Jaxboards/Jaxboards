@@ -76,7 +76,7 @@ final class Members
 
         // fetch all groups
         $groups = keyBy(
-            Group::selectMany($this->database),
+            Group::selectMany(),
             static fn(Group $group): int => $group->id,
         );
 
@@ -95,7 +95,6 @@ final class Members
         $pages = '';
 
         $members = Member::selectMany(
-            $this->database,
             $where
             . "ORDER BY {$sortby} {$sorthow}
             LIMIT ?, ?",

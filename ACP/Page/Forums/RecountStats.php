@@ -41,7 +41,7 @@ final readonly class RecountStats
 
     public function recountStatistics(): void
     {
-        $forums = Forum::selectMany($this->database);
+        $forums = Forum::selectMany();
         $countPostsInForum = [];
         foreach ($forums as $forum) {
             $countPostsInForum[$forum->id] = !$forum->nocount;
@@ -151,7 +151,7 @@ final readonly class RecountStats
         }
 
         // Get # of members.
-        $stat['members'] = Member::count($this->database) ?? 0;
+        $stat['members'] = Member::count() ?? 0;
 
         $this->database->disposeresult($result);
 

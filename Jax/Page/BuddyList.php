@@ -117,7 +117,6 @@ final readonly class BuddyList
         ) {
             $online = $this->usersOnline->getUsersOnline();
             $friends = Member::selectMany(
-                $this->database,
                 'WHERE `id` IN ? ORDER BY `name` ASC',
                 explode(',', $this->user->get()->friends),
             );
@@ -135,7 +134,6 @@ final readonly class BuddyList
 
         if ($this->user->get()->enemies !== '') {
             $enemies = Member::selectMany(
-                $this->database,
                 'WHERE `id` IN ? ORDER BY `name` ASC',
                 explode(',', $this->user->get()->enemies),
             );
@@ -191,7 +189,7 @@ final readonly class BuddyList
 
         $user = null;
         if ($uid !== 0) {
-            $user = Member::selectMany($this->database, Database::WHERE_ID_EQUALS, $uid);
+            $user = Member::selectMany(Database::WHERE_ID_EQUALS, $uid);
         }
 
         if (!$user) {
@@ -215,7 +213,7 @@ final readonly class BuddyList
         $activity->affectedUser = $uid;
         $activity->type = 'buddy_add';
         $activity->uid = $this->user->get()->id;
-        $activity->insert($this->database);
+        $activity->insert();
 
         return true;
     }

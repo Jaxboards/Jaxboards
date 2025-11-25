@@ -55,7 +55,6 @@ final class UsersOnline
     public function fetchUsersOnline(): void
     {
         $sessions = Session::selectMany(
-            $this->database,
             'WHERE lastUpdate>=? ORDER BY lastAction',
             $this->database->datetime(Carbon::now('UTC')->subSeconds($this->serviceConfig->getSetting('timetologout') ?? 900)->getTimestamp()),
         );
@@ -74,7 +73,6 @@ final class UsersOnline
     public function getUsersOnlineToday(): array
     {
         $sessions = Session::selectMany(
-            $this->database,
             'WHERE uid AND hide = 0',
         );
 
@@ -88,7 +86,7 @@ final class UsersOnline
      */
     private function sessionsToUsersOnline(array $sessions): array
     {
-        $members = Member::joinedOn($this->database, $sessions, static fn(Session $session): ?int => $session->uid);
+        $members = Member::joinedOn($sessions, static fn(Session $session): ?int => $session->uid);
 
         $today = gmdate('n j');
 

@@ -157,7 +157,7 @@ final readonly class ModControls
         $displayName = $this->request->asString->post('displayName');
         $mid = (int) $this->request->asString->post('mid');
 
-        $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
+        $member = Member::selectOne(Database::WHERE_ID_EQUALS, $mid);
 
         if (!$displayName) {
             return $this->page->error('Display name is invalid.');
@@ -172,7 +172,7 @@ final readonly class ModControls
         $member->displayName = $displayName;
         $member->full_name = $this->request->asString->post('full_name') ?? '';
         $member->sig = $this->request->asString->post('signature') ?? '';
-        $member->update($this->database);
+        $member->update();
 
         return $this->template->meta('success', 'Profile information saved.');
     }
@@ -194,12 +194,11 @@ final readonly class ModControls
 
         // Get the member data.
         if ($memberId !== 0) {
-            $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $memberId);
+            $member = Member::selectOne(Database::WHERE_ID_EQUALS, $memberId);
         } elseif (!$memberName) {
             return $this->page->error('Member name is a required field.');
         } else {
             $members = Member::selectMany(
-                $this->database,
                 'WHERE `displayName` LIKE ?',
                 $memberName . '%',
             );
@@ -401,7 +400,6 @@ final readonly class ModControls
 
             $content = [];
             $members = Member::selectMany(
-                $this->database,
                 'WHERE `ip`=?',
                 $this->ipAddress->asBinary($ipAddress),
             );
@@ -420,7 +418,6 @@ final readonly class ModControls
                 $content = '';
 
                 $shouts = Shout::selectMany(
-                    $this->database,
                     'WHERE `ip`=?
                     ORDER BY `id`
                     DESC LIMIT 5',
@@ -428,7 +425,6 @@ final readonly class ModControls
                 );
 
                 $members = Member::joinedOn(
-                    $this->database,
                     $shouts,
                     static fn(Shout $shout): int => $shout->uid,
                 );
@@ -449,7 +445,6 @@ final readonly class ModControls
 
             $content = '';
             $posts = Post::selectMany(
-                $this->database,
                 'WHERE `ip`=? ORDER BY `id` DESC LIMIT 5',
                 $this->ipAddress->asBinary($ipAddress),
             );

@@ -103,7 +103,6 @@ final class Search
         }
 
         $forums = Forum::selectMany(
-            $this->database,
             'WHERE `id` IN ? ORDER BY `order` ASC,`title` DESC',
             $this->fids,
         );
@@ -378,7 +377,7 @@ final class Search
         }
 
         $this->fids = [];
-        $forums = Forum::selectMany($this->database);
+        $forums = Forum::selectMany();
         foreach ($forums as $forum) {
             $perms = $this->user->getForumPerms($forum->perms);
             if (!$perms['read']) {

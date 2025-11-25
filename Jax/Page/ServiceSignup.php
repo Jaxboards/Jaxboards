@@ -251,7 +251,7 @@ final readonly class ServiceSignup
         $member->lastVisit = $this->database->datetime();
         $member->name = $username;
         $member->pass = password_hash($password, PASSWORD_DEFAULT);
-        $member->insert($this->database);
+        $member->insert();
 
         $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $boardURLLowercase);
 

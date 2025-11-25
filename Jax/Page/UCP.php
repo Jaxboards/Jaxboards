@@ -403,7 +403,6 @@ final readonly class UCP
         }
 
         $members = Member::selectMany(
-            $this->database,
             'WHERE `displayName` = ? AND `id`!=? LIMIT 1',
             $data['displayName'],
             $this->user->get()->id,
@@ -461,7 +460,7 @@ final readonly class UCP
             $activity->date = $this->database->datetime();
             $activity->type = 'profile_name_change';
             $activity->uid = $this->user->get()->id;
-            $activity->insert($this->database);
+            $activity->insert();
         }
 
         $this->user->setBulk($data);
@@ -574,7 +573,6 @@ final readonly class UCP
         $skinId = (int) $this->request->asString->both('skin');
 
         $skin = Skin::selectOne(
-            $this->database,
             Database::WHERE_ID_EQUALS,
             $skinId,
         );
@@ -613,8 +611,8 @@ final readonly class UCP
         }
 
         $skins = $this->user->get()->groupID !== 2
-            ? Skin::selectMany($this->database, 'WHERE `hidden`!=1 ORDER BY `title` ASC')
-            : Skin::selectMany($this->database, 'ORDER BY `title` ASC');
+            ? Skin::selectMany('WHERE `hidden`!=1 ORDER BY `title` ASC')
+            : Skin::selectMany('ORDER BY `title` ASC');
         $select = '';
         foreach ($skins as $skin) {
             $select .= "<option value='" . $skin->id . "' "

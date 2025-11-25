@@ -309,7 +309,7 @@ final readonly class Themes
         $skinsHTML = '';
         $wrappers = $this->getWrappers();
 
-        $skins = Skin::selectMany($this->database, 'ORDER BY title ASC');
+        $skins = Skin::selectMany('ORDER BY title ASC');
 
         foreach ($skins as $skin) {
             $wrapperOptions = '';
@@ -400,7 +400,7 @@ final readonly class Themes
 
     private function editCSS(int $id): void
     {
-        $skin = Skin::selectOne($this->database, Database::WHERE_ID_EQUALS, $id);
+        $skin = Skin::selectOne(Database::WHERE_ID_EQUALS, $id);
 
         if ($skin === null) {
             $this->page->addContentBox('Error', "Skin id {$id} not found");
@@ -492,7 +492,7 @@ final readonly class Themes
         $skin->hidden = $this->request->post('hidden') ? 1 : 0;
         $skin->title = $skinName ?? '';
         $skin->wrapper = $wrapperName ?? '';
-        $skin->insert($this->database);
+        $skin->insert();
 
         if ($this->request->post('default')) {
             $this->database->update(
@@ -558,7 +558,7 @@ final readonly class Themes
 
     private function deleteSkin(int $id): void
     {
-        $skin = Skin::selectOne($this->database, Database::WHERE_ID_EQUALS, $id);
+        $skin = Skin::selectOne(Database::WHERE_ID_EQUALS, $id);
 
         if ($skin === null) {
             $this->page->addContentBox('Error', "Skin id {$id} not found");

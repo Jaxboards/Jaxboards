@@ -64,7 +64,7 @@ final class Session
         $userId = $this->getPHPSessionValue('uid');
         $uToken = $this->request->cookie('utoken');
         if ($userId === null && $uToken !== null) {
-            $token = Token::selectOne($this->database, 'WHERE `token`=?', $uToken);
+            $token = Token::selectOne('WHERE `token`=?', $uToken);
 
             if ($token !== null) {
                 $this->setPHPSessionValue('uid', $token->uid);
@@ -87,7 +87,7 @@ final class Session
                 ? [Database::WHERE_ID_EQUALS, $sid]
                 : ['WHERE `id`=? AND `ip`=?', $sid, $this->ipAddress->asBinary()];
 
-            $session = ModelsSession::selectOne($this->database, ...$params);
+            $session = ModelsSession::selectOne(...$params);
         }
 
         if ($session !== null) {
@@ -206,7 +206,6 @@ final class Session
 
         $yesterday = mktime(0, 0, 0) ?: 0;
         $sessions = ModelsSession::selectMany(
-            $this->database,
             'WHERE `lastUpdate`<?',
             $this->database->datetime($yesterday),
         );
@@ -333,7 +332,7 @@ final class Session
             $session->uid = $uid;
         }
 
-        $session->insert($this->database);
+        $session->insert();
 
         $this->modelsSession = $session;
     }

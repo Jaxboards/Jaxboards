@@ -35,7 +35,6 @@ final readonly class API
     private function searchMembers(): void
     {
         $members = Member::selectMany(
-            $this->database,
             'WHERE `displayName` LIKE ? ORDER BY `displayName` LIMIT 10',
             htmlspecialchars(
                 str_replace('_', '\_', $this->request->asString->get('term') ?? ''),
