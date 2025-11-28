@@ -175,6 +175,7 @@ final readonly class Badges
                 HTML,
         );
 
+        $this->page->setPageTitle("Viewing Recipients of {$badge->badgeTitle} badge");
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
     }
