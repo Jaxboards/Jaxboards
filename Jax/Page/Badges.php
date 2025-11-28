@@ -13,7 +13,6 @@ use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\TextFormatting;
-use PHP_CodeSniffer\Generators\HTML;
 
 use function array_key_exists;
 
@@ -127,12 +126,12 @@ final readonly class Badges
 
         $badgeAssociations = BadgeAssociation::selectMany(
             'WHERE `badge`=?',
-            $badgeId
+            $badgeId,
         );
 
         $membersWithBadges = Member::joinedOn(
             $badgeAssociations,
-            static fn(BadgeAssociation $badgeAssociation): int => $badgeAssociation->user
+            static fn(BadgeAssociation $badgeAssociation): int => $badgeAssociation->user,
         );
 
 
@@ -152,7 +151,8 @@ final readonly class Badges
                 </tr>
                 HTML;
         }
-        $badgesHTML = $badgesHTML = <<<HTML
+
+        $badgesHTML = <<<HTML
             <table class="badges" style="width:100%">
                 <tr><th>User</th><th>Reason</th><th>Award Date</th></tr>
                 {$badgesTable}
@@ -173,8 +173,7 @@ final readonly class Badges
                 HTML,
         );
 
-	    $this->page->append('PAGE', $page);
+        $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
-
     }
 }
