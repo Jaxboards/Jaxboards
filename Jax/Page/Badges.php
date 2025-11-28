@@ -13,6 +13,7 @@ use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\TextFormatting;
+use PHP_CodeSniffer\Generators\HTML;
 
 use function array_key_exists;
 
@@ -114,20 +115,66 @@ final readonly class Badges
 
     public function renderBadgeRecipients(int $badgeId): void
     {
+        if ($this->request->isJSUpdate()) {
+            return;
+        }
+
         $badge = Badge::selectOne(Database::WHERE_ID_EQUALS, $badgeId);
 
         if ($badge === null) {
             return;
         }
 
+        $badgeAssociations = BadgeAssociation::selectMany(
+            'WHERE `badge`=?',
+            $badgeId
+        );
+
+        $membersWithBadges = Member::joinedOn(
+            $badgeAssociations,
+            static fn(BadgeAssociation $badgeAssociation): int => $badgeAssociation->user
+        );
+
+
+        $badgesTable = '';
+        foreach ($badgeAssociations as $badgeAssociation) {
+            $member = $membersWithBadges[$badgeAssociation->user];
+
+            $badgesTable .= <<<HTML
+                <tr>
+                    <td>
+                        <a href="?act=vu{$member->id}"
+                            class="user{$member->id} mgroup{$member->groupID}"
+                            >{$member->name}</a>
+                    </td>
+                    <td class="reason">{$badgeAssociation->reason}</td>
+                    <td class="award-date">{$this->date->autodate($badgeAssociation->awardDate)}</td>
+                </tr>
+                HTML;
+        }
+        $badgesHTML = $badgesHTML = <<<HTML
+            <table class="badges" style="width:100%">
+                <tr><th>User</th><th>Reason</th><th>Award Date</th></tr>
+                {$badgesTable}
+            </table>
+            HTML;
+
         $page = $this->page->collapseBox(
             "Badge: {$badge->badgeTitle}",
             <<<HTML
-                You are viewing all of the people who have received this badge: <img src="{$badge->imagePath}">
+                <div class="badges">
+                    <section class="badge">
+                        <div class="badge-image"><img src="{$badge->imagePath}" title="{$badge->badgeTitle}"></div>
+                        <div class="badge-title">{$badge->badgeTitle}</div>
+                        <div class="badge-description">{$badge->description}</div>
+                    </section>
+                    {$badgesHTML}
+                </div>
                 HTML,
         );
 
-        $this->page->append('PAGE', $page);
+	    $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
+
     }
 }
