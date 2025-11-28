@@ -18,16 +18,7 @@ $CFG = json_decode(
             "badnamechars": "@[^\\w' ?]@",
             "boardname": "Example Forums",
             "domain": "example.com",
-            "images": [
-                "jpg",
-                "jpeg",
-                "png",
-                "gif",
-                "bmp"
-            ],
             "mail_from": "Example Forums <no-reply@example.com>",
-            "maxfilesize": 5242880,
-            "postmaxsize": 50000,
             "prefix": "jaxboards",
             "service": false,
             "sql_db": "jaxboards",
