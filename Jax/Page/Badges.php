@@ -96,15 +96,17 @@ final readonly class Badges
         foreach ($badgesPerMember[$member->id] as $badgeTuple) {
             $badgesHTML .= <<<HTML
                 <section class="badge">
-                        <div class="badge-image">
+                    <div class="badge-image">
+                        <a href="?act=badges&badgeId={$badgeTuple->badge->id}" title="View all users with this badge">
                             <img src='{$badgeTuple->badge->imagePath}' title='{$badgeTuple->badge->badgeTitle}'>
-                        </div>
-                        <h3 class="badge-title">
-                            {$badgeTuple->badge->badgeTitle}
-                        </h3>
-                        <div class="description">{$badgeTuple->badge->description}</div>
-                        <div class="reason">For: {$badgeTuple->badgeAssociation->reason}</div>
-                        <div class="award-date">{$this->date->autodate($badgeTuple->badgeAssociation->awardDate)}</div>
+                        </a>
+                    </div>
+                    <h3 class="badge-title">
+                        {$badgeTuple->badge->badgeTitle}
+                    </h3>
+                    <div class="description">{$badgeTuple->badge->description}</div>
+                    <div class="reason">For: {$badgeTuple->badgeAssociation->reason}</div>
+                    <div class="award-date">{$this->date->autodate($badgeTuple->badgeAssociation->awardDate)}</div>
                 </section>
                 HTML;
         }
@@ -166,7 +168,7 @@ final readonly class Badges
                     <section class="badge">
                         <div class="badge-image"><img src="{$badge->imagePath}" title="{$badge->badgeTitle}"></div>
                         <div class="badge-title">{$badge->badgeTitle}</div>
-                        <div class="badge-description">{$badge->description}</div>
+                        <div class="description">{$badge->description}</div>
                     </section>
                     {$badgesHTML}
                 </div>

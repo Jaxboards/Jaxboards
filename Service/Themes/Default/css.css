@@ -816,7 +816,7 @@ textarea {
     max-height: 50px;
 }
 
-.userprofile .badge {
+.badges .badge {
     display: grid;
     grid-template-columns: 50px 1fr 1fr;
     grid-template-areas:
@@ -827,32 +827,32 @@ textarea {
     padding: 10px 5px;
 }
 
-.userprofile .badge .badge-title {
+.badges .badge .badge-title {
     grid-area: title;
     margin: 0;
 }
 
-.userprofile .badge .badge-image {
+.badges .badge .badge-image {
     grid-area: badgeImage;
 }
 
-.userprofile .badge .badge-image img {
+.badges .badge .badge-image img {
     position: relative;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
-.userprofile .badge .description {
+.badges .badge .description {
     grid-area: description;
 }
 
-.userprofile .badge .award-date {
+.badges .badge .award-date {
     grid-area: awardDate;
     text-align: right;
 }
 
-.userprofile .badge .reason {
+.badges .badge .reason {
     grid-area: reason;
 }
 
