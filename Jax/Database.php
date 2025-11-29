@@ -7,7 +7,6 @@ namespace Jax;
 use Exception;
 use Jax\Models\Forum;
 use Jax\Models\Topic;
-use Jax\Model;
 use PDO;
 use PDOStatement;
 

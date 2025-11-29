@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use DI\Attribute\Inject;
 use Jax\Attributes\Column;
 use Jax\Attributes\PrimaryKey;
 use PDO;
@@ -25,9 +24,9 @@ abstract class Model
 {
     public const TABLE = '';
 
-    private bool $fromDatabase = false;
-
     private static Database $database;
+
+    private bool $fromDatabase = false;
 
     public function __construct()
     {
@@ -40,7 +39,8 @@ abstract class Model
         $this->fromDatabase = true;
     }
 
-    public static function setDatabase(Database $database) {
+    public static function setDatabase(Database $database): void
+    {
         self::$database = $database;
     }
 
