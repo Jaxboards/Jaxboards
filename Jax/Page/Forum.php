@@ -312,7 +312,7 @@ final class Forum
             // 8
             ($topic->pinned !== 0 ? 'pinned' : '') . ' ' . ($topic->locked !== 0 ? 'locked' : ''),
             // 9
-            $topic->summary !== '' && $topic->summary !== '0' ? $topic->summary . (mb_strlen($topic->summary) > 45 ? '...' : '') : '',
+            $topic->summary !== '' ? $topic->summary . (mb_strlen($topic->summary) > 45 ? '...' : '') : '',
             // 10
             $this->user->getGroup()?->canModerate ? '<a href="?act=modcontrols&do=modt&tid='
                 . $topic->id . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',

@@ -325,7 +325,7 @@ final readonly class ModTopics
     {
         $modtids = (string) $this->session->getVar('modtids');
 
-        return $modtids !== '' && $modtids !== '0' ? array_map(
+        return $modtids !== '' ? array_map(
             static fn($tid): int => (int) $tid,
             explode(',', $modtids),
         ) : [];

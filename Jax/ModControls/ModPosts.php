@@ -184,7 +184,7 @@ final readonly class ModPosts
     private function getModPids(): array
     {
         $modPids = (string) $this->session->getVar('modpids');
-        $intPids = $modPids !== '' && $modPids !== '0'
+        $intPids = $modPids !== ''
             ? array_map(static fn($pid): int => (int) $pid, explode(',', $modPids))
             : [];
         sort($intPids);

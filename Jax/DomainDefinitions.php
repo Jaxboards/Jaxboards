@@ -46,7 +46,7 @@ final class DomainDefinitions
     {
 
         // Figure out url.
-        $host = $_SERVER['SERVER_NAME'] ?? $this->serviceConfig->getSetting('domain');
+        $host = $_SERVER['SERVER_NAME'] ?? (string) $this->serviceConfig->getSetting('domain');
         $port = $_SERVER['SERVER_PORT'] ?? '443';
         $scheme = $_SERVER['REQUEST_SCHEME'] ?? 'https';
 
@@ -68,8 +68,8 @@ final class DomainDefinitions
         if ($this->serviceConfig->getSetting('service')) {
             $domainMatch = str_replace('.', '\.', $this->serviceConfig->getSetting('domain'));
 
-            preg_match('@(.*)\.' . $domainMatch . '@i', (string) $host, $matches);
-            if ($matches[1] !== '' && $matches[1] !== '0') {
+            preg_match('@(.*)\.' . $domainMatch . '@i', $host, $matches);
+            if ($matches[1] !== '') {
                 $prefix = $matches[1];
                 $this->serviceConfig->override([
                     'prefix' => $prefix,

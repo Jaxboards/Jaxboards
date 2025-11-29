@@ -312,7 +312,7 @@ final class IDX
                     $forum->id,
                     $this->textFormatting->wordfilter($forum->title),
                     nl2br($forum->subtitle),
-                    $subforumHTML !== '' && $subforumHTML !== '0'
+                    $subforumHTML !== ''
                         ? $this->template->meta(
                             'idx-subforum-wrapper',
                             mb_substr(

@@ -112,7 +112,6 @@ final readonly class BuddyList
         $contacts = '';
         if (
             $this->user->get()->friends !== ''
-            && $this->user->get()->friends !== '0'
         ) {
             $online = $this->usersOnline->getUsersOnline();
             $friends = Member::selectMany(
@@ -220,10 +219,10 @@ final readonly class BuddyList
     private function block(int $uid): bool
     {
         $error = null;
-        $enemies = $this->user->get()->enemies !== '' && $this->user->get()->enemies !== '0'
+        $enemies = $this->user->get()->enemies !== ''
             ? explode(',', $this->user->get()->enemies)
             : [];
-        $friends = $this->user->get()->friends !== '' && $this->user->get()->friends !== '0'
+        $friends = $this->user->get()->friends !== ''
             ? explode(',', $this->user->get()->friends)
             : [];
 
