@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\ContactDetails;
-use Jax\Database;
 use Jax\IPAddress;
 use Jax\Models\Group;
 use Jax\Models\Member;

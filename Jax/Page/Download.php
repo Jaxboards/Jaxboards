@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
-use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\Models\File;
 use Jax\Request;

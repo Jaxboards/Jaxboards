@@ -7,7 +7,6 @@ namespace Jax\Models;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\PrimaryKey;
-use Jax\Database;
 use Jax\Model;
 
 final class Forum extends Model

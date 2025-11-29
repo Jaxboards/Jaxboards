@@ -17,6 +17,7 @@ use function array_filter;
 use function array_map;
 use function array_merge;
 use function array_unique;
+use function count;
 
 use const SORT_REGULAR;
 
@@ -101,7 +102,7 @@ abstract class Model
      */
     public static function selectOne(...$args): ?static
     {
-        $selectArgs = match(count($args)) {
+        $selectArgs = match (count($args)) {
             1 => [Database::WHERE_ID_EQUALS, $args[0]],
             default => $args,
         };

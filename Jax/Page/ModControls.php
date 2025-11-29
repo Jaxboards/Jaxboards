@@ -6,7 +6,6 @@ namespace Jax\Page;
 
 use Carbon\Carbon;
 use Jax\Config;
-use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
