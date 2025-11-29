@@ -67,7 +67,7 @@ final class LogReg
 
     public function render(): void
     {
-        match ((int) mb_substr($this->request->asString->both('act'), 6)) {
+        match ((int) mb_substr((string) $this->request->asString->both('act'), 6)) {
             1 => $this->register(),
             2 => $this->logout(),
             4 => $this->loginpopup(),

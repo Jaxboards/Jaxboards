@@ -259,7 +259,7 @@ final class Search
         }
 
         $result = null;
-        if ($ids) {
+        if ($ids !== '' && $ids !== '0') {
             $numresults = count(explode(',', $ids));
             $idarray = array_slice(
                 explode(',', $ids),

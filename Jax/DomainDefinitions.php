@@ -68,7 +68,7 @@ final class DomainDefinitions
         if ($this->serviceConfig->getSetting('service')) {
             $domainMatch = str_replace('.', '\.', $this->serviceConfig->getSetting('domain'));
 
-            preg_match('@(.*)\.' . $domainMatch . '@i', $host, $matches);
+            preg_match('@(.*)\.' . $domainMatch . '@i', (string) $host, $matches);
             if ($matches[1] !== '' && $matches[1] !== '0') {
                 $prefix = $matches[1];
                 $this->serviceConfig->override([
