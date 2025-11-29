@@ -651,10 +651,7 @@ final class Topic
         }
 
         if ($this->user->get()->mod !== 0) {
-            $forum = Forum::selectOne(
-                Database::WHERE_ID_EQUALS,
-                $modelsTopic->fid,
-            );
+            $forum = Forum::selectOne($modelsTopic->fid);
 
             if (
                 $forum !== null
@@ -734,10 +731,7 @@ final class Topic
             return;
         }
 
-        $post = Post::selectOne(
-            Database::WHERE_ID_EQUALS,
-            $pid,
-        );
+        $post = Post::selectOne($pid);
 
         if ($post === null) {
             $error = "That post doesn't exist!";
@@ -747,10 +741,7 @@ final class Topic
             return;
         }
 
-        $author = Member::selectOne(
-            Database::WHERE_ID_EQUALS,
-            $post->author,
-        );
+        $author = Member::selectOne($post->author);
 
         if ($this->request->both('qreply')) {
             $this->page->command(

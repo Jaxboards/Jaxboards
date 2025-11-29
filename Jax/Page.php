@@ -205,7 +205,7 @@ final class Page
             : null;
 
         // Couldn't find custom skin, get the default
-        $skin ??= Skin::selectOne('WHERE `default`=1 LIMIT 1');
+        $skin ??= Skin::selectOne('WHERE `default`=? LIMIT 1', 1);
 
         // We've exhausted all other ways of finding the right skin
         // Fallback to default

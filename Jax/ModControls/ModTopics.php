@@ -116,7 +116,7 @@ final readonly class ModTopics
 
         $forumIds = [];
 
-        $trashcan = Forum::selectOne('WHERE `trashcan`=1 LIMIT 1');
+        $trashcan = Forum::selectOne('WHERE `trashcan`=? LIMIT 1', 1);
 
         $trashcan = $trashcan->id ?? false;
 

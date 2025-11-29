@@ -220,10 +220,7 @@ final readonly class Inbox
 
     private function delete(int $messageId, bool $relocate = true): void
     {
-        $message = Message::selectOne(
-            Database::WHERE_ID_EQUALS,
-            $messageId,
-        );
+        $message = Message::selectOne($messageId);
 
         if ($message === null) {
             return;
@@ -345,10 +342,7 @@ final readonly class Inbox
             return "You don't have permission to view this message.";
         }
 
-        $otherMember = Member::selectOne(
-            Database::WHERE_ID_EQUALS,
-            $userIsRecipient ? $message->from : $message->to,
-        );
+        $otherMember = Member::selectOne($userIsRecipient ? $message->from : $message->to);
 
         if (!$message->read && $userIsRecipient) {
             $message->read = 1;

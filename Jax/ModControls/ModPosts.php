@@ -38,7 +38,7 @@ final readonly class ModPosts
 
     public function addPost(int $pid): void
     {
-        $post = $pid !== 0 ? $this->fetchPost($pid) : null;
+        $post = $pid !== 0 ? Post::selectOne($pid) : null;
         if ($post === null) {
             return;
         }
@@ -126,7 +126,7 @@ final readonly class ModPosts
      */
     private function deletePosts(array $pids): bool
     {
-        $trashCanForum = Forum::selectOne('WHERE `trashcan`=1');
+        $trashCanForum = Forum::selectOne('WHERE `trashcan`=?', 1);
 
         $posts = Post::selectMany(
             Database::WHERE_ID_IN,
@@ -192,14 +192,6 @@ final readonly class ModPosts
         return $intPids;
     }
 
-    private function fetchPost(int $pid): ?Post
-    {
-        return Post::selectOne(
-            Database::WHERE_ID_EQUALS,
-            $pid,
-        );
-    }
-
     /**
      * @return list<int> list of mod user IDs assigned to a forum. Empty array when none.
      */
@@ -243,7 +235,7 @@ final readonly class ModPosts
         Forum $trashCanForum,
         string $newTopicTitle,
     ): int {
-        $lastPost = $this->fetchPost((int) end($pids));
+        $lastPost = Post::selectOne(end($pids));
 
         $topic = new Topic();
         $topic->author = $this->user->get()->id;

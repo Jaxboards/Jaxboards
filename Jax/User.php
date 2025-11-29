@@ -99,10 +99,7 @@ final class User
             default => $this->member->groupID,
         };
 
-        $group = Group::selectOne(
-            Database::WHERE_ID_EQUALS,
-            $groupId,
-        );
+        $group = Group::selectOne($groupId);
         $this->userPerms = $group;
 
         return $this->userPerms;

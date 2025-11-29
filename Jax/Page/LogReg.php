@@ -371,10 +371,7 @@ final class LogReg
         }
 
         // Get member.
-        $member = Member::selectOne(
-            Database::WHERE_ID_EQUALS,
-            $token->uid,
-        );
+        $member = Member::selectOne($token->uid);
 
         if ($member === null) {
             return 'The associated account could not be found';

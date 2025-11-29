@@ -572,10 +572,7 @@ final readonly class UCP
     {
         $skinId = (int) $this->request->asString->both('skin');
 
-        $skin = Skin::selectOne(
-            Database::WHERE_ID_EQUALS,
-            $skinId,
-        );
+        $skin = Skin::selectOne($skinId);
 
         if ($skin === null) {
             return 'The skin chosen no longer exists.';
