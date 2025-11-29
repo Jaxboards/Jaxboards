@@ -169,7 +169,7 @@ final readonly class ModTopics
         }
 
         foreach ($forumIds as $forumId) {
-            $this->database->fixForumLastPost($forumId);
+            Forum::fixLastPost($forumId);
         }
 
         $this->cancel();
@@ -312,7 +312,7 @@ final readonly class ModTopics
 
         $fids[] = $forumId;
         foreach ($fids as $fid) {
-            $this->database->fixForumLastPost($fid);
+            Forum::fixLastPost($fid);
         }
 
         $this->page->location('?act=vf' . $forumId);

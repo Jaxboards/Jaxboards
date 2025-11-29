@@ -375,27 +375,6 @@ class Database
         return $this->query($newformat, ...$args);
     }
 
-    public function fixForumLastPost(int $forumId): void
-    {
-        $topic = Topic::selectOne(
-            $this,
-            'WHERE `fid`=? ORDER BY `lastPostDate` DESC LIMIT 1',
-            $forumId,
-        );
-
-        $forum = Forum::selectOne($this, self::WHERE_ID_EQUALS, $forumId);
-
-        if ($topic === null || $forum === null) {
-            return;
-        }
-
-        $forum->lastPostDate = $topic->lastPostDate;
-        $forum->lastPostTopic = $topic->id;
-        $forum->lastPostTopicTitle = $topic->title;
-        $forum->lastPostUser = $topic->lastPostUser;
-        $forum->update();
-    }
-
     /**
      * @param array<string,null|float|int|string> $keyValuePairs
      */

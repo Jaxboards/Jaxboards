@@ -7,6 +7,7 @@ namespace Jax\Models;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\PrimaryKey;
+use Jax\Database;
 use Jax\Model;
 
 final class Forum extends Model
@@ -79,4 +80,27 @@ final class Forum extends Model
 
     #[Column(name: 'showLedBy', type: 'bool')]
     public int $showLedBy = 0;
+
+    /**
+     * Given a forum ID, recomputes last post information for the forum
+     */
+    public static function fixLastPost(int $forumId): void
+    {
+        $topic = Topic::selectOne(
+            'WHERE `fid`=? ORDER BY `lastPostDate` DESC LIMIT 1',
+            $forumId,
+        );
+
+        $forum = Forum::selectOne(Database::WHERE_ID_EQUALS, $forumId);
+
+        if ($topic === null || $forum === null) {
+            return;
+        }
+
+        $forum->lastPostDate = $topic->lastPostDate;
+        $forum->lastPostTopic = $topic->id;
+        $forum->lastPostTopicTitle = $topic->title;
+        $forum->lastPostUser = $topic->lastPostUser;
+        $forum->update();
+    }
 }
