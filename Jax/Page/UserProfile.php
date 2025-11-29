@@ -49,7 +49,7 @@ final readonly class UserProfile
             return;
         }
 
-        $profile = $userId !== 0 ? $this->fetchUser($userId) : null;
+        $profile = $userId !== 0 ? Member::selectOne($userId) : null;
 
 
         match (true) {
@@ -65,18 +65,6 @@ final readonly class UserProfile
         return $this->request->isJSNewLocation()
             && !$this->request->isJSDirectLink()
             && !$this->request->both('page');
-    }
-
-    private function fetchGroupTitle(int $groupId): ?string
-    {
-        $group = Group::selectOne($groupId);
-
-        return $group?->title;
-    }
-
-    private function fetchUser(int $userId): ?Member
-    {
-        return Member::selectOne($userId);
     }
 
     private function isUserInList(int $userId, string $list): bool
@@ -198,7 +186,7 @@ final readonly class UserProfile
             $member->lastVisit,
             $member->id,
             $member->posts,
-            $this->fetchGroupTitle($member->groupID),
+            Group::selectOne($member->groupID)?->title,
             implode('', $tabs),
             $tabHTML,
             $this->user->getGroup()?->canModerate

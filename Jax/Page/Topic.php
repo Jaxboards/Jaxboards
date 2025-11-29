@@ -88,7 +88,7 @@ final class Topic
         $this->pageNumber = max((int) $this->request->both('page') - 1, 0);
         $quickReply = $this->request->both('qreply') !== null;
 
-        $topic = $this->fetchTopicData($tid);
+        $topic = ModelsTopic::selectOne($tid);
         $forumPerms = $topic !== null
             ? $this->fetchForumPermissions($topic)
             : [];
@@ -116,17 +116,6 @@ final class Topic
             $this->request->both('fmt') === 'RSS' => $this->viewRSS($topic),
             default => $this->viewTopic($topic),
         };
-    }
-
-    private function fetchTopicData(int $tid): ?ModelsTopic
-    {
-        $topic = ModelsTopic::selectOne($tid);
-
-        if ($topic === null) {
-            return null;
-        }
-
-        return $topic;
     }
 
     /**
