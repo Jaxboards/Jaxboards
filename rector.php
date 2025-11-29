@@ -12,7 +12,6 @@ use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\CodingStyle\Rector\Catch_\CatchExceptionNameMatchingTypeRector;
 use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
-use Rector\CodingStyle\Rector\If_\NullableCompareToNullRector;
 use Rector\Config\RectorConfig;
 use Rector\Php70\Rector\FunctionLike\ExceptionHandlerTypehintRector;
 use Rector\Php84\Rector\Param\ExplicitNullableParamTypeRector;
@@ -250,8 +249,6 @@ return RectorConfig::configure()
         CatchExceptionNameMatchingTypeRector::class,
         // disable converting enscaped strings, which makes things less readable
         EncapsedStringsToSprintfRector::class,
-        // disable converting ! on nullable to !== null
-        NullableCompareToNullRector::class,
         // no need to check .git directory
         __DIR__ . '/.git',
         // no need to touch vendor files

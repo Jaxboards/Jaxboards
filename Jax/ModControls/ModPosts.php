@@ -90,7 +90,7 @@ final readonly class ModPosts
             default => null,
         };
 
-        if (!$shouldClear) {
+        if ($shouldClear === null) {
             return;
         }
 
