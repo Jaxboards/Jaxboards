@@ -212,7 +212,7 @@ final readonly class Forums
             $forum = $forums[$forumId];
 
             if ($forum->mods) {
-                $modCount = count(explode(',', (string) $forum->mods));
+                $modCount = count(explode(',', $forum->mods));
                 $mods = $this->page->parseTemplate(
                     'forums/order-forums-tree-item-mods.html',
                     [
@@ -447,7 +447,7 @@ final readonly class Forums
         if ($forum?->mods) {
             $members = Member::selectMany(
                 Database::WHERE_ID_IN,
-                explode(',', (string) $forum->mods),
+                explode(',', $forum->mods),
             );
             $modList = '';
             foreach ($members as $member) {
@@ -836,7 +836,7 @@ final readonly class Forums
 
         $mods = [];
         foreach ($this->fetchAllForums() as $forum) {
-            foreach (explode(',', (string) $forum->mods) as $modId) {
+            foreach (explode(',', $forum->mods) as $modId) {
                 if ($modId === '') {
                     continue;
                 }

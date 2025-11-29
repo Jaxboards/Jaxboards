@@ -323,11 +323,11 @@ final readonly class ModTopics
      */
     private function getModTids(): array
     {
-        $modtids = $this->session->getVar('modtids');
+        $modtids = (string) $this->session->getVar('modtids');
 
         return $modtids ? array_map(
             static fn($tid): int => (int) $tid,
-            explode(',', (string) $this->session->getVar('modtids')),
+            explode(',', $modtids),
         ) : [];
     }
 

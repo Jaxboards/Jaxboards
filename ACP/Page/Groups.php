@@ -213,7 +213,7 @@ final class Groups
                 'groups/show-permissions-group-heading.html',
                 [
                     'id' => $groupId,
-                    'title' => (string) $group->title,
+                    'title' => $group->title,
                     'width_percent' => $widthPercent,
                 ],
             );

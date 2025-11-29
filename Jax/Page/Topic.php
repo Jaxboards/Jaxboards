@@ -189,8 +189,8 @@ final class Topic
         // Fix this to work with subforums.
         $this->page->setBreadCrumbs(
             [
-                "?act=vc{$category?->id}" => (string) $category?->title,
-                "?act=vf{$forum?->id}" => (string) $forum?->title,
+                "?act=vc{$category?->id}" => $category?->title ?? '',
+                "?act=vf{$forum?->id}" => $forum?->title ?? '',
                 "?act=vt{$modelsTopic->id}" => $topicTitle,
             ],
         );

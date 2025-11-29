@@ -437,7 +437,7 @@ final class Post
     {
         return match (true) {
             $postData !== null && trim($postData) === '' => "You didn't supply a post!",
-            mb_strlen((string) $this->postData) > 65_535 => 'Post must not exceed 65,535 characters.',
+            $this->postData && mb_strlen($this->postData) > 65_535 => 'Post must not exceed 65,535 characters.',
             default => null,
         };
     }

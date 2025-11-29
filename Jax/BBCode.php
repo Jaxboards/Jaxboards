@@ -225,15 +225,15 @@ final class BBCode
     private function bbcodeVideoCallback(array $match): string
     {
 
-        if (str_contains((string) $match[1], 'youtube.com')) {
-            preg_match('@v=([\w-]+)@', (string) $match[1], $youtubeMatches);
+        if (str_contains($match[1], 'youtube.com')) {
+            preg_match('@v=([\w-]+)@', $match[1], $youtubeMatches);
             $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
 
             return $this->youtubeEmbedHTML($match[1], $embedUrl);
         }
 
-        if (str_contains((string) $match[1], 'youtu.be')) {
-            preg_match('@youtu.be/(.+)$@', (string) $match[1], $youtubeMatches);
+        if (str_contains($match[1], 'youtu.be')) {
+            preg_match('@youtu.be/(.+)$@', $match[1], $youtubeMatches);
             $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
 
             return $this->youtubeEmbedHTML($match[1], $embedUrl);
@@ -248,7 +248,7 @@ final class BBCode
     private function bbcodeLICallback(array $match): string
     {
         $tag = $match[1];
-        $items = preg_split("@([\r\n]+|^)\\*@", (string) $match[2]) ?: [];
+        $items = preg_split("@([\r\n]+|^)\\*@", $match[2]) ?: [];
 
         // This HTML construction could be prettier, but
         // SonarQube requires the LI tags to be surrounded by OL and UL

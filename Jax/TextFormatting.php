@@ -66,14 +66,14 @@ final readonly class TextFormatting
             static fn(string $emote): string => preg_quote($emote, '@'),
             array_keys($emotes),
         );
-        $text = preg_replace_callback(
+        $text = (string) preg_replace_callback(
             '@(\s)(' . implode('|', $emotesEscaped) . ')@',
             $this->emoteCallback(...),
             ' ' . $text,
             $emoticonLimit,
         );
 
-        return mb_substr((string) $text, 1);
+        return mb_substr($text, 1);
     }
 
     /**

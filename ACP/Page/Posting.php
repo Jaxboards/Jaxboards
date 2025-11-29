@@ -47,6 +47,10 @@ final readonly class Posting
     private function wordfilter(): void
     {
         $page = '';
+
+        /**
+         * @var array<string,TextRule>
+         */
         $badWords = keyBy(
             TextRule::selectMany("WHERE `type`='badword'"),
             static fn($textRule) => $textRule->needle,
@@ -99,7 +103,7 @@ final readonly class Posting
                     'posting/word-filter-row.html',
                     [
                         'filter' => $textRule->needle,
-                        'filter_url_encoded' => rawurlencode((string) $textRule->needle),
+                        'filter_url_encoded' => rawurlencode($textRule->needle),
                         'result_code' => $this->textFormatting->blockhtml($textRule->replacement),
                     ],
                 );
@@ -136,7 +140,9 @@ final readonly class Posting
             );
         }
 
-        // Select emoticons.
+        /**
+         * @var array<TextRule>
+         */
         $emoticons = keyBy(
             TextRule::selectMany("WHERE `type`='emote'"),
             static fn($textRule) => $textRule->needle,
@@ -188,7 +194,7 @@ final readonly class Posting
                     'posting/emoticon-row.html',
                     [
                         'emoticon' => $emoticon->needle,
-                        'emoticon_url_encoded' => rawurlencode((string) $emoticon->needle),
+                        'emoticon_url_encoded' => rawurlencode($emoticon->needle),
                         'smiley_url' => $this->textFormatting->blockhtml($emoticon->replacement),
                     ],
                 );

@@ -116,7 +116,7 @@ final readonly class FileManager
 
         $table = '';
         foreach ($files as $file) {
-            $ext = pathinfo((string) $file->name, PATHINFO_EXTENSION);
+            $ext = pathinfo($file->name, PATHINFO_EXTENSION);
 
             $file->name = in_array($ext, Jax::IMAGE_EXTENSIONS, true) ? '<a href="'
                     . $this->domainDefinitions->getBoardPathUrl() . 'Uploads/' . $file->hash . '.' . $ext . '">'

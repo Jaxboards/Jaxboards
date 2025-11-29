@@ -107,7 +107,7 @@ final readonly class RecountStats
                 continue;
             }
 
-            foreach (explode(' ', (string) $forum->path) as $fid) {
+            foreach (explode(' ', $forum->path) as $fid) {
                 $stat['forum_topics'][$fid] += $stat['forum_topics'][$forum->id] ?? 0;
                 $stat['forum_posts'][$fid] += $stat['forum_posts'][$forum->id] ?? 0;
             }

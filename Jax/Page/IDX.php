@@ -144,7 +144,7 @@ final class IDX
         foreach ($forums as $forum) {
             // Store subforum details for later.
             if ($forum->path) {
-                preg_match('@\d+$@', (string) $forum->path, $match);
+                preg_match('@\d+$@', $forum->path, $match);
                 $subForumId = $match !== [] ? (int) $match[0] : null;
                 if (
                     $subForumId
@@ -289,7 +289,7 @@ final class IDX
                     'idx-redirect-row',
                     $forum->id,
                     $forum->title,
-                    nl2br((string) $forum->subtitle),
+                    nl2br($forum->subtitle),
                     'Redirects: ' . $forum->redirects,
                     $this->template->meta('icon-redirect')
                         ?: $this->template->meta('idx-icon-redirect'),
@@ -311,7 +311,7 @@ final class IDX
                     'idx-row',
                     $forum->id,
                     $this->textFormatting->wordfilter($forum->title),
-                    nl2br((string) $forum->subtitle),
+                    nl2br($forum->subtitle),
                     $subforumHTML !== '' && $subforumHTML !== '0'
                         ? $this->template->meta(
                             'idx-subforum-wrapper',
@@ -424,7 +424,7 @@ final class IDX
 
         foreach ($this->usersOnline->getUsersOnline() as $userOnline) {
             $title = $this->textFormatting->blockhtml(
-                (string) $userOnline->locationVerbose ?: 'Viewing the board.',
+                $userOnline->locationVerbose ?: 'Viewing the board.',
             );
             if ($userOnline->isBot) {
                 $html .= '<a class="user' . $userOnline->uid . '" '

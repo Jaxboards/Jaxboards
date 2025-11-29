@@ -143,10 +143,12 @@ final class Search
 
         $searchTerm = $this->request->asString->both('searchterm') ?: (string) $this->session->getVar('searcht');
 
+        $ids = '';
+
         if (
             $this->request->both('searchterm') === null
         ) {
-            $ids = $this->session->getVar('search');
+            $ids = (string) $this->session->getVar('search');
         } else {
             $this->getSearchableForums();
             $fidsInput = $this->request->both('fids');
@@ -242,7 +244,6 @@ final class Search
             );
 
 
-            $ids = '';
             while ($id = $this->database->arow($result)) {
                 if (!$id['id']) {
                     continue;
@@ -259,9 +260,9 @@ final class Search
 
         $result = null;
         if ($ids) {
-            $numresults = count(explode(',', (string) $ids));
+            $numresults = count(explode(',', $ids));
             $idarray = array_slice(
-                explode(',', (string) $ids),
+                explode(',', $ids),
                 $this->pageNum * $this->perpage,
                 $this->perpage,
             );

@@ -93,7 +93,7 @@ final readonly class Inbox
 
             $error = match (true) {
                 !$udata => 'Invalid user!',
-                trim((string) $this->request->asString->both('title')) === '' => 'You must enter a title.',
+                trim($this->request->asString->both('title') ?? '') === '' => 'You must enter a title.',
                 default => null,
             };
 

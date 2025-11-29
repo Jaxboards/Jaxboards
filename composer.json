@@ -75,7 +75,7 @@
         "phpunit": "phpunit",
         "psalm": "psalm",
         "psalm-report": "psalm --output-format=sonarqube > psalm-report.json",
-        "rector": "rector --verbose --verbose",
+        "rector": "rector --verbose",
         "test": "phpunit"
     },
     "version": "2.1.10"

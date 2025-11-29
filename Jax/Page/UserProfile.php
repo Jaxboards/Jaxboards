@@ -41,7 +41,7 @@ final readonly class UserProfile
 
     public function render(): void
     {
-        preg_match('@\d+@', (string) $this->request->asString->both('act'), $match);
+        preg_match('@\d+@', $this->request->asString->both('act') ?? '', $match);
         $userId = $match !== [] ? (int) $match[0] : 0;
 
 
