@@ -168,7 +168,7 @@ final readonly class ModPosts
             ),
         ), SORT_REGULAR);
 
-        array_map(fn($fid) => Forum::fixLastPost($fid), $fids);
+        array_map(static fn($fid) => Forum::fixLastPost($fid), $fids);
 
         // Remove them from the page.
         array_map(fn($postId) => $this->page->command('removeel', '#pid_' . $postId), $pids);

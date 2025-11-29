@@ -82,7 +82,7 @@ final class Forum extends Model
     public int $showLedBy = 0;
 
     /**
-     * Given a forum ID, recomputes last post information for the forum
+     * Given a forum ID, recomputes last post information for the forum.
      */
     public static function fixLastPost(int $forumId): void
     {
@@ -91,7 +91,7 @@ final class Forum extends Model
             $forumId,
         );
 
-        $forum = Forum::selectOne(Database::WHERE_ID_EQUALS, $forumId);
+        $forum = self::selectOne(Database::WHERE_ID_EQUALS, $forumId);
 
         if ($topic === null || $forum === null) {
             return;

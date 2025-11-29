@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Jax;
 
 use Exception;
-use Jax\Models\Forum;
-use Jax\Models\Topic;
 use PDO;
 use PDOStatement;
 
