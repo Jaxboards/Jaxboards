@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use DI\Attribute\Inject;
 use Jax\Attributes\Column;
 use Jax\Attributes\PrimaryKey;
 use PDO;
@@ -26,6 +27,8 @@ abstract class Model
 
     private bool $fromDatabase = false;
 
+    private static Database $database;
+
     public function __construct()
     {
         $primaryKey = static::getPrimaryKey();
@@ -35,6 +38,10 @@ abstract class Model
         }
 
         $this->fromDatabase = true;
+    }
+
+    public static function setDatabase(Database $database) {
+        self::$database = $database;
     }
 
     public static function getPrimaryKey(): string
@@ -77,7 +84,7 @@ abstract class Model
      */
     public static function count(...$args): ?int
     {
-        $database = static::getDatabase();
+        $database = self::$database;
         $stmt = $database->select(
             'COUNT(*) as `count`',
             static::TABLE,
@@ -93,7 +100,7 @@ abstract class Model
      */
     public static function selectOne(...$args): ?static
     {
-        $database = static::getDatabase();
+        $database = self::$database;
         $stmt = $database->select(
             array_map(
                 $database->quoteIdentifier(...),
@@ -115,7 +122,7 @@ abstract class Model
      */
     public static function selectMany(...$args): array
     {
-        $database = static::getDatabase();
+        $database = self::$database;
         $stmt = $database->select(
             array_map(
                 static fn($field): string => "`{$field}`",
@@ -160,16 +167,9 @@ abstract class Model
         ) : $otherIds;
     }
 
-    public static function getDatabase(): Database
-    {
-        global $container;
-
-        return $container->get(Database::class);
-    }
-
     public function delete(): ?PDOStatement
     {
-        $database = static::getDatabase();
+        $database = self::$database;
         $primaryKey = static::getPrimaryKey();
 
         return $database->delete(
@@ -181,7 +181,7 @@ abstract class Model
 
     public function insert(): ?PDOStatement
     {
-        $database = static::getDatabase();
+        $database = self::$database;
         $primaryKey = static::getPrimaryKey();
         $reflectionProperty = new ReflectionProperty(static::class, $primaryKey);
         $type = (string) $reflectionProperty->getType();
@@ -208,7 +208,7 @@ abstract class Model
 
     public function update(): ?PDOStatement
     {
-        $database = static::getDatabase();
+        $database = self::$database;
         $primaryKey = static::getPrimaryKey();
         $data = $this->asArray();
 
