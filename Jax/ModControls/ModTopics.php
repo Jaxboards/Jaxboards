@@ -56,7 +56,7 @@ final readonly class ModTopics
         $this->page->command('softurl');
 
         $topic = $tid !== 0
-            ? Topic::selectOne(Database::WHERE_ID_EQUALS, $tid)
+            ? Topic::selectOne($tid)
             : null;
 
         if ($topic === null) {
@@ -64,7 +64,7 @@ final readonly class ModTopics
         }
 
         if (!$this->user->getGroup()?->canModerate) {
-            $forum = Forum::selectOne(Database::WHERE_ID_EQUALS, $topic->fid);
+            $forum = Forum::selectOne($topic->fid);
 
             if (!$forum || $forum->mods === '') {
                 return;
@@ -281,10 +281,7 @@ final readonly class ModTopics
     private function moveTo(): void
     {
         $forumId = (int) $this->request->asString->post('id');
-        $forum = Forum::selectOne(
-            Database::WHERE_ID_EQUALS,
-            $forumId,
-        );
+        $forum = Forum::selectOne($forumId);
         if ($forum === null) {
             return;
         }

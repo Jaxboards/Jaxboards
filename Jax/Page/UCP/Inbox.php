@@ -89,7 +89,7 @@ final readonly class Inbox
             $to = $this->request->asString->both('to');
             $udata = !$mid && $to
                 ? Member::selectOne('WHERE `displayName`=?', $to)
-                : Member::selectOne(Database::WHERE_ID_EQUALS, $mid);
+                : Member::selectOne($mid);
 
             $error = match (true) {
                 !$udata => 'Invalid user!',
@@ -176,7 +176,7 @@ final readonly class Inbox
 
             if ($message !== null) {
                 $mid = $message->from;
-                $member = Member::selectOne(Database::WHERE_ID_EQUALS, $mid);
+                $member = Member::selectOne($mid);
                 $mname = $member?->displayName;
 
                 $msg = PHP_EOL . PHP_EOL . PHP_EOL
@@ -191,7 +191,7 @@ final readonly class Inbox
 
         if (is_numeric($this->request->asString->get('mid'))) {
             $mid = (int) $this->request->asString->both('mid');
-            $member = Member::selectOne(Database::WHERE_ID_EQUALS, $mid);
+            $member = Member::selectOne($mid);
             $mname = $member?->displayName;
 
             if (!$mname) {

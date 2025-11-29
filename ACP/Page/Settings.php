@@ -338,7 +338,7 @@ final readonly class Settings
 
         $delete = (int) $this->request->asString->both('d');
         if ($delete !== 0) {
-            $badge = Badge::selectOne(Database::WHERE_ID_EQUALS, $delete);
+            $badge = Badge::selectOne($delete);
             if ($badge !== null) {
                 $badge->delete();
             }
@@ -346,7 +346,7 @@ final readonly class Settings
 
         $ungrant = (int) $this->request->asString->both('ungrant');
         if ($ungrant !== 0) {
-            $grant = BadgeAssociation::selectOne(Database::WHERE_ID_EQUALS, $ungrant);
+            $grant = BadgeAssociation::selectOne($ungrant);
             if ($grant !== null) {
                 $grant->delete();
             }

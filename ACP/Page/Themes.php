@@ -400,7 +400,7 @@ final readonly class Themes
 
     private function editCSS(int $id): void
     {
-        $skin = Skin::selectOne(Database::WHERE_ID_EQUALS, $id);
+        $skin = Skin::selectOne($id);
 
         if ($skin === null) {
             $this->page->addContentBox('Error', "Skin id {$id} not found");
@@ -558,7 +558,7 @@ final readonly class Themes
 
     private function deleteSkin(int $id): void
     {
-        $skin = Skin::selectOne(Database::WHERE_ID_EQUALS, $id);
+        $skin = Skin::selectOne($id);
 
         if ($skin === null) {
             $this->page->addContentBox('Error', "Skin id {$id} not found");

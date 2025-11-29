@@ -192,7 +192,7 @@ final class Post
 
         $isEditing = (bool) $topic;
 
-        $forum = Forum::selectOne(Database::WHERE_ID_EQUALS, $fid);
+        $forum = Forum::selectOne($fid);
 
         if ($forum === null) {
             $this->page->location('?');
@@ -306,12 +306,12 @@ final class Post
             $this->page->command('closewindow', '#qreply');
         }
 
-        $topic = Topic::selectOne(Database::WHERE_ID_EQUALS, $tid);
+        $topic = Topic::selectOne($tid);
         if ($topic === null) {
             return "The topic you're attempting to reply in no longer exists.";
         }
 
-        $forum = Forum::selectOne(Database::WHERE_ID_EQUALS, $topic->fid);
+        $forum = Forum::selectOne($topic->fid);
         if ($forum === null) {
             return "The forum you're attempting to reply to no longer exists.";
         }
@@ -420,7 +420,7 @@ final class Post
         }
 
         if ($this->user->get()->mod !== 0) {
-            $forum = Forum::selectOne(Database::WHERE_ID_EQUALS, $topic);
+            $forum = Forum::selectOne($topic);
 
             if (
                 $forum
@@ -506,9 +506,9 @@ final class Post
         $pid = $this->pid;
         $postData = $this->postData;
 
-        $post = ModelsPost::selectOne(Database::WHERE_ID_EQUALS, $pid);
+        $post = ModelsPost::selectOne($pid);
         $topic = $post !== null
-            ? Topic::selectOne(Database::WHERE_ID_EQUALS, $post->tid)
+            ? Topic::selectOne($post->tid)
             : null;
 
         $isTopicPost = $topic && $post && $topic->op === $post->id;
@@ -572,7 +572,7 @@ final class Post
         ) : [];
         $pollType = $this->request->asString->post('pollType');
 
-        $forum = Forum::selectOne(Database::WHERE_ID_EQUALS, $fid);
+        $forum = Forum::selectOne($fid);
 
         $forumPerms = $forum !== null
             ? $this->user->getForumPerms($forum->perms)
@@ -668,9 +668,9 @@ final class Post
             return null;
         }
 
-        $topic = Topic::selectOne(Database::WHERE_ID_EQUALS, $tid);
+        $topic = Topic::selectOne($tid);
         $forum = $topic !== null
-            ? Forum::selectOne(Database::WHERE_ID_EQUALS, $topic->fid)
+            ? Forum::selectOne($topic->fid)
             : null;
 
         if ($topic === null || $forum === null) {

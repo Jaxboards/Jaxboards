@@ -96,10 +96,16 @@ abstract class Model
     }
 
     /**
-     * @param mixed $args
+     * @method ?static selectOne(int|string $primaryKey)
+     * @method ?static selectOne(mixed $args)
      */
     public static function selectOne(...$args): ?static
     {
+        $selectArgs = match(count($args)) {
+            1 => [Database::WHERE_ID_EQUALS, $args[0]],
+            default => $args,
+        };
+
         $database = self::$database;
         $stmt = $database->select(
             array_map(
@@ -107,7 +113,7 @@ abstract class Model
                 static::getFields(),
             ),
             static::TABLE,
-            ...$args,
+            ...$selectArgs,
         );
         $record = $stmt?->fetchObject(static::class) ?: null;
         $database->disposeresult($stmt);

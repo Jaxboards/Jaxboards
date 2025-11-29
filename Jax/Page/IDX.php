@@ -361,7 +361,7 @@ final class IDX
 
         $stats = Stats::selectOne();
         $lastRegisteredMember = $stats?->last_register !== null
-            ? Member::selectOne(Database::WHERE_ID_EQUALS, $stats->last_register)
+            ? Member::selectOne($stats->last_register)
             : null;
 
         $usersOnlineToday = $this->usersOnline->getUsersOnlineToday();

@@ -32,7 +32,7 @@ final readonly class Download
 
     private function downloadFile(int $id): void
     {
-        $file = File::selectOne(Database::WHERE_ID_EQUALS, $id);
+        $file = File::selectOne($id);
 
         if ($file === null) {
             return;

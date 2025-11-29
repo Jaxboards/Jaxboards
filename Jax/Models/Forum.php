@@ -91,7 +91,7 @@ final class Forum extends Model
             $forumId,
         );
 
-        $forum = self::selectOne(Database::WHERE_ID_EQUALS, $forumId);
+        $forum = self::selectOne($forumId);
 
         if ($topic === null || $forum === null) {
             return;

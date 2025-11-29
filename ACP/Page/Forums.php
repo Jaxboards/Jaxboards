@@ -362,7 +362,7 @@ final readonly class Forums
             // Add per-forum moderator.
             $modId = (int) $this->request->asString->post('modid');
             if ($modId !== 0) {
-                $member = Member::selectOne(Database::WHERE_ID_EQUALS, $modId);
+                $member = Member::selectOne($modId);
                 if ($member !== null) {
                     $mods = $forum->mods !== ''
                         ? explode(',', $forum->mods)
@@ -704,7 +704,7 @@ final readonly class Forums
         $cid = $cid ?: (int) $this->request->asString->post('category');
 
         $category = $cid !== 0
-            ? Category::selectOne(Database::WHERE_ID_EQUALS, $cid)
+            ? Category::selectOne($cid)
             : null;
         $category ??= new Category();
 

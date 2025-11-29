@@ -120,7 +120,7 @@ final readonly class Badges
             return;
         }
 
-        $badge = Badge::selectOne(Database::WHERE_ID_EQUALS, $badgeId);
+        $badge = Badge::selectOne($badgeId);
 
         if ($badge === null) {
             return;

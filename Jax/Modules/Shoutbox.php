@@ -280,7 +280,7 @@ final class Shoutbox
 
     public function deleteShout(int $delete): void
     {
-        $shout = Shout::selectOne(Database::WHERE_ID_EQUALS, $delete);
+        $shout = Shout::selectOne($delete);
         $candelete = !$this->user->isGuest() && $shout !== null && $this->canDelete($shout);
 
         if (!$candelete) {

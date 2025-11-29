@@ -120,7 +120,7 @@ final class Topic
 
     private function fetchTopicData(int $tid): ?ModelsTopic
     {
-        $topic = ModelsTopic::selectOne(Database::WHERE_ID_EQUALS, $tid);
+        $topic = ModelsTopic::selectOne($tid);
 
         if ($topic === null) {
             return null;
@@ -142,7 +142,7 @@ final class Topic
             return $forumPerms;
         }
 
-        $forum = $forum ?: Forum::selectOne(Database::WHERE_ID_EQUALS, $modelsTopic->fid);
+        $forum = $forum ?: Forum::selectOne($modelsTopic->fid);
 
         if ($forum === null) {
             return [];
@@ -182,9 +182,9 @@ final class Topic
         $this->page->setPageTitle($topicTitle);
         $this->session->set('locationVerbose', "In topic '" . $topicTitle . "'");
 
-        $forum = Forum::selectOne(Database::WHERE_ID_EQUALS, $modelsTopic->fid);
+        $forum = Forum::selectOne($modelsTopic->fid);
         $category = $forum !== null
-            ? Category::selectOne(Database::WHERE_ID_EQUALS, $forum->category)
+            ? Category::selectOne($forum->category)
             : null;
         // Fix this to work with subforums.
         $this->page->setBreadCrumbs(
@@ -676,7 +676,7 @@ final class Topic
         }
 
         $this->page->command('softurl');
-        $post = Post::selectOne(Database::WHERE_ID_EQUALS, $pid);
+        $post = Post::selectOne($pid);
 
         $hiddenfields = $this->jax->hiddenFormFields(
             [
@@ -811,7 +811,7 @@ final class Topic
     private function findPost(ModelsTopic $modelsTopic, int $postId): void
     {
         $postPosition = null;
-        $post = Post::selectOne(Database::WHERE_ID_EQUALS, $postId);
+        $post = Post::selectOne($postId);
         if ($post === null) {
             return;
         }

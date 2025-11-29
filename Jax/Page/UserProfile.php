@@ -70,14 +70,14 @@ final readonly class UserProfile
 
     private function fetchGroupTitle(int $groupId): ?string
     {
-        $group = Group::selectOne(Database::WHERE_ID_EQUALS, $groupId);
+        $group = Group::selectOne($groupId);
 
         return $group?->title;
     }
 
     private function fetchUser(int $userId): ?Member
     {
-        return Member::selectOne(Database::WHERE_ID_EQUALS, $userId);
+        return Member::selectOne($userId);
     }
 
     private function isUserInList(int $userId, string $list): bool

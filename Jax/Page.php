@@ -201,7 +201,7 @@ final class Page
     private function getSelectedSkin(?int $skinId): Skin
     {
         $skin = $skinId
-            ? Skin::selectOne(Database::WHERE_ID_EQUALS, $skinId)
+            ? Skin::selectOne($skinId)
             : null;
 
         // Couldn't find custom skin, get the default

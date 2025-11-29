@@ -57,7 +57,7 @@ final readonly class Reactions
         }
 
         $this->page->command('softurl');
-        $post = Post::selectOne(Database::WHERE_ID_EQUALS, $pid);
+        $post = Post::selectOne($pid);
 
         $ratings = $post !== null ? json_decode($post->rating, true) : [];
 
@@ -155,7 +155,7 @@ final readonly class Reactions
     {
         $this->page->command('softurl');
 
-        $post = Post::selectOne(Database::WHERE_ID_EQUALS, $postid);
+        $post = Post::selectOne($postid);
 
         $niblets = $this->fetchRatingNiblets();
         $ratings = [];

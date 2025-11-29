@@ -75,10 +75,7 @@ final class User
             return $this->member;
         }
 
-        $user = Member::selectOne(
-            Database::WHERE_ID_EQUALS,
-            $uid,
-        );
+        $user = Member::selectOne($uid);
 
         if ($user === null) {
             return $this->member;

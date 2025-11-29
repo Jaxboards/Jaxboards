@@ -188,7 +188,7 @@ final class BBCode
             return $this->attachmentData[$fileId];
         }
 
-        $file = File::selectOne(Database::WHERE_ID_EQUALS, $fileId);
+        $file = File::selectOne($fileId);
 
         if ($file === null) {
             return null;

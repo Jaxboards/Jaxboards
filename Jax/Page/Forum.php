@@ -111,7 +111,7 @@ final class Forum
         $page = '';
         $table = '';
 
-        $forum = ModelsForum::selectOne(Database::WHERE_ID_EQUALS, $fid);
+        $forum = ModelsForum::selectOne($fid);
 
         if ($forum === null) {
             $this->page->location('?');
@@ -336,7 +336,7 @@ final class Forum
     private function setBreadCrumbs(ModelsForum $forum): void
     {
         // Start building the nav path.
-        $category = Category::selectOne(Database::WHERE_ID_EQUALS, $forum->category);
+        $category = Category::selectOne($forum->category);
         $breadCrumbs = $category !== null
             ? ["?act=vc{$forum->category}" => $category->title]
             : [];

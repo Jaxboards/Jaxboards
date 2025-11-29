@@ -156,7 +156,7 @@ final readonly class ModControls
         $displayName = $this->request->asString->post('displayName');
         $mid = (int) $this->request->asString->post('mid');
 
-        $member = Member::selectOne(Database::WHERE_ID_EQUALS, $mid);
+        $member = Member::selectOne($mid);
 
         if (!$displayName) {
             return $this->page->error('Display name is invalid.');
@@ -193,7 +193,7 @@ final readonly class ModControls
 
         // Get the member data.
         if ($memberId !== 0) {
-            $member = Member::selectOne(Database::WHERE_ID_EQUALS, $memberId);
+            $member = Member::selectOne($memberId);
         } elseif (!$memberName) {
             return $this->page->error('Member name is a required field.');
         } else {

@@ -334,7 +334,7 @@ final class Groups
         }
 
         $group = $gid
-            ? Group::selectOne(Database::WHERE_ID_EQUALS, $gid)
+            ? Group::selectOne($gid)
             : null;
         $group ??= new Group();
 
@@ -368,10 +368,7 @@ final class Groups
 
         $group = null;
         if ($gid) {
-            $group = Group::selectOne(
-                Database::WHERE_ID_EQUALS,
-                $gid,
-            );
+            $group = Group::selectOne($gid);
         }
 
         $page .= $this->page->parseTemplate(

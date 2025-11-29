@@ -105,7 +105,7 @@ final readonly class Members
         $member = null;
         if ($memberId || $this->request->post('submit')) {
             if ($memberId !== 0) {
-                $member = Member::selectOne(Database::WHERE_ID_EQUALS, $memberId);
+                $member = Member::selectOne($memberId);
                 if ($this->request->post('savedata') && $member) {
                     $page = $this->updateMember($member);
                 }
@@ -341,8 +341,8 @@ final readonly class Members
 
     private function mergeMembers(int $mid1, int $mid2): ?string
     {
-        $member1 = Member::selectOne(Database::WHERE_ID_EQUALS, $mid1);
-        $member2 = Member::selectOne(Database::WHERE_ID_EQUALS, $mid2);
+        $member1 = Member::selectOne($mid1);
+        $member2 = Member::selectOne($mid2);
 
         if ($member1 === null || $member2 === null) {
             return 'Invalid input, or the accounts may already be merged';

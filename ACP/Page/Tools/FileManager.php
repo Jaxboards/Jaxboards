@@ -41,7 +41,7 @@ final readonly class FileManager
         $page = '';
         $delete = (int) $this->request->asString->both('delete');
         if ($delete !== 0) {
-            $file = File::selectOne(Database::WHERE_ID_EQUALS, $delete);
+            $file = File::selectOne($delete);
             if ($file !== null) {
                 $ext = mb_strtolower(pathinfo($file->name, PATHINFO_EXTENSION));
                 if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'], true)) {
