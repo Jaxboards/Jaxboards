@@ -22,7 +22,7 @@ use const PHP_EOL;
 
 $jaxboardsRoot = dirname(__DIR__);
 
-require_once dirname(__DIR__) . '/Jax/autoload.php';
+require_once dirname(__DIR__) . '/autoload.php';
 
 function error(string $message): string
 {

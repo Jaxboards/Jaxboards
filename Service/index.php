@@ -13,7 +13,7 @@ declare(strict_types=1);
 use DI\Container;
 use Jax\Page\ServiceSignup;
 
-require_once dirname(__DIR__) . '/Jax/autoload.php';
+require_once dirname(__DIR__) . '/autoload.php';
 
 if (!file_exists(dirname(__DIR__) . '/config.php')) {
     echo 'Jaxboards not installed!';

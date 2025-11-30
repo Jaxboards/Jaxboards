@@ -22,7 +22,7 @@ if (file_exists(dirname(__DIR__) . '/config.php')) {
     exit(1);
 }
 
-require_once dirname(__DIR__) . '/Jax/autoload.php';
+require_once dirname(__DIR__) . '/autoload.php';
 $container = new Container();
 
 $container->get(ServiceInstall::class)->render();
