@@ -2,9 +2,10 @@
     "autoload": {
         "psr-4": {
             "ACP\\": "ACP",
+            "emoticons\\": "emoticons",
             "Jax\\": "Jax",
-            "Tests\\": "Tests",
-            "emoticons\\": "emoticons"
+            "Service\\": "Service",
+            "Tests\\": "Tests"
         }
     },
     "config": {
