@@ -77,7 +77,7 @@ jobs:
                   echo "[]" > psalm-report.json
               shell: bash
             - run: npm run-script ci-lint
-            - run: composer run-script phpunit
+            - run: composer run-script test
             - name: SonarQube Scan
               if: always()
               uses: SonarSource/sonarqube-scan-action@v6
