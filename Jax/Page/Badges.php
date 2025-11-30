@@ -123,6 +123,7 @@ final readonly class Badges
 
         if ($badge === null) {
             $this->page->location('?');
+
             return;
         }
 
