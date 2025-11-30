@@ -44,7 +44,6 @@
             <directory suffix="php">Service</directory>
             <directory suffix="php">api</directory>
             <directory suffix="php">boards</directory>
-            <directory suffix="php">boards</directory>
             <directory suffix="php">tools</directory>
             <file>index.php</file>
         </include>
