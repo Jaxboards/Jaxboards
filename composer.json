@@ -3,7 +3,7 @@
         "psr-4": {
             "ACP\\": "ACP",
             "Jax\\": "Jax",
-            "Test\\": "Test",
+            "Tests\\": "Tests",
             "emoticons\\": "emoticons"
         }
     },
