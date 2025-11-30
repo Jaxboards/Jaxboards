@@ -6,7 +6,7 @@ use ACP\Page\Login;
 use DI\Container;
 
 // Load composer dependencies.
-require_once dirname(__DIR__) . '/autoload.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 $container = new Container();
 $container->get(Login::class)->render();

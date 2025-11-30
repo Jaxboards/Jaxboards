@@ -1,4 +1,13 @@
 {
+    "autoload": {
+        "psr-4": {
+            "ACP\\": "ACP",
+            "Jax\\": "Jax",
+            "Test\\": "Test",
+            "emoticons\\": "emoticons"
+        }
+    },
+
     "config": {
         "classmap-authoritative": true,
         "optimize-autoloader": true,

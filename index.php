@@ -6,7 +6,7 @@ use DI\Container;
 use Jax\App;
 
 // Load composer dependencies.
-require_once __DIR__ . '/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 $container = new Container();
 $container->get(App::class)->render();
