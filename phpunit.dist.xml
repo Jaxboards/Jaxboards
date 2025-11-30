@@ -7,7 +7,7 @@
     beStrictAboutCoverageMetadata="true"
     beStrictAboutOutputDuringTests="true"
     beStrictAboutTestsThatDoNotTestAnything="true"
-    bootstrap="autoload.php"
+    bootstrap="vendor/autoload.php"
     colors="true"
     columns="max"
     cacheDirectory=".phpunit.cache"
@@ -34,10 +34,6 @@
     </logging>
 
     <source>
-        <exclude>
-            <!-- tracking down weird coverage behavior -->
-            <file>autoload.php</file>
-        </exclude>
         <include>
             <directory suffix="php">ACP</directory>
             <directory suffix="php">Jax</directory>
