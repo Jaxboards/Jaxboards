@@ -2,18 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Jax;
+namespace Tests;
 
 use DI\Container;
 use Jax\Attributes\Column;
+use Jax\Config;
 use Jax\Constants\Groups;
+use Jax\Database;
+use Jax\DomainDefinitions;
+use Jax\IPAddress;
+use Jax\Jax;
+use Jax\Model;
 use Jax\Models\Group;
 use Jax\Models\Member;
+use Jax\ServiceConfig;
+use Jax\User;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesFunction;
-use PHPUnit\Framework\TestCase;
 
 use function base64_decode;
 

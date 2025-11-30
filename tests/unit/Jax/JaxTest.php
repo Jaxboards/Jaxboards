@@ -2,10 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Jax;
+namespace Tests;
 
 use DI\Container;
+use Jax\Config;
 use Jax\Constants\Groups;
+use Jax\DomainDefinitions;
+use Jax\Jax;
+use Jax\Model;
+use Jax\ServiceConfig;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\UsesClass;
