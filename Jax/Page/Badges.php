@@ -122,6 +122,7 @@ final readonly class Badges
         $badge = Badge::selectOne($badgeId);
 
         if ($badge === null) {
+            $this->page->location('?');
             return;
         }
 
