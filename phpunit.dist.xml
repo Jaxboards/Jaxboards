@@ -21,7 +21,6 @@
     >
     <coverage
         includeUncoveredFiles="true"
-        pathCoverage="true"
         ignoreDeprecatedCodeUnits="true"
         disableCodeCoverageIgnore="true"
         >
