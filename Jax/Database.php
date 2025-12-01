@@ -77,12 +77,22 @@ class Database
         string $password,
         string $database = '',
         string $prefix = '',
-        string $driver = '',
     ): void {
-        $additionalOptions = $this->driver === 'mysql'
-            ? ';charset=utf8mb4'
-            : '';
-        $this->pdo = new PDO($this->driver . ":host={$host};dbname={$database}" . $additionalOptions, $user, $password, []);
+        $connectionArgs = match ($this->driver) {
+            'mysql' => [
+                "mysql:host={$host};dbname={$database};charset=utf8mb4",
+                $user,
+                $password
+            ],
+            'postgres' => [
+                "postgres:host={$host};dbname={$database}",
+                $user,
+                $password
+            ],
+            'sqliteMemory' => [ "sqlite::memory:" ]
+        };
+
+        $this->pdo = new PDO(...$connectionArgs);
 
         // All datetimes are GMT for jaxboards
         $this->pdo->query($this->driver === 'mysql' ? "SET time_zone = '+0:00'" : 'SET TIME ZONE "UTC"');
