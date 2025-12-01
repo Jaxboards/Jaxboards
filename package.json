@@ -1,10 +1,10 @@
 {
-    "name": "Jaxboards",
+    "name": "jaxboards",
     "devDependencies": {
         "@eslint/eslintrc": "^3.3.1",
         "@eslint/js": "^9.26.0",
         "esbuild": "^0.25.3",
-        "eslint": "^9.26.0",
+        "eslint": "^9.39.1",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-config-prettier": "^10.1.1",
         "eslint-import-resolver-node": "^0.3.9",
