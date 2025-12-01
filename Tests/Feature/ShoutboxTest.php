@@ -26,7 +26,7 @@ final class ShoutboxTest extends TestCase
             $this->container->get(DomainDefinitions::class),
             [
                 'shoutbox' => true,
-            ]
+            ],
         ));
 
         parent::setUp();
