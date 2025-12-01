@@ -85,7 +85,7 @@
         ],
         "psalm": "psalm",
         "psalm-report": "psalm --output-format=sonarqube > psalm-report.json",
-        "rector": "rector --verbose",
+        "rector": "rector",
         "test": "paratest"
     },
     "version": "2.1.10"

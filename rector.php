@@ -17,11 +17,7 @@ use Rector\Php70\Rector\FunctionLike\ExceptionHandlerTypehintRector;
 use Rector\Php84\Rector\Param\ExplicitNullableParamTypeRector;
 use Rector\Removing\Rector\FuncCall\RemoveFuncCallRector;
 use Rector\Renaming\Rector\FuncCall\RenameFunctionRector;
-use Rector\Strict\Rector\BooleanNot\BooleanInBooleanNotRuleFixerRector;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
-use Rector\Strict\Rector\If_\BooleanInIfConditionRuleFixerRector;
-use Rector\Strict\Rector\Ternary\BooleanInTernaryOperatorRuleFixerRector;
-use Rector\Strict\Rector\Ternary\DisallowedShortTernaryRuleFixerRector;
 use Rector\TypeDeclaration\Rector\BooleanAnd\BinaryOpNullableToInstanceofRector;
 use Rector\TypeDeclaration\Rector\While_\WhileNullableToInstanceofRector;
 
@@ -217,7 +213,6 @@ return RectorConfig::configure()
         naming: true,
         instanceOf: true,
         earlyReturn: true,
-        strictBooleans: true,
         carbon: true,
         rectorPreset: true,
         phpunitCodeQuality: false,
@@ -233,11 +228,7 @@ return RectorConfig::configure()
     ->withSkip([
         // disable ! and empty rules which make the code noisy due to the
         // automated handling of it
-        BooleanInBooleanNotRuleFixerRector::class,
-        BooleanInIfConditionRuleFixerRector::class,
-        BooleanInTernaryOperatorRuleFixerRector::class,
         DisallowedEmptyRuleFixerRector::class,
-        DisallowedShortTernaryRuleFixerRector::class,
         // disable transforming Exception catching to Throwable catching which
         // is way too vague of a scope
         ExceptionHandlerTypehintRector::class,
