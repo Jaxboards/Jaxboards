@@ -24,8 +24,9 @@ use const SORT_REGULAR;
 abstract class Model
 {
     public const TABLE = '';
-
     private static Database $database;
+
+    public $name;
 
     private bool $fromDatabase = false;
 
@@ -33,7 +34,7 @@ abstract class Model
     {
         $primaryKey = static::getPrimaryKey();
 
-        if ($primaryKey !== '' && !$this->{$primaryKey->name}) {
+        if (!$this->{$primaryKey->name}) {
             return;
         }
 
