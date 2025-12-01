@@ -1602,7 +1602,6 @@
                                 for (
                                     iterator = iterFn.call(iterable);
                                     !(step = iterator.next()).done;
-
                                 ) {
                                     result = call(
                                         iterator,
