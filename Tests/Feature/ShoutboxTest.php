@@ -12,6 +12,8 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\DOMAssert;
 use Tests\TestCase;
 
+use function DI\autowire;
+
 /**
  * @internal
  */
@@ -21,13 +23,10 @@ final class ShoutboxTest extends TestCase
     protected function setUp(): void
     {
         // Configure shoutbox to be enabled
-        $this->container->set(Config::class, new Config(
-            $this->container->get(ServiceConfig::class),
-            $this->container->get(DomainDefinitions::class),
-            [
-                'shoutbox' => true,
-            ],
-        ));
+        $this->container->set(
+            Config::class,
+            autowire(Config::class)->constructorParameter('boardConfig', ['shoutbox' => true])
+        );
 
         parent::setUp();
     }
