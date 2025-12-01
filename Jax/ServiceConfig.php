@@ -16,10 +16,19 @@ final class ServiceConfig
 {
     private bool $installed = false;
 
-    public function __construct()
+    /**
+     * @var array<mixed>
+     */
+    private $serviceConfig = [];
+
+    /**
+     * @var array<mixed>
+     */
+    private $overrideConfig = [];
+
+    public function __construct(?array $config = null)
     {
-        // Prefetch service config
-        $this->get();
+        $this->serviceConfig = $config ?? $this->getServiceConfig();
     }
 
     /**
@@ -35,13 +44,10 @@ final class ServiceConfig
      */
     public function getServiceConfig(): array
     {
-        static $serviceConfig = null;
-
-        if ($serviceConfig) {
-            return $serviceConfig;
+        if ($this->serviceConfig) {
+            return $this->serviceConfig;
         }
 
-        $serviceConfig = [];
         $configPath = dirname(__DIR__) . '/config.php';
         $serviceConfigPath = dirname(__DIR__) . '/config.default.php';
         $this->installed = file_exists($configPath);
@@ -50,7 +56,9 @@ final class ServiceConfig
 
         require_once $this->installed ? $configPath : $serviceConfigPath;
 
-        return $serviceConfig = $CFG;
+        $this->serviceConfig = $CFG;
+
+        return $this->serviceConfig;
     }
 
     public function hasInstalled(): bool
@@ -72,13 +80,11 @@ final class ServiceConfig
      */
     public function override(?array $override = null): array
     {
-        static $overrideConfig = [];
-
         if ($override) {
-            $overrideConfig = $override;
+            $this->overrideConfig = $override;
         }
 
-        return $overrideConfig;
+        return $this->overrideConfig;
     }
 
     /**
