@@ -80,7 +80,8 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         $this->insertInitialRecords();
     }
 
-    public function createTableQueryFromModel(Model $model):string {
+    public function createTableQueryFromModel(Model $model): string
+    {
         return $this->databaseAdapter->createTableQueryFromModel($model);
     }
 
