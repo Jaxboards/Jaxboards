@@ -55,7 +55,7 @@ final class Shoutbox
             return;
         }
 
-        $this->shoutlimit = (int) $this->config->getSetting('shoutbox_num');
+        $this->shoutlimit = (int) ($this->config->getSetting('shoutbox_num') ?? 5);
         $shoutboxDelete = (int) $this->request->both('shoutbox_delete');
         if ($shoutboxDelete !== 0) {
             $this->deleteShout($shoutboxDelete);

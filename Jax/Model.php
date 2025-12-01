@@ -33,7 +33,7 @@ abstract class Model
     {
         $primaryKey = static::getPrimaryKey();
 
-        if ($primaryKey !== '' && !$this->{$primaryKey}) {
+        if ($primaryKey !== '' && !$this->{$primaryKey->name}) {
             return;
         }
 
@@ -61,7 +61,7 @@ abstract class Model
         self::$database = $database;
     }
 
-    public static function getPrimaryKey(): string
+    public static function getPrimaryKey(): ?Column
     {
         $reflectionClass = new ReflectionClass(static::class);
 
@@ -70,11 +70,11 @@ abstract class Model
             if ($maybePrimaryKeys !== []) {
                 [$column] = $reflectionProperty->getAttributes(Column::class);
 
-                return $column->newInstance()->name;
+                return $column->newInstance();
             }
         }
 
-        return '';
+        return null;
     }
 
     /**
@@ -170,7 +170,7 @@ abstract class Model
         callable $getId,
         ?string $key = null,
     ): array {
-        $primaryKey = static::getPrimaryKey();
+        $primaryKey = static::getPrimaryKey()?->name;
         $key ??= $primaryKey;
 
         $otherIds = array_unique(
@@ -193,7 +193,7 @@ abstract class Model
     public function delete(): ?PDOStatement
     {
         $database = self::$database;
-        $primaryKey = static::getPrimaryKey();
+        $primaryKey = static::getPrimaryKey()?->name;
 
         return $database->delete(
             static::TABLE,
@@ -206,13 +206,22 @@ abstract class Model
     {
         $database = self::$database;
         $primaryKey = static::getPrimaryKey();
-        $reflectionProperty = new ReflectionProperty(static::class, $primaryKey);
+        $primaryKeyName = $primaryKey?->name;
+        $reflectionProperty = new ReflectionProperty(static::class, $primaryKeyName);
         $type = (string) $reflectionProperty->getType();
-        $statement = $database->insert(static::TABLE, $this->asArray());
+
+        $data = $this->asArray();
+
+        // Don't insert empty id if it's autoincrement
+        if ($primaryKey->autoIncrement && !$data[$primaryKeyName]) {
+            unset($data[$primaryKeyName]);
+        }
+
+        $statement = $database->insert(static::TABLE, $data);
         $insertId = $database->insertId();
 
         if ($insertId) {
-            $this->{$primaryKey} = $type === 'string'
+            $this->{$primaryKeyName} = $type === 'string'
                 ? $insertId
                 : (int) $insertId;
         }
@@ -232,7 +241,7 @@ abstract class Model
     public function update(): ?PDOStatement
     {
         $database = self::$database;
-        $primaryKey = static::getPrimaryKey();
+        $primaryKey = static::getPrimaryKey()?->name;
         $data = $this->asArray();
 
         return $database->update(
@@ -240,7 +249,7 @@ abstract class Model
             $this->asArray(),
             ...($primaryKey !== '' ? [
                 "WHERE {$primaryKey}=?",
-                $data[static::getPrimaryKey()],
+                $data[static::getPrimaryKey()?->name],
             ] : []),
         );
     }
