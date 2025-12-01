@@ -11,82 +11,107 @@ final class Request
     // phpcs:ignore SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty
     public RequestStringGetter $asString;
 
-    public function __construct()
+    /**
+     * @var array<mixed>
+     */
+    private array $get = [];
+
+    /**
+     * @var array<mixed>
+     */
+    private array $post = [];
+
+    /**
+     * @var array<mixed>
+     */
+    private array $cookie = [];
+
+    /**
+     * @var array<mixed>
+     */
+    private array $files = [];
+
+    /**
+     * @var array<mixed>
+     */
+    private array $server = [];
+
+    /**
+     * @SuppressWarnings("PHPMD.Superglobals")
+     */
+    public function __construct(
+        ?array $get = null,
+        ?array $post = null,
+        ?array $cookie = null,
+        ?array $files = null,
+        ?array $server = null
+    )
     {
+        $this->get = $get ?? $_GET;
+        $this->post = $post ?? $_POST;
+        $this->cookie = $cookie ?? $_COOKIE;
+        $this->files = $files ?? $_FILES;
+        $this->server = $server ?? $_SERVER;
+
         $this->asString = new RequestStringGetter();
     }
 
     /**
      * Access $_GET and $_POST together. Prioritizes $_POST.
      *
-     * @SuppressWarnings("PHPMD.Superglobals")
-     *
      * @return null|array<mixed>|string
      */
     public function both(string $property): null|array|string
     {
-        return $_POST[$property] ?? $_GET[$property] ?? null;
+        return $this->post[$property] ?? $this->get[$property] ?? null;
     }
 
     /**
      * Access $_GET.
      *
-     * @SuppressWarnings("PHPMD.Superglobals")
-     *
      * @return null|array<mixed>|string
      */
     public function get(string $property): null|array|string
     {
-        return $_GET[$property] ?? null;
+        return $this->get[$property] ?? null;
     }
 
     /**
      * Access $_POST.
      *
-     * @SuppressWarnings("PHPMD.Superglobals")
-     *
      * @return null|array<mixed>|string
      */
     public function post(string $property): null|array|string
     {
-        return $_POST[$property] ?? null;
+        return $this->post[$property] ?? null;
     }
 
     /**
      * Access $_COOKIE.
-     *
-     * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function cookie(string $cookieName): ?string
     {
-        return $_COOKIE[$cookieName] ?? null;
+        return $this->cookie[$cookieName] ?? null;
     }
 
     /**
      * Access $_FILES.
      *
-     * @SuppressWarnings("PHPMD.Superglobals")
-     *
      * @return null|array{error:0,full_path:string,name:string,size:int<0,max>,tmp_name:string,type:string}
      */
     public function file(string $fieldName): ?array
     {
-        $file = $_FILES[$fieldName] ?? null;
+        $file = $this->files[$fieldName] ?? null;
 
         return $file && !$file['error'] ? $file : null;
     }
 
-    /**
-     * @SuppressWarnings("PHPMD.Superglobals")
-     */
     public function hasCookies(): bool
     {
-        return $_COOKIE !== [];
+        return $this->cookie !== [];
     }
 
     /**
-     * @SuppressWarnings("BooleanArgumentFlag")
-     *
      * @param int $expires
      */
     public function setCookie(
@@ -106,12 +131,9 @@ final class Request
         );
     }
 
-    /**
-     * @SuppressWarnings("PHPMD.Superglobals")
-     */
     public function hasPostData(): bool
     {
-        return $_POST !== [];
+        return $this->post !== [];
     }
 
     /**
@@ -147,19 +169,13 @@ final class Request
         return $this->jsAccess() === 3;
     }
 
-    /**
-     * @SuppressWarnings("PHPMD.Superglobals")
-     */
     public function getUserAgent(): ?string
     {
-        return $_SERVER['HTTP_USER_AGENT'] ?: null;
+        return $this->server['HTTP_USER_AGENT'] ?: null;
     }
 
-    /**
-     * @SuppressWarnings("PHPMD.Superglobals")
-     */
     private function jsAccess(): int
     {
-        return (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
+        return (int) ($this->server['HTTP_X_JSACCESS'] ?? 0);
     }
 }
