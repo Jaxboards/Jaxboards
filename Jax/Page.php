@@ -115,18 +115,18 @@ final class Page
         }
     }
 
-    public function out(): void
+    public function out(): string
     {
         if ($this->request->isJSAccess()) {
             $this->outputJavascriptCommands();
 
-            return;
+            return '';
         }
 
         $this->append('PATH', $this->buildPath());
         $this->append('TITLE', $this->getPageTitle());
 
-        echo $this->session->addSessId($this->template->render());
+        return $this->session->addSessId($this->template->render());
     }
 
     public function collapseBox(

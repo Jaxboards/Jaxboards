@@ -9,4 +9,4 @@ use Jax\App;
 require_once __DIR__ . '/vendor/autoload.php';
 
 $container = new Container();
-$container->get(App::class)->render();
+echo $container->get(App::class)->render();

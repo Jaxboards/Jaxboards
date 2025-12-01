@@ -3,6 +3,7 @@
         "dbaeumer.vscode-eslint",
         "editorconfig.editorconfig",
         "bmewburn.vscode-intelephense-client",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "recca0120.vscode-phpunit"
     ]
 }

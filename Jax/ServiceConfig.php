@@ -14,8 +14,6 @@ use const JSON_PRETTY_PRINT;
 
 final class ServiceConfig
 {
-    private bool $installed = false;
-
     /**
      * @var array<mixed>
      */
@@ -50,11 +48,10 @@ final class ServiceConfig
 
         $configPath = dirname(__DIR__) . '/config.php';
         $serviceConfigPath = dirname(__DIR__) . '/config.default.php';
-        $this->installed = file_exists($configPath);
 
         $CFG = [];
 
-        require_once $this->installed ? $configPath : $serviceConfigPath;
+        require_once file_exists($configPath) ? $configPath : $serviceConfigPath;
 
         $this->serviceConfig = $CFG;
 
@@ -63,7 +60,7 @@ final class ServiceConfig
 
     public function hasInstalled(): bool
     {
-        return $this->installed;
+        return $this->serviceConfig != [];
     }
 
     public function getSetting(string $key): mixed

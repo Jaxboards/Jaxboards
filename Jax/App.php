@@ -45,7 +45,7 @@ final readonly class App
         $this->microtime = microtime(true);
     }
 
-    public function render(): void
+    public function render(): string
     {
         header('Cache-Control: no-cache, must-revalidate');
 
@@ -54,9 +54,7 @@ final readonly class App
         }
 
         if (!$this->domainDefinitions->isBoardFound()) {
-            echo 'board not found';
-
-            return;
+            return 'board not found';
         }
 
         $this->startSession();
@@ -90,7 +88,7 @@ final readonly class App
             $this->renderDebugInfo();
         }
 
-        $this->page->out();
+        return $this->page->out();
     }
 
     private function startSession(): void

@@ -52,7 +52,7 @@ final class Request
         $this->files = $files ?? $_FILES;
         $this->server = $server ?? $_SERVER;
 
-        $this->asString = new RequestStringGetter();
+        $this->asString = new RequestStringGetter($this);
     }
 
     /**
@@ -170,7 +170,7 @@ final class Request
 
     public function getUserAgent(): ?string
     {
-        return $this->server['HTTP_USER_AGENT'] ?: null;
+        return $this->server['HTTP_USER_AGENT'] ?? null;
     }
 
     private function jsAccess(): int
