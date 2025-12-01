@@ -21,14 +21,18 @@ use function parse_url;
 #[CoversNothing]
 abstract class TestCase extends PHPUnitTestCase
 {
-    public function go(string $path): string
+    public function go(string|Request $request): string
     {
-        parse_str(parse_url($path)['query'], $getParameters);
+
+        if (!$request instanceof Request) {
+            parse_str(parse_url($request)['query'], $getParameters);
+            $request = new Request(
+                get: $getParameters,
+            );
+        }
 
         $container = new Container([
-            Request::class => new Request(
-                get: $getParameters,
-            ),
+            Request::class => $request,
         ]);
 
         $container->set(ServiceConfig::class, new ServiceConfig([

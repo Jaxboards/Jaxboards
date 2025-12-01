@@ -14,8 +14,6 @@ use Tests\TestCase;
 #[CoversNothing]
 final class ForumIndexTest extends TestCase
 {
-    // phpcs:enable SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder
-
     protected function setUp(): void
     {
         parent::setUp();
