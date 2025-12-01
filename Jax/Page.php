@@ -173,10 +173,11 @@ final class Page
         );
 
         // Load Wrapper
+        $skinWrapper = $skin->wrapper !== '' ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin->wrapper . '.html' : '';
         $this->template->load(
-            $skin->wrapper !== ''
-                ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin->wrapper . '.html'
-                : $this->domainDefinitions->getDefaultThemePath() . '/wrappers.html',
+            $skinWrapper && file_exists($skinWrapper)
+                ? $skinWrapper
+                :  $this->domainDefinitions->getDefaultThemePath() . '/wrappers.html',
         );
     }
 
