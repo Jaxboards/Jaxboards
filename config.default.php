@@ -21,6 +21,7 @@ $CFG = json_decode(
             "mail_from": "Example Forums <no-reply@example.com>",
             "prefix": "jaxboards",
             "service": false,
+            "sql_driver": "mysql",
             "sql_db": "jaxboards",
             "sql_host": "127.0.0.1",
             "sql_username": "SQLUSER",

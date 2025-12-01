@@ -66,6 +66,8 @@ class Database
             exit(1);
         }
 
+        $this->driver = $serviceConfig->getSetting('sql_driver') ?? 'mysql';
+
         Model::setDatabase($this);
     }
 
@@ -75,6 +77,7 @@ class Database
         string $password,
         string $database = '',
         string $prefix = '',
+        string $driver = '',
     ): void {
         $additionalOptions = $this->driver === 'mysql'
             ? ';charset=utf8mb4'
@@ -84,7 +87,7 @@ class Database
         // All datetimes are GMT for jaxboards
         $this->pdo->query($this->driver === 'mysql' ? "SET time_zone = '+0:00'" : 'SET TIME ZONE "UTC"');
 
-        $this->prefix = $prefix;
+        $this->setPrefix($prefix);
     }
 
     public function setPrefix(string $prefix): void
