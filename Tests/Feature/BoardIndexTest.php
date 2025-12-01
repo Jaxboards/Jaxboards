@@ -34,7 +34,7 @@ final class BoardIndexTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('#fid_1_lastpost', 'Welcome to Jaxboards!', 1, $page);
 
         DOMAssert::assertSelectEquals('#stats .content', '1 User Online:', 1, $page);
-        DOMAssert::assertSelectEquals('#statusers .user2', 'Admin', 1, $page);
+        DOMAssert::assertSelectEquals('#statusers .user1', 'Admin', 1, $page);
         DOMAssert::assertSelectEquals('#stats .userstoday', '1 User Online Today:', 1, $page);
     }
 }

@@ -46,7 +46,7 @@ final class ShoutboxTest extends FeatureTestCase
             post: ['shoutbox_shout' => 'hello world!'],
         ));
 
-        DOMAssert::assertSelectEquals('#shoutbox .shouts .shout .user3', 'Member', 1, $page);
+        DOMAssert::assertSelectEquals('#shoutbox .shouts .shout .user2', 'Member', 1, $page);
         DOMAssert::assertSelectEquals('#shoutbox .shouts .shout', 'hello world!', 1, $page);
     }
 }
