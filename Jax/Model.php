@@ -27,15 +27,13 @@ abstract class Model
 
     private static Database $database;
 
-    public $name;
-
     private bool $fromDatabase = false;
 
     public function __construct()
     {
-        $primaryKey = static::getPrimaryKey();
+        $primaryKey = static::getPrimaryKey()?->name;
 
-        if (!$this->{$primaryKey->name}) {
+        if ($primaryKey !== null && !$this->{$primaryKey}) {
             return;
         }
 
