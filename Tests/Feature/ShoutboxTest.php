@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use Jax\Config;
-use Jax\DomainDefinitions;
 use Jax\Request;
-use Jax\ServiceConfig;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\DOMAssert;
 use Tests\TestCase;
@@ -25,7 +23,7 @@ final class ShoutboxTest extends TestCase
         // Configure shoutbox to be enabled
         $this->container->set(
             Config::class,
-            autowire(Config::class)->constructorParameter('boardConfig', ['shoutbox' => true])
+            autowire(Config::class)->constructorParameter('boardConfig', ['shoutbox' => true]),
         );
 
         parent::setUp();
