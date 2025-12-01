@@ -58,7 +58,7 @@ class Database
                     $serviceConfig->getSetting('sql_password'),
                     $serviceConfig->getSetting('sql_db'),
                     $serviceConfig->getSetting('sql_prefix'),
-                    $serviceConfig->getSetting('sql_driver') ?? 'mysql'
+                    $serviceConfig->getSetting('sql_driver') ?? 'mysql',
                 );
             }
         } catch (Exception $e) {
@@ -98,7 +98,7 @@ class Database
         match ($driver) {
             'mysql' => $this->pdo->query("SET time_zone = '+0:00'"),
             'postgres' => $this->pdo->query('SET TIME ZONE "UTC"'),
-            default => null
+            default => null,
         };
 
         $this->setPrefix($prefix);
