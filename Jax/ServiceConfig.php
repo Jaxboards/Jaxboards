@@ -19,12 +19,12 @@ final class ServiceConfig
     /**
      * @var array<mixed>
      */
-    private $serviceConfig = [];
+    private array $serviceConfig = [];
 
     /**
      * @var array<mixed>
      */
-    private $overrideConfig = [];
+    private array $overrideConfig = [];
 
     public function __construct(?array $config = null)
     {
