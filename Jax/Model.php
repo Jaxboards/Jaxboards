@@ -41,18 +41,19 @@ abstract class Model
     }
 
     /**
-     * Creates a new instance of the model
+     * Creates a new instance of the model.
      */
-    public static function create(array $properties = []): static {
-        $model = new static();
+    public static function create(array $properties = []): static
+    {
+        $static = new static();
 
-        foreach($properties as $key=>$value) {
-            $model->{$key} = $value;
+        foreach ($properties as $key => $value) {
+            $static->{$key} = $value;
         }
 
-        $model->insert();
+        $static->insert();
 
-        return $model;
+        return $static;
     }
 
     public static function setDatabase(Database $database): void

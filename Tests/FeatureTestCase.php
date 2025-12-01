@@ -58,11 +58,6 @@ abstract class FeatureTestCase extends PHPUnitTestCase
         parent::setUp();
     }
 
-    private function setupDB() {
-        $databaseUtils = $this->container->get(DatabaseUtils::class);
-        $databaseUtils->install();
-    }
-
     public function go(Request|string $request): string
     {
         if (!$request instanceof Request) {
@@ -77,32 +72,29 @@ abstract class FeatureTestCase extends PHPUnitTestCase
         return $this->container->get(App::class)->render() ?? '';
     }
 
-    public function actingAs(Member|string $member) {
+    public function actingAs(Member|string $member): void
+    {
         $database = $this->container->get(Database::class);
-
-        if (! $member instanceof User) {
-            $timestamps = [
-                'joinDate' => $database->datetime(),
-                'lastVisit' => $database->datetime(),
-            ];
-
-            $member = match($member) {
-                'admin' => Member::create([
-                    'id' => 2,
-                    'name' => 'Admin',
-                    'displayName' => 'Admin',
-                    'groupID' => Groups::Admin->value,
-                    ...$timestamps,
-                ]),
-                default => Member::create([
-                    'id' => 3,
-                    'name' => 'Member',
-                    'displayName' => 'Member',
-                    'groupID' => Groups::Member->value,
-                    ...$timestamps,
-                ]),
-            };
-        }
+        $timestamps = [
+            'joinDate' => $database->datetime(),
+            'lastVisit' => $database->datetime(),
+        ];
+        $member = match ($member) {
+            'admin' => Member::create([
+                'id' => 2,
+                'name' => 'Admin',
+                'displayName' => 'Admin',
+                'groupID' => Groups::Admin->value,
+                ...$timestamps,
+            ]),
+            default => Member::create([
+                'id' => 3,
+                'name' => 'Member',
+                'displayName' => 'Member',
+                'groupID' => Groups::Member->value,
+                ...$timestamps,
+            ]),
+        };
 
         $this->container->set(
             User::class,
@@ -111,7 +103,13 @@ abstract class FeatureTestCase extends PHPUnitTestCase
 
         $this->container->set(
             JaxSession::class,
-            autowire()->constructorParameter('session', ['uid' => $member->id])
+            autowire()->constructorParameter('session', ['uid' => $member->id]),
         );
+    }
+
+    private function setupDB(): void
+    {
+        $databaseUtils = $this->container->get(DatabaseUtils::class);
+        $databaseUtils->install();
     }
 }
