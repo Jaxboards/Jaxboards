@@ -24,6 +24,7 @@ use const SORT_REGULAR;
 abstract class Model
 {
     public const TABLE = '';
+
     private static Database $database;
 
     public $name;
