@@ -44,9 +44,8 @@ final class Request
         ?array $post = null,
         ?array $cookie = null,
         ?array $files = null,
-        ?array $server = null
-    )
-    {
+        ?array $server = null,
+    ) {
         $this->get = $get ?? $_GET;
         $this->post = $post ?? $_POST;
         $this->cookie = $cookie ?? $_COOKIE;
