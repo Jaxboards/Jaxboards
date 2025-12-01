@@ -11,6 +11,4 @@ use PHPUnit\Framework\TestCase as PHPUnitTestCase;
  * @internal
  */
 #[CoversNothing]
-abstract class UnitTestCase extends PHPUnitTestCase
-{
-}
+abstract class UnitTestCase extends PHPUnitTestCase {}
