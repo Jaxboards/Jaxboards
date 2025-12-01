@@ -12,13 +12,12 @@ use function file_put_contents;
 final class Config
 {
     /**
-     * @var null|array<string, mixed>
+     * @param null|array<mixed> $boardConfig
      */
-    private ?array $boardConfig = null;
-
     public function __construct(
         private readonly ServiceConfig $serviceConfig,
         private readonly DomainDefinitions $domainDefinitions,
+        private ?array $boardConfig = null,
     ) {}
 
     /**

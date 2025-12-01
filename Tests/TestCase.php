@@ -21,9 +21,17 @@ use function parse_url;
 #[CoversNothing]
 abstract class TestCase extends PHPUnitTestCase
 {
+    protected Container $container;
+
+    public function __construct(string $name)
+    {
+        $this->container = new Container();
+
+        return parent::__construct($name);
+    }
+
     public function go(Request|string $request): string
     {
-
         if (!$request instanceof Request) {
             parse_str(parse_url($request)['query'], $getParameters);
             $request = new Request(
@@ -31,11 +39,9 @@ abstract class TestCase extends PHPUnitTestCase
             );
         }
 
-        $container = new Container([
-            Request::class => $request,
-        ]);
+        $this->container->set(Request::class, $request);
 
-        $container->set(ServiceConfig::class, new ServiceConfig([
+        $this->container->set(ServiceConfig::class, new ServiceConfig([
             'badnamechars' => "@[^\\w' ?]@",
             'boardname' => 'Example Forums',
             'domain' => 'example.com',
@@ -51,9 +57,9 @@ abstract class TestCase extends PHPUnitTestCase
             'timetologout' => 900,
         ]));
 
-        $databaseUtils = $container->get(DatabaseUtils::class);
+        $databaseUtils = $this->container->get(DatabaseUtils::class);
         $databaseUtils->install();
 
-        return $container->get(App::class)->render() ?? '';
+        return $this->container->get(App::class)->render() ?? '';
     }
 }
