@@ -9,10 +9,11 @@ use PHPUnit\Framework\DOMAssert;
 
 /**
  * @internal
+ *
+ * @coversNothing
  */
 final class ForumIndexTest extends TestCase
 {
-
     // phpcs:enable SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder
 
     protected function setUp(): void

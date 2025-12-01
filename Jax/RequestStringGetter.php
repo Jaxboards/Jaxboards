@@ -6,7 +6,7 @@ namespace Jax;
 
 use function is_string;
 
-final class RequestStringGetter
+final readonly class RequestStringGetter
 {
     public function __construct(private Request $request) {}
 

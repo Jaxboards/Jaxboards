@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use Jax\Attributes\Column;
 use Jax\DatabaseUtils\DatabaseAdapter;
 use Jax\DatabaseUtils\MySQL;
 use Jax\DatabaseUtils\SQLite;
@@ -55,21 +54,22 @@ final readonly class DatabaseUtils
         'sqliteMemory' => SQLite::class,
     ];
 
-    private DatabaseAdapter $adapter;
+    private DatabaseAdapter $databaseAdapter;
 
-    public function __construct(private Database $database) {
+    public function __construct(private Database $database)
+    {
         $adapterClass = self::ADAPTERS[$database->driver];
-        $this->adapter = new $adapterClass($database);
+        $this->databaseAdapter = new $adapterClass($database);
     }
 
     public function install(): void
     {
-        $this->adapter->install();
+        $this->databaseAdapter->install();
 
         foreach ($this::MODELS as $modelClass) {
             $model = new $modelClass();
             $queries[] = 'DROP TABLE IF EXISTS ' . $this->database->ftable($model::TABLE);
-            $queries[] = $this->adapter->createTableQueryFromModel($model);
+            $queries[] = $this->databaseAdapter->createTableQueryFromModel($model);
         }
 
         // Create tables

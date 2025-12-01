@@ -51,7 +51,9 @@ final class ServiceConfig
 
         $CFG = [];
 
-        require_once file_exists($configPath) ? $configPath : $serviceConfigPath;
+        require_once file_exists($configPath)
+            ? $configPath
+            : $serviceConfigPath;
 
         $this->serviceConfig = $CFG;
 
@@ -60,7 +62,7 @@ final class ServiceConfig
 
     public function hasInstalled(): bool
     {
-        return $this->serviceConfig != [];
+        return $this->serviceConfig !== [];
     }
 
     public function getSetting(string $key): mixed

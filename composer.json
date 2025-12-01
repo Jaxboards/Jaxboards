@@ -31,12 +31,12 @@
         "phpmd/phpmd": "^2.15",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^11.5",
+        "phpunit/phpunit-dom-assertions": "^3.2",
         "rector/rector": "^2.0",
         "roave/security-advisories": "dev-master@dev",
         "slevomat/coding-standard": "^8.16",
         "squizlabs/php_codesniffer": "^3.12",
-        "vimeo/psalm": "^6.5",
-        "phpunit/phpunit-dom-assertions": "^3.2"
+        "vimeo/psalm": "^6.5"
     },
     "require": {
         "composer": "^2.8",

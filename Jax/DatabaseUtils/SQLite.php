@@ -73,20 +73,16 @@ final readonly class SQLite implements DatabaseAdapter
             $keys[] = "{$fulltext}KEY {$fieldName} ({$fieldName})";
         }
 
-        $createTable = "CREATE TABLE {$tableQuoted} (" . PHP_EOL
+        return "CREATE TABLE {$tableQuoted} (" . PHP_EOL
             . '  ' . implode(',' . PHP_EOL . '  ', array_merge(
                 $fields,
                 // $keys,
                 $constraints,
             )) . PHP_EOL
         . ')';
-
-        return $createTable;
     }
 
-    public function install(): void
-    {
-    }
+    public function install(): void {}
 
     private function fieldDefinition(Column $column): string
     {
@@ -104,6 +100,7 @@ final readonly class SQLite implements DatabaseAdapter
 
             case 'int':
                 $type = 'integer';
+
                 break;
 
             case 'string':
@@ -115,8 +112,12 @@ final readonly class SQLite implements DatabaseAdapter
         }
 
         $length = $column->length !== 0 ? "({$column->length})" : '';
-        $nullable = !$column->autoIncrement && $column->nullable === false ? ' NOT NULL' : '';
-        $autoIncrement = $column->autoIncrement ?  ' PRIMARY KEY AUTOINCREMENT' : '';
+        $nullable = !$column->autoIncrement && $column->nullable === false
+            ? ' NOT NULL'
+            : '';
+        $autoIncrement = $column->autoIncrement
+            ? ' PRIMARY KEY AUTOINCREMENT'
+            : '';
         $default = $column->default !== null
             ? " DEFAULT '{$column->default}'"
             : '';

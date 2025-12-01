@@ -9,7 +9,6 @@ use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
 use Jax\Attributes\PrimaryKey;
 use Jax\Database;
-use Jax\DatabaseUtils\DatabaseAdapter;
 use Jax\Model;
 use ReflectionClass;
 
@@ -75,15 +74,13 @@ final readonly class MySQL implements DatabaseAdapter
             $keys[] = "{$fulltext}KEY {$fieldName} ({$fieldName})";
         }
 
-        $createTable = "CREATE TABLE {$tableQuoted} (" . PHP_EOL
+        return "CREATE TABLE {$tableQuoted} (" . PHP_EOL
             . '  ' . implode(',' . PHP_EOL . '  ', array_merge(
                 $fields,
                 // $keys,
                 $constraints,
             )) . PHP_EOL
         . ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
-
-        return $createTable;
     }
 
     public function install(): void
