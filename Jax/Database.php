@@ -82,14 +82,14 @@ class Database
             'mysql' => [
                 "mysql:host={$host};dbname={$database};charset=utf8mb4",
                 $user,
-                $password
+                $password,
             ],
             'postgres' => [
                 "postgres:host={$host};dbname={$database}",
                 $user,
-                $password
+                $password,
             ],
-            'sqliteMemory' => [ "sqlite::memory:" ]
+            'sqliteMemory' => ['sqlite::memory:'],
         };
 
         $this->pdo = new PDO(...$connectionArgs);
