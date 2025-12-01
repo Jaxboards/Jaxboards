@@ -80,6 +80,10 @@ final readonly class DatabaseUtils
         $this->insertInitialRecords();
     }
 
+    public function createTableQueryFromModel(Model $model) {
+        return $this->databaseAdapter->createTableQueryFromModel($model);
+    }
+
     private function insertInitialRecords(): void
     {
         $category = new Category();
