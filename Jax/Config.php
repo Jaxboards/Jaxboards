@@ -38,6 +38,7 @@ final class Config
             return $this->boardConfig;
         }
 
+        $this->boardConfig = [];
         $CFG = [];
 
         $boardConfigPath = $this->domainDefinitions->getBoardPath() . '/config.php';
