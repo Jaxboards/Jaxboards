@@ -6,13 +6,13 @@ namespace Tests\Feature;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\DOMAssert;
-use Tests\TestCase;
+use Tests\FeatureTestCase;
 
 /**
  * @internal
  */
 #[CoversNothing]
-final class ForumIndexTest extends TestCase
+final class ForumIndexTest extends FeatureTestCase
 {
     protected function setUp(): void
     {

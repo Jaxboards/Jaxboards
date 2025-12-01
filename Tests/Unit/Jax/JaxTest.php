@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesFunction;
-use PHPUnit\Framework\TestCase;
+use Tests\UnitTestCase;
 
 use function array_keys;
 use function base64_decode;
@@ -30,7 +30,7 @@ use function base64_decode;
 #[UsesClass(ServiceConfig::class)]
 #[UsesClass(Model::class)]
 #[UsesFunction('\Jax\pathjoin')]
-final class JaxTest extends TestCase
+final class JaxTest extends UnitTestCase
 {
     private string $encodedForumFlags;
 

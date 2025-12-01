@@ -8,7 +8,7 @@ use Jax\Config;
 use Jax\Request;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\DOMAssert;
-use Tests\TestCase;
+use Tests\FeatureTestCase;
 
 use function DI\autowire;
 
@@ -16,14 +16,14 @@ use function DI\autowire;
  * @internal
  */
 #[CoversNothing]
-final class ShoutboxTest extends TestCase
+final class ShoutboxTest extends FeatureTestCase
 {
     protected function setUp(): void
     {
         // Configure shoutbox to be enabled
         $this->container->set(
             Config::class,
-            autowire(Config::class)->constructorParameter('boardConfig', ['shoutbox' => true]),
+            autowire()->constructorParameter('boardConfig', ['shoutbox' => true]),
         );
 
         parent::setUp();

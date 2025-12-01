@@ -19,7 +19,7 @@ use function parse_url;
  * @internal
  */
 #[CoversNothing]
-abstract class TestCase extends PHPUnitTestCase
+abstract class FeatureTestCase extends PHPUnitTestCase
 {
     protected Container $container;
 
