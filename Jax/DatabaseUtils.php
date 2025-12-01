@@ -26,7 +26,7 @@ use Jax\Models\TextRule;
 use Jax\Models\Token;
 use Jax\Models\Topic;
 
-final readonly class DatabaseUtils
+final readonly class DatabaseUtils implements DatabaseAdapter
 {
     public const MODELS = [
         Activity::class,
@@ -80,7 +80,7 @@ final readonly class DatabaseUtils
         $this->insertInitialRecords();
     }
 
-    public function createTableQueryFromModel(Model $model) {
+    public function createTableQueryFromModel(Model $model):string {
         return $this->databaseAdapter->createTableQueryFromModel($model);
     }
 
