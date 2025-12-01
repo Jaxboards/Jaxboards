@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Tests;
+namespace Tests\Unit\Jax;
 
 use DI\Container;
 use Jax\Attributes\Column;

@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests;
+namespace Tests\Feature;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\DOMAssert;
+use Tests\TestCase;
 
 /**
  * @internal
