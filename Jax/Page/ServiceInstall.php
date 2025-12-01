@@ -80,13 +80,13 @@ final readonly class ServiceInstall
     ];
 
     public function __construct(
-        private readonly Blueprint $blueprint,
-        private readonly Database $database,
-        private readonly DatabaseUtils $databaseUtils,
-        private readonly FileUtils $fileUtils,
-        private readonly IPAddress $ipAddress,
-        private readonly Request $request,
-        private readonly ServiceConfig $serviceConfig,
+        private Blueprint $blueprint,
+        private Database $database,
+        private DatabaseUtils $databaseUtils,
+        private FileUtils $fileUtils,
+        private IPAddress $ipAddress,
+        private Request $request,
+        private ServiceConfig $serviceConfig,
     ) {}
 
     public function render(): void
@@ -97,7 +97,7 @@ final readonly class ServiceInstall
             $errors = $this->install();
         }
 
-        $errorsHTML = implode('', array_map(static fn($error): string => "<div class='error'>{$error}</div>", $errors));
+        $errorsHTML = implode('', array_map(static fn(string $error): string => "<div class='error'>{$error}</div>", $errors));
         $formFields = '';
         foreach (self::FIELDS as $field => $attributes) {
             $placeholder = $attributes['placeholder'] ?? '';

@@ -14,10 +14,10 @@ use function nl2br;
 final readonly class BoardOffline
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Page $page,
-        private readonly Request $request,
-        private readonly Template $template,
+        private Config $config,
+        private Page $page,
+        private Request $request,
+        private Template $template,
     ) {}
 
     public function render(): void

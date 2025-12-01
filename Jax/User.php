@@ -43,7 +43,7 @@ final class User
         return $this->member;
     }
 
-    public function set(string $property, null|int|string $value): void
+    public function set(string $property, int|string|null $value): void
     {
         $this->setBulk([$property => $value]);
     }

@@ -41,12 +41,12 @@ use function trim;
 final readonly class Forums
 {
     public function __construct(
-        private readonly Database $database,
-        private readonly Jax $jax,
-        private readonly Page $page,
-        private readonly RecountStats $recountStats,
-        private readonly Request $request,
-        private readonly TextFormatting $textFormatting,
+        private Database $database,
+        private Jax $jax,
+        private Page $page,
+        private RecountStats $recountStats,
+        private Request $request,
+        private TextFormatting $textFormatting,
     ) {}
 
     public function render(): void

@@ -12,13 +12,13 @@ final class Category extends Model
 {
     public const TABLE = 'categories';
 
-    #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
+    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
     #[PrimaryKey]
     public int $id = 0;
 
     #[Column(name: 'title', type: 'string', length: 255, nullable: false)]
     public string $title = '';
 
-    #[Column(name: 'order', type: 'int', unsigned: true, nullable: false, default: 0)]
+    #[Column(name: 'order', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $order = 0;
 }

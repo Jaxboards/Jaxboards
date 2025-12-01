@@ -60,7 +60,7 @@ final class Request
      *
      * @return null|array<mixed>|string
      */
-    public function both(string $property): null|array|string
+    public function both(string $property): array|string|null
     {
         return $this->post[$property] ?? $this->get[$property] ?? null;
     }
@@ -70,7 +70,7 @@ final class Request
      *
      * @return null|array<mixed>|string
      */
-    public function get(string $property): null|array|string
+    public function get(string $property): array|string|null
     {
         return $this->get[$property] ?? null;
     }
@@ -80,7 +80,7 @@ final class Request
      *
      * @return null|array<mixed>|string
      */
-    public function post(string $property): null|array|string
+    public function post(string $property): array|string|null
     {
         return $this->post[$property] ?? null;
     }

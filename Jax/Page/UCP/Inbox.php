@@ -389,7 +389,7 @@ final readonly class Inbox
             10,
         );
 
-        $pages .= implode(' &middot; ', array_map(static function ($pageNumber) use ($requestPage, $view): string {
+        $pages .= implode(' &middot; ', array_map(static function (int $pageNumber) use ($requestPage, $view): string {
             $active = $pageNumber === $requestPage ? ' class="active"' : '';
 
             return <<<HTML

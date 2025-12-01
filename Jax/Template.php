@@ -186,7 +186,7 @@ final class Template
                 ['<%%', '%%>'],
                 $this->userMetaDefs[$meta] ?? $this->metaDefs[$meta] ?? '',
             ),
-            array_map(static fn($arg): string => (string) $arg, $args),
+            array_map(static fn(float|int|string|null $arg): string => (string) $arg, $args),
         );
 
         if (array_key_exists($meta, $this->moreFormatting)) {
@@ -221,7 +221,7 @@ final class Template
         }
 
         $html = $this->filtervars($html);
-        if ($this->checkExtended($html, null)) {
+        if ($this->checkExtended($html)) {
             return $this->metaExtended($html);
         }
 
@@ -258,7 +258,7 @@ final class Template
      */
     private function loadComponentTemplates(string $componentDir): array
     {
-        return array_reduce(glob($componentDir . '/*.html') ?: [], function (array $meta, $metaFile) {
+        return array_reduce(glob($componentDir . '/*.html') ?: [], function (array $meta, string $metaFile): array {
             $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
             $metaContent = file_get_contents($metaFile);
 

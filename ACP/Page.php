@@ -163,8 +163,8 @@ final class Page
         }
 
         return str_replace(
-            array_map(static fn($name): string => '{{ ' . $name . ' }}', array_keys($data)),
-            array_map(static fn($content): string => "{$content}", $data),
+            array_map(static fn(string $name): string => '{{ ' . $name . ' }}', array_keys($data)),
+            array_map(static fn(float|int|string $content): string => "{$content}", $data),
             $template,
         ) . PHP_EOL;
     }

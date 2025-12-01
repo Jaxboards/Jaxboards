@@ -25,13 +25,13 @@ use function in_array;
 final readonly class BuddyList
 {
     public function __construct(
-        private readonly Jax $jax,
-        private readonly Page $page,
-        private readonly Session $session,
-        private readonly Request $request,
-        private readonly Template $template,
-        private readonly User $user,
-        private readonly UsersOnline $usersOnline,
+        private Jax $jax,
+        private Page $page,
+        private Session $session,
+        private Request $request,
+        private Template $template,
+        private User $user,
+        private UsersOnline $usersOnline,
     ) {
         $buddylist = $this->jax->hiddenFormFields(['act' => 'buddylist']);
         $this->template->addMeta(

@@ -85,7 +85,7 @@ final readonly class Themes
     private function getWrappers(): array
     {
         return array_map(
-            static fn($path): string => pathinfo($path, PATHINFO_FILENAME),
+            static fn(string $path): string => pathinfo($path, PATHINFO_FILENAME),
             glob($this->wrappersPath . '/*') ?: [],
         );
     }

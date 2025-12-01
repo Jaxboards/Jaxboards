@@ -150,7 +150,7 @@ final class IPAddress
             return array_filter(
                 file($bannedIPsPath, FILE_IGNORE_NEW_LINES) ?: [],
                 // Filter out empty lines and comments
-                static fn($line): bool => $line !== '' && $line[0] !== '#',
+                static fn(string $line): bool => $line !== '' && $line[0] !== '#',
             );
         }
 

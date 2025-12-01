@@ -107,7 +107,7 @@ final class Search
             $this->fids,
         );
 
-        $titles = array_reduce($forums, static function (array $titles, Forum $forum) {
+        $titles = array_reduce($forums, static function (array $titles, Forum $forum): array {
             $titles[$forum->id] = $forum->title;
 
             return $titles;

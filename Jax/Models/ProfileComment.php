@@ -13,15 +13,15 @@ final class ProfileComment extends Model
 {
     public const TABLE = 'profile_comments';
 
-    #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
+    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
     #[PrimaryKey]
     public int $id = 0;
 
-    #[Column(name: 'to', type: 'int', unsigned: true, nullable: false)]
+    #[Column(name: 'to', type: 'int', nullable: false, unsigned: true)]
     #[ForeignKey(table: 'members', field: 'id', onDelete: 'cascade')]
     public int $to = 0;
 
-    #[Column(name: 'from', type: 'int', unsigned: true, nullable: false)]
+    #[Column(name: 'from', type: 'int', nullable: false, unsigned: true)]
     #[ForeignKey(table: 'members', field: 'id', onDelete: 'cascade')]
     public int $from = 0;
 

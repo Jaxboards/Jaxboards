@@ -85,7 +85,7 @@ final readonly class UserProfile
 
         $links = $this->contactDetails->getContactLinks($member);
         $contactDetails = implode('', array_map(
-            static function ($service) use ($links): string {
+            static function (string $service) use ($links): string {
                 [$href, $value] = $links[$service];
 
                 return <<<HTML

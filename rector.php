@@ -27,9 +27,9 @@ return RectorConfig::configure()
         __DIR__ . '/tools/phpstan-bootstrap.php',
     ])
     ->withCache(
+        cacheDirectory: '/tmp/rector',
         // ensure file system caching is used instead of in-memory
         cacheClass: FileCacheStorage::class,
-        cacheDirectory: '/tmp/rector',
     )
     ->withComposerBased(
         twig: false,

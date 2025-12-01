@@ -16,6 +16,6 @@ final class Page extends Model
     #[PrimaryKey]
     public string $act = '';
 
-    #[Column(name: 'page', type: 'text', nullable: false, default: '')]
+    #[Column(name: 'page', type: 'text', default: '', nullable: false)]
     public string $page = '';
 }

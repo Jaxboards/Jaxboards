@@ -158,7 +158,7 @@ $rules = array_reduce(
     $data['files'],
     static fn(array $rules, array $file): array => array_reduce(
         $file['violations'],
-        static function (array $rules, array $violation) {
+        static function (array $rules, array $violation): array {
             if (array_key_exists($violation['rule'], $rules)) {
                 return $rules;
             }

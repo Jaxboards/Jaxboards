@@ -12,11 +12,11 @@ final class Skin extends Model
 {
     public const TABLE = 'skins';
 
-    #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
+    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
     #[PrimaryKey]
     public int $id = 0;
 
-    #[Column(name: 'using', type: 'int', unsigned: true, nullable: false, default: 0)]
+    #[Column(name: 'using', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $using = 0;
 
     #[Column(name: 'title', type: 'string', length: 250, nullable: false)]
@@ -25,7 +25,7 @@ final class Skin extends Model
     #[Column(name: 'custom', type: 'bool', default: true)]
     public int $custom = 1;
 
-    #[Column(name: 'wrapper', type: 'text', nullable: false, default: '')]
+    #[Column(name: 'wrapper', type: 'text', default: '', nullable: false)]
     public string $wrapper = '';
 
     #[Column(name: 'default', type: 'bool')]

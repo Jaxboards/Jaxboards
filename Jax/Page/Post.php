@@ -564,10 +564,10 @@ final class Post
         $subTitle = $this->request->asString->post('subtitle');
         $pollQuestion = $this->request->asString->post('pollq');
         $pollChoices = $inputPollChoices !== null ? array_map(
-            fn($line): string => $this->textFormatting->blockhtml($line),
+            $this->textFormatting->blockhtml(...),
             array_filter(
                 preg_split("@[\r\n]+@", $inputPollChoices) ?: [],
-                static fn($line): bool => trim($line) !== '',
+                static fn(string $line): bool => trim($line) !== '',
             ),
         ) : [];
         $pollType = $this->request->asString->post('pollType');

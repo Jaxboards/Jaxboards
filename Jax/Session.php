@@ -82,7 +82,7 @@ final class Session
         return $userId ?? 0;
     }
 
-    public function fetchSessionData(null|int|string $sid = null): void
+    public function fetchSessionData(int|string|null $sid = null): void
     {
         $botName = $this->botDetector->getBotName();
         $sid = $botName ?? $sid;

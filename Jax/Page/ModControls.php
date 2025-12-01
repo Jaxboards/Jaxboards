@@ -231,7 +231,7 @@ final readonly class ModControls
         $fieldRows = implode(
             '',
             array_map(
-                static function ($field): string {
+                static function (array $field): string {
                     [$label, $name, $value, $type] = $field;
                     $input = $type === 'textarea'
                         ? <<<HTML

@@ -18,10 +18,10 @@ final class Token extends Model
     #[PrimaryKey]
     public string $token = '';
 
-    #[Column(name: 'type', type: 'string', length: 20, nullable: false, default: 'login')]
+    #[Column(name: 'type', type: 'string', default: 'login', length: 20, nullable: false)]
     public string $type = 'login';
 
-    #[Column(name: 'uid', type: 'int', unsigned: true, nullable: false)]
+    #[Column(name: 'uid', type: 'int', nullable: false, unsigned: true)]
     #[ForeignKey(table: 'members', field: 'id', onDelete: 'cascade')]
     public int $uid = 0;
 

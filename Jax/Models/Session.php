@@ -21,10 +21,10 @@ final class Session extends Model
     #[ForeignKey(table: 'members', field: 'id', onDelete: 'cascade')]
     public ?int $uid = null;
 
-    #[Column(name: 'ip', type: 'binary', length: 16, nullable: false, default: '')]
+    #[Column(name: 'ip', type: 'binary', default: '', length: 16, nullable: false)]
     public string $ip = '';
 
-    #[Column(name: 'vars', type: 'text', nullable: false, default: '')]
+    #[Column(name: 'vars', type: 'text', default: '', nullable: false)]
     public string $vars = '';
 
     #[Column(name: 'lastUpdate', type: 'datetime')]
@@ -33,31 +33,31 @@ final class Session extends Model
     #[Column(name: 'lastAction', type: 'datetime')]
     public ?string $lastAction = null;
 
-    #[Column(name: 'runonce', type: 'text', nullable: false, default: '')]
+    #[Column(name: 'runonce', type: 'text', default: '', nullable: false)]
     public string $runonce = '';
 
-    #[Column(name: 'location', type: 'text', nullable: false, default: '')]
+    #[Column(name: 'location', type: 'text', default: '', nullable: false)]
     public string $location = '';
 
-    #[Column(name: 'usersOnlineCache', type: 'text', nullable: false, default: '')]
+    #[Column(name: 'usersOnlineCache', type: 'text', default: '', nullable: false)]
     public string $usersOnlineCache = '';
 
     #[Column(name: 'isBot', type: 'bool')]
     public int $isBot = 0;
 
-    #[Column(name: 'buddyListCache', type: 'text', nullable: false, default: '')]
+    #[Column(name: 'buddyListCache', type: 'text', default: '', nullable: false)]
     public string $buddyListCache = '';
 
-    #[Column(name: 'locationVerbose', type: 'string', length: 100, nullable: false, default: '')]
+    #[Column(name: 'locationVerbose', type: 'string', default: '', length: 100, nullable: false)]
     public string $locationVerbose = '';
 
-    #[Column(name: 'useragent', type: 'text', nullable: false, default: '')]
+    #[Column(name: 'useragent', type: 'text', default: '', nullable: false)]
     public string $useragent = '';
 
-    #[Column(name: 'forumsread', type: 'json', nullable: false, default: '{}')]
+    #[Column(name: 'forumsread', type: 'json', default: '{}', nullable: false)]
     public string $forumsread = '{}';
 
-    #[Column(name: 'topicsread', type: 'json', nullable: false, default: '{}')]
+    #[Column(name: 'topicsread', type: 'json', default: '{}', nullable: false)]
     public string $topicsread = '{}';
 
     #[Column(name: 'readDate', type: 'datetime')]

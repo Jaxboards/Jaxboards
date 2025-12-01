@@ -23,7 +23,7 @@ final readonly class SQLite implements DatabaseAdapter
 
     public function createTableQueryFromModel(Model $model): string
     {
-        $table = $model::TABLE;
+        $table = Model::TABLE;
         $tableQuoted = $this->database->ftable($table);
         $reflectionClass = new ReflectionClass($model::class);
 

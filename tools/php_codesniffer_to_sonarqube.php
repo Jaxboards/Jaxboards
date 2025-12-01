@@ -202,7 +202,7 @@ $rules = array_reduce(
     $data['files'],
     static fn(array $rules, array $file): array => array_reduce(
         $file['messages'],
-        static function (array $rules, array $message) {
+        static function (array $rules, array $message): array {
             if (array_key_exists($message['source'], $rules)) {
                 return $rules;
             }
@@ -251,7 +251,7 @@ const TAB_WIDTH = 4;
 $issues = array_merge_recursive(
     ...array_map(
         static function (
-            $filename,
+            int|string $filename,
         ) use ($data): array {
             $file = new SplFileObject($filename);
 

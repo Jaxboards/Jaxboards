@@ -335,7 +335,7 @@ class Database
     /**
      * @param null|array<mixed>|float|int|string $value
      */
-    public function evalue(null|array|float|int|string $value): int|string
+    public function evalue(array|float|int|string|null $value): int|string
     {
         if (is_array($value)) {
             return $value[0];
@@ -416,7 +416,7 @@ class Database
     }
 
     private function queryTypeForPDOValue(
-        null|bool|float|int|string $value,
+        bool|float|int|string|null $value,
     ): int {
         return match (true) {
             $value === null => PDO::PARAM_NULL,

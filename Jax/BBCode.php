@@ -254,8 +254,8 @@ final class BBCode
         // SonarQube requires the LI tags to be surrounded by OL and UL
         $html = $tag === 'ol' ? '<ol>' : '<ul>';
         $html .= implode('', array_map(
-            static fn($item): string => "<li>{$item}</li>",
-            array_filter($items, static fn($line): bool => (bool) trim($line)),
+            static fn(string $item): string => "<li>{$item}</li>",
+            array_filter($items, static fn(string $line): bool => (bool) trim($line)),
         ));
 
         return $html . ($tag === 'ol' ? '</ol>' : '</ul>');

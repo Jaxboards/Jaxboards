@@ -16,7 +16,7 @@ final class Date
      * Returns a span-wrapped date which is automatically converted to the user's timezone
      * on the client.
      */
-    public function autoDate(null|int|string $date): string
+    public function autoDate(int|string|null $date): string
     {
         // Some old forums have nullable fields that are no longer nullable
         // This needs to stay for data backwards compatibility

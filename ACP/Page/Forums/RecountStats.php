@@ -16,9 +16,9 @@ use function explode;
 final readonly class RecountStats
 {
     public function __construct(
-        private readonly Page $page,
-        private readonly Database $database,
-        private readonly Request $request,
+        private Page $page,
+        private Database $database,
+        private Request $request,
     ) {}
 
     public function render(): void

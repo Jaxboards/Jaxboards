@@ -539,7 +539,7 @@ final readonly class Members
                 $this->database->delete('members', Database::WHERE_ID_EQUALS, $memberId);
 
                 array_map(
-                    static fn($forum) => Forum::fixLastPost($forum->id),
+                    static fn(Forum $forum) => Forum::fixLastPost($forum->id),
                     Forum::selectMany(),
                 );
 

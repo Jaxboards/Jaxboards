@@ -115,7 +115,7 @@ final class IDX
 
         return array_filter(
             $forums,
-            fn($forum): bool => !$forum->perms || $this->user->getForumPerms($forum->perms)['view'],
+            fn(Forum $forum): bool => !$forum->perms || $this->user->getForumPerms($forum->perms)['view'],
         );
     }
 
@@ -515,7 +515,7 @@ final class IDX
     {
         $unreadForums = array_filter(
             $this->fetchIDXForums(),
-            fn($forum): bool => !$this->isForumRead($forum),
+            fn(Forum $forum): bool => !$this->isForumRead($forum),
         );
 
         $lastPostMembers = $this->fetchLastPostMembers($unreadForums);

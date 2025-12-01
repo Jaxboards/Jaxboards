@@ -135,7 +135,7 @@ final readonly class ModPosts
 
         // Build list of topic ids that the posts were in.
         $tids = array_unique(array_map(
-            static fn($post): int => $post->id,
+            static fn(Post $post): int => $post->id,
             $posts,
         ), SORT_REGULAR);
 
@@ -163,15 +163,15 @@ final readonly class ModPosts
         $fids = array_unique(array_merge(
             $trashCanForum !== null ? [$trashCanForum->id] : [],
             array_map(
-                static fn($topic): int => (int) $topic->fid,
+                static fn(Topic $topic): int => (int) $topic->fid,
                 $topics,
             ),
         ), SORT_REGULAR);
 
-        array_map(static fn($fid) => Forum::fixLastPost($fid), $fids);
+        array_map(Forum::fixLastPost(...), $fids);
 
         // Remove them from the page.
-        array_map(fn($postId) => $this->page->command('removeel', '#pid_' . $postId), $pids);
+        array_map(fn(int $postId) => $this->page->command('removeel', '#pid_' . $postId), $pids);
 
         return true;
     }

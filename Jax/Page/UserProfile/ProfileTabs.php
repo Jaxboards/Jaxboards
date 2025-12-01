@@ -75,7 +75,7 @@ final readonly class ProfileTabs
         };
 
         $tabs = array_map(
-            static function ($tab) use ($selectedTab, $member): string {
+            static function (string $tab) use ($selectedTab, $member): string {
                 $active = ($tab === $selectedTab ? ' class="active"' : '');
                 $uppercase = ucwords($tab);
                 $profileId = $member->id;

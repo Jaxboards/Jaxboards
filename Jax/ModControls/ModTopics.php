@@ -291,7 +291,7 @@ final readonly class ModTopics
             $this->getModTids(),
         );
         $fids = array_unique(array_map(
-            static fn($topic): int => (int) $topic->fid,
+            static fn(Topic $topic): int => (int) $topic->fid,
             $topics,
         ), SORT_REGULAR);
 

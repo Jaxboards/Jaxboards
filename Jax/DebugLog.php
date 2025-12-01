@@ -38,7 +38,7 @@ final class DebugLog
         $categories = array_keys($this->lines);
         sort($categories);
 
-        return array_reduce($categories, function ($lines, $category) {
+        return array_reduce($categories, function ($lines, string $category): array {
             $heading = $category !== ''
                 ? ["---- {$category} ----"]
                 : [];

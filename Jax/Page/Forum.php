@@ -155,7 +155,7 @@ final class Forum
         $forumpages = '';
         if ($numpages !== 0) {
             $forumpages = implode(' · ', array_map(
-                function ($pageNumber) use ($fid): string {
+                function (int $pageNumber) use ($fid): string {
                     $activeClass = ($pageNumber - 1 === $this->pageNumber ? ' class="active"' : '');
 
                     return "<a href='?act=vf{$fid}&amp;page={$pageNumber}'{$activeClass}'>{$pageNumber}</a> ";
@@ -219,7 +219,7 @@ final class Forum
 
         $rows = implode(
             '',
-            array_map(fn($topic): string => $this->renderForumRow($topic, $membersById), $topics),
+            array_map(fn(Topic $topic): string => $this->renderForumRow($topic, $membersById), $topics),
         );
 
         // If they're on the first page and all topics are read
@@ -349,7 +349,7 @@ final class Forum
             // does not select records in the same order
             $forumTitles = array_reduce(
                 $forums,
-                static function (array $forumTitles, ModelsForum $modelsForum) {
+                static function (array $forumTitles, ModelsForum $modelsForum): array {
                     $forumTitles[$modelsForum->id] = $modelsForum->title;
 
                     return $forumTitles;

@@ -14,7 +14,7 @@ final class File extends Model
 {
     public const TABLE = 'files';
 
-    #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
+    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
     #[PrimaryKey]
     public int $id = 0;
 
@@ -25,17 +25,17 @@ final class File extends Model
     #[Key]
     public string $hash = '';
 
-    #[Column(name: 'uid', type: 'int', unsigned: true, default: null)]
+    #[Column(name: 'uid', type: 'int', default: null, unsigned: true)]
     #[ForeignKey(table: 'members', field: 'id', onDelete: 'null')]
     public int $uid = 0;
 
-    #[Column(name: 'size', type: 'int', unsigned: true, nullable: false, default: 0)]
+    #[Column(name: 'size', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $size = 0;
 
-    #[Column(name: 'downloads', type: 'int', unsigned: true, nullable: false, default: 0)]
+    #[Column(name: 'downloads', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $downloads = 0;
 
-    #[Column(name: 'ip', type: 'binary', length: 16, nullable: false, default: '')]
+    #[Column(name: 'ip', type: 'binary', default: '', length: 16, nullable: false)]
     #[Key]
     public string $ip = '';
 }

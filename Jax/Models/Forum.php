@@ -13,68 +13,68 @@ final class Forum extends Model
 {
     public const TABLE = 'forums';
 
-    #[Column(name: 'id', type: 'int', unsigned: true, nullable: false, autoIncrement: true)]
+    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
     #[PrimaryKey]
     public int $id = 0;
 
-    #[Column(name: 'category', type: 'int', unsigned: true, default: null)]
+    #[Column(name: 'category', type: 'int', default: null, unsigned: true)]
     #[ForeignKey(table: 'categories', field: 'id', onDelete: 'null')]
     public ?int $category = null;
 
     #[Column(name: 'title', type: 'string', length: 255, nullable: false)]
     public string $title;
 
-    #[Column(name: 'subtitle', type: 'text', nullable: false, default: '')]
+    #[Column(name: 'subtitle', type: 'text', default: '', nullable: false)]
     public string $subtitle = '';
 
-    #[Column(name: 'lastPostUser', type: 'int', unsigned: true, default: null)]
+    #[Column(name: 'lastPostUser', type: 'int', default: null, unsigned: true)]
     #[ForeignKey(table: 'members', field: 'id', onDelete: 'null')]
     public ?int $lastPostUser = null;
 
     #[Column(name: 'lastPostDate', type: 'datetime', default: null)]
     public ?string $lastPostDate = null;
 
-    #[Column(name: 'lastPostTopic', type: 'int', unsigned: true, default: null)]
+    #[Column(name: 'lastPostTopic', type: 'int', default: null, unsigned: true)]
     #[ForeignKey(table: 'topics', field: 'id', onDelete: 'null')]
     public ?int $lastPostTopic = null;
 
-    #[Column(name: 'lastPostTopicTitle', type: 'string', length: 255, nullable: false, default: '')]
+    #[Column(name: 'lastPostTopicTitle', type: 'string', default: '', length: 255, nullable: false)]
     public string $lastPostTopicTitle = '';
 
-    #[Column(name: 'path', type: 'string', length: 100, nullable: false, default: '')]
+    #[Column(name: 'path', type: 'string', default: '', length: 100, nullable: false)]
     public string $path = '';
 
-    #[Column(name: 'showSubForums', type: 'tinyint', unsigned: true, nullable: false, default: 0)]
+    #[Column(name: 'showSubForums', type: 'tinyint', default: 0, nullable: false, unsigned: true)]
     public int $showSubForums = 0;
 
-    #[Column(name: 'redirect', type: 'string', length: 255, nullable: false, default: '')]
+    #[Column(name: 'redirect', type: 'string', default: '', length: 255, nullable: false)]
     public string $redirect = '';
 
-    #[Column(name: 'topics', type: 'int', unsigned: true, nullable: false, default: 0)]
+    #[Column(name: 'topics', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $topics = 0;
 
-    #[Column(name: 'posts', type: 'int', unsigned: true, nullable: false, default: 0)]
+    #[Column(name: 'posts', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $posts = 0;
 
-    #[Column(name: 'order', type: 'int', unsigned: true, nullable: false, default: 0)]
+    #[Column(name: 'order', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $order = 0;
 
-    #[Column(name: 'perms', type: 'binary', length: 48, nullable: false, default: '')]
+    #[Column(name: 'perms', type: 'binary', default: '', length: 48, nullable: false)]
     public string $perms = '';
 
-    #[Column(name: 'orderby', type: 'tinyint', unsigned: true, nullable: false, default: 0)]
+    #[Column(name: 'orderby', type: 'tinyint', default: 0, nullable: false, unsigned: true)]
     public int $orderby = 0;
 
     #[Column(name: 'nocount', type: 'bool')]
     public int $nocount = 0;
 
-    #[Column(name: 'redirects', type: 'int', unsigned: true, nullable: false, default: 0)]
+    #[Column(name: 'redirects', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $redirects = 0;
 
     #[Column(name: 'trashcan', type: 'bool')]
     public int $trashcan = 0;
 
-    #[Column(name: 'mods', type: 'string', length: 255, nullable: false, default: '')]
+    #[Column(name: 'mods', type: 'string', default: '', length: 255, nullable: false)]
     public string $mods = '';
 
     #[Column(name: 'showLedBy', type: 'bool')]

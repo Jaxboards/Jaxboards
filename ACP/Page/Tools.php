@@ -30,13 +30,13 @@ use const PHP_EOL;
 final readonly class Tools
 {
     public function __construct(
-        private readonly Database $database,
-        private readonly DatabaseUtils $databaseUtils,
-        private readonly DomainDefinitions $domainDefinitions,
-        private readonly FileUtils $fileUtils,
-        private readonly Page $page,
-        private readonly Request $request,
-        private readonly FileManager $fileManager,
+        private Database $database,
+        private DatabaseUtils $databaseUtils,
+        private DomainDefinitions $domainDefinitions,
+        private FileUtils $fileUtils,
+        private Page $page,
+        private Request $request,
+        private FileManager $fileManager,
     ) {}
 
     public function render(): void

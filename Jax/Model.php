@@ -85,7 +85,7 @@ abstract class Model
         $reflectionClass = new ReflectionClass(static::class);
         $attributes = array_merge(
             ...array_map(
-                static fn(ReflectionProperty $reflectionProperty) => $reflectionProperty->getAttributes(Column::class),
+                static fn(ReflectionProperty $reflectionProperty): array => $reflectionProperty->getAttributes(Column::class),
                 $reflectionClass->getProperties(),
             ),
         );
@@ -148,7 +148,7 @@ abstract class Model
         $database = self::$database;
         $stmt = $database->select(
             array_map(
-                static fn($field): string => "`{$field}`",
+                static fn(string $field): string => "`{$field}`",
                 static::getFields(),
             ),
             static::TABLE,
