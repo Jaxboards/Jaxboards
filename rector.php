@@ -9,6 +9,7 @@
 declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\CodeQuality\Rector\ClassConstFetch\VariableConstFetchToClassConstFetchRector;
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\CodingStyle\Rector\Catch_\CatchExceptionNameMatchingTypeRector;
 use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
@@ -240,6 +241,8 @@ return RectorConfig::configure()
         CatchExceptionNameMatchingTypeRector::class,
         // disable converting enscaped strings, which makes things less readable
         EncapsedStringsToSprintfRector::class,
+        // changes $model::TABLE to Model::TABLE which is not accurate
+        VariableConstFetchToClassConstFetchRector::class,
         // no need to check .git directory
         __DIR__ . '/.git',
         // no need to touch vendor files

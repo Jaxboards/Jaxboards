@@ -23,7 +23,7 @@ final readonly class MySQL implements DatabaseAdapter
 
     public function createTableQueryFromModel(Model $model): string
     {
-        $table = Model::TABLE;
+        $table = $model::TABLE;
         $tableQuoted = $this->database->ftable($table);
         $reflectionClass = new ReflectionClass($model::class);
 
