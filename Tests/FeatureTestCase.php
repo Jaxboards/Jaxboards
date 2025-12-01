@@ -81,14 +81,14 @@ abstract class FeatureTestCase extends PHPUnitTestCase
         ];
         $member = match ($member) {
             'admin' => Member::create([
-                'id' => 2,
+                'id' => 1,
                 'name' => 'Admin',
                 'displayName' => 'Admin',
                 'groupID' => Groups::Admin->value,
                 ...$timestamps,
             ]),
             default => Member::create([
-                'id' => 3,
+                'id' => 2,
                 'name' => 'Member',
                 'displayName' => 'Member',
                 'groupID' => Groups::Member->value,

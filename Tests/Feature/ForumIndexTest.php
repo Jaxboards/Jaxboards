@@ -24,17 +24,13 @@ final class ForumIndexTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?');
+        $page = $this->go('?act=vf1');
 
-        DOMAssert::assertSelectEquals('#userbox .welcome', 'Admin', 1, $page);
-
-        DOMAssert::assertSelectEquals('#cat_1 .title', 'Category', 1, $page);
-
-        DOMAssert::assertSelectEquals('#fid_1 .description', 'Your very first forum!', 1, $page);
-        DOMAssert::assertSelectEquals('#fid_1_lastpost', 'Welcome to Jaxboards!', 1, $page);
-
-        DOMAssert::assertSelectEquals('#stats .content', '1 User Online:', 1, $page);
-        DOMAssert::assertSelectEquals('#statusers .user2', 'Admin', 1, $page);
-        DOMAssert::assertSelectEquals('#stats .userstoday', '1 User Online Today:', 1, $page);
+        DOMAssert::assertSelectEquals('#fid_1_listing .title', 'Forum', 1, $page, 'Forum title');
+        DOMAssert::assertSelectEquals('#fr_1 .topic', 'Welcome to Jaxboards!', 1, $page, 'Topic Title');
+        DOMAssert::assertSelectEquals('#fr_1 .topic', 'Your support is appreciated.', 1, $page, 'Topic Description');
+        DOMAssert::assertSelectEquals('#fr_1 .item_1 .user1', 'Admin', 1, $page, 'Topic Author');
+        DOMAssert::assertSelectEquals('#fr_1 .last_post .autodate', 'a minute ago', 1, $page, 'Last Post Date');
+        DOMAssert::assertSelectEquals('#fr_1 .last_post .user1', 'Admin', 1, $page, 'Last Post Author');
     }
 }
