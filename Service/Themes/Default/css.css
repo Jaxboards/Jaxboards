@@ -572,7 +572,6 @@ textarea {
 #buddylist .contact {
     background: #fff;
     position: relative;
-    cursor: hand;
     cursor: pointer;
     min-height: 32px;
     padding: 5px;
@@ -792,7 +791,6 @@ textarea {
 .userprofile .contacts .contact {
     background: #fff;
     border: 1px solid #fff;
-    cursor: hand;
     cursor: pointer;
     padding: 30px 10px;
     min-height: 80px;
