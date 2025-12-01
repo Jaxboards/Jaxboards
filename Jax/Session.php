@@ -35,6 +35,9 @@ final class Session
 
     private ModelsSession $modelsSession;
 
+    /**
+     * @SuppressWarnings("PHPMD.Superglobals")
+     */
     public function __construct(
         private readonly Config $config,
         private readonly BotDetector $botDetector,
@@ -42,12 +45,15 @@ final class Session
         private readonly Database $database,
         private readonly Request $request,
         private readonly User $user,
+        private ?array $session = null,
     ) {
         ini_set('session.cookie_secure', '1');
         ini_set('session.cookie_httponly', '1');
         ini_set('session.use_cookies', '1');
         ini_set('session.use_only_cookies', '1');
         session_start();
+
+        $this->session = $session ?? $_SESSION;
 
         // This is only here so that the field is never null
         $this->modelsSession = new ModelsSession();
@@ -105,12 +111,9 @@ final class Session
         return $this->modelsSession;
     }
 
-    /**
-     * @SuppressWarnings("PHPMD.Superglobals")
-     */
     public function getPHPSessionValue(string $field): mixed
     {
-        return $_SESSION[$field] ?? null;
+        return $this->session[$field] ?? null;
     }
 
     /**

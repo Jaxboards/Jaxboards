@@ -6,12 +6,18 @@ namespace Tests;
 
 use DI\Container;
 use Jax\App;
+use Jax\Constants\Groups;
+use Jax\Database;
 use Jax\DatabaseUtils;
+use Jax\Models\Member;
 use Jax\Request;
 use Jax\ServiceConfig;
+use Jax\Session as JaxSession;
+use Jax\User;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
+use function DI\autowire;
 use function parse_str;
 use function parse_url;
 
@@ -26,20 +32,6 @@ abstract class FeatureTestCase extends PHPUnitTestCase
     public function __construct(string $name)
     {
         $this->container = new Container();
-
-        return parent::__construct($name);
-    }
-
-    public function go(Request|string $request): string
-    {
-        if (!$request instanceof Request) {
-            parse_str(parse_url($request)['query'], $getParameters);
-            $request = new Request(
-                get: $getParameters,
-            );
-        }
-
-        $this->container->set(Request::class, $request);
 
         $this->container->set(ServiceConfig::class, new ServiceConfig([
             'badnamechars' => "@[^\\w' ?]@",
@@ -57,9 +49,69 @@ abstract class FeatureTestCase extends PHPUnitTestCase
             'timetologout' => 900,
         ]));
 
+        return parent::__construct($name);
+    }
+
+    protected function setUp(): void
+    {
+        $this->setupDB();
+        parent::setUp();
+    }
+
+    private function setupDB() {
         $databaseUtils = $this->container->get(DatabaseUtils::class);
         $databaseUtils->install();
+    }
+
+    public function go(Request|string $request): string
+    {
+        if (!$request instanceof Request) {
+            parse_str(parse_url($request)['query'], $getParameters);
+            $request = new Request(
+                get: $getParameters,
+            );
+        }
+
+        $this->container->set(Request::class, $request);
 
         return $this->container->get(App::class)->render() ?? '';
+    }
+
+    public function actingAs(Member|string $member) {
+        $database = $this->container->get(Database::class);
+
+        if (! $member instanceof User) {
+            $timestamps = [
+                'joinDate' => $database->datetime(),
+                'lastVisit' => $database->datetime(),
+            ];
+
+            $member = match($member) {
+                'admin' => Member::create([
+                    'id' => 2,
+                    'name' => 'Admin',
+                    'displayName' => 'Admin',
+                    'groupID' => Groups::Admin->value,
+                    ...$timestamps,
+                ]),
+                default => Member::create([
+                    'id' => 3,
+                    'name' => 'Member',
+                    'displayName' => 'Member',
+                    'groupID' => Groups::Member->value,
+                    ...$timestamps,
+                ]),
+            };
+        }
+
+        $this->container->set(
+            User::class,
+            autowire()->constructorParameter('member', $member),
+        );
+
+        $this->container->set(
+            JaxSession::class,
+            autowire()->constructorParameter('session', ['uid' => $member->id])
+        );
     }
 }

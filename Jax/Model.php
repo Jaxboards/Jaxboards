@@ -40,6 +40,21 @@ abstract class Model
         $this->fromDatabase = true;
     }
 
+    /**
+     * Creates a new instance of the model
+     */
+    public static function create(array $properties = []): static {
+        $model = new static();
+
+        foreach($properties as $key=>$value) {
+            $model->{$key} = $value;
+        }
+
+        $model->insert();
+
+        return $model;
+    }
+
     public static function setDatabase(Database $database): void
     {
         self::$database = $database;
