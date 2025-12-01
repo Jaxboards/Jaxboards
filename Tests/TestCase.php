@@ -21,7 +21,7 @@ use function parse_url;
 #[CoversNothing]
 abstract class TestCase extends PHPUnitTestCase
 {
-    public function go(string|Request $request): string
+    public function go(Request|string $request): string
     {
 
         if (!$request instanceof Request) {
