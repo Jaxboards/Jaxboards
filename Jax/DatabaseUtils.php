@@ -370,6 +370,7 @@ final readonly class DatabaseUtils
         $topic->title = 'Welcome to Jaxboards!';
         $topic->subtitle = 'Your support is appreciated.';
         $topic->lastPostUser = 1;
+        $topic->lastPostDate = $this->database->datetime();
         $topic->fid = 1;
         $topic->author = 1;
         $topic->summary = " Now, it's only a matter of time";
