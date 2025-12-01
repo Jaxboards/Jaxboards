@@ -58,6 +58,7 @@ class Database
                     $serviceConfig->getSetting('sql_password'),
                     $serviceConfig->getSetting('sql_db'),
                     $serviceConfig->getSetting('sql_prefix'),
+                    $serviceConfig->getSetting('sql_driver') ?? 'mysql'
                 );
             }
         } catch (Exception $e) {
@@ -65,8 +66,6 @@ class Database
 
             exit(1);
         }
-
-        $this->driver = $serviceConfig->getSetting('sql_driver') ?? 'mysql';
 
         Model::setDatabase($this);
     }
@@ -77,8 +76,9 @@ class Database
         string $password,
         string $database = '',
         string $prefix = '',
+        string $driver = '',
     ): void {
-        $connectionArgs = match ($this->driver) {
+        $connectionArgs = match ($driver) {
             'mysql' => [
                 "mysql:host={$host};dbname={$database};charset=utf8mb4",
                 $user,
@@ -95,9 +95,14 @@ class Database
         $this->pdo = new PDO(...$connectionArgs);
 
         // All datetimes are GMT for jaxboards
-        $this->pdo->query($this->driver === 'mysql' ? "SET time_zone = '+0:00'" : 'SET TIME ZONE "UTC"');
+        match ($driver) {
+            'mysql' => $this->pdo->query("SET time_zone = '+0:00'"),
+            'postgres' => $this->pdo->query('SET TIME ZONE "UTC"'),
+            default => null
+        };
 
         $this->setPrefix($prefix);
+        $this->driver = $driver;
     }
 
     public function setPrefix(string $prefix): void
