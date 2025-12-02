@@ -6,6 +6,7 @@ namespace Tests;
 
 use DI\Container;
 use Jax\App;
+use Jax\Config;
 use Jax\Constants\Groups;
 use Jax\Database;
 use Jax\DatabaseUtils;
@@ -31,6 +32,17 @@ abstract class FeatureTestCase extends PHPUnitTestCase
     {
         $this->container = new Container();
 
+        $this->container->set(Config::class, autowire()->constructorParameter('boardConfig', [
+            'boardoffline' => '0',
+            'emotepack' => 'keshaemotes',
+            'offlinetext' => 'The board is offline!',
+            'shoutbox' => '1',
+            'shoutbox_num' => '10',
+            'timetoidle' => '300',
+            'timetologout' => '900',
+            'usedisplayname' => '1',
+        ]));
+
         $this->container->set(ServiceConfig::class, new ServiceConfig([
             'badnamechars' => "@[^\\w' ?]@",
             'boardname' => 'Example Forums',
@@ -46,6 +58,7 @@ abstract class FeatureTestCase extends PHPUnitTestCase
             'sql_prefix' => 'jaxboards_',
             'timetologout' => 900,
         ]));
+
 
         return parent::__construct($name);
     }

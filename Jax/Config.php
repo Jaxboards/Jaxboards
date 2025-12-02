@@ -6,7 +6,6 @@ namespace Jax;
 
 use function array_key_exists;
 use function array_merge;
-use function file_exists;
 use function file_put_contents;
 
 final class Config
@@ -37,18 +36,7 @@ final class Config
             return $this->boardConfig;
         }
 
-        $this->boardConfig = [];
-        $CFG = [];
-
-        $boardConfigPath = $this->domainDefinitions->getBoardPath() . '/config.php';
-
-        if (file_exists($boardConfigPath)) {
-            require_once $this->domainDefinitions->getBoardPath() . '/config.php';
-
-            $this->boardConfig = $CFG;
-        }
-
-        return $this->boardConfig;
+        throw 'SEAN';
     }
 
     public function getSetting(string $key): mixed
