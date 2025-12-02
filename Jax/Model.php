@@ -210,9 +210,11 @@ abstract class Model
             $type = (string) $reflectionProperty->getType();
 
             $insertId = $database->insertId();
-            $this->{$primaryKey->name} = $type === 'string'
-                ? $insertId
-                : (int) $insertId;
+            if ($insertId) {
+                $this->{$primaryKey->name} = $type === 'string'
+                    ? $insertId
+                    : (int) $insertId;
+            }
         }
 
         return $statement;
