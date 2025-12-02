@@ -88,12 +88,15 @@ abstract class FeatureTestCase extends PHPUnitTestCase
                     $member->displayName = 'Admin';
                     $member->sig = 'I like tacos';
                     $member->groupID = Groups::Admin->value;
+
                     break;
+
                 default:
                     $member->id = 2;
                     $member->name = 'Member';
                     $member->displayName = 'Member';
                     $member->groupID = Groups::Member->value;
+
                     break;
             }
 

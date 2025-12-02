@@ -99,6 +99,7 @@ abstract class Model
     /**
      * @method ?static selectOne(int|string $primaryKey)
      * @method ?static selectOne(mixed $args)
+     *
      * @param array<mixed> $args
      */
     public static function selectOne(...$args): ?static
@@ -205,7 +206,7 @@ abstract class Model
 
         $statement = $database->insert(static::TABLE, $data);
 
-        if ($primaryKey) {
+        if ($primaryKey instanceof Column) {
             $reflectionProperty = new ReflectionProperty(static::class, $primaryKey->name);
             $type = (string) $reflectionProperty->getType();
 
