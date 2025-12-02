@@ -84,6 +84,7 @@ abstract class FeatureTestCase extends PHPUnitTestCase
                 'id' => 1,
                 'name' => 'Admin',
                 'displayName' => 'Admin',
+                'sig' => 'I like tacos',
                 'groupID' => Groups::Admin->value,
                 ...$timestamps,
             ]),
