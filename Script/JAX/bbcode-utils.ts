@@ -114,16 +114,16 @@ export function htmlToBBCode(html: string) {
         },
     );
     return bbcode
-        .replaceAll(/&amp;/g, '&')
-        .replaceAll(/&gt;/g, '>')
-        .replaceAll(/&lt;/g, '<')
-        .replaceAll(/&nbsp;/g, ' ');
+        .replaceAll('&amp;', '&')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&nbsp;', ' ');
 }
 
 export function bbcodeToHTML(bbcode: string) {
     let html = bbcode
-        .replaceAll(/</g, '&lt;')
-        .replaceAll(/>/g, '&gt;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
         .replaceAll(/(\s) /g, '$1&nbsp;');
     html = html.replaceAll(/\[b\]([^]*?)\[\/b\]/gi, '<b>$1</b>');
     html = html.replaceAll(/\[i\]([^]*?)\[\/i\]/gi, '<i>$1</i>');
@@ -162,6 +162,6 @@ export function bbcodeToHTML(bbcode: string) {
             return `<${tag}>${lis}</${tag}>`;
         },
     );
-    html = html.replaceAll(/\n/g, '<br />');
+    html = html.replaceAll('\n', '<br />');
     return html;
 }
