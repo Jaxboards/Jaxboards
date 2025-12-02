@@ -35,6 +35,5 @@ final class MembersListTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('#memberlist tr:nth-child(2) td:nth-child(3)', '#1', 1, $page);
         DOMAssert::assertSelectEquals('#memberlist tr:nth-child(2) td:nth-child(4)', '0', 1, $page);
         DOMAssert::assertSelectEquals('#memberlist tr:nth-child(2) td:nth-child(5)', 'a minute ago', 1, $page);
-
     }
 }
