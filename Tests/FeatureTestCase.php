@@ -83,7 +83,7 @@ abstract class FeatureTestCase extends PHPUnitTestCase
         return $this->container->get(App::class)->render() ?? '';
     }
 
-    public function actingAs(Member|string $member): void
+    public function actingAs(Member|string $member, array $memberOverrides = []): void
     {
         $database = $this->container->get(Database::class);
 
@@ -110,6 +110,10 @@ abstract class FeatureTestCase extends PHPUnitTestCase
                     $member->groupID = Groups::Member->value;
 
                     break;
+            }
+
+            foreach ($memberOverrides as $property => $value) {
+                $member->{$property} = $value;
             }
 
             $member->insert();

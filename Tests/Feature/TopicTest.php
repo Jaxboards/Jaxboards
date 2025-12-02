@@ -88,7 +88,7 @@ final class TopicTest extends FeatureTestCase
 
     public function testViewTopicAsAdmin(): void
     {
-        $this->actingAs('admin');
+        $this->actingAs('admin', ['sig' => 'I like tacos']);
 
         $page = $this->go('?act=vt1');
 
