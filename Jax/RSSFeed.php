@@ -29,7 +29,7 @@ final class RSSFeed
         $this->items[] = $item;
     }
 
-    public function publish(): never
+    public function publish(): string
     {
         $this->feed['pubDate'] = gmdate('r');
         $xmlFeed = $this->makeXML($this->feed);
@@ -38,7 +38,7 @@ final class RSSFeed
         }
 
         header('Content-type: application/rss+xml');
-        echo <<<EOT
+        return <<<EOT
             <?xml version="1.0" encoding="UTF-8" ?>
             <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
                 <channel>
@@ -47,8 +47,6 @@ final class RSSFeed
                 </channel>
             </rss>
             EOT;
-
-        exit(0);
     }
 
     /**

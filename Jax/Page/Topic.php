@@ -854,6 +854,6 @@ final class Topic
             );
         }
 
-        $rssFeed->publish();
+        $this->page->earlyFlush($rssFeed->publish());
     }
 }

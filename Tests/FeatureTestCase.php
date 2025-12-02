@@ -9,6 +9,7 @@ use Jax\App;
 use Jax\Constants\Groups;
 use Jax\Database;
 use Jax\DatabaseUtils;
+use Jax\Models\Group;
 use Jax\Models\Member;
 use Jax\Request;
 use Jax\ServiceConfig;
@@ -97,9 +98,12 @@ abstract class FeatureTestCase extends PHPUnitTestCase
             ]),
         };
 
+        $group = Group::selectOne($member->groupID);
+
         $this->container->set(
             User::class,
             autowire()->constructorParameter('member', $member),
+            autowire()->constructorParameter('group', $group)
         );
 
         $this->container->set(

@@ -8,6 +8,7 @@ use Jax\Database;
 use Jax\Date;
 use Jax\DomainDefinitions;
 use Jax\Models\Member;
+use Jax\Page;
 use Jax\Request;
 use Jax\RSSFeed;
 use Jax\Template;
@@ -24,6 +25,7 @@ final readonly class Activity
         private Database $database,
         private Date $date,
         private DomainDefinitions $domainDefinitions,
+        private Page $page,
         private Request $request,
         private TextFormatting $textFormatting,
         private Template $template,
@@ -61,13 +63,13 @@ final readonly class Activity
                     'description' => $parsed['text'],
                     'guid' => $activity['id'],
                     'link' => $this->domainDefinitions->getBoardUrl() . $parsed['link'],
-                    'pubDate' => gmdate('r', $activity['date']),
+                    'pubDate' => $this->date->datetimeAsCarbon($activity['date'])->format('r'),
                     'title' => $parsed['text'],
                 ],
             );
         }
 
-        $rssFeed->publish();
+        $this->page->earlyFlush($rssFeed->publish());
     }
 
     /**
@@ -88,7 +90,7 @@ final readonly class Activity
             $activity['aff_name'],
         );
 
-        $date = $this->date->smallDate((int) $activity['date']);
+        $date = $this->date->smallDate($activity['date']);
         $text = match ($activity['type']) {
             'profile_comment' => "{$user}  commented on  {$otherguy}'s profile",
             'new_post' => <<<HTML
@@ -182,7 +184,7 @@ final readonly class Activity
                     a.`type` AS `type`,
                     a.`arg1` AS `arg1`,
                     a.`uid` AS `uid`,
-                    UNIX_TIMESTAMP(a.`date`) AS `date`,
+                    a.`date` AS `date`,
                     a.`affectedUser` AS `affectedUser`,
                     a.`tid` AS `tid`,
                     a.`pid` AS `pid`,

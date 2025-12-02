@@ -51,7 +51,6 @@ final readonly class UserProfile
 
         $profile = $userId !== 0 ? Member::selectOne($userId) : null;
 
-
         match (true) {
             !$profile => $this->showProfileError(),
             $this->didComeFromForum() => $this->showContactCard($profile),

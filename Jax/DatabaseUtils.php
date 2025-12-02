@@ -136,7 +136,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         $member->canViewShoutbox = 1;
         $member->canViewStats = 1;
         $member->legend = 0;
-        $member->canViewFullProfile = 0;
+        $member->canViewFullProfile = 1;
         $member->insert();
 
         $admin = new Group();
@@ -170,7 +170,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         $admin->canViewShoutbox = 1;
         $admin->canViewStats = 1;
         $admin->legend = 0;
-        $admin->canViewFullProfile = 0;
+        $admin->canViewFullProfile = 1;
         $admin->insert();
 
         $guest = new Group();
@@ -204,7 +204,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         $guest->canViewShoutbox = 1;
         $guest->canViewStats = 1;
         $guest->legend = 0;
-        $guest->canViewFullProfile = 0;
+        $guest->canViewFullProfile = 1;
         $guest->insert();
 
         $banned = new Group();
@@ -272,7 +272,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         $validating->canViewShoutbox = 1;
         $validating->canViewStats = 1;
         $validating->legend = 0;
-        $validating->canViewFullProfile = 0;
+        $validating->canViewFullProfile = 1;
         $validating->insert();
 
         $post = new Post();

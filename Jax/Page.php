@@ -38,6 +38,8 @@ final class Page
 
     private string $pageTitle = '';
 
+    private ?string $earlyFlush = null;
+
     public function __construct(
         private readonly Config $config,
         private readonly DomainDefinitions $domainDefinitions,
@@ -116,12 +118,20 @@ final class Page
         }
     }
 
+    public function earlyFlush(string $content) {
+        $this->earlyFlush = $content;
+    }
+
     public function out(): string
     {
         if ($this->request->isJSAccess()) {
             $this->outputJavascriptCommands();
 
             return '';
+        }
+
+        if ($this->earlyFlush) {
+            return $this->earlyFlush;
         }
 
         $this->append('PATH', $this->buildPath());
