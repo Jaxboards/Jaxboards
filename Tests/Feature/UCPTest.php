@@ -4,8 +4,39 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\App;
+use Jax\Attributes\Column;
+use Jax\Attributes\ForeignKey;
+use Jax\Attributes\Key;
+use Jax\BBCode;
+use Jax\BotDetector;
+use Jax\Config;
+use Jax\Database;
+use Jax\DatabaseUtils;
+use Jax\DatabaseUtils\SQLite;
+use Jax\Date;
+use Jax\DebugLog;
+use Jax\DomainDefinitions;
+use Jax\IPAddress;
+use Jax\Jax;
+use Jax\Model;
+use Jax\Modules\PrivateMessage;
+use Jax\Modules\Shoutbox;
+use Jax\Page;
+use Jax\Page\TextRules;
+use Jax\Page\UCP\Inbox;
+use Jax\RequestStringGetter;
+use Jax\Router;
+use Jax\ServiceConfig;
+use Jax\Session;
+use Jax\Template;
+use Jax\TextFormatting;
+use Jax\User;
 use Jax\Models\Member;
+use Jax\Page\UCP;
 use Jax\Request;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
@@ -14,9 +45,38 @@ use function PHPUnit\Framework\assertStringContainsString;
 
 /**
  * @internal
- *
- * @coversNothing
  */
+#[CoversClass(UCP::class)]
+#[CoversClass(App::class)]
+#[CoversClass(Column::class)]
+#[CoversClass(ForeignKey::class)]
+#[CoversClass(Key::class)]
+#[CoversClass(BBCode::class)]
+#[CoversClass(BotDetector::class)]
+#[CoversClass(Config::class)]
+#[CoversClass(Database::class)]
+#[CoversClass(DatabaseUtils::class)]
+#[CoversClass(SQLite::class)]
+#[CoversClass(Date::class)]
+#[CoversClass(DebugLog::class)]
+#[CoversClass(DomainDefinitions::class)]
+#[CoversClass(IPAddress::class)]
+#[CoversClass(Jax::class)]
+#[CoversClass(Model::class)]
+#[CoversClass(PrivateMessage::class)]
+#[CoversClass(Shoutbox::class)]
+#[CoversClass(Page::class)]
+#[CoversClass(TextRules::class)]
+#[CoversClass(Inbox::class)]
+#[CoversClass(Request::class)]
+#[CoversClass(RequestStringGetter::class)]
+#[CoversClass(Router::class)]
+#[CoversClass(ServiceConfig::class)]
+#[CoversClass(Session::class)]
+#[CoversClass(Template::class)]
+#[CoversClass(TextFormatting::class)]
+#[CoversClass(User::class)]
+#[CoversFunction('Jax\pathjoin')]
 final class UCPTest extends FeatureTestCase
 {
     protected function setUp(): void
