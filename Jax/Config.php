@@ -35,8 +35,6 @@ final class Config
         if ($this->boardConfig) {
             return $this->boardConfig;
         }
-
-        throw 'SEAN';
     }
 
     public function getSetting(string $key): mixed
