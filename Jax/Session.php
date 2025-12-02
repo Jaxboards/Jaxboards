@@ -37,6 +37,8 @@ final class Session
 
     /**
      * @SuppressWarnings("PHPMD.Superglobals")
+     *
+     * @param array<mixed> $session
      */
     public function __construct(
         private readonly Config $config,

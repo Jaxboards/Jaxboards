@@ -38,6 +38,12 @@ final class Request
 
     /**
      * @SuppressWarnings("PHPMD.Superglobals")
+     *
+     * @param array<mixed> $get
+     * @param array<mixed> $post
+     * @param array<mixed> $cookie
+     * @param array<mixed> $files
+     * @param array<mixed> $server
      */
     public function __construct(
         ?array $get = null,

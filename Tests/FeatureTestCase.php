@@ -75,27 +75,30 @@ abstract class FeatureTestCase extends PHPUnitTestCase
     public function actingAs(Member|string $member): void
     {
         $database = $this->container->get(Database::class);
-        $timestamps = [
-            'joinDate' => $database->datetime(),
-            'lastVisit' => $database->datetime(),
-        ];
-        $member = match ($member) {
-            'admin' => Member::create([
-                'id' => 1,
-                'name' => 'Admin',
-                'displayName' => 'Admin',
-                'sig' => 'I like tacos',
-                'groupID' => Groups::Admin->value,
-                ...$timestamps,
-            ]),
-            default => Member::create([
-                'id' => 2,
-                'name' => 'Member',
-                'displayName' => 'Member',
-                'groupID' => Groups::Member->value,
-                ...$timestamps,
-            ]),
-        };
+
+        if (! $member instanceof Member) {
+            $member = new Member();
+            $member->joinDate = $database->datetime();
+            $member->lastVisit = $database->datetime();
+
+            switch ($member) {
+                case 'admin':
+                    $member->id = 1;
+                    $member->name = 'Admin';
+                    $member->displayName = 'Admin';
+                    $member->sig = 'I like tacos';
+                    $member->groupID = Groups::Admin->value;
+                    break;
+                default:
+                    $member->id = 2;
+                    $member->name = 'Member';
+                    $member->displayName = 'Member';
+                    $member->groupID = Groups::Member->value;
+                    break;
+            }
+
+            $member->insert();
+        }
 
         $this->container->set(
             User::class,

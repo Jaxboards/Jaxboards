@@ -251,7 +251,7 @@ const TAB_WIDTH = 4;
 $issues = array_merge_recursive(
     ...array_map(
         static function (
-            int|string $filename,
+            string $filename,
         ) use ($data): array {
             $file = new SplFileObject($filename);
 

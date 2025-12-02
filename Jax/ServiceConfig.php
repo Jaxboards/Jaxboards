@@ -24,6 +24,9 @@ final class ServiceConfig
      */
     private array $overrideConfig = [];
 
+    /**
+     * @param array<mixed> $config
+     */
     public function __construct(?array $config = null)
     {
         $this->serviceConfig = $config ?? $this->getServiceConfig();

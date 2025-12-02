@@ -40,22 +40,6 @@ abstract class Model
         $this->fromDatabase = true;
     }
 
-    /**
-     * Creates a new instance of the model.
-     */
-    public static function create(array $properties = []): static
-    {
-        $static = new static();
-
-        foreach ($properties as $key => $value) {
-            $static->{$key} = $value;
-        }
-
-        $static->insert();
-
-        return $static;
-    }
-
     public static function setDatabase(Database $database): void
     {
         self::$database = $database;
@@ -115,6 +99,7 @@ abstract class Model
     /**
      * @method ?static selectOne(int|string $primaryKey)
      * @method ?static selectOne(mixed $args)
+     * @param array<mixed> $args
      */
     public static function selectOne(...$args): ?static
     {
@@ -202,26 +187,30 @@ abstract class Model
         );
     }
 
+    /**
+     * Inserts a record.
+     * If the model has an autoincrement primary key, it is updated.
+     */
     public function insert(): ?PDOStatement
     {
         $database = self::$database;
         $primaryKey = static::getPrimaryKey();
-        $primaryKeyName = $primaryKey?->name;
-        $reflectionProperty = new ReflectionProperty(static::class, $primaryKeyName);
-        $type = (string) $reflectionProperty->getType();
 
         $data = $this->asArray();
 
         // Don't insert empty id if it's autoincrement
-        if ($primaryKey->autoIncrement && !$data[$primaryKeyName]) {
-            unset($data[$primaryKeyName]);
+        if ($primaryKey?->autoIncrement && !$data[$primaryKey->name]) {
+            unset($data[$primaryKey->name]);
         }
 
         $statement = $database->insert(static::TABLE, $data);
-        $insertId = $database->insertId();
 
-        if ($insertId) {
-            $this->{$primaryKeyName} = $type === 'string'
+        if ($primaryKey) {
+            $reflectionProperty = new ReflectionProperty(static::class, $primaryKey->name);
+            $type = (string) $reflectionProperty->getType();
+
+            $insertId = $database->insertId();
+            $this->{$primaryKey->name} = $type === 'string'
                 ? $insertId
                 : (int) $insertId;
         }

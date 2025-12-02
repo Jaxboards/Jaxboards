@@ -79,17 +79,17 @@ class Database
         string $driver = '',
     ): void {
         $connectionArgs = match ($driver) {
-            'mysql' => [
-                "mysql:host={$host};dbname={$database};charset=utf8mb4",
-                $user,
-                $password,
-            ],
             'postgres' => [
                 "postgres:host={$host};dbname={$database}",
                 $user,
                 $password,
             ],
             'sqliteMemory' => ['sqlite::memory:'],
+            default => [
+                "mysql:host={$host};dbname={$database};charset=utf8mb4",
+                $user,
+                $password,
+            ],
         };
 
         $this->pdo = new PDO(...$connectionArgs);
