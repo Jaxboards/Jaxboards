@@ -206,7 +206,8 @@ abstract class Model
 
         $statement = $database->insert(static::TABLE, $data);
 
-        if ($primaryKey instanceof Column) {
+        // Update insertId on the model
+        if ($primaryKey !== null && !$data[$primaryKey->name]) {
             $reflectionProperty = new ReflectionProperty(static::class, $primaryKey->name);
             $type = (string) $reflectionProperty->getType();
 

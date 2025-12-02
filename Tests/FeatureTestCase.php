@@ -77,11 +77,12 @@ abstract class FeatureTestCase extends PHPUnitTestCase
         $database = $this->container->get(Database::class);
 
         if (! $member instanceof Member) {
+            $memberName = $member;
             $member = new Member();
             $member->joinDate = $database->datetime();
             $member->lastVisit = $database->datetime();
 
-            switch ($member) {
+            switch ($memberName) {
                 case 'admin':
                     $member->id = 1;
                     $member->name = 'Admin';
