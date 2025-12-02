@@ -48,8 +48,11 @@ final class Ticker
 
     private function index(): void
     {
-        $this->session->set('locationVerbose', 'Using the ticker!');
+        $this->page->setBreadCrumbs([
+            '?act=ticker' => 'Ticker',
+        ]);
 
+        $this->session->set('locationVerbose', 'Using the ticker!');
 
         $ticksHTML = '';
         $first = 0;

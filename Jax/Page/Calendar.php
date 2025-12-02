@@ -32,6 +32,10 @@ final readonly class Calendar
 
     public function render(): void
     {
+        $this->page->setBreadCrumbs([
+            '?act=calendar' => 'Calendar',
+        ]);
+
         $month = is_numeric($this->request->both('month'))
             ? (int) $this->request->both('month')
             : (int) gmdate('n');

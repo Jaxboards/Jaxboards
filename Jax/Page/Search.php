@@ -61,6 +61,10 @@ final class Search
 
     public function render(): void
     {
+        $this->page->setBreadCrumbs([
+            '?act=search' => 'Search',
+        ]);
+
         $this->pageNum = (int) $this->request->asString->both('page') - 1;
         if ($this->pageNum < 0) {
             $this->pageNum = 0;
