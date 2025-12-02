@@ -35,6 +35,19 @@ final class Config
         if ($this->boardConfig) {
             return $this->boardConfig;
         }
+
+        $this->boardConfig = [];
+        $CFG = [];
+
+        $boardConfigPath = $this->domainDefinitions->getBoardPath() . '/config.php';
+
+        if (file_exists($boardConfigPath)) {
+            require_once $this->domainDefinitions->getBoardPath() . '/config.php';
+
+            $this->boardConfig = $CFG;
+        }
+
+        return $this->boardConfig;
     }
 
     public function getSetting(string $key): mixed
