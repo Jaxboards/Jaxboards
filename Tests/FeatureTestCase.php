@@ -98,11 +98,9 @@ abstract class FeatureTestCase extends PHPUnitTestCase
             ]),
         };
 
-        Group::selectOne($member->groupID);
-
         $this->container->set(
             User::class,
-            autowire()->constructorParameter('member', $member),
+            autowire()->constructorParameter('member', $member)
         );
 
         $this->container->set(
