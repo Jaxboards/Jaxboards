@@ -52,7 +52,7 @@ function createMessagingWindow({
                     <input type='hidden' name='act' value='blank' />
                 </form>
             </div>
-        `.replaceAll(/%s/, `${fromId}`),
+        `.replaceAll(/%s/g, `${fromId}`),
         className: 'im',
         resize: '.ims',
         animate: true,

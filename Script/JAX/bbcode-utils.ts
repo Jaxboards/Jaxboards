@@ -14,11 +14,11 @@ const fontWeightRegex = /font-weight: ?bold/i;
 export function htmlToBBCode(html: string) {
     let bbcode = html;
     const nestedTagRegex = /<(\w+)([^>]*)>([^]*?)<\/\1>/i;
-    bbcode = bbcode.replaceAll(/[\r\n]+/, '');
-    bbcode = bbcode.replaceAll(/<(hr|br|meta)[^>]*>/i, '\n');
+    bbcode = bbcode.replaceAll(/[\r\n]+/g, '');
+    bbcode = bbcode.replaceAll(/<(hr|br|meta)[^>]*>/gi, '\n');
     // images and emojis
     bbcode = bbcode.replaceAll(
-        /<img.*?src=["']?([^'"]+)["'](?: alt=["']?([^"']+)["'])?[^>]*\/?>/,
+        /<img.*?src=["']?([^'"]+)["'](?: alt=["']?([^"']+)["'])?[^>]*\/?>/g,
         (_: string, src: string, alt: string) => alt || `[img]${src}[/img]`,
     );
     bbcode = bbcode.replaceAll(
@@ -30,7 +30,7 @@ export function htmlToBBCode(html: string) {
                 : innerHTML;
             const att: Record<string, string> = {};
             attributes.replaceAll(
-                /(color|size|style|href|src)=(['"]?)(.*?)\2/i,
+                /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
                 (__: string, attr: string, q: string, value: string) => {
                     att[attr] = value;
                     return '';
@@ -114,45 +114,45 @@ export function htmlToBBCode(html: string) {
         },
     );
     return bbcode
-        .replaceAll(/&amp;/, '&')
-        .replaceAll(/&gt;/, '>')
-        .replaceAll(/&lt;/, '<')
-        .replaceAll(/&nbsp;/, ' ');
+        .replaceAll(/&amp;/g, '&')
+        .replaceAll(/&gt;/g, '>')
+        .replaceAll(/&lt;/g, '<')
+        .replaceAll(/&nbsp;/g, ' ');
 }
 
 export function bbcodeToHTML(bbcode: string) {
     let html = bbcode
-        .replaceAll(/</, '&lt;')
-        .replaceAll(/>/, '&gt;')
-        .replaceAll(/(\s) /, '$1&nbsp;');
-    html = html.replaceAll(/\[b\]([^]*?)\[\/b\]/i, '<b>$1</b>');
-    html = html.replaceAll(/\[i\]([^]*?)\[\/i\]/i, '<i>$1</i>');
-    html = html.replaceAll(/\[u\]([^]*?)\[\/u\]/i, '<u>$1</u>');
-    html = html.replaceAll(/\[s\]([^]*?)\[\/s\]/i, '<s>$1</s>');
-    html = html.replaceAll(/\[img\]([^'"[]+)\[\/img\]/i, '<img src="$1">');
+        .replaceAll(/</g, '&lt;')
+        .replaceAll(/>/g, '&gt;')
+        .replaceAll(/(\s) /g, '$1&nbsp;');
+    html = html.replaceAll(/\[b\]([^]*?)\[\/b\]/gi, '<b>$1</b>');
+    html = html.replaceAll(/\[i\]([^]*?)\[\/i\]/gi, '<i>$1</i>');
+    html = html.replaceAll(/\[u\]([^]*?)\[\/u\]/gi, '<u>$1</u>');
+    html = html.replaceAll(/\[s\]([^]*?)\[\/s\]/gi, '<s>$1</s>');
+    html = html.replaceAll(/\[img\]([^'"[]+)\[\/img\]/gi, '<img src="$1">');
     html = html.replaceAll(
-        /\[color=([^\]]+)\](.*?)\[\/color\]/i,
+        /\[color=([^\]]+)\](.*?)\[\/color\]/gi,
         '<span style="color:$1">$2</span>',
     );
     html = html.replaceAll(
-        /\[size=([^\]]+)\](.*?)\[\/size\]/i,
+        /\[size=([^\]]+)\](.*?)\[\/size\]/gi,
         '<span style="font-size:$1">$2</span>',
     );
     html = html.replaceAll(
-        /\[url=([^\]]+)\](.*?)\[\/url\]/i,
+        /\[url=([^\]]+)\](.*?)\[\/url\]/gi,
         '<a href="$1">$2</a>',
     );
     html = html.replaceAll(
-        /\[bgcolor=([^\]]+)\](.*?)\[\/bgcolor\]/i,
+        /\[bgcolor=([^\]]+)\](.*?)\[\/bgcolor\]/gi,
         '<span style="backgroun-color:$1">$2</span>',
     );
-    html = html.replaceAll(/\[h(\d)\](.*?)\[\/h\1\]/, '<h$1>$2</h$1>');
+    html = html.replaceAll(/\[h(\d)\](.*?)\[\/h\1\]/g, '<h$1>$2</h$1>');
     html = html.replaceAll(
-        /\[align=(left|right|center)\](.*?)\[\/align\]/,
+        /\[align=(left|right|center)\](.*?)\[\/align\]/g,
         '<div style="text-align:$1">$2</div>',
     );
     html = html.replaceAll(
-        /\[(ul|ol)\]([^]*?)\[\/\1\]/i,
+        /\[(ul|ol)\]([^]*?)\[\/\1\]/gi,
         (_, tag, contents) => {
             const listItems = contents.split(/(^|[\r\n]+)\*/);
             const lis = listItems
@@ -162,6 +162,6 @@ export function bbcodeToHTML(bbcode: string) {
             return `<${tag}>${lis}</${tag}>`;
         },
     );
-    html = html.replaceAll(/\n/, '<br />');
+    html = html.replaceAll(/\n/g, '<br />');
     return html;
 }
