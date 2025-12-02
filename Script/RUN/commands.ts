@@ -117,7 +117,6 @@ export default {
             x.parentNode.removeChild(x);
         }
         new Animation(div).dehighlight().play();
-        debugger;
         if (globalSettings.soundShout) {
             Sound.play('sbblip');
         }
