@@ -56,6 +56,7 @@ class Drag {
     }
 
     start(event: MouseEvent, target?: HTMLElement, handle?: HTMLElement) {
+        event.preventDefault();
         event.stopPropagation();
         const el = target || (event.target as HTMLElement);
         const style = getComputedStyle(el);
