@@ -18,7 +18,6 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
-use PHP_CodeSniffer\Generators\HTML;
 
 use function ceil;
 use function mb_strlen;
@@ -183,7 +182,7 @@ final class Shoutbox
                         soundShout: {$soundShout},
                     });
                 </script>
-                HTML
+                HTML,
         );
     }
 
