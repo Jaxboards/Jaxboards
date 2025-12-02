@@ -15,8 +15,6 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function gmdate;
-
 final readonly class Activity
 {
     private const ACTIVITY_LIMIT = 30;

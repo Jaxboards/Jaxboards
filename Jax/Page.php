@@ -118,7 +118,8 @@ final class Page
         }
     }
 
-    public function earlyFlush(string $content) {
+    public function earlyFlush(string $content): void
+    {
         $this->earlyFlush = $content;
     }
 
