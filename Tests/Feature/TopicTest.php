@@ -9,6 +9,8 @@ use Tests\FeatureTestCase;
 
 /**
  * @internal
+ *
+ * @coversNothing
  */
 final class TopicTest extends FeatureTestCase
 {

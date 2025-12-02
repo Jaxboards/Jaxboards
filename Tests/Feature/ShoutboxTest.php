@@ -13,6 +13,8 @@ use function DI\autowire;
 
 /**
  * @internal
+ *
+ * @coversNothing
  */
 final class ShoutboxTest extends FeatureTestCase
 {
