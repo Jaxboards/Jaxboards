@@ -1,4 +1,4 @@
-/* global RUN, globalsettings */
+/* global RUN, globalSettings */
 
 import Sound from '../sound';
 import { flashTitle } from './flashing-title';
@@ -71,13 +71,13 @@ function createMessagingWindow({
     const test = getComputedStyle(messagesContainer);
     messagesContainer.style.width = test.width;
     messagesContainer.style.height = test.height;
-    if (message && globalsettings.sound_im) Sound.play('imnewwindow');
+    if (message && globalSettings.soundIM) Sound.play('imnewwindow');
 
     return messagesContainer;
 }
 
 export default function IMWindow(uid: number, uname: string) {
-    if (!globalsettings.can_im) {
+    if (!globalSettings.canIM) {
         // eslint-disable-next-line no-alert
         alert('You do not have permission to use this feature.');
         return;
@@ -136,5 +136,5 @@ export function messageReceived({
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
     gracefulDegrade(div);
-    if (globalsettings.sound_im) Sound.play('imbeep');
+    if (globalSettings.soundIM) Sound.play('imbeep');
 }

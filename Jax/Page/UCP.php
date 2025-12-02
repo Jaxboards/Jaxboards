@@ -162,7 +162,7 @@ final readonly class UCP
             foreach ($fields as $field) {
                 $this->page->command(
                     'script',
-                    "window.globalsettings.{$field}="
+                    "window.globalSettings.{$field}="
                         . ($this->request->post($field) !== null ? 1 : 0),
                 );
             }

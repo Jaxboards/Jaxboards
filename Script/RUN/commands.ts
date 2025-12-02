@@ -1,4 +1,4 @@
-/* global RUN, globalsettings */
+/* global RUN, globalSettings */
 /* eslint-disable no-alert */
 import Animation from '../JAX/animation';
 import { addIdleClock } from '../JAX/date';
@@ -112,12 +112,15 @@ export default {
         span.innerHTML = message;
         const div = span.firstChild;
         ss[0].parentNode?.insertBefore(div, ss[0]);
-        while (ss.length > globalsettings.shoutlimit - 1) {
+        while (ss.length > globalSettings.shoutLimit - 1) {
             x = ss.pop();
             x.parentNode.removeChild(x);
         }
         new Animation(div).dehighlight().play();
-        if (globalsettings.sound_shout) Sound.play('sbblip');
+        debugger;
+        if (globalSettings.soundShout) {
+            Sound.play('sbblip');
+        }
         gracefulDegrade(div);
     },
     tick(html: string) {

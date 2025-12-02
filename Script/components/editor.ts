@@ -1,4 +1,4 @@
-/* global globalsettings */
+/* global globalSettings */
 /* eslint-disable no-script-url, no-alert */
 
 import Ajax from '../JAX/ajax';
@@ -39,7 +39,7 @@ export default class Editor {
 
         iframe.className = 'editorframe';
         // 1 for html editing mode, 0 for textarea mode
-        this.mode = Browser.mobile || Browser.n3ds ? 0 : globalsettings.wysiwyg;
+        this.mode = Browser.mobile || Browser.n3ds ? 0 : globalSettings.wysiwyg;
         this.mode = this.mode || 0;
         this.window = iframe.contentWindow;
         this.doc = iframe.contentWindow.document;

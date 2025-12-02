@@ -18,6 +18,7 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use PHP_CodeSniffer\Generators\HTML;
 
 use function ceil;
 use function mb_strlen;
@@ -160,6 +161,9 @@ final class Shoutbox
         }
 
         $this->session->addVar('sb_id', $shouts[0]->id ?? 0);
+
+        $soundShout = $this->user->get()->soundShout !== 0 ? 1 : 0;
+
         $this->page->append(
             'SHOUTBOX',
             $this->template->meta(
@@ -172,10 +176,14 @@ final class Shoutbox
                     'shoutbox',
                     $shoutHTML,
                 ),
-            ) . "<script type='text/javascript'>globalsettings.shoutlimit="
-                . $this->shoutlimit . ';globalsettings.soundShout='
-                . ($this->user->get()->soundShout !== 0 ? 1 : 0)
-                . '</script>',
+            ) . <<<HTML
+                <script type='text/javascript'>
+                    Object.assign(globalSettings, {
+                        shoutLimit: {$this->shoutlimit},
+                        soundShout: {$soundShout},
+                    });
+                </script>
+                HTML
         );
     }
 

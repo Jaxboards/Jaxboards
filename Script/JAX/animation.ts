@@ -117,7 +117,7 @@ class Animation {
 
         if (!bg2 || !bg) return this;
 
-        return this.add('backgroundColor', bg2, bg).then(() => {
+        return this.add('backgroundColor', bg2, bg).andThen(() => {
             this.el.style.backgroundColor = bg;
         });
     }

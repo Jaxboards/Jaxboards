@@ -1,11 +1,13 @@
-export {};
+export { };
 
 declare global {
-    const globalsettings: {
-        can_im: boolean;
-        groupid: number;
-        sound_im: boolean;
-        userid: number;
+    const globalSettings: {
+        canIM: boolean;
+        groupID: number;
+        soundIM: boolean;
+        soundShout: boolean;
+        shoutLimit: number;
+        userID: number;
         username: string;
         wysiwyg: boolean;
     };

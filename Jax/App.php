@@ -352,12 +352,12 @@ final readonly class App
 
         $this->page->append(
             'SCRIPT',
-            '<script>window.globalsettings='
+            '<script>window.globalSettings='
             . json_encode([
                 'canIM' => $this->user->getGroup()?->canIM,
-                'groupid' => $this->user->get()->groupID,
+                'groupID' => $this->user->get()->groupID,
                 'soundIM' => $this->user->get()->soundIM,
-                'userid' => $this->user->get()->id,
+                'userID' => $this->user->get()->id,
                 'username' => $this->user->get()->displayName,
                 'wysiwyg' => $this->user->get()->wysiwyg,
             ])
