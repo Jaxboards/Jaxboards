@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
 /**
  * @internal
  */
-#[CoversNothing]
 final class TopicTest extends FeatureTestCase
 {
     protected function setUp(): void
@@ -19,7 +17,6 @@ final class TopicTest extends FeatureTestCase
         parent::setUp();
     }
 
-    #[CoversNothing]
     public function testViewTopicAsAdmin(): void
     {
         $this->actingAs('admin');

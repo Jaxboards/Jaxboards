@@ -16,7 +16,7 @@
     enforceTimeLimit="true"
     failOnAllIssues="true"
     processIsolation="true"
-    requireCoverageMetadata="true"
+    requireCoverageMetadata="false"
     stderr="true"
     >
     <coverage

@@ -6,7 +6,6 @@ namespace Tests\Feature;
 
 use Jax\Config;
 use Jax\Request;
-use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
@@ -15,7 +14,6 @@ use function DI\autowire;
 /**
  * @internal
  */
-#[CoversNothing]
 final class ShoutboxTest extends FeatureTestCase
 {
     protected function setUp(): void

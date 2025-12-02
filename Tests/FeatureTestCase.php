@@ -14,7 +14,6 @@ use Jax\Request;
 use Jax\ServiceConfig;
 use Jax\Session as JaxSession;
 use Jax\User;
-use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 use function DI\autowire;
@@ -24,7 +23,6 @@ use function parse_url;
 /**
  * @internal
  */
-#[CoversNothing]
 abstract class FeatureTestCase extends PHPUnitTestCase
 {
     protected Container $container;

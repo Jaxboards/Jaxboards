@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
 /**
  * @internal
  */
-#[CoversNothing]
 final class ProfileTest extends FeatureTestCase
 {
     protected function setUp(): void
