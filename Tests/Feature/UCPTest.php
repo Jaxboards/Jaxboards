@@ -4,49 +4,18 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Jax\App;
-use Jax\Attributes\Column;
-use Jax\Attributes\ForeignKey;
-use Jax\Attributes\Key;
-use Jax\BBCode;
-use Jax\BotDetector;
-use Jax\Database;
-use Jax\DatabaseUtils;
-use Jax\DatabaseUtils\SQLite;
-use Jax\Date;
-use Jax\DebugLog;
-use Jax\DomainDefinitions;
-use Jax\IPAddress;
-use Jax\Jax;
-use Jax\Model;
-use Jax\Modules\PrivateMessage;
-use Jax\Page;
-use Jax\Page\IDX;
-use Jax\Page\TextRules;
-use Jax\RequestStringGetter;
-use Jax\Router;
-use Jax\ServiceConfig;
-use Jax\Session;
-use Jax\Template;
-use Jax\TextFormatting;
-use Jax\User;
-use Jax\UsersOnline;
-use Jax\Hooks;
-use Jax\Config;
 use Jax\Models\Member;
-use Jax\Modules\Shoutbox;
 use Jax\Request;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
-use function DI\autowire;
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertStringContainsString;
 
 /**
  * @internal
+ *
+ * @coversNothing
  */
 final class UCPTest extends FeatureTestCase
 {
@@ -70,7 +39,7 @@ final class UCPTest extends FeatureTestCase
 
         $page = $this->go(new Request(
             get: ['act' => 'ucp'],
-            post: ['ucpnotepad' => 'howdy']
+            post: ['ucpnotepad' => 'howdy'],
         ));
 
         DOMAssert::assertSelectEquals('#notepad', 'howdy', 1, $page);
@@ -85,7 +54,8 @@ final class UCPTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('#changesig', 'I like tacos', 1, $page);
     }
 
-    public function testSignatureChange(): void {
+    public function testSignatureChange(): void
+    {
         $this->actingAs('member');
 
         $page = $this->go(new Request(
