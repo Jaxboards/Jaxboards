@@ -42,6 +42,7 @@ use Tests\FeatureTestCase;
 
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertStringContainsString;
+use function PHPUnit\Framework\assertTrue;
 
 /**
  * @internal
@@ -156,5 +157,44 @@ final class UCPTest extends FeatureTestCase
         assertStringContainsString('Email settings updated.', $page);
 
         assertEquals(Member::selectOne(2)->email, 'jaxboards@jaxboards.com');
+    }
+
+    public function testChangePassword(): void
+    {
+        $this->actingAs('member', [
+            'pass' => password_hash('oldpass', PASSWORD_DEFAULT)
+        ]);
+
+        $page = $this->go(new Request(
+            get: ['act' => 'ucp', 'what' => 'pass'],
+            post: [
+                'curpass' => 'oldpass',
+                'newpass1' => 'newpass',
+                'newpass2' => 'newpass',
+                'passchange' => 'true',
+            ]
+        ));
+
+        assertStringContainsString('Password changed.', $page);
+        assertTrue(password_verify('newpass', Member::selectOne(2)->pass));
+    }
+
+    public function testChangePasswordIncorrectCurrentPassword(): void
+    {
+        $this->actingAs('member', [
+            'pass' => password_hash('oldpass', PASSWORD_DEFAULT)
+        ]);
+
+        $page = $this->go(new Request(
+            get: ['act' => 'ucp', 'what' => 'pass'],
+            post: [
+                'curpass' => 'wrong',
+                'newpass1' => 'newpass',
+                'newpass2' => 'newpass',
+                'passchange' => 'true',
+            ]
+        ));
+
+        DOMAssert::assertSelectEquals('.error', 'The password you entered is incorrect.', 1, $page);
     }
 }
