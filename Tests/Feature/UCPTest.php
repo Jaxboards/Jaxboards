@@ -40,9 +40,13 @@ use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
+use function password_hash;
+use function password_verify;
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertStringContainsString;
 use function PHPUnit\Framework\assertTrue;
+
+use const PASSWORD_DEFAULT;
 
 /**
  * @internal
@@ -162,7 +166,7 @@ final class UCPTest extends FeatureTestCase
     public function testChangePassword(): void
     {
         $this->actingAs('member', [
-            'pass' => password_hash('oldpass', PASSWORD_DEFAULT)
+            'pass' => password_hash('oldpass', PASSWORD_DEFAULT),
         ]);
 
         $page = $this->go(new Request(
@@ -172,7 +176,7 @@ final class UCPTest extends FeatureTestCase
                 'newpass1' => 'newpass',
                 'newpass2' => 'newpass',
                 'passchange' => 'true',
-            ]
+            ],
         ));
 
         assertStringContainsString('Password changed.', $page);
@@ -182,7 +186,7 @@ final class UCPTest extends FeatureTestCase
     public function testChangePasswordIncorrectCurrentPassword(): void
     {
         $this->actingAs('member', [
-            'pass' => password_hash('oldpass', PASSWORD_DEFAULT)
+            'pass' => password_hash('oldpass', PASSWORD_DEFAULT),
         ]);
 
         $page = $this->go(new Request(
@@ -192,7 +196,7 @@ final class UCPTest extends FeatureTestCase
                 'newpass1' => 'newpass',
                 'newpass2' => 'newpass',
                 'passchange' => 'true',
-            ]
+            ],
         ));
 
         DOMAssert::assertSelectEquals('.error', 'The password you entered is incorrect.', 1, $page);
