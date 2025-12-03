@@ -13,7 +13,7 @@ const fontWeightRegex = /font-weight: ?bold/i;
 
 export function htmlToBBCode(html: string) {
     let bbcode = html;
-    const nestedTagRegex = /<(\w+)([^>]*)>([^]*?)<\/\1>/i;
+    const nestedTagRegex = /<(\w+)([^>]*)>([^]*?)<\/\1>/gi;
     bbcode = bbcode.replaceAll(/[\r\n]+/g, '');
     bbcode = bbcode.replaceAll(/<(hr|br|meta)[^>]*>/gi, '\n');
     // images and emojis
