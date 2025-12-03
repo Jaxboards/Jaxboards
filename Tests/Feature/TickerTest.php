@@ -78,7 +78,7 @@ final class TickerTest extends FeatureTestCase
         parent::setUp();
     }
 
-    public function testViewMissingUser(): void
+    public function testTickerView(): void
     {
         $this->actingAs('admin');
 
