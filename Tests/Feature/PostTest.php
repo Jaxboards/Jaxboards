@@ -17,13 +17,18 @@ use Jax\DatabaseUtils\SQLite;
 use Jax\Date;
 use Jax\DebugLog;
 use Jax\DomainDefinitions;
+use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Model;
+use Jax\Models\Post as ModelsPost;
+use Jax\Models\Topic;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
+use Jax\Page\Post;
 use Jax\Page\TextRules;
+use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
 use Jax\ServiceConfig;
@@ -31,11 +36,6 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
-use Jax\Hooks;
-use Jax\Models\Post as ModelsPost;
-use Jax\Models\Topic;
-use Jax\Page\Post;
-use Jax\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
@@ -108,7 +108,7 @@ final class PostTest extends FeatureTestCase
                 'tdesc' => 'Topic description',
                 'postdata' => 'Post data',
                 'submit' => 'Post New Topic',
-            ]
+            ],
         ));
 
         $this->assertRedirect('?act=vt2&getlast=1', $page);
@@ -135,16 +135,15 @@ final class PostTest extends FeatureTestCase
     {
         $this->actingAs('member');
 
-        /**
-         * Create a callback to test the post hook
-         */
+        // Create a callback to test the post hook
         $postHookCalled = true;
         $postHookPost = null;
         $this->container->get(Hooks::class)
-            ->addListener('post', function ($postHookPostArg) use (&$postHookCalled, &$postHookPost): void {
+            ->addListener('post', static function ($postHookPostArg) use (&$postHookCalled, &$postHookPost): void {
                 $postHookCalled = true;
                 $postHookPost = $postHookPostArg;
-            });
+            })
+        ;
 
 
         $page = $this->go(new Request(
@@ -158,7 +157,7 @@ final class PostTest extends FeatureTestCase
                 'tdesc' => '',
                 'postdata' => 'Post data',
                 'submit' => 'Post New Topic',
-            ]
+            ],
         ));
 
         $this->assertRedirect('?act=vt1&getlast=1', $page);

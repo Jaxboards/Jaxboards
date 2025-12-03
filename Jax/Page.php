@@ -15,7 +15,6 @@ use function is_array;
 use function is_dir;
 use function json_decode;
 use function json_encode;
-use function mb_substr;
 
 use const PHP_EOL;
 
@@ -67,7 +66,7 @@ final class Page
     public function location(string $newLocation): void
     {
         if (!$this->request->hasCookies() && $newLocation[0] === '?') {
-            $newLocation = $newLocation . '&sessid=' . $this->session->get()->id;
+            $newLocation .= '&sessid=' . $this->session->get()->id;
         }
 
         if ($this->request->isJSAccess()) {
