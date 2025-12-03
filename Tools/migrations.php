@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace tools;
+namespace Tools;
 
 use DI\Container;
 use Jax\Database;
@@ -43,7 +43,7 @@ function getDBVersion(Database $database): int
 }
 
 $migrations = array_reduce(
-    glob($jaxboardsRoot . '/tools/migrations/**/*.php') ?: [],
+    glob($jaxboardsRoot . '/Tools/migrations/**/*.php') ?: [],
     static function ($migrations, string $path) {
         preg_match('/V(\d+)/', $path, $match);
         $migrations[(int) $match[1]] = pathinfo($path, PATHINFO_FILENAME);

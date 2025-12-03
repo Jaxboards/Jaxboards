@@ -4,7 +4,7 @@
 # See https://phpstan.org/config-reference
 parameters:
   bootstrapFiles:
-    - tools/phpstan-bootstrap.php
+    - Tools/phpstan-bootstrap.php
   excludePaths:
     analyse:
       - node_modules

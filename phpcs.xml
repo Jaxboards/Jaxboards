@@ -33,10 +33,10 @@
     <exclude name="Squiz.WhiteSpace.ScopeClosingBrace.Indent"/>
   </rule>
   <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
-    <exclude-pattern>./tools/composer_version.php</exclude-pattern>
-    <exclude-pattern>./tools/php_codesniffer_to_sonarqube.php</exclude-pattern>
-    <exclude-pattern>./tools/phpmd_to_sonarqube.php</exclude-pattern>
-    <exclude-pattern>./tools/update_composer_version.php</exclude-pattern>
+    <exclude-pattern>./Tools/composer_version.php</exclude-pattern>
+    <exclude-pattern>./Tools/php_codesniffer_to_sonarqube.php</exclude-pattern>
+    <exclude-pattern>./Tools/phpmd_to_sonarqube.php</exclude-pattern>
+    <exclude-pattern>./Tools/update_composer_version.php</exclude-pattern>
   </rule>
   <!-- Here's some comment rules we can follow -->
   <rule ref="Squiz.Commenting.InlineComment">
@@ -199,8 +199,8 @@
   <rule ref="SlevomatCodingStandard.Files.FileLength">
     <exclude-pattern>./index.php</exclude-pattern>
     <exclude-pattern>./rector.php</exclude-pattern>
-    <exclude-pattern>./tools/php_codesniffer_to_sonarqube.php</exclude-pattern>
-    <exclude-pattern>./tools/phpmd_to_sonarqube.php</exclude-pattern>
+    <exclude-pattern>./Tools/php_codesniffer_to_sonarqube.php</exclude-pattern>
+    <exclude-pattern>./Tools/phpmd_to_sonarqube.php</exclude-pattern>
   </rule>
   <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
   	<properties>

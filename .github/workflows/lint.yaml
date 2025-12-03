@@ -33,14 +33,14 @@ jobs:
                   cache: npm
             - uses: ramsey/composer-install@v3
             - run: npm clean-install
-            - run: ./tools/update_composer_version.php
+            - run: ./Tools/update_composer_version.php
             # get the package-lock.json and composer.lock files up to date
             - run: npm clean-install --ignore-scripts --package-lock-only
             - run: composer update --lock
             # run npm install _again_ due to --package-lock-only above
             - run: npm clean-install
             - run: echo "BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
-            - run: echo "VERSION=$(./tools/greater_version.php composer.json package.json)" >> $GITHUB_ENV
+            - run: echo "VERSION=$(./Tools/greater_version.php composer.json package.json)" >> $GITHUB_ENV
             - if: env.BRANCH == 'main'
               run: |
                   jq ".version = \"$VERSION\"" composer.json > /tmp/composer.json && \
