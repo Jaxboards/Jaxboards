@@ -200,7 +200,8 @@ final class UCPTest extends FeatureTestCase
         $this->assertFalse(password_verify('newpass', Member::selectOne(2)->pass));
     }
 
-    public function testProfileChange() {
+    public function testProfileChange(): void
+    {
         $this->actingAs('member');
 
         $page = $this->go(new Request(
@@ -227,7 +228,7 @@ final class UCPTest extends FeatureTestCase
                 'contactBlueSky' => 'BlueSky',
                 'website' => 'http://google.com',
                 'submit' => 'Save Profile Settings',
-            ]
+            ],
         ));
 
         $this->assertStringContainsString('Profile successfully updated.', $page);
@@ -252,7 +253,8 @@ final class UCPTest extends FeatureTestCase
         $this->assertEquals($member->website, 'http://google.com');
 
         $birthdate = $this->container->get(Date::class)
-            ->datetimeAsCarbon($member->birthdate);
+            ->datetimeAsCarbon($member->birthdate)
+        ;
 
         $this->assertEquals($birthdate->month, 1);
         $this->assertEquals($birthdate->day, 1);
