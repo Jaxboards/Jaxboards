@@ -42,9 +42,6 @@ use Tests\FeatureTestCase;
 
 use function password_hash;
 use function password_verify;
-use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertStringContainsString;
-use function PHPUnit\Framework\assertTrue;
 
 use const PASSWORD_DEFAULT;
 
@@ -137,7 +134,7 @@ final class UCPTest extends FeatureTestCase
 
         $page = $this->go('?act=ucp&what=email');
 
-        assertStringContainsString('Your current email: --none--', $page);
+        $this->assertStringContainsString('Your current email: --none--', $page);
     }
 
     public function testEmail(): void
@@ -146,7 +143,7 @@ final class UCPTest extends FeatureTestCase
 
         $page = $this->go('?act=ucp&what=email');
 
-        assertStringContainsString('Your current email: <strong>jaxboards@jaxboards.com</strong>', $page);
+        $this->assertStringContainsString('Your current email: <strong>jaxboards@jaxboards.com</strong>', $page);
     }
 
     public function testEmailChange(): void
@@ -158,9 +155,9 @@ final class UCPTest extends FeatureTestCase
             post: ['email' => 'jaxboards@jaxboards.com', 'submit' => 'true'],
         ));
 
-        assertStringContainsString('Email settings updated.', $page);
+        $this->assertStringContainsString('Email settings updated.', $page);
 
-        assertEquals(Member::selectOne(2)->email, 'jaxboards@jaxboards.com');
+        $this->assertEquals(Member::selectOne(2)->email, 'jaxboards@jaxboards.com');
     }
 
     public function testChangePassword(): void
@@ -179,8 +176,8 @@ final class UCPTest extends FeatureTestCase
             ],
         ));
 
-        assertStringContainsString('Password changed.', $page);
-        assertTrue(password_verify('newpass', Member::selectOne(2)->pass));
+        $this->assertStringContainsString('Password changed.', $page);
+        $this->assertTrue(password_verify('newpass', Member::selectOne(2)->pass));
     }
 
     public function testChangePasswordIncorrectCurrentPassword(): void
@@ -200,5 +197,65 @@ final class UCPTest extends FeatureTestCase
         ));
 
         DOMAssert::assertSelectEquals('.error', 'The password you entered is incorrect.', 1, $page);
+        $this->assertFalse(password_verify('newpass', Member::selectOne(2)->pass));
+    }
+
+    public function testProfileChange() {
+        $this->actingAs('member');
+
+        $page = $this->go(new Request(
+            get: ['act' => 'ucp', 'what' => 'profile'],
+            post: [
+                'displayName' => 'DisplayName',
+                'full_name' => 'Full Name',
+                'usertitle' => 'User Title',
+                'about' => 'About me',
+                'location' => 'Location',
+                'gender' => 'male',
+                'dob_month' => '1',
+                'dob_day' => '1',
+                'dob_year' => '2000',
+                'contactSkype' => 'Skype',
+                'contactDiscord' => 'Discord',
+                'contactYIM' => 'YIM',
+                'contactMSN' => 'MSN',
+                'contactGoogleChat' => 'GoogleChat',
+                'contactAIM' => 'AIM',
+                'contactYoutube' => 'Youtube',
+                'contactSteam' => 'Steam',
+                'contactTwitter' => 'Twitter',
+                'contactBlueSky' => 'BlueSky',
+                'website' => 'http://google.com',
+                'submit' => 'Save Profile Settings',
+            ]
+        ));
+
+        $this->assertStringContainsString('Profile successfully updated.', $page);
+
+        $member = Member::selectOne(2);
+        $this->assertEquals($member->displayName, 'DisplayName');
+        $this->assertEquals($member->full_name, 'Full Name');
+        $this->assertEquals($member->usertitle, 'User Title');
+        $this->assertEquals($member->about, 'About me');
+        $this->assertEquals($member->location, 'Location');
+        $this->assertEquals($member->gender, 'male');
+        $this->assertEquals($member->contactSkype, 'Skype');
+        $this->assertEquals($member->contactDiscord, 'Discord');
+        $this->assertEquals($member->contactYIM, 'YIM');
+        $this->assertEquals($member->contactMSN, 'MSN');
+        $this->assertEquals($member->contactGoogleChat, 'GoogleChat');
+        $this->assertEquals($member->contactAIM, 'AIM');
+        $this->assertEquals($member->contactYoutube, 'Youtube');
+        $this->assertEquals($member->contactSteam, 'Steam');
+        $this->assertEquals($member->contactTwitter, 'Twitter');
+        $this->assertEquals($member->contactBlueSky, 'BlueSky');
+        $this->assertEquals($member->website, 'http://google.com');
+
+        $birthdate = $this->container->get(Date::class)
+            ->datetimeAsCarbon($member->birthdate);
+
+        $this->assertEquals($birthdate->month, 1);
+        $this->assertEquals($birthdate->day, 1);
+        $this->assertEquals($birthdate->year, 2000);
     }
 }

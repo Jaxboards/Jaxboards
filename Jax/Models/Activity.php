@@ -36,11 +36,11 @@ final class Activity extends Model
 
     #[Column(name: 'tid', type: 'int', default: null, unsigned: true)]
     #[ForeignKey(table: 'topics', field: 'id', onDelete: 'cascade')]
-    public ?int $tid = 0;
+    public ?int $tid = null;
 
     #[Column(name: 'pid', type: 'int', default: null, unsigned: true)]
     #[ForeignKey(table: 'posts', field: 'id', onDelete: 'cascade')]
-    public ?int $pid = 0;
+    public ?int $pid = null;
 
     #[Column(name: 'arg2', type: 'string', default: '', length: 255, nullable: false)]
     public string $arg2 = '';
