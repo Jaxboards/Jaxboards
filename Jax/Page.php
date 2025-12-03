@@ -67,7 +67,7 @@ final class Page
     public function location(string $newLocation): void
     {
         if (!$this->request->hasCookies() && $newLocation[0] === '?') {
-            $newLocation = '?sessid=' . $this->session->get()->id . '&' . mb_substr($newLocation, 1);
+            $newLocation = $newLocation . '&sessid=' . $this->session->get()->id;
         }
 
         if ($this->request->isJSAccess()) {
@@ -77,6 +77,7 @@ final class Page
         }
 
         header("Location: {$newLocation}");
+        $this->append('PAGE', "Should've redirected to Location: {$newLocation}");
     }
 
     /**
