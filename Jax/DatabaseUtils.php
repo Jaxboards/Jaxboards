@@ -286,6 +286,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
             POST;
         $post->tid = 1;
         $post->newtopic = 1;
+        $post->date = $this->database->datetime();
         $post->insert();
 
         $skin = new Skin();
