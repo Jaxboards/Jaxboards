@@ -200,35 +200,67 @@ final class UCPTest extends FeatureTestCase
         $this->assertFalse(password_verify('newpass', Member::selectOne(2)->pass));
     }
 
+    private function getProfileFormData(): array
+    {
+        return [
+            'displayName' => 'DisplayName',
+            'full_name' => 'Full Name',
+            'usertitle' => 'User Title',
+            'about' => 'About me',
+            'location' => 'Location',
+            'gender' => 'male',
+            'dob_month' => '1',
+            'dob_day' => '1',
+            'dob_year' => '2000',
+            'contactSkype' => 'Skype',
+            'contactDiscord' => 'Discord',
+            'contactYIM' => 'YIM',
+            'contactMSN' => 'MSN',
+            'contactGoogleChat' => 'GoogleChat',
+            'contactAIM' => 'AIM',
+            'contactYoutube' => 'Youtube',
+            'contactSteam' => 'Steam',
+            'contactTwitter' => 'Twitter',
+            'contactBlueSky' => 'BlueSky',
+            'website' => 'http://google.com',
+            'submit' => 'Save Profile Settings',
+        ];
+    }
+
+    public function testProfileForm(): void
+    {
+        $this->actingAs('member');
+
+        $page = $this->go('?act=ucp&what=profile');
+
+        foreach ($this->getProfileFormData() as $field => $value) {
+            if ($field === 'submit') {
+                continue;
+            }
+
+            if (in_array($field, ['dob_month', 'dob_day', 'dob_year', 'gender'])) {
+                DOMAssert::assertSelectCount("select[name={$field}]", 1, $page);
+                continue;
+            }
+
+            if ($field === 'about') {
+                DOMAssert::assertSelectCount("textarea[name={$field}]", 1, $page);
+                continue;
+            }
+
+            DOMAssert::assertSelectCount("input[name={$field}]", 1, $page);
+        }
+    }
+
     public function testProfileChange(): void
     {
         $this->actingAs('member');
 
+        $formData = $this->getProfileFormData();
+
         $page = $this->go(new Request(
             get: ['act' => 'ucp', 'what' => 'profile'],
-            post: [
-                'displayName' => 'DisplayName',
-                'full_name' => 'Full Name',
-                'usertitle' => 'User Title',
-                'about' => 'About me',
-                'location' => 'Location',
-                'gender' => 'male',
-                'dob_month' => '1',
-                'dob_day' => '1',
-                'dob_year' => '2000',
-                'contactSkype' => 'Skype',
-                'contactDiscord' => 'Discord',
-                'contactYIM' => 'YIM',
-                'contactMSN' => 'MSN',
-                'contactGoogleChat' => 'GoogleChat',
-                'contactAIM' => 'AIM',
-                'contactYoutube' => 'Youtube',
-                'contactSteam' => 'Steam',
-                'contactTwitter' => 'Twitter',
-                'contactBlueSky' => 'BlueSky',
-                'website' => 'http://google.com',
-                'submit' => 'Save Profile Settings',
-            ],
+            post: $formData,
         ));
 
         $this->assertStringContainsString('Profile successfully updated.', $page);
