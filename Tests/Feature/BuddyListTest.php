@@ -39,6 +39,7 @@ use Jax\User;
 use Jax\UsersOnline;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
 use function array_find;
@@ -119,7 +120,7 @@ final class BuddyListTest extends FeatureTestCase
         $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         $this->assertEquals('buddylist', $window[1]['id']);
         $this->assertEquals('Buddies', $window[1]['title']);
-        $this->assertStringContainsString('Admin', $window[1]['content']);
+        DOMAssert::assertSelectEquals('.contact .name', 'Admin', 1, $window[1]['content']);
 
         $activity = Activity::selectOne();
         $this->assertEquals('buddy_add', $activity->type);
@@ -143,7 +144,7 @@ final class BuddyListTest extends FeatureTestCase
         $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         $this->assertEquals('buddylist', $window[1]['id']);
         $this->assertEquals('Buddies', $window[1]['title']);
-        $this->assertStringNotContainsString('Admin', $window[1]['content']);
+        DOMAssert::assertSelectEquals('.contact .name', 'Admin', 0, $window[1]['content']);
 
         $member = Member::selectOne(1);
         $this->assertEquals($member->friends, '');
@@ -165,7 +166,7 @@ final class BuddyListTest extends FeatureTestCase
         $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         $this->assertEquals('buddylist', $window[1]['id']);
         $this->assertEquals('Buddies', $window[1]['title']);
-        $this->assertStringContainsString('Admin', $window[1]['content']);
+        DOMAssert::assertSelectEquals('.contact .name', 'Admin', 1, $window[1]['content']);
 
         DOMAssert::assertSelectCount('.contact.blocked', 1, $window[1]['content']);
 
