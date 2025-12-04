@@ -162,7 +162,7 @@ final class BuddyListTest extends FeatureTestCase
 
         $this->assertContainsEquals(['softurl'], $json);
 
-        $window = array_find($json, fn($cmd) => $cmd[0] === 'window');
+        $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         $this->assertEquals('buddylist', $window[1]['id']);
         $this->assertEquals('Buddies', $window[1]['title']);
         $this->assertStringContainsString('Admin', $window[1]['content']);
@@ -186,7 +186,7 @@ final class BuddyListTest extends FeatureTestCase
 
         $this->assertContainsEquals(['softurl'], $json);
 
-        $window = array_find($json, fn($cmd) => $cmd[0] === 'window');
+        $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         $this->assertEquals('buddylist', $window[1]['id']);
         $this->assertEquals('Buddies', $window[1]['title']);
         $this->assertStringNotContainsString('Admin', $window[1]['content']);
