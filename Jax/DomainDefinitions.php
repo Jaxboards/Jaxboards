@@ -44,9 +44,8 @@ final class DomainDefinitions
      */
     public function __construct(
         private readonly ServiceConfig $serviceConfig,
-        private readonly Request $request,
-    )
-    {
+        Request $request,
+    ) {
 
         // Figure out url.
         $host = $request->server('SERVER_NAME') ?? (string) $this->serviceConfig->getSetting('domain');
@@ -59,7 +58,7 @@ final class DomainDefinitions
             !($port === '443' && $scheme === 'https')
             && !($port === '80' && $scheme === 'http')
         ) {
-            $boardURL .= ($port ? ':' . $port : '');
+            $boardURL .= ($port !== '' && $port !== '0' ? ':' . $port : '');
         }
 
         $this->boardURL = $boardURL;
@@ -71,7 +70,7 @@ final class DomainDefinitions
         if ($this->serviceConfig->getSetting('service')) {
             $domainMatch = str_replace('.', '\.', $this->serviceConfig->getSetting('domain'));
 
-            preg_match('@(.*)\.' . $domainMatch . '@i', (string) $host, $matches);
+            preg_match('@(.*)\.' . $domainMatch . '@i', $host, $matches);
             if ($matches[1] !== '') {
                 $prefix = $matches[1];
                 $this->serviceConfig->override([

@@ -116,7 +116,7 @@ final class Request
     /**
      * Access $_SERVER.
      */
-    public function server (string $fieldName): ?string
+    public function server(string $fieldName): ?string
     {
         return $this->server[$fieldName] ?? null;
     }

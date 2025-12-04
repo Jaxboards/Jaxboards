@@ -103,7 +103,7 @@ final class BoardIndexTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            server: [ 'REMOTE_ADDR' => '::1']
+            server: ['REMOTE_ADDR' => '::1'],
         ));
 
         DOMAssert::assertSelectCount('#debug', 1, $page);
