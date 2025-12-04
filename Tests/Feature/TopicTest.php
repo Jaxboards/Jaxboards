@@ -11,6 +11,7 @@ use Jax\Attributes\Key;
 use Jax\BBCode;
 use Jax\BotDetector;
 use Jax\Config;
+use Jax\Constants\JSAccess;
 use Jax\Database;
 use Jax\DatabaseUtils;
 use Jax\DatabaseUtils\SQLite;
@@ -108,5 +109,37 @@ final class TopicTest extends FeatureTestCase
         DOMAssert::assertSelectRegExp('#pid_1 .userstats', '/Status: Online!/', 1, $page);
         DOMAssert::assertSelectRegExp('#pid_1 .userstats', '/Group: Admin/', 1, $page);
         DOMAssert::assertSelectRegExp('#pid_1 .userstats', '/Member: #1/', 1, $page);
+    }
+
+    public function testTopicUpdate(): void
+    {
+        $this->actingAs('admin');
+
+        $page = $this->go(new Request(
+            get: ['act' => 'vt1'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::UPDATING->value]
+        ));
+
+        $json = json_decode($page, true);
+
+        // TODO: Test that there are new posts
+        $this->assertEquals([], $json);
+    }
+
+    public function testQuickReplyWindow(): void
+    {
+        $this->actingAs('admin');
+
+        $page = $this->go(new Request(
+            get: ['act' => 'vt1', 'qreply' => '1'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value]
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['softurl'], $json);
+        $window = array_find($json, fn($item) => $item[0] === 'window');
+
+        DOMAssert::assertSelectCount('.topic-reply-form textarea[name="postdata"]', 1, $window[1]['content']);
     }
 }

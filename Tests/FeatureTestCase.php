@@ -31,8 +31,6 @@ abstract class FeatureTestCase extends PHPUnitTestCase
 {
     protected Container $container;
 
-    private string $lastPageContents = '';
-
     public function __construct(string $name)
     {
         $this->container = new Container();
@@ -85,12 +83,12 @@ abstract class FeatureTestCase extends PHPUnitTestCase
 
         $this->container->set(Request::class, $request);
 
-        return $this->lastPageContents = $this->container->get(App::class)->render() ?? '';
+        return $this->container->get(App::class)->render() ?? '';
     }
 
     public function assertRedirect(string $location, string $page): void
     {
-        $this->assertStringContainsString("Location: {$location}", $this->lastPageContents);
+        $this->assertStringContainsString("Location: {$location}", $page);
     }
 
     public function actingAs(
