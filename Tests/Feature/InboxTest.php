@@ -192,6 +192,7 @@ final class InboxTest extends FeatureTestCase
         foreach ($messageProperties as $key => $value) {
             $message->{$key} = $value;
         }
+
         $message->insert();
     }
 }
