@@ -42,6 +42,7 @@
         "composer": "^2.8",
         "composer-plugin-api": "^2.6",
         "composer-runtime-api": "^2.2",
+        "seanjohnson08/mysqlite": "dev-main",
         "ext-curl": "*",
         "ext-date": "*",
         "ext-json": "*",
@@ -59,6 +60,12 @@
         "nesbot/carbon": "^3.9",
         "lodash-php/lodash-php": "^0.1.0"
     },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/seanjohnson08/mysqlite"
+        }
+    ],
     "scripts": {
         "lint": [
             "@phpcs"

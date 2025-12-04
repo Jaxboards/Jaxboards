@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use DateTime;
 use Exception;
+use MySQLite\MySQLite;
 use PDO;
 use PDOStatement;
 
@@ -111,31 +111,7 @@ class Database
                 break;
 
             case 'sqliteMemory':
-                // polyfill datetime functions
-                $this->pdo->sqliteCreateFunction(
-                    'MONTH',
-                    static function (?string $datetime): ?int {
-                        if ($datetime === null) {
-                            return null;
-                        }
-
-                        $parsed = new DateTime($datetime);
-
-                        return (int) $parsed->format('m');
-                    },
-                );
-                $this->pdo->sqliteCreateFunction(
-                    'YEAR',
-                    static function (?string $datetime): ?int {
-                        if ($datetime === null) {
-                            return null;
-                        }
-
-                        $parsed = new DateTime($datetime);
-
-                        return (int) $parsed->format('Y');
-                    },
-                );
+                MySQLite::install($this->pdo);
 
                 break;
         }
