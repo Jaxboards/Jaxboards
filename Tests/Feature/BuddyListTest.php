@@ -148,4 +148,52 @@ final class BuddyListTest extends FeatureTestCase
         $member = Member::selectOne(1);
         $this->assertEquals($member->friends, '');
     }
+
+    public function testBlock(): void
+    {
+        $this->actingAs('admin');
+
+        $page = $this->go(new Request(
+            get: ['act' => 'buddylist', 'block' => '1'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['softurl'], $json);
+
+        $window = array_find($json, fn($cmd) => $cmd[0] === 'window');
+        $this->assertEquals('buddylist', $window[1]['id']);
+        $this->assertEquals('Buddies', $window[1]['title']);
+        $this->assertStringContainsString('Admin', $window[1]['content']);
+
+        DOMAssert::assertSelectCount('.contact.blocked', 1, $window[1]['content']);
+
+        $member = Member::selectOne(1);
+        $this->assertEquals($member->enemies, '1');
+    }
+
+    public function testUnblock(): void
+    {
+        $this->actingAs('admin', ['enemies' => '1']);
+
+        $page = $this->go(new Request(
+            get: ['act' => 'buddylist', 'unblock' => '1'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['softurl'], $json);
+
+        $window = array_find($json, fn($cmd) => $cmd[0] === 'window');
+        $this->assertEquals('buddylist', $window[1]['id']);
+        $this->assertEquals('Buddies', $window[1]['title']);
+        $this->assertStringNotContainsString('Admin', $window[1]['content']);
+
+        DOMAssert::assertSelectCount('.contact.blocked', 0, $window[1]['content']);
+
+        $member = Member::selectOne(1);
+        $this->assertEquals($member->enemies, '');
+    }
 }
