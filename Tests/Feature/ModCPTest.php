@@ -199,4 +199,12 @@ final class ModCPTest extends FeatureTestCase
         $this->assertContainsEquals(['softurl'], $json);
         $this->assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
     }
+
+    public function testLoadModControlsJS(): void {
+        $this->actingAs('admin');
+
+        $page = $this->go('?act=modcontrols&do=load');
+
+        $this->assertStringContainsString('modcontrols', $page);
+    }
 }

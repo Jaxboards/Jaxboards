@@ -107,9 +107,8 @@ final readonly class ModControls
             header('Content-Type: application/javascript; charset=utf-8');
             header('Expires: ' . Carbon::now('UTC')->addMonth()->format(Carbon::RFC7231));
 
-            echo $script;
-
-            exit(0);
+            $this->page->earlyFlush($script);
+            return;
         }
 
         $this->page->command('softurl');
