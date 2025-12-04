@@ -32,6 +32,7 @@ final class IPAddress
         private readonly Config $config,
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
+        private readonly Request $request,
     ) {
         $this->ipBanCache = $this->loadBannedIps();
     }
@@ -157,11 +158,8 @@ final class IPAddress
         return [];
     }
 
-    /**
-     * @SuppressWarnings("PHPMD.Superglobals")
-     */
     private function getIp(): string
     {
-        return $_SERVER['REMOTE_ADDR'] ?? '';
+        return $this->request->server('REMOTE_ADDR') ?? '';
     }
 }

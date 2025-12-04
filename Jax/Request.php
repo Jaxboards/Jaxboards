@@ -113,6 +113,14 @@ final class Request
         return $file && !$file['error'] ? $file : null;
     }
 
+    /**
+     * Access $_SERVER.
+     */
+    public function server (string $fieldName): ?string
+    {
+        return $this->server[$fieldName] ?? null;
+    }
+
     public function hasCookies(): bool
     {
         return $this->cookie !== [];

@@ -32,6 +32,7 @@ final readonly class TextFormatting
     public function __construct(
         private BBCode $bbCode,
         public TextRules $rules,
+        private Request $request,
         private User $user,
     ) {}
 
@@ -217,7 +218,7 @@ final readonly class TextFormatting
             is_array($parts)
             && array_key_exists('host', $parts)
             && array_key_exists('query', $parts)
-            && $parts['host'] === $_SERVER['HTTP_HOST']
+            && $parts['host'] === $this->request->server('HTTP_HOST')
         ) {
             $inner = match (true) {
                 (bool) preg_match('@pid=(\d+)@', $parts['query'], $postMatch) => "Post #{$postMatch[1]}",

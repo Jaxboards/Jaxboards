@@ -42,13 +42,16 @@ final class DomainDefinitions
     /**
      * @SuppressWarnings("PHPMD.Superglobals")
      */
-    public function __construct(private readonly ServiceConfig $serviceConfig)
+    public function __construct(
+        private readonly ServiceConfig $serviceConfig,
+        private readonly Request $request,
+    )
     {
 
         // Figure out url.
-        $host = $_SERVER['SERVER_NAME'] ?? (string) $this->serviceConfig->getSetting('domain');
-        $port = $_SERVER['SERVER_PORT'] ?? '443';
-        $scheme = $_SERVER['REQUEST_SCHEME'] ?? 'https';
+        $host = $request->server('SERVER_NAME') ?? (string) $this->serviceConfig->getSetting('domain');
+        $port = $request->server('SERVER_PORT') ?? '443';
+        $scheme = $request->server('REQUEST_SCHEME') ?? 'https';
 
         // Build the url.
         $boardURL = '//' . $host;

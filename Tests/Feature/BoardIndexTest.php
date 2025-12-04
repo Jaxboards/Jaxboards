@@ -97,4 +97,15 @@ final class BoardIndexTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('#statusers .user1', 'Admin', 1, $page);
         DOMAssert::assertSelectEquals('#stats .userstoday', '1 User Online Today:', 1, $page);
     }
+
+    public function testDebugInfo(): void
+    {
+        $this->actingAs('admin');
+
+        $page = $this->go(new Request(
+            server: [ 'REMOTE_ADDR' => '::1']
+        ));
+
+        DOMAssert::assertSelectCount('#debug', 1, $page);
+    }
 }
