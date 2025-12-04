@@ -40,6 +40,7 @@ class Database
     public const WHERE_ID_IN = 'WHERE `id` IN ?';
 
     public const DATE = 'Y-m-d';
+
     public const DATE_TIME = 'Y-m-d H:i:s';
 
     public string $driver = 'mysql';
@@ -101,28 +102,43 @@ class Database
             case 'mysql':
             default:
                 $this->pdo->query("SET time_zone = '+0:00'");
+
                 break;
+
             case 'postgres':
                 $this->pdo->query('SET TIME ZONE "UTC"');
+
                 break;
+
             case 'sqliteMemory':
                 // polyfill datetime functions
-                $this->pdo->sqliteCreateFunction('MONTH',
-                    function (?string $datetime) {
-                        if ($datetime === null) return null;
+                $this->pdo->sqliteCreateFunction(
+                    'MONTH',
+                    static function (?string $datetime): ?int {
+                        if ($datetime === null) {
+                            return null;
+                        }
+
                         $parsed = new DateTime($datetime);
+
                         return (int) $parsed->format('m');
-                    }
+                    },
                 );
-                $this->pdo->sqliteCreateFunction('YEAR',
-                    function (?string $datetime) {
-                        if ($datetime === null) return null;
+                $this->pdo->sqliteCreateFunction(
+                    'YEAR',
+                    static function (?string $datetime): ?int {
+                        if ($datetime === null) {
+                            return null;
+                        }
+
                         $parsed = new DateTime($datetime);
+
                         return (int) $parsed->format('Y');
-                    }
+                    },
                 );
+
                 break;
-        };
+        }
 
         $this->setPrefix($prefix);
         $this->driver = $driver;
