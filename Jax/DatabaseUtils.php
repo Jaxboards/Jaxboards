@@ -8,6 +8,8 @@ use Jax\DatabaseUtils\DatabaseAdapter;
 use Jax\DatabaseUtils\MySQL;
 use Jax\DatabaseUtils\SQLite;
 use Jax\Models\Activity;
+use Jax\Models\Badge;
+use Jax\Models\BadgeAssociation;
 use Jax\Models\Category;
 use Jax\Models\File;
 use Jax\Models\Forum;
@@ -30,6 +32,8 @@ final readonly class DatabaseUtils implements DatabaseAdapter
 {
     public const MODELS = [
         Activity::class,
+        Badge::class,
+        BadgeAssociation::class,
         Category::class,
         File::class,
         Forum::class,
