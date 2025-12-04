@@ -59,12 +59,16 @@ final readonly class ModControls
             !$this->user->getGroup()?->canModerate
             && !$this->user->get()->mod
         ) {
-            $this->page->command('softurl');
-            $this->page->command(
-                'alert',
-                'Your account does not have moderator permissions.',
-            );
+            if ($this->request->isJSAccess()) {
+                $this->page->command('softurl');
+                $this->page->command(
+                    'alert',
+                    'Your account does not have moderator permissions.',
+                );
+                return;
+            }
 
+            $this->page->location('?');
             return;
         }
 
@@ -137,7 +141,7 @@ final readonly class ModControls
         );
     }
 
-    private function showModCP(string $cppage = ''): void
+    private function showModCP(string $cppage = 'Choose an option on the left.'): void
     {
         if (!$this->user->getGroup()?->canModerate) {
             return;
