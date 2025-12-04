@@ -139,9 +139,9 @@ final class ProfileTest extends FeatureTestCase
         $database = $this->container->get(Database::class);
 
         $activity = new ModelsActivity();
-        $activity->uid=1;
-        $activity->type='profile_comment';
-        $activity->affectedUser=1;
+        $activity->uid = 1;
+        $activity->type = 'profile_comment';
+        $activity->affectedUser = 1;
         $activity->date = $database->datetime();
         $activity->insert();
 
