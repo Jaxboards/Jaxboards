@@ -59,16 +59,6 @@ final readonly class ModControls
             !$this->user->getGroup()?->canModerate
             && !$this->user->get()->mod
         ) {
-            if ($this->request->isJSAccess()) {
-                $this->page->command('softurl');
-                $this->page->command(
-                    'alert',
-                    'Your account does not have moderator permissions.',
-                );
-
-                return;
-            }
-
             $this->page->location('?');
 
             return;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Jax\Constants\JSAccess;
+
 use function setcookie;
 
 final class Request
@@ -154,7 +156,7 @@ final class Request
      */
     public function isJSUpdate(): bool
     {
-        return $this->jsAccess() === 1 && !$this->hasPostData();
+        return $this->jsAccess() === JSAccess::UPDATING->value && !$this->hasPostData();
     }
 
     /**
@@ -162,16 +164,16 @@ final class Request
      */
     public function isJSNewLocation(): bool
     {
-        if ($this->jsAccess() === 2) {
+        if ($this->jsAccess() === JsAccess::ACTING->value) {
             return true;
         }
 
-        return $this->jsAccess() === 3;
+        return $this->jsAccess() === JSAccess::DIRECTLINK->value;
     }
 
     public function isJSDirectLink(): bool
     {
-        return $this->jsAccess() === 3;
+        return $this->jsAccess() === jsAccess::DIRECTLINK->value;
     }
 
     public function getUserAgent(): ?string

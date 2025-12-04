@@ -126,9 +126,7 @@ final class Page
     public function out(): string
     {
         if ($this->request->isJSAccess()) {
-            $this->outputJavascriptCommands();
-
-            return '';
+            return $this->outputJavascriptCommands();
         }
 
         if ($this->earlyFlush) {
@@ -241,7 +239,7 @@ final class Page
         ) . ($this->pageTitle !== '' ? ' -> ' . $this->pageTitle : '');
     }
 
-    private function outputJavascriptCommands(): void
+    private function outputJavascriptCommands(): string
     {
         if (!headers_sent()) {
             header('Content-type:application/json');
@@ -253,7 +251,7 @@ final class Page
             $this->command('update', 'path', $this->buildpath());
         }
 
-        echo json_encode($this->commands);
+        return json_encode($this->commands);
     }
 
     private function buildPath(): string

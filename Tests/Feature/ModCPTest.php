@@ -11,6 +11,7 @@ use Jax\Attributes\Key;
 use Jax\BBCode;
 use Jax\BotDetector;
 use Jax\Config;
+use Jax\Constants\JSAccess;
 use Jax\Database;
 use Jax\DatabaseUtils;
 use Jax\DatabaseUtils\SQLite;
@@ -165,5 +166,35 @@ final class ModCPTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Last 5 shouts:', 1, $page);
         DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Last 5 posts:', 1, $page);
         DOMAssert::assertSelectEquals('.modcppage .minibox .content', '--No Data--', 3, $page);
+    }
+
+    public function testAddPostToModerate(): void
+    {
+        $this->actingAs('admin');
+
+        $page = $this->go(new Request(
+            get: ['act' => 'modcontrols', 'do' => 'modp', 'pid' => '1'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['softurl'], $json);
+        $this->assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
+    }
+
+    public function testAddTopicToModerate(): void
+    {
+        $this->actingAs('admin');
+
+        $page = $this->go(new Request(
+            get: ['act' => 'modcontrols', 'do' => 'modt', 'tid' => '1'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['softurl'], $json);
+        $this->assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
     }
 }
