@@ -65,7 +65,7 @@ final class ServiceConfig
 
     public function hasInstalled(): bool
     {
-        return $this->serviceConfig !== [];
+        return file_exists(dirname(__DIR__) . '/config.php');
     }
 
     public function getSetting(string $key): mixed

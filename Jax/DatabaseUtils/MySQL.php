@@ -77,7 +77,7 @@ final readonly class MySQL implements DatabaseAdapter
         return "CREATE TABLE {$tableQuoted} (" . PHP_EOL
             . '  ' . implode(',' . PHP_EOL . '  ', array_merge(
                 $fields,
-                // $keys,
+                $keys,
                 $constraints,
             )) . PHP_EOL
         . ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
@@ -122,7 +122,7 @@ final readonly class MySQL implements DatabaseAdapter
         $length = $column->length !== 0 ? "({$column->length})" : '';
         $nullable = $column->nullable === false ? ' NOT NULL' : '';
         $autoIncrement = $column->autoIncrement ? ' AUTO_INCREMENT' : '';
-        $unsigned = ' unsigned';
+        $unsigned = $column->unsigned ? ' unsigned' : '';
         $default = $column->default !== null
             ? " DEFAULT '{$column->default}'"
             : '';
