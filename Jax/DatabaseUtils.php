@@ -30,29 +30,6 @@ use Jax\Models\Topic;
 
 final readonly class DatabaseUtils implements DatabaseAdapter
 {
-    public const MODELS = [
-        Activity::class,
-        Badge::class,
-        BadgeAssociation::class,
-        Category::class,
-        File::class,
-        Forum::class,
-        Group::class,
-        Member::class,
-        Message::class,
-        Page::class,
-        Post::class,
-        ProfileComment::class,
-        RatingNiblet::class,
-        Session::class,
-        Shout::class,
-        Skin::class,
-        Stats::class,
-        TextRule::class,
-        Token::class,
-        Topic::class,
-    ];
-
     public const ADAPTERS = [
         'mysql' => MySQL::class,
         'sqliteMemory' => SQLite::class,
@@ -70,7 +47,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
     {
         $this->databaseAdapter->install();
 
-        foreach ($this::MODELS as $modelClass) {
+        foreach (self::getModels() as $modelClass) {
             $model = new $modelClass();
             $queries[] = 'DROP TABLE IF EXISTS ' . $this->database->ftable($model::TABLE);
             $queries[] = $this->databaseAdapter->createTableQueryFromModel($model);
@@ -87,6 +64,46 @@ final readonly class DatabaseUtils implements DatabaseAdapter
     public function createTableQueryFromModel(Model $model): string
     {
         return $this->databaseAdapter->createTableQueryFromModel($model);
+    }
+
+    /**
+     * Discover model classes under the `Jax\\Models` directory.
+     *
+     * Returns fully-qualified class names like `Jax\\Models\\Post`.
+     */
+    public static function getModels(): array
+    {
+        static $modelClassesCache = null;
+        if ($modelClassesCache !== null) {
+            return $modelClassesCache;
+        }
+
+        $modelsDir = __DIR__ . '/Models';
+        if (!is_dir($modelsDir)) {
+            return $modelClassesCache = [];
+        }
+
+        $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($modelsDir));
+        $modelClassesCache = [];
+
+        foreach ($rii as $file) {
+            if ($file->isDir()) {
+                continue;
+            }
+
+            $realPath = $file->getRealPath();
+            if ($realPath === false) {
+                continue;
+            }
+
+            $relative = substr($realPath, strlen($modelsDir) + 1);
+            $relative = str_replace(DIRECTORY_SEPARATOR, '\\', $relative);
+            $relative = substr($relative, 0, -4); // strip .php
+
+            $modelClassesCache[] = __NAMESPACE__ . '\\Models\\' . $relative;
+        }
+
+        return $modelClassesCache;
     }
 
     private function insertInitialRecords(): void

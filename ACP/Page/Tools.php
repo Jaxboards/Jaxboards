@@ -72,7 +72,7 @@ final readonly class Tools
     {
         $dbPrefix = $this->database->getPrefix();
 
-        $models = DatabaseUtils::MODELS;
+        $models = DatabaseUtils::getModels();
 
         $sqlFileLines = [
             "-- Jaxboards Backup {$dbPrefix} {$this->database->datetime()}",
