@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jax;
 
-use Jax\Request;
-use Jax\RequestStringGetter;
 use DI\Container;
 use Jax\Attributes\Column;
 use Jax\Config;
@@ -17,6 +15,8 @@ use Jax\Jax;
 use Jax\Model;
 use Jax\Models\Group;
 use Jax\Models\Member;
+use Jax\Request;
+use Jax\RequestStringGetter;
 use Jax\ServiceConfig;
 use Jax\User;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -30,7 +30,6 @@ use function base64_decode;
  * @internal
  */
 #[CoversClass(User::class)]
-#[Small]
 #[CoversClass(Config::class)]
 #[CoversClass(Database::class)]
 #[CoversClass(DomainDefinitions::class)]
@@ -41,6 +40,7 @@ use function base64_decode;
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
+#[Small]
 #[UsesFunction('\Jax\pathjoin')]
 final class UserTest extends UnitTestCase
 {
