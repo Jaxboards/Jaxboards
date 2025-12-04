@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "719cc7c1c012356b63b35570d8fd8a5c",
+    "content-hash": "2895db6c1ac4f3ee362709233e864517",
     "packages": [
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -532,8 +532,14 @@
             "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://github.com/seanjohnson08/mysqlite",
-                "reference": "d578d41a062bab9f1c71821518cf99e834463673"
+                "url": "https://github.com/seanjohnson08/mysqlite.git",
+                "reference": "98cec2a5b03dd517aafa47efeb5f70f8fe84b90e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/seanjohnson08/mysqlite/zipball/98cec2a5b03dd517aafa47efeb5f70f8fe84b90e",
+                "reference": "98cec2a5b03dd517aafa47efeb5f70f8fe84b90e",
+                "shasum": ""
             },
             "require-dev": {
                 "phpunit/phpunit": "^11.5"
@@ -545,11 +551,7 @@
                     "MySQLite\\": "src"
                 }
             },
-            "scripts": {
-                "test": [
-                    "phpunit"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "authors": [
                 {
                     "name": "Sean Johnson",
@@ -557,7 +559,11 @@
                 }
             ],
             "description": "Polyfills for SQLite to make it as compatible with MySQL queries as possible.",
-            "time": "2025-12-04T16:15:53+00:00"
+            "support": {
+                "issues": "https://github.com/seanjohnson08/mysqlite/issues",
+                "source": "https://github.com/seanjohnson08/mysqlite/tree/main"
+            },
+            "time": "2025-12-04T16:45:31+00:00"
         },
         {
             "name": "sebastian/comparator",

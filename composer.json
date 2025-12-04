@@ -60,12 +60,6 @@
         "nesbot/carbon": "^3.9",
         "lodash-php/lodash-php": "^0.1.0"
     },
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/seanjohnson08/mysqlite"
-        }
-    ],
     "scripts": {
         "lint": [
             "@phpcs"
