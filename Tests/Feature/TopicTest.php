@@ -43,6 +43,9 @@ use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
+use function array_find;
+use function json_decode;
+
 /**
  * @internal
  */
@@ -117,7 +120,7 @@ final class TopicTest extends FeatureTestCase
 
         $page = $this->go(new Request(
             get: ['act' => 'vt1'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::UPDATING->value]
+            server: ['HTTP_X_JSACCESS' => JSAccess::UPDATING->value],
         ));
 
         $json = json_decode($page, true);
@@ -132,13 +135,13 @@ final class TopicTest extends FeatureTestCase
 
         $page = $this->go(new Request(
             get: ['act' => 'vt1', 'qreply' => '1'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value]
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
         $json = json_decode($page, true);
 
         $this->assertContainsEquals(['softurl'], $json);
-        $window = array_find($json, fn($item) => $item[0] === 'window');
+        $window = array_find($json, static fn($item): bool => $item[0] === 'window');
 
         DOMAssert::assertSelectCount('.topic-reply-form textarea[name="postdata"]', 1, $window[1]['content']);
     }
