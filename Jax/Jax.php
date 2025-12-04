@@ -104,6 +104,10 @@ final readonly class Jax
      */
     public function pages(int $numpages, int $active, int $tofill): array
     {
+        if ($numpages <= 0) {
+            return [];
+        }
+
         $tofill -= 2;
         $pages = [1];
         if ($numpages === 1) {

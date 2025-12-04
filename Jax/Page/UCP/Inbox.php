@@ -44,7 +44,7 @@ final readonly class Inbox
 
     public function render(): ?string
     {
-        $messageId = (int) $this->request->asString->post('messageid');
+        $messageId = (int) $this->request->asString->both('messageid');
         $view = $this->request->asString->both('view');
         $page = $this->request->asString->both('page');
         $flag = (int) $this->request->asString->both('flag');
@@ -267,11 +267,11 @@ final readonly class Inbox
     private function fetchMessageCount(?string $view = null): int
     {
         $criteria = match ($view) {
-            'sent' => 'WHERE `from`=? AND !`deletedSender`',
+            'sent' => 'WHERE `from`=? AND `deletedSender`=0',
             'flagged' => 'WHERE `to`=? AND `flag`=1',
-            'unread' => 'WHERE `to`=? AND !`read`',
+            'unread' => 'WHERE `to`=? AND `read`=0',
             'read' => 'WHERE `to`=? AND `read`=1',
-            default => 'WHERE `to`=? AND !`deletedRecipient`',
+            default => 'WHERE `to`=? AND `deletedRecipient`=0',
         };
 
         return Message::count($criteria, $this->user->get()->id) ?? 0;
@@ -283,9 +283,9 @@ final readonly class Inbox
     private function fetchMessages(string $view, int $pageNumber = 0): array
     {
         $criteria = match ($view) {
-            'sent' => 'WHERE `from`=? AND !deletedSender',
+            'sent' => 'WHERE `from`=? AND `deletedSender`=0',
             'flagged' => 'WHERE `to`=? AND flag=1',
-            default => 'WHERE `to`=? AND !deletedRecipient',
+            default => 'WHERE `to`=? AND deletedRecipient=0',
         };
 
         return Message::selectMany(
@@ -382,7 +382,7 @@ final readonly class Inbox
         $requestPage = max(1, (int) $this->request->asString->both('page'));
         $numMessages = $this->fetchMessageCount($view);
 
-        $pages = 'Pages: ';
+        $pages = $numMessages ? 'Pages: ' : '';
         $pageNumbers = $this->jax->pages(
             (int) ceil($numMessages / self::MESSAGES_PER_PAGE),
             $requestPage,
