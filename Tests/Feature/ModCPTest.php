@@ -105,7 +105,7 @@ final class ModCPTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=modcontrols&do=iptools');
+        $page = $this->go('?act=modcontrols&do=emem');
 
         DOMAssert::assertSelectCount('input[name=mname]', 1, $page);
     }
@@ -141,6 +141,15 @@ final class ModCPTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('textarea[name=signature]', 'New signature', 1, $page);
     }
 
+    public function testIPTools(): void
+    {
+        $this->actingAs('admin');
+
+        $page = $this->go('?act=modcontrols&do=iptools');
+
+        DOMAssert::assertSelectCount('input[name=ip]', 1, $page);
+    }
+
     public function testIPToolsLookup(): void
     {
         $this->actingAs('admin');
@@ -156,14 +165,5 @@ final class ModCPTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Last 5 shouts:', 1, $page);
         DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Last 5 posts:', 1, $page);
         DOMAssert::assertSelectEquals('.modcppage .minibox .content', '--No Data--', 3, $page);
-    }
-
-    public function testIPTools(): void
-    {
-        $this->actingAs('admin');
-
-        $page = $this->go('?act=modcontrols&do=iptools');
-
-        DOMAssert::assertSelectCount('input[name=ip]', 1, $page);
     }
 }

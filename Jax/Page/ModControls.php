@@ -115,7 +115,7 @@ final readonly class ModControls
 
         if (!$this->request->isJSAccess()) {
             header('Content-Type: application/javascript; charset=utf-8');
-            header('Expires: ' . gmdate('D, d M Y H:i:s', Carbon::now('UTC')->addMonth()->getTimestamp()) . ' GMT');
+            header('Expires: ' . Carbon::now('UTC')->addMonth()->format(Carbon::RFC7231));
 
             echo $script;
 
