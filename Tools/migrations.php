@@ -68,7 +68,7 @@ foreach ($migrations as $version => $migration) {
 
     echo "notice: migrating from v{$dbVersion} to v{$version}" . PHP_EOL;
 
-    $migrationClass = $container->get("tools\\migrations\\V{$version}\\{$migration}");
+    $migrationClass = $container->get("Tools\\Migrations\\V{$version}\\{$migration}");
 
     try {
         $migrationClass->execute($database);

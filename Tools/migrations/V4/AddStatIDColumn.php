@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace tools\migrations\V4;
+namespace Tools\Migrations\V4;
 
 use Jax\Database;
 
