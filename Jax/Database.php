@@ -98,23 +98,11 @@ class Database
         $this->pdo = new PDO(...$connectionArgs);
 
         // All datetimes are GMT for jaxboards
-        switch ($driver) {
-            case 'mysql':
-            default:
-                $this->pdo->query("SET time_zone = '+0:00'");
-
-                break;
-
-            case 'postgres':
-                $this->pdo->query('SET TIME ZONE "UTC"');
-
-                break;
-
-            case 'sqliteMemory':
-                MySQLite::install($this->pdo);
-
-                break;
-        }
+        match ($driver) {
+            'postgres' => $this->pdo->query('SET TIME ZONE "UTC"'),
+            'sqliteMemory' => MySQLite::install($this->pdo),
+            default => $this->pdo->query("SET time_zone = '+0:00'"),
+        };
 
         $this->setPrefix($prefix);
         $this->driver = $driver;
