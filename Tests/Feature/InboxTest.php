@@ -20,11 +20,14 @@ use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Model;
+use Jax\Models\Message;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
 use Jax\Page\TextRules;
 use Jax\Page\UCP;
+use Jax\Page\UCP\Inbox;
+use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
 use Jax\ServiceConfig;
@@ -32,14 +35,14 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
-use Jax\Models\Message;
-use Jax\Page\UCP\Inbox;
-use Jax\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
+/**
+ * @internal
+ */
 #[CoversClass(Inbox::class)]
 #[CoversClass(App::class)]
 #[CoversClass(Column::class)]
