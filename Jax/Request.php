@@ -136,6 +136,7 @@ final class Request
                 'secure' => true,
             ],
         );
+        $this->cookie[$cookieName] = $cookieValue;
     }
 
     public function hasPostData(): bool

@@ -251,7 +251,7 @@ final class LogReg
                 $this->session->set('uid', $this->user->get()->id);
                 $this->session->act();
                 if ($this->registering) {
-                    $this->page->command('location', '/');
+                    $this->page->location('/');
                 } elseif ($this->request->isJSAccess()) {
                     $this->page->command('reload');
                 } else {

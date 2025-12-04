@@ -108,6 +108,7 @@ abstract class FeatureTestCase extends PHPUnitTestCase
                     $member->name = 'Admin';
                     $member->displayName = 'Admin';
                     $member->sig = 'I like tacos';
+                    $member->pass = password_hash('password', PASSWORD_DEFAULT);
                     $member->groupID = Groups::Admin->value;
 
                     break;

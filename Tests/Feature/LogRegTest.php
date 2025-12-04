@@ -20,6 +20,8 @@ use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Model;
+use Jax\Models\Member;
+use Jax\Models\Stats;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
@@ -91,6 +93,25 @@ final class LogRegTest extends FeatureTestCase
         DOMAssert::assertSelectCount('input[name=email]', 1, $page);
     }
 
+    public function testRegistration(): void
+    {
+        $page = $this->go(new Request(
+            get: ['act' => 'logreg1'],
+            post: [
+                'register' => 'true',
+                'name' => 'Sean',
+                'display_name' => 'Sean',
+                'pass1' => 'password',
+                'pass2' => 'password',
+                'email' => 'test@test.com',
+            ]
+        ));
+
+        $this->assertRedirect('/', $page);
+        $this->assertEquals(Member::selectOne(1)->displayName, 'Sean');
+        $this->assertEquals(Stats::selectOne()->last_register, 1);
+    }
+
     public function testLogout(): void
     {
         $this->actingAs('member');
@@ -110,6 +131,24 @@ final class LogRegTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('.box.login', 'Login', 1, $page);
         DOMAssert::assertSelectCount('input[name=user]', 1, $page);
         DOMAssert::assertSelectCount('input[name=pass]', 1, $page);
+    }
+
+    public function testLogin(): void
+    {
+        // This just ensures the admin model is inserted
+        $this->actingAs('admin');
+
+        $page = $this->go(new Request(
+            get: ['act' => 'logreg3'],
+            post: [
+                'user' => 'Admin',
+                'pass' => 'password',
+            ]
+        ));
+
+        $this->assertRedirect('?', $page);
+        $request = $this->container->get(Request::class);
+        $this->assertNotEmpty($request->cookie('utoken'));
     }
 
     public function testForgotPasswordForm(): void
