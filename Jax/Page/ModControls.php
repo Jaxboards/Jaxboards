@@ -108,6 +108,7 @@ final readonly class ModControls
             header('Expires: ' . Carbon::now('UTC')->addMonth()->format(Carbon::RFC7231));
 
             $this->page->earlyFlush($script);
+
             return;
         }
 
