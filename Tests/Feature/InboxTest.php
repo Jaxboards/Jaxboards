@@ -154,13 +154,44 @@ final class InboxTest extends FeatureTestCase
         $this->assertEquals(1, $message->to);
     }
 
-    private function insertMessage(): void
+    public function testInboxFlagMessage(): void
+    {
+        $this->insertMessage();
+
+        $this->actingAs('admin');
+
+        $page = $this->go('?act=ucp&what=inbox&flag=1&tog=1');
+
+        $this->assertRedirect('?act=ucp&what=inbox', $page);
+
+        $message = Message::selectOne(1);
+        $this->assertEquals(1, $message->flag);
+    }
+
+    public function testInboxUnflagMessage(): void
+    {
+        $this->insertMessage(['flag' => 1]);
+
+        $this->actingAs('admin');
+
+        $page = $this->go('?act=ucp&what=inbox&flag=1&tog=0');
+
+        $this->assertRedirect('?act=ucp&what=inbox', $page);
+
+        $message = Message::selectOne(1);
+        $this->assertEquals(0, $message->flag);
+    }
+
+    private function insertMessage(?array $messageProperties = []): void
     {
         $message = new Message();
         $message->from = 1;
         $message->to = 1;
         $message->title = 'Test Message';
         $message->message = 'This is a test message.';
+        foreach ($messageProperties as $key => $value) {
+            $message->{$key} = $value;
+        }
         $message->insert();
     }
 }

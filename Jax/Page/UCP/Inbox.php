@@ -313,6 +313,10 @@ final readonly class Inbox
             $message->update();
         }
 
+        if (!$this->request->isJSAccess()) {
+            $this->page->location('?act=ucp&what=inbox');
+        }
+
         return null;
     }
 
