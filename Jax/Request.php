@@ -164,7 +164,7 @@ final class Request
      */
     public function isJSNewLocation(): bool
     {
-        if ($this->jsAccess() === JsAccess::ACTING->value) {
+        if ($this->jsAccess() === JSAccess::ACTING->value) {
             return true;
         }
 
@@ -173,7 +173,7 @@ final class Request
 
     public function isJSDirectLink(): bool
     {
-        return $this->jsAccess() === jsAccess::DIRECTLINK->value;
+        return $this->jsAccess() === JSAccess::DIRECTLINK->value;
     }
 
     public function getUserAgent(): ?string

@@ -41,6 +41,8 @@ use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
+use function json_decode;
+
 /**
  * @internal
  */
