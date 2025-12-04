@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Feature;
+
 use Jax\Models\Message;
 use Jax\Request;
 use PHPUnit\Framework\DOMAssert;
