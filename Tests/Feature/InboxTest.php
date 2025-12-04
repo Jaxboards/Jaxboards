@@ -132,6 +132,28 @@ final class InboxTest extends FeatureTestCase
         $this->assertStringContainsString('No messages.', $page);
     }
 
+    public function testInboxComposeMessage(): void
+    {
+        $this->actingAs('admin');
+
+        $page = $this->go(new Request(
+            get: ['act' => 'ucp', 'what' => 'inbox', 'view' => 'compose'],
+            post: [
+                'submit' => '1',
+                'mid' => '1',
+                'title' => 'Hello there',
+                'message' => 'How have you been?',
+            ],
+        ));
+
+        DOMAssert::assertSelectEquals('#ucppage', 'Message successfully delivered.', 1, $page);
+        $message = Message::selectOne(1);
+        $this->assertEquals('Hello there', $message->title);
+        $this->assertEquals('How have you been?', $message->message);
+        $this->assertEquals(1, $message->from);
+        $this->assertEquals(1, $message->to);
+    }
+
     private function insertMessage(): void
     {
         $message = new Message();
