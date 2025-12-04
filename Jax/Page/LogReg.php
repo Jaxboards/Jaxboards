@@ -70,7 +70,6 @@ final class LogReg
         match ((int) mb_substr((string) $this->request->asString->both('act'), 6)) {
             1 => $this->register(),
             2 => $this->logout(),
-            4 => $this->loginpopup(),
             5 => $this->toggleinvisible(),
             6 => $this->forgotpassword(),
             default => $this->login(
@@ -301,41 +300,6 @@ final class LogReg
         }
 
         $this->login();
-    }
-
-    private function loginpopup(): void
-    {
-        $this->page->command('softurl');
-        $this->page->command(
-            'window',
-            [
-                'content' => <<<'HTML'
-                    <form method="post" data-ajax-form="resetOnSubmit">
-                        <input type="hidden" name="act" value="logreg3" />
-                        <input type="hidden" name="popup" value="1" />
-                        <label for="user">Username:</label>
-                        <input type="text" name="user" id="user" />
-                        <br>
-                        <label for="pass">
-                            Password
-                            (
-                            <a href="?act=logreg6" title="Forgot your password?"
-                                data-use-tooltip="true"
-                                data-window-close="true">
-                                ?
-                            </a>
-                            ):
-                        </label>
-                        <input type="password" name="pass" id="pass" />
-                        <br>
-                        <input type="submit" value="Login" />
-                        <a href="?act=logreg1" data-window-close="true">Register</a>
-                    </form>
-                    HTML,
-                'id' => 'loginform',
-                'title' => 'Login',
-            ],
-        );
     }
 
     private function toggleinvisible(): void

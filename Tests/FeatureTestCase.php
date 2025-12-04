@@ -112,20 +112,25 @@ abstract class FeatureTestCase extends PHPUnitTestCase
 
                     break;
 
-                default:
+                case 'member':
                     $member->id = 2;
                     $member->name = 'Member';
                     $member->displayName = 'Member';
                     $member->groupID = Groups::Member->value;
 
                     break;
+
+                case 'guest':
+                    $member = null;
             }
 
-            foreach ($memberOverrides as $property => $value) {
-                $member->{$property} = $value;
-            }
+            if ($member !== null) {
+                foreach ($memberOverrides as $property => $value) {
+                    $member->{$property} = $value;
+                }
 
-            $member->insert();
+                $member->insert();
+            }
         }
 
         $this->container->set(
