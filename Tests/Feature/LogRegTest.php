@@ -22,6 +22,7 @@ use Jax\Jax;
 use Jax\Model;
 use Jax\Models\Member;
 use Jax\Models\Stats;
+use Jax\Models\Token;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
@@ -147,8 +148,14 @@ final class LogRegTest extends FeatureTestCase
         ));
 
         $this->assertRedirect('?', $page);
+
+        // Ensure token inserted
+        $token = Token::selectOne();
+        $this->assertEquals($token->uid, 1);
+        $this->assertEquals($token->type, 'login');
+
         $request = $this->container->get(Request::class);
-        $this->assertNotEmpty($request->cookie('utoken'));
+        $this->assertEquals($request->cookie('utoken'), $token->token);
     }
 
     public function testForgotPasswordForm(): void
