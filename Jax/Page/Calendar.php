@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Carbon\Carbon;
 use Jax\Date;
 use Jax\Models\Member;
 use Jax\Page;
@@ -59,15 +60,17 @@ final readonly class Calendar
             $month,
         ] = explode(
             ' ',
-            gmdate('w t F Y n', mktime(0, 0, 0, $monthOffset, 1) ?: 0),
+            Carbon::create(year: null, day: null, month: $monthOffset, timezone: 'UTC')
+                ->format('w t F Y n'),
         );
         $offset = (int) $offset;
         $daysInMonth = (int) $daysInMonth;
         $year = (int) $year;
+        $month = (int) $month;
 
         $this->session->set('locationVerbose', 'Checking out the calendar for ' . $monthName . ' ' . $year);
         $members = Member::selectMany(
-            'WHERE MONTH(`birthdate`)=? AND YEAR(`birthdate`)<?',
+            'WHERE MONTH(`birthdate`)=? AND YEAR(`birthdate`)<=?',
             $month,
             $year,
         );
@@ -84,7 +87,7 @@ final readonly class Calendar
                 . '%3$s</a>',
                 $member->id,
                 $member->groupID,
-                $member->name,
+                $member->displayName,
                 $year - ($birthday->year ?? 0),
             );
         }

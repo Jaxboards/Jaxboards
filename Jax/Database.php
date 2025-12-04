@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use DateTime;
 use Exception;
 use PDO;
 use PDOStatement;
@@ -38,6 +39,7 @@ class Database
 
     public const WHERE_ID_IN = 'WHERE `id` IN ?';
 
+    public const DATE = 'Y-m-d';
     public const DATE_TIME = 'Y-m-d H:i:s';
 
     public string $driver = 'mysql';
@@ -95,10 +97,31 @@ class Database
         $this->pdo = new PDO(...$connectionArgs);
 
         // All datetimes are GMT for jaxboards
-        match ($driver) {
-            'mysql' => $this->pdo->query("SET time_zone = '+0:00'"),
-            'postgres' => $this->pdo->query('SET TIME ZONE "UTC"'),
-            default => null,
+        switch ($driver) {
+            case 'mysql':
+            default:
+                $this->pdo->query("SET time_zone = '+0:00'");
+                break;
+            case 'postgres':
+                $this->pdo->query('SET TIME ZONE "UTC"');
+                break;
+            case 'sqliteMemory':
+                // polyfill datetime functions
+                $this->pdo->sqliteCreateFunction('MONTH',
+                    function (?string $datetime) {
+                        if ($datetime === null) return null;
+                        $parsed = new DateTime($datetime);
+                        return (int) $parsed->format('m');
+                    }
+                );
+                $this->pdo->sqliteCreateFunction('YEAR',
+                    function (?string $datetime) {
+                        if ($datetime === null) return null;
+                        $parsed = new DateTime($datetime);
+                        return (int) $parsed->format('Y');
+                    }
+                );
+                break;
         };
 
         $this->setPrefix($prefix);
@@ -360,6 +383,11 @@ class Database
         $quote = $this->driver === 'pgsql' ? '"' : '`';
 
         return $quote . $identifier . $quote;
+    }
+
+    public function date(?int $timestamp = null): string
+    {
+        return gmdate(self::DATE, $timestamp);
     }
 
     public function datetime(?int $timestamp = null): string
