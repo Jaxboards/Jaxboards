@@ -88,7 +88,9 @@ final readonly class Activity
             $activity['aff_name'],
         );
 
-        $date = $activity['date'] ? $this->date->smallDate($activity['date']) : '';
+        $date = $activity['date']
+            ? $this->date->smallDate($activity['date'])
+            : '';
         $text = match ($activity['type']) {
             'profile_comment' => "{$user}  commented on  {$otherguy}'s profile",
             'new_post' => <<<HTML
