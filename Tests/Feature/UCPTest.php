@@ -296,4 +296,78 @@ final class UCPTest extends FeatureTestCase
             'submit' => 'Save Profile Settings',
         ];
     }
+
+    public function testAvatarSettings(): void
+    {
+        $this->actingAs('member');
+
+        $page = $this->go('?act=ucp&what=avatar');
+
+        DOMAssert::assertSelectCount('.avatar img[src="/Service/Themes/Default/avatars/default.gif"]', 1, $page);
+    }
+
+    public function testAvatarSettingsSave(): void
+    {
+        $this->actingAs('member');
+
+        $page = $this->go(new Request(
+            get: ['act' => 'ucp', 'what' => 'avatar'],
+            post: ['changedava' => 'http://jaxboards.com']
+        ));
+
+        DOMAssert::assertSelectCount('.avatar img[src="http://jaxboards.com"]', 1, $page);
+    }
+
+    public function testSoundSettings(): void
+    {
+        $this->actingAs('member');
+
+        $page = $this->go('?act=ucp&what=sounds');
+
+        DOMAssert::assertSelectCount('input[name=soundShout][checked]', 1, $page);
+    }
+
+    public function testSoundSettingsSave(): void
+    {
+        $this->actingAs('member');
+
+        $page = $this->go(new Request(
+            get: ['act' => 'ucp', 'what' => 'sounds'],
+            post: [
+                // clear all checkboxes
+                'submit' => 'true',
+            ]
+        ));
+
+        DOMAssert::assertSelectCount('input[name=soundShout][checked]', 0, $page);
+    }
+
+    public function testBoardCustomization(): void
+    {
+        $this->actingAs('member');
+
+        $page = $this->go('?act=ucp&what=board');
+
+        DOMAssert::assertSelectCount('select[name=skin]', 1, $page);
+        DOMAssert::assertSelectCount('input[name=usewordfilter][checked]', 1, $page);
+        DOMAssert::assertSelectCount('input[name=wysiwyg][checked]', 1, $page);
+    }
+
+    public function testBoardCustomizationSave(): void
+    {
+        $this->actingAs('member');
+
+        $page = $this->go(new Request(
+            get: ['act' => 'ucp', 'what' => 'board'],
+            post: [
+                'skin' => '1',
+                // clear all checkboxes
+                'submit' => 'true',
+            ]
+        ));
+
+        DOMAssert::assertSelectCount('select[name=skin]', 1, $page);
+        DOMAssert::assertSelectCount('input[name=usewordfilter][checked]', 0, $page);
+        DOMAssert::assertSelectCount('input[name=wysiwyg][checked]', 0, $page);
+    }
 }

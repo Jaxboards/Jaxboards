@@ -341,7 +341,7 @@ final readonly class UCP
             }
         }
 
-        $avatarURL = $avatar ?: $this->template->meta('default-avatar');
+        $avatarURL = $avatar ?: trim($this->template->meta('default-avatar'));
         $locationForForm = $this->getlocationforform();
         $errorDisplay = $error !== null ? $this->page->error($error) : '';
         $avatarInputValue = $this->textFormatting->blockhtml($avatar);
