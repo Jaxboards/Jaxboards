@@ -270,33 +270,6 @@ final class UCPTest extends FeatureTestCase
         $this->assertEquals($birthdate->year, 2000);
     }
 
-    private function getProfileFormData(): array
-    {
-        return [
-            'displayName' => 'DisplayName',
-            'full_name' => 'Full Name',
-            'usertitle' => 'User Title',
-            'about' => 'About me',
-            'location' => 'Location',
-            'gender' => 'male',
-            'dob_month' => '1',
-            'dob_day' => '1',
-            'dob_year' => '2000',
-            'contactSkype' => 'Skype',
-            'contactDiscord' => 'Discord',
-            'contactYIM' => 'YIM',
-            'contactMSN' => 'MSN',
-            'contactGoogleChat' => 'GoogleChat',
-            'contactAIM' => 'AIM',
-            'contactYoutube' => 'Youtube',
-            'contactSteam' => 'Steam',
-            'contactTwitter' => 'Twitter',
-            'contactBlueSky' => 'BlueSky',
-            'website' => 'http://google.com',
-            'submit' => 'Save Profile Settings',
-        ];
-    }
-
     public function testAvatarSettings(): void
     {
         $this->actingAs('member');
@@ -312,7 +285,7 @@ final class UCPTest extends FeatureTestCase
 
         $page = $this->go(new Request(
             get: ['act' => 'ucp', 'what' => 'avatar'],
-            post: ['changedava' => 'http://jaxboards.com']
+            post: ['changedava' => 'http://jaxboards.com'],
         ));
 
         DOMAssert::assertSelectCount('.avatar img[src="http://jaxboards.com"]', 1, $page);
@@ -336,7 +309,7 @@ final class UCPTest extends FeatureTestCase
             post: [
                 // clear all checkboxes
                 'submit' => 'true',
-            ]
+            ],
         ));
 
         DOMAssert::assertSelectCount('input[name=soundShout][checked]', 0, $page);
@@ -363,11 +336,38 @@ final class UCPTest extends FeatureTestCase
                 'skin' => '1',
                 // clear all checkboxes
                 'submit' => 'true',
-            ]
+            ],
         ));
 
         DOMAssert::assertSelectCount('select[name=skin]', 1, $page);
         DOMAssert::assertSelectCount('input[name=usewordfilter][checked]', 0, $page);
         DOMAssert::assertSelectCount('input[name=wysiwyg][checked]', 0, $page);
+    }
+
+    private function getProfileFormData(): array
+    {
+        return [
+            'displayName' => 'DisplayName',
+            'full_name' => 'Full Name',
+            'usertitle' => 'User Title',
+            'about' => 'About me',
+            'location' => 'Location',
+            'gender' => 'male',
+            'dob_month' => '1',
+            'dob_day' => '1',
+            'dob_year' => '2000',
+            'contactSkype' => 'Skype',
+            'contactDiscord' => 'Discord',
+            'contactYIM' => 'YIM',
+            'contactMSN' => 'MSN',
+            'contactGoogleChat' => 'GoogleChat',
+            'contactAIM' => 'AIM',
+            'contactYoutube' => 'Youtube',
+            'contactSteam' => 'Steam',
+            'contactTwitter' => 'Twitter',
+            'contactBlueSky' => 'BlueSky',
+            'website' => 'http://google.com',
+            'submit' => 'Save Profile Settings',
+        ];
     }
 }
