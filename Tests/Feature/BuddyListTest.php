@@ -26,7 +26,7 @@ use Jax\Models\Member;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
-use Jax\Page\Calendar;
+use Jax\Page\BuddyList;
 use Jax\Page\TextRules;
 use Jax\Request;
 use Jax\RequestStringGetter;
@@ -36,44 +36,47 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use Jax\UsersOnline;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversFunction;
-use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
+
+use function array_find;
+use function json_decode;
 
 /**
  * @internal
  */
-#[CoversClass('Jax\App')]
-#[CoversClass('Jax\Attributes\Column')]
-#[CoversClass('Jax\Attributes\ForeignKey')]
-#[CoversClass('Jax\Attributes\Key')]
-#[CoversClass('Jax\BBCode')]
-#[CoversClass('Jax\BotDetector')]
-#[CoversClass('Jax\Config')]
-#[CoversClass('Jax\Database')]
-#[CoversClass('Jax\DatabaseUtils')]
-#[CoversClass('Jax\DatabaseUtils\SQLite')]
-#[CoversClass('Jax\Date')]
-#[CoversClass('Jax\DebugLog')]
-#[CoversClass('Jax\DomainDefinitions')]
-#[CoversClass('Jax\IPAddress')]
-#[CoversClass('Jax\Jax')]
-#[CoversClass('Jax\Model')]
-#[CoversClass('Jax\Modules\PrivateMessage')]
-#[CoversClass('Jax\Modules\Shoutbox')]
-#[CoversClass('Jax\Page')]
-#[CoversClass('Jax\Page\BuddyList')]
-#[CoversClass('Jax\Page\TextRules')]
-#[CoversClass('Jax\Request')]
-#[CoversClass('Jax\RequestStringGetter')]
-#[CoversClass('Jax\Router')]
-#[CoversClass('Jax\ServiceConfig')]
-#[CoversClass('Jax\Session')]
-#[CoversClass('Jax\Template')]
-#[CoversClass('Jax\TextFormatting')]
-#[CoversClass('Jax\User')]
-#[CoversClass('Jax\UsersOnline')]
+#[CoversClass(App::class)]
+#[CoversClass(Column::class)]
+#[CoversClass(ForeignKey::class)]
+#[CoversClass(Key::class)]
+#[CoversClass(BBCode::class)]
+#[CoversClass(BotDetector::class)]
+#[CoversClass(Config::class)]
+#[CoversClass(Database::class)]
+#[CoversClass(DatabaseUtils::class)]
+#[CoversClass(SQLite::class)]
+#[CoversClass(Date::class)]
+#[CoversClass(DebugLog::class)]
+#[CoversClass(DomainDefinitions::class)]
+#[CoversClass(IPAddress::class)]
+#[CoversClass(Jax::class)]
+#[CoversClass(Model::class)]
+#[CoversClass(PrivateMessage::class)]
+#[CoversClass(Shoutbox::class)]
+#[CoversClass(Page::class)]
+#[CoversClass(BuddyList::class)]
+#[CoversClass(TextRules::class)]
+#[CoversClass(Request::class)]
+#[CoversClass(RequestStringGetter::class)]
+#[CoversClass(Router::class)]
+#[CoversClass(ServiceConfig::class)]
+#[CoversClass(Session::class)]
+#[CoversClass(Template::class)]
+#[CoversClass(TextFormatting::class)]
+#[CoversClass(User::class)]
+#[CoversClass(UsersOnline::class)]
 #[CoversFunction('Jax\pathjoin')]
 final class BuddyListTest extends FeatureTestCase
 {
@@ -95,7 +98,7 @@ final class BuddyListTest extends FeatureTestCase
 
         $this->assertContainsEquals(['softurl'], $json);
 
-        $window = array_find($json, fn($cmd) => $cmd[0] === 'window');
+        $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         $this->assertEquals('buddylist', $window[1]['id']);
         $this->assertEquals('Buddies', $window[1]['title']);
     }
@@ -113,7 +116,7 @@ final class BuddyListTest extends FeatureTestCase
 
         $this->assertContainsEquals(['softurl'], $json);
 
-        $window = array_find($json, fn($cmd) => $cmd[0] === 'window');
+        $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         $this->assertEquals('buddylist', $window[1]['id']);
         $this->assertEquals('Buddies', $window[1]['title']);
         $this->assertStringContainsString('Admin', $window[1]['content']);
@@ -137,7 +140,7 @@ final class BuddyListTest extends FeatureTestCase
 
         $this->assertContainsEquals(['softurl'], $json);
 
-        $window = array_find($json, fn($cmd) => $cmd[0] === 'window');
+        $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         $this->assertEquals('buddylist', $window[1]['id']);
         $this->assertEquals('Buddies', $window[1]['title']);
         $this->assertStringNotContainsString('Admin', $window[1]['content']);
