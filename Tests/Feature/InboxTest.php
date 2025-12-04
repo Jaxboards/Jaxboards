@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
 use Jax\Models\Message;
@@ -7,7 +9,12 @@ use Jax\Request;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
-class InboxTest extends FeatureTestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class InboxTest extends FeatureTestCase
 {
     public function testInboxNoMessages(): void
     {

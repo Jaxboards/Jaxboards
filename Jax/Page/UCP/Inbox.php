@@ -382,7 +382,7 @@ final readonly class Inbox
         $requestPage = max(1, (int) $this->request->asString->both('page'));
         $numMessages = $this->fetchMessageCount($view);
 
-        $pages = $numMessages ? 'Pages: ' : '';
+        $pages = $numMessages !== 0 ? 'Pages: ' : '';
         $pageNumbers = $this->jax->pages(
             (int) ceil($numMessages / self::MESSAGES_PER_PAGE),
             $requestPage,
