@@ -81,8 +81,6 @@ final class LogRegTest extends FeatureTestCase
 
     public function testRegistrationForm(): void
     {
-        $this->actingAs('guest');
-
         $page = $this->go('?act=logreg1');
 
         DOMAssert::assertSelectEquals('.box.register', 'Registration', 1, $page);
