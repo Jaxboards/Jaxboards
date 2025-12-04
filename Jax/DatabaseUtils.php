@@ -7,26 +7,22 @@ namespace Jax;
 use Jax\DatabaseUtils\DatabaseAdapter;
 use Jax\DatabaseUtils\MySQL;
 use Jax\DatabaseUtils\SQLite;
-use Jax\Models\Activity;
-use Jax\Models\Badge;
-use Jax\Models\BadgeAssociation;
 use Jax\Models\Category;
-use Jax\Models\File;
 use Jax\Models\Forum;
 use Jax\Models\Group;
-use Jax\Models\Member;
-use Jax\Models\Message;
-use Jax\Models\Page;
 use Jax\Models\Post;
-use Jax\Models\ProfileComment;
-use Jax\Models\RatingNiblet;
-use Jax\Models\Session;
-use Jax\Models\Shout;
 use Jax\Models\Skin;
 use Jax\Models\Stats;
-use Jax\Models\TextRule;
-use Jax\Models\Token;
 use Jax\Models\Topic;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+
+use function is_dir;
+use function mb_strlen;
+use function mb_substr;
+use function str_replace;
+
+use const DIRECTORY_SEPARATOR;
 
 final readonly class DatabaseUtils implements DatabaseAdapter
 {
@@ -41,6 +37,46 @@ final readonly class DatabaseUtils implements DatabaseAdapter
     {
         $adapterClass = self::ADAPTERS[$database->driver];
         $this->databaseAdapter = new $adapterClass($database);
+    }
+
+    /**
+     * Discover model classes under the `Jax\\Models` directory.
+     *
+     * Returns fully-qualified class names like `Jax\\Models\\Post`.
+     */
+    public static function getModels(): array
+    {
+        static $modelClassesCache = null;
+        if ($modelClassesCache !== null) {
+            return $modelClassesCache;
+        }
+
+        $modelsDir = __DIR__ . '/Models';
+        if (!is_dir($modelsDir)) {
+            return $modelClassesCache = [];
+        }
+
+        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($modelsDir));
+        $modelClassesCache = [];
+
+        foreach ($rii as $file) {
+            if ($file->isDir()) {
+                continue;
+            }
+
+            $realPath = $file->getRealPath();
+            if ($realPath === false) {
+                continue;
+            }
+
+            $relative = mb_substr((string) $realPath, mb_strlen($modelsDir) + 1);
+            $relative = str_replace(DIRECTORY_SEPARATOR, '\\', $relative);
+            $relative = mb_substr($relative, 0, -4);
+            // strip .php
+            $modelClassesCache[] = __NAMESPACE__ . '\Models\\' . $relative;
+        }
+
+        return $modelClassesCache;
     }
 
     public function install(): void
@@ -64,46 +100,6 @@ final readonly class DatabaseUtils implements DatabaseAdapter
     public function createTableQueryFromModel(Model $model): string
     {
         return $this->databaseAdapter->createTableQueryFromModel($model);
-    }
-
-    /**
-     * Discover model classes under the `Jax\\Models` directory.
-     *
-     * Returns fully-qualified class names like `Jax\\Models\\Post`.
-     */
-    public static function getModels(): array
-    {
-        static $modelClassesCache = null;
-        if ($modelClassesCache !== null) {
-            return $modelClassesCache;
-        }
-
-        $modelsDir = __DIR__ . '/Models';
-        if (!is_dir($modelsDir)) {
-            return $modelClassesCache = [];
-        }
-
-        $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($modelsDir));
-        $modelClassesCache = [];
-
-        foreach ($rii as $file) {
-            if ($file->isDir()) {
-                continue;
-            }
-
-            $realPath = $file->getRealPath();
-            if ($realPath === false) {
-                continue;
-            }
-
-            $relative = substr($realPath, strlen($modelsDir) + 1);
-            $relative = str_replace(DIRECTORY_SEPARATOR, '\\', $relative);
-            $relative = substr($relative, 0, -4); // strip .php
-
-            $modelClassesCache[] = __NAMESPACE__ . '\\Models\\' . $relative;
-        }
-
-        return $modelClassesCache;
     }
 
     private function insertInitialRecords(): void
