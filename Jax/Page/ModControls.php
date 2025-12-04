@@ -65,10 +65,12 @@ final readonly class ModControls
                     'alert',
                     'Your account does not have moderator permissions.',
                 );
+
                 return;
             }
 
             $this->page->location('?');
+
             return;
         }
 
@@ -141,8 +143,9 @@ final readonly class ModControls
         );
     }
 
-    private function showModCP(string $cppage = 'Choose an option on the left.'): void
-    {
+    private function showModCP(
+        string $cppage = 'Choose an option on the left.',
+    ): void {
         if (!$this->user->getGroup()?->canModerate) {
             return;
         }

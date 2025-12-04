@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Jax\ModControls\ModPosts;
-use Jax\ModControls\ModTopics;
-use Jax\Page\ModControls;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -22,10 +19,13 @@ use Jax\DebugLog;
 use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\ModControls\ModPosts;
+use Jax\ModControls\ModTopics;
 use Jax\Model;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
+use Jax\Page\ModControls;
 use Jax\Page\TextRules;
 use Jax\Request;
 use Jax\RequestStringGetter;
@@ -43,7 +43,6 @@ use Tests\FeatureTestCase;
 /**
  * @internal
  */
-
 #[CoversClass(App::class)]
 #[CoversClass(Column::class)]
 #[CoversClass(ForeignKey::class)]
@@ -116,8 +115,8 @@ final class ModCPTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: [ 'act' => 'modcontrols', 'do' => 'emem'],
-            post: ['mid' => '1', 'submit' => 'showform']
+            get: ['act' => 'modcontrols', 'do' => 'emem'],
+            post: ['mid' => '1', 'submit' => 'showform'],
         ));
 
         DOMAssert::assertSelectCount('input[name=displayName][value=Admin]', 1, $page);
@@ -128,13 +127,13 @@ final class ModCPTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: [ 'act' => 'modcontrols', 'do' => 'emem'],
+            get: ['act' => 'modcontrols', 'do' => 'emem'],
             post: [
                 'mid' => '1',
                 'displayName' => 'New Name',
                 'signature' => 'New signature',
-                'submit' => 'save'
-            ]
+                'submit' => 'save',
+            ],
         ));
 
         DOMAssert::assertSelectEquals('.success', 'Profile information saved.', 1, $page);
@@ -159,7 +158,7 @@ final class ModCPTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('.modcppage .minibox .content', '--No Data--', 3, $page);
     }
 
-        public function testIPTools(): void
+    public function testIPTools(): void
     {
         $this->actingAs('admin');
 
@@ -167,5 +166,4 @@ final class ModCPTest extends FeatureTestCase
 
         DOMAssert::assertSelectCount('input[name=ip]', 1, $page);
     }
-
 }
