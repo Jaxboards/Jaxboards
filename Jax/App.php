@@ -20,6 +20,7 @@ use function microtime;
 use function pathinfo;
 use function round;
 
+use const JSON_FORCE_OBJECT;
 use const JSON_OBJECT_AS_ARRAY;
 use const JSON_THROW_ON_ERROR;
 use const PATHINFO_FILENAME;
@@ -350,7 +351,7 @@ final readonly class App
 
         $this->page->append(
             'SCRIPT',
-            '<script>window.globalSettings=' . json_encode($globalSettings, JSON_FORCE_OBJECT) . '</script>'
+            '<script>window.globalSettings=' . json_encode($globalSettings, JSON_FORCE_OBJECT) . '</script>',
         );
 
         if ($this->user->isGuest()) {

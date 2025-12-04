@@ -20,6 +20,9 @@ use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use function DI\autowire;
 use function parse_str;
 use function parse_url;
+use function password_hash;
+
+use const PASSWORD_DEFAULT;
 
 /**
  * @internal

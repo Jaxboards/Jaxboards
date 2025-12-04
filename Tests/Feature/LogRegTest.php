@@ -104,7 +104,7 @@ final class LogRegTest extends FeatureTestCase
                 'pass1' => 'password',
                 'pass2' => 'password',
                 'email' => 'test@test.com',
-            ]
+            ],
         ));
 
         $this->assertRedirect('/', $page);
@@ -143,7 +143,7 @@ final class LogRegTest extends FeatureTestCase
             post: [
                 'user' => 'Admin',
                 'pass' => 'password',
-            ]
+            ],
         ));
 
         $this->assertRedirect('?', $page);
