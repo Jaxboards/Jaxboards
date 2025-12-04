@@ -339,6 +339,20 @@ final readonly class App
         );
         $this->template->addVar('boardname', $this->config->getSetting('boardname'));
 
+        $globalSettings = $this->user->isGuest() ? [] : [
+            'canIM' => $this->user->getGroup()?->canIM,
+            'groupID' => $this->user->get()->groupID,
+            'soundIM' => $this->user->get()->soundIM,
+            'userID' => $this->user->get()->id,
+            'username' => $this->user->get()->displayName,
+            'wysiwyg' => $this->user->get()->wysiwyg,
+        ];
+
+        $this->page->append(
+            'SCRIPT',
+            '<script>window.globalSettings=' . json_encode($globalSettings, JSON_FORCE_OBJECT) . '</script>'
+        );
+
         if ($this->user->isGuest()) {
             return;
         }
@@ -349,19 +363,5 @@ final readonly class App
         $this->template->addVar('avatar', $this->user->get()->avatar ?: $this->template->meta('default-avatar'));
         $this->template->addVar('username', $this->user->get()->displayName);
         $this->template->addVar('userid', (string) $this->user->get()->id ?: '0');
-
-        $this->page->append(
-            'SCRIPT',
-            '<script>window.globalSettings='
-            . json_encode([
-                'canIM' => $this->user->getGroup()?->canIM,
-                'groupID' => $this->user->get()->groupID,
-                'soundIM' => $this->user->get()->soundIM,
-                'userID' => $this->user->get()->id,
-                'username' => $this->user->get()->displayName,
-                'wysiwyg' => $this->user->get()->wysiwyg,
-            ])
-            . '</script>',
-        );
     }
 }
