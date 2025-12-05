@@ -93,9 +93,7 @@ export function supportsEmoji(): boolean {
         );
         element.appendChild(document.createTextNode(character));
         const width = element.offsetWidth;
-        if (element.parentNode) {
-            element.parentNode.removeChild(element);
-        }
+        element.remove();
 
         return width;
     });

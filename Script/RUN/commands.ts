@@ -104,17 +104,16 @@ export default {
         }
     },
     addshout(message: string) {
-        const ss = Array.from(
+        const shouts = Array.from(
             document.querySelectorAll<HTMLDivElement>('#shoutbox .shout'),
         );
-        let x;
         const span = document.createElement('span');
         span.innerHTML = message;
-        const div = span.firstChild;
-        ss[0].parentNode?.insertBefore(div, ss[0]);
-        while (ss.length > globalSettings.shoutLimit - 1) {
-            x = ss.pop();
-            x.parentNode.removeChild(x);
+        const div = span.firstElementChild;
+        if (!div) return;
+        shouts[0].parentNode?.insertBefore(div, shouts[0]);
+        while (shouts.length > globalSettings.shoutLimit - 1) {
+            shouts.pop()?.remove();
         }
         new Animation(div).dehighlight().play();
         if (globalSettings.soundShout) {

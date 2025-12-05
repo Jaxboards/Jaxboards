@@ -15,6 +15,18 @@ export default class Editor {
 
     element: HTMLTextAreaElement;
 
+    colorWindow?: HTMLTableElement;
+
+    doc?: Document;
+
+    htmlMode: boolean = false;
+
+    editbar?: HTMLDivElement;
+
+    emoteWindow?: HTMLDivElement;
+
+    window?: Window;
+
     static selector(container: HTMLElement): void {
         container
             .querySelectorAll<HTMLTextAreaElement>('textarea.bbcode-editor')
@@ -39,10 +51,14 @@ export default class Editor {
 
         iframe.className = 'editorframe';
         // 1 for html editing mode, 0 for textarea mode
-        this.mode = Browser.mobile || Browser.n3ds ? 0 : globalSettings.wysiwyg;
-        this.mode = this.mode || 0;
-        this.window = iframe.contentWindow;
-        this.doc = iframe.contentWindow.document;
+        this.htmlMode =
+            Browser.mobile || Browser.n3ds ? false : globalSettings.wysiwyg;
+        this.window = iframe.contentWindow || undefined;
+        this.doc = iframe.contentWindow?.document;
+
+        if (!this.doc) {
+            return;
+        }
 
         const cs = getComputedStyle(element);
         const body = this.doc.getElementsByTagName('body')[0];
@@ -54,8 +70,7 @@ export default class Editor {
 
         this.doc.designMode = 'on';
 
-        this.editbar = document.createElement('div');
-        this.buildEditBar();
+        this.editbar = this.buildEditBar();
 
         iframe.style.height = `${element.clientHeight}px`;
 
@@ -65,12 +80,13 @@ export default class Editor {
         this.setSource('<div></div>');
         setTimeout(() => {
             this.setSource(bbcodeToHTML(element.value));
-            this.switchMode(this.mode);
+            this.switchMode(this.htmlMode);
         }, 100);
     }
 
-    buildEditBar() {
-        this.editbar.className = 'editbar';
+    buildEditBar(): HTMLDivElement {
+        const editbar = document.createElement('div');
+        editbar.className = 'editbar';
         const cmds = [
             'bold',
             'italic',
@@ -117,18 +133,19 @@ export default class Editor {
             'Switch editor mode',
         ];
 
-        cmds.forEach((cmd, i) => {
+        for (let i = 0; i < cmds.length; i += 1) {
             const a = document.createElement('a');
-            a.className = cmd;
+            a.className = cmds[i];
             a.title = cmddesc[i];
             a.href = 'javascript:void(0)';
-            a.unselectable = 'on';
-            a.onclick = (event) => this.editbarCommand(event, cmd);
-            this.editbar.appendChild(a);
-        });
+            a.onclick = (event: MouseEvent) =>
+                this.editbarCommand(event, cmds[i]);
+            editbar.appendChild(a);
+        }
+        return editbar;
     }
 
-    editbarCommand(event, cmd) {
+    editbarCommand(event: MouseEvent, cmd: string) {
         event.preventDefault();
 
         switch (cmd) {
@@ -140,7 +157,7 @@ export default class Editor {
                 this.showEmotes(event.pageX, event.pageY);
                 break;
             case 'c_switcheditmode':
-                this.switchMode(Math.abs(this.mode - 1));
+                this.switchMode(!this.htmlMode);
                 break;
             default:
                 this.cmd(cmd);
@@ -148,7 +165,7 @@ export default class Editor {
         }
     }
 
-    showEmotes(x, y) {
+    showEmotes(x: number, y: number) {
         const emotewin = this.emoteWindow;
         if (!emotewin) {
             new Ajax().load('/api/?act=emotes', {
@@ -172,12 +189,12 @@ export default class Editor {
         }
     }
 
-    createEmoteWindow(xml, position) {
+    createEmoteWindow(xml: XMLHttpRequest, position: { x: number; y: number }) {
         const [smileyText, images] = JSON.parse(xml.responseText);
         const emotewin = document.createElement('div');
         emotewin.className = 'emotewin';
 
-        smileyText.forEach((smiley, i) => {
+        smileyText.forEach((smiley: string, i: number) => {
             const image = images[i];
             const link = document.createElement('a');
             link.href = 'javascript:void(0)';
@@ -192,16 +209,16 @@ export default class Editor {
         emotewin.style.position = 'absolute';
         emotewin.style.display = 'none';
         this.emoteWindow = emotewin;
-        document.querySelector('#page').appendChild(emotewin);
+        document.querySelector('#page')?.appendChild(emotewin);
         this.showEmotes(position.x, position.y);
     }
 
-    colorHandler(cmd, color) {
+    colorHandler(cmd: string, color: string) {
         this.cmd(cmd, color);
         this.hideColors();
     }
 
-    showColors(posx, posy, cmd) {
+    showColors(posx: number, posy: number, cmd: string) {
         // close the color window if it is already open
         this.hideColors();
         const colors = [
@@ -236,7 +253,7 @@ export default class Editor {
                     continue;
                 }
                 c.style.border = '1px solid #000';
-                c.style.padding = 0;
+                c.style.padding = '0px';
                 const a = document.createElement('a');
                 a.href = 'javascript:void(0)';
                 a.onclick = () => this.colorHandler(cmd, color);
@@ -251,23 +268,23 @@ export default class Editor {
             }
         }
         this.colorWindow = colorwin;
-        document.querySelector('#page').appendChild(colorwin);
+        document.querySelector('#page')?.appendChild(colorwin);
         return null;
     }
 
     hideColors() {
         if (this.colorWindow) {
-            this.colorWindow.parentNode.removeChild(this.colorWindow);
+            this.colorWindow.remove();
             this.colorWindow = undefined;
         }
     }
 
-    cmd(command, arg) {
+    cmd(command: string, arg?: string) {
         let rng;
         const selection = this.getSelection();
-        let bbcode;
+        let bbcode = '';
         let realCommand = command;
-        let arg1 = arg;
+        let arg1 = arg || '';
         switch (command.toLowerCase()) {
             case 'bold':
                 bbcode = `[b]${selection}[/b]`;
@@ -291,7 +308,7 @@ export default class Editor {
                 bbcode = `[align=left]${selection}[/align]`;
                 break;
             case 'insertimage':
-                arg1 = prompt('Image URL:');
+                arg1 = prompt('Image URL:') || '';
                 if (!arg1) {
                     return;
                 }
@@ -302,24 +319,24 @@ export default class Editor {
                 bbcode = `[img]${arg1}[/img]`;
                 break;
             case 'insertorderedlist':
-                if (!this.mode) {
+                if (!this.htmlMode) {
                     bbcode = `[ol]${selection.replaceAll(/(.+([\r\n]+|$))/i, '*$1')}[/ol]`;
                 }
                 break;
             case 'insertunorderedlist':
-                if (!this.mode) {
+                if (!this.htmlMode) {
                     bbcode = `[ul]${selection.replaceAll(/(.+([\r\n]+|$))/i, '*$1')}[/ul]`;
                 }
                 break;
             case 'createlink':
-                arg1 = prompt('Link:');
+                arg1 = prompt('Link:') || '';
                 if (!arg1) return;
                 if (!arg1.match(/^(https?|ftp|mailto):/))
                     arg1 = `https://${arg1}`;
                 bbcode = `[url=${arg1}]${selection}[/url]`;
                 break;
             case 'c_email':
-                arg1 = prompt('Email:');
+                arg1 = prompt('Email:') || '';
                 if (!arg1) return;
                 realCommand = 'createlink';
                 arg1 = `mailto:${arg1}`;
@@ -341,7 +358,7 @@ export default class Editor {
                 break;
             case 'c_quote':
                 realCommand = 'inserthtml';
-                arg1 = prompt('Who said this?');
+                arg1 = prompt('Who said this?') || '';
                 arg1 = `[quote${arg1 ? `=${arg1}` : ''}]${selection}[/quote]`;
                 bbcode = arg1;
                 break;
@@ -352,7 +369,7 @@ export default class Editor {
                 break;
             case 'c_youtube':
                 realCommand = 'inserthtml';
-                arg1 = prompt('Video URL?');
+                arg1 = prompt('Video URL?') || '';
                 if (!arg1) {
                     return;
                 }
@@ -365,9 +382,9 @@ export default class Editor {
             default:
                 throw new Error(`Unsupported editor command ${command}`);
         }
-        if (this.mode) {
+        if (this.htmlMode) {
             if (realCommand === 'inserthtml' && Browser.ie) {
-                rng = this.doc.selection.createRange();
+                rng = this.doc?.selection.createRange();
                 if (!rng.text.length) this.doc.body.innerHTML += arg1;
                 else {
                     rng.pasteHTML(arg1);
@@ -383,9 +400,9 @@ export default class Editor {
         } else replaceSelection(this.element, bbcode);
     }
 
-    getSelection() {
-        if (this.mode) {
-            return this.window.getSelection();
+    getSelection(): string {
+        if (this.htmlMode) {
+            return this.window?.getSelection()?.toString() || '';
         }
         return this.element.value.substring(
             this.element.selectionStart,
@@ -393,18 +410,18 @@ export default class Editor {
         );
     }
 
-    getSource() {
-        return this.doc.body.innerHTML;
+    getSource(): string | undefined {
+        return this.doc?.body.innerHTML;
     }
 
-    setSource(a) {
-        if (this.doc && this.doc.body) this.doc.body.innerHTML = a;
+    setSource(innerHTML: string) {
+        if (this.doc && this.doc.body) this.doc.body.innerHTML = innerHTML;
     }
 
-    switchMode(toggle) {
+    switchMode(htmlMode: boolean) {
         const { element, iframe } = this;
-        if (!toggle) {
-            element.value = htmlToBBCode(this.getSource());
+        if (!htmlMode) {
+            element.value = htmlToBBCode(this.getSource() || '');
             element.style.display = '';
             iframe.style.display = 'none';
         } else {
@@ -412,13 +429,13 @@ export default class Editor {
             element.style.display = 'none';
             iframe.style.display = '';
         }
-        this.mode = toggle;
+        this.htmlMode = htmlMode;
     }
 
     submit() {
-        if (this.mode) {
-            this.switchMode(0);
-            this.switchMode(1);
+        if (this.htmlMode) {
+            this.switchMode(false);
+            this.switchMode(true);
         }
     }
 }

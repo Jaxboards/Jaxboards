@@ -26,19 +26,19 @@ export function isChildOf(a: HTMLElement, b: HTMLElement) {
     return b.contains(a);
 }
 
-export function insertBefore(a: Node, b: Node) {
-    if (a.parentNode) a.parentNode.removeChild(a);
+export function insertBefore(a: Element, b: Element) {
+    a.remove();
     b.parentNode?.insertBefore(a, b);
 }
 
-export function insertAfter(a: Node, b: Node) {
-    if (a.parentNode) a.parentNode.removeChild(a);
+export function insertAfter(a: Element, b: Element) {
+    a.remove();
     b.parentNode?.insertBefore(a, b.nextSibling);
 }
 
-export function replace(a: HTMLElement, b: HTMLElement) {
+export function replace(a: Element, b: Element) {
     insertBefore(b, a);
-    if (a.parentNode) a.parentNode.removeChild(a);
+    a.remove();
 }
 
 export function getHighestZIndex() {

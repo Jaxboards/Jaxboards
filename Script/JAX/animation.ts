@@ -6,7 +6,7 @@ import { getComputedStyle } from './el';
  * It should be replaced.
  */
 class Animation {
-    private el: HTMLElement;
+    private el: Element;
 
     private delay: number;
 
@@ -23,12 +23,12 @@ class Animation {
     private lineup: Array<
         Array<
             (
-                el: HTMLElement,
+                el: Element,
             ) => void | [string, string | number, string | number]
         >
     >;
 
-    constructor(el: HTMLElement, steps = 30, delay = 20, loop = 0) {
+    constructor(el: Element, steps = 30, delay = 20, loop = 0) {
         this.el = el;
         this.steps = steps;
         this.delay = delay;
@@ -123,7 +123,7 @@ class Animation {
     }
 
     andThen(
-        what: string | ((el: HTMLElement) => void),
+        what: string | ((el: Element) => void),
         from = undefined,
         to = undefined,
         steps = undefined,
