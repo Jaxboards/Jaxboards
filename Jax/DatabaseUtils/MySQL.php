@@ -74,13 +74,18 @@ final readonly class MySQL implements DatabaseAdapter
             $keys[] = "{$fulltext}KEY {$fieldName} ({$fieldName})";
         }
 
-        return "CREATE TABLE {$tableQuoted} (" . PHP_EOL
-            . '  ' . implode(',' . PHP_EOL . '  ', array_merge(
-                $fields,
-                $keys,
-                $constraints,
-            )) . PHP_EOL
-        . ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
+        return implode(
+            "\n",
+            [
+                "CREATE TABLE {$tableQuoted} (",
+                '    ' . implode(",\n    ", array_merge(
+                    $fields,
+                    $keys,
+                    $constraints,
+                )),
+                ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+            ]
+            );
     }
 
     public function install(): void
