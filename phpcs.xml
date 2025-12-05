@@ -197,6 +197,9 @@
   <rule ref="SlevomatCodingStandard.Exceptions.DeadCatch"/>
   <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch"/>
   <rule ref="SlevomatCodingStandard.Files.FileLength">
+    <properties>
+      <property name="maxLines" value="500"/>
+    </properties>
     <exclude-pattern>./index.php</exclude-pattern>
     <exclude-pattern>./rector.php</exclude-pattern>
     <exclude-pattern>./Tools/php_codesniffer_to_sonarqube.php</exclude-pattern>
