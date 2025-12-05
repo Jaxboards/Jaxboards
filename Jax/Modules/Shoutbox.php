@@ -57,18 +57,18 @@ final class Shoutbox
 
         $this->shoutlimit = (int) ($this->config->getSetting('shoutbox_num') ?? 5);
         $shoutboxDelete = (int) $this->request->both('shoutbox_delete');
+        $shoutboxShout = trim($this->request->asString->post('shoutbox_shout') ?? '');
+
+        if ($shoutboxShout !== '') {
+            $this->addShout($shoutboxShout);
+        }
+
         if ($shoutboxDelete !== 0) {
             $this->deleteShout($shoutboxDelete);
         } elseif (
             $this->request->both('module') === 'shoutbox'
         ) {
             $this->showAllShouts();
-        }
-
-        if (
-            trim($this->request->asString->post('shoutbox_shout') ?? '') !== ''
-        ) {
-            $this->addShout();
         }
 
         if (!$this->request->isJSAccess()) {
@@ -304,10 +304,9 @@ final class Shoutbox
         );
     }
 
-    public function addShout(): void
+    public function addShout(string $shoutBody): void
     {
         $this->session->act();
-        $shoutBody = $this->request->asString->post('shoutbox_shout') ?? '';
         $shoutBody = $this->textFormatting->linkify($shoutBody);
 
         $error = match (true) {

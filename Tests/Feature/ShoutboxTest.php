@@ -110,4 +110,28 @@ final class ShoutboxTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('#shoutbox .shouts .shout .user2', 'Member', 1, $page);
         DOMAssert::assertSelectEquals('#shoutbox .shouts .shout', 'hello world!', 1, $page);
     }
+
+    public function testMeCommand(): void
+    {
+        $this->actingAs('member');
+
+        $page = $this->go(new Request(
+            post: ['shoutbox_shout' => '/me did some stuff just now'],
+        ));
+
+        DOMAssert::assertSelectEquals('#shoutbox .shouts .shout .user2', 'Member', 1, $page);
+        DOMAssert::assertSelectRegExp('#shoutbox .shouts .shout.action', '/did some stuff just now/', 1, $page);
+    }
+
+    public function testViewAllShouts(): void
+    {
+        $this->actingAs('member');
+
+        $page = $this->go(new Request(
+            get: ['module' => 'shoutbox'],
+            post: ['shoutbox_shout' => 'Howdy partner!'],
+        ));
+
+        DOMAssert::assertSelectEquals('.sbhistory .shout', 'Howdy partner!', 1, $page);
+    }
 }
