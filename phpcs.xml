@@ -198,7 +198,7 @@
   <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch"/>
   <rule ref="SlevomatCodingStandard.Files.FileLength">
     <properties>
-      <property name="maxLines" value="500"/>
+      <property name="maxLinesLength" value="500"/>
     </properties>
     <exclude-pattern>./index.php</exclude-pattern>
     <exclude-pattern>./rector.php</exclude-pattern>
