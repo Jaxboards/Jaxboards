@@ -204,6 +204,7 @@
     <exclude-pattern>./rector.php</exclude-pattern>
     <exclude-pattern>./Tools/php_codesniffer_to_sonarqube.php</exclude-pattern>
     <exclude-pattern>./Tools/phpmd_to_sonarqube.php</exclude-pattern>
+    <exclude-pattern>./Tests/</exclude-pattern>
   </rule>
   <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
   	<properties>
