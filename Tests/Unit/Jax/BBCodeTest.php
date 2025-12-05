@@ -1,0 +1,96 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Unit\Jax;
+
+use DI\Container;
+use Jax\BBCode;
+use Jax\Config;
+use Jax\Constants\Groups;
+use Jax\Database;
+use Jax\DomainDefinitions;
+use Jax\Jax;
+use Jax\Model;
+use Jax\Request;
+use Jax\RequestStringGetter;
+use Jax\ServiceConfig;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\UsesFunction;
+use Tests\UnitTestCase;
+
+use function array_keys;
+use function base64_decode;
+
+/**
+ * @internal
+ */
+#[CoversClass(BBCode::class)]
+#[Small]
+#[CoversClass('Jax\DomainDefinitions')]
+#[CoversClass('Jax\Request')]
+#[CoversClass('Jax\RequestStringGetter')]
+#[CoversClass('Jax\ServiceConfig')]
+#[CoversClass('Jax\Model')]
+#[CoversClass('Jax\Database')]
+#[CoversClass('Jax\DebugLog')]
+#[UsesFunction('\Jax\pathjoin')]
+final class BBCodeTest extends UnitTestCase
+{
+    private BBCode $bbcode;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Database is needed for attachment tag testing
+        $this->container->get(Database::class);
+        $this->bbcode = $this->container->get(BBCode::class);
+    }
+
+    public function testToHTML(): void
+    {
+        $testCases = [
+            '[b]bold[/b]' => '<strong>bold</strong>',
+            '[i]italic[/i]' => '<em>italic</em>',
+            '[u]underline[/u]' => '<span style="text-decoration:underline">underline</span>',
+            '[s]strikethrough[/s]' => '<span style="text-decoration:line-through">strikethrough</span>',
+            '[color=red]red text[/color]' => '<span style="color:red">red text</span>',
+            '[bg=#FFFF00]yellow background[/bg]' => '<span style="background:#FFFF00">yellow background</span>',
+            '[font=Arial]Arial font[/font]' => '<span style="font-family:Arial">Arial font</span>',
+            '[align=center]centered text[/align]' => '<p style="text-align:center">centered text</p>',
+            '[url]http://example.com[/url]' => '<a href="http://example.com">http://example.com</a>',
+            '[url=http://example.com]Example[/url]' => '<a href="http://example.com">Example</a>',
+            '[img]http://example.com/image.jpg[/img]' => '<img src="http://example.com/image.jpg" title="" alt="" class="bbcodeimg" />',
+            '[img=An image]http://example.com/image.jpg[/img]' => '<img src="http://example.com/image.jpg" title="An image" alt="An image" class="bbcodeimg" />',
+            '[h2]Header 2[/h2]' => '<h2>Header 2</h2>',
+            '[spoiler]hidden text[/spoiler]' => '<span class="spoilertext">hidden text</span>',
+            <<<BBCODE
+            [ul]
+            *Item 1
+            *Item 2
+            [/ul]
+            BBCODE => '<ul><li>Item 1</li><li>Item 2</li></ul>',
+            '[quote]quoted text[/quote]' => "<div class='quote'>quoted text</div>",
+            '[quote=Sean]quoted text[/quote]' => "<div class='quote'><div class='quotee'>Sean</div>quoted text</div>",
+            '[attachment]1[/attachment]' => '/Attachment doesn\'t exist/',
+            '[video]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/video]' => '/YouTube video player/',
+        ];
+
+        foreach ($testCases as $input => $output) {
+            if (str_starts_with($output, '/')) {
+                $this->assertMatchesRegularExpression(
+                    $output,
+                    $this->bbcode->toHTML($input),
+                );
+                continue;
+            }
+
+            $this->assertEquals(
+                $output,
+                $this->bbcode->toHTML($input),
+            );
+        }
+    }
+}
