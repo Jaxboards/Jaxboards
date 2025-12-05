@@ -62,8 +62,6 @@ abstract class FeatureTestCase extends PHPUnitTestCase
             'timetologout' => 900,
         ]));
 
-        $this->database = $this->container->get(Database::class);
-
         return parent::__construct($name);
     }
 
