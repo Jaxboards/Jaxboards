@@ -55,7 +55,7 @@ final readonly class Calendar
             $month,
         ] = explode(
             ' ',
-            Carbon::create(year: null, day: null, month: null, timezone: 'UTC')
+            Carbon::today('UTC')
                 ->addMonths($monthOffset)
                 ->format('w t F Y n'),
         );
