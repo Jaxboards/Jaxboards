@@ -22,9 +22,7 @@ class Animation {
 
     private lineup: Array<
         Array<
-            (
-                el: Element,
-            ) => void | [string, string | number, string | number]
+            (el: Element) => void | [string, string | number, string | number]
         >
     >;
 
