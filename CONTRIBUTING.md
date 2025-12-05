@@ -113,3 +113,11 @@ And run this in the Jaxboards directory to run the fixer tool on all files:
 ```bash
 npm run-script phpcbf
 ```
+
+### Tests
+
+All changes are run against our test suite through github actions, but if you want to run them yourself locally:
+
+```bash
+npm run-script test
+```
