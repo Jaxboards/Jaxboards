@@ -11,7 +11,12 @@ use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 use function DI\autowire;
 
-class TestCase extends PHPUnitTestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class TestCase extends PHPUnitTestCase
 {
     protected readonly Container $container;
 
