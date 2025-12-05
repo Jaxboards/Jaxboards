@@ -29,8 +29,12 @@ abstract class Model
 
     private bool $fromDatabase = false;
 
-    public function __construct()
+    public function __construct($properties = [])
     {
+        foreach ($properties as $property => $value) {
+            $this->{$property} = $value;
+        }
+
         $primaryKey = static::getPrimaryKey()?->name;
 
         if ($primaryKey !== null && !$this->{$primaryKey}) {

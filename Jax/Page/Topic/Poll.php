@@ -48,8 +48,9 @@ final readonly class Poll
     {
         $error = null;
         if ($this->user->isGuest()) {
-            $this->page->command('error', 'You must be logged in to vote!');
-
+            $error = 'You must be logged in to vote!';
+            $this->page->command('error', $error);
+            $this->page->append('PAGE', $this->page->error($error));
             return;
         }
 
@@ -100,7 +101,7 @@ final readonly class Poll
 
         if ($error !== null) {
             $this->page->command('error', $error);
-
+            $this->page->append('PAGE', $this->page->error($error));
             return;
         }
 
@@ -122,15 +123,6 @@ final readonly class Poll
 
         $topic->pollResults = implode(';', $presults);
         $topic->update();
-
-        $this->page->command(
-            'update',
-            '#poll .content',
-            $this->renderPollHTML(
-                $topic,
-            ),
-            '1',
-        );
     }
 
     private function renderPollHTML(Topic $topic): string

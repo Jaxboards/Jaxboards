@@ -99,13 +99,16 @@ final class Topic
             return;
         }
 
+        if ($this->request->both('votepoll') !== null) {
+            $this->poll->vote($topic);
+        }
+
         match (true) {
             $quickReply && !$this->request->isJSUpdate() => match (true) {
                 $this->request->isJSAccess() && !$this->request->isJSDirectLink() => $this->quickReplyForm($topic),
                 default => $this->page->location('?act=post&tid=' . $topic->id),
             },
             $ratePost !== 0 => $this->reactions->toggleReaction($ratePost, (int) $this->request->both('niblet')),
-            $this->request->both('votepoll') !== null => $this->poll->vote($topic),
             $findPost !== 0 => $this->findPost($topic, $findPost),
             $this->request->both('getlast') !== null => $this->getLastPost($topic->id),
             $edit !== 0 => $this->quickEditPost($topic, $edit),

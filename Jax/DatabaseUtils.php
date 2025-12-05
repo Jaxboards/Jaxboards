@@ -154,6 +154,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         $member->canViewStats = 1;
         $member->legend = 0;
         $member->canViewFullProfile = 1;
+        $member->canPoll = 1;
         $member->insert();
 
         $admin = new Group();
@@ -188,6 +189,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         $admin->canViewStats = 1;
         $admin->legend = 0;
         $admin->canViewFullProfile = 1;
+        $admin->canPoll = 1;
         $admin->insert();
 
         $guest = new Group();

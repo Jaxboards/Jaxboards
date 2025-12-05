@@ -184,14 +184,13 @@ final class InboxTest extends FeatureTestCase
 
     private function insertMessage(?array $messageProperties = []): void
     {
-        $message = new Message();
-        $message->from = 1;
-        $message->to = 1;
-        $message->title = 'Test Message';
-        $message->message = 'This is a test message.';
-        foreach ($messageProperties as $key => $value) {
-            $message->{$key} = $value;
-        }
+        $message = new Message([
+            'from' => 1,
+            'to' => 1,
+            'title' => 'Test Message',
+            'message' => 'This is a test message.',
+            ...$messageProperties,
+        ]);
 
         $message->insert();
     }
