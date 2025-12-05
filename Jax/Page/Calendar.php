@@ -36,11 +36,7 @@ final readonly class Calendar
             '?act=calendar' => 'Calendar',
         ]);
 
-        $month = is_numeric($this->request->both('month'))
-            ? (int) $this->request->both('month')
-            : (int) gmdate('n');
-
-        $this->monthView($month);
+        $this->monthView((int) $this->request->both('month'));
     }
 
     private function monthView(int $monthOffset): void
@@ -59,7 +55,8 @@ final readonly class Calendar
             $month,
         ] = explode(
             ' ',
-            Carbon::create(year: null, day: null, month: $monthOffset, timezone: 'UTC')
+            Carbon::create(year: null, day: null, month: null, timezone: 'UTC')
+                ->addMonths($monthOffset)
                 ->format('w t F Y n'),
         );
         $offset = (int) $offset;
