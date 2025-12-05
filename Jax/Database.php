@@ -74,9 +74,9 @@ class Database
     }
 
     public function connect(
-        string $host,
-        string $user,
-        string $password,
+        string $host = '',
+        string $user = '',
+        string $password = '',
         string $database = '',
         string $prefix = '',
         string $driver = '',

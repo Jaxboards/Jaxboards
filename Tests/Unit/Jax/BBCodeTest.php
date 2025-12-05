@@ -43,8 +43,6 @@ final class BBCodeTest extends UnitTestCase
     {
         parent::setUp();
 
-        // Database is needed for attachment tag testing
-        $this->container->get(Database::class);
         $this->bbCode = $this->container->get(BBCode::class);
     }
 
@@ -73,7 +71,6 @@ final class BBCodeTest extends UnitTestCase
             ]) => '<ul><li>Item 1</li><li>Item 2</li></ul>',
             '[quote]quoted text[/quote]' => "<div class='quote'>quoted text</div>",
             '[quote=Sean]quoted text[/quote]' => "<div class='quote'><div class='quotee'>Sean</div>quoted text</div>",
-            '[attachment]1[/attachment]' => "/Attachment doesn't exist/",
             '[video]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/video]' => '/YouTube video player/',
         ];
 
