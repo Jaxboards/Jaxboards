@@ -11,7 +11,6 @@ use Jax\Attributes\Key;
 use Jax\BBCode;
 use Jax\BotDetector;
 use Jax\Config;
-use Jax\Constants\JSAccess;
 use Jax\Database;
 use Jax\DatabaseUtils;
 use Jax\DatabaseUtils\SQLite;
@@ -43,9 +42,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
-
-use function array_find;
-use function json_decode;
 
 /**
  * @internal
@@ -91,27 +87,13 @@ final class PollTest extends FeatureTestCase
         parent::setUp();
     }
 
-    private function createPoll($props = ['pollType' => 'single']): ModelsTopic{
-        $topic = new ModelsTopic($props);
-        $topic->op = 1;
-        $topic->title = 'Favorite Pet Poll';
-        $topic->fid = 1;
-        $topic->pollQuestion = 'What is your favorite pet?';
-        $topic->pollChoices = '["Dog","Cat","Fish"]';
-        $topic->pollResults = '2,3,4;5,6,7;8,9,10';
-
-        $topic->insert();
-
-        return $topic;
-    }
-
     public function testViewPollSingleChoice(): void
     {
         $this->actingAs('admin');
 
-        $poll = $this->createPoll();
+        $topic = $this->createPoll();
 
-        $page = $this->go('?act=vt' . $poll->id);
+        $page = $this->go('?act=vt' . $topic->id);
 
         DOMAssert::assertSelectCount('#poll form input[type="radio"]', 3, $page);
         DOMAssert::assertSelectEquals('#poll .title', 'What is your favorite pet?', 1, $page);
@@ -124,10 +106,10 @@ final class PollTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $poll = $this->createPoll();
+        $topic = $this->createPoll();
 
         $page = $this->go(new Request(
-            get: ['act' => 'vt' . $poll->id],
+            get: ['act' => 'vt' . $topic->id],
             post: ['choice' => '1', 'votepoll' => '1'],
         ));
 
@@ -141,9 +123,9 @@ final class PollTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $poll = $this->createPoll(['pollType' => 'multi']);
+        $topic = $this->createPoll(['pollType' => 'multi']);
 
-        $page = $this->go('?act=vt' . $poll->id);
+        $page = $this->go('?act=vt' . $topic->id);
 
         DOMAssert::assertSelectCount('#poll form input[type="checkbox"]', 3, $page);
         DOMAssert::assertSelectEquals('#poll .title', 'What is your favorite pet?', 1, $page);
@@ -156,10 +138,10 @@ final class PollTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $poll = $this->createPoll(['pollType' => 'multi']);
+        $topic = $this->createPoll(['pollType' => 'multi']);
 
         $page = $this->go(new Request(
-            get: ['act' => 'vt' . $poll->id],
+            get: ['act' => 'vt' . $topic->id],
             post: ['choice' => ['0', '1'], 'votepoll' => '1'],
         ));
 
@@ -167,5 +149,20 @@ final class PollTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('.numvotes', '4 votes (36.36%)', 2, $page);
         DOMAssert::assertSelectEquals('.numvotes', '3 votes (27.27%)', 1, $page);
         DOMAssert::assertSelectEquals('.totalvotes', 'Total Votes: 10', 1, $page);
+    }
+
+    private function createPoll($props = ['pollType' => 'single']): ModelsTopic
+    {
+        $topic = new ModelsTopic($props);
+        $topic->op = 1;
+        $topic->title = 'Favorite Pet Poll';
+        $topic->fid = 1;
+        $topic->pollQuestion = 'What is your favorite pet?';
+        $topic->pollChoices = '["Dog","Cat","Fish"]';
+        $topic->pollResults = '2,3,4;5,6,7;8,9,10';
+
+        $topic->insert();
+
+        return $topic;
     }
 }

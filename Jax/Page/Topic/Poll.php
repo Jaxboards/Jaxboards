@@ -51,6 +51,7 @@ final readonly class Poll
             $error = 'You must be logged in to vote!';
             $this->page->command('error', $error);
             $this->page->append('PAGE', $this->page->error($error));
+
             return;
         }
 
@@ -102,6 +103,7 @@ final readonly class Poll
         if ($error !== null) {
             $this->page->command('error', $error);
             $this->page->append('PAGE', $this->page->error($error));
+
             return;
         }
 
