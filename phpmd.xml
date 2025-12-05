@@ -22,7 +22,9 @@
         <properties>
             <property name="exceptions">
                 <value>
-                    \Carbon\Carbon
+                    \Carbon\Carbon,
+                    \PHPUnit\Framework\DOMAssert,
+                    \MySQLite\MySQLite
                 </value>
             </property>
             <property name="ignorepattern">

@@ -44,7 +44,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
      *
      * Returns fully-qualified class names like `Jax\\Models\\Post`.
      */
-    public static function getModels(): array
+    public function getModels(): array
     {
         static $modelClassesCache = null;
         if ($modelClassesCache !== null) {
@@ -83,7 +83,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
     {
         $this->databaseAdapter->install();
 
-        foreach (self::getModels() as $modelClass) {
+        foreach ($this->getModels() as $modelClass) {
             $model = new $modelClass();
             $queries[] = 'DROP TABLE IF EXISTS ' . $this->database->ftable($model::TABLE);
             $queries[] = $this->databaseAdapter->createTableQueryFromModel($model);

@@ -205,11 +205,12 @@
   <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
   	<properties>
       <property name="rootNamespaces" type="array">
-        <element key="Jax" value="Jax"/>
-        <element key="emoticons" value="emoticons"/>
         <element key="ACP" value="ACP"/>
+        <element key="emoticons" value="emoticons"/>
+        <element key="Jax" value="Jax"/>
         <element key="Service" value="Service"/>
-        <element key="tools" value="tools"/>
+        <element key="Tests" value="Service"/>
+        <element key="Tools" value="tools"/>
       </property>
     </properties>
   </rule>
