@@ -24,11 +24,14 @@ final class ServiceConfig
      */
     private array $overrideConfig = [];
 
+    private bool $installed = false;
+
     /**
      * @param array<mixed> $config
      */
     public function __construct(?array $config = null)
     {
+        $this->installed = $config !== null ? true : $this->hasInstalled();
         $this->serviceConfig = $config ?? $this->getServiceConfig();
     }
 
@@ -54,7 +57,7 @@ final class ServiceConfig
 
         $CFG = [];
 
-        require_once file_exists($configPath)
+        require_once $this->installed
             ? $configPath
             : $serviceConfigPath;
 
@@ -65,7 +68,7 @@ final class ServiceConfig
 
     public function hasInstalled(): bool
     {
-        return file_exists(dirname(__DIR__) . '/config.php');
+        return $this->installed || file_exists(dirname(__DIR__) . '/config.php');
     }
 
     public function getSetting(string $key): mixed

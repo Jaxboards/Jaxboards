@@ -46,7 +46,7 @@ abstract class FeatureTestCase extends PHPUnitTestCase
             'usedisplayname' => '1',
         ]));
 
-        $this->container->set(ServiceConfig::class, new ServiceConfig([
+        $this->container->set(ServiceConfig::class, autowire()->constructorParameter('config', [
             'badnamechars' => "@[^\\w' ?]@",
             'boardname' => 'Example Forums',
             'domain' => 'example.com',
@@ -62,6 +62,7 @@ abstract class FeatureTestCase extends PHPUnitTestCase
             'timetologout' => 900,
         ]));
 
+        $this->database = $this->container->get(Database::class);
 
         return parent::__construct($name);
     }
