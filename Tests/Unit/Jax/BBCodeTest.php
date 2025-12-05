@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jax;
 
-use Jax\DebugLog;
 use Jax\BBCode;
 use Jax\Database;
+use Jax\DebugLog;
 use Jax\DomainDefinitions;
 use Jax\Model;
 use Jax\Request;
@@ -17,11 +17,15 @@ use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\UsesFunction;
 use Tests\UnitTestCase;
 
+use function implode;
+use function str_starts_with;
+
+use const PHP_EOL;
+
 /**
  * @internal
  */
 #[CoversClass(BBCode::class)]
-#[Small]
 #[CoversClass(DomainDefinitions::class)]
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
@@ -29,6 +33,7 @@ use Tests\UnitTestCase;
 #[CoversClass(Model::class)]
 #[CoversClass(Database::class)]
 #[CoversClass(DebugLog::class)]
+#[Small]
 #[UsesFunction('\Jax\pathjoin')]
 final class BBCodeTest extends UnitTestCase
 {
@@ -78,6 +83,7 @@ final class BBCodeTest extends UnitTestCase
                     $output,
                     $this->bbCode->toHTML($input),
                 );
+
                 continue;
             }
 
