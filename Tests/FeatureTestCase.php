@@ -12,6 +12,7 @@ use Jax\Models\Member;
 use Jax\Request;
 use Jax\Session as JaxSession;
 use Jax\User;
+use PHPUnit\Framework\Attributes\CoversNothing;
 
 use function DI\autowire;
 use function parse_str;
@@ -23,6 +24,7 @@ use const PASSWORD_DEFAULT;
 /**
  * @internal
  */
+#[CoversNothing]
 abstract class FeatureTestCase extends TestCase
 {
     protected function setUp(): void

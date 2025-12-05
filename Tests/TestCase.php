@@ -16,9 +16,9 @@ use function DI\autowire;
  * @internal
  */
 #[CoversNothing]
-final class TestCase extends PHPUnitTestCase
+abstract class TestCase extends PHPUnitTestCase
 {
-    private readonly Container $container;
+    protected readonly Container $container;
 
     public function __construct(string $name)
     {
