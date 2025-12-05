@@ -7,18 +7,18 @@ namespace Tests;
 use DI\Container;
 use Jax\Config;
 use Jax\ServiceConfig;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 use function DI\autowire;
 
 /**
  * @internal
- *
- * @coversNothing
  */
+#[CoversNothing]
 final class TestCase extends PHPUnitTestCase
 {
-    protected readonly Container $container;
+    private readonly Container $container;
 
     public function __construct(string $name)
     {
