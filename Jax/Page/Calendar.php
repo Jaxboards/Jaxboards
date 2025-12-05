@@ -15,7 +15,6 @@ use Jax\Template;
 use function explode;
 use function gmdate;
 use function implode;
-use function is_numeric;
 use function sprintf;
 
 final readonly class Calendar

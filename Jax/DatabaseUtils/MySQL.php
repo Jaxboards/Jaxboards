@@ -15,8 +15,6 @@ use ReflectionClass;
 use function array_merge;
 use function implode;
 
-use const PHP_EOL;
-
 final readonly class MySQL implements DatabaseAdapter
 {
     public function __construct(private Database $database) {}
@@ -83,9 +81,9 @@ final readonly class MySQL implements DatabaseAdapter
                     $keys,
                     $constraints,
                 )),
-                ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
-            ]
-            );
+                ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci',
+            ],
+        );
     }
 
     public function install(): void
