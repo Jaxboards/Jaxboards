@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jax;
 
-use DI\Container;
+use Jax\DebugLog;
 use Jax\BBCode;
-use Jax\Config;
-use Jax\Constants\Groups;
 use Jax\Database;
 use Jax\DomainDefinitions;
-use Jax\Jax;
 use Jax\Model;
 use Jax\Request;
 use Jax\RequestStringGetter;
@@ -20,25 +17,22 @@ use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\UsesFunction;
 use Tests\UnitTestCase;
 
-use function array_keys;
-use function base64_decode;
-
 /**
  * @internal
  */
 #[CoversClass(BBCode::class)]
 #[Small]
-#[CoversClass('Jax\DomainDefinitions')]
-#[CoversClass('Jax\Request')]
-#[CoversClass('Jax\RequestStringGetter')]
-#[CoversClass('Jax\ServiceConfig')]
-#[CoversClass('Jax\Model')]
-#[CoversClass('Jax\Database')]
-#[CoversClass('Jax\DebugLog')]
+#[CoversClass(DomainDefinitions::class)]
+#[CoversClass(Request::class)]
+#[CoversClass(RequestStringGetter::class)]
+#[CoversClass(ServiceConfig::class)]
+#[CoversClass(Model::class)]
+#[CoversClass(Database::class)]
+#[CoversClass(DebugLog::class)]
 #[UsesFunction('\Jax\pathjoin')]
 final class BBCodeTest extends UnitTestCase
 {
-    private BBCode $bbcode;
+    private BBCode $bbCode;
 
     protected function setUp(): void
     {
@@ -46,7 +40,7 @@ final class BBCodeTest extends UnitTestCase
 
         // Database is needed for attachment tag testing
         $this->container->get(Database::class);
-        $this->bbcode = $this->container->get(BBCode::class);
+        $this->bbCode = $this->container->get(BBCode::class);
     }
 
     public function testToHTML(): void
@@ -66,15 +60,15 @@ final class BBCodeTest extends UnitTestCase
             '[img=An image]http://example.com/image.jpg[/img]' => '<img src="http://example.com/image.jpg" title="An image" alt="An image" class="bbcodeimg" />',
             '[h2]Header 2[/h2]' => '<h2>Header 2</h2>',
             '[spoiler]hidden text[/spoiler]' => '<span class="spoilertext">hidden text</span>',
-            <<<BBCODE
-            [ul]
-            *Item 1
-            *Item 2
-            [/ul]
-            BBCODE => '<ul><li>Item 1</li><li>Item 2</li></ul>',
+            implode(PHP_EOL, [
+                '[ul]',
+                '*Item 1',
+                '*Item 2',
+                '[/ul]',
+            ]) => '<ul><li>Item 1</li><li>Item 2</li></ul>',
             '[quote]quoted text[/quote]' => "<div class='quote'>quoted text</div>",
             '[quote=Sean]quoted text[/quote]' => "<div class='quote'><div class='quotee'>Sean</div>quoted text</div>",
-            '[attachment]1[/attachment]' => '/Attachment doesn\'t exist/',
+            '[attachment]1[/attachment]' => "/Attachment doesn't exist/",
             '[video]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/video]' => '/YouTube video player/',
         ];
 
@@ -82,14 +76,14 @@ final class BBCodeTest extends UnitTestCase
             if (str_starts_with($output, '/')) {
                 $this->assertMatchesRegularExpression(
                     $output,
-                    $this->bbcode->toHTML($input),
+                    $this->bbCode->toHTML($input),
                 );
                 continue;
             }
 
             $this->assertEquals(
                 $output,
-                $this->bbcode->toHTML($input),
+                $this->bbCode->toHTML($input),
             );
         }
     }
