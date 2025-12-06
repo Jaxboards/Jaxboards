@@ -24,6 +24,7 @@ use function round;
 use function trim;
 use function unlink;
 
+use const PHP_EOL;
 use const SEEK_END;
 
 /**
