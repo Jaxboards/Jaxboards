@@ -12,7 +12,6 @@ use Jax\IPAddress;
 use Jax\Models\Member;
 use Jax\Request;
 use Jax\ServiceConfig;
-use Service\Blueprint;
 
 use function count;
 use function dirname;
@@ -37,7 +36,6 @@ use const PASSWORD_DEFAULT;
 final readonly class ServiceSignup
 {
     public function __construct(
-        private Blueprint $blueprint,
         private Database $database,
         private DatabaseUtils $databaseUtils,
         private FileSystem $fileSystem,
@@ -253,7 +251,7 @@ final readonly class ServiceSignup
         $member->pass = password_hash($password, PASSWORD_DEFAULT);
         $member->insert();
 
-        $this->fileSystem->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $boardURLLowercase);
+        $this->fileSystem->copyDirectory('Service/blueprint', dirname(__DIR__) . '/boards/' . $boardURLLowercase);
 
         header('Location: https://' . $boardURL . '.' . $this->serviceConfig->getSetting('domain'));
 

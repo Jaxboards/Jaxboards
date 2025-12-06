@@ -52,10 +52,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
             return $modelClassesCache;
         }
 
-        $modelsDir = 'Jax/Models';
-        if (!$this->fileSystem->getFileInfo($modelsDir)->isDir()) {
-            return $modelClassesCache = [];
-        }
+        $modelsDir = $this->fileSystem->pathFromRoot('Jax/Models');
 
         $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($modelsDir));
         $modelClassesCache = [];
@@ -74,6 +71,8 @@ final readonly class DatabaseUtils implements DatabaseAdapter
     public function install(): void
     {
         $this->databaseAdapter->install();
+
+        $queries = [];
 
         foreach ($this->getModels() as $modelClass) {
             $model = new $modelClass();

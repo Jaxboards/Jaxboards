@@ -14,14 +14,11 @@ use Jax\TextFormatting;
 
 use function array_key_exists;
 use function array_map;
-use function copy;
 use function in_array;
 use function is_array;
 use function is_string;
 use function mb_strlen;
-use function mkdir;
 use function preg_match;
-use function rename;
 
 final readonly class Themes
 {
@@ -198,7 +195,10 @@ final readonly class Themes
                 'WHERE `title`=? AND `custom`=1',
                 $oldName,
             );
-            rename($this->themesPath . $oldName, $this->themesPath . $newName);
+            $this->fileSystem->rename(
+                $this->fileSystem->pathJoin($this->themesPath, $oldName),
+                $this->fileSystem->pathJoin($this->themesPath, $newName)
+            );
         }
 
         return null;
@@ -244,7 +244,7 @@ final readonly class Themes
                 'WHERE `wrapper`=? AND `custom`=1',
                 $wrapperName,
             );
-            rename(
+            $this->fileSystem->rename(
                 $this->pathToWrapper($wrapperName),
                 $this->pathToWrapper($wrapperNewName),
             );
@@ -486,10 +486,10 @@ final readonly class Themes
 
         $newThemePath = $this->fileSystem->pathJoin($this->themesPath, $skinName);
 
-        mkdir($newThemePath, 0o777, true);
-        copy(
-            $this->domainDefinitions->getDefaultThemePath() . '/css.css',
-            $newThemePath . '/css.css',
+        $this->fileSystem->mkdir($newThemePath, 0o777, true);
+        $this->fileSystem->copy(
+            $this->fileSystem->pathjoin($this->domainDefinitions->getDefaultThemePath(), 'css.css'),
+            $this->fileSystem->pathjoin($newThemePath, 'css.css'),
         );
 
         $skin = new Skin();
@@ -558,7 +558,7 @@ final readonly class Themes
             return;
         }
 
-        $skindir = $this->themesPath . $skin->title;
+        $skindir = $this->fileSystem->pathJoin($this->themesPath, $skin->title);
         if ($this->fileSystem->getFileInfo($skindir)->isDir()) {
             $this->fileSystem->removeDirectory($skindir);
         }

@@ -42,6 +42,14 @@ final readonly class FileSystem
         $this->root = $root ?? dirname(__DIR__);
     }
 
+    public function copy(string $from, string $to): bool
+    {
+        return copy(
+            $this->pathFromRoot($from),
+            $this->pathFromRoot($to)
+        );
+    }
+
     /**
      * Recursively copies one directory to another.
      *
@@ -52,34 +60,28 @@ final readonly class FileSystem
      */
     public function copyDirectory($src, $dst): bool
     {
-        $dir = opendir($src);
-
-        if (!$dir || !mkdir($dst)) {
+        if (!$this->mkdir($dst)) {
             return false;
         }
 
-        while (($file = readdir($dir)) !== false) {
-            if ($file === '.') {
-                continue;
-            }
-
-            if ($file === '..') {
-                continue;
-            }
-
-            $sourcePath = "{$src}/{$file}";
-            $destPath = "{$dst}/{$file}";
-
-            if ($this->getFileInfo($sourcePath)->isDir()) {
-                self::copyDirectory($sourcePath, $destPath);
-
-                continue;
-            }
-
-            copy($sourcePath, $destPath);
+        // Make directories first
+        foreach($this->glob($this->pathJoin($src, '**'), GLOB_ONLYDIR) as $directory) {
+            $destDir = str_replace($src, $dst, $directory);
+            $this->mkdir($destDir, recursive: true);
         }
 
-        closedir($dir);
+        // Then files
+        foreach ($this->glob($this->pathJoin($src, '**/*')) as $sourceFile) {
+            $destFile = str_replace($src, $dst, $sourceFile);
+
+            if ($this->getFileInfo($sourceFile)->isDir()) {
+                $this->mkdir($destFile, recursive: true);
+
+                continue;
+            }
+
+            $this->copy($sourceFile, $destFile);
+        }
 
         return true;
     }
@@ -143,9 +145,14 @@ final readonly class FileSystem
     public function glob(string $pattern, int $flags = 0): array
     {
         return array_map(
-            fn($path): string => mb_substr($path, mb_strlen($this->root)),
+            fn($path): string => mb_substr((string) $path, mb_strlen($this->root)),
             glob($this->pathFromRoot($pattern), $flags),
         );
+    }
+
+    public function mkdir(string $directory, int $mode = 0777, bool $recursive = false): bool
+    {
+        return mkdir($this->pathFromRoot($directory), $mode, $recursive);
     }
 
     /**
@@ -174,27 +181,31 @@ final readonly class FileSystem
         return $file->fwrite($data);
     }
 
+    public function rename(string $from, string $to): bool
+    {
+        return rename(
+            $this->pathFromRoot($from),
+            $this->pathFromRoot($to),
+        );
+    }
+
     /**
      * Recursively removes a whole directory and its files.
      * Equivalent to `rmdir -r`.
      */
     public function removeDirectory(string $dir): bool
     {
-        if (mb_substr($dir, -1) !== '/') {
-            $dir .= '/';
-        }
-
-        foreach ($this->glob($dir . '**') ?: [] as $fileOrDir) {
+        foreach ($this->glob($dir . '/**') ?: [] as $fileOrDir) {
             if ($this->getFileInfo($fileOrDir)->isDir()) {
                 self::removeDirectory($fileOrDir);
 
                 continue;
             }
 
-            unlink($fileOrDir);
+            $this->unlink($fileOrDir);
         }
 
-        rmdir($dir);
+        rmdir($this->pathFromRoot($dir));
 
         return true;
     }

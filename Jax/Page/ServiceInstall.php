@@ -11,17 +11,14 @@ use Jax\IPAddress;
 use Jax\Models\Member;
 use Jax\Request;
 use Jax\ServiceConfig;
-use Service\Blueprint;
 
 use function array_keys;
 use function array_map;
-use function dirname;
 use function filter_var;
 use function gmdate;
 use function header;
 use function implode;
 use function mb_strlen;
-use function mkdir;
 use function parse_url;
 use function password_hash;
 use function preg_match;
@@ -80,7 +77,6 @@ final readonly class ServiceInstall
     ];
 
     public function __construct(
-        private Blueprint $blueprint,
         private Database $database,
         private DatabaseUtils $databaseUtils,
         private FileSystem $fileSystem,
@@ -365,9 +361,7 @@ final readonly class ServiceInstall
             );
             $member->insert();
 
-            $jaxRoot = dirname(__DIR__, 2);
-            mkdir($jaxRoot . '/boards');
-            $this->fileSystem->copyDirectory($this->blueprint->getDirectory(), $jaxRoot . '/boards/' . $board);
+            $this->fileSystem->copyDirectory('Service/blueprint', 'boards/' . $board);
         }
 
         if ($serviceMode) {
