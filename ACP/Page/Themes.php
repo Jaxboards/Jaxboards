@@ -16,7 +16,6 @@ use SplFileInfo;
 use function array_key_exists;
 use function array_map;
 use function copy;
-use function dirname;
 use function in_array;
 use function is_array;
 use function is_string;
@@ -91,7 +90,7 @@ final readonly class Themes
         $wrapperPath = $this->pathToWrapper($wrapper);
         if (
             $this->isValidFilename($wrapper)
-            && $this->fileUtils->isFile($wrapperPath)
+            && $this->fileUtils->getFileInfo($wrapperPath)->isFile()
         ) {
             $this->fileUtils->unlink($wrapperPath);
             $this->page->location('?act=Themes');
@@ -108,13 +107,14 @@ final readonly class Themes
     private function createWrapper(string $wrapper): ?string
     {
         $newWrapperPath = $this->pathToWrapper($wrapper);
+        $newWrapperFileInfo = $this->fileUtils->getFileInfo($newWrapperPath);
 
         return match (true) {
             !$this->isValidFilename($wrapper) => 'Wrapper name must consist of letters, '
                 . 'numbers, spaces, and underscore.',
             mb_strlen($wrapper) > 50 => 'Wrapper name must be less than 50 characters.',
-            $this->fileUtils->isFile($newWrapperPath) => 'That wrapper already exists.',
-            !$this->fileUtils->isWritable(dirname($newWrapperPath)) => 'Wrapper directory is not writable.',
+            $newWrapperFileInfo->isFile() => 'That wrapper already exists.',
+            !$newWrapperFileInfo->isWritable() => 'Wrapper is not writable.',
 
             $this->fileUtils->putContents(
                 $newWrapperPath,
@@ -174,7 +174,7 @@ final readonly class Themes
 
             if (
                 !$this->isValidFilename($oldName)
-                || !$this->fileUtils->isDir($this->themesPath . $oldName)
+                || !$this->fileUtils->getFileInfo($this->themesPath . $oldName)->isDir()
             ) {
                 return 'Invalid from skin name';
             }
@@ -186,7 +186,7 @@ final readonly class Themes
                 return 'Skin name must consist of letters, numbers, spaces, and underscore, and be under 50 characters long.';
             }
 
-            if ($this->fileUtils->isDir($this->themesPath . $newName)) {
+            if ($this->fileUtils->getFileInfo($this->themesPath . $newName)->isDir()) {
                 return 'That skin name is already being used.';
             }
 
@@ -220,7 +220,7 @@ final readonly class Themes
                 continue;
             }
 
-            if (!$this->fileUtils->isFile($this->pathToWrapper($wrapperName))) {
+            if (!$this->fileUtils->getFileInfo($this->pathToWrapper($wrapperName))->isFile()) {
                 continue;
             }
 
@@ -232,7 +232,7 @@ final readonly class Themes
                     under 50 characters long.';
             }
 
-            if ($this->fileUtils->isFile($this->pathToWrapper($wrapperNewName))) {
+            if ($this->fileUtils->getFileInfo($this->pathToWrapper($wrapperNewName))->isFile()) {
                 return "That wrapper name ({$wrapperNewName}) is already being used.";
             }
 
@@ -436,7 +436,7 @@ final readonly class Themes
         $wrapperPath = $this->pathToWrapper($wrapper);
         if (
             !$this->isValidFilename($wrapper)
-            || !$this->fileUtils->isFile($wrapperPath)
+            || !$this->fileUtils->getFileInfo($wrapperPath)->isFile()
         ) {
             $this->page->addContentBox(
                 'Error',
@@ -475,7 +475,7 @@ final readonly class Themes
             !$skinName => 'No skin name supplied!',
             !$this->isValidFilename($skinName) => 'Skinname must only consist of letters, numbers, and spaces.',
             mb_strlen($skinName) > 50 => 'Skin name must be less than 50 characters.',
-            $this->fileUtils->isDir($this->themesPath . $skinName) => 'A skin with that name already exists.',
+            $this->fileUtils->getFileInfo($this->themesPath . $skinName)->isDir() => 'A skin with that name already exists.',
             !in_array($wrapperName, $this->getWrappers()) => 'Invalid wrapper.',
             default => null,
         };
@@ -503,7 +503,7 @@ final readonly class Themes
             );
         }
 
-        $safeThemesPath = $this->fileUtils->getRealPath($this->themesPath . $skinName);
+        $safeThemesPath = $this->fileUtils->getFileInfo($this->themesPath . $skinName)->getRealPath();
         if (
             !$safeThemesPath
             || !str_starts_with($safeThemesPath, $this->themesPath)
@@ -565,7 +565,7 @@ final readonly class Themes
         }
 
         $skindir = $this->themesPath . $skin->title;
-        if ($this->fileUtils->isDir($skindir)) {
+        if ($this->fileUtils->getFileInfo($skindir)->isDir()) {
             $this->fileUtils->removeDirectory($skindir);
         }
 

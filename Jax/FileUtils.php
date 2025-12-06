@@ -60,7 +60,7 @@ final class FileUtils
             $sourcePath = "{$src}/{$file}";
             $destPath = "{$dst}/{$file}";
 
-            if ($this->isDir($sourcePath)) {
+            if ($this->getFileInfo($sourcePath)->isDir()) {
                 self::copyDirectory($sourcePath, $destPath);
 
                 continue;
@@ -98,11 +98,12 @@ final class FileUtils
         return implode(PHP_EOL, $this->getLines($filename));
     }
 
-    public function getRealPath(string $filename): string
+    /**
+     * Wrap SplFileInfo to make test mocking easier.
+     */
+    public function getFileInfo(string $filename): SplFileInfo
     {
-        $fileInfo = new SplFileInfo($filename);
-
-        return $fileInfo->getRealPath();
+        return new SplFileInfo($filename);
     }
 
     /**
@@ -120,40 +121,6 @@ final class FileUtils
     public function glob(string $pattern, int $flags = 0)
     {
         return glob($pattern, $flags);
-    }
-
-    public function isDir(string $filename): bool
-    {
-        $fileInfo = new SplFileInfo($filename);
-
-        return $fileInfo->isDir();
-    }
-
-    public function isFile(string $filename): bool
-    {
-        $fileInfo = new SplFileInfo($filename);
-
-        return $fileInfo->isFile();
-    }
-
-    /**
-     * Is a file readable?
-     */
-    public function isReadable(string $filename): bool
-    {
-        $fileInfo = new SplFileInfo($filename);
-
-        return $fileInfo->isReadable();
-    }
-
-    /**
-     * Is a file writable?
-     */
-    public function isWritable(string $filename): bool
-    {
-        $fileInfo = new SplFileInfo($filename);
-
-        return $fileInfo->isWritable();
     }
 
     /**
@@ -185,7 +152,7 @@ final class FileUtils
         }
 
         foreach ($this->glob($dir . '**') ?: [] as $fileOrDir) {
-            if ($this->isDir($fileOrDir)) {
+            if ($this->getFileInfo($fileOrDir)->isDir()) {
                 self::removeDirectory($fileOrDir);
 
                 continue;

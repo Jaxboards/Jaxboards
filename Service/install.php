@@ -22,7 +22,7 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 $container = new Container();
 $fileUtils = $container->get(FileUtils::class);
 
-if ($fileUtils->isFile(dirname(__DIR__) . '/config.php')) {
+if ($fileUtils->getFileInfo(dirname(__DIR__) . '/config.php')->isFile()) {
     echo 'Detected config.php at root. '
         . 'Jaxboards has already been installed. '
         . 'If you would like to reinstall, delete the root config.';

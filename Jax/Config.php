@@ -41,7 +41,7 @@ final class Config
 
         $boardConfigPath = $this->domainDefinitions->getBoardPath() . '/config.php';
 
-        if ($this->fileUtils->isFile($boardConfigPath)) {
+        if ($this->fileUtils->getFileInfo($boardConfigPath)->isFile()) {
             require_once $this->domainDefinitions->getBoardPath() . '/config.php';
 
             $this->boardConfig = $CFG;

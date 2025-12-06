@@ -45,8 +45,10 @@ final readonly class FileManager
                     $file->hash .= '.' . $ext;
                 }
 
-                if ($this->fileUtils->isWritable($this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash)) {
-                    $page .= $this->fileUtils->unlink($this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash)
+                $uploadFilePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash;
+
+                if ($this->fileUtils->getFileInfo($uploadFilePath)->isWritable()) {
+                    $page .= $this->fileUtils->unlink($uploadFilePath)
                         ? $this->page->success('File deleted')
                         : $this->page->error(
                             "Error deleting file, maybe it's already been "

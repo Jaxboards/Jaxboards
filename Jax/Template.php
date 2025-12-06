@@ -157,8 +157,8 @@ final class Template
         $defaultComponentDir = $this->domainDefinitions->getDefaultThemePath() . '/views/' . $component;
 
         $componentDir = match (true) {
-            $this->fileUtils->isDir($themeComponentDir) => $themeComponentDir,
-            $this->fileUtils->isDir($defaultComponentDir) => $defaultComponentDir,
+            $this->fileUtils->getFileInfo($themeComponentDir)->isDir() => $themeComponentDir,
+            $this->fileUtils->getFileInfo($defaultComponentDir)->isDir() => $defaultComponentDir,
             default => null,
         };
 

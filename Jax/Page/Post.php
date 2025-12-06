@@ -143,7 +143,7 @@ final class Post
 
         $filePath = $uploadPath . $hash . $imageExtension;
 
-        if (!$this->fileUtils->isFile($filePath)) {
+        if (!$this->fileUtils->getFileInfo($filePath)->isFile()) {
             move_uploaded_file($fileobj['tmp_name'], $filePath);
 
             $file = new File();

@@ -58,7 +58,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         }
 
         $modelsDir = __DIR__ . '/Models';
-        if (!$this->fileUtils->isDir($modelsDir)) {
+        if (!$this->fileUtils->getFileInfo($modelsDir)->isDir()) {
             return $modelClassesCache = [];
         }
 

@@ -50,7 +50,7 @@ final readonly class Download
         }
 
         $filePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash;
-        if ($this->fileUtils->isFile($filePath)) {
+        if ($this->fileUtils->getFileInfo($filePath)->isFile()) {
             header('Content-type:application/idk');
             header(
                 'Content-disposition:attachment;filename="'
