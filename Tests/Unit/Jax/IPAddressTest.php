@@ -1,37 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 use Jax\IPAddress;
 use Jax\Request;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\UnitTestCase;
 
-class IPAddressTest extends UnitTestCase {
-    const TESTIP = '192.168.1.1';
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class IPAddressTest extends UnitTestCase
+{
+    public const TESTIP = '192.168.1.1';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    private function getIPAddress(string $ipAddress = self::TESTIP): IPAddress
-    {
-        $this->container->set(Request::class, new Request(
-            server: ['REMOTE_ADDR' => $ipAddress]
-        ));
-        return $this->container->get(IPAddress::class);
-    }
-
-    public function testBinaryConversions()
+    public function testBinaryConversions(): void
     {
         $ipAddress = $this->getIPAddress();
 
         $this->assertEquals(
             $ipAddress->asHumanReadable($ipAddress->asBinary()),
-            self::TESTIP
+            self::TESTIP,
         );
     }
 
-    public function testBanUnban() {
+    public function testBanUnban(): void
+    {
         $ipAddress = $this->getIPAddress();
 
         $ipAddress->ban(self::TESTIP);
@@ -43,6 +44,16 @@ class IPAddressTest extends UnitTestCase {
         $this->assertFalse($ipAddress->isBanned());
     }
 
+    #[DataProvider('localHostDataProvider')]
+    public function testIsLocalHost(
+        string $ipHumanReadable,
+        bool $isLocalHost,
+    ): void {
+        $ipAddress = $this->getIPAddress($ipHumanReadable);
+
+        $this->assertEquals($ipAddress->isLocalHost(), $isLocalHost);
+    }
+
     public static function localHostDataProvider(): array
     {
         return [
@@ -52,11 +63,12 @@ class IPAddressTest extends UnitTestCase {
         ];
     }
 
-    #[DataProvider('localHostDataProvider')]
-    public function testIsLocalHost(string $ipHumanReadable, bool $isLocalHost)
+    private function getIPAddress(string $ipAddress = self::TESTIP): IPAddress
     {
-        $ipAddress = $this->getIPAddress($ipHumanReadable);
+        $this->container->set(Request::class, new Request(
+            server: ['REMOTE_ADDR' => $ipAddress],
+        ));
 
-        $this->assertEquals($ipAddress->isLocalHost(), $isLocalHost);
+        return $this->container->get(IPAddress::class);
     }
 }
