@@ -11,7 +11,6 @@ use function array_reverse;
 use function closedir;
 use function copy;
 use function count;
-use function file;
 use function glob;
 use function implode;
 use function mb_substr;
@@ -24,7 +23,6 @@ use function round;
 use function trim;
 use function unlink;
 
-use const FILE_IGNORE_NEW_LINES;
 use const SEEK_END;
 
 /**
@@ -114,9 +112,12 @@ final class FileUtils
      */
     public function getLines(
         string $filename,
-        $flags = FILE_IGNORE_NEW_LINES,
     ): array {
-        return file($filename, $flags);
+        $file = new SplFileObject($filename);
+
+        $file->setFlags(SplFileObject::DROP_NEW_LINE);
+
+        return iterator_to_array($file);
     }
 
     public function glob(string $pattern, int $flags = 0)
