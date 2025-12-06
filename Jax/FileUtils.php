@@ -10,8 +10,12 @@ use function array_reverse;
 use function closedir;
 use function copy;
 use function count;
+use function file_exists;
+use function file_put_contents;
 use function glob;
 use function is_dir;
+use function is_readable;
+use function is_writable;
 use function mb_substr;
 use function mkdir;
 use function opendir;
@@ -95,7 +99,7 @@ final class FileUtils
     }
 
     /**
-     * Write data to file
+     * Write data to file.
      */
     public function putContents(string $filename, mixed $data): int|false
     {

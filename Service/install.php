@@ -6,7 +6,7 @@ use DI\Container;
 use Jax\FileUtils;
 use Jax\Page\ServiceInstall;
 
-/*
+/**
  * Service install file, for installing a new JaxBoards service.
  *
  * PHP Version 5.3.7
@@ -29,4 +29,3 @@ if ($fileUtils->exists(dirname(__DIR__) . '/config.php')) {
 } else {
     $container->get(ServiceInstall::class)->render();
 }
-

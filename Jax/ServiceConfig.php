@@ -29,9 +29,8 @@ final class ServiceConfig
      */
     public function __construct(
         private readonly FileUtils $fileUtils,
-        ?array $config = null
-    )
-    {
+        ?array $config = null,
+    ) {
         $this->installed = $config !== null ? true : $this->hasInstalled();
         $this->serviceConfig = $config ?? $this->getServiceConfig();
     }

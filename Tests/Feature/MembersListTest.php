@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Jax\FileUtils;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -19,6 +18,7 @@ use Jax\DatabaseUtils\SQLite;
 use Jax\Date;
 use Jax\DebugLog;
 use Jax\DomainDefinitions;
+use Jax\FileUtils;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Model;
