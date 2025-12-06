@@ -12,7 +12,6 @@ use function array_pop;
 use function array_reduce;
 use function array_values;
 use function explode;
-use function glob;
 use function in_array;
 use function is_dir;
 use function is_string;

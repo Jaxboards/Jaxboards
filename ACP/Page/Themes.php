@@ -16,7 +16,6 @@ use function array_key_exists;
 use function array_map;
 use function copy;
 use function dirname;
-use function glob;
 use function in_array;
 use function is_array;
 use function is_dir;

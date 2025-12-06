@@ -12,7 +12,6 @@ use PDOException;
 
 use function array_reduce;
 use function dirname;
-use function glob;
 use function implode;
 use function ksort;
 use function pathinfo;

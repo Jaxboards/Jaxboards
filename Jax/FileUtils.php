@@ -120,7 +120,8 @@ final class FileUtils
         return file($filename, $flags);
     }
 
-    public function glob(string $pattern, int $flags = 0) {
+    public function glob(string $pattern, int $flags = 0)
+    {
         return glob($pattern, $flags);
     }
 

@@ -8,7 +8,6 @@ use DI\Container;
 use Jax\Models\Message;
 
 use function dirname;
-use function glob;
 use function gmdate;
 use function header;
 use function implode;
@@ -140,7 +139,7 @@ final readonly class App
         }
 
         foreach ($modules as $module) {
-            $moduleName = pathinfo($module, PATHINFO_FILENAME);
+            $moduleName = pathinfo((string) $module, PATHINFO_FILENAME);
 
             $module = $this->container->get('Jax\Modules\\' . $moduleName);
 
