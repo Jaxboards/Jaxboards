@@ -8,6 +8,7 @@ use function array_any;
 use function array_filter;
 use function array_search;
 use function filter_var;
+use function implode;
 use function in_array;
 use function inet_ntop;
 use function inet_pton;
@@ -17,6 +18,7 @@ use function pack;
 use function str_starts_with;
 
 use const FILTER_VALIDATE_IP;
+use const PHP_EOL;
 
 final class IPAddress
 {
@@ -69,6 +71,7 @@ final class IPAddress
         if (!$this->isBanned($ipAddress)) {
             $this->ipBanCache[] = $ipAddress;
         }
+
         $this->writeBannedIps();
     }
 
@@ -78,6 +81,7 @@ final class IPAddress
         if ($index === false) {
             return;
         }
+
         unset($this->ipBanCache[$index]);
         $this->writeBannedIps();
     }
@@ -164,7 +168,7 @@ final class IPAddress
         return [];
     }
 
-    private function writeBannedIps()
+    private function writeBannedIps(): void
     {
         $this->fileUtils->putContents(
             $this->domainDefinitions->getBoardPath() . '/bannedips.txt',

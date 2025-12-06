@@ -6,7 +6,6 @@ namespace Jax\Page;
 
 use Carbon\Carbon;
 use Jax\Config;
-use Jax\DomainDefinitions;
 use Jax\FileUtils;
 use Jax\IPAddress;
 use Jax\Jax;
@@ -31,13 +30,11 @@ use function implode;
 use function nl2br;
 
 use const FILTER_VALIDATE_IP;
-use const PHP_EOL;
 
 final readonly class ModControls
 {
     public function __construct(
         private Config $config,
-        private DomainDefinitions $domainDefinitions,
         private FileUtils $fileUtils,
         private IPAddress $ipAddress,
         private Jax $jax,
