@@ -485,6 +485,14 @@ final readonly class Themes
             return $error;
         }
 
+        $newThemePath = $this->fileSystem->pathJoin($this->themesPath, $skinName);
+
+        mkdir($newThemePath, 0o777, true);
+        copy(
+            $this->domainDefinitions->getDefaultThemePath() . '/css.css',
+            $newThemePath . '/css.css',
+        );
+
         $skin = new Skin();
         $skin->custom = 1;
         $skin->default = $this->request->post('default') ? 1 : 0;
@@ -503,20 +511,6 @@ final readonly class Themes
                 $skin->id,
             );
         }
-
-        $safeThemesPath = $this->fileSystem->getFileInfo($this->themesPath . $skinName)->getRealPath();
-        if (
-            !$safeThemesPath
-            || !str_starts_with($safeThemesPath, $this->themesPath)
-        ) {
-            return 'Invalid skin name';
-        }
-
-        mkdir($safeThemesPath, 0o777, true);
-        copy(
-            $this->domainDefinitions->getDefaultThemePath() . '/css.css',
-            $safeThemesPath . '/css.css',
-        );
 
         $this->page->location('?act=Themes');
 

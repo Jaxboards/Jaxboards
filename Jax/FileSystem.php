@@ -135,9 +135,15 @@ final readonly class FileSystem
         return iterator_to_array($file);
     }
 
+    /**
+     * Returns list of files that match pattern relative to jaxboards root
+     */
     public function glob(string $pattern, int $flags = 0)
     {
-        return glob($this->pathFromRoot($pattern), $flags);
+        return array_map(
+            fn($path) => mb_substr($path, strlen($this->root)),
+            glob($this->pathFromRoot($pattern), $flags),
+        );
     }
 
     /**

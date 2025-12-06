@@ -57,7 +57,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
             return $modelClassesCache;
         }
 
-        $modelsDir = __DIR__ . '/Models';
+        $modelsDir = 'Jax/Models';
         if (!$this->fileSystem->getFileInfo($modelsDir)->isDir()) {
             return $modelClassesCache = [];
         }
@@ -70,16 +70,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
                 continue;
             }
 
-            $realPath = $file->getRealPath();
-            if ($realPath === false) {
-                continue;
-            }
-
-            $relative = mb_substr((string) $realPath, mb_strlen($modelsDir) + 1);
-            $relative = str_replace(DIRECTORY_SEPARATOR, '\\', $relative);
-            $relative = mb_substr($relative, 0, -4);
-            // strip .php
-            $modelClassesCache[] = __NAMESPACE__ . '\Models\\' . $relative;
+            $modelClassesCache[] = __NAMESPACE__ . '\\Models\\' . $file->getBasename('.php');
         }
 
         return $modelClassesCache;
