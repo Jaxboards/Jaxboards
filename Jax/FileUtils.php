@@ -124,6 +124,14 @@ final class FileUtils
     }
 
     /**
+     * Equivalent to Node's path.join method
+     */
+    public function pathjoin(string ...$paths): string
+    {
+        return (string) preg_replace('@\/+@', '/', implode('/', $paths));
+    }
+
+    /**
      * Write data to file.
      */
     public function putContents(string $filename, mixed $data): int|false

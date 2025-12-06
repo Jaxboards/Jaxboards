@@ -8,13 +8,13 @@ use Jax\BBCode;
 use Jax\Database;
 use Jax\DebugLog;
 use Jax\DomainDefinitions;
+use Jax\FileUtils;
 use Jax\Model;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\ServiceConfig;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
-use PHPUnit\Framework\Attributes\UsesFunction;
 use Tests\UnitTestCase;
 
 use function implode;
@@ -26,15 +26,15 @@ use const PHP_EOL;
  * @internal
  */
 #[CoversClass(BBCode::class)]
+#[CoversClass(Database::class)]
+#[CoversClass(DebugLog::class)]
 #[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FileUtils::class)]
+#[CoversClass(Model::class)]
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(ServiceConfig::class)]
-#[CoversClass(Model::class)]
-#[CoversClass(Database::class)]
-#[CoversClass(DebugLog::class)]
 #[Small]
-#[UsesFunction('\Jax\pathjoin')]
 final class BBCodeTest extends UnitTestCase
 {
     private BBCode $bbCode;

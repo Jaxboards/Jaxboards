@@ -14,7 +14,6 @@ use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\ServiceConfig;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\UnitTestCase;
 
@@ -30,7 +29,6 @@ use Tests\UnitTestCase;
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(IPAddress::class)]
-#[CoversFunction('Jax\pathjoin')]
 final class IPAddressTest extends UnitTestCase
 {
     public const TESTIP = '192.168.1.1';

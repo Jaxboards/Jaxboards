@@ -36,7 +36,6 @@ use Jax\TextFormatting;
 use Jax\User;
 use Jax\UsersOnline;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
@@ -74,7 +73,6 @@ use Tests\FeatureTestCase;
 #[CoversClass(TextRules::class)]
 #[CoversClass(User::class)]
 #[CoversClass(UsersOnline::class)]
-#[CoversFunction('Jax\pathjoin')]
 final class BoardIndexTest extends FeatureTestCase
 {
     protected function setUp(): void

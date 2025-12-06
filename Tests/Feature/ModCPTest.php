@@ -38,7 +38,6 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
@@ -79,7 +78,6 @@ use function json_decode;
 #[CoversClass(Template::class)]
 #[CoversClass(TextFormatting::class)]
 #[CoversClass(User::class)]
-#[CoversFunction('Jax\pathjoin')]
 final class ModCPTest extends FeatureTestCase
 {
     protected function setUp(): void

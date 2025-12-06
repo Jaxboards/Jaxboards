@@ -40,7 +40,6 @@ use Jax\TextFormatting;
 use Jax\User;
 use Jax\UsersOnline;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
@@ -84,7 +83,6 @@ use function json_decode;
 #[CoversClass(Topic::class)]
 #[CoversClass(User::class)]
 #[CoversClass(UsersOnline::class)]
-#[CoversFunction('Jax\pathjoin')]
 final class TopicTest extends FeatureTestCase
 {
     protected function setUp(): void

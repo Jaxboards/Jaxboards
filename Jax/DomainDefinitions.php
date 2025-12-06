@@ -5,24 +5,15 @@ declare(strict_types=1);
 namespace Jax;
 
 use function dirname;
-use function implode;
 use function preg_match;
-use function preg_replace;
 use function str_replace;
 
 /**
  * Figures out what board we're talking about if it's a service,
  * but regardless defines some important paths.
  *
- * PHP Version 5.4.0
- *
  * @see https://github.com/jaxboards/jaxboards Jaxboards Github Repo
  */
-function pathjoin(string ...$paths): string
-{
-    return (string) preg_replace('@\/+@', '/', implode('/', $paths));
-}
-
 final class DomainDefinitions
 {
     private string $boardURL = '';
@@ -43,6 +34,7 @@ final class DomainDefinitions
      * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function __construct(
+        private readonly FileUtils $fileUtils,
         private readonly ServiceConfig $serviceConfig,
         Request $request,
     ) {
@@ -82,16 +74,16 @@ final class DomainDefinitions
             }
         }
 
-        $this->defaultThemePath = pathjoin(dirname(__DIR__), 'Service/Themes/Default/');
-        $this->serviceThemePath = pathjoin(dirname(__DIR__), 'Service/Themes');
+        $this->defaultThemePath = $this->fileUtils->pathjoin(dirname(__DIR__), 'Service/Themes/Default/');
+        $this->serviceThemePath = $this->fileUtils->pathjoin(dirname(__DIR__), 'Service/Themes');
 
         if (!$prefix) {
             return;
         }
 
         $this->boardFound = true;
-        $this->boardPath = pathjoin(dirname(__DIR__), 'boards', $prefix);
-        $this->boardPathURL = $this->boardURL . '/' . pathjoin('boards', $prefix);
+        $this->boardPath = $this->fileUtils->pathjoin(dirname(__DIR__), 'boards', $prefix);
+        $this->boardPathURL = $this->boardURL . '/' . $this->fileUtils->pathjoin('boards', $prefix);
     }
 
     public function isBoardFound(): bool

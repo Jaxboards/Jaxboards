@@ -43,7 +43,6 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
@@ -86,7 +85,6 @@ use Tests\FeatureTestCase;
 #[CoversClass(TextRules::class)]
 #[CoversClass(User::class)]
 #[CoversClass(UserProfile::class)]
-#[CoversFunction('Jax\pathjoin')]
 final class ProfileTest extends FeatureTestCase
 {
     protected function setUp(): void
