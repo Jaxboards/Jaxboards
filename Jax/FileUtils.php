@@ -15,12 +15,14 @@ use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
 use function glob;
+use function implode;
 use function is_dir;
 use function is_readable;
 use function is_writable;
 use function mb_substr;
 use function mkdir;
 use function opendir;
+use function preg_replace;
 use function readdir;
 use function rmdir;
 use function round;
@@ -124,7 +126,7 @@ final class FileUtils
     }
 
     /**
-     * Equivalent to Node's path.join method
+     * Equivalent to Node's path.join method.
      */
     public function pathjoin(string ...$paths): string
     {
