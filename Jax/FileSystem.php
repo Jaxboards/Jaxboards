@@ -74,12 +74,6 @@ final readonly class FileSystem
         foreach ($this->glob($this->pathJoin($src, '**/*')) as $sourceFile) {
             $destFile = str_replace($src, $dst, $sourceFile);
 
-            if ($this->getFileInfo($sourceFile)->isDir()) {
-                $this->mkdir($destFile, recursive: true);
-
-                continue;
-            }
-
             $this->copy($sourceFile, $destFile);
         }
 
