@@ -8,7 +8,7 @@ use Jax\BBCode;
 use Jax\Database;
 use Jax\DebugLog;
 use Jax\DomainDefinitions;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\Model;
 use Jax\Request;
 use Jax\RequestStringGetter;
@@ -29,7 +29,7 @@ use const PHP_EOL;
 #[CoversClass(Database::class)]
 #[CoversClass(DebugLog::class)]
 #[CoversClass(DomainDefinitions::class)]
-#[CoversClass(FileUtils::class)]
+#[CoversClass(FileSystem::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]

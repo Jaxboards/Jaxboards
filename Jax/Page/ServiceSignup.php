@@ -7,7 +7,7 @@ namespace Jax\Page;
 use Carbon\Carbon;
 use Jax\Database;
 use Jax\DatabaseUtils;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Models\Member;
 use Jax\Request;
@@ -40,7 +40,7 @@ final readonly class ServiceSignup
         private Blueprint $blueprint,
         private Database $database,
         private DatabaseUtils $databaseUtils,
-        private FileUtils $fileUtils,
+        private FileSystem $fileSystem,
         private IPAddress $ipAddress,
         private Request $request,
         private ServiceConfig $serviceConfig,
@@ -253,7 +253,7 @@ final readonly class ServiceSignup
         $member->pass = password_hash($password, PASSWORD_DEFAULT);
         $member->insert();
 
-        $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $boardURLLowercase);
+        $this->fileSystem->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $boardURLLowercase);
 
         header('Location: https://' . $boardURL . '.' . $this->serviceConfig->getSetting('domain'));
 

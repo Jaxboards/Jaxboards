@@ -8,7 +8,7 @@ use DI\Container;
 use Jax\Config;
 use Jax\Constants\Groups;
 use Jax\DomainDefinitions;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\Jax;
 use Jax\Model;
 use Jax\Request;
@@ -26,7 +26,7 @@ use function base64_decode;
  */
 #[CoversClass(Config::class)]
 #[CoversClass(DomainDefinitions::class)]
-#[CoversClass(FileUtils::class)]
+#[CoversClass(FileSystem::class)]
 #[CoversClass(Jax::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(Request::class)]

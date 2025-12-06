@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\DomainDefinitions;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\Models\File;
 use Jax\Page;
 use Jax\Request;
@@ -21,7 +21,7 @@ final readonly class Download
 {
     public function __construct(
         private DomainDefinitions $domainDefinitions,
-        private FileUtils $fileUtils,
+        private FileSystem $fileSystem,
         private Request $request,
         private Page $page,
     ) {}
@@ -50,13 +50,13 @@ final readonly class Download
         }
 
         $filePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash;
-        if ($this->fileUtils->getFileInfo($filePath)->isFile()) {
+        if ($this->fileSystem->getFileInfo($filePath)->isFile()) {
             header('Content-type:application/idk');
             header(
                 'Content-disposition:attachment;filename="'
                 . ($file->name || 'unknown') . '"',
             );
-            $this->page->earlyFlush($this->fileUtils->getContents($filePath));
+            $this->page->earlyFlush($this->fileSystem->getContents($filePath));
         }
 
         exit;

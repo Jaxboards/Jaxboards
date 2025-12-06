@@ -40,7 +40,7 @@ final class Page
     public function __construct(
         private readonly Config $config,
         private readonly DomainDefinitions $domainDefinitions,
-        private readonly FileUtils $fileUtils,
+        private readonly FileSystem $fileSystem,
         private readonly Request $request,
         private readonly Template $template,
         private readonly Session $session,
@@ -162,7 +162,7 @@ final class Page
         $themeUrl = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardPathUrl() : '') . '/Themes/' . $skin->title;
 
         // Custom theme found but files not there, also fallback to default
-        if (!$this->fileUtils->getFileInfo($themePath)->isDir()) {
+        if (!$this->fileSystem->getFileInfo($themePath)->isDir()) {
             $themePath = $this->domainDefinitions->getDefaultThemePath();
             $themeUrl = $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default/';
         }
@@ -189,7 +189,7 @@ final class Page
             ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin->wrapper . '.html'
             : '';
         $this->template->load(
-            $skinWrapper && $this->fileUtils->getFileInfo($skinWrapper)->isFile()
+            $skinWrapper && $this->fileSystem->getFileInfo($skinWrapper)->isFile()
                 ? $skinWrapper
                 : $this->domainDefinitions->getDefaultThemePath() . '/wrappers.html',
         );

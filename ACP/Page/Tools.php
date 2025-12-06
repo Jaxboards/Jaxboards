@@ -9,7 +9,7 @@ use ACP\Page\Tools\FileManager;
 use Jax\Database;
 use Jax\DatabaseUtils;
 use Jax\DomainDefinitions;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\Request;
 use ZipArchive;
 
@@ -30,7 +30,7 @@ final readonly class Tools
         private Database $database,
         private DatabaseUtils $databaseUtils,
         private DomainDefinitions $domainDefinitions,
-        private FileUtils $fileUtils,
+        private FileSystem $fileSystem,
         private Page $page,
         private Request $request,
         private FileManager $fileManager,
@@ -134,8 +134,8 @@ final readonly class Tools
         $zipArchive->addFromString('backup.sql', $fileContents);
         $zipArchive->close();
 
-        echo $this->fileUtils->getContents($tempFile);
-        $this->fileUtils->unlink($tempFile);
+        echo $this->fileSystem->getContents($tempFile);
+        $this->fileSystem->unlink($tempFile);
     }
 
     private function outputTextFile(string $fileContents): void
@@ -155,8 +155,8 @@ final readonly class Tools
 
         $contents = "Sorry, Jaxboards does not have file permissions to read your PHP error log file. ({$logPath})";
 
-        if ($this->fileUtils->getFileInfo($logPath)->isReadable()) {
-            $last100Lines = htmlspecialchars(implode(PHP_EOL, $this->fileUtils->tail(
+        if ($this->fileSystem->getFileInfo($logPath)->isReadable()) {
+            $last100Lines = htmlspecialchars(implode(PHP_EOL, $this->fileSystem->tail(
                 $logPath,
                 100,
             )));

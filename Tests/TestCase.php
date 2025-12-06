@@ -6,7 +6,7 @@ namespace Tests;
 
 use DI\Container;
 use Jax\Config;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\ServiceConfig;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
@@ -27,8 +27,8 @@ abstract class TestCase extends PHPUnitTestCase
 
         // Prevent test suite from mutating files
         $this->container->set(
-            FileUtils::class,
-            $this->getMockBuilder(FileUtils::class)
+            FileSystem::class,
+            $this->getMockBuilder(FileSystem::class)
                 ->onlyMethods(['putContents', 'unlink'])
                 ->getMock(),
         );

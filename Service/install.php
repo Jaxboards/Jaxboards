@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use DI\Container;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\Page\ServiceInstall;
 
 /**
@@ -20,9 +20,9 @@ use Jax\Page\ServiceInstall;
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 $container = new Container();
-$fileUtils = $container->get(FileUtils::class);
+$fileSystem = $container->get(FileSystem::class);
 
-if ($fileUtils->getFileInfo(dirname(__DIR__) . '/config.php')->isFile()) {
+if ($fileSystem->getFileInfo(dirname(__DIR__) . '/config.php')->isFile()) {
     echo 'Detected config.php at root. '
         . 'Jaxboards has already been installed. '
         . 'If you would like to reinstall, delete the root config.';

@@ -17,7 +17,7 @@ use Jax\DatabaseUtils\SQLite;
 use Jax\Date;
 use Jax\DebugLog;
 use Jax\DomainDefinitions;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Model;
@@ -46,7 +46,7 @@ use Tests\FeatureTestCase;
  */
 #[CoversClass(LogReg::class)]
 #[CoversClass(App::class)]
-#[CoversClass(FileUtils::class)]
+#[CoversClass(FileSystem::class)]
 #[CoversClass(Column::class)]
 #[CoversClass(ForeignKey::class)]
 #[CoversClass(Key::class)]

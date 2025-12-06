@@ -39,7 +39,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
 
     public function __construct(
         private Database $database,
-        private FileUtils $fileUtils,
+        private FileSystem $fileSystem,
     ) {
         $adapterClass = self::ADAPTERS[$database->driver];
         $this->databaseAdapter = new $adapterClass($database);
@@ -58,7 +58,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         }
 
         $modelsDir = __DIR__ . '/Models';
-        if (!$this->fileUtils->getFileInfo($modelsDir)->isDir()) {
+        if (!$this->fileSystem->getFileInfo($modelsDir)->isDir()) {
             return $modelClassesCache = [];
         }
 

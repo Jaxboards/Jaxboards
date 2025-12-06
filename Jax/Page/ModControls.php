@@ -6,7 +6,7 @@ namespace Jax\Page;
 
 use Carbon\Carbon;
 use Jax\Config;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\ModControls\ModPosts;
@@ -35,7 +35,7 @@ final readonly class ModControls
 {
     public function __construct(
         private Config $config,
-        private FileUtils $fileUtils,
+        private FileSystem $fileSystem,
         private IPAddress $ipAddress,
         private Jax $jax,
         private ModTopics $modTopics,
@@ -98,7 +98,7 @@ final readonly class ModControls
 
     private function load(): void
     {
-        $script = $this->fileUtils->getContents('dist/modcontrols.js');
+        $script = $this->fileSystem->getContents('dist/modcontrols.js');
 
         if (!$this->request->isJSAccess()) {
             header('Content-Type: application/javascript; charset=utf-8');

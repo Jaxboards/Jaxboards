@@ -7,7 +7,7 @@ namespace Tools;
 use DI\Container;
 use Jax\Database;
 use Jax\DebugLog;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use PDOException;
 use SplFileInfo;
 
@@ -23,7 +23,7 @@ $jaxboardsRoot = dirname(__DIR__);
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 $container = new Container();
-$fileUtils = $container->get(FileUtils::class);
+$fileSystem = $container->get(FileSystem::class);
 
 function error(string $message): string
 {
@@ -44,7 +44,7 @@ function getDBVersion(Database $database): int
 }
 
 $migrations = array_reduce(
-    $fileUtils->glob($jaxboardsRoot . '/Tools/migrations/**/*.php') ?: [],
+    $fileSystem->glob($jaxboardsRoot . '/Tools/migrations/**/*.php') ?: [],
     static function ($migrations, string $path) {
         preg_match('/V(\d+)/', $path, $match);
         $fileInfo = new SplFileInfo($path);

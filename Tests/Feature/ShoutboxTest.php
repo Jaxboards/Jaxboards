@@ -17,7 +17,7 @@ use Jax\DatabaseUtils\SQLite;
 use Jax\Date;
 use Jax\DebugLog;
 use Jax\DomainDefinitions;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
@@ -46,7 +46,7 @@ use function DI\autowire;
  * @internal
  */
 #[CoversClass(App::class)]
-#[CoversClass(FileUtils::class)]
+#[CoversClass(FileSystem::class)]
 #[CoversClass(BBCode::class)]
 #[CoversClass(BotDetector::class)]
 #[CoversClass(Column::class)]

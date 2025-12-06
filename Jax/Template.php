@@ -114,7 +114,7 @@ final class Template
     public function __construct(
         private readonly DebugLog $debugLog,
         private readonly DomainDefinitions $domainDefinitions,
-        private readonly FileUtils $fileUtils,
+        private readonly FileSystem $fileSystem,
     ) {
         $this->themePath = $this->domainDefinitions->getDefaultThemePath();
     }
@@ -142,7 +142,7 @@ final class Template
 
     public function load(string $file): void
     {
-        $this->template = $this->fileUtils->getContents($file) ?: '';
+        $this->template = $this->fileSystem->getContents($file) ?: '';
         $this->template = (string) preg_replace_callback(
             '@<M name=([\'"])([^\'"]+)\1>(.*?)</M>@s',
             $this->userMetaParse(...),
@@ -157,8 +157,8 @@ final class Template
         $defaultComponentDir = $this->domainDefinitions->getDefaultThemePath() . '/views/' . $component;
 
         $componentDir = match (true) {
-            $this->fileUtils->getFileInfo($themeComponentDir)->isDir() => $themeComponentDir,
-            $this->fileUtils->getFileInfo($defaultComponentDir)->isDir() => $defaultComponentDir,
+            $this->fileSystem->getFileInfo($themeComponentDir)->isDir() => $themeComponentDir,
+            $this->fileSystem->getFileInfo($defaultComponentDir)->isDir() => $defaultComponentDir,
             default => null,
         };
 
@@ -254,10 +254,10 @@ final class Template
      */
     private function loadComponentTemplates(string $componentDir): array
     {
-        return array_reduce($this->fileUtils->glob($componentDir . '/*.html') ?: [], function (array $meta, string $metaFile): array {
+        return array_reduce($this->fileSystem->glob($componentDir . '/*.html') ?: [], function (array $meta, string $metaFile): array {
             $fileInfo = new SplFileInfo($metaFile);
             $metaName = $fileInfo->getBasename('.' . $fileInfo->getExtension());
-            $metaContent = $this->fileUtils->getContents($metaFile);
+            $metaContent = $this->fileSystem->getContents($metaFile);
 
             if (!is_string($metaContent)) {
                 return $meta;

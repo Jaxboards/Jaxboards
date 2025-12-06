@@ -6,7 +6,7 @@ namespace Jax\Page;
 
 use Jax\Database;
 use Jax\DomainDefinitions;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
@@ -59,7 +59,7 @@ final class Post
     public function __construct(
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
-        private readonly FileUtils $fileUtils,
+        private readonly FileSystem $fileSystem,
         private readonly Hooks $hooks,
         private readonly IPAddress $ipAddress,
         private readonly Page $page,
@@ -143,7 +143,7 @@ final class Post
 
         $filePath = $uploadPath . $hash . $imageExtension;
 
-        if (!$this->fileUtils->getFileInfo($filePath)->isFile()) {
+        if (!$this->fileSystem->getFileInfo($filePath)->isFile()) {
             move_uploaded_file($fileobj['tmp_name'], $filePath);
 
             $file = new File();

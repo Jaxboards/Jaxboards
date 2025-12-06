@@ -30,7 +30,7 @@ use const SEEK_END;
 /**
  * This class should be used for all file operations (to keep test mocking easy).
  */
-final class FileUtils
+final class FileSystem
 {
     /**
      * Recursively copies one directory to another.

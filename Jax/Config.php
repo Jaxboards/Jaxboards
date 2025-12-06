@@ -15,7 +15,7 @@ final class Config
     public function __construct(
         private readonly ServiceConfig $serviceConfig,
         private readonly DomainDefinitions $domainDefinitions,
-        private readonly FileUtils $fileUtils,
+        private readonly FileSystem $fileSystem,
         private ?array $boardConfig = null,
     ) {}
 
@@ -41,7 +41,7 @@ final class Config
 
         $boardConfigPath = $this->domainDefinitions->getBoardPath() . '/config.php';
 
-        if ($this->fileUtils->getFileInfo($boardConfigPath)->isFile()) {
+        if ($this->fileSystem->getFileInfo($boardConfigPath)->isFile()) {
             require_once $this->domainDefinitions->getBoardPath() . '/config.php';
 
             $this->boardConfig = $CFG;
@@ -75,6 +75,6 @@ final class Config
     {
         $this->boardConfig = array_merge($this->boardConfig ?? [], $data);
 
-        $this->fileUtils->putContents($this->domainDefinitions->getBoardPath() . '/config.php', $this->serviceConfig->configFileContents($this->boardConfig));
+        $this->fileSystem->putContents($this->domainDefinitions->getBoardPath() . '/config.php', $this->serviceConfig->configFileContents($this->boardConfig));
     }
 }

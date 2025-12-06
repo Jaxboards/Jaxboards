@@ -6,7 +6,7 @@ namespace Jax\Page;
 
 use Jax\Database;
 use Jax\DatabaseUtils;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Models\Member;
 use Jax\Request;
@@ -83,7 +83,7 @@ final readonly class ServiceInstall
         private Blueprint $blueprint,
         private Database $database,
         private DatabaseUtils $databaseUtils,
-        private FileUtils $fileUtils,
+        private FileSystem $fileSystem,
         private IPAddress $ipAddress,
         private Request $request,
         private ServiceConfig $serviceConfig,
@@ -367,7 +367,7 @@ final readonly class ServiceInstall
 
             $jaxRoot = dirname(__DIR__, 2);
             mkdir($jaxRoot . '/boards');
-            $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), $jaxRoot . '/boards/' . $board);
+            $this->fileSystem->copyDirectory($this->blueprint->getDirectory(), $jaxRoot . '/boards/' . $board);
         }
 
         if ($serviceMode) {

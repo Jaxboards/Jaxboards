@@ -10,7 +10,7 @@ use Jax\Config;
 use Jax\Constants\Groups;
 use Jax\Database;
 use Jax\DomainDefinitions;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Models\Forum;
@@ -36,7 +36,7 @@ final readonly class Members
         private Config $config,
         private Database $database,
         private DomainDefinitions $domainDefinitions,
-        private FileUtils $fileUtils,
+        private FileSystem $fileSystem,
         private IPAddress $ipAddress,
         private Jax $jax,
         private Page $page,
@@ -573,13 +573,13 @@ final readonly class Members
         $ipBans = $this->request->asString->post('ipbans');
         $bannedIpsPath = $this->domainDefinitions->getBoardPath() . '/bannedips.txt';
         if ($ipBans !== null) {
-            $this->fileUtils->putContents(
+            $this->fileSystem->putContents(
                 $bannedIpsPath,
                 $ipBans,
             );
         }
 
-        $data = $this->fileUtils->getContents($bannedIpsPath) ?: '';
+        $data = $this->fileSystem->getContents($bannedIpsPath) ?: '';
 
         $this->page->addContentBox(
             'IP Bans',

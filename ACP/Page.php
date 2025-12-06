@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ACP;
 
 use Jax\DomainDefinitions;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\Request;
 use SplFileInfo;
 
@@ -31,7 +31,7 @@ final class Page
 
     public function __construct(
         private readonly DomainDefinitions $domainDefinitions,
-        private readonly FileUtils $fileUtils,
+        private readonly FileSystem $fileSystem,
         private readonly Request $request,
     ) {}
 
@@ -157,7 +157,7 @@ final class Page
             $templateFile .= 'html';
         }
 
-        $template = $this->fileUtils->getContents($templateFile);
+        $template = $this->fileSystem->getContents($templateFile);
 
         if ($template === false) {
             return '';

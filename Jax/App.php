@@ -32,7 +32,7 @@ final readonly class App
         private Date $date,
         private DebugLog $debugLog,
         private DomainDefinitions $domainDefinitions,
-        private FileUtils $fileUtils,
+        private FileSystem $fileSystem,
         private IPAddress $ipAddress,
         private Page $page,
         private Request $request,
@@ -132,7 +132,7 @@ final readonly class App
 
     private function loadModules(): void
     {
-        $modules = $this->fileUtils->glob('Jax/Modules/*.php');
+        $modules = $this->fileSystem->glob('Jax/Modules/*.php');
         if (!$modules) {
             return;
         }
@@ -260,7 +260,7 @@ final readonly class App
         $this->template->addVar('inbox', (string) $numMessages);
 
         $version = json_decode(
-            $this->fileUtils->getContents(dirname(__DIR__) . '/composer.json') ?: '',
+            $this->fileSystem->getContents(dirname(__DIR__) . '/composer.json') ?: '',
             null,
             512,
             JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,

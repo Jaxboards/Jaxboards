@@ -31,7 +31,7 @@ final class IPAddress
         private readonly Config $config,
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
-        private readonly FileUtils $fileUtils,
+        private readonly FileSystem $fileSystem,
         private readonly Request $request,
     ) {
         $this->ipBanCache = $this->loadBannedIps();
@@ -157,9 +157,9 @@ final class IPAddress
     private function loadBannedIps(): array
     {
         $bannedIPsPath = $this->domainDefinitions->getBoardPath() . '/bannedips.txt';
-        if ($this->fileUtils->getFileInfo($bannedIPsPath)->isFile()) {
+        if ($this->fileSystem->getFileInfo($bannedIPsPath)->isFile()) {
             return array_filter(
-                $this->fileUtils->getLines($bannedIPsPath) ?: [],
+                $this->fileSystem->getLines($bannedIPsPath) ?: [],
                 // Filter out empty lines and comments
                 static fn(string $line): bool => $line !== '' && $line[0] !== '#',
             );
@@ -170,7 +170,7 @@ final class IPAddress
 
     private function writeBannedIps(): void
     {
-        $this->fileUtils->putContents(
+        $this->fileSystem->putContents(
             $this->domainDefinitions->getBoardPath() . '/bannedips.txt',
             implode(PHP_EOL, $this->ipBanCache),
         );

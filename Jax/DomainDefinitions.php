@@ -34,7 +34,7 @@ final class DomainDefinitions
      * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function __construct(
-        private readonly FileUtils $fileUtils,
+        private readonly FileSystem $fileSystem,
         private readonly ServiceConfig $serviceConfig,
         Request $request,
     ) {
@@ -74,16 +74,16 @@ final class DomainDefinitions
             }
         }
 
-        $this->defaultThemePath = $this->fileUtils->pathJoin(dirname(__DIR__), 'Service/Themes/Default/');
-        $this->serviceThemePath = $this->fileUtils->pathJoin(dirname(__DIR__), 'Service/Themes');
+        $this->defaultThemePath = $this->fileSystem->pathJoin(dirname(__DIR__), 'Service/Themes/Default/');
+        $this->serviceThemePath = $this->fileSystem->pathJoin(dirname(__DIR__), 'Service/Themes');
 
         if (!$prefix) {
             return;
         }
 
         $this->boardFound = true;
-        $this->boardPath = $this->fileUtils->pathJoin(dirname(__DIR__), 'boards', $prefix);
-        $this->boardPathURL = $this->boardURL . '/' . $this->fileUtils->pathJoin('boards', $prefix);
+        $this->boardPath = $this->fileSystem->pathJoin(dirname(__DIR__), 'boards', $prefix);
+        $this->boardPathURL = $this->boardURL . '/' . $this->fileSystem->pathJoin('boards', $prefix);
     }
 
     public function isBoardFound(): bool

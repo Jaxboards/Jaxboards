@@ -18,7 +18,7 @@ use Jax\DatabaseUtils\SQLite;
 use Jax\Date;
 use Jax\DebugLog;
 use Jax\DomainDefinitions;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Model;
@@ -50,7 +50,7 @@ use function json_decode;
  * @internal
  */
 #[CoversClass(App::class)]
-#[CoversClass(FileUtils::class)]
+#[CoversClass(FileSystem::class)]
 #[CoversClass(Badges::class)]
 #[CoversClass(BBCode::class)]
 #[CoversClass(BotDetector::class)]

@@ -28,7 +28,7 @@ final class ServiceConfig
      * @param array<mixed> $config
      */
     public function __construct(
-        private readonly FileUtils $fileUtils,
+        private readonly FileSystem $fileSystem,
         ?array $config = null,
     ) {
         $this->installed = $config !== null ? true : $this->hasInstalled();
@@ -68,7 +68,7 @@ final class ServiceConfig
 
     public function hasInstalled(): bool
     {
-        return $this->installed || $this->fileUtils->getFileInfo(dirname(__DIR__) . '/config.php')->isFile();
+        return $this->installed || $this->fileSystem->getFileInfo(dirname(__DIR__) . '/config.php')->isFile();
     }
 
     public function getSetting(string $key): mixed
@@ -99,7 +99,7 @@ final class ServiceConfig
      */
     public function writeServiceConfig(array $data): void
     {
-        $this->fileUtils->putContents(dirname(__DIR__) . '/config.php', $this->configFileContents($data));
+        $this->fileSystem->putContents(dirname(__DIR__) . '/config.php', $this->configFileContents($data));
     }
 
     /**

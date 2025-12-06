@@ -7,7 +7,7 @@ namespace ACP\Page\Tools;
 use ACP\Page;
 use Jax\Database;
 use Jax\DomainDefinitions;
-use Jax\FileUtils;
+use Jax\FileSystem;
 use Jax\Jax;
 use Jax\Models\File;
 use Jax\Models\Member;
@@ -27,7 +27,7 @@ final readonly class FileManager
     public function __construct(
         private DomainDefinitions $domainDefinitions,
         private Database $database,
-        private FileUtils $fileUtils,
+        private FileSystem $fileSystem,
         private Page $page,
         private Request $request,
     ) {}
@@ -47,8 +47,8 @@ final readonly class FileManager
 
                 $uploadFilePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash;
 
-                if ($this->fileUtils->getFileInfo($uploadFilePath)->isWritable()) {
-                    $page .= $this->fileUtils->unlink($uploadFilePath)
+                if ($this->fileSystem->getFileInfo($uploadFilePath)->isWritable()) {
+                    $page .= $this->fileSystem->unlink($uploadFilePath)
                         ? $this->page->success('File deleted')
                         : $this->page->error(
                             "Error deleting file, maybe it's already been "
@@ -127,7 +127,7 @@ final readonly class FileManager
                 'tools/file-manager-row.html',
                 [
                     'downloads' => $file->downloads,
-                    'filesize' => $this->fileUtils->fileSizeHumanReadable($file->size),
+                    'filesize' => $this->fileSystem->fileSizeHumanReadable($file->size),
                     'id' => $file->id,
                     'linked_in' => array_key_exists($file->id, $linkedIn)
                         ? implode(', ', $linkedIn[$file->id]) : 'Not linked!',
