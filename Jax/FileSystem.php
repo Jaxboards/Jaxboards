@@ -7,6 +7,7 @@ namespace Jax;
 use SplFileInfo;
 use SplFileObject;
 
+use function array_map;
 use function array_reverse;
 use function closedir;
 use function copy;
@@ -15,6 +16,7 @@ use function dirname;
 use function glob;
 use function implode;
 use function iterator_to_array;
+use function mb_strlen;
 use function mb_substr;
 use function mkdir;
 use function opendir;
@@ -136,12 +138,12 @@ final readonly class FileSystem
     }
 
     /**
-     * Returns list of files that match pattern relative to jaxboards root
+     * Returns list of files that match pattern relative to jaxboards root.
      */
-    public function glob(string $pattern, int $flags = 0)
+    public function glob(string $pattern, int $flags = 0): array
     {
         return array_map(
-            fn($path) => mb_substr($path, strlen($this->root)),
+            fn($path): string => mb_substr((string) $path, mb_strlen($this->root)),
             glob($this->pathFromRoot($pattern), $flags),
         );
     }

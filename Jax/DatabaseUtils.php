@@ -22,11 +22,6 @@ use function implode;
 use function is_string;
 use function mb_check_encoding;
 use function mb_convert_encoding;
-use function mb_strlen;
-use function mb_substr;
-use function str_replace;
-
-use const DIRECTORY_SEPARATOR;
 
 final readonly class DatabaseUtils implements DatabaseAdapter
 {
@@ -70,7 +65,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
                 continue;
             }
 
-            $modelClassesCache[] = __NAMESPACE__ . '\\Models\\' . $file->getBasename('.php');
+            $modelClassesCache[] = __NAMESPACE__ . '\Models\\' . $file->getBasename('.php');
         }
 
         return $modelClassesCache;

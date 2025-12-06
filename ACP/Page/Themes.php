@@ -22,7 +22,6 @@ use function mb_strlen;
 use function mkdir;
 use function preg_match;
 use function rename;
-use function str_starts_with;
 
 final readonly class Themes
 {
