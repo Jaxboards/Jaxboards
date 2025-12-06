@@ -141,7 +141,7 @@ final readonly class FileSystem
     }
 
     /**
-     * Returns the fully qualified.
+     * Returns the fully qualified path from root of jaxboards.
      */
     public function pathFromRoot(string ...$paths): string
     {
