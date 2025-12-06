@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2895db6c1ac4f3ee362709233e864517",
+    "content-hash": "ca35436c06eb09dec151984853aff4cf",
     "packages": [
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -533,12 +533,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/seanjohnson08/mysqlite.git",
-                "reference": "adc50cb98483269224704b3a98e9646ae582dc00"
+                "reference": "646f1bc1ff45f2fe307bf37e3677e374bdc785a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seanjohnson08/mysqlite/zipball/adc50cb98483269224704b3a98e9646ae582dc00",
-                "reference": "adc50cb98483269224704b3a98e9646ae582dc00",
+                "url": "https://api.github.com/repos/seanjohnson08/mysqlite/zipball/646f1bc1ff45f2fe307bf37e3677e374bdc785a9",
+                "reference": "646f1bc1ff45f2fe307bf37e3677e374bdc785a9",
                 "shasum": ""
             },
             "require-dev": {
@@ -553,6 +553,9 @@
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
             "authors": [
                 {
                     "name": "Sean Johnson",
@@ -564,7 +567,7 @@
                 "issues": "https://github.com/seanjohnson08/mysqlite/issues",
                 "source": "https://github.com/seanjohnson08/mysqlite/tree/main"
             },
-            "time": "2025-12-06T01:12:51+00:00"
+            "time": "2025-12-06T02:05:10+00:00"
         },
         {
             "name": "sebastian/comparator",
@@ -3683,16 +3686,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.91.2",
+            "version": "v3.91.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "f171dc216bc8a4192d5a0876a899cce6f9e379d6"
+                "reference": "9f10aa6390cea91da175ea608880e942d7c0226e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/f171dc216bc8a4192d5a0876a899cce6f9e379d6",
-                "reference": "f171dc216bc8a4192d5a0876a899cce6f9e379d6",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/9f10aa6390cea91da175ea608880e942d7c0226e",
+                "reference": "9f10aa6390cea91da175ea608880e942d7c0226e",
                 "shasum": ""
             },
             "require": {
@@ -3774,7 +3777,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.91.2"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.91.3"
             },
             "funding": [
                 {
@@ -3782,7 +3785,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-01T20:56:13+00:00"
+            "time": "2025-12-05T19:45:37+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -4931,11 +4934,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.32",
+            "version": "2.1.33",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e126cad1e30a99b137b8ed75a85a676450ebb227",
-                "reference": "e126cad1e30a99b137b8ed75a85a676450ebb227",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9e800e6bee7d5bd02784d4c6069b48032d16224f",
+                "reference": "9e800e6bee7d5bd02784d4c6069b48032d16224f",
                 "shasum": ""
             },
             "require": {
@@ -4980,7 +4983,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-11-11T15:18:17+00:00"
+            "time": "2025-12-05T10:24:31+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -6365,12 +6368,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "fe1c8ca582c84d6e7cef4588af1753d697bcca03"
+                "reference": "10c1e6abcb8094a428b92e7d8c3126371f9f9126"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/fe1c8ca582c84d6e7cef4588af1753d697bcca03",
-                "reference": "fe1c8ca582c84d6e7cef4588af1753d697bcca03",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/10c1e6abcb8094a428b92e7d8c3126371f9f9126",
+                "reference": "10c1e6abcb8094a428b92e7d8c3126371f9f9126",
                 "shasum": ""
             },
             "conflict": {
@@ -6390,6 +6393,7 @@
                 "akaunting/akaunting": "<2.1.13",
                 "akeneo/pim-community-dev": "<5.0.119|>=6,<6.0.53",
                 "alextselegidis/easyappointments": "<1.5.2.0-beta1",
+                "alexusmai/laravel-file-manager": "<=3.3.1",
                 "alt-design/alt-redirect": "<1.6.4",
                 "alterphp/easyadmin-extension-bundle": ">=1.2,<1.2.11|>=1.3,<1.3.1",
                 "amazing/media2click": ">=1,<1.3.3",
@@ -6785,7 +6789,7 @@
                 "leantime/leantime": "<3.3",
                 "lexik/jwt-authentication-bundle": "<2.10.7|>=2.11,<2.11.3",
                 "libreform/libreform": ">=2,<=2.0.8",
-                "librenms/librenms": "<2017.08.18",
+                "librenms/librenms": "<25.11",
                 "liftkit/database": "<2.13.2",
                 "lightsaml/lightsaml": "<1.3.5",
                 "limesurvey/limesurvey": "<6.5.12",
@@ -7354,7 +7358,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-12-03T14:06:51+00:00"
+            "time": "2025-12-05T21:05:14+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -9750,7 +9754,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "composer": "^2.8",
+        "composer": "^2.9.2",
         "composer-plugin-api": "^2.6",
         "composer-runtime-api": "^2.2",
         "ext-curl": "*",
@@ -9765,9 +9769,7 @@
         "lib-zip-libzip": "*",
         "php": "^8.2.12"
     },
-    "platform-dev": {
-        "composer": "2.9.2"
-    },
+    "platform-dev": {},
     "platform-overrides": {
         "composer": "2.9.2",
         "php": "8.2.12"

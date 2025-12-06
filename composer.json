@@ -1,4 +1,7 @@
 {
+    "name":  "jaxboards/jaxboards",
+    "description": "Realtime forum",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "ACP\\": "ACP",
@@ -24,7 +27,6 @@
     "prefer-stable": true,
     "require-dev": {
         "brianium/paratest": "^7.8",
-        "composer": "2.9.2",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
         "friendsofphp/php-cs-fixer": "^3.73",
         "php-parallel-lint/php-parallel-lint": "^1.4",
@@ -40,7 +42,7 @@
         "vimeo/psalm": "^6.5"
     },
     "require": {
-        "composer": "^2.8",
+        "composer": "^2.9.2",
         "composer-plugin-api": "^2.6",
         "composer-runtime-api": "^2.2",
         "seanjohnson08/mysqlite": "dev-main",
