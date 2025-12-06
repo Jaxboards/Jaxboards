@@ -185,47 +185,6 @@ class Database
     }
 
     /**
-     * This function was designed to create aggregate INSERT queries of many rows
-     * but is currently only used to insert one row at a time.
-     *
-     * @param array<array<mixed>> $tableData
-     */
-    public function buildInsertQuery(
-        string $tableName,
-        array $tableData,
-    ): string {
-        $columnNames = [];
-        $rows = [[]];
-
-        foreach ($tableData as $rowIndex => $row) {
-            ksort($row);
-            foreach ($row as $columnName => $value) {
-                if (
-                    is_string($value)
-                    && !mb_check_encoding($value, 'UTF-8')
-                ) {
-                    $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1');
-                }
-
-                if ($rowIndex === 0) {
-                    $columnNames[] = "`{$columnName}`";
-                }
-
-                $rows[$rowIndex][] = $this->evalue($value);
-            }
-        }
-
-        $values = implode(',', array_map(
-            static fn($strRow): string => "({$strRow})",
-            array_map(static fn(array $row): string => implode(',', $row), $rows),
-        ));
-
-        return "INSERT INTO {$tableName}"
-            . ' (' . implode(',', $columnNames) . ')'
-            . " VALUES {$values};";
-    }
-
-    /**
      * @param array<string,null|float|int|string> $keyValuePairs
      * @param mixed                               $whereParams
      */

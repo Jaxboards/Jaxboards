@@ -102,6 +102,46 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         return $this->databaseAdapter->createTableQueryFromModel($model);
     }
 
+
+    /**
+     * Build an INSERT SQL query for the given table and data.
+     *
+     * @param array<array<mixed>> $tableData - an array of rows, each row being an associative array of column => value pairs
+     */
+    public function buildInsertQuery(
+        string $tableName,
+        array $tableData,
+    ): string {
+        $columnNames = [];
+        $rows = [[]];
+
+        foreach ($tableData as $rowIndex => $row) {
+            foreach ($row as $columnName => $value) {
+                if (
+                    is_string($value)
+                    && !mb_check_encoding($value, 'UTF-8')
+                ) {
+                    $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1');
+                }
+
+                if ($rowIndex === 0) {
+                    $columnNames[] = "`{$columnName}`";
+                }
+
+                $rows[$rowIndex][] = $this->database->evalue($value);
+            }
+        }
+
+        $values = implode(', ', array_map(
+            static fn($strRow): string => "({$strRow})",
+            array_map(static fn(array $row): string => implode(', ', $row), $rows),
+        ));
+
+        return "INSERT INTO `{$tableName}`"
+            . ' (' . implode(', ', $columnNames) . ')'
+            . " VALUES {$values};";
+    }
+
     private function insertInitialRecords(): void
     {
         $category = new Category();

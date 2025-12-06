@@ -95,7 +95,7 @@ final readonly class Tools
             // Generate INSERTS with all row data
             $select = $this->database->select('*', $tableName);
             foreach ($this->database->arows($select) as $row) {
-                $sqlFileLines[] = $this->database->buildInsertQuery($ftable, [$row]);
+                $sqlFileLines[] = $this->databaseUtils->buildInsertQuery($ftable, [$row]);
             }
 
             $sqlFileLines[] = '';
