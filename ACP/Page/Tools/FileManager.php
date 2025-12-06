@@ -21,7 +21,6 @@ use function is_array;
 use function mb_strtolower;
 use function pathinfo;
 use function preg_match_all;
-use function unlink;
 
 use const PATHINFO_EXTENSION;
 
@@ -48,7 +47,7 @@ final readonly class FileManager
                 }
 
                 if ($this->fileUtils->isWritable($this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash)) {
-                    $page .= unlink($this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash)
+                    $page .= $this->fileUtils->unlink($this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash)
                         ? $this->page->success('File deleted')
                         : $this->page->error(
                             "Error deleting file, maybe it's already been "

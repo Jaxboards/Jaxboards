@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\DomainDefinitions;
 use Jax\FileUtils;
 use Jax\Models\File;
+use Jax\Page;
 use Jax\Request;
 
 use function array_pop;
@@ -15,7 +16,6 @@ use function explode;
 use function header;
 use function in_array;
 use function mb_strtolower;
-use function readfile;
 
 final readonly class Download
 {
@@ -23,6 +23,7 @@ final readonly class Download
         private DomainDefinitions $domainDefinitions,
         private FileUtils $fileUtils,
         private Request $request,
+        private Page $page,
     ) {}
 
     public function render(): void
@@ -59,7 +60,7 @@ final readonly class Download
                 'Content-disposition:attachment;filename="'
                 . $file->name . '"',
             );
-            readfile($filePath);
+            $this->page->earlyFlush($filePath);
         }
 
         exit;

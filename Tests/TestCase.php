@@ -29,7 +29,7 @@ abstract class TestCase extends PHPUnitTestCase
         $this->container->set(
             FileUtils::class,
             $this->getMockBuilder(FileUtils::class)
-                ->onlyMethods(['putContents'])
+                ->onlyMethods(['putContents', 'unlink'])
                 ->getMock(),
         );
 

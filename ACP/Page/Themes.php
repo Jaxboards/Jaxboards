@@ -29,7 +29,6 @@ use function preg_match;
 use function realpath;
 use function rename;
 use function str_starts_with;
-use function unlink;
 
 use const PATHINFO_FILENAME;
 
@@ -96,7 +95,7 @@ final readonly class Themes
             $this->isValidFilename($wrapper)
             && $this->fileUtils->exists($wrapperPath)
         ) {
-            unlink($wrapperPath);
+            $this->fileUtils->unlink($wrapperPath);
             $this->page->location('?act=Themes');
 
             return '';

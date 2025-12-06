@@ -118,6 +118,11 @@ final class FileUtils
         return file($filename, $flags);
     }
 
+    public function unlink(string $filename): bool
+    {
+        return unlink($filename);
+    }
+
     /**
      * Write data to file.
      */

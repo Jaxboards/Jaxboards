@@ -118,6 +118,9 @@ final class Page
         }
     }
 
+    /**
+     * Outputs $content and ensures nothing else is printed afterwards.
+     */
     public function earlyFlush(string $content): void
     {
         $this->earlyFlush = $content;
