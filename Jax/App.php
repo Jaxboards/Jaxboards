@@ -7,7 +7,6 @@ namespace Jax;
 use DI\Container;
 use Jax\Models\Message;
 
-use function dirname;
 use function gmdate;
 use function header;
 use function implode;

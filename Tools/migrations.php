@@ -42,7 +42,7 @@ function getDBVersion(Database $database): int
 
 $migrations = array_reduce(
     $fileSystem->glob('Tools/migrations/**/*.php') ?: [],
-    function ($migrations, string $path) use ($fileSystem) {
+    static function ($migrations, string $path) use ($fileSystem) {
         preg_match('/V(\d+)/', $path, $match);
         $fileInfo = $fileSystem->getFileInfo($path);
         $migrations[(int) $match[1]] = $fileInfo->getBasename('.' . $fileInfo->getExtension());

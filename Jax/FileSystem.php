@@ -11,6 +11,7 @@ use function array_reverse;
 use function closedir;
 use function copy;
 use function count;
+use function dirname;
 use function glob;
 use function implode;
 use function iterator_to_array;
@@ -30,7 +31,7 @@ use const SEEK_END;
 /**
  * This class should be used for all file operations (to keep test mocking easy).
  */
-final class FileSystem
+final readonly class FileSystem
 {
     private string $root;
 
@@ -106,7 +107,7 @@ final class FileSystem
     }
 
     /**
-     * Get FileInfo for a file
+     * Get FileInfo for a file.
      *
      * @param string $filename relative path from root
      */
@@ -115,8 +116,10 @@ final class FileSystem
         return new SplFileInfo($this->pathFromRoot($filename));
     }
 
-    public function getFileObject(string $filename, string $mode = 'r'): SplFileObject
-    {
+    public function getFileObject(
+        string $filename,
+        string $mode = 'r',
+    ): SplFileObject {
         return new SplFileObject($this->pathFromRoot($filename), $mode);
     }
 
@@ -138,9 +141,9 @@ final class FileSystem
     }
 
     /**
-     * Returns the fully qualified
+     * Returns the fully qualified.
      */
-    public function pathFromRoot(string ...$paths)
+    public function pathFromRoot(string ...$paths): string
     {
         return $this->pathJoin($this->root, ...$paths);
     }

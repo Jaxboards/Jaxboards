@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax;
 
 use function array_merge;
-use function dirname;
 use function json_encode;
 
 use const JSON_PRETTY_PRINT;

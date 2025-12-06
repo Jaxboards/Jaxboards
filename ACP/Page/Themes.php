@@ -118,7 +118,7 @@ final readonly class Themes
             $this->fileSystem->putContents(
                 $newWrapperPath,
                 $this->fileSystem->getContents(
-                    $this->fileSystem->pathJoin($this->domainDefinitions->getDefaultThemePath(), 'wrappers.html')
+                    $this->fileSystem->pathJoin($this->domainDefinitions->getDefaultThemePath(), 'wrappers.html'),
                 ),
             ) === false => 'Wrapper could not be created.',
             default => null,
