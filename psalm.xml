@@ -15,7 +15,7 @@
         <directory name="ACP" />
         <directory name="api" />
         <directory name="Jax" />
-        <directory name="tools" />
+        <directory name="Tools" />
         <directory name="Service" />
         <ignoreFiles>
             <directory name="vendor" />

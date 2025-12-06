@@ -7,7 +7,7 @@
     beStrictAboutCoverageMetadata="true"
     beStrictAboutOutputDuringTests="true"
     beStrictAboutTestsThatDoNotTestAnything="true"
-    bootstrap="vendor/autoload.php"
+    bootstrap="Tests/bootstrap.php"
     colors="true"
     columns="max"
     cacheDirectory=".phpunit.cache"

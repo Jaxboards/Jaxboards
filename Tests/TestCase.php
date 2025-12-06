@@ -6,6 +6,7 @@ namespace Tests;
 
 use DI\Container;
 use Jax\Config;
+use Jax\FileUtils;
 use Jax\ServiceConfig;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
@@ -23,6 +24,14 @@ abstract class TestCase extends PHPUnitTestCase
     public function __construct(string $name)
     {
         $this->container = new Container();
+
+        // Prevent test suite from mutating files
+        $this->container->set(
+            FileUtils::class,
+            $this->getMockBuilder(FileUtils::class)
+                ->onlyMethods(['putContents'])
+                ->getMock()
+        );
 
         $this->container->set(Config::class, autowire()->constructorParameter('boardConfig', [
             'boardoffline' => '0',

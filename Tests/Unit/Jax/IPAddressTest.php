@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Tests\Unit\Jax;
+
 use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
