@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace ACP;
 
 use Jax\DomainDefinitions;
+use Jax\FileUtils;
 use Jax\Request;
 
 use function array_key_exists;
 use function array_keys;
 use function array_map;
-use function file_get_contents;
 use function header;
 use function mb_substr;
 use function pathinfo;
@@ -32,6 +32,7 @@ final class Page
 
     public function __construct(
         private readonly DomainDefinitions $domainDefinitions,
+        private readonly FileUtils $fileUtils,
         private readonly Request $request,
     ) {}
 
@@ -156,7 +157,7 @@ final class Page
             $templateFile .= 'html';
         }
 
-        $template = file_get_contents($templateFile);
+        $template = $this->fileUtils->getContents($templateFile);
 
         if ($template === false) {
             return '';

@@ -22,7 +22,6 @@ use Jax\User;
 
 use function array_map;
 use function count;
-use function file_get_contents;
 use function htmlspecialchars;
 use function mb_strlen;
 use function password_hash;
@@ -580,7 +579,7 @@ final readonly class Members
             );
         }
 
-        $data = file_get_contents($bannedIpsPath) ?: '';
+        $data = $this->fileUtils->getContents($bannedIpsPath) ?: '';
 
         $this->page->addContentBox(
             'IP Bans',

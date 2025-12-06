@@ -24,7 +24,6 @@ use Jax\User;
 
 use function array_map;
 use function count;
-use function file_get_contents;
 use function filter_var;
 use function gmdate;
 use function header;
@@ -102,7 +101,7 @@ final readonly class ModControls
 
     private function load(): void
     {
-        $script = file_get_contents('dist/modcontrols.js');
+        $script = $this->fileUtils->getContents('dist/modcontrols.js');
 
         if (!$this->request->isJSAccess()) {
             header('Content-Type: application/javascript; charset=utf-8');

@@ -98,6 +98,11 @@ final class FileUtils
         return is_writable($filename);
     }
 
+    public function getContents(string $filename): string|false
+    {
+        return file_get_contents($filename);
+    }
+
     /**
      * Write data to file.
      */

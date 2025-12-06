@@ -12,7 +12,6 @@ use function array_pop;
 use function array_reduce;
 use function array_values;
 use function explode;
-use function file_get_contents;
 use function glob;
 use function in_array;
 use function is_dir;
@@ -119,6 +118,7 @@ final class Template
     public function __construct(
         private readonly DebugLog $debugLog,
         private readonly DomainDefinitions $domainDefinitions,
+        private readonly FileUtils $fileUtils,
     ) {
         $this->themePath = $this->domainDefinitions->getDefaultThemePath();
     }
@@ -146,7 +146,7 @@ final class Template
 
     public function load(string $file): void
     {
-        $this->template = file_get_contents($file) ?: '';
+        $this->template = $this->fileUtils->getContents($file) ?: '';
         $this->template = (string) preg_replace_callback(
             '@<M name=([\'"])([^\'"]+)\1>(.*?)</M>@s',
             $this->userMetaParse(...),
@@ -260,7 +260,7 @@ final class Template
     {
         return array_reduce(glob($componentDir . '/*.html') ?: [], function (array $meta, string $metaFile): array {
             $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
-            $metaContent = file_get_contents($metaFile);
+            $metaContent = $this->fileUtils->getContents($metaFile);
 
             if (!is_string($metaContent)) {
                 return $meta;

@@ -8,7 +8,6 @@ use DI\Container;
 use Jax\Models\Message;
 
 use function dirname;
-use function file_get_contents;
 use function glob;
 use function gmdate;
 use function header;
@@ -35,6 +34,7 @@ final readonly class App
         private Date $date,
         private DebugLog $debugLog,
         private DomainDefinitions $domainDefinitions,
+        private FileUtils $fileUtils,
         private IPAddress $ipAddress,
         private Page $page,
         private Request $request,
@@ -261,7 +261,7 @@ final readonly class App
         $this->template->addVar('inbox', (string) $numMessages);
 
         $version = json_decode(
-            file_get_contents(dirname(__DIR__) . '/composer.json') ?: '',
+            $this->fileUtils->getContents(dirname(__DIR__) . '/composer.json') ?: '',
             null,
             512,
             JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,

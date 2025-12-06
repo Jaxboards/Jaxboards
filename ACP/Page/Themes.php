@@ -16,7 +16,6 @@ use function array_key_exists;
 use function array_map;
 use function copy;
 use function dirname;
-use function file_get_contents;
 use function glob;
 use function in_array;
 use function is_array;
@@ -122,7 +121,7 @@ final readonly class Themes
 
             $this->fileUtils->putContents(
                 $newWrapperPath,
-                file_get_contents($this->domainDefinitions->getDefaultThemePath() . '/wrappers.html'),
+                $this->fileUtils->getContents($this->domainDefinitions->getDefaultThemePath() . '/wrappers.html'),
             ) === false => 'Wrapper could not be created.',
             default => null,
         };
@@ -419,7 +418,7 @@ final readonly class Themes
                 'themes/edit-css.html',
                 [
                     'content' => $this->textFormatting->blockhtml(
-                        file_get_contents(
+                        $this->fileUtils->getContents(
                             (
                                 $skin->custom !== 0
                                 ? $this->themesPath : $this->domainDefinitions->getServiceThemePath()
@@ -460,7 +459,9 @@ final readonly class Themes
             $saved . $this->page->parseTemplate(
                 'themes/edit-wrapper.html',
                 [
-                    'content' => $this->textFormatting->blockhtml(file_get_contents($wrapperPath) ?: ''),
+                    'content' => $this->textFormatting->blockhtml(
+                        $this->fileUtils->getContents($wrapperPath) ?: ''
+                    ),
                 ],
             ),
         );
