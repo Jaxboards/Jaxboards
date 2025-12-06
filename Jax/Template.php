@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use SplFileInfo;
 
 use function array_key_exists;
 use function array_keys;
@@ -255,7 +254,7 @@ final class Template
     private function loadComponentTemplates(string $componentDir): array
     {
         return array_reduce($this->fileSystem->glob($componentDir . '/*.html') ?: [], function (array $meta, string $metaFile): array {
-            $fileInfo = new SplFileInfo($metaFile);
+            $fileInfo = $this->fileSystem->getFileInfo($metaFile);
             $metaName = $fileInfo->getBasename('.' . $fileInfo->getExtension());
             $metaContent = $this->fileSystem->getContents($metaFile);
 
@@ -342,7 +341,7 @@ final class Template
                 $componentDir,
             );
 
-            $dirInfo = new SplFileInfo($componentDir);
+            $dirInfo = $this->fileSystem->getFileInfo($componentDir);
             $component = $dirInfo->getBasename();
             $this->debugLog->log("{$process} triggered {$component} to load");
 

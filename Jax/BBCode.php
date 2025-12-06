@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax;
 
 use Jax\Models\File;
-use SplFileInfo;
 
 use function array_filter;
 use function array_key_exists;
@@ -61,6 +60,7 @@ final class BBCode
 
     public function __construct(
         private readonly DomainDefinitions $domainDefinitions,
+        private readonly FileSystem $fileSystem,
     ) {}
 
     public function toHTML(string $text): string
@@ -154,8 +154,7 @@ final class BBCode
             return "Attachment doesn't exist";
         }
 
-        $fileInfo = new SplFileInfo($file->name);
-        $ext = $fileInfo->getExtension();
+        $ext = $this->fileSystem->getFileInfo($file->name)->getExtension();
 
         if (
             !in_array($ext, Jax::IMAGE_EXTENSIONS, true)

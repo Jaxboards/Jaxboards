@@ -6,7 +6,6 @@ namespace Jax;
 
 use DI\Container;
 use Jax\Models\Message;
-use SplFileInfo;
 
 use function dirname;
 use function gmdate;
@@ -138,7 +137,7 @@ final readonly class App
         }
 
         foreach ($modules as $module) {
-            $fileInfo = new SplFileInfo((string) $module);
+            $fileInfo = $this->fileSystem->getFileInfo((string) $module);
             $moduleName = $fileInfo->getBasename('.' . $fileInfo->getExtension());
 
             $module = $this->container->get('Jax\Modules\\' . $moduleName);
@@ -260,7 +259,7 @@ final readonly class App
         $this->template->addVar('inbox', (string) $numMessages);
 
         $version = json_decode(
-            $this->fileSystem->getContents(dirname(__DIR__) . '/composer.json') ?: '',
+            $this->fileSystem->getContents('composer.json') ?: '',
             null,
             512,
             JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,

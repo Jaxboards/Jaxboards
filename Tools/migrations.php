@@ -9,7 +9,6 @@ use Jax\Database;
 use Jax\DebugLog;
 use Jax\FileSystem;
 use PDOException;
-use SplFileInfo;
 
 use function array_reduce;
 use function dirname;
@@ -18,8 +17,6 @@ use function ksort;
 use function preg_match;
 
 use const PHP_EOL;
-
-$jaxboardsRoot = dirname(__DIR__);
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 $container = new Container();
@@ -44,10 +41,10 @@ function getDBVersion(Database $database): int
 }
 
 $migrations = array_reduce(
-    $fileSystem->glob($jaxboardsRoot . '/Tools/migrations/**/*.php') ?: [],
-    static function ($migrations, string $path) {
+    $fileSystem->glob('Tools/migrations/**/*.php') ?: [],
+    function ($migrations, string $path) use ($fileSystem) {
         preg_match('/V(\d+)/', $path, $match);
-        $fileInfo = new SplFileInfo($path);
+        $fileInfo = $fileSystem->getFileInfo($path);
         $migrations[(int) $match[1]] = $fileInfo->getBasename('.' . $fileInfo->getExtension());
 
         return $migrations;

@@ -23,7 +23,6 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
-use SplFileInfo;
 
 use function array_filter;
 use function array_map;
@@ -134,8 +133,7 @@ final class Post
         $hash = hash_file('sha1', $fileobj['tmp_name']) ?: 'hash_error';
         $uploadPath = $this->domainDefinitions->getBoardPath() . '/Uploads/';
 
-        $fileInfo = new SplFileInfo($fileobj['name']);
-        $ext = $fileInfo->getExtension();
+        $ext = $this->fileSystem->getFileInfo($fileobj['name'])->getExtension();
 
         $imageExtension = in_array($ext, Jax::IMAGE_EXTENSIONS, true)
             ? ".{$ext}"

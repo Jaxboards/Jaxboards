@@ -18,7 +18,7 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 $container = new Container();
 $fileSystem = $container->get(FileSystem::class);
-if (!$fileSystem->getFileInfo(dirname(__DIR__) . '/config.php')->isFile()) {
+if (!$fileSystem->getFileInfo('config.php')->isFile()) {
     echo 'Jaxboards not installed!';
 } else {
     $container->get(ServiceSignup::class)->render();

@@ -32,6 +32,13 @@ use const SEEK_END;
  */
 final class FileSystem
 {
+    private string $root;
+
+    public function __construct(?string $root = null)
+    {
+        $this->root = $root ?? dirname(__DIR__);
+    }
+
     /**
      * Recursively copies one directory to another.
      *
@@ -99,11 +106,18 @@ final class FileSystem
     }
 
     /**
-     * Wrap SplFileInfo to make test mocking easier.
+     * Get FileInfo for a file
+     *
+     * @param string $filename relative path from root
      */
     public function getFileInfo(string $filename): SplFileInfo
     {
-        return new SplFileInfo($filename);
+        return new SplFileInfo($this->pathFromRoot($filename));
+    }
+
+    public function getFileObject(string $filename, string $mode = 'r'): SplFileObject
+    {
+        return new SplFileObject($this->pathFromRoot($filename), $mode);
     }
 
     /**
@@ -111,7 +125,7 @@ final class FileSystem
      */
     public function getLines(string $filename): array
     {
-        $file = new SplFileObject($filename);
+        $file = $this->getFileObject($filename);
 
         $file->setFlags(SplFileObject::DROP_NEW_LINE);
 
@@ -120,7 +134,15 @@ final class FileSystem
 
     public function glob(string $pattern, int $flags = 0)
     {
-        return glob($pattern, $flags);
+        return glob($this->pathFromRoot($pattern), $flags);
+    }
+
+    /**
+     * Returns the fully qualified
+     */
+    public function pathFromRoot(string ...$paths)
+    {
+        return $this->pathJoin($this->root, ...$paths);
     }
 
     /**
@@ -136,7 +158,7 @@ final class FileSystem
      */
     public function putContents(string $filename, mixed $data): int|false
     {
-        $file = new SplFileObject($filename, 'w');
+        $file = $this->getFileObject($filename, 'w');
 
         return $file->fwrite($data);
     }
@@ -173,7 +195,7 @@ final class FileSystem
      */
     public function tail(string $path, int $totalLines): array
     {
-        $logFile = new SplFileObject($path, 'r');
+        $logFile = $this->getFileObject($path, 'r');
         $logFile->fseek(0, SEEK_END);
 
         $lines = [];
@@ -210,6 +232,6 @@ final class FileSystem
 
     public function unlink(string $filename): bool
     {
-        return unlink($filename);
+        return unlink($this->pathFromRoot($filename));
     }
 }

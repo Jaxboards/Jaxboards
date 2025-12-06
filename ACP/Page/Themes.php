@@ -11,7 +11,6 @@ use Jax\FileSystem;
 use Jax\Models\Skin;
 use Jax\Request;
 use Jax\TextFormatting;
-use SplFileInfo;
 
 use function array_key_exists;
 use function array_map;
@@ -73,8 +72,8 @@ final readonly class Themes
     private function getWrappers(): array
     {
         return array_map(
-            static function (string $path): string {
-                $fileInfo = new SplFileInfo($path);
+            function (string $path): string {
+                $fileInfo = $this->fileSystem->getFileInfo($path);
 
                 return $fileInfo->getBasename('.' . $fileInfo->getExtension());
             },
@@ -118,7 +117,9 @@ final readonly class Themes
 
             $this->fileSystem->putContents(
                 $newWrapperPath,
-                $this->fileSystem->getContents($this->domainDefinitions->getDefaultThemePath() . '/wrappers.html'),
+                $this->fileSystem->getContents(
+                    $this->fileSystem->pathJoin($this->domainDefinitions->getDefaultThemePath(), 'wrappers.html')
+                ),
             ) === false => 'Wrapper could not be created.',
             default => null,
         };
@@ -587,7 +588,7 @@ final readonly class Themes
 
     private function pathToWrapper(string $wrapperName): string
     {
-        return $this->wrappersPath . $wrapperName . '.html';
+        return $this->fileSystem->pathJoin($this->wrappersPath, $wrapperName . '.html');
     }
 
     /**

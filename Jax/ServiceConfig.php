@@ -52,8 +52,8 @@ final class ServiceConfig
             return $this->serviceConfig;
         }
 
-        $configPath = dirname(__DIR__) . '/config.php';
-        $serviceConfigPath = dirname(__DIR__) . '/config.default.php';
+        $configPath = $this->fileSystem->pathFromRoot('config.php');
+        $serviceConfigPath = $this->fileSystem->pathFromRoot('config.default.php');
 
         $CFG = [];
 
@@ -68,7 +68,7 @@ final class ServiceConfig
 
     public function hasInstalled(): bool
     {
-        return $this->installed || $this->fileSystem->getFileInfo(dirname(__DIR__) . '/config.php')->isFile();
+        return $this->installed || $this->fileSystem->getFileInfo('config.php')->isFile();
     }
 
     public function getSetting(string $key): mixed
@@ -99,7 +99,7 @@ final class ServiceConfig
      */
     public function writeServiceConfig(array $data): void
     {
-        $this->fileSystem->putContents(dirname(__DIR__) . '/config.php', $this->configFileContents($data));
+        $this->fileSystem->putContents('config.php', $this->configFileContents($data));
     }
 
     /**

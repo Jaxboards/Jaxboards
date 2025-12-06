@@ -13,7 +13,6 @@ use Jax\Models\File;
 use Jax\Models\Member;
 use Jax\Models\Post;
 use Jax\Request;
-use SplFileInfo;
 
 use function array_key_exists;
 use function implode;
@@ -39,7 +38,7 @@ final readonly class FileManager
         if ($delete !== 0) {
             $file = File::selectOne($delete);
             if ($file !== null) {
-                $fileInfo = new SplFileInfo($file->name);
+                $fileInfo = $this->fileSystem->getFileInfo($file->name);
                 $ext = mb_strtolower($fileInfo->getExtension());
                 if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'], true)) {
                     $file->hash .= '.' . $ext;
@@ -115,8 +114,7 @@ final readonly class FileManager
 
         $table = '';
         foreach ($files as $file) {
-            $fileInfo = new SplFileInfo($file->name);
-            $ext = $fileInfo->getExtension();
+            $ext = $this->fileSystem->getFileInfo($file->name)->getExtension();
 
             $file->name = in_array($ext, Jax::IMAGE_EXTENSIONS, true) ? '<a href="'
                     . $this->domainDefinitions->getBoardPathUrl() . 'Uploads/' . $file->hash . '.' . $ext . '">'

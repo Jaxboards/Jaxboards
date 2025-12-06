@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use function dirname;
 use function preg_match;
 use function str_replace;
 
@@ -74,15 +73,15 @@ final class DomainDefinitions
             }
         }
 
-        $this->defaultThemePath = $this->fileSystem->pathJoin(dirname(__DIR__), 'Service/Themes/Default/');
-        $this->serviceThemePath = $this->fileSystem->pathJoin(dirname(__DIR__), 'Service/Themes');
+        $this->defaultThemePath = 'Service/Themes/Default/';
+        $this->serviceThemePath = 'Service/Themes';
 
         if (!$prefix) {
             return;
         }
 
         $this->boardFound = true;
-        $this->boardPath = $this->fileSystem->pathJoin(dirname(__DIR__), 'boards', $prefix);
+        $this->boardPath = $this->fileSystem->pathJoin('boards', $prefix);
         $this->boardPathURL = $this->boardURL . '/' . $this->fileSystem->pathJoin('boards', $prefix);
     }
 

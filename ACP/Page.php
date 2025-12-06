@@ -7,7 +7,6 @@ namespace ACP;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\Request;
-use SplFileInfo;
 
 use function array_key_exists;
 use function array_keys;
@@ -146,8 +145,8 @@ final class Page
         string $templateFile,
         array $data = [],
     ): string {
-        $templateFile = 'views/' . $templateFile;
-        $fileInfo = new SplFileInfo($templateFile);
+        $templateFile = 'ACP/views/' . $templateFile;
+        $fileInfo = $this->fileSystem->getFileInfo($templateFile);
 
         if ($fileInfo->getExtension() !== 'html') {
             if (mb_substr($templateFile, -1) !== '.') {
