@@ -51,16 +51,12 @@ final readonly class Download
 
         $filePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash;
         if ($this->fileUtils->exists($filePath)) {
-            if ($file->name === '') {
-                $file->name = 'unknown';
-            }
-
             header('Content-type:application/idk');
             header(
                 'Content-disposition:attachment;filename="'
-                . $file->name . '"',
+                . ($file->name || 'unknown') . '"',
             );
-            $this->page->earlyFlush($filePath);
+            $this->page->earlyFlush($this->fileUtils->getContents($filePath));
         }
 
         exit;
