@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 use Jax\IPAddress;
 use Jax\Request;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\UnitTestCase;
 
 /**
  * @internal
- *
- * @coversNothing
  */
+#[CoversNothing]
 final class IPAddressTest extends UnitTestCase
 {
     public const TESTIP = '192.168.1.1';
