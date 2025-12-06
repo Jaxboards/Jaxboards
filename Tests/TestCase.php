@@ -30,7 +30,7 @@ abstract class TestCase extends PHPUnitTestCase
             FileUtils::class,
             $this->getMockBuilder(FileUtils::class)
                 ->onlyMethods(['putContents'])
-                ->getMock()
+                ->getMock(),
         );
 
         $this->container->set(Config::class, autowire()->constructorParameter('boardConfig', [
