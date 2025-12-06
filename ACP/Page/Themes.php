@@ -460,7 +460,7 @@ final readonly class Themes
                 'themes/edit-wrapper.html',
                 [
                     'content' => $this->textFormatting->blockhtml(
-                        $this->fileUtils->getContents($wrapperPath) ?: ''
+                        $this->fileUtils->getContents($wrapperPath) ?: '',
                     ),
                 ],
             ),

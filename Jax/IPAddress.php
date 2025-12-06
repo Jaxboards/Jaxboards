@@ -7,7 +7,6 @@ namespace Jax;
 use function array_any;
 use function array_filter;
 use function array_search;
-use function file;
 use function filter_var;
 use function in_array;
 use function inet_ntop;
@@ -17,7 +16,6 @@ use function mb_substr;
 use function pack;
 use function str_starts_with;
 
-use const FILE_IGNORE_NEW_LINES;
 use const FILTER_VALIDATE_IP;
 
 final class IPAddress

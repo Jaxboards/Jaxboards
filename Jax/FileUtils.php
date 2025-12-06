@@ -10,7 +10,9 @@ use function array_reverse;
 use function closedir;
 use function copy;
 use function count;
+use function file;
 use function file_exists;
+use function file_get_contents;
 use function file_put_contents;
 use function glob;
 use function is_dir;
@@ -25,6 +27,7 @@ use function round;
 use function trim;
 use function unlink;
 
+use const FILE_IGNORE_NEW_LINES;
 use const SEEK_END;
 
 /**
@@ -104,10 +107,14 @@ final class FileUtils
     }
 
     /**
-     * Returns an array of lines in a file
+     * Returns an array of lines in a file.
+     *
+     * @param mixed $flags
      */
-    public function getLines(string $filename, $flags = FILE_IGNORE_NEW_LINES): array
-    {
+    public function getLines(
+        string $filename,
+        $flags = FILE_IGNORE_NEW_LINES,
+    ): array {
         return file($filename, $flags);
     }
 
