@@ -12,8 +12,6 @@ use function closedir;
 use function copy;
 use function count;
 use function file;
-use function file_get_contents;
-use function file_put_contents;
 use function glob;
 use function implode;
 use function mb_substr;
@@ -97,7 +95,9 @@ final class FileUtils
 
     public function getContents(string $filename): string|false
     {
-        return file_get_contents($filename);
+        $file = new SplFileObject($filename);
+
+        return $file->fread($file->getSize());
     }
 
     public function getRealPath(string $filename): string
@@ -171,7 +171,9 @@ final class FileUtils
      */
     public function putContents(string $filename, mixed $data): int|false
     {
-        return file_put_contents($filename, $data);
+        $file = new SplFileObject($filename, 'w');
+
+        return $file->fwrite($data);
     }
 
     /**
