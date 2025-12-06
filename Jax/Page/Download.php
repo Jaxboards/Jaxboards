@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\DomainDefinitions;
+use Jax\FileUtils;
 use Jax\Models\File;
 use Jax\Request;
 
 use function array_pop;
 use function count;
 use function explode;
-use function file_exists;
 use function header;
 use function in_array;
 use function mb_strtolower;
@@ -21,6 +21,7 @@ final readonly class Download
 {
     public function __construct(
         private DomainDefinitions $domainDefinitions,
+        private FileUtils $fileUtils,
         private Request $request,
     ) {}
 
@@ -48,7 +49,7 @@ final readonly class Download
         }
 
         $filePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash;
-        if (file_exists($filePath)) {
+        if ($this->fileUtils->exists($filePath)) {
             if ($file->name === '') {
                 $file->name = 'unknown';
             }

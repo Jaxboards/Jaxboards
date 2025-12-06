@@ -11,13 +11,15 @@
 declare(strict_types=1);
 
 use DI\Container;
+use Jax\FileUtils;
 use Jax\Page\ServiceSignup;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-if (!file_exists(dirname(__DIR__) . '/config.php')) {
+$container = new Container();
+$fileUtils = $container->get(FileUtils::class);
+if (!$fileUtils->exists(dirname(__DIR__) . '/config.php')) {
     echo 'Jaxboards not installed!';
 } else {
-    $container = new Container();
     $container->get(ServiceSignup::class)->render();
 }

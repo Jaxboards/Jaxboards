@@ -2,16 +2,33 @@
 
 declare(strict_types=1);
 
+use Jax\Config;
+use Jax\Database;
+use Jax\DomainDefinitions;
+use Jax\FileUtils;
+use Jax\Model;
+use Jax\RequestStringGetter;
+use Jax\ServiceConfig;
 use Jax\IPAddress;
 use Jax\Request;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\UnitTestCase;
 
 /**
  * @internal
  */
-#[CoversNothing]
+#[CoversClass(Config::class)]
+#[CoversClass(Database::class)]
+#[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FileUtils::class)]
+#[CoversClass(Model::class)]
+#[CoversClass(Request::class)]
+#[CoversClass(RequestStringGetter::class)]
+#[CoversClass(ServiceConfig::class)]
+#[CoversClass(IPAddress::class)]
+#[CoversFunction('Jax\pathjoin')]
 final class IPAddressTest extends UnitTestCase
 {
     public const TESTIP = '192.168.1.1';

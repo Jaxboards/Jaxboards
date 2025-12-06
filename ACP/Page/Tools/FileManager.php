@@ -18,7 +18,6 @@ use function array_key_exists;
 use function implode;
 use function in_array;
 use function is_array;
-use function is_writable;
 use function mb_strtolower;
 use function pathinfo;
 use function preg_match_all;
@@ -48,7 +47,7 @@ final readonly class FileManager
                     $file->hash .= '.' . $ext;
                 }
 
-                if (is_writable($this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash)) {
+                if ($this->fileUtils->isWritable($this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash)) {
                     $page .= unlink($this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash)
                         ? $this->page->success('File deleted')
                         : $this->page->error(

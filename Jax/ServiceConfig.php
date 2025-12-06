@@ -6,8 +6,6 @@ namespace Jax;
 
 use function array_merge;
 use function dirname;
-use function file_exists;
-use function file_put_contents;
 use function json_encode;
 
 use const JSON_PRETTY_PRINT;
@@ -29,7 +27,10 @@ final class ServiceConfig
     /**
      * @param array<mixed> $config
      */
-    public function __construct(?array $config = null)
+    public function __construct(
+        private readonly FileUtils $fileUtils,
+        ?array $config = null
+    )
     {
         $this->installed = $config !== null ? true : $this->hasInstalled();
         $this->serviceConfig = $config ?? $this->getServiceConfig();
@@ -68,7 +69,7 @@ final class ServiceConfig
 
     public function hasInstalled(): bool
     {
-        return $this->installed || file_exists(dirname(__DIR__) . '/config.php');
+        return $this->installed || $this->fileUtils->exists(dirname(__DIR__) . '/config.php');
     }
 
     public function getSetting(string $key): mixed
@@ -99,7 +100,7 @@ final class ServiceConfig
      */
     public function writeServiceConfig(array $data): void
     {
-        file_put_contents(dirname(__DIR__) . '/config.php', $this->configFileContents($data));
+        $this->fileUtils->putContents(dirname(__DIR__) . '/config.php', $this->configFileContents($data));
     }
 
     /**

@@ -8,7 +8,6 @@ use Jax\Models\Skin;
 
 use function array_merge;
 use function explode;
-use function file_exists;
 use function header;
 use function headers_sent;
 use function is_array;
@@ -42,6 +41,7 @@ final class Page
     public function __construct(
         private readonly Config $config,
         private readonly DomainDefinitions $domainDefinitions,
+        private readonly FileUtils $fileUtils,
         private readonly Request $request,
         private readonly Template $template,
         private readonly Session $session,
@@ -187,7 +187,7 @@ final class Page
             ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin->wrapper . '.html'
             : '';
         $this->template->load(
-            $skinWrapper && file_exists($skinWrapper)
+            $skinWrapper && $this->fileUtils->exists($skinWrapper)
                 ? $skinWrapper
                 : $this->domainDefinitions->getDefaultThemePath() . '/wrappers.html',
         );

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\FileUtils;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -47,6 +48,7 @@ use Tests\FeatureTestCase;
  * @internal
  */
 #[CoversClass(App::class)]
+#[CoversClass(FileUtils::class)]
 #[CoversClass(Badges::class)]
 #[CoversClass(BBCode::class)]
 #[CoversClass(BotDetector::class)]

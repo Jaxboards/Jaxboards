@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\FileUtils;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -52,6 +53,7 @@ use const PASSWORD_DEFAULT;
  */
 #[CoversClass(UCP::class)]
 #[CoversClass(App::class)]
+#[CoversClass(FileUtils::class)]
 #[CoversClass(Column::class)]
 #[CoversClass(ForeignKey::class)]
 #[CoversClass(Key::class)]

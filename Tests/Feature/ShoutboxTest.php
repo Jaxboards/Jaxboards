@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\FileUtils;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -46,6 +47,7 @@ use function DI\autowire;
  * @internal
  */
 #[CoversClass(App::class)]
+#[CoversClass(FileUtils::class)]
 #[CoversClass(BBCode::class)]
 #[CoversClass(BotDetector::class)]
 #[CoversClass(Column::class)]

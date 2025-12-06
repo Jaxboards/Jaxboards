@@ -23,6 +23,9 @@ use function unlink;
 
 use const SEEK_END;
 
+/**
+ * This class should be used for all file operations (to keep test mocking easy).
+ */
 final class FileUtils
 {
     /**
@@ -65,6 +68,38 @@ final class FileUtils
         closedir($dir);
 
         return true;
+    }
+
+    /**
+     * Does $filename exist?
+     */
+    public function exists(string $filename): bool
+    {
+        return file_exists($filename);
+    }
+
+    /**
+     * Is a file readable?
+     */
+    public function isReadable(string $filename): bool
+    {
+        return is_readable($filename);
+    }
+
+    /**
+     * Is a file writable?
+     */
+    public function isWritable(string $filename): bool
+    {
+        return is_writable($filename);
+    }
+
+    /**
+     * Write data to file
+     */
+    public function putContents(string $filename, mixed $data): int|false
+    {
+        return file_put_contents($filename, $data);
     }
 
     /**

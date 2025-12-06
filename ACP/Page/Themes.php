@@ -16,16 +16,13 @@ use function array_key_exists;
 use function array_map;
 use function copy;
 use function dirname;
-use function file_exists;
 use function file_get_contents;
-use function file_put_contents;
 use function glob;
 use function in_array;
 use function is_array;
 use function is_dir;
 use function is_file;
 use function is_string;
-use function is_writable;
 use function mb_strlen;
 use function mkdir;
 use function pathinfo;
@@ -98,7 +95,7 @@ final readonly class Themes
         $wrapperPath = $this->pathToWrapper($wrapper);
         if (
             $this->isValidFilename($wrapper)
-            && file_exists($wrapperPath)
+            && $this->fileUtils->exists($wrapperPath)
         ) {
             unlink($wrapperPath);
             $this->page->location('?act=Themes');
@@ -120,10 +117,10 @@ final readonly class Themes
             !$this->isValidFilename($wrapper) => 'Wrapper name must consist of letters, '
                 . 'numbers, spaces, and underscore.',
             mb_strlen($wrapper) > 50 => 'Wrapper name must be less than 50 characters.',
-            file_exists($newWrapperPath) => 'That wrapper already exists.',
-            !is_writable(dirname($newWrapperPath)) => 'Wrapper directory is not writable.',
+            $this->fileUtils->exists($newWrapperPath) => 'That wrapper already exists.',
+            !$this->fileUtils->isWritable(dirname($newWrapperPath)) => 'Wrapper directory is not writable.',
 
-            file_put_contents(
+            $this->fileUtils->putContents(
                 $newWrapperPath,
                 file_get_contents($this->domainDefinitions->getDefaultThemePath() . '/wrappers.html'),
             ) === false => 'Wrapper could not be created.',
@@ -410,7 +407,7 @@ final readonly class Themes
 
         $newSkinData = $this->request->asString->post('newskindata');
         if ($skin->custom && $newSkinData) {
-            file_put_contents(
+            $this->fileUtils->putContents(
                 $this->themesPath . $skin->title . '/css.css',
                 $newSkinData,
             );
@@ -453,7 +450,7 @@ final readonly class Themes
         $wrapperContents = $this->request->post('newwrapper');
         $saved = match (true) {
             !is_string($wrapperContents) => '',
-            default => file_put_contents($wrapperPath, $wrapperContents)
+            default => $this->fileUtils->putContents($wrapperPath, $wrapperContents)
                 ? $this->page->success('Wrapper saved successfully.')
                 : $this->page->error('Error saving wrapper.'),
         };

@@ -10,6 +10,7 @@ use Jax\Config;
 use Jax\Constants\Groups;
 use Jax\Database;
 use Jax\DomainDefinitions;
+use Jax\FileUtils;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Model;
@@ -29,17 +30,18 @@ use function base64_decode;
 /**
  * @internal
  */
-#[CoversClass(User::class)]
+#[CoversClass(Column::class)]
 #[CoversClass(Config::class)]
 #[CoversClass(Database::class)]
 #[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FileUtils::class)]
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
 #[CoversClass(Model::class)]
-#[CoversClass(Column::class)]
-#[CoversClass(ServiceConfig::class)]
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
+#[CoversClass(ServiceConfig::class)]
+#[CoversClass(User::class)]
 #[Small]
 #[UsesFunction('\Jax\pathjoin')]
 final class UserTest extends UnitTestCase

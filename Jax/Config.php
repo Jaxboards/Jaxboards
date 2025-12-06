@@ -6,8 +6,6 @@ namespace Jax;
 
 use function array_key_exists;
 use function array_merge;
-use function file_exists;
-use function file_put_contents;
 
 final class Config
 {
@@ -17,6 +15,7 @@ final class Config
     public function __construct(
         private readonly ServiceConfig $serviceConfig,
         private readonly DomainDefinitions $domainDefinitions,
+        private readonly FileUtils $fileUtils,
         private ?array $boardConfig = null,
     ) {}
 
@@ -42,7 +41,7 @@ final class Config
 
         $boardConfigPath = $this->domainDefinitions->getBoardPath() . '/config.php';
 
-        if (file_exists($boardConfigPath)) {
+        if ($this->fileUtils->exists($boardConfigPath)) {
             require_once $this->domainDefinitions->getBoardPath() . '/config.php';
 
             $this->boardConfig = $CFG;
@@ -76,6 +75,6 @@ final class Config
     {
         $this->boardConfig = array_merge($this->boardConfig ?? [], $data);
 
-        file_put_contents($this->domainDefinitions->getBoardPath() . '/config.php', $this->serviceConfig->configFileContents($this->boardConfig));
+        $this->fileUtils->putContents($this->domainDefinitions->getBoardPath() . '/config.php', $this->serviceConfig->configFileContents($this->boardConfig));
     }
 }

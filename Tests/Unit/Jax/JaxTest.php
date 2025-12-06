@@ -8,6 +8,7 @@ use DI\Container;
 use Jax\Config;
 use Jax\Constants\Groups;
 use Jax\DomainDefinitions;
+use Jax\FileUtils;
 use Jax\Jax;
 use Jax\Model;
 use Jax\Request;
@@ -24,13 +25,14 @@ use function base64_decode;
 /**
  * @internal
  */
-#[CoversClass(Jax::class)]
 #[CoversClass(Config::class)]
 #[CoversClass(DomainDefinitions::class)]
-#[CoversClass(ServiceConfig::class)]
+#[CoversClass(FileUtils::class)]
+#[CoversClass(Jax::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
+#[CoversClass(ServiceConfig::class)]
 #[Small]
 #[UsesFunction('\Jax\pathjoin')]
 final class JaxTest extends UnitTestCase

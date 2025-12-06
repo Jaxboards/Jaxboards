@@ -19,7 +19,6 @@ use function header;
 use function htmlspecialchars;
 use function implode;
 use function ini_get;
-use function is_readable;
 use function readfile;
 use function sys_get_temp_dir;
 use function tempnam;
@@ -158,7 +157,7 @@ final readonly class Tools
 
         $contents = "Sorry, Jaxboards does not have file permissions to read your PHP error log file. ({$logPath})";
 
-        if (is_readable($logPath)) {
+        if ($this->fileUtils->isReadable($logPath)) {
             $last100Lines = htmlspecialchars(implode(PHP_EOL, $this->fileUtils->tail(
                 $logPath,
                 100,

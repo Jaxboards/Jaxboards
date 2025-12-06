@@ -8,7 +8,6 @@ use function array_any;
 use function array_filter;
 use function array_search;
 use function file;
-use function file_exists;
 use function filter_var;
 use function in_array;
 use function inet_ntop;
@@ -32,6 +31,7 @@ final class IPAddress
         private readonly Config $config,
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
+        private readonly FileUtils $fileUtils,
         private readonly Request $request,
     ) {
         $this->ipBanCache = $this->loadBannedIps();
@@ -147,7 +147,7 @@ final class IPAddress
     private function loadBannedIps(): array
     {
         $bannedIPsPath = $this->domainDefinitions->getBoardPath() . '/bannedips.txt';
-        if (file_exists($bannedIPsPath)) {
+        if ($this->fileUtils->exists($bannedIPsPath)) {
             return array_filter(
                 file($bannedIPsPath, FILE_IGNORE_NEW_LINES) ?: [],
                 // Filter out empty lines and comments

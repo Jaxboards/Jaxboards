@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Carbon\Carbon;
 use Jax\Config;
 use Jax\DomainDefinitions;
+use Jax\FileUtils;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\ModControls\ModPosts;
@@ -24,7 +25,6 @@ use Jax\User;
 use function array_map;
 use function count;
 use function file_get_contents;
-use function file_put_contents;
 use function filter_var;
 use function gmdate;
 use function header;
@@ -39,6 +39,7 @@ final readonly class ModControls
     public function __construct(
         private Config $config,
         private DomainDefinitions $domainDefinitions,
+        private FileUtils $fileUtils,
         private IPAddress $ipAddress,
         private Jax $jax,
         private ModTopics $modTopics,
@@ -325,7 +326,7 @@ final readonly class ModControls
         }
 
         if ($changed) {
-            file_put_contents(
+            $this->fileUtils->putContents(
                 $this->domainDefinitions->getBoardPath() . '/bannedips.txt',
                 implode(PHP_EOL, $this->ipAddress->getBannedIps()),
             );

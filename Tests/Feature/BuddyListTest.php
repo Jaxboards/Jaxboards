@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\FileUtils;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -49,6 +50,7 @@ use function json_decode;
  * @internal
  */
 #[CoversClass(App::class)]
+#[CoversClass(FileUtils::class)]
 #[CoversClass(Column::class)]
 #[CoversClass(ForeignKey::class)]
 #[CoversClass(Key::class)]
