@@ -533,16 +533,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/seanjohnson08/mysqlite.git",
-                "reference": "fbedfcc27db2e050a96d0f7d9f4894953aef3a01"
+                "reference": "adc50cb98483269224704b3a98e9646ae582dc00"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seanjohnson08/mysqlite/zipball/fbedfcc27db2e050a96d0f7d9f4894953aef3a01",
-                "reference": "fbedfcc27db2e050a96d0f7d9f4894953aef3a01",
+                "url": "https://api.github.com/repos/seanjohnson08/mysqlite/zipball/adc50cb98483269224704b3a98e9646ae582dc00",
+                "reference": "adc50cb98483269224704b3a98e9646ae582dc00",
                 "shasum": ""
             },
             "require-dev": {
-                "phpunit/phpunit": "^11.5"
+                "phpunit/phpunit": "^11.5",
+                "rector/rector": "^2.2"
             },
             "default-branch": true,
             "type": "library",
@@ -563,7 +564,7 @@
                 "issues": "https://github.com/seanjohnson08/mysqlite/issues",
                 "source": "https://github.com/seanjohnson08/mysqlite/tree/main"
             },
-            "time": "2025-12-04T22:06:16+00:00"
+            "time": "2025-12-06T01:12:51+00:00"
         },
         {
             "name": "sebastian/comparator",
