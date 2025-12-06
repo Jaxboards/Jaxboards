@@ -7,16 +7,15 @@ namespace ACP;
 use Jax\DomainDefinitions;
 use Jax\FileUtils;
 use Jax\Request;
+use SplFileInfo;
 
 use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function header;
 use function mb_substr;
-use function pathinfo;
 use function str_replace;
 
-use const PATHINFO_EXTENSION;
 use const PHP_EOL;
 
 final class Page
@@ -148,8 +147,9 @@ final class Page
         array $data = [],
     ): string {
         $templateFile = 'views/' . $templateFile;
+        $fileInfo = new SplFileInfo($templateFile);
 
-        if (pathinfo($templateFile, PATHINFO_EXTENSION) !== 'html') {
+        if ($fileInfo->getExtension() !== 'html') {
             if (mb_substr($templateFile, -1) !== '.') {
                 $templateFile .= '.';
             }

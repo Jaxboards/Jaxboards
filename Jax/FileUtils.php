@@ -88,19 +88,22 @@ final class FileUtils
     }
 
     /**
-     * Is a file readable?
+     * Computes a human readable filesize.
      */
-    public function isReadable(string $filename): bool
+    public function fileSizeHumanReadable(int $sizeInBytes): string
     {
-        return is_readable($filename);
-    }
+        $magnitude = 0;
+        $sizes = ' KMGTE';
+        while ($sizeInBytes > 1_024) {
+            $sizeInBytes /= 1_024;
+            ++$magnitude;
+        }
 
-    /**
-     * Is a file writable?
-     */
-    public function isWritable(string $filename): bool
-    {
-        return is_writable($filename);
+        $prefix = $magnitude > 0 && $magnitude <= 5
+            ? $sizes[$magnitude]
+            : '';
+
+        return round($sizeInBytes, 2) . "{$prefix}B";
     }
 
     public function getContents(string $filename): string|false
@@ -125,14 +128,25 @@ final class FileUtils
         return glob($pattern, $flags);
     }
 
+    /**
+     * Is a file readable?
+     */
+    public function isReadable(string $filename): bool
+    {
+        return is_readable($filename);
+    }
+
+    /**
+     * Is a file writable?
+     */
+    public function isWritable(string $filename): bool
+    {
+        return is_writable($filename);
+    }
+
     public function isDir(string $filename)
     {
         return is_dir($filename);
-    }
-
-    public function unlink(string $filename): bool
-    {
-        return unlink($filename);
     }
 
     /**
@@ -177,25 +191,6 @@ final class FileUtils
     }
 
     /**
-     * Computes a human readable filesize.
-     */
-    public function fileSizeHumanReadable(int $sizeInBytes): string
-    {
-        $magnitude = 0;
-        $sizes = ' KMGTE';
-        while ($sizeInBytes > 1_024) {
-            $sizeInBytes /= 1_024;
-            ++$magnitude;
-        }
-
-        $prefix = $magnitude > 0 && $magnitude <= 5
-            ? $sizes[$magnitude]
-            : '';
-
-        return round($sizeInBytes, 2) . "{$prefix}B";
-    }
-
-    /**
      * Reads the last $totalLines of a file.
      *
      * @return array<string>
@@ -235,5 +230,10 @@ final class FileUtils
         }
 
         return array_reverse($lines);
+    }
+
+    public function unlink(string $filename): bool
+    {
+        return unlink($filename);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use Jax\Models\File;
+use SplFileInfo;
 
 use function array_filter;
 use function array_key_exists;
@@ -14,7 +15,6 @@ use function array_values;
 use function implode;
 use function in_array;
 use function is_string;
-use function pathinfo;
 use function preg_match;
 use function preg_replace;
 use function preg_replace_callback;
@@ -22,8 +22,6 @@ use function preg_split;
 use function str_contains;
 use function trim;
 use function urlencode;
-
-use const PATHINFO_EXTENSION;
 
 final class BBCode
 {
@@ -156,7 +154,8 @@ final class BBCode
             return "Attachment doesn't exist";
         }
 
-        $ext = pathinfo($file->name, PATHINFO_EXTENSION);
+        $fileInfo = new SplFileInfo($file->name);
+        $ext = $fileInfo->getExtension();
 
         if (
             !in_array($ext, Jax::IMAGE_EXTENSIONS, true)

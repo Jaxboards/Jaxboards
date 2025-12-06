@@ -6,6 +6,7 @@ namespace Jax;
 
 use DI\Container;
 use Jax\Models\Message;
+use SplFileInfo;
 
 use function dirname;
 use function gmdate;
@@ -15,13 +16,11 @@ use function json_decode;
 use function json_encode;
 use function mb_strtolower;
 use function microtime;
-use function pathinfo;
 use function round;
 
 use const JSON_FORCE_OBJECT;
 use const JSON_OBJECT_AS_ARRAY;
 use const JSON_THROW_ON_ERROR;
-use const PATHINFO_FILENAME;
 
 final readonly class App
 {
@@ -139,7 +138,8 @@ final readonly class App
         }
 
         foreach ($modules as $module) {
-            $moduleName = pathinfo((string) $module, PATHINFO_FILENAME);
+            $fileInfo = new SplFileInfo((string) $module);
+            $moduleName = $fileInfo->getBasename('.' . $fileInfo->getExtension());
 
             $module = $this->container->get('Jax\Modules\\' . $moduleName);
 

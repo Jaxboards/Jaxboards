@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use SplFileInfo;
+
 use function array_key_exists;
 use function array_keys;
 use function array_map;
@@ -15,15 +17,11 @@ use function explode;
 use function in_array;
 use function is_string;
 use function mb_strtolower;
-use function pathinfo;
 use function preg_match;
 use function preg_replace_callback;
 use function str_contains;
 use function str_replace;
 use function vsprintf;
-
-use const PATHINFO_BASENAME;
-use const PATHINFO_FILENAME;
 
 /**
  * This class is entirely responsible for rendering the page.
@@ -257,7 +255,8 @@ final class Template
     private function loadComponentTemplates(string $componentDir): array
     {
         return array_reduce($this->fileUtils->glob($componentDir . '/*.html') ?: [], function (array $meta, string $metaFile): array {
-            $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
+            $fileInfo = new SplFileInfo($metaFile);
+            $metaName = $fileInfo->getBasename('.' . $fileInfo->getExtension());
             $metaContent = $this->fileUtils->getContents($metaFile);
 
             if (!is_string($metaContent)) {
@@ -343,7 +342,8 @@ final class Template
                 $componentDir,
             );
 
-            $component = pathinfo($componentDir, PATHINFO_BASENAME);
+            $dirInfo = new SplFileInfo($componentDir);
+            $component = $dirInfo->getBasename();
             $this->debugLog->log("{$process} triggered {$component} to load");
 
 

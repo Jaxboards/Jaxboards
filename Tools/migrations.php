@@ -9,15 +9,14 @@ use Jax\Database;
 use Jax\DebugLog;
 use Jax\FileUtils;
 use PDOException;
+use SplFileInfo;
 
 use function array_reduce;
 use function dirname;
 use function implode;
 use function ksort;
-use function pathinfo;
 use function preg_match;
 
-use const PATHINFO_FILENAME;
 use const PHP_EOL;
 
 $jaxboardsRoot = dirname(__DIR__);
@@ -48,7 +47,8 @@ $migrations = array_reduce(
     $fileUtils->glob($jaxboardsRoot . '/Tools/migrations/**/*.php') ?: [],
     static function ($migrations, string $path) {
         preg_match('/V(\d+)/', $path, $match);
-        $migrations[(int) $match[1]] = pathinfo($path, PATHINFO_FILENAME);
+        $fileInfo = new SplFileInfo($path);
+        $migrations[(int) $match[1]] = $fileInfo->getBasename('.' . $fileInfo->getExtension());
 
         return $migrations;
     },

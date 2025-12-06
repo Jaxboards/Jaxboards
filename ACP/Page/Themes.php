@@ -11,6 +11,7 @@ use Jax\FileUtils;
 use Jax\Models\Skin;
 use Jax\Request;
 use Jax\TextFormatting;
+use SplFileInfo;
 
 use function array_key_exists;
 use function array_map;
@@ -22,13 +23,10 @@ use function is_file;
 use function is_string;
 use function mb_strlen;
 use function mkdir;
-use function pathinfo;
 use function preg_match;
 use function realpath;
 use function rename;
 use function str_starts_with;
-
-use const PATHINFO_FILENAME;
 
 final readonly class Themes
 {
@@ -78,7 +76,11 @@ final readonly class Themes
     private function getWrappers(): array
     {
         return array_map(
-            static fn(string $path): string => pathinfo($path, PATHINFO_FILENAME),
+            function (string $path): string
+            {
+                $fileInfo = new SplFileInfo($path);
+                return $fileInfo->getBasename('.' . $fileInfo->getExtension());
+            },
             $this->fileUtils->glob($this->wrappersPath . '/*') ?: [],
         );
     }

@@ -22,6 +22,7 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use SplFileInfo;
 
 use function array_filter;
 use function array_map;
@@ -35,12 +36,10 @@ use function json_encode;
 use function mb_strlen;
 use function mb_substr;
 use function move_uploaded_file;
-use function pathinfo;
 use function preg_replace;
 use function preg_split;
 use function trim;
 
-use const PATHINFO_EXTENSION;
 use const PHP_EOL;
 
 final class Post
@@ -134,7 +133,8 @@ final class Post
         $hash = hash_file('sha1', $fileobj['tmp_name']) ?: 'hash_error';
         $uploadPath = $this->domainDefinitions->getBoardPath() . '/Uploads/';
 
-        $ext = pathinfo((string) $fileobj['name'], PATHINFO_EXTENSION);
+        $fileInfo = new SplFileInfo($fileobj['name']);
+        $ext = $fileInfo->getExtension();
 
         $imageExtension = in_array($ext, Jax::IMAGE_EXTENSIONS, true)
             ? ".{$ext}"
