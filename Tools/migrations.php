@@ -7,6 +7,7 @@ namespace Tools;
 use DI\Container;
 use Jax\Database;
 use Jax\DebugLog;
+use Jax\FileUtils;
 use PDOException;
 
 use function array_reduce;
@@ -23,6 +24,8 @@ use const PHP_EOL;
 $jaxboardsRoot = dirname(__DIR__);
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
+$container = new Container();
+$fileUtils = $container->get(FileUtils::class);
 
 function error(string $message): string
 {
@@ -43,7 +46,7 @@ function getDBVersion(Database $database): int
 }
 
 $migrations = array_reduce(
-    glob($jaxboardsRoot . '/Tools/migrations/**/*.php') ?: [],
+    $fileUtils->glob($jaxboardsRoot . '/Tools/migrations/**/*.php') ?: [],
     static function ($migrations, string $path) {
         preg_match('/V(\d+)/', $path, $match);
         $migrations[(int) $match[1]] = pathinfo($path, PATHINFO_FILENAME);
@@ -55,8 +58,6 @@ $migrations = array_reduce(
 
 // Sort migrations to run them in order
 ksort($migrations);
-
-$container = new Container();
 
 $database = $container->get(Database::class);
 $dbVersion = getDBVersion($database);

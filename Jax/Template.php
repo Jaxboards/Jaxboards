@@ -258,7 +258,7 @@ final class Template
      */
     private function loadComponentTemplates(string $componentDir): array
     {
-        return array_reduce(glob($componentDir . '/*.html') ?: [], function (array $meta, string $metaFile): array {
+        return array_reduce($this->fileUtils->glob($componentDir . '/*.html') ?: [], function (array $meta, string $metaFile): array {
             $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
             $metaContent = $this->fileUtils->getContents($metaFile);
 

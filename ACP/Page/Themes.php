@@ -81,7 +81,7 @@ final readonly class Themes
     {
         return array_map(
             static fn(string $path): string => pathinfo($path, PATHINFO_FILENAME),
-            glob($this->wrappersPath . '/*') ?: [],
+            $this->fileUtils->glob($this->wrappersPath . '/*') ?: [],
         );
     }
 

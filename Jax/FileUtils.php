@@ -120,6 +120,10 @@ final class FileUtils
         return file($filename, $flags);
     }
 
+    public function glob(string $pattern, int $flags = 0) {
+        return glob($pattern, $flags);
+    }
+
     public function unlink(string $filename): bool
     {
         return unlink($filename);
@@ -151,7 +155,7 @@ final class FileUtils
             $dir .= '/';
         }
 
-        foreach (glob($dir . '**') ?: [] as $fileOrDir) {
+        foreach ($this->glob($dir . '**') ?: [] as $fileOrDir) {
             if (is_dir($fileOrDir)) {
                 self::removeDirectory($fileOrDir);
 
