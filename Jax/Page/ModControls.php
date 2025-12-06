@@ -310,25 +310,10 @@ final readonly class ModControls
             $ipAddress = '';
         }
 
-        $changed = false;
-
         if ($this->request->post('ban') !== null) {
-            if (!$this->ipAddress->isBanned($ipAddress)) {
-                $changed = true;
-                $this->ipAddress->ban($ipAddress);
-            }
+            $this->ipAddress->ban($ipAddress);
         } elseif ($this->request->post('unban') !== null) {
-            if ($this->ipAddress->isBanned($ipAddress)) {
-                $changed = true;
-                $this->ipAddress->unBan($ipAddress);
-            }
-        }
-
-        if ($changed) {
-            $this->fileUtils->putContents(
-                $this->domainDefinitions->getBoardPath() . '/bannedips.txt',
-                implode(PHP_EOL, $this->ipAddress->getBannedIps()),
-            );
+            $this->ipAddress->unBan($ipAddress);
         }
 
         $hiddenFields = $this->jax->hiddenFormFields(

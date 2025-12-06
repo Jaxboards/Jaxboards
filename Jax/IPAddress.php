@@ -66,12 +66,20 @@ final class IPAddress
 
     public function ban(string $ipAddress): void
     {
-        $this->ipBanCache[] = $ipAddress;
+        if (!$this->isBanned($ipAddress)) {
+            $this->ipBanCache[] = $ipAddress;
+        }
+        $this->writeBannedIps();
     }
 
     public function unBan(string $ipAddress): void
     {
-        unset($this->ipBanCache[array_search($ipAddress, $this->ipBanCache, true)]);
+        $index = array_search($ipAddress, $this->ipBanCache, true);
+        if ($index === false) {
+            return;
+        }
+        unset($this->ipBanCache[$index]);
+        $this->writeBannedIps();
     }
 
     public function isBanned(?string $ipAddress = null): bool
@@ -154,6 +162,14 @@ final class IPAddress
         }
 
         return [];
+    }
+
+    private function writeBannedIps()
+    {
+        $this->fileUtils->putContents(
+            $this->domainDefinitions->getBoardPath() . '/bannedips.txt',
+            implode(PHP_EOL, $this->ipBanCache),
+        );
     }
 
     private function getIp(): string
