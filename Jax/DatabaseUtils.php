@@ -19,7 +19,6 @@ use RecursiveIteratorIterator;
 
 use function array_map;
 use function implode;
-use function is_dir;
 use function is_string;
 use function mb_check_encoding;
 use function mb_convert_encoding;
@@ -38,7 +37,10 @@ final readonly class DatabaseUtils implements DatabaseAdapter
 
     private DatabaseAdapter $databaseAdapter;
 
-    public function __construct(private Database $database)
+    public function __construct(
+        private Database $database,
+        private FileUtils $fileUtils,
+    )
     {
         $adapterClass = self::ADAPTERS[$database->driver];
         $this->databaseAdapter = new $adapterClass($database);
@@ -57,7 +59,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         }
 
         $modelsDir = __DIR__ . '/Models';
-        if (!is_dir($modelsDir)) {
+        if (!$this->fileUtils->isDir($modelsDir)) {
             return $modelClassesCache = [];
         }
 

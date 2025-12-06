@@ -65,7 +65,7 @@ final class FileUtils
             $sourcePath = "{$src}/{$file}";
             $destPath = "{$dst}/{$file}";
 
-            if (is_dir($sourcePath)) {
+            if ($this->isDir($sourcePath)) {
                 self::copyDirectory($sourcePath, $destPath);
 
                 continue;
@@ -125,6 +125,11 @@ final class FileUtils
         return glob($pattern, $flags);
     }
 
+    public function isDir(string $filename)
+    {
+        return is_dir($filename);
+    }
+
     public function unlink(string $filename): bool
     {
         return unlink($filename);
@@ -157,7 +162,7 @@ final class FileUtils
         }
 
         foreach ($this->glob($dir . '**') ?: [] as $fileOrDir) {
-            if (is_dir($fileOrDir)) {
+            if ($this->isDir($fileOrDir)) {
                 self::removeDirectory($fileOrDir);
 
                 continue;

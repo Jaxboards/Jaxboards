@@ -13,7 +13,6 @@ use function array_reduce;
 use function array_values;
 use function explode;
 use function in_array;
-use function is_dir;
 use function is_string;
 use function mb_strtolower;
 use function pathinfo;
@@ -160,8 +159,8 @@ final class Template
         $defaultComponentDir = $this->domainDefinitions->getDefaultThemePath() . '/views/' . $component;
 
         $componentDir = match (true) {
-            is_dir($themeComponentDir) => $themeComponentDir,
-            is_dir($defaultComponentDir) => $defaultComponentDir,
+            $this->fileUtils->isDir($themeComponentDir) => $themeComponentDir,
+            $this->fileUtils->isDir($defaultComponentDir) => $defaultComponentDir,
             default => null,
         };
 

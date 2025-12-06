@@ -11,7 +11,6 @@ use function explode;
 use function header;
 use function headers_sent;
 use function is_array;
-use function is_dir;
 use function json_decode;
 use function json_encode;
 
@@ -163,7 +162,7 @@ final class Page
         $themeUrl = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardPathUrl() : '') . '/Themes/' . $skin->title;
 
         // Custom theme found but files not there, also fallback to default
-        if (!is_dir($themePath)) {
+        if (!$this->fileUtils->isDir($themePath)) {
             $themePath = $this->domainDefinitions->getDefaultThemePath();
             $themeUrl = $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default/';
         }

@@ -18,7 +18,6 @@ use function copy;
 use function dirname;
 use function in_array;
 use function is_array;
-use function is_dir;
 use function is_file;
 use function is_string;
 use function mb_strlen;
@@ -175,7 +174,7 @@ final readonly class Themes
 
             if (
                 !$this->isValidFilename($oldName)
-                || !is_dir($this->themesPath . $oldName)
+                || !$this->fileUtils->isDir($this->themesPath . $oldName)
             ) {
                 return 'Invalid from skin name';
             }
@@ -187,7 +186,7 @@ final readonly class Themes
                 return 'Skin name must consist of letters, numbers, spaces, and underscore, and be under 50 characters long.';
             }
 
-            if (is_dir($this->themesPath . $newName)) {
+            if ($this->fileUtils->isDir($this->themesPath . $newName)) {
                 return 'That skin name is already being used.';
             }
 
@@ -473,7 +472,7 @@ final readonly class Themes
             !$skinName => 'No skin name supplied!',
             !$this->isValidFilename($skinName) => 'Skinname must only consist of letters, numbers, and spaces.',
             mb_strlen($skinName) > 50 => 'Skin name must be less than 50 characters.',
-            is_dir($this->themesPath . $skinName) => 'A skin with that name already exists.',
+            $this->fileUtils->isDir($this->themesPath . $skinName) => 'A skin with that name already exists.',
             !in_array($wrapperName, $this->getWrappers()) => 'Invalid wrapper.',
             default => null,
         };
@@ -563,7 +562,7 @@ final readonly class Themes
         }
 
         $skindir = $this->themesPath . $skin->title;
-        if (is_dir($skindir)) {
+        if ($this->fileUtils->isDir($skindir)) {
             $this->fileUtils->removeDirectory($skindir);
         }
 
