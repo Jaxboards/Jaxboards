@@ -104,6 +104,14 @@ final class FileUtils
     }
 
     /**
+     * Returns an array of lines in a file
+     */
+    public function getLines(string $filename, $flags = FILE_IGNORE_NEW_LINES): array
+    {
+        return file($filename, $flags);
+    }
+
+    /**
      * Write data to file.
      */
     public function putContents(string $filename, mixed $data): int|false

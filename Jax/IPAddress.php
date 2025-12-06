@@ -149,7 +149,7 @@ final class IPAddress
         $bannedIPsPath = $this->domainDefinitions->getBoardPath() . '/bannedips.txt';
         if ($this->fileUtils->exists($bannedIPsPath)) {
             return array_filter(
-                file($bannedIPsPath, FILE_IGNORE_NEW_LINES) ?: [],
+                $this->fileUtils->getLines($bannedIPsPath) ?: [],
                 // Filter out empty lines and comments
                 static fn(string $line): bool => $line !== '' && $line[0] !== '#',
             );
