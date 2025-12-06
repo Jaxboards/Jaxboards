@@ -159,7 +159,7 @@ final class FileUtils
     /**
      * Equivalent to Node's path.join method.
      */
-    public function pathjoin(string ...$paths): string
+    public function pathJoin(string ...$paths): string
     {
         return (string) preg_replace('@\/+@', '/', implode('/', $paths));
     }
