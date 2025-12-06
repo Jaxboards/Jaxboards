@@ -13,6 +13,7 @@ use function copy;
 use function count;
 use function glob;
 use function implode;
+use function iterator_to_array;
 use function mb_substr;
 use function mkdir;
 use function opendir;
@@ -107,12 +108,9 @@ final class FileUtils
 
     /**
      * Returns an array of lines in a file.
-     *
-     * @param mixed $flags
      */
-    public function getLines(
-        string $filename,
-    ): array {
+    public function getLines(string $filename): array
+    {
         $file = new SplFileObject($filename);
 
         $file->setFlags(SplFileObject::DROP_NEW_LINE);
