@@ -94,9 +94,7 @@ final class FileUtils
 
     public function getContents(string $filename): string|false
     {
-        $file = new SplFileObject($filename);
-
-        return $file->fread($file->getSize());
+        return implode(PHP_EOL, $this->getLines($filename));
     }
 
     public function getRealPath(string $filename): string
