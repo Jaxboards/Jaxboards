@@ -189,7 +189,7 @@ final class Page
             ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin->wrapper . '.html'
             : '';
         $this->template->load(
-            $skinWrapper && $this->fileUtils->exists($skinWrapper)
+            $skinWrapper && $this->fileUtils->isFile($skinWrapper)
                 ? $skinWrapper
                 : $this->domainDefinitions->getDefaultThemePath() . '/wrappers.html',
         );

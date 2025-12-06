@@ -157,7 +157,7 @@ final class IPAddress
     private function loadBannedIps(): array
     {
         $bannedIPsPath = $this->domainDefinitions->getBoardPath() . '/bannedips.txt';
-        if ($this->fileUtils->exists($bannedIPsPath)) {
+        if ($this->fileUtils->isFile($bannedIPsPath)) {
             return array_filter(
                 $this->fileUtils->getLines($bannedIPsPath) ?: [],
                 // Filter out empty lines and comments

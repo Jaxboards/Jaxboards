@@ -91,7 +91,7 @@ final readonly class Themes
         $wrapperPath = $this->pathToWrapper($wrapper);
         if (
             $this->isValidFilename($wrapper)
-            && $this->fileUtils->exists($wrapperPath)
+            && $this->fileUtils->isFile($wrapperPath)
         ) {
             $this->fileUtils->unlink($wrapperPath);
             $this->page->location('?act=Themes');
@@ -113,7 +113,7 @@ final readonly class Themes
             !$this->isValidFilename($wrapper) => 'Wrapper name must consist of letters, '
                 . 'numbers, spaces, and underscore.',
             mb_strlen($wrapper) > 50 => 'Wrapper name must be less than 50 characters.',
-            $this->fileUtils->exists($newWrapperPath) => 'That wrapper already exists.',
+            $this->fileUtils->isFile($newWrapperPath) => 'That wrapper already exists.',
             !$this->fileUtils->isWritable(dirname($newWrapperPath)) => 'Wrapper directory is not writable.',
 
             $this->fileUtils->putContents(

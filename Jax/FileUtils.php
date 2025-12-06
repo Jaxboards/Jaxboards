@@ -78,14 +78,6 @@ final class FileUtils
     }
 
     /**
-     * Does $filename exist?
-     */
-    public function exists(string $filename): bool
-    {
-        return file_exists($filename);
-    }
-
-    /**
      * Computes a human readable filesize.
      */
     public function fileSizeHumanReadable(int $sizeInBytes): string
@@ -133,6 +125,13 @@ final class FileUtils
         return glob($pattern, $flags);
     }
 
+    public function isDir(string $filename): bool
+    {
+        $fileInfo = new SplFileInfo($filename);
+
+        return $fileInfo->isDir();
+    }
+
     public function isFile(string $filename): bool
     {
         $fileInfo = new SplFileInfo($filename);
@@ -158,13 +157,6 @@ final class FileUtils
         $fileInfo = new SplFileInfo($filename);
 
         return $fileInfo->isWritable();
-    }
-
-    public function isDir(string $filename): bool
-    {
-        $fileInfo = new SplFileInfo($filename);
-
-        return $fileInfo->isDir();
     }
 
     /**
