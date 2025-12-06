@@ -17,7 +17,12 @@ use Jax\Models\Topic;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
+use function array_map;
+use function implode;
 use function is_dir;
+use function is_string;
+use function mb_check_encoding;
+use function mb_convert_encoding;
 use function mb_strlen;
 use function mb_substr;
 use function str_replace;
@@ -101,7 +106,6 @@ final readonly class DatabaseUtils implements DatabaseAdapter
     {
         return $this->databaseAdapter->createTableQueryFromModel($model);
     }
-
 
     /**
      * Build an INSERT SQL query for the given table and data.

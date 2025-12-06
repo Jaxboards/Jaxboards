@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jax;
 
-use Jax\DatabaseUtils\SQLite;
 use Jax\Database;
 use Jax\DatabaseUtils;
+use Jax\DatabaseUtils\SQLite;
 use Jax\Model;
 use Jax\ServiceConfig;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -42,7 +42,7 @@ final class DatabaseUtilsTest extends UnitTestCase
 
         $this->assertEquals(
             "INSERT INTO `test_table` (`id`, `name`, `age`) VALUES (1, 'O''Reilly', 30), (2, 'Alice', 25);",
-            $query
+            $query,
         );
     }
 }
