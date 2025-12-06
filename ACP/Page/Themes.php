@@ -19,12 +19,10 @@ use function copy;
 use function dirname;
 use function in_array;
 use function is_array;
-use function is_file;
 use function is_string;
 use function mb_strlen;
 use function mkdir;
 use function preg_match;
-use function realpath;
 use function rename;
 use function str_starts_with;
 
@@ -222,7 +220,7 @@ final readonly class Themes
                 continue;
             }
 
-            if (!is_file($this->pathToWrapper($wrapperName))) {
+            if (!$this->fileUtils->isFile($this->pathToWrapper($wrapperName))) {
                 continue;
             }
 
@@ -234,7 +232,7 @@ final readonly class Themes
                     under 50 characters long.';
             }
 
-            if (is_file($this->pathToWrapper($wrapperNewName))) {
+            if ($this->fileUtils->isFile($this->pathToWrapper($wrapperNewName))) {
                 return "That wrapper name ({$wrapperNewName}) is already being used.";
             }
 
@@ -436,7 +434,7 @@ final readonly class Themes
     {
         $saved = '';
         $wrapperPath = $this->pathToWrapper($wrapper);
-        if (!$this->isValidFilename($wrapper) || !is_file($wrapperPath)) {
+        if (!$this->isValidFilename($wrapper) || !$this->fileUtils->isFile($wrapperPath)) {
             $this->page->addContentBox(
                 'Error',
                 "The theme you're trying to edit does not exist.",
@@ -502,7 +500,7 @@ final readonly class Themes
             );
         }
 
-        $safeThemesPath = realpath($this->themesPath . $skinName);
+        $safeThemesPath = $this->fileUtils->getRealPath($this->themesPath . $skinName);
         if (
             !$safeThemesPath
             || !str_starts_with($safeThemesPath, $this->themesPath)

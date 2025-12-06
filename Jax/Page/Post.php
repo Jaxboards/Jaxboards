@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Jax\Database;
 use Jax\DomainDefinitions;
+use Jax\FileUtils;
 use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
@@ -31,7 +32,6 @@ use function explode;
 use function filesize;
 use function hash_file;
 use function in_array;
-use function is_file;
 use function json_encode;
 use function mb_strlen;
 use function mb_substr;
@@ -59,13 +59,14 @@ final class Post
     public function __construct(
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
+        private readonly FileUtils $fileUtils,
         private readonly Hooks $hooks,
-        private readonly Page $page,
         private readonly IPAddress $ipAddress,
+        private readonly Page $page,
         private readonly Request $request,
         private readonly Session $session,
-        private readonly TextFormatting $textFormatting,
         private readonly Template $template,
+        private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
         $this->template->addMeta('post-preview', $this->template->meta('box', '', 'Post Preview', '%s'));
@@ -142,7 +143,7 @@ final class Post
 
         $filePath = $uploadPath . $hash . $imageExtension;
 
-        if (!is_file($filePath)) {
+        if (!$this->fileUtils->isFile($filePath)) {
             move_uploaded_file($fileobj['tmp_name'], $filePath);
 
             $file = new File();

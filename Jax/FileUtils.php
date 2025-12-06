@@ -16,9 +16,6 @@ use function file_get_contents;
 use function file_put_contents;
 use function glob;
 use function implode;
-use function is_dir;
-use function is_readable;
-use function is_writable;
 use function mb_substr;
 use function mkdir;
 use function opendir;
@@ -111,6 +108,12 @@ final class FileUtils
         return file_get_contents($filename);
     }
 
+    public function getRealPath(string $filename): string
+    {
+        $fileInfo = new SplFileObject($filename);
+        return $fileInfo->getRealPath();
+    }
+
     /**
      * Returns an array of lines in a file.
      *
@@ -128,12 +131,19 @@ final class FileUtils
         return glob($pattern, $flags);
     }
 
+    public function isFile(string $filename): bool
+    {
+        $fileInfo = new SplFileObject($filename);
+        return $fileInfo->isFile();
+    }
+
     /**
      * Is a file readable?
      */
     public function isReadable(string $filename): bool
     {
-        return is_readable($filename);
+        $fileInfo = new SplFileObject($filename);
+        return $fileInfo->isReadable();
     }
 
     /**
@@ -141,12 +151,14 @@ final class FileUtils
      */
     public function isWritable(string $filename): bool
     {
-        return is_writable($filename);
+        $fileInfo = new SplFileObject($filename);
+        return $fileInfo->isWritable();
     }
 
     public function isDir(string $filename)
     {
-        return is_dir($filename);
+        $fileInfo = new SplFileObject($filename);
+        return $fileInfo->isDir();
     }
 
     /**
