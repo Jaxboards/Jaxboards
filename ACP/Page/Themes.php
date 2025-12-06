@@ -74,9 +74,9 @@ final readonly class Themes
     private function getWrappers(): array
     {
         return array_map(
-            function (string $path): string
-            {
+            static function (string $path): string {
                 $fileInfo = new SplFileInfo($path);
+
                 return $fileInfo->getBasename('.' . $fileInfo->getExtension());
             },
             $this->fileUtils->glob($this->wrappersPath . '/*') ?: [],
@@ -434,7 +434,10 @@ final readonly class Themes
     {
         $saved = '';
         $wrapperPath = $this->pathToWrapper($wrapper);
-        if (!$this->isValidFilename($wrapper) || !$this->fileUtils->isFile($wrapperPath)) {
+        if (
+            !$this->isValidFilename($wrapper)
+            || !$this->fileUtils->isFile($wrapperPath)
+        ) {
             $this->page->addContentBox(
                 'Error',
                 "The theme you're trying to edit does not exist.",

@@ -40,8 +40,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
     public function __construct(
         private Database $database,
         private FileUtils $fileUtils,
-    )
-    {
+    ) {
         $adapterClass = self::ADAPTERS[$database->driver];
         $this->databaseAdapter = new $adapterClass($database);
     }

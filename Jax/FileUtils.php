@@ -111,6 +111,7 @@ final class FileUtils
     public function getRealPath(string $filename): string
     {
         $fileInfo = new SplFileObject($filename);
+
         return $fileInfo->getRealPath();
     }
 
@@ -134,6 +135,7 @@ final class FileUtils
     public function isFile(string $filename): bool
     {
         $fileInfo = new SplFileObject($filename);
+
         return $fileInfo->isFile();
     }
 
@@ -143,6 +145,7 @@ final class FileUtils
     public function isReadable(string $filename): bool
     {
         $fileInfo = new SplFileObject($filename);
+
         return $fileInfo->isReadable();
     }
 
@@ -152,12 +155,14 @@ final class FileUtils
     public function isWritable(string $filename): bool
     {
         $fileInfo = new SplFileObject($filename);
+
         return $fileInfo->isWritable();
     }
 
-    public function isDir(string $filename)
+    public function isDir(string $filename): bool
     {
         $fileInfo = new SplFileObject($filename);
+
         return $fileInfo->isDir();
     }
 
