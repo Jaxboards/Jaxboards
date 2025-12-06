@@ -197,7 +197,7 @@ final readonly class Themes
             );
             $this->fileSystem->rename(
                 $this->fileSystem->pathJoin($this->themesPath, $oldName),
-                $this->fileSystem->pathJoin($this->themesPath, $newName)
+                $this->fileSystem->pathJoin($this->themesPath, $newName),
             );
         }
 

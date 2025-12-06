@@ -9,7 +9,6 @@ use SplFileObject;
 
 use function array_map;
 use function array_reverse;
-use function closedir;
 use function copy;
 use function count;
 use function dirname;
@@ -19,14 +18,15 @@ use function iterator_to_array;
 use function mb_strlen;
 use function mb_substr;
 use function mkdir;
-use function opendir;
 use function preg_replace;
-use function readdir;
+use function rename;
 use function rmdir;
 use function round;
+use function str_replace;
 use function trim;
 use function unlink;
 
+use const GLOB_ONLYDIR;
 use const PHP_EOL;
 use const SEEK_END;
 
@@ -46,7 +46,7 @@ final readonly class FileSystem
     {
         return copy(
             $this->pathFromRoot($from),
-            $this->pathFromRoot($to)
+            $this->pathFromRoot($to),
         );
     }
 
@@ -58,14 +58,14 @@ final readonly class FileSystem
      *
      * @return bool true on success, false on failure
      */
-    public function copyDirectory($src, $dst): bool
+    public function copyDirectory(string $src, $dst): bool
     {
         if (!$this->mkdir($dst)) {
             return false;
         }
 
         // Make directories first
-        foreach($this->glob($this->pathJoin($src, '**'), GLOB_ONLYDIR) as $directory) {
+        foreach ($this->glob($this->pathJoin($src, '**'), GLOB_ONLYDIR) as $directory) {
             $destDir = str_replace($src, $dst, $directory);
             $this->mkdir($destDir, recursive: true);
         }
@@ -145,13 +145,16 @@ final readonly class FileSystem
     public function glob(string $pattern, int $flags = 0): array
     {
         return array_map(
-            fn($path): string => mb_substr((string) $path, mb_strlen($this->root)),
+            fn($path): string => mb_substr($path, mb_strlen($this->root)),
             glob($this->pathFromRoot($pattern), $flags),
         );
     }
 
-    public function mkdir(string $directory, int $mode = 0777, bool $recursive = false): bool
-    {
+    public function mkdir(
+        string $directory,
+        int $mode = 0o777,
+        bool $recursive = false,
+    ): bool {
         return mkdir($this->pathFromRoot($directory), $mode, $recursive);
     }
 
