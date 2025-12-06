@@ -143,7 +143,7 @@ final readonly class FileSystem
     public function glob(string $pattern, int $flags = 0): array
     {
         return array_map(
-            fn($path): string => mb_substr((string) $path, mb_strlen($this->root)),
+            fn($path): string => mb_substr($path, mb_strlen($this->root)),
             glob($this->pathFromRoot($pattern), $flags),
         );
     }

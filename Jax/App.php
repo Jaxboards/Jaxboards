@@ -131,7 +131,7 @@ final readonly class App
     private function loadModules(): void
     {
         $modules = $this->fileSystem->glob('Jax/Modules/*.php');
-        if (!$modules) {
+        if ($modules === []) {
             return;
         }
 
