@@ -117,12 +117,19 @@ final class ProfileTest extends FeatureTestCase
 
     public function testViewProfileRSSFeed(): void
     {
+        $this->insertActivities();
+
         $this->actingAs('admin');
 
         $page = $this->go('?act=vu1&page=activity&fmt=RSS');
 
         $this->assertStringContainsString("<title>Admin's recent activity</title>", $page);
         $this->assertStringContainsString('<link>//example.com?act=vu1</link>', $page);
+        $this->assertStringContainsString("<description>Admin made friends with Admin</description>", $page);
+        $this->assertStringContainsString("<description>Prince is now known as Admin</description>", $page);
+        $this->assertStringContainsString("<description>Admin posted in topic Post</description>", $page);
+        $this->assertStringContainsString("<description>Admin created new topic Topic</description>", $page);
+        $this->assertStringContainsString("<description>Admin commented on Admin's profile</description>", $page);
     }
 
     public function testViewUserProfileActivityNoActivity(): void
@@ -136,14 +143,7 @@ final class ProfileTest extends FeatureTestCase
 
     public function testViewUserProfileActivitySomeActivity(): void
     {
-        $database = $this->container->get(Database::class);
-
-        $activity = new ModelsActivity();
-        $activity->uid = 1;
-        $activity->type = 'profile_comment';
-        $activity->affectedUser = 1;
-        $activity->date = $database->datetime();
-        $activity->insert();
+        $this->insertActivities();
 
         $this->actingAs('admin');
 
@@ -198,5 +198,48 @@ final class ProfileTest extends FeatureTestCase
         $page = $this->go('?act=vu1&page=comments');
 
         DOMAssert::assertSelectEquals('#pfbox .userdata .username', 'Admin', 1, $page);
+    }
+
+    private function insertActivities(): void {
+        $database = $this->container->get(Database::class);
+
+        $activity = new ModelsActivity();
+        $activity->uid = 1;
+        $activity->type = 'profile_comment';
+        $activity->affectedUser = 1;
+        $activity->date = $database->datetime();
+        $activity->insert();
+
+        $activity = new ModelsActivity();
+        $activity->uid = 1;
+        $activity->tid = 1;
+        $activity->type = 'new_topic';
+        $activity->arg1 = 'Topic';
+        $activity->date = $database->datetime();
+        $activity->insert();
+
+        $activity = new ModelsActivity();
+        $activity->uid = 1;
+        $activity->tid = 1;
+        $activity->pid = 1;
+        $activity->type = 'new_post';
+        $activity->arg1 = 'Post';
+        $activity->date = $database->datetime();
+        $activity->insert();
+
+        $activity = new ModelsActivity();
+        $activity->uid = 1;
+        $activity->type = 'profile_name_change';
+        $activity->arg1 = "Prince";
+        $activity->arg2 = "Admin";
+        $activity->date = $database->datetime();
+        $activity->insert();
+
+        $activity = new ModelsActivity();
+        $activity->uid = 1;
+        $activity->type = 'buddy_add';
+        $activity->affectedUser = 1;
+        $activity->date = $database->datetime();
+        $activity->insert();
     }
 }
