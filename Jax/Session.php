@@ -159,7 +159,7 @@ final class Session
 
     public function getVar(string $varName): mixed
     {
-        return $this->vars[$varName] ?? null;
+        return $this->vars[$varName] ?? $this->session[$varName] ?? null;
     }
 
     public function act(?string $location = null): void

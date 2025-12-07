@@ -133,7 +133,7 @@ class ModControls {
     }
 
     destroyModControls() {
-        window.removeEventListener('pushstate', this.boundCheckLocation);
+        globalThis.removeEventListener('pushstate', this.boundCheckLocation);
         if (this.modb) {
             this.modb.innerHTML = '';
             this.modb.style.display = 'none';

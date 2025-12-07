@@ -24,6 +24,10 @@ use Jax\Jax;
 use Jax\ModControls\ModPosts;
 use Jax\ModControls\ModTopics;
 use Jax\Model;
+use Jax\Models\Forum;
+use Jax\Models\Post;
+use Jax\Models\Session as ModelsSession;
+use Jax\Models\Topic;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
@@ -47,36 +51,37 @@ use function json_decode;
  * @internal
  */
 #[CoversClass(App::class)]
-#[CoversClass(FileSystem::class)]
-#[CoversClass(Column::class)]
-#[CoversClass(ForeignKey::class)]
-#[CoversClass(Key::class)]
 #[CoversClass(BBCode::class)]
 #[CoversClass(BotDetector::class)]
+#[CoversClass(Column::class)]
 #[CoversClass(Config::class)]
 #[CoversClass(Database::class)]
 #[CoversClass(DatabaseUtils::class)]
-#[CoversClass(SQLite::class)]
 #[CoversClass(Date::class)]
 #[CoversClass(DebugLog::class)]
 #[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FileSystem::class)]
+#[CoversClass(ForeignKey::class)]
+#[CoversClass(Forum::class)]
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
+#[CoversClass(Key::class)]
+#[CoversClass(ModControls::class)]
+#[CoversClass(Model::class)]
 #[CoversClass(ModPosts::class)]
 #[CoversClass(ModTopics::class)]
-#[CoversClass(Model::class)]
-#[CoversClass(PrivateMessage::class)]
-#[CoversClass(Shoutbox::class)]
 #[CoversClass(Page::class)]
-#[CoversClass(ModControls::class)]
-#[CoversClass(TextRules::class)]
+#[CoversClass(PrivateMessage::class)]
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(Router::class)]
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(Session::class)]
+#[CoversClass(Shoutbox::class)]
+#[CoversClass(SQLite::class)]
 #[CoversClass(Template::class)]
 #[CoversClass(TextFormatting::class)]
+#[CoversClass(TextRules::class)]
 #[CoversClass(User::class)]
 final class ModCPTest extends FeatureTestCase
 {
@@ -170,7 +175,7 @@ final class ModCPTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('.modcppage .minibox .content', '--No Data--', 3, $page);
     }
 
-    public function testAddPostToModerate(): void
+    public function testAddOriginalPostToModerate(): void
     {
         $this->actingAs('admin');
 
@@ -180,9 +185,30 @@ final class ModCPTest extends FeatureTestCase
         ));
 
         $json = json_decode($page, true);
+        $sessionData = ModelsSession::selectOne();
 
         $this->assertContainsEquals(['softurl'], $json);
         $this->assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
+        $this->assertEquals(serialize(['modtids' => '1']), $sessionData->vars);
+    }
+
+    public function testAddPostReplyToModerate(): void
+    {
+        $this->actingAs('admin');
+
+        $pid = (string) $this->insertReply();
+
+        $page = $this->go(new Request(
+            get: ['act' => 'modcontrols', 'do' => 'modp', 'pid' => $pid],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+        $sessionData = ModelsSession::selectOne();
+
+        $this->assertContainsEquals(['softurl'], $json);
+        $this->assertContainsEquals(['modcontrols_postsync', $pid, ''], $json);
+        $this->assertEquals(serialize(['modpids' => $pid]), $sessionData->vars);
     }
 
     public function testAddTopicToModerate(): void
@@ -195,9 +221,91 @@ final class ModCPTest extends FeatureTestCase
         ));
 
         $json = json_decode($page, true);
+        $sessionData = ModelsSession::selectOne();
 
         $this->assertContainsEquals(['softurl'], $json);
         $this->assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
+        $this->assertEquals(serialize(['modtids' => '1']), $sessionData->vars);
+    }
+
+    public function testDeletePostsWithoutTrashcan(): void {
+        $pid = $this->insertReply();
+
+        $this->actingAs(
+            'admin',
+            sessionOverrides: ['modpids' => (string) $pid]
+        );
+
+        $page = $this->go(new Request(
+            post: ['act' => 'modcontrols', 'dop' => 'delete'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['removeel', '#pid_2'], $json);
+        $this->assertContainsEquals(['modcontrols_clearbox'], $json);
+
+        $this->assertNull(Post::selectOne($pid), 'Post is deleted');
+    }
+
+    public function testDeleteTopicWithoutTrashcan(): void {
+        $this->actingAs(
+            'admin',
+            sessionOverrides: ['modtids' => '1']
+        );
+
+        $page = $this->go(new Request(
+            post: ['act' => 'modcontrols', 'dot' => 'delete'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['modcontrols_clearbox'], $json);
+
+        $this->assertNull(Topic::selectOne(1), 'Topic is deleted');
+        $this->assertNull(Post::selectOne(1), 'Post is deleted');
+    }
+
+    public function testMovePosts(): void {
+        $pid = $this->insertReply();
+        $tid = $this->insertTopic();
+
+        $this->actingAs(
+            'admin',
+            sessionOverrides: ['modpids' => (string) $pid]
+        );
+
+        $page = $this->go(new Request(
+            post: ['act' => 'modcontrols', 'dop' => 'moveto', 'id' => (string) $tid],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['modcontrols_clearbox'], $json);
+
+        $this->assertEquals(Post::selectOne($pid)->tid, $tid, 'Post was moved');
+    }
+
+    public function testMoveTopics(): void {
+        $fid = $this->insertForum();
+
+        $this->actingAs(
+            'admin',
+            sessionOverrides: ['modtids' => '1']
+        );
+
+        $page = $this->go(new Request(
+            post: ['act' => 'modcontrols', 'dot' => 'moveto', 'id' => (string) $fid],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['modcontrols_clearbox'], $json);
+        $this->assertEquals(Topic::selectOne(1)->fid, $fid, 'Topic was moved');
     }
 
     public function testLoadModControlsJS(): void
@@ -207,5 +315,30 @@ final class ModCPTest extends FeatureTestCase
         $page = $this->go('?act=modcontrols&do=load');
 
         $this->assertStringContainsString('modcontrols', $page);
+    }
+
+    private function insertForum(): int
+    {
+        $forum = new Forum();
+        $forum->title = 'Other forum';
+        $forum->insert();
+        return $forum->id;
+    }
+
+    private function insertTopic(): int
+    {
+        $topic = new Topic();
+        $topic->insert();
+        return $topic->id;
+    }
+
+    private function insertReply(): int
+    {
+        $post = new Post();
+        $post->author = 1;
+        $post->post = 'reply';
+        $post->tid = 1;
+        $post->insert();
+        return $post->id;
     }
 }

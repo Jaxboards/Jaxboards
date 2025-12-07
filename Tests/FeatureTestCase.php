@@ -52,9 +52,15 @@ abstract class FeatureTestCase extends TestCase
         $this->assertStringContainsString("Location: {$location}", $page);
     }
 
+    /**
+     * Sets up an authenticated user for testing purposes
+     * @param array<mixed> $memberOverrides Overrides to properties of the Member model
+     * @param array<mixed> $sessionOverrides Overrides to properties of the Session variables
+     */
     public function actingAs(
         Member|string $member,
         array $memberOverrides = [],
+        array $sessionOverrides = [],
     ): void {
         $database = $this->container->get(Database::class);
 
@@ -99,7 +105,7 @@ abstract class FeatureTestCase extends TestCase
 
         $this->container->set(
             JaxSession::class,
-            autowire()->constructorParameter('session', ['uid' => $member->id]),
+            autowire()->constructorParameter('session', ['uid' => $member->id, ...$sessionOverrides]),
         );
     }
 
