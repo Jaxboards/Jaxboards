@@ -16,7 +16,8 @@ use function str_replace;
 final class DomainDefinitions
 {
     private string $boardURL = '';
-    private ?string $prefix;
+
+    private readonly ?string $prefix;
 
     /**
      * @SuppressWarnings("PHPMD.Superglobals")
@@ -92,7 +93,7 @@ final class DomainDefinitions
         if ($this->serviceConfig->getSetting('service')) {
             $domainMatch = str_replace('.', '\.', $this->serviceConfig->getSetting('domain'));
 
-            preg_match("/(.*)\.{$domainMatch}/i", $host, $matches);
+            preg_match("/(.*)\\.{$domainMatch}/i", $host, $matches);
 
             if ($matches[1] !== '') {
                 $prefix = $matches[1];
@@ -100,6 +101,7 @@ final class DomainDefinitions
                     'prefix' => $prefix,
                     'sql_prefix' => $prefix . '_',
                 ]);
+
                 return $prefix;
             }
         }
