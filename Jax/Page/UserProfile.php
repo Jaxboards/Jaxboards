@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\ContactDetails;
+use Jax\Date;
 use Jax\IPAddress;
 use Jax\Models\Group;
 use Jax\Models\Member;
@@ -27,6 +28,7 @@ final readonly class UserProfile
 {
     public function __construct(
         private ContactDetails $contactDetails,
+        private Date $date,
         private IPAddress $ipAddress,
         private Page $page,
         private ProfileTabs $profileTabs,
@@ -169,7 +171,10 @@ final readonly class UserProfile
 
         $contactdetails = $this->renderContactDetails($member);
 
-        $birthday = $member->birthdate ?: 'N/A';
+        $birthdate = $member->birthdate !== null
+            ? $this->date->dateAsCarbon($member->birthdate)
+            : null;
+
         $page = $this->template->meta(
             'userprofile-full-profile',
             $member->displayName,
@@ -179,7 +184,7 @@ final readonly class UserProfile
             $member->full_name ?: 'N/A',
             ucfirst($member->gender) ?: 'N/A',
             $member->location,
-            $birthday,
+            $birthdate !== null ? $birthdate->format('M jS') . ", {$birthdate->age} years old!" : 'N/A',
             $member->website !== '' ? "<a href='{$member->website}'>{$member->website}</a>" : 'N/A',
             $member->joinDate,
             $member->lastVisit,
