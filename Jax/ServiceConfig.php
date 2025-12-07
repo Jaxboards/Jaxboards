@@ -98,6 +98,7 @@ final class ServiceConfig
      */
     public function writeServiceConfig(array $data): void
     {
+        $this->serviceConfig = array_merge($this->serviceConfig, $data);
         $this->fileSystem->putContents('config.php', $this->configFileContents($data));
     }
 

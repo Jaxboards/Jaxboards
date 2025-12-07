@@ -99,6 +99,9 @@ final readonly class ServiceInstall
 
         if ($this->request->post('submit') !== null) {
             $errors = $this->install();
+            if ($errors === []) {
+                return 'Taking you to the board index...';
+            };
         }
 
         $errorsHTML = implode('', array_map(static fn(string $error): string => "<div class='error'>{$error}</div>", $errors));
@@ -225,6 +228,10 @@ final readonly class ServiceInstall
         $sqlPassword = $this->request->asString->post('sql_password');
         $sqlDB = $this->request->asString->post('sql_db');
 
+        // This only exists so the test can set it, although
+        // it could be a form field one day (so the user can choose the driver)
+        $sqlDriver = $this->request->asString->post('sql_driver');
+
         if (
             $domain !== null
             && !parse_url($domain, PHP_URL_HOST)
@@ -267,7 +274,13 @@ final readonly class ServiceInstall
         if (!$sqlHost || !$sqlUsername || !$sqlPassword || !$sqlDB) {
             $errors[] = 'SQL host, username, password, database fields required';
         } else {
-            $this->database->connect($sqlHost, $sqlUsername, $sqlPassword, $sqlDB);
+            $this->database->connect(
+                host: $sqlHost,
+                user: $sqlUsername,
+                password: $sqlPassword,
+                database: $sqlDB,
+                driver: $sqlDriver
+            );
         }
 
         if ($errors !== []) {
@@ -296,7 +309,7 @@ final readonly class ServiceInstall
                 'DROP TABLE IF EXISTS `directory`;',
                 <<<'SQL'
                     CREATE TABLE `directory` (
-                    `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                    `id` int(10) NOT NULL AUTO_INCREMENT,
                     `registrar_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
                     `registrar_ip` varbinary(16) NOT NULL DEFAULT '',
                     `date` datetime DEFAULT NULL,

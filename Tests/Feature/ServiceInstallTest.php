@@ -16,6 +16,8 @@ use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Model;
+use Jax\Models\Member;
+use Jax\Models\Post;
 use Jax\Page\ServiceInstall;
 use Jax\Request;
 use Jax\RequestStringGetter;
@@ -23,12 +25,18 @@ use Jax\ServiceConfig;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use SplFileInfo;
-use Tests\FeatureTestCase;
+use Tests\TestCase;
 
 use function array_key_exists;
 use function DI\autowire;
 
 /**
+ * The installer test is special.
+ *
+ * It should run standalone and not extend a normal feature test.
+ *
+ * It fully mocks out the filesystem and assumes the database has not yet been installed.
+ *
  * @internal
  */
 #[CoversClass(ServiceInstall::class)]
@@ -47,8 +55,9 @@ use function DI\autowire;
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(ServiceConfig::class)]
-final class ServiceInstallTest extends FeatureTestCase
+final class ServiceInstallTest extends TestCase
 {
+    private \PHPUnit\Framework\MockObject\MockObject&\Jax\FileSystem $fileSystemMock;
     /**
      * @var array<SplFileInfo>
      */
@@ -58,15 +67,15 @@ final class ServiceInstallTest extends FeatureTestCase
     {
         $originalFileSystem = $this->container->get(FileSystem::class);
 
-        $fileSystemStub = $this->createStub(FileSystem::class);
+        $this->fileSystemMock = $fileSystemMock = $this->createMock(FileSystem::class);
 
-        // Pass through necessary reads
-        $fileSystemStub->method('glob')
+        // Pass through the models glob
+        $fileSystemMock->method('glob')
             ->willReturnCallback($originalFileSystem->glob(...))
         ;
 
         $this->mockedFiles = [];
-        $fileSystemStub->method('getFileInfo')
+        $fileSystemMock->method('getFileInfo')
             ->willReturnCallback(function (string $filename) use ($originalFileSystem): SplFileInfo {
                 if (array_key_exists($filename, $this->mockedFiles)) {
                     return $this->mockedFiles[$filename];
@@ -78,7 +87,7 @@ final class ServiceInstallTest extends FeatureTestCase
         ;
 
         // Stub out FileSystem
-        $this->container->set(FileSystem::class, $fileSystemStub);
+        $this->container->set(FileSystem::class, $fileSystemMock);
 
         parent::setUp();
     }
@@ -108,11 +117,66 @@ final class ServiceInstallTest extends FeatureTestCase
         DOMAssert::assertSelectCount('input[name=admin_username]', 1, $page);
         DOMAssert::assertSelectCount('input[name=admin_password]', 1, $page);
         DOMAssert::assertSelectCount('input[name=admin_password_2]', 1, $page);
+        DOMAssert::assertSelectCount('input[name=admin_email]', 1, $page);
         DOMAssert::assertSelectCount('input[name=domain]', 1, $page);
         DOMAssert::assertSelectCount('input[name=sql_db]', 1, $page);
         DOMAssert::assertSelectCount('input[name=sql_host]', 1, $page);
         DOMAssert::assertSelectCount('input[name=sql_username]', 1, $page);
         DOMAssert::assertSelectCount('input[name=sql_password]', 1, $page);
+    }
+
+    public function testInstallerFormSubmitNormalMode(): void
+    {
+        $this->mockedFiles['config.php'] = $this->createConfiguredStub(
+            SplFileInfo::class,
+            ['isFile' => false],
+        );
+
+        // Assert that the boards directory is set up
+        $this->fileSystemMock->expects($this->once())
+            ->method('copyDirectory')
+            ->with('Service/blueprint', 'boards/jaxboards');
+
+        $page = $this->goServiceInstall(new Request(
+            post: [
+                // 'service' =>
+                'admin_username' => 'Sean',
+                'admin_password' => 'password',
+                'admin_password_2' => 'password',
+                'admin_email' => 'admin_email@jaxboards.com',
+                'domain' => 'domain.com',
+                'sql_db' => 'sql_db',
+                'sql_host' => 'sql_host',
+                'sql_username' => 'sql_username',
+                'sql_password' => 'sql_password',
+                'sql_driver' => 'sqliteMemory',
+                'submit' => 'Start your service!',
+            ]
+        ));
+
+        // Assert the config was written
+        $serviceConfig = $this->container->get(ServiceConfig::class)->get();
+        $this->assertEquals($serviceConfig['service'], false);
+        $this->assertEquals($serviceConfig['boardname'], 'Jaxboards');
+        $this->assertEquals($serviceConfig['domain'], 'domain.com');
+        $this->assertEquals($serviceConfig['mail_from'], 'Sean <admin_email@jaxboards.com>');
+        $this->assertEquals($serviceConfig['prefix'], 'jaxboards');
+        $this->assertEquals($serviceConfig['sql_db'], 'sql_db');
+        $this->assertEquals($serviceConfig['sql_host'], 'sql_host');
+        $this->assertEquals($serviceConfig['sql_username'], 'sql_username');
+        $this->assertEquals($serviceConfig['sql_password'], 'sql_password');
+        $this->assertEquals($serviceConfig['sql_prefix'], 'jaxboards_');
+
+        // Do some spot checking to see if the installer
+        // set up the tables based on form data
+        $this->assertEquals(Post::selectOne(1)->author, 1);
+
+        $member = Member::selectOne(1);
+        $this->assertEquals($member->displayName, 'Sean');
+        $this->assertEquals($member->email, 'admin_email@jaxboards.com');
+        $this->assertTrue(password_verify('password', $member->pass));
+
+        $this->assertStringContainsString('Taking you to the board index', $page);
     }
 
     private function goServiceInstall(?Request $request = null)
