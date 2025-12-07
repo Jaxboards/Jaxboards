@@ -14,8 +14,6 @@ use Jax\Models\Post;
 use Jax\Models\Skin;
 use Jax\Models\Stats;
 use Jax\Models\Topic;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 
 use function array_map;
 use function implode;
