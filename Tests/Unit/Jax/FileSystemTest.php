@@ -10,22 +10,27 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\UnitTestCase;
 
+use function implode;
+use function range;
+use function sys_get_temp_dir;
+
 /**
  * @internal
  */
-#[Small]
 #[CoversClass(FileSystem::class)]
+#[Small]
 final class FileSystemTest extends UnitTestCase
 {
     private FileSystem $fileSystem;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->fileSystem = new FileSystem(sys_get_temp_dir());
         parent::setUp();
     }
 
-    public function testOperations() {
+    public function testOperations(): void
+    {
         // mkdir
         $this->fileSystem->mkdir('jaxboards/deep', recursive: true);
         $this->assertTrue($this->fileSystem->getFileInfo('jaxboards/deep')->isDir());
@@ -33,7 +38,7 @@ final class FileSystemTest extends UnitTestCase
         // putContents
         $this->fileSystem->putContents(
             'jaxboards/test',
-            implode("\n", range(1, 100))
+            implode("\n", range(1, 100)),
         );
 
         $fileInfo = $this->fileSystem->getFileInfo('jaxboards/test');
@@ -78,20 +83,23 @@ final class FileSystemTest extends UnitTestCase
     }
 
     #[DataProvider('fileSizeHumanReadableDataProvider')]
-    public function testFileSizeHumanReadable(int $fileSize, string $readable)
-    {
+    public function testFileSizeHumanReadable(
+        int $fileSize,
+        string $readable,
+    ): void {
         $this->assertEquals($readable, $this->fileSystem->fileSizeHumanReadable($fileSize));
     }
 
-    public static function fileSizeHumanReadableDataProvider() {
+    public static function fileSizeHumanReadableDataProvider(): array
+    {
         return [
             [5, '5B'],
-            [1<<10, '1KB'],
-            [3<<9, '1.5KB'],
-            [1<<20, '1MB'],
-            [1<<30, '1GB'],
-            [1<<40, '1TB'],
-            [1<<50, '1EB'],
+            [1 << 10, '1KB'],
+            [3 << 9, '1.5KB'],
+            [1 << 20, '1MB'],
+            [1 << 30, '1GB'],
+            [1 << 40, '1TB'],
+            [1 << 50, '1EB'],
         ];
     }
 }

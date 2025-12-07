@@ -22,10 +22,12 @@ use function preg_replace;
 use function rename;
 use function rmdir;
 use function round;
+use function str_ends_with;
 use function str_replace;
 use function trim;
 use function unlink;
 
+use const GLOB_BRACE;
 use const GLOB_ONLYDIR;
 use const PHP_EOL;
 use const SEEK_END;
@@ -41,7 +43,7 @@ final readonly class FileSystem
 
     public function __construct(?string $root = null)
     {
-        $root = $root ?? dirname(__DIR__);
+        $root ??= dirname(__DIR__);
 
         // ensure trailing slash
         $this->root = str_ends_with($root, '/') ? $root : $root . '/';
@@ -83,6 +85,7 @@ final readonly class FileSystem
             if ($this->getFileInfo($sourceFile)->isDir()) {
                 continue;
             }
+
             $destFile = str_replace($src, $dst, $sourceFile);
             $this->copy($sourceFile, $destFile);
         }
