@@ -9,5 +9,8 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Key
 {
-    public function __construct(public bool $fulltext = false) {}
+    public function __construct(
+        public bool $fulltext = false,
+        public bool $unique = false,
+    ) {}
 }

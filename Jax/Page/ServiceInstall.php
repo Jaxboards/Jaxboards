@@ -9,6 +9,8 @@ use Jax\DatabaseUtils;
 use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Models\Member;
+use Jax\Models\Service\Banlist;
+use Jax\Models\Service\Directory;
 use Jax\Request;
 use Jax\ServiceConfig;
 
@@ -100,7 +102,7 @@ final readonly class ServiceInstall
         if ($this->request->post('submit') !== null) {
             $errors = $this->install();
             if ($errors === []) {
-                return 'Taking you to the board index...';
+                return 'Redirecting...';
             }
         }
 
@@ -307,27 +309,11 @@ final readonly class ServiceInstall
             // Create directory table.
             $queries = [
                 'DROP TABLE IF EXISTS `directory`;',
-                <<<'SQL'
-                    CREATE TABLE `directory` (
-                    `id` int(10) NOT NULL AUTO_INCREMENT,
-                    `registrar_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                    `registrar_ip` varbinary(16) NOT NULL DEFAULT '',
-                    `date` datetime DEFAULT NULL,
-                    `boardname` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-                    `referral` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                    PRIMARY KEY (`id`)
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-                    SQL,
-                'TRUNCATE `directory`;',
+                $this->databaseUtils->createTableQueryFromModel(new Directory()),
                 'DROP TABLE IF EXISTS `banlist`;',
-                <<<'SQL'
-                    CREATE TABLE `banlist` (
-                    `ip` varbinary(16) NOT NULL,
-                    UNIQUE KEY `ip` (`ip`)
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-                    SQL,
-                'TRUNCATE `banlist`;',
+                $this->databaseUtils->createTableQueryFromModel(new Banlist()),
             ];
+
             foreach ($queries as $query) {
                 $result = $this->database->query($query);
                 $this->database->disposeresult($result);
@@ -387,9 +373,10 @@ final readonly class ServiceInstall
 
         if ($serviceMode) {
             header('Location: ./');
-        } else {
-            header('Location: ../');
+            return [];
         }
+
+        header('Location: ../');
 
         return [];
     }

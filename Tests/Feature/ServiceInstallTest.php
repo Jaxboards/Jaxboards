@@ -18,6 +18,7 @@ use Jax\IPAddress;
 use Jax\Model;
 use Jax\Models\Member;
 use Jax\Models\Post;
+use Jax\Models\Service\Directory;
 use Jax\Page\ServiceInstall;
 use Jax\Request;
 use Jax\RequestStringGetter;
@@ -180,7 +181,74 @@ final class ServiceInstallTest extends TestCase
         $this->assertEquals($member->email, 'admin_email@jaxboards.com');
         $this->assertTrue(password_verify('password', $member->pass));
 
-        $this->assertStringContainsString('Taking you to the board index', $page);
+        $this->assertStringContainsString('Redirecting', $page);
+    }
+
+
+    public function testInstallerFormSubmitServiceMode(): void
+    {
+        $this->mockedFiles['config.php'] = $this->createConfiguredStub(
+            SplFileInfo::class,
+            ['isFile' => false],
+        );
+
+        // Assert that the boards directory is set up
+        $this->fileSystemMock->expects($this->exactly(2))
+            ->method('copyDirectory')
+            ->with(
+                'Service/blueprint',
+                $this->callback(fn($path) => in_array($path, [
+                    'boards/test',
+                    'boards/support'
+                ])
+            ));
+
+
+        $page = $this->goServiceInstall(new Request(
+            post: [
+                'service' => 'on',
+                'admin_username' => 'Sean',
+                'admin_password' => 'password',
+                'admin_password_2' => 'password',
+                'admin_email' => 'admin_email@jaxboards.com',
+                'domain' => 'domain.com',
+                'sql_db' => 'sql_db',
+                'sql_host' => 'sql_host',
+                'sql_username' => 'sql_username',
+                'sql_password' => 'sql_password',
+                'sql_driver' => 'sqliteMemory',
+                'submit' => 'Start your service!',
+            ],
+        ));
+
+        // Assert the config was written
+        $serviceConfig = $this->container->get(ServiceConfig::class)->get();
+        $this->assertEquals($serviceConfig['service'], true);
+        $this->assertEquals($serviceConfig['boardname'], 'Jaxboards');
+        $this->assertEquals($serviceConfig['domain'], 'domain.com');
+        $this->assertEquals($serviceConfig['mail_from'], 'Sean <admin_email@jaxboards.com>');
+        $this->assertEquals($serviceConfig['prefix'], '');
+        $this->assertEquals($serviceConfig['sql_db'], 'sql_db');
+        $this->assertEquals($serviceConfig['sql_host'], 'sql_host');
+        $this->assertEquals($serviceConfig['sql_username'], 'sql_username');
+        $this->assertEquals($serviceConfig['sql_password'], 'sql_password');
+        $this->assertEquals($serviceConfig['sql_prefix'], '');
+
+        // Do some spot checking to see if the installer
+        // set up the tables based on form data
+        $this->assertEquals(Post::selectOne(1)->author, 1);
+
+        $member = Member::selectOne(1);
+        $this->assertEquals($member->displayName, 'Sean');
+        $this->assertEquals($member->email, 'admin_email@jaxboards.com');
+        $this->assertTrue(password_verify('password', $member->pass));
+
+        $this->container->get(Database::class)->setPrefix('');
+        $directory = Directory::selectOne(1);
+        $this->assertEquals($directory->registrar_email, 'admin_email@jaxboards.com');
+        $this->assertEquals($directory->boardname, 'support');
+
+        $this->assertStringContainsString('Redirecting', $page);
     }
 
     private function goServiceInstall(?Request $request = null)

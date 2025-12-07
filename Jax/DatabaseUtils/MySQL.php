@@ -67,9 +67,13 @@ final readonly class MySQL implements DatabaseAdapter
             }
 
             $keyAttribute = $keyAttributes[0]->newInstance();
-            $fulltext = $keyAttribute->fulltext ? 'FULLTEXT ' : '';
+            $keyType = match (true) {
+                $keyAttribute->fulltext => 'FULLTEXT ',
+                $keyAttribute->unique => 'UNIQUE ',
+                default => '',
+            };
 
-            $keys[] = "{$fulltext}KEY {$fieldName} ({$fieldName})";
+            $keys[] = "{$keyType}KEY {$fieldName} ({$fieldName})";
         }
 
         return implode(
