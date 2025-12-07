@@ -41,7 +41,10 @@ final readonly class FileSystem
 
     public function __construct(?string $root = null)
     {
-        $this->root = $root ?? dirname(__DIR__);
+        $root = $root ?? dirname(__DIR__);
+
+        // ensure trailing slash
+        $this->root = str_ends_with($root, '/') ? $root : $root . '/';
     }
 
     /**
@@ -76,7 +79,10 @@ final readonly class FileSystem
         }
 
         // Then files
-        foreach ($this->glob($this->pathJoin($src, '**/*')) as $sourceFile) {
+        foreach ($this->glob($this->pathJoin($src, '{**/,}*'), GLOB_BRACE) as $sourceFile) {
+            if ($this->getFileInfo($sourceFile)->isDir()) {
+                continue;
+            }
             $destFile = str_replace($src, $dst, $sourceFile);
             $this->copy($sourceFile, $destFile);
         }
@@ -91,7 +97,7 @@ final readonly class FileSystem
     {
         $magnitude = 0;
         $sizes = ' KMGTE';
-        while ($sizeInBytes > 1_024) {
+        while ($sizeInBytes >= 1_024) {
             $sizeInBytes /= 1_024;
             ++$magnitude;
         }
