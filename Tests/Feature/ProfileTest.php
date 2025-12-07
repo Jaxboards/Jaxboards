@@ -125,10 +125,10 @@ final class ProfileTest extends FeatureTestCase
 
         $this->assertStringContainsString("<title>Admin's recent activity</title>", $page);
         $this->assertStringContainsString('<link>//example.com?act=vu1</link>', $page);
-        $this->assertStringContainsString("<description>Admin made friends with Admin</description>", $page);
-        $this->assertStringContainsString("<description>Prince is now known as Admin</description>", $page);
-        $this->assertStringContainsString("<description>Admin posted in topic Post</description>", $page);
-        $this->assertStringContainsString("<description>Admin created new topic Topic</description>", $page);
+        $this->assertStringContainsString('<description>Admin made friends with Admin</description>', $page);
+        $this->assertStringContainsString('<description>Prince is now known as Admin</description>', $page);
+        $this->assertStringContainsString('<description>Admin posted in topic Post</description>', $page);
+        $this->assertStringContainsString('<description>Admin created new topic Topic</description>', $page);
         $this->assertStringContainsString("<description>Admin commented on Admin's profile</description>", $page);
     }
 
@@ -200,7 +200,8 @@ final class ProfileTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('#pfbox .userdata .username', 'Admin', 1, $page);
     }
 
-    private function insertActivities(): void {
+    private function insertActivities(): void
+    {
         $database = $this->container->get(Database::class);
 
         $activity = new ModelsActivity();
@@ -230,8 +231,8 @@ final class ProfileTest extends FeatureTestCase
         $activity = new ModelsActivity();
         $activity->uid = 1;
         $activity->type = 'profile_name_change';
-        $activity->arg1 = "Prince";
-        $activity->arg2 = "Admin";
+        $activity->arg1 = 'Prince';
+        $activity->arg2 = 'Admin';
         $activity->date = $database->datetime();
         $activity->insert();
 
