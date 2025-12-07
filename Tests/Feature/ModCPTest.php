@@ -271,6 +271,37 @@ final class ModCPTest extends FeatureTestCase
         $this->assertNull(Post::selectOne(1), 'Post is deleted');
     }
 
+    public function testMovePostCommand(): void
+    {
+        $this->actingAs(
+            'admin',
+            sessionOverrides: ['modpids' => '1']
+        );
+
+        $page = $this->go(new Request(
+            post: ['act' => 'modcontrols', 'dop' => 'move'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['modcontrols_move', '1'], $json);
+    }
+
+    public function testMoveTopicCommand(): void
+    {
+        $this->actingAs('admin');
+
+        $page = $this->go(new Request(
+            post: ['act' => 'modcontrols', 'dot' => 'move'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['modcontrols_move', '0'], $json);
+    }
+
     public function testMovePosts(): void
     {
         $pid = $this->insertReply();
@@ -313,6 +344,62 @@ final class ModCPTest extends FeatureTestCase
         $this->assertEquals(Topic::selectOne(1)->fid, $fid, 'Topic was moved');
     }
 
+    public function testMergeTopicsForm(): void
+    {
+        $otherTid = $this->insertTopic();
+
+        $this->actingAs(
+            'admin',
+            sessionOverrides: ['modtids' => '1'],
+        );
+
+        $page = $this->go(new Request(
+            post: ['act' => 'modcontrols', 'dot' => 'merge', 'id' => (string) $otherTid],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $html = array_find(
+            $json,
+            fn($record) => array_key_exists(1, $record) && $record[1] === 'page'
+        )[2];
+
+        $this->assertStringContainsString('Which topic should the topics be merged into?', $html);
+        DOMAssert::assertSelectCount('input[name="ot"][value="1"]', 1, $html);
+    }
+
+    public function testMergeTopicsDoMerge(): void
+    {
+        $otherTid = $this->insertTopic();
+
+        $this->actingAs(
+            'admin',
+            sessionOverrides: ['modtids' => implode(',', [1, $otherTid])],
+        );
+
+        $page = $this->go(new Request(
+            post: [
+                'act' => 'modcontrols',
+                'dot' => 'merge',
+                'ot' => (string) $otherTid,
+            ],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['modcontrols_clearbox'], $json);
+
+        $redirect = array_find($json, fn($cmd) => $cmd[0] === 'location');
+        $this->assertStringContainsString("?act=vt{$otherTid}", $redirect[1]);
+
+        $this->assertNull(Topic::selectOne(1), 'Original topic is deleted');
+        $this->assertEquals($otherTid, Post::selectOne(1)->tid, 'OP moved to new topic');
+        $this->assertEquals(1, Post::selectOne(1)->newtopic, 'Older post becomes OP');
+        $this->assertEquals(0, Post::selectOne(2)->newtopic, 'Newer post gets demoted to reply');
+    }
+
     public function testLoadModControlsJS(): void
     {
         $this->actingAs('admin');
@@ -335,6 +422,12 @@ final class ModCPTest extends FeatureTestCase
     {
         $topic = new Topic();
         $topic->insert();
+
+        $post = new Post();
+        $post->newtopic = 1;
+        $post->tid = $topic->id;
+        $post->post = 'OP';
+        $post->insert();
 
         return $topic->id;
     }
