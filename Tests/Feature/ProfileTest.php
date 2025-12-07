@@ -195,9 +195,20 @@ final class ProfileTest extends FeatureTestCase
     {
         $this->actingAs('admin', ['friends' => '1']);
 
-        $page = $this->go('?act=vu1&page=comments');
+        $page = $this->go('?act=vu1&page=friends');
 
-        DOMAssert::assertSelectEquals('#pfbox .userdata .username', 'Admin', 1, $page);
+        DOMAssert::assertSelectEquals('.contacts .contact .user1', 'Admin', 1, $page);
+    }
+
+    public function testViewUserProfileAbout(): void
+    {
+        $aboutText = "I'm a strong single admin that don't need no members";
+        $this->actingAs('admin', ['friends' => '1', 'about' => $aboutText]);
+
+        $page = $this->go('?act=vu1&page=about');
+
+        DOMAssert::assertSelectRegExp('#pfbox', '/strong/', 1, $page);
+        DOMAssert::assertSelectRegExp('#pfbox', '/I like tacos/', 1, $page);
     }
 
     private function insertActivities(): void
