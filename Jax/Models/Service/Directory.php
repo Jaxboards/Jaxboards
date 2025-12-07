@@ -16,11 +16,11 @@ final class Directory extends Model
     #[PrimaryKey]
     public int $id = 0;
 
-    #[Column(name: 'registrar_email', type: 'string', length: 255, nullable: false)]
-    public string $registrar_email = '';
+    #[Column(name: 'registrarEmail', type: 'string', length: 255, nullable: false)]
+    public string $registrarEmail = '';
 
-    #[Column(name: 'registrar_ip', type: 'binary', default: '', length: 16, nullable: false)]
-    public string $registrar_ip = '';
+    #[Column(name: 'registrarIP', type: 'binary', default: '', length: 16, nullable: false)]
+    public string $registrarIP = '';
 
     #[Column(name: 'date', type: 'datetime', default: null)]
     public ?string $date = null;

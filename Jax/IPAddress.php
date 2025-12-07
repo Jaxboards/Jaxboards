@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Jax\Models\Service\Banlist;
+
 use function array_any;
 use function array_filter;
 use function array_search;
@@ -29,7 +31,6 @@ final class IPAddress
 
     public function __construct(
         private readonly Config $config,
-        private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly FileSystem $fileSystem,
         private readonly Request $request,
@@ -136,19 +137,9 @@ final class IPAddress
             return false;
         }
 
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT COUNT(`ip`) as `banned`
-                    FROM `banlist`
-                    WHERE ip = ?
-                SQL,
-            [],
-            $binaryIp,
-        );
-        $row = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $banlistCount = Banlist::count('WHERE `ipAddress`=?', $binaryIp);
 
-        return $row !== null && $row['banned'] > 0;
+        return $banlistCount> 0;
     }
 
     /**

@@ -10,11 +10,9 @@ use Jax\DatabaseUtils;
 use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Models\Member;
+use Jax\Models\Service\Directory;
 use Jax\Request;
 use Jax\ServiceConfig;
-
-use function count;
-use function dirname;
 use function filter_var;
 use function gmdate;
 use function header;
@@ -185,18 +183,14 @@ final readonly class ServiceSignup
                 . 'numbers, and underscore only';
         }
 
-        $result = $this->database->select(
-            ['id'],
-            'directory',
-            'WHERE `registrar_ip`=? AND `date`>?',
+        $directoryCount = Directory::count(
+            'WHERE `registrarIP`=? AND `date`>?',
             $this->ipAddress->asBinary(),
             $this->database->datetime(Carbon::now('UTC')->subWeeks(1)->getTimestamp()),
         );
-        if (count($this->database->arows($result)) > 3) {
+        if ($directoryCount > 3) {
             return 'You may only register 3 boards per week.';
         }
-
-        $this->database->disposeresult($result);
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return 'invalid email';
@@ -211,31 +205,23 @@ final readonly class ServiceSignup
                 . 'numbers, and underscore only';
         }
 
-        $result = $this->database->select(
-            ['id'],
-            'directory',
-            'WHERE `boardname`=?',
-            $boardURL,
-        );
-        if ($this->database->arow($result)) {
+        $result = Directory::selectOne('WHERE `boardname`=?', $boardURL);
+        if ($result !== null) {
             return' that board already exists';
         }
 
-        $this->database->disposeresult($result);
         $boardPrefix = $boardURLLowercase . '_';
 
         $this->database->setPrefix('');
-        // Add board to directory.
-        $this->database->insert(
-            'directory',
-            [
-                'boardname' => $boardURL,
-                'date' => $this->database->datetime(),
-                'referral' => $this->request->asString->both('r'),
-                'registrar_email' => $email,
-                'registrar_ip' => $this->ipAddress->asBinary(),
-            ],
-        );
+
+        $directory = new Directory();
+        $directory->boardname = $boardURL;
+        $directory->date = $this->database->datetime();
+        $directory->referral = $this->request->asString->both('r');
+        $directory->registrarEmail = $email;
+        $directory->registrarIP = $this->ipAddress->asBinary();
+        $directory->insert();
+
         $this->database->setPrefix($boardPrefix);
 
         $this->databaseUtils->install();
@@ -251,7 +237,7 @@ final readonly class ServiceSignup
         $member->pass = password_hash($password, PASSWORD_DEFAULT);
         $member->insert();
 
-        $this->fileSystem->copyDirectory('Service/blueprint', dirname(__DIR__) . '/boards/' . $boardURLLowercase);
+        $this->fileSystem->copyDirectory('Service/blueprint', 'boards/' . $boardURLLowercase);
 
         header('Location: https://' . $boardURL . '.' . $this->serviceConfig->getSetting('domain'));
 

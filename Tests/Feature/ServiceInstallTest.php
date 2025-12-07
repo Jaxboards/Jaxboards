@@ -248,7 +248,7 @@ final class ServiceInstallTest extends TestCase
 
         $this->container->get(Database::class)->setPrefix('');
         $directory = Directory::selectOne(1);
-        $this->assertEquals($directory->registrar_email, 'admin_email@jaxboards.com');
+        $this->assertEquals($directory->registrarEmail, 'admin_email@jaxboards.com');
         $this->assertEquals($directory->boardname, 'support');
 
         $this->assertStringContainsString('Redirecting', $page);

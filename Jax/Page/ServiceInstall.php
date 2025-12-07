@@ -344,8 +344,8 @@ final readonly class ServiceInstall
                         'boardname' => $board,
                         'date' => $this->database->datetime(),
                         'referral' => $this->request->asString->both('r') ?? '',
-                        'registrar_email' => $adminEmail,
-                        'registrar_ip' => $this->ipAddress->asBinary(),
+                        'registrarEmail' => $adminEmail,
+                        'registrarIP' => $this->ipAddress->asBinary(),
                     ],
                 );
                 $this->database->setPrefix($boardPrefix);
