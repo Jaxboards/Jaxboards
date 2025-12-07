@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use Jax\FileSystem;
 use Jax\Page\ServiceInstall;
 use Jax\Request;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\DOMAssert;
 use SplFileInfo;
 use Tests\FeatureTestCase;
@@ -16,9 +17,8 @@ use function DI\autowire;
 
 /**
  * @internal
- *
- * @coversNothing
  */
+#[CoversNothing]
 final class ServiceInstallTest extends FeatureTestCase
 {
     /**

@@ -91,7 +91,7 @@ final readonly class ServiceInstall
             return implode('<br>', [
                 'Detected config.php at root.',
                 'Jaxboards has already been installed.',
-                'If you would like to reinstall, delete the root config.'
+                'If you would like to reinstall, delete the root config.',
             ]);
         }
 
