@@ -373,6 +373,7 @@ final readonly class ServiceInstall
 
         if ($serviceMode) {
             header('Location: ./');
+
             return [];
         }
 

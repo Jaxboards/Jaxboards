@@ -12,7 +12,7 @@ final class Banlist extends Model
 {
     public const TABLE = 'banlist';
 
-    #[Key(unique: true)]
     #[Column(name: 'ip', type: 'binary', default: '', length: 16, nullable: false)]
+    #[Key(unique: true)]
     public string $ip = '';
 }

@@ -31,6 +31,7 @@ use Tests\TestCase;
 
 use function array_key_exists;
 use function DI\autowire;
+use function in_array;
 use function password_verify;
 
 /**
@@ -184,7 +185,6 @@ final class ServiceInstallTest extends TestCase
         $this->assertStringContainsString('Redirecting', $page);
     }
 
-
     public function testInstallerFormSubmitServiceMode(): void
     {
         $this->mockedFiles['config.php'] = $this->createConfiguredStub(
@@ -197,11 +197,14 @@ final class ServiceInstallTest extends TestCase
             ->method('copyDirectory')
             ->with(
                 'Service/blueprint',
-                $this->callback(fn($path) => in_array($path, [
-                    'boards/test',
-                    'boards/support'
-                ])
-            ));
+                $this->callback(
+                    static fn($path): bool => in_array($path, [
+                        'boards/test',
+                        'boards/support',
+                    ]),
+                ),
+            )
+        ;
 
 
         $page = $this->goServiceInstall(new Request(
