@@ -198,7 +198,7 @@ final class ProfileTest extends FeatureTestCase
 
         $page = $this->go(new Request(
             get: ['act' => 'vu1', 'page' => 'comments'],
-            post: ['comment' => 'This is a profile comment.']
+            post: ['comment' => 'This is a profile comment.'],
         ));
 
         DOMAssert::assertSelectRegExp('.comment .username', '/Admin/', 2, $page);
