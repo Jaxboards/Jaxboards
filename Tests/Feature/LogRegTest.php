@@ -108,8 +108,8 @@ final class LogRegTest extends FeatureTestCase
         ));
 
         $this->assertRedirect('/', $page);
-        $this->assertEquals(Member::selectOne(1)->displayName, 'Sean');
-        $this->assertEquals(Stats::selectOne()->last_register, 1);
+        $this->assertEquals('Sean', Member::selectOne(1)->displayName);
+        $this->assertEquals(1, Stats::selectOne()->last_register);
     }
 
     public function testLogout(): void
@@ -150,8 +150,8 @@ final class LogRegTest extends FeatureTestCase
 
         // Ensure token inserted
         $token = Token::selectOne();
-        $this->assertEquals($token->uid, 1);
-        $this->assertEquals($token->type, 'login');
+        $this->assertEquals(1, $token->uid);
+        $this->assertEquals('login', $token->type);
 
         $request = $this->container->get(Request::class);
         $this->assertEquals($request->cookie('utoken'), $token->token);

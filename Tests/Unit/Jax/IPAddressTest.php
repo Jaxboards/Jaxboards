@@ -43,8 +43,8 @@ final class IPAddressTest extends UnitTestCase
         $ipAddress = $this->getIPAddress();
 
         $this->assertEquals(
-            $ipAddress->asHumanReadable($ipAddress->asBinary()),
             self::TESTIP,
+            $ipAddress->asHumanReadable($ipAddress->asBinary()),
         );
     }
 

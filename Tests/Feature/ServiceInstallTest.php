@@ -162,16 +162,16 @@ final class ServiceInstallTest extends TestCase
 
         // Assert the config was written
         $serviceConfig = $this->container->get(ServiceConfig::class)->get();
-        $this->assertEquals($serviceConfig['service'], false);
-        $this->assertEquals($serviceConfig['boardname'], 'Jaxboards');
-        $this->assertEquals($serviceConfig['domain'], 'domain.com');
-        $this->assertEquals($serviceConfig['mail_from'], 'Sean <admin_email@jaxboards.com>');
-        $this->assertEquals($serviceConfig['prefix'], 'jaxboards');
-        $this->assertEquals($serviceConfig['sql_db'], 'sql_db');
-        $this->assertEquals($serviceConfig['sql_host'], 'sql_host');
-        $this->assertEquals($serviceConfig['sql_username'], 'sql_username');
-        $this->assertEquals($serviceConfig['sql_password'], 'sql_password');
-        $this->assertEquals($serviceConfig['sql_prefix'], 'jaxboards_');
+        $this->assertEquals(false, $serviceConfig['service']);
+        $this->assertEquals('Jaxboards', $serviceConfig['boardname']);
+        $this->assertEquals('domain.com', $serviceConfig['domain']);
+        $this->assertEquals('Sean <admin_email@jaxboards.com>', $serviceConfig['mail_from']);
+        $this->assertEquals('jaxboards', $serviceConfig['prefix']);
+        $this->assertEquals('sql_db', $serviceConfig['sql_db']);
+        $this->assertEquals('sql_host', $serviceConfig['sql_host']);
+        $this->assertEquals('sql_username', $serviceConfig['sql_username']);
+        $this->assertEquals('sql_password', $serviceConfig['sql_password']);
+        $this->assertEquals('jaxboards_', $serviceConfig['sql_prefix']);
 
         // Do some spot checking to see if the installer
         // set up the tables based on form data
@@ -226,30 +226,30 @@ final class ServiceInstallTest extends TestCase
 
         // Assert the config was written
         $serviceConfig = $this->container->get(ServiceConfig::class)->get();
-        $this->assertEquals($serviceConfig['service'], true);
-        $this->assertEquals($serviceConfig['boardname'], 'Jaxboards');
-        $this->assertEquals($serviceConfig['domain'], 'domain.com');
-        $this->assertEquals($serviceConfig['mail_from'], 'Sean <admin_email@jaxboards.com>');
-        $this->assertEquals($serviceConfig['prefix'], '');
-        $this->assertEquals($serviceConfig['sql_db'], 'sql_db');
-        $this->assertEquals($serviceConfig['sql_host'], 'sql_host');
-        $this->assertEquals($serviceConfig['sql_username'], 'sql_username');
-        $this->assertEquals($serviceConfig['sql_password'], 'sql_password');
-        $this->assertEquals($serviceConfig['sql_prefix'], '');
+        $this->assertEquals(true, $serviceConfig['service']);
+        $this->assertEquals('Jaxboards', $serviceConfig['boardname']);
+        $this->assertEquals('domain.com', $serviceConfig['domain']);
+        $this->assertEquals('Sean <admin_email@jaxboards.com>', $serviceConfig['mail_from']);
+        $this->assertEquals('', $serviceConfig['prefix']);
+        $this->assertEquals('sql_db', $serviceConfig['sql_db']);
+        $this->assertEquals('sql_host', $serviceConfig['sql_host']);
+        $this->assertEquals('sql_username', $serviceConfig['sql_username']);
+        $this->assertEquals('sql_password', $serviceConfig['sql_password']);
+        $this->assertEquals('', $serviceConfig['sql_prefix']);
 
         // Do some spot checking to see if the installer
         // set up the tables based on form data
         $this->assertEquals(Post::selectOne(1)->author, 1);
 
         $member = Member::selectOne(1);
-        $this->assertEquals($member->displayName, 'Sean');
-        $this->assertEquals($member->email, 'admin_email@jaxboards.com');
+        $this->assertEquals('Sean', $member->displayName);
+        $this->assertEquals('admin_email@jaxboards.com', $member->email);
         $this->assertTrue(password_verify('password', $member->pass));
 
         $this->container->get(Database::class)->setPrefix('');
         $directory = Directory::selectOne(1);
-        $this->assertEquals($directory->registrarEmail, 'admin_email@jaxboards.com');
-        $this->assertEquals($directory->boardname, 'support');
+        $this->assertEquals('admin_email@jaxboards.com', $directory->registrarEmail);
+        $this->assertEquals('support', $directory->boardname);
 
         $this->assertStringContainsString('Redirecting', $page);
     }

@@ -147,7 +147,7 @@ final class BuddyListTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('.contact .name', 'Admin', 0, $window[1]['content']);
 
         $member = Member::selectOne(1);
-        $this->assertEquals($member->friends, '');
+        $this->assertEquals('', $member->friends);
     }
 
     public function testBlock(): void
@@ -171,7 +171,7 @@ final class BuddyListTest extends FeatureTestCase
         DOMAssert::assertSelectCount('.contact.blocked', 1, $window[1]['content']);
 
         $member = Member::selectOne(1);
-        $this->assertEquals($member->enemies, '1');
+        $this->assertEquals('1', $member->enemies);
     }
 
     public function testUnblock(): void
@@ -195,6 +195,6 @@ final class BuddyListTest extends FeatureTestCase
         DOMAssert::assertSelectCount('.contact.blocked', 0, $window[1]['content']);
 
         $member = Member::selectOne(1);
-        $this->assertEquals($member->enemies, '');
+        $this->assertEquals('', $member->enemies);
     }
 }
