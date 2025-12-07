@@ -4,10 +4,23 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\Attributes\Column;
+use Jax\Attributes\ForeignKey;
+use Jax\Attributes\Key;
+use Jax\Config;
+use Jax\Database;
+use Jax\DatabaseUtils;
+use Jax\DatabaseUtils\SQLite;
+use Jax\DebugLog;
+use Jax\DomainDefinitions;
+use Jax\IPAddress;
+use Jax\Model;
+use Jax\RequestStringGetter;
+use Jax\ServiceConfig;
 use Jax\FileSystem;
 use Jax\Page\ServiceInstall;
 use Jax\Request;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use SplFileInfo;
 use Tests\FeatureTestCase;
@@ -18,7 +31,22 @@ use function DI\autowire;
 /**
  * @internal
  */
-#[CoversNothing]
+#[CoversClass(ServiceInstall::class)]
+#[CoversClass(Column::class)]
+#[CoversClass(ForeignKey::class)]
+#[CoversClass(Key::class)]
+#[CoversClass(Config::class)]
+#[CoversClass(Database::class)]
+#[CoversClass(DatabaseUtils::class)]
+#[CoversClass(SQLite::class)]
+#[CoversClass(DebugLog::class)]
+#[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FileSystem::class)]
+#[CoversClass(IPAddress::class)]
+#[CoversClass(Model::class)]
+#[CoversClass(Request::class)]
+#[CoversClass(RequestStringGetter::class)]
+#[CoversClass(ServiceConfig::class)]
 final class ServiceInstallTest extends FeatureTestCase
 {
     /**
