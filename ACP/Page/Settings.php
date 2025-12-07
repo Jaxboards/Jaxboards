@@ -260,8 +260,8 @@ final readonly class Settings
         $page .= $this->page->parseTemplate(
             'settings/shoutbox.html',
             [
-                'shoutbox_avatar_checked' => $this->page->checked($this->config->getSetting('shoutboxava')),
-                'shoutbox_checked' => $this->page->checked($this->config->getSetting('shoutbox')),
+                'shoutbox_avatar_checked' => $this->page->checked((bool) $this->config->getSetting('shoutboxava')),
+                'shoutbox_checked' => $this->page->checked((bool) $this->config->getSetting('shoutbox')),
                 'show_shouts' => $this->config->getSetting('shoutbox_num'),
             ],
         );
