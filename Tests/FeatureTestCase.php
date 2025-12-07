@@ -53,8 +53,9 @@ abstract class FeatureTestCase extends TestCase
     }
 
     /**
-     * Sets up an authenticated user for testing purposes
-     * @param array<mixed> $memberOverrides Overrides to properties of the Member model
+     * Sets up an authenticated user for testing purposes.
+     *
+     * @param array<mixed> $memberOverrides  Overrides to properties of the Member model
      * @param array<mixed> $sessionOverrides Overrides to properties of the Session variables
      */
     public function actingAs(

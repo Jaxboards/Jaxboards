@@ -46,6 +46,7 @@ use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
 use function json_decode;
+use function serialize;
 
 /**
  * @internal
@@ -228,12 +229,13 @@ final class ModCPTest extends FeatureTestCase
         $this->assertEquals(serialize(['modtids' => '1']), $sessionData->vars);
     }
 
-    public function testDeletePostsWithoutTrashcan(): void {
+    public function testDeletePostsWithoutTrashcan(): void
+    {
         $pid = $this->insertReply();
 
         $this->actingAs(
             'admin',
-            sessionOverrides: ['modpids' => (string) $pid]
+            sessionOverrides: ['modpids' => (string) $pid],
         );
 
         $page = $this->go(new Request(
@@ -249,10 +251,11 @@ final class ModCPTest extends FeatureTestCase
         $this->assertNull(Post::selectOne($pid), 'Post is deleted');
     }
 
-    public function testDeleteTopicWithoutTrashcan(): void {
+    public function testDeleteTopicWithoutTrashcan(): void
+    {
         $this->actingAs(
             'admin',
-            sessionOverrides: ['modtids' => '1']
+            sessionOverrides: ['modtids' => '1'],
         );
 
         $page = $this->go(new Request(
@@ -268,13 +271,14 @@ final class ModCPTest extends FeatureTestCase
         $this->assertNull(Post::selectOne(1), 'Post is deleted');
     }
 
-    public function testMovePosts(): void {
+    public function testMovePosts(): void
+    {
         $pid = $this->insertReply();
         $tid = $this->insertTopic();
 
         $this->actingAs(
             'admin',
-            sessionOverrides: ['modpids' => (string) $pid]
+            sessionOverrides: ['modpids' => (string) $pid],
         );
 
         $page = $this->go(new Request(
@@ -289,12 +293,13 @@ final class ModCPTest extends FeatureTestCase
         $this->assertEquals(Post::selectOne($pid)->tid, $tid, 'Post was moved');
     }
 
-    public function testMoveTopics(): void {
+    public function testMoveTopics(): void
+    {
         $fid = $this->insertForum();
 
         $this->actingAs(
             'admin',
-            sessionOverrides: ['modtids' => '1']
+            sessionOverrides: ['modtids' => '1'],
         );
 
         $page = $this->go(new Request(
@@ -322,6 +327,7 @@ final class ModCPTest extends FeatureTestCase
         $forum = new Forum();
         $forum->title = 'Other forum';
         $forum->insert();
+
         return $forum->id;
     }
 
@@ -329,6 +335,7 @@ final class ModCPTest extends FeatureTestCase
     {
         $topic = new Topic();
         $topic->insert();
+
         return $topic->id;
     }
 
@@ -339,6 +346,7 @@ final class ModCPTest extends FeatureTestCase
         $post->post = 'reply';
         $post->tid = 1;
         $post->insert();
+
         return $post->id;
     }
 }
