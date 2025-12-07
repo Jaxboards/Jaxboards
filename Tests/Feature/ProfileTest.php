@@ -188,6 +188,20 @@ final class ProfileTest extends FeatureTestCase
 
         $page = $this->go('?act=vu1&page=comments');
 
+        DOMAssert::assertSelectCount('textarea[name=comment]', 1, $page);
+        DOMAssert::assertSelectRegExp('.commenttext', '/This is a profile comment./', 1, $page);
+    }
+
+    public function testViewUserProfileCommentsAddCommentAsAdmin(): void
+    {
+        $this->actingAs('admin');
+
+        $page = $this->go(new Request(
+            get: ['act' => 'vu1', 'page' => 'comments'],
+            post: ['comment' => 'This is a profile comment.']
+        ));
+
+        DOMAssert::assertSelectRegExp('.comment .username', '/Admin/', 2, $page);
         DOMAssert::assertSelectRegExp('.commenttext', '/This is a profile comment./', 1, $page);
     }
 
@@ -207,7 +221,7 @@ final class ProfileTest extends FeatureTestCase
 
         $page = $this->go('?act=vu1&page=about');
 
-        DOMAssert::assertSelectRegExp('#pfbox', '/strong/', 1, $page);
+        DOMAssert::assertSelectRegExp('#pfbox', '/strong single/', 1, $page);
         DOMAssert::assertSelectRegExp('#pfbox', '/I like tacos/', 1, $page);
     }
 
