@@ -16,18 +16,7 @@ use function str_replace;
 final class DomainDefinitions
 {
     private string $boardURL = '';
-
-    private string $soundsURL = '';
-
-    private string $serviceThemePath = '';
-
-    private string $boardPath = '';
-
-    private string $boardPathURL = '';
-
-    private string $defaultThemePath = '';
-
-    private bool $boardFound = false;
+    private ?string $prefix;
 
     /**
      * @SuppressWarnings("PHPMD.Superglobals")
@@ -53,41 +42,13 @@ final class DomainDefinitions
         }
 
         $this->boardURL = $boardURL;
-        $this->soundsURL = $this->boardURL . '/Sounds';
 
-
-        // Get prefix.
-        $prefix = $this->serviceConfig->getSetting('prefix');
-        if ($this->serviceConfig->getSetting('service')) {
-            $domainMatch = str_replace('.', '\.', $this->serviceConfig->getSetting('domain'));
-
-            preg_match('@(.*)\.' . $domainMatch . '@i', $host, $matches);
-            if ($matches[1] !== '') {
-                $prefix = $matches[1];
-                $this->serviceConfig->override([
-                    'prefix' => $prefix,
-                    'sql_prefix' => $prefix . '_',
-                ]);
-            } else {
-                $prefix = null;
-            }
-        }
-
-        $this->defaultThemePath = 'Service/Themes/Default/';
-        $this->serviceThemePath = 'Service/Themes';
-
-        if (!$prefix) {
-            return;
-        }
-
-        $this->boardFound = true;
-        $this->boardPath = $this->fileSystem->pathJoin('boards', $prefix);
-        $this->boardPathURL = $this->boardURL . '/' . $this->fileSystem->pathJoin('boards', $prefix);
+        $this->prefix = $this->getPrefix($host);
     }
 
     public function isBoardFound(): bool
     {
-        return $this->boardFound;
+        return (bool) $this->prefix;
     }
 
     public function getBoardURL(): string
@@ -97,26 +58,52 @@ final class DomainDefinitions
 
     public function getDefaultThemePath(): string
     {
-        return $this->defaultThemePath;
+        return 'Service/Themes/Default/';
     }
 
     public function getSoundsURL(): string
     {
-        return $this->soundsURL;
+        return $this->boardURL . '/Sounds';
     }
 
     public function getServiceThemePath(): string
     {
-        return $this->serviceThemePath;
+        return 'Service/Themes';
     }
 
     public function getBoardPath(): string
     {
-        return $this->boardPath;
+        return $this->fileSystem->pathJoin('boards', $this->prefix);
     }
 
     public function getBoardPathUrl(): string
     {
-        return $this->boardPathURL;
+        return $this->boardURL . '/' . $this->fileSystem->pathJoin('boards', $this->prefix);
+    }
+
+    /**
+     * Attempts to retrieve the board's slug/prefix from the hostname
+     * when in service mode.
+     *
+     * Given: "test.jaxboards.com" returns "test"
+     */
+    private function getPrefix(string $host): ?string
+    {
+        if ($this->serviceConfig->getSetting('service')) {
+            $domainMatch = str_replace('.', '\.', $this->serviceConfig->getSetting('domain'));
+
+            preg_match("/(.*)\.{$domainMatch}/i", $host, $matches);
+
+            if ($matches[1] !== '') {
+                $prefix = $matches[1];
+                $this->serviceConfig->override([
+                    'prefix' => $prefix,
+                    'sql_prefix' => $prefix . '_',
+                ]);
+                return $prefix;
+            }
+        }
+
+        return $this->serviceConfig->getSetting('prefix');
     }
 }
