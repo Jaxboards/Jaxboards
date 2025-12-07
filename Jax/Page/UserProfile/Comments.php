@@ -77,8 +77,8 @@ final readonly class Comments
                 $this->user->getGroup()?->canModerate
                 || ($this->user->getGroup()?->canDeleteComments && $comment->from === $this->user->get()->id)
             ) ? <<<HTML
-                    <a href="?act={$act}&page=comments&del={$comment->id}" class="delete">[X]</a>
-                    HTML
+                <a href="?act={$act}&page=comments&del={$comment->id}" class="delete">[X]</a>
+                HTML
                 : '';
 
             $fromMember = $membersById[$comment->from];
