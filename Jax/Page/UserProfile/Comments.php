@@ -72,9 +72,11 @@ final readonly class Comments
 
         foreach ($comments as $comment) {
             $act = $this->request->asString->both('act');
-            $deleteLink = $this->user->getGroup()?->canDeleteComments
-                && $comment->from === $this->user->get()->id
-                || $this->user->getGroup()?->canModerate ? <<<HTML
+
+            $deleteLink = (
+                $this->user->getGroup()?->canModerate
+                || ($this->user->getGroup()?->canDeleteComments && $comment->from === $this->user->get()->id)
+            ) ? <<<HTML
                     <a href="?act={$act}&page=comments&del={$comment->id}" class="delete">[X]</a>
                     HTML
                 : '';

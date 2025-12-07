@@ -246,7 +246,7 @@ final class Groups
 
             'Profiles' => [
                 'canAddComments' => 'Add Comments',
-                'canDeleteComments' => '*Delete own Comments',
+                'canDeleteComments' => 'Delete own Comments',
                 'canViewFullProfile' => 'Can View Full Profile',
             ],
 

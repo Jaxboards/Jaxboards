@@ -151,7 +151,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         $member->canEditPosts = 1;
         $member->canCreateTopics = 1;
         $member->canEditTopics = 1;
-        $member->canAddComments = 0;
+        $member->canAddComments = 1;
         $member->canDeleteComments = 0;
         $member->canViewBoard = 1;
         $member->canViewOfflineBoard = 0;
