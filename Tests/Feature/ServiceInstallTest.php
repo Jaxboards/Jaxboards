@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
 use Jax\FileSystem;
@@ -9,15 +11,22 @@ use PHPUnit\Framework\DOMAssert;
 use SplFileInfo;
 use Tests\FeatureTestCase;
 
+use function array_key_exists;
 use function DI\autowire;
 
-class ServiceInstallTest extends FeatureTestCase {
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ServiceInstallTest extends FeatureTestCase
+{
     /**
      * @var array<SplFileInfo>
      */
-    private $mockedFiles = [];
+    private array $mockedFiles = [];
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $originalFileSystem = $this->container->get(FileSystem::class);
 
@@ -25,7 +34,8 @@ class ServiceInstallTest extends FeatureTestCase {
 
         // Pass through necessary reads
         $fileSystemStub->method('glob')
-            ->willReturnCallback($originalFileSystem->glob(...));
+            ->willReturnCallback($originalFileSystem->glob(...))
+        ;
 
         $this->mockedFiles = [];
         $fileSystemStub->method('getFileInfo')
@@ -36,7 +46,8 @@ class ServiceInstallTest extends FeatureTestCase {
 
                 // Pass through all others
                 return $originalFileSystem->getFileInfo($filename);
-            });
+            })
+        ;
 
         // Stub out FileSystem
         $this->container->set(FileSystem::class, $fileSystemStub);
@@ -44,11 +55,11 @@ class ServiceInstallTest extends FeatureTestCase {
         parent::setUp();
     }
 
-    public function testInstallerFormInstalled()
+    public function testInstallerFormInstalled(): void
     {
         $this->mockedFiles['config.php'] = $this->createConfiguredStub(
             SplFileInfo::class,
-            ['isFile' => true]
+            ['isFile' => true],
         );
 
         $page = $this->goServiceInstall();
@@ -56,11 +67,11 @@ class ServiceInstallTest extends FeatureTestCase {
         $this->assertStringContainsString('Detected config.php at root.', $page);
     }
 
-    public function testInstallerFormNotInstalled()
+    public function testInstallerFormNotInstalled(): void
     {
         $this->mockedFiles['config.php'] = $this->createConfiguredStub(
             SplFileInfo::class,
-            ['isFile' => false]
+            ['isFile' => false],
         );
 
         $page = $this->goServiceInstall();
@@ -76,11 +87,12 @@ class ServiceInstallTest extends FeatureTestCase {
         DOMAssert::assertSelectCount('input[name=sql_password]', 1, $page);
     }
 
-    private function goServiceInstall(?Request $request = null) {
-        if ($request) {
+    private function goServiceInstall(?Request $request = null)
+    {
+        if ($request instanceof Request) {
             $this->container->set(
                 ServiceInstall::class,
-                autowire()->constructorParameter('request', $request)
+                autowire()->constructorParameter('request', $request),
             );
         }
 

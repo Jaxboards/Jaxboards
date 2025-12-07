@@ -88,11 +88,11 @@ final readonly class ServiceInstall
     public function render(): string
     {
         if ($this->fileSystem->getFileInfo('config.php')->isFile()) {
-            return <<<TXT
-                Detected config.php at root.
-                Jaxboards has already been installed.
-                If you would like to reinstall, delete the root config.
-                TXT;
+            return implode('<br>', [
+                'Detected config.php at root.',
+                'Jaxboards has already been installed.',
+                'If you would like to reinstall, delete the root config.'
+            ]);
         }
 
         $errors = [];

@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use DI\Container;
-use Jax\FileSystem;
 use Jax\Page\ServiceInstall;
 
 /**
