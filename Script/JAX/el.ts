@@ -1,5 +1,5 @@
 export function getComputedStyle(element: HTMLElement) {
-    return window.getComputedStyle(element);
+    return globalThis.getComputedStyle(element);
 }
 
 /**
@@ -9,8 +9,8 @@ export function getComputedStyle(element: HTMLElement) {
 export function getCoordinates(el: HTMLElement) {
     const { x: elX, y: elY, height, width } = el.getBoundingClientRect();
 
-    const x = elX + window.scrollX;
-    const y = elY + window.scrollY;
+    const x = elX + globalThis.scrollX;
+    const y = elY + globalThis.scrollY;
 
     return {
         x,

@@ -31,7 +31,7 @@ export default function gracefulDegrade(container: HTMLElement) {
         }
 
         const href = link.getAttribute('href');
-        const { host, pathname } = window.location;
+        const { host, pathname } = globalThis.location;
         const isLocalLink =
             !link.target && link.host === host && link.pathname === pathname;
 

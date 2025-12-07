@@ -31,7 +31,7 @@ export default {
         alert([message]);
     },
     reload(timeout: number = 0) {
-        setTimeout(() => window.location.reload(), timeout);
+        setTimeout(() => globalThis.location.reload(), timeout);
     },
     refreshdata() {
         RUN.stream.pollData(true);
@@ -73,7 +73,7 @@ export default {
         if (el) el.parentNode?.removeChild(el);
     },
     back() {
-        window.history.back();
+        globalThis.history.back();
     },
     setstatus(className: string) {
         const status = document.querySelector('#status');
@@ -248,7 +248,7 @@ export default {
         onImagesLoaded(Array.from(document.querySelectorAll('#page img'))).then(
             () => {
                 const pos = getCoordinates(el);
-                window.scrollTo({ top: pos.y });
+                globalThis.scrollTo({ top: pos.y });
             },
         );
         return true;

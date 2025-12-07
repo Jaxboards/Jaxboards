@@ -4,14 +4,14 @@
  * @return {Void}
  */
 export function selectAll(element: HTMLElement) {
-    if (!window.getSelection) {
+    if (!globalThis.getSelection) {
         return;
     }
 
     const range = document.createRange();
     range.selectNode(element);
 
-    const selection = window.getSelection();
+    const selection = globalThis.getSelection();
     if (!selection) return;
 
     if (selection.rangeCount) selection.removeAllRanges();

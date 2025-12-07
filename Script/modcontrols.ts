@@ -72,7 +72,10 @@ class ModControls {
             modcontrols_move: (act: string) => {
                 const whichone = Number.parseInt(act || this.whichone, 10);
                 this.whichone = whichone;
-                window.addEventListener('pushstate', this.boundCheckLocation);
+                globalThis.addEventListener(
+                    'pushstate',
+                    this.boundCheckLocation,
+                );
                 this.createModControls(
                     `Ok, now browse to the ${
                         whichone ? 'topic' : 'forum'

@@ -1,3 +1,5 @@
+import type { AppState } from './run';
+
 export {};
 
 declare global {
@@ -11,4 +13,6 @@ declare global {
         username: string;
         wysiwyg: boolean;
     };
+
+    const RUN: AppState;
 }

@@ -18,7 +18,7 @@ class AppState {
         setInterval(updateDates, 1000 * 30);
 
         this.stream.pollData();
-        window.addEventListener('popstate', ({ state }) => {
+        globalThis.addEventListener('popstate', ({ state }) => {
             if (state) {
                 const { queryParams } = state;
                 this.stream.updatePage(queryParams);
@@ -76,7 +76,7 @@ class AppState {
             names.push(submitButton.name);
             values.push(submitButton.value);
         }
-        this.stream.load(window.location.search, { data: [names, values] });
+        this.stream.load(globalThis.location.search, { data: [names, values] });
         if (resetOnSubmit) {
             form.reset();
         }
@@ -90,7 +90,7 @@ class AppState {
     }
 
     setWindowActive() {
-        document.cookie = `actw=${window.name}; SameSite:Lax`;
+        document.cookie = `actw=${globalThis.name}; SameSite:Lax`;
         stopTitleFlashing();
         this.stream.pollData();
     }
@@ -102,9 +102,9 @@ onDOMReady(() => {
     RUN.onAppReady();
 });
 onDOMReady(() => {
-    window.name = `${Math.random()}`;
+    globalThis.name = `${Math.random()}`;
     RUN.setWindowActive();
-    window.addEventListener('focus', () => {
+    globalThis.addEventListener('focus', () => {
         RUN.setWindowActive();
     });
     if (!supportsEmoji()) {

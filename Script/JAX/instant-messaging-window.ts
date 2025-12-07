@@ -10,14 +10,14 @@ function notification(fromName: string, message: string) {
 
     if (
         !document.hasFocus() &&
-        window.Notification &&
+        globalThis.Notification &&
         Notification.permission === 'granted'
     ) {
         const notify = new Notification(`${fromName} says:`, {
             body: message,
         });
         notify.onclick = () => {
-            window.focus();
+            globalThis.focus();
             notify.close();
         };
     }

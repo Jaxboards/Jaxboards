@@ -39,13 +39,13 @@ class Stream {
         if (xmlobj.requestType === 2) {
             const queryParams = xmlobj.url.substring(1);
             if (!softurl) {
-                window.history.pushState(
+                globalThis.history.pushState(
                     { queryParams },
                     '',
                     `?${queryParams}`,
                 );
                 // pushstate is not a real browser event unfortunately, so I have to trigger it myself
-                window.dispatchEvent(new Event('pushstate'));
+                globalThis.dispatchEvent(new Event('pushstate'));
                 this.lastURL = queryParams;
             }
         }
@@ -74,7 +74,7 @@ class Stream {
             this.loader();
         }
         clearTimeout(this.timeout);
-        if (document.cookie.includes(`actw=${window.name}`)) {
+        if (document.cookie.includes(`actw=${globalThis.name}`)) {
             this.timeout = setTimeout(() => this.loader(), UPDATE_INTERVAL);
         }
     }
