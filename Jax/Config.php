@@ -39,10 +39,10 @@ final class Config
         $this->boardConfig = [];
         $CFG = [];
 
-        $boardConfigPath = $this->fileSystem->pathFromRoot($this->domainDefinitions->getBoardPath(), '/config.php');
+        $boardConfigPath = $this->fileSystem->pathJoin($this->domainDefinitions->getBoardPath(), '/config.php');
 
         if ($this->fileSystem->getFileInfo($boardConfigPath)->isFile()) {
-            require_once $this->domainDefinitions->getBoardPath() . '/config.php';
+            require_once $this->fileSystem->pathFromRoot($boardConfigPath);
 
             $this->boardConfig = $CFG;
         }
