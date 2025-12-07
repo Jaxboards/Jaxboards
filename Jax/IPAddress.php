@@ -139,7 +139,7 @@ final class IPAddress
 
         $banlistCount = Banlist::count('WHERE `ipAddress`=?', $binaryIp);
 
-        return $banlistCount> 0;
+        return $banlistCount > 0;
     }
 
     /**
