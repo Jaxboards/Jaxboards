@@ -45,6 +45,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
+use function array_find;
+use function array_key_exists;
+use function implode;
 use function json_decode;
 use function serialize;
 
@@ -275,7 +278,7 @@ final class ModCPTest extends FeatureTestCase
     {
         $this->actingAs(
             'admin',
-            sessionOverrides: ['modpids' => '1']
+            sessionOverrides: ['modpids' => '1'],
         );
 
         $page = $this->go(new Request(
@@ -362,7 +365,7 @@ final class ModCPTest extends FeatureTestCase
 
         $html = array_find(
             $json,
-            fn($record) => array_key_exists(1, $record) && $record[1] === 'page'
+            static fn($record): bool => array_key_exists(1, $record) && $record[1] === 'page',
         )[2];
 
         $this->assertStringContainsString('Which topic should the topics be merged into?', $html);
@@ -391,7 +394,7 @@ final class ModCPTest extends FeatureTestCase
 
         $this->assertContainsEquals(['modcontrols_clearbox'], $json);
 
-        $redirect = array_find($json, fn($cmd) => $cmd[0] === 'location');
+        $redirect = array_find($json, static fn($cmd): bool => $cmd[0] === 'location');
         $this->assertStringContainsString("?act=vt{$otherTid}", $redirect[1]);
 
         $this->assertNull(Topic::selectOne(1), 'Original topic is deleted');
