@@ -236,7 +236,7 @@ final class Groups
                 'canDeleteOwnPosts' => '*Delete Own Posts',
                 'canEditPosts' => 'Edit',
                 'canPost' => 'Create',
-                'canUseSignatures' => '*Can have signatures',
+                'canUseSignatures' => 'Can have signatures',
             ],
 
             'Private/Instant Messaging' => [

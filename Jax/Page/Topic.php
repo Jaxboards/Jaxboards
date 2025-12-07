@@ -580,7 +580,7 @@ final class Topic
                         >{$this->template->meta('topic-perma-button')}</a>
                     HTML,
                 $postBody,
-                $author?->sig
+                $authorGroup->canUseSignatures && $author?->sig
                     ? $this->textFormatting->theWorks($author->sig)
                     : '',
                 $post->author,
