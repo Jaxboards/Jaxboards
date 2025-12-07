@@ -60,7 +60,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         return $modelClassesCache;
     }
 
-    public function install($additionalModels = []): void
+    public function install(): void
     {
         $this->databaseAdapter->install();
 
