@@ -51,14 +51,11 @@ final class ServiceConfig
             return $this->serviceConfig;
         }
 
-        $configPath = $this->fileSystem->pathFromRoot('config.php');
-        $serviceConfigPath = $this->fileSystem->pathFromRoot('config.default.php');
-
         $CFG = [];
 
         require_once $this->installed
-            ? $configPath
-            : $serviceConfigPath;
+            ? $this->fileSystem->pathFromRoot('config.php')
+            : $this->fileSystem->pathFromRoot('config.default.php');
 
         $this->serviceConfig = $CFG;
 
