@@ -101,7 +101,7 @@ final readonly class ServiceInstall
             $errors = $this->install();
             if ($errors === []) {
                 return 'Taking you to the board index...';
-            };
+            }
         }
 
         $errorsHTML = implode('', array_map(static fn(string $error): string => "<div class='error'>{$error}</div>", $errors));
@@ -279,7 +279,7 @@ final readonly class ServiceInstall
                 user: $sqlUsername,
                 password: $sqlPassword,
                 database: $sqlDB,
-                driver: $sqlDriver
+                driver: $sqlDriver,
             );
         }
 

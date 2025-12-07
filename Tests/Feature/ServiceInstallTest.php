@@ -24,11 +24,13 @@ use Jax\RequestStringGetter;
 use Jax\ServiceConfig;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
+use PHPUnit\Framework\MockObject\MockObject;
 use SplFileInfo;
 use Tests\TestCase;
 
 use function array_key_exists;
 use function DI\autowire;
+use function password_verify;
 
 /**
  * The installer test is special.
@@ -57,7 +59,8 @@ use function DI\autowire;
 #[CoversClass(ServiceConfig::class)]
 final class ServiceInstallTest extends TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject&\Jax\FileSystem $fileSystemMock;
+    private MockObject&FileSystem $fileSystemMock;
+
     /**
      * @var array<SplFileInfo>
      */
@@ -66,8 +69,8 @@ final class ServiceInstallTest extends TestCase
     protected function setUp(): void
     {
         $originalFileSystem = $this->container->get(FileSystem::class);
-
-        $this->fileSystemMock = $fileSystemMock = $this->createMock(FileSystem::class);
+        $this->fileSystemMock = $this->createMock(FileSystem::class);
+        $fileSystemMock = $this->fileSystemMock;
 
         // Pass through the models glob
         $fileSystemMock->method('glob')
@@ -135,7 +138,8 @@ final class ServiceInstallTest extends TestCase
         // Assert that the boards directory is set up
         $this->fileSystemMock->expects($this->once())
             ->method('copyDirectory')
-            ->with('Service/blueprint', 'boards/jaxboards');
+            ->with('Service/blueprint', 'boards/jaxboards')
+        ;
 
         $page = $this->goServiceInstall(new Request(
             post: [
@@ -151,7 +155,7 @@ final class ServiceInstallTest extends TestCase
                 'sql_password' => 'sql_password',
                 'sql_driver' => 'sqliteMemory',
                 'submit' => 'Start your service!',
-            ]
+            ],
         ));
 
         // Assert the config was written
