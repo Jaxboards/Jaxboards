@@ -95,6 +95,7 @@ final class BoardIndexTest extends FeatureTestCase
 
         DOMAssert::assertSelectEquals('#stats .content', '1 User Online:', 1, $page);
         DOMAssert::assertSelectEquals('#statusers .user1', 'Admin', 1, $page);
+        DOMAssert::assertSelectCount('#statusers .user1.birthday', 1, $page);
         DOMAssert::assertSelectEquals('#stats .userstoday', '1 User Online Today:', 1, $page);
     }
 

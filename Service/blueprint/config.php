@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 $CFG = [
     'boardoffline' => '0',
+    'birthdays' => '1',
     'emotepack' => 'keshaemotes',
     'offlinetext' => 'The board is offline!',
     'shoutbox' => '1',

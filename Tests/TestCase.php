@@ -43,6 +43,7 @@ abstract class TestCase extends PHPUnitTestCase
 
         $this->container->set(Config::class, autowire()->constructorParameter('boardConfig', [
             'boardoffline' => '0',
+            'birthdays' => '1',
             'emotepack' => 'keshaemotes',
             'offlinetext' => 'The board is offline!',
             'shoutbox' => '1',

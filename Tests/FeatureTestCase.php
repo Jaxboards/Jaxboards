@@ -78,6 +78,7 @@ abstract class FeatureTestCase extends TestCase
                     $member->displayName = 'Admin';
                     $member->sig = 'I like tacos';
                     $member->pass = password_hash('password', PASSWORD_DEFAULT);
+                    $member->birthdate = $database->date();
                     $member->groupID = Groups::Admin->value;
 
                     break;
