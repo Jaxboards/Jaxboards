@@ -15,17 +15,8 @@ use Jax\Page\ServiceInstall;
  */
 
 
-
-
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 $container = new Container();
-$fileSystem = $container->get(FileSystem::class);
 
-if ($fileSystem->getFileInfo('config.php')->isFile()) {
-    echo 'Detected config.php at root. '
-        . 'Jaxboards has already been installed. '
-        . 'If you would like to reinstall, delete the root config.';
-} else {
-    $container->get(ServiceInstall::class)->render();
-}
+echo $container->get(ServiceInstall::class)->render();

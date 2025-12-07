@@ -85,8 +85,16 @@ final readonly class ServiceInstall
         private ServiceConfig $serviceConfig,
     ) {}
 
-    public function render(): void
+    public function render(): string
     {
+        if ($this->fileSystem->getFileInfo('config.php')->isFile()) {
+            return <<<TXT
+                Detected config.php at root.
+                Jaxboards has already been installed.
+                If you would like to reinstall, delete the root config.
+                TXT;
+        }
+
         $errors = [];
 
         if ($this->request->post('submit') !== null) {
@@ -112,7 +120,7 @@ final readonly class ServiceInstall
 
         $currentYear = gmdate('Y');
 
-        echo <<<HTML
+        return <<<HTML
             <!DOCTYPE html>
             <html lang="en">
                 <head>

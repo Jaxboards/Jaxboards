@@ -32,6 +32,8 @@ use const SEEK_END;
 
 /**
  * This class should be used for all file operations (to keep test mocking easy).
+ *
+ * All paths passed to these functions should be relative to project root.
  */
 final readonly class FileSystem
 {
@@ -42,6 +44,9 @@ final readonly class FileSystem
         $this->root = $root ?? dirname(__DIR__);
     }
 
+    /**
+     * Copy a file.
+     */
     public function copy(string $from, string $to): bool
     {
         return copy(
@@ -60,7 +65,7 @@ final readonly class FileSystem
      */
     public function copyDirectory(string $src, $dst): bool
     {
-        if (!$this->mkdir($dst)) {
+        if (!$this->mkdir($dst, recursive: true)) {
             return false;
         }
 
@@ -73,7 +78,6 @@ final readonly class FileSystem
         // Then files
         foreach ($this->glob($this->pathJoin($src, '**/*')) as $sourceFile) {
             $destFile = str_replace($src, $dst, $sourceFile);
-
             $this->copy($sourceFile, $destFile);
         }
 
@@ -105,15 +109,16 @@ final readonly class FileSystem
     }
 
     /**
-     * Get FileInfo for a file.
-     *
-     * @param string $filename relative path from root
+     * Get SplFileInfo for a file.
      */
     public function getFileInfo(string $filename): SplFileInfo
     {
         return new SplFileInfo($this->pathFromRoot($filename));
     }
 
+    /**
+     * Get SplFileObject for a file.
+     */
     public function getFileObject(
         string $filename,
         string $mode = 'r',
@@ -178,6 +183,9 @@ final readonly class FileSystem
         return $file->fwrite($data);
     }
 
+    /**
+     * Rename a file.
+     */
     public function rename(string $from, string $to): bool
     {
         return rename(
@@ -249,6 +257,9 @@ final readonly class FileSystem
         return array_reverse($lines);
     }
 
+    /**
+     * Remove a file.
+     */
     public function unlink(string $filename): bool
     {
         return unlink($this->pathFromRoot($filename));
