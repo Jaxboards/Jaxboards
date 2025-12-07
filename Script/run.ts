@@ -6,7 +6,7 @@ import Sound from './sound';
 
 const useJSLinks = 2;
 
-class AppState {
+export class AppState {
     stream: Stream = new Stream();
 
     onAppReady() {

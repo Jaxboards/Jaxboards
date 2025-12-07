@@ -22,7 +22,7 @@ export default {
     },
     script(script: string) {
         // eslint-disable-next-line
-        eval(script);
+        (0,eval)(script);
     },
     error(message: string) {
         alert(message);
