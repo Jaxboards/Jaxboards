@@ -11,6 +11,7 @@ use Jax\Attributes\Key;
 use Jax\BBCode;
 use Jax\BotDetector;
 use Jax\Config;
+use Jax\Constants\JSAccess;
 use Jax\Database;
 use Jax\DatabaseUtils;
 use Jax\DatabaseUtils\SQLite;
@@ -97,6 +98,18 @@ final class BoardIndexTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('#statusers .user1', 'Admin', 1, $page);
         DOMAssert::assertSelectCount('#statusers .user1.birthday', 1, $page);
         DOMAssert::assertSelectEquals('#stats .userstoday', '1 User Online Today:', 1, $page);
+    }
+
+    public function testBoardIndexUpdate(): void
+    {
+        $this->actingAs('admin');
+
+        $page = $this->go(new Request(
+            server: ['HTTP_X_JSACCESS' => JSAccess::UPDATING->value],
+        ));
+
+        $this->assertStringContainsString('onlinelist', $page);
+        $this->assertStringContainsString('fid_1_lastpost', $page);
     }
 
     public function testDebugInfo(): void
