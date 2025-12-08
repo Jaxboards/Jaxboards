@@ -169,7 +169,7 @@ final readonly class Activity
      */
     private function fetchActivities(int $profileId): array
     {
-        $activities = ModelsActivity::selectMany(<<<SQL
+        $activities = ModelsActivity::selectMany(<<<'SQL'
             WHERE `uid`= ?
             ORDER BY id DESC
             LIMIT ?
