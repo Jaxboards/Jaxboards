@@ -9,8 +9,6 @@ use Jax\DatabaseUtils;
 use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Models\Member;
-use Jax\Models\Service\Banlist;
-use Jax\Models\Service\Directory;
 use Jax\Request;
 use Jax\ServiceConfig;
 

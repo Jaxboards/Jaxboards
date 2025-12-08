@@ -105,17 +105,17 @@ final class ServiceSignupTest extends FeatureTestCase
 
         $page = $this->go(
             new Request(
-                server: [
-                    'SERVER_NAME' => 'www.jaxboards.com',
-                    'REMOTE_ADDR' => '::1'
-                ],
                 post: [
                     'username' => 'username',
                     'password' => 'password',
                     'boardurl' => 'boardname',
                     'email' => 'email@email.com',
                     'submit' => 'Register a Forum!',
-                ]
+                ],
+                server: [
+                    'SERVER_NAME' => 'www.jaxboards.com',
+                    'REMOTE_ADDR' => '::1',
+                ],
             ),
             pageClass: ServiceSignup::class,
         );
@@ -125,8 +125,9 @@ final class ServiceSignupTest extends FeatureTestCase
         // Check board directory was added
         $database = $this->container->get(Database::class);
         $database->setPrefix('');
+
         $directoryEntry = Directory::selectOne(1);
-        $this->assertEquals("email@email.com", $directoryEntry->registrarEmail);
-        $this->assertEquals("boardname", $directoryEntry->boardname);
+        $this->assertEquals('email@email.com', $directoryEntry->registrarEmail);
+        $this->assertEquals('boardname', $directoryEntry->boardname);
     }
 }

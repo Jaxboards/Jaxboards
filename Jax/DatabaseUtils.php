@@ -20,6 +20,7 @@ use function implode;
 use function is_string;
 use function mb_check_encoding;
 use function mb_convert_encoding;
+use function str_replace;
 
 final readonly class DatabaseUtils implements DatabaseAdapter
 {
@@ -42,14 +43,16 @@ final readonly class DatabaseUtils implements DatabaseAdapter
      * Discover model classes under the `Jax\\Models` directory.
      *
      * Returns fully-qualified class names like `Jax\\Models\\Post`.
+     *
+     * @param mixed $directory
      */
-    public function getModels($directory = "Jax/Models/"): array
+    public function getModels($directory = 'Jax/Models/'): array
     {
         $models = [];
 
-        foreach ($this->fileSystem->glob("$directory/*.php") as $model) {
+        foreach ($this->fileSystem->glob("{$directory}/*.php") as $model) {
             $fileInfo = $this->fileSystem->getFileInfo($model);
-            $models[] = str_replace("/", "\\", $directory) . $fileInfo->getBasename('.php');
+            $models[] = str_replace('/', '\\', $directory) . $fileInfo->getBasename('.php');
         }
 
         return $models;
@@ -70,24 +73,6 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         $this->database->setPrefix('');
         $this->installTablesFromModels($this->getModels('Jax/Models/Service/'));
         $this->database->setPrefix($prefix);
-    }
-
-    /**
-     * @param class-string[] $models
-     */
-    private function installTablesFromModels(array $models) {
-        $queries = [];
-
-        foreach ($models as $modelClass) {
-            $model = new $modelClass();
-            $queries[] = 'DROP TABLE IF EXISTS ' . $this->database->ftable($model::TABLE);
-            $queries[] = $this->databaseAdapter->createTableQueryFromModel($model);
-        }
-
-        // Create tables
-        foreach ($queries as $query) {
-            $this->database->query($query);
-        }
     }
 
     public function createTableQueryFromModel(Model $model): string
@@ -132,6 +117,25 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         return "INSERT INTO `{$tableName}`"
             . ' (' . implode(', ', $columnNames) . ')'
             . " VALUES {$values};";
+    }
+
+    /**
+     * @param array<class-string> $models
+     */
+    private function installTablesFromModels(array $models): void
+    {
+        $queries = [];
+
+        foreach ($models as $modelClass) {
+            $model = new $modelClass();
+            $queries[] = 'DROP TABLE IF EXISTS ' . $this->database->ftable($model::TABLE);
+            $queries[] = $this->databaseAdapter->createTableQueryFromModel($model);
+        }
+
+        // Create tables
+        foreach ($queries as $query) {
+            $this->database->query($query);
+        }
     }
 
     private function insertInitialRecords(): void

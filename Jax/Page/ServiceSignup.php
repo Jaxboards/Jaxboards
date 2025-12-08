@@ -153,7 +153,7 @@ final readonly class ServiceSignup
             HTML;
     }
 
-    private function signup(): ?string
+    private function signup(): string
     {
         if ($this->request->post('post') !== null) {
             header('Location: https://test.' . $this->serviceConfig->getSetting('domain'));
@@ -210,6 +210,7 @@ final readonly class ServiceSignup
         if ($directoryCount > 3) {
             return 'You may only register 3 boards per week.';
         }
+
         $result = Directory::selectOne('WHERE `boardname`=?', $boardURL);
         if ($result !== null) {
             return' that board already exists';
@@ -241,8 +242,8 @@ final readonly class ServiceSignup
         $this->fileSystem->copyDirectory('Service/blueprint', 'boards/' . $boardURLLowercase);
 
         $redirect = 'https://' . $boardURL . '.' . $this->serviceConfig->getSetting('domain');
-        header("Location: $redirect");
+        header("Location: {$redirect}");
 
-        return "Error redirecting you to Location: $redirect";
+        return "Error redirecting you to Location: {$redirect}";
     }
 }
