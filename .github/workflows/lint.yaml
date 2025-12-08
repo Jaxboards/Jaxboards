@@ -79,7 +79,7 @@ jobs:
             - run: npm run-script ci-lint
             - run: composer run-script test
             - name: SonarQube Scan
-              if: always()
+              if: ${{ !cancelled() }}
               uses: SonarSource/sonarqube-scan-action@v6
               env:
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
