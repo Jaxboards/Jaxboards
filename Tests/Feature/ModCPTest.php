@@ -365,7 +365,7 @@ final class ModCPTest extends FeatureTestCase
 
         $html = array_find(
             $json,
-            static fn($record): bool => array_key_exists(1, $record) && $record[1] === 'page',
+            static fn($record): bool => array_key_exists(1, $record) && $record[1] === 'page'
         )[2];
 
         $this->assertStringContainsString('Which topic should the topics be merged into?', $html);

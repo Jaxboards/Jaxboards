@@ -124,7 +124,7 @@ final class ProfileTest extends FeatureTestCase
         $page = $this->go('?act=vu1&page=activity&fmt=RSS');
 
         $this->assertStringContainsString("<title>Admin's recent activity</title>", $page);
-        $this->assertStringContainsString('<link>//example.com?act=vu1</link>', $page);
+        $this->assertStringContainsString('<link>//jaxboards.com?act=vu1</link>', $page);
         $this->assertStringContainsString('<description>Admin made friends with Admin</description>', $page);
         $this->assertStringContainsString('<description>Prince is now known as Admin</description>', $page);
         $this->assertStringContainsString('<description>Admin posted in topic Post</description>', $page);

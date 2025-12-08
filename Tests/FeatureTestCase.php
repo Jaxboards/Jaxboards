@@ -33,18 +33,20 @@ abstract class FeatureTestCase extends TestCase
         parent::setUp();
     }
 
-    public function go(Request|string $request): string
+    public function go(Request|string|null $request = null, string $pageClass = App::class): string
     {
-        if (!$request instanceof Request) {
+        if (is_string($request)) {
             parse_str(parse_url($request)['query'], $getParameters);
             $request = new Request(
                 get: $getParameters,
             );
         }
 
-        $this->container->set(Request::class, $request);
+        if ($request instanceof Request) {
+            $this->container->set(Request::class, $request);
+        }
 
-        return $this->container->get(App::class)->render() ?? '';
+        return $this->container->get($pageClass)->render() ?? '';
     }
 
     public function assertRedirect(string $location, string $page): void

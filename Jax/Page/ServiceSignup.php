@@ -43,12 +43,14 @@ final readonly class ServiceSignup
         private ServiceConfig $serviceConfig,
     ) {}
 
-    public function render(): void
+    public function render(): string
     {
-        if (!$this->serviceConfig->getSetting('service')) {
-            echo 'Service mode not enabled';
+        if (!$this->fileSystem->getFileInfo('config.php')->isFile()) {
+            return 'Jaxboards not installed!';
+        }
 
-            return;
+        if (!$this->serviceConfig->getSetting('service')) {
+            return 'Service mode not enabled';
         }
 
         $error = null;
@@ -59,7 +61,7 @@ final readonly class ServiceSignup
         $currentYear = gmdate('Y');
         $errorDisplay = $error ? "<div class='error'>{$error}</div>" : '';
 
-        echo <<<HTML
+        return <<<HTML
             <!doctype html>
             <html lang="en">
                 <head>

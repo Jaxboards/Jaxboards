@@ -53,11 +53,17 @@ abstract class TestCase extends PHPUnitTestCase
             'usedisplayname' => '1',
         ]));
 
+        $this->setServiceConfig();
+
+        return parent::__construct($name);
+    }
+
+    protected function setServiceConfig($config = []) {
         $this->container->set(ServiceConfig::class, autowire()->constructorParameter('config', [
             'badnamechars' => "@[^\\w' ?]@",
             'boardname' => 'Example Forums',
-            'domain' => 'example.com',
-            'mail_from' => 'Example Forums <no-reply@example.com>',
+            'domain' => 'jaxboards.com',
+            'mail_from' => 'Example Forums <no-reply@jaxboards.com>',
             'prefix' => 'jaxboards',
             'service' => false,
             'sql_driver' => 'sqliteMemory',
@@ -67,8 +73,7 @@ abstract class TestCase extends PHPUnitTestCase
             'sql_password' => '',
             'sql_prefix' => 'jaxboards_',
             'timetologout' => 900,
+            ...$config,
         ]));
-
-        return parent::__construct($name);
     }
 }
