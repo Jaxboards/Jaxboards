@@ -59,7 +59,9 @@ final readonly class Reactions
         $this->page->command('softurl');
         $post = Post::selectOne($pid);
 
-        $ratings = $post !== null && $post->rating !== '' ? json_decode($post->rating, true) : [];
+        $ratings = $post !== null && $post->rating !== ''
+            ? json_decode($post->rating, true)
+            : [];
 
         if ($ratings === []) {
             return;

@@ -23,6 +23,7 @@ use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Model;
 use Jax\Models\Post;
+use Jax\Models\RatingNiblet;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
@@ -30,6 +31,7 @@ use Jax\Page\Badges;
 use Jax\Page\TextRules;
 use Jax\Page\Topic;
 use Jax\Page\Topic\Poll;
+use Jax\Page\Topic\Reactions;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
@@ -39,11 +41,12 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 use Jax\UsersOnline;
-use Jax\Models\RatingNiblet;
-use Jax\Page\Topic\Reactions;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
+
+use function json_decode;
+use function json_encode;
 
 /**
  * @internal
@@ -126,7 +129,7 @@ final class ReactionsTest extends FeatureTestCase
         $json = json_decode($page);
 
         $this->assertContainsEquals(['softurl'], $json);
-        $this->assertEquals('listrating', $json[1][0], );
+        $this->assertEquals('listrating', $json[1][0]);
         $this->assertEquals(1, $json[1][1]);
         $this->assertStringContainsString('Admin', $json[1][2]);
     }
