@@ -11,6 +11,7 @@ use Jax\Attributes\Key;
 use Jax\BBCode;
 use Jax\BotDetector;
 use Jax\Config;
+use Jax\Constants\JSAccess;
 use Jax\ContactDetails;
 use Jax\Database;
 use Jax\DatabaseUtils;
@@ -223,6 +224,24 @@ final class ProfileTest extends FeatureTestCase
 
         DOMAssert::assertSelectRegExp('#pfbox', '/strong single/', 1, $page);
         DOMAssert::assertSelectRegExp('#pfbox', '/I like tacos/', 1, $page);
+    }
+
+    public function testViewUserProfileContactCard(): void
+    {
+        $this->actingAs('admin');
+
+        $page = $this->go(new Request(
+            get: ['act' => 'vu1'],
+             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContains(['softurl'], $json);
+
+        $window = array_find($json, fn($cmd) => $cmd[0] === 'window');
+        $this->assertEquals('Contact Card', $window[1]['title']);
+        $this->assertStringContainsString('Add Contact', $window[1]['content']);
     }
 
     private function insertActivities(): void
