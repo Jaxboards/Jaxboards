@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Page\UserProfile;
 
-use Jax\Database;
 use Jax\Date;
 use Jax\DomainDefinitions;
 use Jax\Models\Activity as ModelsActivity;
@@ -16,12 +15,13 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function array_map;
+
 final readonly class Activity
 {
     private const ACTIVITY_LIMIT = 30;
 
     public function __construct(
-        private Database $database,
         private Date $date,
         private DomainDefinitions $domainDefinitions,
         private Page $page,
@@ -69,78 +69,84 @@ final readonly class Activity
         $this->page->earlyFlush($rssFeed->publish());
     }
 
-    private function parseActivity(ModelsActivity $activity, Member $member, ?Member $affectedUser): string
-    {
+    private function parseActivity(
+        ModelsActivity $modelsActivity,
+        Member $member,
+        ?Member $affectedUser,
+    ): string {
         $user = $this->template->meta(
             'user-link',
-            $activity->uid,
+            $modelsActivity->uid,
             $member->groupID,
-            $this->user->get()->id === $activity->uid ? 'You' : $member->displayName,
+            $this->user->get()->id === $modelsActivity->uid ? 'You' : $member->displayName,
         );
-        $otherguy = $affectedUser ? $this->template->meta(
+        $otherguy = $affectedUser instanceof Member ? $this->template->meta(
             'user-link',
             $affectedUser->id,
             $affectedUser->groupID,
             $affectedUser->displayName,
         ) : '';
 
-        $date = $activity->date
-            ? $this->date->smallDate($activity->date)
+        $date = $modelsActivity->date
+            ? $this->date->smallDate($modelsActivity->date)
             : '';
-        $text = match ($activity->type) {
+        $text = match ($modelsActivity->type) {
             'profile_comment' => "{$user}  commented on  {$otherguy}'s profile",
             'new_post' => <<<HTML
                 {$user} posted in topic
-                <a href="?act=vt{$activity->tid}&findpost={$activity->pid}">{$activity->arg1}</a>
+                <a href="?act=vt{$modelsActivity->tid}&findpost={$modelsActivity->pid}">{$modelsActivity->arg1}</a>
                 {$date}
                 HTML,
             'new_topic' => <<<HTML
                 {$user} created new topic
-                <a href="?act=vt{$activity->tid}">{$activity->arg1}</a>
+                <a href="?act=vt{$modelsActivity->tid}">{$modelsActivity->arg1}</a>
                 {$date}
                 HTML,
             'profile_name_change' => $this->template->meta(
                 'user-link',
-                $activity->uid,
+                $modelsActivity->uid,
                 $member->groupID,
-                $activity->arg1,
+                $modelsActivity->arg1,
             ) . ' is now known as ' . $this->template->meta(
                 'user-link',
-                $activity->uid,
+                $modelsActivity->uid,
                 $member->groupID,
-                $activity->arg2,
+                $modelsActivity->arg2,
             ) . ', ' . $date,
             'buddy_add' => $user . ' made friends with ' . $otherguy,
             default => '',
         };
 
-        return "<div class=\"activity {$activity->type}\">{$text}</div>";
+        return "<div class=\"activity {$modelsActivity->type}\">{$text}</div>";
     }
 
     /**
      * @return array{link:string,text:string}
      */
-    private function parseActivityRSS(ModelsActivity $activity, Member $user, ?Member $affectedUser): array
-    {
-        return match ($activity->type) {
+    private function parseActivityRSS(
+        ModelsActivity $modelsActivity,
+        Member $user,
+        ?Member $affectedUser,
+    ): array {
+        return match ($modelsActivity->type) {
             'profile_comment' => [
-                'link' => $this->textFormatting->blockhtml('?act=vu' . $activity->affectedUser),
+                'link' => $this->textFormatting->blockhtml('?act=vu' . $modelsActivity->affectedUser),
                 'text' => "{$user->displayName} commented on {$affectedUser->displayName}'s profile",
             ],
             'new_post' => [
-                'link' => $this->textFormatting->blockhtml("?act=vt{$activity->tid}&findpost={$activity->pid}"),
-                'text' => $user->displayName . ' posted in topic ' . $activity->arg1,
+                'link' => $this->textFormatting->blockhtml("?act=vt{$modelsActivity->tid}&findpost={$modelsActivity->pid}"),
+                'text' => $user->displayName . ' posted in topic ' . $modelsActivity->arg1,
             ],
             'new_topic' => [
-                'link' => $this->textFormatting->blockhtml('?act=vt' . $activity->tid),
-                'text' => $user->displayName . ' created new topic ' . $activity->arg1,
+                'link' => $this->textFormatting->blockhtml('?act=vt' . $modelsActivity->tid),
+                'text' => $user->displayName . ' created new topic ' . $modelsActivity->arg1,
             ],
             'profile_name_change' => [
-                'link' => $this->textFormatting->blockhtml('?act=vu' . $activity->uid),
-                'text' => $activity->arg1 . ' is now known as ' . $activity->arg2,
+                'link' => $this->textFormatting->blockhtml('?act=vu' . $modelsActivity->uid),
+                'text' => $modelsActivity->arg1 . ' is now known as ' . $modelsActivity->arg2,
             ],
             'buddy_add' => [
-                'link' => $this->textFormatting->blockhtml('?act=vu' . $activity->uid),
+                'link' => $this->textFormatting->blockhtml('?act=vu' . $modelsActivity->uid),
                 'text' => $user->displayName . ' made friends with ' . $affectedUser->displayName,
             ],
             default => ['link' => '', 'text' => ''],
@@ -169,27 +175,26 @@ final readonly class Activity
      */
     private function fetchActivities(int $profileId): array
     {
-        $activities = ModelsActivity::selectMany(<<<'SQL'
-            WHERE `uid`= ?
-            ORDER BY id DESC
-            LIMIT ?
-            SQL,
+        $activities = ModelsActivity::selectMany(
+            <<<'SQL'
+                WHERE `uid`= ?
+                ORDER BY id DESC
+                LIMIT ?
+                SQL,
             $profileId,
-            self::ACTIVITY_LIMIT
+            self::ACTIVITY_LIMIT,
         );
 
         $members = Member::joinedOn(
             $activities,
-            fn(ModelsActivity $activity) => $activity->affectedUser,
+            static fn(ModelsActivity $modelsActivity): ?int => $modelsActivity->affectedUser,
         );
 
         return array_map(
-            function (ModelsActivity $activity) use ($members) {
-                return [
-                    $activity,
-                    $members[$activity->affectedUser] ?? null,
-                ];
-            },
+            static fn(ModelsActivity $modelsActivity): array => [
+                $modelsActivity,
+                $members[$modelsActivity->affectedUser] ?? null,
+            ],
             $activities,
         );
     }
