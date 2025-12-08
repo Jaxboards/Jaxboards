@@ -427,7 +427,7 @@ final readonly class ModControls
             );
             foreach ($posts as $post) {
                 $content .= "<div class='post'>"
-                    . nl2br($this->textFormatting->blockhtml($this->textFormatting->textOnly($post->post)))
+                    . nl2br($this->textFormatting->blockhtml($this->textFormatting->textOnly($post->post)), false)
                     . '</div>';
             }
 

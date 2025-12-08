@@ -180,7 +180,7 @@ final readonly class TextFormatting
         [$text, $codes] = $this->startCodeTags($text);
 
         $text = $this->blockhtml($text);
-        $text = nl2br($text);
+        $text = nl2br($text, false);
         $text = $this->emotes($text);
         $text = $this->bbCode->toHTML($text);
         $text = $this->finishCodeTags($text, $codes);
@@ -194,7 +194,7 @@ final readonly class TextFormatting
      */
     public function theWorksInline(string $text): string
     {
-        $text = nl2br($this->blockhtml($text));
+        $text = nl2br($this->blockhtml($text), false);
         $text = $this->emotes($text);
         $text = $this->bbCode->toInlineHTML($text);
 

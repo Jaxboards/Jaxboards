@@ -289,7 +289,7 @@ final class IDX
                     'idx-redirect-row',
                     $forum->id,
                     $forum->title,
-                    nl2br($forum->subtitle),
+                    nl2br($forum->subtitle, false),
                     'Redirects: ' . $forum->redirects,
                     $this->template->meta('icon-redirect')
                         ?: $this->template->meta('idx-icon-redirect'),
@@ -311,7 +311,7 @@ final class IDX
                     'idx-row',
                     $forum->id,
                     $this->textFormatting->wordfilter($forum->title),
-                    nl2br($forum->subtitle),
+                    nl2br($forum->subtitle, false),
                     $subforumHTML !== ''
                         ? $this->template->meta(
                             'idx-subforum-wrapper',

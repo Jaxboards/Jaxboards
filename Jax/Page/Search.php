@@ -308,7 +308,7 @@ final class Search
         while ($postRow = $this->database->arow($result)) {
             $post = $this->textFormatting->textOnly($postRow['post']);
             $post = $this->textFormatting->blockHtml($post);
-            $post = nl2br($post);
+            $post = nl2br($post, false);
             $post = preg_replace(
                 '@' . implode('|', $terms) . '@i',
                 $this->template->meta('search-highlight', '$0'),
