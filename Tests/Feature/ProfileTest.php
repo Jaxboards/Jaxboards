@@ -47,6 +47,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
+use function array_find;
+use function json_decode;
+
 /**
  * @internal
  */
@@ -232,14 +235,14 @@ final class ProfileTest extends FeatureTestCase
 
         $page = $this->go(new Request(
             get: ['act' => 'vu1'],
-             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
         $json = json_decode($page, true);
 
         $this->assertContains(['softurl'], $json);
 
-        $window = array_find($json, fn($cmd) => $cmd[0] === 'window');
+        $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         $this->assertEquals('Contact Card', $window[1]['title']);
         $this->assertStringContainsString('Add Contact', $window[1]['content']);
     }
