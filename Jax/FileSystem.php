@@ -14,6 +14,7 @@ use function count;
 use function dirname;
 use function glob;
 use function implode;
+use function is_string;
 use function iterator_to_array;
 use function mb_strlen;
 use function mb_substr;
@@ -120,8 +121,10 @@ final readonly class FileSystem
     /**
      * Get SplFileInfo for a file.
      */
-    public function getFileInfo(string $filename, bool $allowRootBypass = false): SplFileInfo
-    {
+    public function getFileInfo(
+        string $filename,
+        bool $allowRootBypass = false,
+    ): SplFileInfo {
         return new SplFileInfo($allowRootBypass ? $filename : $this->pathFromRoot($filename));
     }
 
@@ -131,7 +134,7 @@ final readonly class FileSystem
     public function getFileObject(
         string $filename,
         string $mode = 'r',
-        bool $allowRootBypass = false
+        bool $allowRootBypass = false,
     ): SplFileObject {
         return new SplFileObject($allowRootBypass ? $filename : $this->pathFromRoot($filename), $mode);
     }
