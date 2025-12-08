@@ -41,20 +41,8 @@ abstract class TestCase extends PHPUnitTestCase
                 ->getMock(),
         );
 
-        $this->container->set(Config::class, autowire()->constructorParameter('boardConfig', [
-            'boardoffline' => 0,
-            'badgesEnabled' => 1,
-            'birthdays' => 1,
-            'emotepack' => 'keshaemotes',
-            'offlinetext' => 'The board is offline!',
-            'shoutbox' => 1,
-            'shoutbox_num' => 10,
-            'timetoidle' => 300,
-            'timetologout' => 900,
-            'usedisplayname' => 1,
-        ]));
-
         $this->setServiceConfig();
+        $this->setBoardConfig();
 
         return parent::__construct($name);
     }
@@ -75,6 +63,24 @@ abstract class TestCase extends PHPUnitTestCase
             'sql_password' => '',
             'sql_prefix' => 'jaxboards_',
             'timetologout' => 900,
+            ...$config,
+        ]));
+    }
+
+    protected function setBoardConfig($config = []): void
+    {
+        $this->container->set(Config::class, autowire()->constructorParameter('boardConfig', [
+            'boardoffline' => 0,
+            'badgesEnabled' => 1,
+            'birthdays' => 1,
+            'emotepack' => 'keshaemotes',
+            'offlinetext' => 'The board is offline!',
+            'reactions' => 1,
+            'shoutbox' => 1,
+            'shoutbox_num' => 10,
+            'timetoidle' => 300,
+            'timetologout' => 900,
+            'usedisplayname' => 1,
             ...$config,
         ]));
     }

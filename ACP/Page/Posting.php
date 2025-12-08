@@ -281,19 +281,19 @@ final readonly class Posting
 
         if ($this->request->post('rsubmit') !== null) {
             $this->config->write([
-                'ratings' => ($this->request->post('renabled') !== null ? 1 : 0)
+                'reactions' => ($this->request->post('renabled') !== null ? 1 : 0)
                 + ($this->request->post('ranon') !== null ? 2 : 0),
             ]);
             $page2 .= $this->page->success('Settings saved!');
         }
 
-        $ratingsettings = $this->config->getSetting('ratings');
+        $reactionsettings = $this->config->getSetting('reactions');
 
         $page2 .= $this->page->parseTemplate(
             'posting/post-rating-settings.html',
             [
-                'ratings_anonymous' => $this->page->checked(($ratingsettings & 2) !== 0),
-                'ratings_enabled' => $this->page->checked(($ratingsettings & 1) !== 0),
+                'ratings_anonymous' => $this->page->checked(($reactionsettings & 2) !== 0),
+                'ratings_enabled' => $this->page->checked(($reactionsettings & 1) !== 0),
             ],
         );
         $table = $this->page->parseTemplate(

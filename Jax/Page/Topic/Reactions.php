@@ -59,7 +59,7 @@ final readonly class Reactions
         $this->page->command('softurl');
         $post = Post::selectOne($pid);
 
-        $ratings = $post !== null ? json_decode($post->rating, true) : [];
+        $ratings = $post !== null && $post->rating !== '' ? json_decode($post->rating, true) : [];
 
         if ($ratings === []) {
             return;
@@ -196,7 +196,7 @@ final readonly class Reactions
 
     private function getRatingSetting(): int
     {
-        return $this->config->getSetting('ratings') ?? 0;
+        return $this->config->getSetting('reactions') ?? 0;
     }
 
     private function isReactionsEnabled(): bool

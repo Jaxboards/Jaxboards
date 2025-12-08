@@ -480,7 +480,6 @@ final class Topic
         int $lastpid = 0,
     ): string {
         $usersonline = $this->usersOnline->getUsersOnline();
-        $this->config->getSetting('ratings') ?? 0;
 
         $topicPostCounter = $this->pageNumber * $this->numperpage;
         $posts = Post::selectMany(

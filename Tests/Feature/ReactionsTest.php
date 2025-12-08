@@ -1,0 +1,141 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use Jax\App;
+use Jax\Attributes\Column;
+use Jax\Attributes\ForeignKey;
+use Jax\Attributes\Key;
+use Jax\BBCode;
+use Jax\BotDetector;
+use Jax\Config;
+use Jax\Constants\JSAccess;
+use Jax\Database;
+use Jax\DatabaseUtils;
+use Jax\DatabaseUtils\SQLite;
+use Jax\Date;
+use Jax\DebugLog;
+use Jax\DomainDefinitions;
+use Jax\FileSystem;
+use Jax\IPAddress;
+use Jax\Jax;
+use Jax\Model;
+use Jax\Models\Post;
+use Jax\Modules\PrivateMessage;
+use Jax\Modules\Shoutbox;
+use Jax\Page;
+use Jax\Page\Badges;
+use Jax\Page\TextRules;
+use Jax\Page\Topic;
+use Jax\Page\Topic\Poll;
+use Jax\Request;
+use Jax\RequestStringGetter;
+use Jax\Router;
+use Jax\ServiceConfig;
+use Jax\Session;
+use Jax\Template;
+use Jax\TextFormatting;
+use Jax\User;
+use Jax\UsersOnline;
+use Jax\Models\RatingNiblet;
+use Jax\Page\Topic\Reactions;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\DOMAssert;
+use Tests\FeatureTestCase;
+
+/**
+ * @internal
+ */
+#[CoversClass(Reactions::class)]
+#[CoversClass(App::class)]
+#[CoversClass(Column::class)]
+#[CoversClass(ForeignKey::class)]
+#[CoversClass(Key::class)]
+#[CoversClass(BBCode::class)]
+#[CoversClass(BotDetector::class)]
+#[CoversClass(Config::class)]
+#[CoversClass(Database::class)]
+#[CoversClass(DatabaseUtils::class)]
+#[CoversClass(SQLite::class)]
+#[CoversClass(Date::class)]
+#[CoversClass(DebugLog::class)]
+#[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FileSystem::class)]
+#[CoversClass(IPAddress::class)]
+#[CoversClass(Jax::class)]
+#[CoversClass(Model::class)]
+#[CoversClass(PrivateMessage::class)]
+#[CoversClass(Shoutbox::class)]
+#[CoversClass(Page::class)]
+#[CoversClass(Badges::class)]
+#[CoversClass(TextRules::class)]
+#[CoversClass(Topic::class)]
+#[CoversClass(Poll::class)]
+#[CoversClass(Request::class)]
+#[CoversClass(RequestStringGetter::class)]
+#[CoversClass(Router::class)]
+#[CoversClass(ServiceConfig::class)]
+#[CoversClass(Session::class)]
+#[CoversClass(Template::class)]
+#[CoversClass(TextFormatting::class)]
+#[CoversClass(User::class)]
+#[CoversClass(UsersOnline::class)]
+final class ReactionsTest extends FeatureTestCase
+{
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->insertRatingNiblets();
+    }
+
+    public function testReactionsInTopic(): void
+    {
+        $this->actingAs('admin');
+
+        $page = $this->go('?act=vt1');
+
+        DOMAssert::assertSelectCount('.postrating a[href^="?act=vt1&ratepost=1&niblet=1"]', 1, $page);
+        DOMAssert::assertSelectCount('.postrating img[src="image"][title="title"]', 1, $page);
+    }
+
+    public function testReactionsReactToPost(): void
+    {
+        $this->actingAs('admin');
+
+        $this->go('?act=vt1&ratepost=1&niblet=1');
+
+        $this->assertEquals(json_encode(['1' => [1]]), Post::selectOne(1)->rating);
+    }
+
+    public function testListReactions(): void
+    {
+        $this->actingAs('admin');
+
+        $post = Post::selectOne(1);
+        $post->rating = json_encode(['1' => [1]]);
+        $post->update();
+
+        $page = $this->go(new Request(
+            get: ['act' => 'vt1', 'listrating' => '1'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::UPDATING->value],
+        ));
+
+        $json = json_decode($page);
+
+        $this->assertContainsEquals(['softurl'], $json);
+        $this->assertEquals('listrating', $json[1][0], );
+        $this->assertEquals(1, $json[1][1]);
+        $this->assertStringContainsString('Admin', $json[1][2]);
+    }
+
+    private function insertRatingNiblets(): void
+    {
+        $ratingNiblet = new RatingNiblet();
+        $ratingNiblet->img = 'image';
+        $ratingNiblet->title = 'title';
+        $ratingNiblet->insert();
+    }
+}
