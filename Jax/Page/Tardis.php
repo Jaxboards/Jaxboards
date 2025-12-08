@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\DomainDefinitions;
+use Jax\Interfaces\Route;
 use Jax\Page;
 
-final readonly class Tardis
+final readonly class Tardis implements Route
 {
     public function __construct(
         private Page $page,

@@ -6,6 +6,7 @@ namespace Jax\Modules;
 
 use Carbon\Carbon;
 use Jax\Database;
+use Jax\Interfaces\Module;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -21,7 +22,7 @@ use function trim;
 
 use const PHP_EOL;
 
-final readonly class PrivateMessage
+final readonly class PrivateMessage implements Module
 {
     public function __construct(
         private Database $database,

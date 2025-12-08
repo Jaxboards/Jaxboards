@@ -9,6 +9,7 @@ use Jax\Config;
 use Jax\Constants\Groups;
 use Jax\Database;
 use Jax\Date;
+use Jax\Interfaces\Route;
 use Jax\Jax;
 use Jax\Models\Activity;
 use Jax\Models\Member;
@@ -37,7 +38,7 @@ use const FILTER_VALIDATE_EMAIL;
 use const FILTER_VALIDATE_URL;
 use const PASSWORD_DEFAULT;
 
-final readonly class UCP
+final readonly class UCP implements Route
 {
     public function __construct(
         private Config $config,

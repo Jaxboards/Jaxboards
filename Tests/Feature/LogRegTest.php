@@ -28,7 +28,7 @@ use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
 use Jax\Page\LogReg;
-use Jax\Page\TextRules;
+use Jax\TextRules;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;

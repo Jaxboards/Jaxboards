@@ -18,7 +18,7 @@ use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Model;
-use Jax\Page\TextRules;
+use Jax\TextRules;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\ServiceConfig;

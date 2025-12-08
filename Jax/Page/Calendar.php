@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Carbon\Carbon;
 use Jax\Date;
+use Jax\Interfaces\Route;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
@@ -17,7 +18,7 @@ use function gmdate;
 use function implode;
 use function sprintf;
 
-final readonly class Calendar
+final readonly class Calendar implements Route
 {
     public function __construct(
         private Date $date,

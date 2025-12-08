@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Carbon\Carbon;
 use Jax\Config;
 use Jax\FileSystem;
+use Jax\Interfaces\Route;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\ModControls\ModPosts;
@@ -31,7 +32,7 @@ use function nl2br;
 
 use const FILTER_VALIDATE_IP;
 
-final readonly class ModControls
+final readonly class ModControls implements Route
 {
     public function __construct(
         private Config $config,

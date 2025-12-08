@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use Jax\Page\TextRules;
-
 use function array_key_exists;
 use function array_keys;
 use function array_map;

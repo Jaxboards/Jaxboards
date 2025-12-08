@@ -8,6 +8,7 @@ use Jax\Config;
 use Jax\Database;
 use Jax\Date;
 use Jax\Hooks;
+use Jax\Interfaces\Module;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Models\Member;
@@ -24,7 +25,7 @@ use function mb_strlen;
 use function mb_substr;
 use function trim;
 
-final class Shoutbox
+final class Shoutbox implements Module
 {
     private int $shoutlimit;
 

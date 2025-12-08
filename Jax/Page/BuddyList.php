@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Database;
+use Jax\Interfaces\Route;
 use Jax\Jax;
 use Jax\Models\Activity;
 use Jax\Models\Member;
@@ -22,7 +23,7 @@ use function explode;
 use function implode;
 use function in_array;
 
-final readonly class BuddyList
+final readonly class BuddyList implements Route
 {
     public function __construct(
         private Jax $jax,

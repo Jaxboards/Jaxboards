@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Jax\Config;
 use Jax\Database;
 use Jax\Date;
+use Jax\Interfaces\Route;
 use Jax\Jax;
 use Jax\Models\Category;
 use Jax\Models\Forum;
@@ -43,7 +44,7 @@ use function sprintf;
 
 use const SORT_REGULAR;
 
-final class IDX
+final class IDX implements Route
 {
     /**
      * @var ?array<int,int> Map of forum IDs to their last read timestamp

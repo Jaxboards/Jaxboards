@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
+use Jax\Interfaces\Route;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Models\Member;
@@ -45,7 +46,7 @@ use const CURLOPT_URL;
 use const FILTER_VALIDATE_EMAIL;
 use const PASSWORD_DEFAULT;
 
-final class LogReg
+final class LogReg implements Route
 {
     private bool $registering = false;
 

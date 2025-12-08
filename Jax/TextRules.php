@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Jax\Page;
+namespace Jax;
 
 use DI\Container;
 use Jax\Config;

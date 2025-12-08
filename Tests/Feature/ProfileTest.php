@@ -29,7 +29,7 @@ use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
 use Jax\Page\Badges;
-use Jax\Page\TextRules;
+use Jax\TextRules;
 use Jax\Page\UserProfile;
 use Jax\Page\UserProfile\Activity;
 use Jax\Page\UserProfile\Comments;

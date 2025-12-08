@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
+use Jax\Interfaces\Route;
 use Jax\Models\File;
 use Jax\Page;
 use Jax\Request;
@@ -17,7 +18,7 @@ use function header;
 use function in_array;
 use function mb_strtolower;
 
-final readonly class Download
+final readonly class Download implements Route
 {
     public function __construct(
         private DomainDefinitions $domainDefinitions,

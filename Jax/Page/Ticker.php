@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Date;
+use Jax\Interfaces\Route;
 use Jax\Models\Forum;
 use Jax\Models\Member;
 use Jax\Models\Post;
@@ -16,7 +17,7 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-final class Ticker
+final class Ticker implements Route
 {
     private int $maxticks = 60;
 

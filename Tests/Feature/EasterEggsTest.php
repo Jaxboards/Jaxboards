@@ -30,7 +30,7 @@ use Jax\Page\Katamari;
 use Jax\Page\Rainbow;
 use Jax\Page\Solitaire;
 use Jax\Page\Tardis;
-use Jax\Page\TextRules;
+use Jax\TextRules;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;

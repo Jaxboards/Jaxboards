@@ -26,7 +26,7 @@ use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
 use Jax\Page\Badges;
-use Jax\Page\TextRules;
+use Jax\TextRules;
 use Jax\Page\Topic;
 use Jax\Page\Topic\Poll;
 use Jax\Page\Topic\Reactions;

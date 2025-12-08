@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Config;
+use Jax\Interfaces\Route;
 use Jax\Page;
 use Jax\Request;
 use Jax\Template;
 
 use function nl2br;
 
-final readonly class BoardOffline
+final readonly class BoardOffline implements Route
 {
     public function __construct(
         private Config $config,

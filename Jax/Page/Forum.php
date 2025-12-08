@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Carbon\Carbon;
 use Jax\Database;
 use Jax\Date;
+use Jax\Interfaces\Route;
 use Jax\Jax;
 use Jax\Models\Category;
 use Jax\Models\Forum as ModelsForum;
@@ -35,7 +36,7 @@ use function mb_strlen;
 use function number_format;
 use function preg_match;
 
-final class Forum
+final class Forum implements Route
 {
     /**
      * @var array<int,int> key: forumId, value: timestamp

@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Jax\Config;
 use Jax\Date;
+use Jax\Interfaces\Route;
 use Jax\Models\Badge;
 use Jax\Models\BadgeAssociation;
 use Jax\Models\Member;
@@ -15,7 +16,7 @@ use Jax\TextFormatting;
 
 use function array_key_exists;
 
-final readonly class Badges
+final readonly class Badges implements Route
 {
     public function __construct(
         private Config $config,

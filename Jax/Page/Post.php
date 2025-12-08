@@ -8,6 +8,7 @@ use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\Hooks;
+use Jax\Interfaces\Route;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Models\Activity;
@@ -41,7 +42,7 @@ use function trim;
 
 use const PHP_EOL;
 
-final class Post
+final class Post implements Route
 {
     private ?string $postData = null;
 

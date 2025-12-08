@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\ContactDetails;
 use Jax\Database;
 use Jax\Date;
+use Jax\Interfaces\Route;
 use Jax\Jax;
 use Jax\Models\Group;
 use Jax\Models\Member;
@@ -21,7 +22,7 @@ use function array_map;
 use function ceil;
 use function implode;
 
-final class Members
+final class Members implements Route
 {
     private int $pageNumber = 0;
 

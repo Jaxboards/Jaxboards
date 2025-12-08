@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Jax\ContactDetails;
 use Jax\Date;
+use Jax\Interfaces\Route;
 use Jax\IPAddress;
 use Jax\Models\Group;
 use Jax\Models\Member;
@@ -24,7 +25,7 @@ use function in_array;
 use function preg_match;
 use function ucfirst;
 
-final readonly class UserProfile
+final readonly class UserProfile implements Route
 {
     public function __construct(
         private ContactDetails $contactDetails,

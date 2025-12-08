@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Carbon\Carbon;
 use Jax\Database;
 use Jax\ForumTree;
+use Jax\Interfaces\Route;
 use Jax\Jax;
 use Jax\Models\Forum;
 use Jax\Page;
@@ -35,7 +36,7 @@ use function preg_split;
 use function str_repeat;
 use function trim;
 
-final class Search
+final class Search implements Route
 {
     private int $pageNum = 0;
 

@@ -9,6 +9,7 @@ use Jax\Config;
 use Jax\Database;
 use Jax\Date;
 use Jax\DomainDefinitions;
+use Jax\Interfaces\Route;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Models\Category;
@@ -47,7 +48,7 @@ use function preg_match;
 use const PHP_EOL;
 use const SORT_REGULAR;
 
-final class Topic
+final class Topic implements Route
 {
     private int $pageNumber = 0;
 

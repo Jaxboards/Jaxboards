@@ -25,7 +25,7 @@ use Jax\Models\Message;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
-use Jax\Page\TextRules;
+use Jax\TextRules;
 use Jax\Page\UCP;
 use Jax\Page\UCP\Inbox;
 use Jax\Request;
