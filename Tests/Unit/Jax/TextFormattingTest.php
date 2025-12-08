@@ -9,6 +9,8 @@ use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
 use Jax\BBCode;
 use Jax\Config;
+use Jax\Database;
+use Jax\DatabaseUtils;
 use Jax\DatabaseUtils\SQLite;
 use Jax\DebugLog;
 use Jax\DomainDefinitions;
@@ -20,10 +22,8 @@ use Jax\Page\TextRules;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\ServiceConfig;
-use Jax\User;
-use Jax\Database;
-use Jax\DatabaseUtils;
 use Jax\TextFormatting;
+use Jax\User;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\UnitTestCase;
@@ -69,19 +69,20 @@ final class TextFormattingTest extends UnitTestCase
     public function testTheWorks(): void
     {
         $result = $this->textFormatting->theWorks(
-            <<<TEXT
-            [code]hello[/code]
-            :)
-            world
-            TEXT
+            <<<'TEXT'
+                [code]hello[/code]
+                :)
+                world
+                TEXT,
         );
 
-        $this->assertEquals(<<<HTML
-            <div class="bbcode code ">hello</div><br>
-            <img src='emoticons/keshaemotes/smile.gif' alt=':)' /><br>
-            world
-            HTML,
-            $result
+        $this->assertEquals(
+            <<<'HTML'
+                <div class="bbcode code ">hello</div><br>
+                <img src='emoticons/keshaemotes/smile.gif' alt=':)' /><br>
+                world
+                HTML,
+            $result,
         );
     }
 
