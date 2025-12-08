@@ -242,6 +242,23 @@ final class PostTest extends FeatureTestCase
 
         $page = $this->go('?act=post&how=edit&tid=1&pid=2');
 
-        DOMAssert::assertSelectRegExp('textarea[name=postdata]', '/matter of time/', 1, $page);
+        DOMAssert::assertSelectEquals('textarea[name=postdata]', 'post', 1, $page);
+    }
+
+    public function testMemberEditAdminPost(): void
+    {
+        $this->actingAs('member');
+
+        // Insert a post by another user
+        $post = new ModelsPost();
+        $post->tid = 1;
+        $post->post = 'post';
+        $post->author = 1;
+        $post->insert();
+
+        $page = $this->go('?act=post&how=edit&tid=1&pid=2');
+
+        DOMAssert::assertSelectEquals('.error', "You don't have permission to edit that post!", 1, $page);
+        DOMAssert::assertSelectCount('textarea[name=postdata]', 0, $page);
     }
 }
