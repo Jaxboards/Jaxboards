@@ -45,7 +45,7 @@ final readonly class ServiceSignup
 
     public function render(): string
     {
-        if (!$this->fileSystem->getFileInfo('config.php')->isFile()) {
+        if (!$this->serviceConfig->hasInstalled()) {
             return 'Jaxboards not installed!';
         }
 
