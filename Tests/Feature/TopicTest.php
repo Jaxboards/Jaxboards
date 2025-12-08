@@ -22,6 +22,7 @@ use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Model;
+use Jax\Models\Session as ModelsSession;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
@@ -88,6 +89,8 @@ final class TopicTest extends FeatureTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->insertBotViewingTopic();
     }
 
     public function testViewTopicAsAdmin(): void
@@ -112,6 +115,8 @@ final class TopicTest extends FeatureTestCase
         DOMAssert::assertSelectRegExp('#pid_1 .userstats', '/Status: Online!/', 1, $page);
         DOMAssert::assertSelectRegExp('#pid_1 .userstats', '/Group: Admin/', 1, $page);
         DOMAssert::assertSelectRegExp('#pid_1 .userstats', '/Member: #1/', 1, $page);
+
+        DOMAssert::assertSelectEquals('#statusers .userGoogleBot', 'GoogleBot', 1, $page);
     }
 
     public function testTopicUpdate(): void
@@ -126,12 +131,13 @@ final class TopicTest extends FeatureTestCase
         $json = json_decode($page, true);
 
         // TODO: Test that there are new posts
-        $this->assertEquals([], $json);
+        $this->assertEquals($json[0][0], 'onlinelist');
+        $this->assertEquals($json[0][1][0][0], 'GoogleBot');
     }
 
     public function testQuickReplyWindow(): void
     {
-        $this->actingAs('admin');
+        $this->actingAs('admin', sessionOverrides: ['multiquote' => 1]);
 
         $page = $this->go(new Request(
             get: ['act' => 'vt1', 'qreply' => '1'],
@@ -143,6 +149,20 @@ final class TopicTest extends FeatureTestCase
         $this->assertContainsEquals(['softurl'], $json);
         $window = array_find($json, static fn($item): bool => $item[0] === 'window');
 
-        DOMAssert::assertSelectCount('.topic-reply-form textarea[name="postdata"]', 1, $window[1]['content']);
+        DOMAssert::assertSelectRegExp('.topic-reply-form textarea[name="postdata"]', '/\[quote=Admin\]Now, /', 1, $window[1]['content']);
+    }
+
+    private function insertBotViewingTopic(): void
+    {
+        $database = $this->container->get(Database::class);
+        // Insert a bot viewing the topic
+        $session = new ModelsSession();
+        $session->id = 'GoogleBot';
+        $session->lastAction = $database->datetime();
+        $session->lastUpdate = $database->datetime();
+        $session->isBot = 1;
+        $session->uid = 1;
+        $session->location='vt1';
+        $session->insert();
     }
 }

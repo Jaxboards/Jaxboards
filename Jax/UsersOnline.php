@@ -98,7 +98,9 @@ final class UsersOnline
                 continue;
             }
 
-            $birthday = $member?->birthdate && $this->date->dateAsCarbon($member->birthdate)?->format('n j') === $today;
+            $birthday = !$session->isBot
+                && $member?->birthdate
+                && $this->date->dateAsCarbon($member->birthdate)?->format('n j') === $today;
             $uid = $session->isBot ? $session->id : $session->uid;
             $name = ($session->isBot ? $session->id : $member?->displayName);
 
