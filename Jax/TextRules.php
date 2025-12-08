@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax;
 
 use DI\Container;
-use Jax\Config;
 use Jax\Models\TextRule;
 
 final class TextRules
