@@ -403,6 +403,93 @@ final class ModCPTest extends FeatureTestCase
         $this->assertEquals(0, Post::selectOne(2)->newtopic, 'Newer post gets demoted to reply');
     }
 
+    public function testLockTopic(): void
+    {
+        $this->actingAs(
+            'admin',
+            sessionOverrides: ['modtids' => '1'],
+        );
+
+        $page = $this->go(new Request(
+            post: ['act' => 'modcontrols', 'dot' => 'lock'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['modcontrols_clearbox'], $json);
+
+        $this->assertEquals(1, Topic::selectOne(1)->locked);
+    }
+
+
+    public function testUnlockTopic(): void
+    {
+        $this->actingAs(
+            'admin',
+            sessionOverrides: ['modtids' => '1'],
+        );
+
+        // lock the topic
+        $topic = Topic::selectOne(1);
+        $topic->locked = 1;
+        $topic->update();
+
+        $page = $this->go(new Request(
+            post: ['act' => 'modcontrols', 'dot' => 'unlock'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['modcontrols_clearbox'], $json);
+
+        $this->assertEquals(0, Topic::selectOne(1)->locked);
+    }
+
+    public function testUnpinTopic(): void
+    {
+        $this->actingAs(
+            'admin',
+            sessionOverrides: ['modtids' => '1'],
+        );
+
+        $topic = Topic::selectOne(1);
+        $topic->pinned = 1;
+        $topic->update();
+
+        $page = $this->go(new Request(
+            post: ['act' => 'modcontrols', 'dot' => 'unpin'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['modcontrols_clearbox'], $json);
+
+        $this->assertEquals(0, Topic::selectOne(1)->pinned);
+    }
+
+
+    public function testPinTopic(): void
+    {
+        $this->actingAs(
+            'admin',
+            sessionOverrides: ['modtids' => '1'],
+        );
+
+        $page = $this->go(new Request(
+            post: ['act' => 'modcontrols', 'dot' => 'pin'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['modcontrols_clearbox'], $json);
+
+        $this->assertEquals(1, Topic::selectOne(1)->pinned);
+    }
+
     public function testLoadModControlsJS(): void
     {
         $this->actingAs('admin');
