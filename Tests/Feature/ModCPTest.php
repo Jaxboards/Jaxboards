@@ -422,7 +422,6 @@ final class ModCPTest extends FeatureTestCase
         $this->assertEquals(1, Topic::selectOne(1)->locked);
     }
 
-
     public function testUnlockTopic(): void
     {
         $this->actingAs(
@@ -469,7 +468,6 @@ final class ModCPTest extends FeatureTestCase
 
         $this->assertEquals(0, Topic::selectOne(1)->pinned);
     }
-
 
     public function testPinTopic(): void
     {
