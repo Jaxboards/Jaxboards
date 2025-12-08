@@ -8,7 +8,6 @@ use Jax\Models\Member;
 
 use function array_keys;
 use function array_values;
-use function header;
 use function htmlspecialchars;
 use function json_encode;
 use function str_replace;
@@ -27,7 +26,7 @@ final readonly class API
         return match ($this->request->get('act')) {
             'searchmembers' => $this->searchMembers(),
             'emotes' => $this->emotes(),
-            default => header('Location: /'),
+            default => '',
         };
     }
 
