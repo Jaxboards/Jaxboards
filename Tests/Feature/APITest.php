@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\API;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
@@ -24,10 +25,14 @@ use Jax\RequestStringGetter;
 use Jax\ServiceConfig;
 use Jax\TextFormatting;
 use Jax\User;
-use Jax\API;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\FeatureTestCase;
 
+use function json_decode;
+
+/**
+ * @internal
+ */
 #[CoversClass(API::class)]
 #[CoversClass(Column::class)]
 #[CoversClass(ForeignKey::class)]
@@ -49,7 +54,8 @@ use Tests\FeatureTestCase;
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(TextFormatting::class)]
 #[CoversClass(User::class)]
-final class APITest extends FeatureTestCase {
+final class APITest extends FeatureTestCase
+{
     protected function setUp(): void
     {
         parent::setUp();
