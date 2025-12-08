@@ -479,6 +479,7 @@ final class Post
             return $error;
         }
 
+        $topic->title = $topicTitle;
         $topic->subtitle = $this->textFormatting->blockhtml($topicDesc ?? '');
         $topic->summary = mb_substr(
             (string) preg_replace(

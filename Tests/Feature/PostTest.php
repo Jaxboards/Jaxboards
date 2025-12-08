@@ -122,13 +122,13 @@ final class PostTest extends FeatureTestCase
 
     public function testPostReply(): void
     {
-        $this->actingAs('member');
+        $this->actingAs('member', sessionOverrides: ['multiquote' => 1]);
 
-        $page = $this->go('?act=post&tid=1');
+        $page = $this->go('?act=post&tid=1&how=qreply');
 
         DOMAssert::assertSelectCount('input[name=ttitle]', 0, $page);
         DOMAssert::assertSelectCount('input[name=tdesc]', 0, $page);
-        DOMAssert::assertSelectCount('textarea[name=postdata]', 1, $page);
+        DOMAssert::assertSelectRegExp('textarea[name=postdata]', '/matter of time/', 1, $page);
     }
 
     public function testPostReplySubmit(): void
@@ -168,5 +168,80 @@ final class PostTest extends FeatureTestCase
         $this->assertEquals('Post data', $post->post);
         $this->assertTrue($postHookCalled);
         $this->assertEquals($post->asArray(), $postHookPost?->asArray());
+    }
+
+    public function testPostReplySubmitPreview(): void
+    {
+        $this->actingAs('member');
+
+        $page = $this->go(new Request(
+            get: ['act' => 'post', 'tid' => '1'],
+            post: [
+                'act' => 'post',
+                'how' => 'fullpost',
+                'fid' => '',
+                'tid' => '1',
+                'ttitle' => '',
+                'tdesc' => '',
+                'postdata' => 'Post data',
+                'submit' => 'Preview',
+            ],
+        ));
+
+        DOMAssert::assertSelectEquals('#post-preview .title', 'Post Preview', 1, $page);
+        DOMAssert::assertSelectEquals('#post-preview .content', 'Post data', 1, $page);
+    }
+
+    public function testEditOwnPostForm(): void
+    {
+        $this->actingAs('admin');
+
+        $page = $this->go('?act=post&how=edit&tid=1&pid=1');
+
+        DOMAssert::assertSelectRegExp('textarea[name=postdata]', '/matter of time/', 1, $page);
+    }
+
+    public function testEditOwnPostFormSubmit(): void
+    {
+        $this->actingAs('admin');
+
+        $page = $this->go(new Request(
+            get: ['act' => 'post', 'how' => 'edit', 'tid' => '1', 'pid' => '1'],
+            post: [
+                'act' => 'post',
+                'how' => 'edit',
+                'fid' => '1',
+                'tid' => '1',
+                'ttitle' => 'updated title',
+                'tdesc' => 'updated description',
+                'postdata' => 'updated post',
+                'submit' => 'Edit Topic',
+            ],
+        ));
+
+        $topic = Topic::selectOne(1);
+        $post = ModelsPost::selectOne(1);
+
+        $this->assertEquals('updated title', $topic->title);
+        $this->assertEquals('updated description', $topic->subtitle);
+        $this->assertEquals('updated post', $post->post);
+
+        $this->assertRedirect('?act=vt1&findpost=1', $page);
+    }
+
+    public function testAdminEditOtherPost(): void
+    {
+        $this->actingAs('admin');
+
+        // Insert a post by another user
+        $post = new ModelsPost();
+        $post->tid = 1;
+        $post->post = 'post';
+        $post->author = 2;
+        $post->insert();
+
+        $page = $this->go('?act=post&how=edit&tid=1&pid=2');
+
+        DOMAssert::assertSelectRegExp('textarea[name=postdata]', '/matter of time/', 1, $page);
     }
 }
