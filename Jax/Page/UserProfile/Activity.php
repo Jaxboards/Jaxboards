@@ -60,7 +60,7 @@ final readonly class Activity
                     'description' => $parsed['text'],
                     'guid' => $activity->id,
                     'link' => $this->domainDefinitions->getBoardUrl() . $parsed['link'],
-                    'pubDate' => $activity->date ? $this->date->datetimeAsCarbon($activity->date)?->format('r') : '',
+                    'pubDate' => $this->date->datetimeAsCarbon($activity->date)?->format('r') ?? '',
                     'title' => $parsed['text'],
                 ],
             );

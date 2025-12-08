@@ -36,8 +36,6 @@ final class Session
     private ModelsSession $modelsSession;
 
     /**
-     * @SuppressWarnings("PHPMD.Superglobals")
-     *
      * @param array<mixed> $session
      */
     public function __construct(
@@ -54,8 +52,6 @@ final class Session
         ini_set('session.use_cookies', '1');
         ini_set('session.use_only_cookies', '1');
         session_start();
-
-        $this->session = $session ?? $_SESSION;
 
         // This is only here so that the field is never null
         $this->modelsSession = new ModelsSession();
@@ -113,9 +109,12 @@ final class Session
         return $this->modelsSession;
     }
 
+    /**
+     * @SuppressWarnings("PHPMD.Superglobals")
+     */
     public function getPHPSessionValue(string $field): mixed
     {
-        return $this->session[$field] ?? null;
+        return $this->session[$field] ?? $_SESSION[$field] ?? null;
     }
 
     /**
@@ -159,7 +158,7 @@ final class Session
 
     public function getVar(string $varName): mixed
     {
-        return $this->vars[$varName] ?? $this->session[$varName] ?? null;
+        return $this->vars[$varName] ?? $this->getPHPSessionValue($varName) ?? null;
     }
 
     public function act(?string $location = null): void
