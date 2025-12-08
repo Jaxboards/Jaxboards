@@ -22,6 +22,8 @@ use function in_array;
 use function json_decode;
 use function json_encode;
 
+use const JSON_THROW_ON_ERROR;
+
 final readonly class Reactions
 {
     public function __construct(

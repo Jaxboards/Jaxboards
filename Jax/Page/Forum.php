@@ -36,6 +36,8 @@ use function mb_strlen;
 use function number_format;
 use function preg_match;
 
+use const JSON_THROW_ON_ERROR;
+
 final class Forum implements Route
 {
     /**
@@ -516,6 +518,6 @@ final class Forum implements Route
     {
         $forumsread = $this->jax->parseReadMarkers($this->session->get()->forumsread);
         $forumsread[$id] = Carbon::now('UTC')->getTimestamp();
-        $this->session->set('forumsread', (string) json_encode($forumsread, JSON_THROW_ON_ERROR));
+        $this->session->set('forumsread', json_encode($forumsread, JSON_THROW_ON_ERROR));
     }
 }

@@ -45,6 +45,7 @@ use function json_encode;
 use function max;
 use function preg_match;
 
+use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
 use const SORT_REGULAR;
 
@@ -826,7 +827,7 @@ final class Topic implements Route
     {
         $topicsread = $this->jax->parseReadMarkers($this->session->get()->topicsread);
         $topicsread[$modelsTopic->id] = Carbon::now('UTC')->getTimestamp();
-        $this->session->set('topicsread', (string) json_encode($topicsread, JSON_THROW_ON_ERROR));
+        $this->session->set('topicsread', json_encode($topicsread, JSON_THROW_ON_ERROR));
     }
 
     private function viewRSS(ModelsTopic $modelsTopic): void

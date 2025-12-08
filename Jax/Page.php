@@ -14,6 +14,7 @@ use function is_array;
 use function json_decode;
 use function json_encode;
 
+use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
 
 final class Page
@@ -253,7 +254,7 @@ final class Page
             $this->command('update', 'path', $this->buildpath());
         }
 
-        return (string) json_encode($this->commands, JSON_THROW_ON_ERROR);
+        return json_encode($this->commands, JSON_THROW_ON_ERROR);
     }
 
     private function buildPath(): string

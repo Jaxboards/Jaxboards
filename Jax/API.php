@@ -13,6 +13,7 @@ use function json_encode;
 use function str_replace;
 
 use const ENT_QUOTES;
+use const JSON_THROW_ON_ERROR;
 
 final readonly class API
 {
@@ -46,7 +47,7 @@ final readonly class API
             $list[1][] = $member->displayName;
         }
 
-        return (string) json_encode($list, JSON_THROW_ON_ERROR);
+        return json_encode($list, JSON_THROW_ON_ERROR);
     }
 
     private function emotes(): string
@@ -56,6 +57,6 @@ final readonly class API
             $rules[$text] = '<img src="' . $image . '" alt="' . $this->textFormatting->blockhtml($text) . '" />';
         }
 
-        return (string) json_encode([array_keys($rules), array_values($rules)], JSON_THROW_ON_ERROR);
+        return json_encode([array_keys($rules), array_values($rules)], JSON_THROW_ON_ERROR);
     }
 }

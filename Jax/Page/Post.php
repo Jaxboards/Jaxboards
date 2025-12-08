@@ -40,6 +40,7 @@ use function preg_replace;
 use function preg_split;
 use function trim;
 
+use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
 
 final class Post implements Route
@@ -619,7 +620,7 @@ final class Post implements Route
         $topic->lastPostDate = $postDate;
         $topic->lastPostUser = $uid;
         $topic->pollChoices = $pollChoices !== []
-                    ? ((string) json_encode($pollChoices, JSON_THROW_ON_ERROR))
+                    ? (json_encode($pollChoices, JSON_THROW_ON_ERROR))
                     : '';
         $topic->pollQuestion = $pollQuestion !== null
                     ? $this->textFormatting->blockhtml($pollQuestion)
