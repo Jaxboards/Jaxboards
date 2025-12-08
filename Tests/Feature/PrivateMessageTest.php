@@ -39,6 +39,9 @@ use Jax\UsersOnline;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\FeatureTestCase;
 
+use function array_find;
+use function json_decode;
+
 /**
  * @internal
  */
@@ -85,13 +88,13 @@ final class PrivateMessageTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            post: ['im_uid' => '1',  'im_im' => 'test'],
+            post: ['im_uid' => '1', 'im_im' => 'test'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
         $json = json_decode($page, true);
 
-        $instantMessageCommand = array_find($json, fn($cmd): bool => $cmd[0] === 'im');
+        $instantMessageCommand = array_find($json, static fn($cmd): bool => $cmd[0] === 'im');
         $this->assertEquals(1, $instantMessageCommand[1]);
         $this->assertEquals('Admin', $instantMessageCommand[2]);
         $this->assertEquals('test', $instantMessageCommand[3]);
