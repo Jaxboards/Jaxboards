@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
 use Jax\Database;
@@ -8,7 +10,13 @@ use Jax\Models\BadgeAssociation;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
-class BadgesTest extends FeatureTestCase {
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class BadgesTest extends FeatureTestCase
+{
     protected function setUp(): void
     {
         parent::setUp();
