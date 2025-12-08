@@ -13,9 +13,7 @@ use function sort;
 final class DebugLog
 {
     /**
-     * Map of log categories => log lines.
-     *
-     * @var array<string,array<string>>
+     * @var array<string,array<string>> map of log categories => log lines
      */
     private array $lines = [];
 

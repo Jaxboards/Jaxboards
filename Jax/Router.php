@@ -36,7 +36,7 @@ use function str_contains;
 final class Router
 {
     /**
-     * @var array<string,class-string>
+     * var array<string,class-string> $staticRoutes.
      */
     private array $staticRoutes = [
         '' => IDX::class,

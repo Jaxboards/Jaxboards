@@ -32,7 +32,6 @@ final class BBCode
     /**
      * @var array<string,string>
      */
-    // phpcs:ignore
     private array $inlineBBCodes = [
         '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi' => '<span style="background:$2">$3</span>',
         '@\[b\](.*)\[/b\]@Usi' => '<strong>$1</strong>',

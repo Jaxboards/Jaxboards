@@ -20,10 +20,7 @@ use const PHP_EOL;
 final class Page
 {
     /**
-     * These are sent when the browser requests updates through javascript.
-     * They're parsed and executed in the client side javascript.
-     *
-     * @var array<array<mixed>>
+     * @var array<array<mixed>> JS commands
      */
     private array $commands = [];
 

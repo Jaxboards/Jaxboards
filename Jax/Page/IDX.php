@@ -57,16 +57,12 @@ final class IDX implements Route
     private array $mods = [];
 
     /**
-     * A map of forum IDs to the subforums they contain.
-     *
-     * @var array<int,array<int>>
+     * @var array<int,array<int>> a map of forum IDs to the subforums they contain
      */
     private array $subforumids = [];
 
     /**
-     * Map of forum IDs to their compiled HTML link lists.
-     *
-     * @var array<int,string>
+     * @var array<int,string> map of forum IDs to their compiled HTML link lists
      */
     private array $subforums = [];
 
