@@ -28,6 +28,6 @@ final class Directory extends Model
     #[Column(name: 'boardname', type: 'string', length: 30, nullable: false)]
     public string $boardname = '';
 
-    #[Column(name: 'referral', type: 'string', length: 255, nullable: false)]
-    public string $referral = '';
+    #[Column(name: 'referral', type: 'string', length: 255, nullable: true)]
+    public ?string $referral = null;
 }

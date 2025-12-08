@@ -306,18 +306,7 @@ final readonly class ServiceInstall
         );
 
         if ($serviceMode) {
-            // Create directory table.
-            $queries = [
-                'DROP TABLE IF EXISTS `directory`;',
-                $this->databaseUtils->createTableQueryFromModel(new Directory()),
-                'DROP TABLE IF EXISTS `banlist`;',
-                $this->databaseUtils->createTableQueryFromModel(new Banlist()),
-            ];
-
-            foreach ($queries as $query) {
-                $result = $this->database->query($query);
-                $this->database->disposeresult($result);
-            }
+            $this->databaseUtils->installServiceTables();
 
             // Create the text and support boards.
             $default_boards = [

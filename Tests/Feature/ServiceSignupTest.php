@@ -16,6 +16,7 @@ use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Model;
+use Jax\Models\Service\Directory;
 use Jax\Page\ServiceSignup;
 use Jax\Request;
 use Jax\RequestStringGetter;
@@ -87,5 +88,45 @@ final class ServiceSignupTest extends FeatureTestCase
         DOMAssert::assertSelectCount('input[name=username]', 1, $page);
         DOMAssert::assertSelectCount('input[name=email]', 1, $page);
         DOMAssert::assertSelectCount('input[name=post]', 1, $page);
+    }
+
+    public function testSignupFormServiceModeEnabledSubmit(): void
+    {
+        $this->setServiceConfig(['service' => true]);
+
+        $this->container->get(DatabaseUtils::class)->installServiceTables();
+
+        // Assert that the boards directory is set up
+        $fileSystem = $this->container->get(FileSystem::class);
+        $fileSystem->expects($this->once())
+            ->method('copyDirectory')
+            ->with('Service/blueprint', 'boards/boardname')
+        ;
+
+        $page = $this->go(
+            new Request(
+                server: [
+                    'SERVER_NAME' => 'www.jaxboards.com',
+                    'REMOTE_ADDR' => '::1'
+                ],
+                post: [
+                    'username' => 'username',
+                    'password' => 'password',
+                    'boardurl' => 'boardname',
+                    'email' => 'email@email.com',
+                    'submit' => 'Register a Forum!',
+                ]
+            ),
+            pageClass: ServiceSignup::class,
+        );
+
+        $this->assertRedirect('https://boardname.jaxboards.com', $page);
+
+        // Check board directory was added
+        $database = $this->container->get(Database::class);
+        $database->setPrefix('');
+        $directoryEntry = Directory::selectOne(1);
+        $this->assertEquals("email@email.com", $directoryEntry->registrarEmail);
+        $this->assertEquals("boardname", $directoryEntry->boardname);
     }
 }

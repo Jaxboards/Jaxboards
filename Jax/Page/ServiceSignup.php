@@ -97,7 +97,7 @@ final readonly class ServiceSignup
                                     </p>
                                 </div>
                                 <div id="signup" class="flex1">
-                                    <form  method="post">
+                                    <form method="post">
                                         {$errorDisplay}
                                         <input type="text" name="boardurl" id="boardname">.{$this->serviceConfig->getSetting('domain')}<br>
                                         <label for="username">Username:</label>
@@ -186,15 +186,6 @@ final readonly class ServiceSignup
                 . 'numbers, and underscore only';
         }
 
-        $directoryCount = Directory::count(
-            'WHERE `registrarIP`=? AND `date`>?',
-            $this->ipAddress->asBinary(),
-            $this->database->datetime(Carbon::now('UTC')->subWeeks(1)->getTimestamp()),
-        );
-        if ($directoryCount > 3) {
-            return 'You may only register 3 boards per week.';
-        }
-
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return 'invalid email';
         }
@@ -208,14 +199,21 @@ final readonly class ServiceSignup
                 . 'numbers, and underscore only';
         }
 
+        $this->database->setPrefix('');
+
+        $directoryCount = Directory::count(
+            'WHERE `registrarIP`=? AND `date`>?',
+            $this->ipAddress->asBinary(),
+            $this->database->datetime(Carbon::now('UTC')->subWeeks(1)->getTimestamp()),
+        );
+
+        if ($directoryCount > 3) {
+            return 'You may only register 3 boards per week.';
+        }
         $result = Directory::selectOne('WHERE `boardname`=?', $boardURL);
         if ($result !== null) {
             return' that board already exists';
         }
-
-        $boardPrefix = $boardURLLowercase . '_';
-
-        $this->database->setPrefix('');
 
         $directory = new Directory();
         $directory->boardname = $boardURL;
@@ -225,7 +223,7 @@ final readonly class ServiceSignup
         $directory->registrarIP = $this->ipAddress->asBinary();
         $directory->insert();
 
-        $this->database->setPrefix($boardPrefix);
+        $this->database->setPrefix($boardURLLowercase . '_');
 
         $this->databaseUtils->install();
 
@@ -242,8 +240,9 @@ final readonly class ServiceSignup
 
         $this->fileSystem->copyDirectory('Service/blueprint', 'boards/' . $boardURLLowercase);
 
-        header('Location: https://' . $boardURL . '.' . $this->serviceConfig->getSetting('domain'));
+        $redirect = 'https://' . $boardURL . '.' . $this->serviceConfig->getSetting('domain');
+        header("Location: $redirect");
 
-        return null;
+        return "Error redirecting you to Location: $redirect";
     }
 }

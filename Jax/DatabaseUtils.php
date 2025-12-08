@@ -43,30 +43,42 @@ final readonly class DatabaseUtils implements DatabaseAdapter
      *
      * Returns fully-qualified class names like `Jax\\Models\\Post`.
      */
-    public function getModels(): array
+    public function getModels($directory = "Jax/Models/"): array
     {
-        static $modelClassesCache = null;
-        if ($modelClassesCache !== null) {
-            return $modelClassesCache;
-        }
+        $models = [];
 
-        $modelClassesCache = [];
-
-        foreach ($this->fileSystem->glob('Jax/Models/*.php') as $model) {
+        foreach ($this->fileSystem->glob("$directory/*.php") as $model) {
             $fileInfo = $this->fileSystem->getFileInfo($model);
-            $modelClassesCache[] = __NAMESPACE__ . '\Models\\' . $fileInfo->getBasename('.php');
+            $models[] = str_replace("/", "\\", $directory) . $fileInfo->getBasename('.php');
         }
 
-        return $modelClassesCache;
+        return $models;
     }
 
     public function install(): void
     {
         $this->databaseAdapter->install();
 
+        $this->installTablesFromModels($this->getModels());
+
+        $this->insertInitialRecords();
+    }
+
+    public function installServiceTables(): void
+    {
+        $prefix = $this->database->getPrefix();
+        $this->database->setPrefix('');
+        $this->installTablesFromModels($this->getModels('Jax/Models/Service/'));
+        $this->database->setPrefix($prefix);
+    }
+
+    /**
+     * @param class-string[] $models
+     */
+    private function installTablesFromModels(array $models) {
         $queries = [];
 
-        foreach ($this->getModels() as $modelClass) {
+        foreach ($models as $modelClass) {
             $model = new $modelClass();
             $queries[] = 'DROP TABLE IF EXISTS ' . $this->database->ftable($model::TABLE);
             $queries[] = $this->databaseAdapter->createTableQueryFromModel($model);
@@ -76,8 +88,6 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         foreach ($queries as $query) {
             $this->database->query($query);
         }
-
-        $this->insertInitialRecords();
     }
 
     public function createTableQueryFromModel(Model $model): string
