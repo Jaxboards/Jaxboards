@@ -11,4 +11,4 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 $container = new Container();
 // Init DB before API routes
 $container->get(Database::class);
-$container->get(API::class)->render();
+echo $container->get(API::class)->render();

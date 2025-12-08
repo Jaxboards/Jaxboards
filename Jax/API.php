@@ -22,16 +22,16 @@ final readonly class API
         private TextFormatting $textFormatting,
     ) {}
 
-    public function render(): void
+    public function render(): string
     {
-        match ($this->request->get('act')) {
+        return match ($this->request->get('act')) {
             'searchmembers' => $this->searchMembers(),
             'emotes' => $this->emotes(),
             default => header('Location: /'),
         };
     }
 
-    private function searchMembers(): void
+    private function searchMembers(): string
     {
         $members = Member::selectMany(
             'WHERE `displayName` LIKE ? ORDER BY `displayName` LIMIT 10',
@@ -47,16 +47,16 @@ final readonly class API
             $list[1][] = $member->displayName;
         }
 
-        echo json_encode($list);
+        return json_encode($list);
     }
 
-    private function emotes(): void
+    private function emotes(): string
     {
         $rules = $this->textFormatting->rules->getEmotes();
         foreach ($rules as $text => $image) {
             $rules[$text] = '<img src="' . $image . '" alt="' . $this->textFormatting->blockhtml($text) . '" />';
         }
 
-        echo json_encode([array_keys($rules), array_values($rules)]);
+        return json_encode([array_keys($rules), array_values($rules)]);
     }
 }
