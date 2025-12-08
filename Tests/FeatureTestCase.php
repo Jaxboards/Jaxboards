@@ -15,6 +15,7 @@ use Jax\User;
 use PHPUnit\Framework\Attributes\CoversNothing;
 
 use function DI\autowire;
+use function is_string;
 use function parse_str;
 use function parse_url;
 use function password_hash;
@@ -33,8 +34,10 @@ abstract class FeatureTestCase extends TestCase
         parent::setUp();
     }
 
-    public function go(Request|string|null $request = null, string $pageClass = App::class): string
-    {
+    public function go(
+        Request|string|null $request = null,
+        string $pageClass = App::class,
+    ): string {
         if (is_string($request)) {
             parse_str(parse_url($request)['query'], $getParameters);
             $request = new Request(

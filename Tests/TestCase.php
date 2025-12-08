@@ -58,7 +58,8 @@ abstract class TestCase extends PHPUnitTestCase
         return parent::__construct($name);
     }
 
-    protected function setServiceConfig($config = []) {
+    protected function setServiceConfig($config = []): void
+    {
         $this->container->set(ServiceConfig::class, autowire()->constructorParameter('config', [
             'badnamechars' => "@[^\\w' ?]@",
             'boardname' => 'Example Forums',

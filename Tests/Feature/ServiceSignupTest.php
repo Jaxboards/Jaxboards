@@ -23,7 +23,6 @@ use Jax\ServiceConfig;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
-use function DI\autowire;
 
 /**
  * The installer test is special.
@@ -57,16 +56,15 @@ final class ServiceSignupTest extends FeatureTestCase
         parent::setUp();
     }
 
-
     public function testSignupFormServiceModeDisabled(): void
     {
-        $this->setServiceConfig([ 'service' => false ]);
+        $this->setServiceConfig(['service' => false]);
 
         $page = $this->go(
             new Request(
                 server: ['SERVER_NAME' => 'www.jaxboards.com'],
             ),
-            pageClass: ServiceSignup::class
+            pageClass: ServiceSignup::class,
         );
 
         $this->assertEquals('Service mode not enabled', $page);
@@ -74,13 +72,13 @@ final class ServiceSignupTest extends FeatureTestCase
 
     public function testSignupFormServiceModeEnabled(): void
     {
-        $this->setServiceConfig([ 'service' => true ]);
+        $this->setServiceConfig(['service' => true]);
 
         $page = $this->go(
             new Request(
                 server: ['SERVER_NAME' => 'www.jaxboards.com'],
             ),
-            pageClass: ServiceSignup::class
+            pageClass: ServiceSignup::class,
         );
 
         DOMAssert::assertSelectCount('input[name=boardurl]', 1, $page);
