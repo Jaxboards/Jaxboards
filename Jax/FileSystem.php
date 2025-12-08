@@ -120,9 +120,9 @@ final readonly class FileSystem
     /**
      * Get SplFileInfo for a file.
      */
-    public function getFileInfo(string $filename): SplFileInfo
+    public function getFileInfo(string $filename, bool $allowRootBypass = false): SplFileInfo
     {
-        return new SplFileInfo($this->pathFromRoot($filename));
+        return new SplFileInfo($allowRootBypass ? $filename : $this->pathFromRoot($filename));
     }
 
     /**
@@ -131,8 +131,9 @@ final readonly class FileSystem
     public function getFileObject(
         string $filename,
         string $mode = 'r',
+        bool $allowRootBypass = false
     ): SplFileObject {
-        return new SplFileObject($this->pathFromRoot($filename), $mode);
+        return new SplFileObject($allowRootBypass ? $filename : $this->pathFromRoot($filename), $mode);
     }
 
     /**
@@ -229,18 +230,21 @@ final readonly class FileSystem
      *
      * @return array<string>
      */
-    public function tail(string $path, int $totalLines): array
+    public function tail(SplFileObject|string $file, int $totalLines): array
     {
-        $logFile = $this->getFileObject($path, 'r');
-        $logFile->fseek(0, SEEK_END);
+        if (is_string($file)) {
+            $file = $this->getFileObject($file);
+        }
+
+        $file->fseek(0, SEEK_END);
 
         $lines = [];
         $lastLine = '';
 
         // Loop backward until we have our lines or we reach the start
-        for ($pos = $logFile->ftell() - 1; $pos >= 0; --$pos) {
-            $logFile->fseek($pos);
-            $character = $logFile->fgetc();
+        for ($pos = $file->ftell() - 1; $pos >= 0; --$pos) {
+            $file->fseek($pos);
+            $character = $file->fgetc();
 
             if ($pos === 0 || $character !== "\n") {
                 $lastLine = $character . $lastLine;

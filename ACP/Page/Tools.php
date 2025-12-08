@@ -155,9 +155,11 @@ final readonly class Tools
 
         $contents = "Sorry, Jaxboards does not have file permissions to read your PHP error log file. ({$logPath})";
 
-        if ($this->fileSystem->getFileInfo($logPath)->isReadable()) {
+        if ($this->fileSystem->getFileInfo($logPath, true)->isReadable()) {
+            $logFile = $this->fileSystem->getFileObject($logPath, 'r', true);
+
             $last100Lines = htmlspecialchars(implode(PHP_EOL, $this->fileSystem->tail(
-                $logPath,
+                $logFile,
                 100,
             )));
             $contents = <<<HTML
