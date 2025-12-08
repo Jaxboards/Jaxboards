@@ -7,6 +7,7 @@ namespace Jax\Page\UserProfile;
 use Jax\Database;
 use Jax\Date;
 use Jax\DomainDefinitions;
+use Jax\Models\Activity as ModelsActivity;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
@@ -52,16 +53,14 @@ final readonly class Activity
                 'title' => $member->displayName . "'s recent activity",
             ],
         );
-        foreach ($this->fetchActivities($member->id) as $activity) {
-            $activity['name'] = $member->displayName;
-            $activity['groupID'] = $member->groupID;
-            $parsed = $this->parseActivityRSS($activity);
+        foreach ($this->fetchActivities($member->id) as [$activity, $affectedUser]) {
+            $parsed = $this->parseActivityRSS($activity, $member, $affectedUser);
             $rssFeed->additem(
                 [
                     'description' => $parsed['text'],
-                    'guid' => $activity['id'],
+                    'guid' => $activity->id,
                     'link' => $this->domainDefinitions->getBoardUrl() . $parsed['link'],
-                    'pubDate' => $this->date->datetimeAsCarbon($activity['date'])?->format('r'),
+                    'pubDate' => $activity->date ? $this->date->datetimeAsCarbon($activity->date)?->format('r') : '',
                     'title' => $parsed['text'],
                 ],
             );
@@ -70,84 +69,79 @@ final readonly class Activity
         $this->page->earlyFlush($rssFeed->publish());
     }
 
-    /**
-     * @param array<string,mixed> $activity
-     */
-    private function parseActivity(array $activity): string
+    private function parseActivity(ModelsActivity $activity, Member $member, ?Member $affectedUser): string
     {
         $user = $this->template->meta(
             'user-link',
-            $activity['uid'],
-            $activity['groupID'],
-            $this->user->get()->id === $activity['uid'] ? 'You' : $activity['name'],
+            $activity->uid,
+            $member->groupID,
+            $this->user->get()->id === $activity->uid ? 'You' : $member->displayName,
         );
-        $otherguy = $this->template->meta(
+        $otherguy = $affectedUser ? $this->template->meta(
             'user-link',
-            $activity['aff_id'],
-            $activity['aff_groupID'],
-            $activity['aff_name'],
-        );
+            $affectedUser->id,
+            $affectedUser->groupID,
+            $affectedUser->displayName,
+        ) : '';
 
-        $date = $activity['date']
-            ? $this->date->smallDate($activity['date'])
+        $date = $activity->date
+            ? $this->date->smallDate($activity->date)
             : '';
-        $text = match ($activity['type']) {
+        $text = match ($activity->type) {
             'profile_comment' => "{$user}  commented on  {$otherguy}'s profile",
             'new_post' => <<<HTML
                 {$user} posted in topic
-                <a href="?act=vt{$activity['tid']}&findpost={$activity['pid']}">{$activity['arg1']}</a>
+                <a href="?act=vt{$activity->tid}&findpost={$activity->pid}">{$activity->arg1}</a>
                 {$date}
                 HTML,
             'new_topic' => <<<HTML
                 {$user} created new topic
-                <a href="?act=vt{$activity['tid']}">{$activity['arg1']}</a>
+                <a href="?act=vt{$activity->tid}">{$activity->arg1}</a>
                 {$date}
                 HTML,
             'profile_name_change' => $this->template->meta(
                 'user-link',
-                $activity['uid'],
-                $activity['groupID'],
-                $activity['arg1'],
+                $activity->uid,
+                $member->groupID,
+                $activity->arg1,
             ) . ' is now known as ' . $this->template->meta(
                 'user-link',
-                $activity['uid'],
-                $activity['groupID'],
-                $activity['arg2'],
+                $activity->uid,
+                $member->groupID,
+                $activity->arg2,
             ) . ', ' . $date,
             'buddy_add' => $user . ' made friends with ' . $otherguy,
             default => '',
         };
 
-        return "<div class=\"activity {$activity['type']}\">{$text}</div>";
+        return "<div class=\"activity {$activity->type}\">{$text}</div>";
     }
 
     /**
-     * @param array<string,mixed> $activity
-     *
      * @return array{link:string,text:string}
      */
-    private function parseActivityRSS(array $activity): array
+    private function parseActivityRSS(ModelsActivity $activity, Member $user, ?Member $affectedUser): array
     {
-        return match ($activity['type']) {
+        return match ($activity->type) {
             'profile_comment' => [
-                'link' => $this->textFormatting->blockhtml('?act=vu' . $activity['aff_id']),
-                'text' => "{$activity['name']} commented on {$activity['aff_name']}'s profile",
+                'link' => $this->textFormatting->blockhtml('?act=vu' . $activity->affectedUser),
+                'text' => "{$user->displayName} commented on {$affectedUser->displayName}'s profile",
             ],
             'new_post' => [
-                'link' => $this->textFormatting->blockhtml("?act=vt{$activity['tid']}&findpost={$activity['pid']}"),
-                'text' => $activity['name'] . ' posted in topic ' . $activity['arg1'],
+                'link' => $this->textFormatting->blockhtml("?act=vt{$activity->tid}&findpost={$activity->pid}"),
+                'text' => $user->displayName . ' posted in topic ' . $activity->arg1,
             ],
             'new_topic' => [
-                'link' => $this->textFormatting->blockhtml('?act=vt' . $activity['tid']),
-                'text' => $activity['name'] . ' created new topic ' . $activity['arg1'],
+                'link' => $this->textFormatting->blockhtml('?act=vt' . $activity->tid),
+                'text' => $user->displayName . ' created new topic ' . $activity->arg1,
             ],
             'profile_name_change' => [
-                'link' => $this->textFormatting->blockhtml('?act=vu' . $activity['uid']),
-                'text' => $activity['arg1'] . ' is now known as ' . $activity['arg2'],
+                'link' => $this->textFormatting->blockhtml('?act=vu' . $activity->uid),
+                'text' => $activity->arg1 . ' is now known as ' . $activity->arg2,
             ],
             'buddy_add' => [
-                'link' => $this->textFormatting->blockhtml('?act=vu' . $activity['uid']),
-                'text' => $activity['name'] . ' made friends with ' . $activity['aff_name'],
+                'link' => $this->textFormatting->blockhtml('?act=vu' . $activity->uid),
+                'text' => $user->displayName . ' made friends with ' . $affectedUser->displayName,
             ],
             default => ['link' => '', 'text' => ''],
         };
@@ -157,10 +151,8 @@ final readonly class Activity
     {
         $tabHTML = '';
 
-        foreach ($this->fetchActivities($member->id) as $activity) {
-            $activity['name'] = $member->displayName;
-            $activity['groupID'] = $member->groupID;
-            $tabHTML .= $this->parseActivity($activity);
+        foreach ($this->fetchActivities($member->id) as [$activity, $affectedUser]) {
+            $tabHTML .= $this->parseActivity($activity, $member, $affectedUser);
         }
 
         return $tabHTML !== ''
@@ -173,37 +165,32 @@ final readonly class Activity
     }
 
     /**
-     * @return array<int,array<string,mixed>>
+     * @return array<array{ModelsActivity,?Member}>
      */
     private function fetchActivities(int $profileId): array
     {
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT
-                    a.`id` AS `id`,
-                    a.`type` AS `type`,
-                    a.`arg1` AS `arg1`,
-                    a.`uid` AS `uid`,
-                    a.`date` AS `date`,
-                    a.`affectedUser` AS `affectedUser`,
-                    a.`tid` AS `tid`,
-                    a.`pid` AS `pid`,
-                    a.`arg2` AS `arg2`,
-                    a.`affectedUser` AS `aff_id`,
-                    m.`displayName` AS `aff_name`,
-                    m.`groupID` AS `aff_groupID`
-                FROM %t a
-                LEFT JOIN %t m
-                    ON a.`affectedUser`=m.`id`
-                WHERE a.`uid`=?
-                ORDER BY a.`id` DESC
-                LIMIT ?
-                SQL,
-            ['activity', 'members'],
+        $activities = ModelsActivity::selectMany(<<<SQL
+            WHERE `uid`= ?
+            ORDER BY id DESC
+            LIMIT ?
+            SQL,
             $profileId,
-            self::ACTIVITY_LIMIT,
+            self::ACTIVITY_LIMIT
         );
 
-        return $this->database->arows($result);
+        $members = Member::joinedOn(
+            $activities,
+            fn(ModelsActivity $activity) => $activity->affectedUser,
+        );
+
+        return array_map(
+            function (ModelsActivity $activity) use ($members) {
+                return [
+                    $activity,
+                    $members[$activity->affectedUser] ?? null,
+                ];
+            },
+            $activities,
+        );
     }
 }
