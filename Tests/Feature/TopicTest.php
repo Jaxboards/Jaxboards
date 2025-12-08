@@ -162,7 +162,7 @@ final class TopicTest extends FeatureTestCase
         $session->lastUpdate = $database->datetime();
         $session->isBot = 1;
         $session->uid = 1;
-        $session->location='vt1';
+        $session->location = 'vt1';
         $session->insert();
     }
 }
