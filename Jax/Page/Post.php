@@ -619,7 +619,7 @@ final class Post implements Route
         $topic->lastPostDate = $postDate;
         $topic->lastPostUser = $uid;
         $topic->pollChoices = $pollChoices !== []
-                    ? (json_encode($pollChoices) ?: '')
+                    ? ((string) json_encode($pollChoices, JSON_THROW_ON_ERROR))
                     : '';
         $topic->pollQuestion = $pollQuestion !== null
                     ? $this->textFormatting->blockhtml($pollQuestion)

@@ -131,6 +131,7 @@ final readonly class Inbox
                     'You have a new message from ' . $this->user->get()->displayName,
                     $message->id,
                 ],
+                JSON_THROW_ON_ERROR
             ) . PHP_EOL;
             $this->database->special(
                 <<<'SQL'

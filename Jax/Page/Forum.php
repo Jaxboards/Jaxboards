@@ -516,6 +516,6 @@ final class Forum implements Route
     {
         $forumsread = $this->jax->parseReadMarkers($this->session->get()->forumsread);
         $forumsread[$id] = Carbon::now('UTC')->getTimestamp();
-        $this->session->set('forumsread', json_encode($forumsread));
+        $this->session->set('forumsread', (string) json_encode($forumsread, JSON_THROW_ON_ERROR));
     }
 }

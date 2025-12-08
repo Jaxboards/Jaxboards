@@ -118,7 +118,7 @@ final class ReactionsTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $post = Post::selectOne(1);
-        $post->rating = json_encode(['1' => [1]]);
+        $post->rating = json_encode(['1' => [1]], JSON_THROW_ON_ERROR);
         $post->update();
 
         $page = $this->go(new Request(

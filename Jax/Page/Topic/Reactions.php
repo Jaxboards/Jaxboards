@@ -190,7 +190,7 @@ final readonly class Reactions
             $ratings[$nibletid][] = $this->user->get()->id;
         }
 
-        $post->rating = json_encode($ratings) ?: $post->rating;
+        $post->rating = json_encode($ratings, JSON_THROW_ON_ERROR) ?: $post->rating;
         $post->update();
 
         $this->page->command('update', "#reaction_p{$post->id}", $this->render($post));

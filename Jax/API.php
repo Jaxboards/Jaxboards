@@ -46,7 +46,7 @@ final readonly class API
             $list[1][] = $member->displayName;
         }
 
-        return json_encode($list);
+        return (string) json_encode($list, JSON_THROW_ON_ERROR);
     }
 
     private function emotes(): string
@@ -56,6 +56,6 @@ final readonly class API
             $rules[$text] = '<img src="' . $image . '" alt="' . $this->textFormatting->blockhtml($text) . '" />';
         }
 
-        return json_encode([array_keys($rules), array_values($rules)]);
+        return (string) json_encode([array_keys($rules), array_values($rules)], JSON_THROW_ON_ERROR);
     }
 }

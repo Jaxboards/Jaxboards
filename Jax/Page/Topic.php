@@ -826,7 +826,7 @@ final class Topic implements Route
     {
         $topicsread = $this->jax->parseReadMarkers($this->session->get()->topicsread);
         $topicsread[$modelsTopic->id] = Carbon::now('UTC')->getTimestamp();
-        $this->session->set('topicsread', json_encode($topicsread));
+        $this->session->set('topicsread', (string) json_encode($topicsread, JSON_THROW_ON_ERROR));
     }
 
     private function viewRSS(ModelsTopic $modelsTopic): void
