@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ACP\Page\Tools;
 
 use ACP\Page;
-use Jax\Database\Database as JaxDatabase;
+use Jax\Database\Database;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\Jax;
@@ -25,7 +25,7 @@ final readonly class FileManager
 {
     public function __construct(
         private DomainDefinitions $domainDefinitions,
-        private JaxDatabase $jaxDatabase,
+        private Database $database,
         private FileSystem $fileSystem,
         private Page $page,
         private Request $request,
@@ -69,12 +69,12 @@ final readonly class FileManager
                     continue;
                 }
 
-                $this->jaxDatabase->update(
+                $this->database->update(
                     'files',
                     [
                         'downloads' => $downloads,
                     ],
-                    JaxDatabase::WHERE_ID_EQUALS,
+                    Database::WHERE_ID_EQUALS,
                     $fileId,
                 );
             }
