@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Tests\Unit\Jax;
 
 use Jax\BBCode;
-use Jax\Database;
+use Jax\Database\Database;
 use Jax\DebugLog;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
-use Jax\Model;
+use Jax\Database\Model;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\ServiceConfig;

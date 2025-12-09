@@ -6,6 +6,7 @@ namespace Jax;
 
 use Carbon\Carbon;
 use Jax\Constants\Groups;
+use Jax\Database\Database;
 use Jax\Models\Member;
 use Jax\Models\Session;
 

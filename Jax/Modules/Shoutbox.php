@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Jax\Modules;
 
 use Jax\Config;
-use Jax\Database;
+use Jax\Database\Database;
 use Jax\Date;
 use Jax\Hooks;
 use Jax\Interfaces\Module;

@@ -6,7 +6,7 @@ namespace ACP\Page;
 
 use ACP\Page;
 use Jax\Config;
-use Jax\Database;
+use Jax\Database\Database;
 use Jax\Models\RatingNiblet;
 use Jax\Models\TextRule;
 use Jax\Request;

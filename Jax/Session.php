@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use Carbon\Carbon;
+use Jax\Database\Database;
 use Jax\Models\Session as ModelsSession;
 use Jax\Models\Token;
 

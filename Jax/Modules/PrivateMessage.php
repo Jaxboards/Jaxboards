@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Jax\Modules;
 
 use Carbon\Carbon;
-use Jax\Database;
+use Jax\Database\Database;
 use Jax\Interfaces\Module;
 use Jax\Page;
 use Jax\Request;

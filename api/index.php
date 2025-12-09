@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use DI\Container;
 use Jax\API;
-use Jax\Database;
+use Jax\Database\Database;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 

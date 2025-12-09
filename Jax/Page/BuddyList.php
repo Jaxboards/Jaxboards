@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
-use Jax\Database;
+use Jax\Database\Database;
 use Jax\Interfaces\Route;
 use Jax\Jax;
 use Jax\Models\Activity;

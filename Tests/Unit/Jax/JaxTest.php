@@ -10,7 +10,7 @@ use Jax\Constants\Groups;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\Jax;
-use Jax\Model;
+use Jax\Database\Model;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\ServiceConfig;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ACP\Page;
 
 use ACP\Page;
-use Jax\Database;
+use Jax\Database\Database;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\Models\Skin;

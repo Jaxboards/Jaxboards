@@ -8,7 +8,7 @@ use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
 use Jax\Attributes\PrimaryKey;
-use Jax\Model;
+use Jax\Database\Model;
 
 final class File extends Model
 {

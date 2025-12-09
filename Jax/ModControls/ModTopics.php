@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\ModControls;
 
-use Jax\Database;
+use Jax\Database\Database;
 use Jax\Jax;
 use Jax\Models\Forum;
 use Jax\Models\Topic;

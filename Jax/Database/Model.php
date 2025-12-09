@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Jax;
+namespace Jax\Database;
 
 use Jax\Attributes\Column;
 use Jax\Attributes\PrimaryKey;

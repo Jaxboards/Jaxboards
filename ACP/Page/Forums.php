@@ -6,7 +6,7 @@ namespace ACP\Page;
 
 use ACP\Page;
 use ACP\Page\Forums\RecountStats;
-use Jax\Database;
+use Jax\Database\Database;
 use Jax\ForumTree;
 use Jax\Jax;
 use Jax\Models\Category;

@@ -6,7 +6,7 @@ namespace ACP\Page;
 
 use ACP\Page;
 use Jax\Constants\Groups as ConstantsGroups;
-use Jax\Database;
+use Jax\Database\Database;
 use Jax\Models\Group;
 use Jax\Request;
 use Jax\TextFormatting;

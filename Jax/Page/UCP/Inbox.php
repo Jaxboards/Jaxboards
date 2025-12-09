@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Page\UCP;
 
-use Jax\Database;
+use Jax\Database\Database;
 use Jax\Date;
 use Jax\Jax;
 use Jax\Models\Member;

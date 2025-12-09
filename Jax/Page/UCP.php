@@ -7,7 +7,7 @@ namespace Jax\Page;
 use Carbon\Carbon;
 use Jax\Config;
 use Jax\Constants\Groups;
-use Jax\Database;
+use Jax\Database\Database;
 use Jax\Date;
 use Jax\Interfaces\Route;
 use Jax\Jax;

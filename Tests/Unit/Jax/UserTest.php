@@ -8,12 +8,12 @@ use DI\Container;
 use Jax\Attributes\Column;
 use Jax\Config;
 use Jax\Constants\Groups;
-use Jax\Database;
+use Jax\Database\Database;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Jax;
-use Jax\Model;
+use Jax\Database\Model;
 use Jax\Models\Group;
 use Jax\Models\Member;
 use Jax\Request;
@@ -119,7 +119,6 @@ final class UserTest extends UnitTestCase
         $userMember->groupID = Groups::Admin->value;
 
         $user = new User(
-            $database,
             $container->get(Jax::class),
             $container->get(IPAddress::class),
             $userMember,
@@ -175,7 +174,6 @@ final class UserTest extends UnitTestCase
         $userMember->groupID = Groups::Guest->value;
 
         $user = new User(
-            $database,
             $container->get(Jax::class),
             $container->get(IPAddress::class),
             $userMember,
@@ -224,7 +222,6 @@ final class UserTest extends UnitTestCase
         $userMember->groupID = Groups::Banned->value;
 
         $user = new User(
-            $database,
             $container->get(Jax::class),
             $container->get(IPAddress::class),
             $userMember,

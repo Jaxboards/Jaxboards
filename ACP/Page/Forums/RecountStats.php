@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ACP\Page\Forums;
 
 use ACP\Page;
-use Jax\Database;
+use Jax\Database\Database;
 use Jax\Models\Forum;
 use Jax\Models\Member;
 use Jax\Request;

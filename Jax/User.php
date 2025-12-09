@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use Jax\Constants\Groups;
+use Jax\Database\Database;
 use Jax\Models\Group;
 use Jax\Models\Member;
 
@@ -19,7 +20,6 @@ final class User
     private Member $member;
 
     public function __construct(
-        private readonly Database $database,
         private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
         // Exposing these for testing
@@ -61,12 +61,7 @@ final class User
             $this->member->{$key} = $value;
         }
 
-        $this->database->update(
-            'members',
-            $fields,
-            ' WHERE `id`=?',
-            $this->member->id,
-        );
+        $this->member->update();
     }
 
     public function login(?int $uid = null, ?string $pass = null): Member

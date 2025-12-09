@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Jax;
+namespace Jax\Database;
 
 use Exception;
+use Jax\DebugLog;
+use Jax\ServiceConfig;
 use MySQLite\MySQLite;
 use PDO;
 use PDOStatement;
@@ -26,8 +28,7 @@ use function vsprintf;
 
 use const PHP_EOL;
 
-// phpcs:disable SlevomatCodingStandard.Classes.RequireAbstractOrFinal.ClassNeitherAbstractNorFinal
-class Database
+final class Database
 {
     // This is a bit silly, but these constants shows up so often in our codebase
     // that I'm defining them here to make our linters happy.

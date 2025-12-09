@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Jax;
+namespace Jax\Database;
 
-use Jax\DatabaseUtils\DatabaseAdapter;
-use Jax\DatabaseUtils\MySQL;
-use Jax\DatabaseUtils\SQLite;
+use Jax\Database\Adapters\Adapter;
+use Jax\Database\Adapters\MySQL;
+use Jax\Database\Adapters\SQLite;
+use Jax\FileSystem;
 use Jax\Models\Category;
 use Jax\Models\Forum;
 use Jax\Models\Group;
@@ -22,21 +23,21 @@ use function mb_check_encoding;
 use function mb_convert_encoding;
 use function str_replace;
 
-final readonly class DatabaseUtils implements DatabaseAdapter
+final readonly class Utils implements Adapter
 {
     public const ADAPTERS = [
         'mysql' => MySQL::class,
         'sqliteMemory' => SQLite::class,
     ];
 
-    private DatabaseAdapter $databaseAdapter;
+    private Adapter $adapter;
 
     public function __construct(
         private Database $database,
         private FileSystem $fileSystem,
     ) {
         $adapterClass = self::ADAPTERS[$database->driver];
-        $this->databaseAdapter = new $adapterClass($database);
+        $this->adapter = new $adapterClass($database);
     }
 
     /**
@@ -60,7 +61,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
 
     public function install(): void
     {
-        $this->databaseAdapter->install();
+        $this->adapter->install();
 
         $this->installTablesFromModels($this->getModels());
 
@@ -77,7 +78,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
 
     public function createTableQueryFromModel(Model $model): string
     {
-        return $this->databaseAdapter->createTableQueryFromModel($model);
+        return $this->adapter->createTableQueryFromModel($model);
     }
 
     /**
@@ -129,7 +130,7 @@ final readonly class DatabaseUtils implements DatabaseAdapter
         foreach ($models as $modelClass) {
             $model = new $modelClass();
             $queries[] = 'DROP TABLE IF EXISTS ' . $this->database->ftable($model::TABLE);
-            $queries[] = $this->databaseAdapter->createTableQueryFromModel($model);
+            $queries[] = $this->adapter->createTableQueryFromModel($model);
         }
 
         // Create tables

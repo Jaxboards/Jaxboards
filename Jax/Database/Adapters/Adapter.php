@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Jax\DatabaseUtils;
+namespace Jax\Database\Adapters;
 
-use Jax\Model;
+use Jax\Database\Model;
 
-interface DatabaseAdapter
+interface Adapter
 {
     public function install(): void;
 

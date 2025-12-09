@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Jax\DatabaseUtils;
+namespace Tests\Unit\Jax\Database\Adapters;
 
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
-use Jax\Database;
-use Jax\DatabaseUtils\MySQL;
-use Jax\Model;
+use Jax\Database\Database;
+use Jax\Database\Adapters\MySQL;
+use Jax\Database\Model;
 use Jax\Models\Member;
 use Jax\ServiceConfig;
 use PHPUnit\Framework\Attributes\CoversClass;

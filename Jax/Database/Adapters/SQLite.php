@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Jax\DatabaseUtils;
+namespace Jax\Database\Adapters;
 
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
 use Jax\Attributes\PrimaryKey;
-use Jax\Database;
-use Jax\Model;
+use Jax\Database\Database;
+use Jax\Database\Model;
 use ReflectionClass;
 
 use function array_merge;
@@ -17,7 +17,7 @@ use function implode;
 
 use const PHP_EOL;
 
-final readonly class SQLite implements DatabaseAdapter
+final readonly class SQLite implements Adapter
 {
     public function __construct(private Database $database) {}
 

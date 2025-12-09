@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Jax;
+namespace Tests\Unit\Jax\Database;
 
-use Jax\Database;
-use Jax\DatabaseUtils;
-use Jax\DatabaseUtils\SQLite;
-use Jax\Model;
+use Jax\Database\Database;
+use Jax\Database\Utils as DatabaseUtils;
+use Jax\Database\Adapters\SQLite;
+use Jax\Database\Model;
 use Jax\ServiceConfig;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
@@ -22,7 +22,7 @@ use Tests\UnitTestCase;
 #[CoversClass(Model::class)]
 #[CoversClass(ServiceConfig::class)]
 #[Small]
-final class DatabaseUtilsTest extends UnitTestCase
+final class UtilsTest extends UnitTestCase
 {
     private DatabaseUtils $databaseUtils;
 

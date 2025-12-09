@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Jax\Page\Topic;
 
 use Jax\Config;
-use Jax\Database;
+use Jax\Database\Database;
 use Jax\Models\Member;
 use Jax\Models\Post;
 use Jax\Models\RatingNiblet;

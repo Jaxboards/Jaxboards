@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
-use Jax\Database;
-use Jax\DatabaseUtils;
+use Jax\Database\Database;
+use Jax\Database\Utils as DatabaseUtils;
 use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Models\Member;
