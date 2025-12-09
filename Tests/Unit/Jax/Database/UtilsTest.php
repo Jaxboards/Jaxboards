@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jax\Database;
 
-use Jax\Database\Database;
-use Jax\Database\Utils as DatabaseUtils;
 use Jax\Database\Adapters\SQLite;
+use Jax\Database\Database;
 use Jax\Database\Model;
+use Jax\Database\Utils as DatabaseUtils;
 use Jax\ServiceConfig;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;

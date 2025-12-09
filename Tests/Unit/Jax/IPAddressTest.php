@@ -6,10 +6,10 @@ namespace Tests\Unit\Jax;
 
 use Jax\Config;
 use Jax\Database\Database;
+use Jax\Database\Model;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\IPAddress;
-use Jax\Database\Model;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\ServiceConfig;

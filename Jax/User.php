@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax;
 
 use Jax\Constants\Groups;
-use Jax\Database\Database;
 use Jax\Models\Group;
 use Jax\Models\Member;
 

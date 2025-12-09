@@ -6,10 +6,10 @@ namespace Tests\Unit\Jax;
 
 use Jax\BBCode;
 use Jax\Database\Database;
+use Jax\Database\Model;
 use Jax\DebugLog;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
-use Jax\Database\Model;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\ServiceConfig;
