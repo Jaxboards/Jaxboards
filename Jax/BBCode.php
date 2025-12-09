@@ -258,7 +258,6 @@ final class BBCode
         return $html . ($tag === 'ol' ? '</ol>' : '</ul>');
     }
 
-    // phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
     private function youtubeEmbedHTML(
         string $link,
         string $embedUrl,
@@ -298,6 +297,5 @@ final class BBCode
                 </div>
             </div>
             DOC;
-        // phpcs:enable
     }
 }

@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace ACP\Page\Tools;
 
 use ACP\Page;
-use Jax\Database;
+use Jax\Database\Database;
+use Jax\Database\Database as JaxDatabase;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\Jax;
@@ -25,7 +26,7 @@ final readonly class FileManager
 {
     public function __construct(
         private DomainDefinitions $domainDefinitions,
-        private Database $database,
+        private JaxDatabase $database,
         private FileSystem $fileSystem,
         private Page $page,
         private Request $request,

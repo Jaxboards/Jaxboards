@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tools;
 
 use DI\Container;
-use Jax\Database;
+use Jax\Database\Database;
 use Jax\DebugLog;
 use Jax\FileSystem;
 use PDOException;

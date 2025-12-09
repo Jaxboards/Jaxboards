@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tools\Migrations\V3;
 
-use Jax\Database;
+use Jax\Database\Database;
 
 final class CreateBadgeTables
 {
