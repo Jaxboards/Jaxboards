@@ -257,7 +257,9 @@ final class Shoutbox implements Module
             $pages .= '</span>';
         }
 
-        $this->page->setBreadCrumbs(['?module=shoutbox' => 'Shoutbox History']);
+        $this->page->setBreadCrumbs([
+            $this->router->url('shoutbox') => 'Shoutbox History'
+        ]);
         if ($this->request->isJSUpdate()) {
             return;
         }
@@ -294,7 +296,7 @@ final class Shoutbox implements Module
         $candelete = !$this->user->isGuest() && $shout !== null && $this->canDelete($shout);
 
         if (!$candelete) {
-            $this->router->redirect('?');
+            $this->router->redirect('index');
 
             return;
         }

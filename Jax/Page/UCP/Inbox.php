@@ -6,6 +6,7 @@ namespace Jax\Page\UCP;
 
 use Jax\Database\Database;
 use Jax\Date;
+use Jax\DomainDefinitions;
 use Jax\Jax;
 use Jax\Models\Member;
 use Jax\Models\Message;
@@ -36,6 +37,7 @@ final readonly class Inbox
     public function __construct(
         private Database $database,
         private Date $date,
+        private DomainDefinitions $domainDefinitions,
         private Jax $jax,
         private Page $page,
         private Request $request,
@@ -146,23 +148,29 @@ final readonly class Inbox
                 $cmd,
                 $udata->id,
             );
+
+            $inboxURL = $this->domainDefinitions->getBoardUrl() . $this->router->url('ucp', ['what' => 'inbox']);
+
             // Send em an email!
             if (($udata->emailSettings & 2) !== 0) {
+                $fromName = $this->user->get()->displayName;
                 $this->jax->mail(
                     $udata->email,
-                    'PM From ' . $this->user->get()->displayName,
-                    "You are receiving this email because you've "
-                        . 'received a message from ' . $this->user->get()->displayName
-                        . ' on {BOARDLINK}.<br>'
-                        . '<br>Please go to '
-                        . "<a href='{BOARDURL}?act=ucp&what=inbox'>"
-                        . '{BOARDURL}?act=ucp&what=inbox</a>'
-                        . ' to view your message.',
+                    "PM From {$fromName}",
+                    <<<HTML
+                        You are receiving this email because you've
+                        received a message from {$fromName} on {BOARDLINK}<br>
+                        Please go to <a href='{$inboxURL}'>{$inboxURL}</a>
+                        to view your message.
+                        HTML,
                 );
             }
 
-            return 'Message successfully delivered.'
-                . "<br><br><a href='?act=ucp&what=inbox'>Back</a>";
+            return <<<HTML
+                Message successfully delivered.
+                <br><br>
+                <a href='{$inboxURL}'>Back</a>
+                HTML;
         }
 
         if ($this->request->isJSUpdate() && !$messageid) {
@@ -252,9 +260,11 @@ final readonly class Inbox
         }
 
         $this->router->redirect(
-            '?act=ucp&what=inbox'
-                . ($this->request->both('prevpage') !== null
-                    ? '&page=' . $this->request->asString->both('prevpage') : ''),
+            'ucp',
+            [
+                'what' => 'inbox',
+                'page' => $this->request->asString->both('prevpage') ?? '',
+            ]
         );
     }
 
@@ -318,7 +328,7 @@ final readonly class Inbox
         }
 
         if (!$this->request->isJSAccess()) {
-            $this->router->redirect('?act=ucp&what=inbox');
+            $this->router->redirect('ucp', ['what' => 'inbox']);
         }
 
         return null;
@@ -397,11 +407,16 @@ final readonly class Inbox
             10,
         );
 
-        $pages .= implode(' &middot; ', array_map(static function (int $pageNumber) use ($requestPage, $view): string {
+        $pages .= implode(' &middot; ', array_map(function (int $pageNumber) use ($requestPage, $view): string {
             $active = $pageNumber === $requestPage ? ' class="active"' : '';
+            $pageURL = $this->router->url('ucp', [
+                'what' => 'inbox',
+                'view' => $view,
+                'page' => $pageNumber
+            ]);
 
             return <<<HTML
-                <a href="?act=ucp&what=inbox&view={$view}&page={$pageNumber}" {$active}>{$pageNumber}</a>
+                <a href="{$pageURL}" {$active}>{$pageNumber}</a>
                 HTML;
         }, $pageNumbers));
 
@@ -435,7 +450,7 @@ final readonly class Inbox
                 '<input type="checkbox" '
                     . ($message->flag ? 'checked="checked" ' : '')
                     . 'class="switch flag" onchange="' . $dmessageOnchange . '" />',
-                $message->id,
+                $this->router->url('ucp', ['what' => 'inbox', 'view' => $message->id]),
                 $message->title,
                 $otherMember->displayName,
                 $this->date->autoDate($message->date),
@@ -443,12 +458,13 @@ final readonly class Inbox
         }
 
         if ($messages === []) {
+            $composeURL = $this->router->url('ucp', ['what' => 'inbox', 'view' => 'compose']);
             $msg = match ($view) {
                 'sent' => 'No sent messages.',
                 'flagged' => 'No flagged messages.',
-                default => 'No messages. You could always try '
-                    . '<a href="?act=ucp&what=inbox&view=compose">'
-                    . 'sending some</a>, though!',
+                default => <<<HTML
+                    No messages. You could always try <a href="{$composeURL}">sending some</a>, though!
+                    HTML,
             };
 
             $html .= '<tr><td colspan="5" class="error">' . $msg . '</td></tr>';

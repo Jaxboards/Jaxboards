@@ -10,6 +10,7 @@ use Jax\Models\Member;
 use Jax\Models\Post;
 use Jax\Models\RatingNiblet;
 use Jax\Page;
+use Jax\Router;
 use Jax\Template;
 use Jax\User;
 
@@ -29,6 +30,7 @@ final readonly class Reactions
     public function __construct(
         private Config $config,
         private Page $page,
+        private Router $router,
         private User $user,
         private Template $template,
     ) {}
@@ -123,10 +125,13 @@ final readonly class Reactions
                 $ratingNiblet->img,
                 $ratingNiblet->title,
             );
+            $ratePostURL = $this->router->url('topic', [
+                'id' => $post->tid,
+                'ratepost' => $post->id,
+                'niblet' => $ratingNiblet->id
+            ]);
             $postratingbuttons .= <<<HTML
-                <a href="?act=vt{$post->tid}&amp;ratepost={$post->id}&amp;niblet={$ratingNiblet->id}">
-                    {$nibletHTML}
-                </a>
+                <a href="{$ratePostURL}">{$nibletHTML}</a>
                 HTML;
             if (!array_key_exists($ratingNiblet->id, $prating)) {
                 continue;
@@ -145,12 +150,14 @@ final readonly class Reactions
             ) . $num;
         }
 
+        $listRatingURL = $this->router->url('topic', ['id' => $post->tid, 'listrating' => $post->id]);
+
         return $this->template->meta(
             'rating-wrapper',
             $postratingbuttons,
             $this->isAnonymousReactionsEnabled()
                 ? ''
-                : "<a href='?act=vt{$post->tid}&amp;listrating={$post->id}'>(List)</a>",
+                : "<a href='{$listRatingURL}'>(List)</a>",
             $showrating,
         );
     }

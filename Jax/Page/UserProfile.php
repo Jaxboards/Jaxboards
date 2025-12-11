@@ -58,7 +58,7 @@ final readonly class UserProfile implements Route
             !$profile => $this->showProfileError(),
             $this->didComeFromForum() => $this->showContactCard($profile),
             (bool) $this->user->getGroup()?->canViewFullProfile => $this->showFullProfile($profile),
-            default => $this->router->redirect('?'),
+            default => $this->router->redirect('index'),
         };
     }
 
@@ -97,23 +97,26 @@ final readonly class UserProfile implements Route
             array_keys($links),
         ));
 
-        $contactDetails .= <<<"HTML"
+        $privateMessageURL = $this->router->url('ucp', ['what' => 'inbox', 'view' => 'compose', 'mid' => $member->id]);
+
+        $contactDetails .= <<<HTML
             <div class="contact im">
                 <a href="javascript:void(0)"
                     onclick="new IMWindow({$member->id},'{$member->displayName}')"
                     >IM</a>
             </div>
             <div class="contact pm">
-                <a href="?act=ucp&what=inbox&view=compose&mid={$member->id}">PM</a>
+                <a href="{$privateMessageURL}">PM</a>
             </div>
             HTML;
 
         if ($this->user->getGroup()?->canModerate) {
             $ipReadable = $member->ip !== ''
-                ? $this->ipAddress->asHumanReadable($member->ip)
-                : '';
+            ? $this->ipAddress->asHumanReadable($member->ip)
+            : '';
+            $modControlsIPURL = $this->router->url('modcontrols', ['do' => 'iptools', 'ip' => $ipReadable]);
             $contactDetails .= <<<HTML
-                    <div>IP: <a href="?act=modcontrols&do=iptools&ip={$ipReadable}">{$ipReadable}</a></div>
+                    <div>IP: <a href="{$modControlsIPURL}">{$ipReadable}</a></div>
                 HTML;
         }
 
@@ -130,13 +133,27 @@ final readonly class UserProfile implements Route
                 HTML;
         }
 
+        $buddyListURLs = [
+            'add' => $this->router->url('buddylist', ['add' => $member->id]),
+            'block' => $this->router->url('buddylist', ['block' => $member->id]),
+            'remove' => $this->router->url('buddylist', [ 'remove' => $member->id ]),
+            'unblock' => $this->router->url('buddylist', ['unblock' => $member->id]),
+        ];
+
         $addContactLink = $this->isUserInList($member->id, $this->user->get()->friends)
-            ? "<a href='?act=buddylist&remove={$member->id}'>Remove Contact</a>"
-            : "<a href='?act=buddylist&add={$member->id}'>Add Contact</a>";
+            ? "<a href='{$buddyListURLs['remove']}'>Remove Contact</a>"
+            : "<a href='{$buddyListURLs['add']}'>Add Contact</a>";
 
         $blockLink = $this->isUserInList($member->id, $this->user->get()->enemies)
-            ? "<a href='?act=buddylist&unblock={$member->id}'>Unblock Contact</a>"
-            : "<a href='?act=buddylist&block={$member->id}'>Block Contact</a>";
+            ? "<a href='{$buddyListURLs['unblock']}'>Unblock Contact</a>"
+            : "<a href='{$buddyListURLs['block']}'>Block Contact</a>";
+
+        $viewProfileURL = $this->router->url('profile', ['id' => $member->id]);
+        $privateMessageURL = $this->router->url('ucp', [
+            'what' => 'inbox',
+            'view' => 'compose',
+            'mid' => $member->id,
+        ]);
 
         $this->page->command('softurl');
         $this->page->command(
@@ -153,6 +170,8 @@ final readonly class UserProfile implements Route
                     $contactdetails,
                     $addContactLink,
                     $blockLink,
+                    $viewProfileURL,
+                    $privateMessageURL,
                 ),
                 'minimizable' => false,
                 'title' => 'Contact Card',
@@ -166,7 +185,8 @@ final readonly class UserProfile implements Route
 
         $this->page->setBreadCrumbs(
             [
-                "?act=vu{$member->id}&page=profile" => "{$member->displayName}'s profile",
+                $this->router->url('profile', ['id' => $member->id, 'page' => 'profile'])
+                    => "{$member->displayName}'s profile",
             ],
         );
 
@@ -176,6 +196,7 @@ final readonly class UserProfile implements Route
             ? $this->date->dateAsCarbon($member->birthdate)
             : null;
 
+        $moderateMemberURL = $this->router->url('modcontrols', ['do' => 'emem', 'mid' => $member->id]);
         $page = $this->template->meta(
             'userprofile-full-profile',
             $member->displayName,
@@ -195,7 +216,7 @@ final readonly class UserProfile implements Route
             implode('', $tabs),
             $tabHTML,
             $this->user->getGroup()?->canModerate
-                ? "<a class='moderate' href='?act=modcontrols&do=emem&mid={$member->id}'>Edit</a>" : '',
+                ? "<a class='moderate' href='{$moderateMemberURL}'>Edit</a>" : '',
         );
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);

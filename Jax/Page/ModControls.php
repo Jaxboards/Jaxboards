@@ -59,7 +59,7 @@ final readonly class ModControls implements Route
             !$this->user->getGroup()?->canModerate
             && !$this->user->get()->mod
         ) {
-            $this->router->redirect('?');
+            $this->router->redirect('index');
 
             return;
         }
@@ -140,7 +140,12 @@ final readonly class ModControls implements Route
             return;
         }
 
-        $page = $this->template->meta('modcp-index', $cppage);
+        $page = $this->template->meta(
+            'modcp-index',
+            $this->router->url('modcontrols', ['do' => 'emem']),
+            $this->router->url('modcontrols', ['do' => 'iptools']),
+            $cppage
+        );
         $page = $this->template->meta('box', ' id="modcp"', 'Mod CP', $page);
 
         $this->page->append('PAGE', $page);

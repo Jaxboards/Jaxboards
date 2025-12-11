@@ -10,13 +10,13 @@ use Jax\Interfaces\Route;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 
 use function explode;
 use function gmdate;
 use function implode;
-use function sprintf;
 
 final readonly class Calendar implements Route
 {
@@ -24,6 +24,7 @@ final readonly class Calendar implements Route
         private Date $date,
         private Page $page,
         private Request $request,
+        private Router $router,
         private Session $session,
         private Template $template,
     ) {
@@ -33,7 +34,7 @@ final readonly class Calendar implements Route
     public function route($params): void
     {
         $this->page->setBreadCrumbs([
-            '?act=calendar' => 'Calendar',
+            $this->router->url('calendar') => 'Calendar',
         ]);
 
         $this->monthView((int) $this->request->both('month'));
@@ -77,23 +78,25 @@ final readonly class Calendar implements Route
             }
 
             $birthday = $this->date->dateAsCarbon($member->birthdate);
-            $birthdays[$birthday?->day][] = sprintf(
-                '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '
-                . 'title="%4$s years old!" data-use-tooltip="true">'
-                . '%3$s</a>',
-                $member->id,
-                $member->groupID,
-                $member->displayName,
-                $year - ($birthday->year ?? 0),
-            );
+            $profileURL = $this->router->url('profile', ['id' => $member->id]);
+            $birthdays[$birthday?->day][] = <<<HTML
+                <a
+                    href="{$profileURL}"
+                    class="user{$member->id} mgroup{$member->groupID}"
+                    title="{$birthday->age} years old!"
+                    data-use-tooltip="true">{$member->displayName}</a>
+            HTML;
         }
+
+        $prevMonthURL = $this->router->url('calendar', ['month' => $monthOffset - 1]);
+        $nextMonthURL = $this->router->url('calendar', ['month' => $monthOffset + 1]);
 
         $page .= $this->template->meta(
             'calendar-heading',
             $monthName,
             $year,
-            $monthOffset - 1,
-            $monthOffset + 1,
+            $monthOffset >= -11 ? "<a href='{$prevMonthURL}'>&lt;</a>" : '',
+            $monthOffset <= 11 ? "<a href='{$nextMonthURL}'>&gt;</a>" : '',
         );
         $page .= $this->template->meta('calendar-daynames');
         $week = '';

@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\BotDetector;
+use Jax\Jax;
+use Jax\Page;
+use Jax\Router;
+use Jax\Session;
+use Jax\Template;
+use Jax\User;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
@@ -50,6 +57,13 @@ use Tests\FeatureTestCase;
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(ServiceConfig::class)]
+#[CoversClass(BotDetector::class)]
+#[CoversClass(Jax::class)]
+#[CoversClass(Page::class)]
+#[CoversClass(Router::class)]
+#[CoversClass(Session::class)]
+#[CoversClass(Template::class)]
+#[CoversClass(User::class)]
 final class ServiceSignupTest extends FeatureTestCase
 {
     protected function setUp(): void
@@ -120,7 +134,7 @@ final class ServiceSignupTest extends FeatureTestCase
             pageClass: ServiceSignup::class,
         );
 
-        $this->assertRedirect('https://boardname.jaxboards.com', $page);
+        $this->assertRedirect('https://boardname.jaxboards.com', [], $page);
 
         // Check board directory was added
         $database = $this->container->get(Database::class);

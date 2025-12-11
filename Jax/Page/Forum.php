@@ -83,14 +83,14 @@ final class Forum implements Route
         if ($this->request->both('markread') !== null) {
             $this->markRead($forumId);
 
-            $this->router->redirect('?');
+            $this->router->redirect('index');
 
             return;
         }
 
         if (is_numeric($replies)) {
             if (!$this->request->isJSAccess()) {
-                $this->router->redirect('?');
+                $this->router->redirect('index');
 
                 return;
             }
@@ -107,7 +107,7 @@ final class Forum implements Route
     {
         // If no fid supplied, go to the index and halt execution.
         if ($fid === 0) {
-            $this->router->redirect('?');
+            $this->router->redirect('index');
 
             return;
         }
@@ -118,7 +118,7 @@ final class Forum implements Route
         $forum = ModelsForum::selectOne($fid);
 
         if ($forum === null) {
-            $this->router->redirect('?');
+            $this->router->redirect('index');
 
             return;
         }
@@ -138,7 +138,7 @@ final class Forum implements Route
         if (!$forumPerms['read']) {
             $this->page->command('alert', 'no permission');
 
-            $this->router->redirect('?');
+            $this->router->redirect('index');
 
             return;
         }
@@ -159,18 +159,24 @@ final class Forum implements Route
         $forumpages = '';
         if ($numpages !== 0) {
             $forumpages = implode(' · ', array_map(
-                function (int $pageNumber) use ($fid): string {
-                    $activeClass = ($pageNumber - 1 === $this->pageNumber ? ' class="active"' : '');
+                function (int $pageNumber) use ($forum): string {
+                    $activeClass = ($pageNumber - 1 === $this->pageNumber ? 'class="active"' : '');
+                    $pageURL = $this->router->url('forum', [
+                        'id' => $forum->id,
+                        'page' => $pageNumber,
+                        'slug' => $this->textFormatting->slugify($forum->title),
+                    ]);
 
-                    return "<a href='?act=vf{$fid}&amp;page={$pageNumber}'{$activeClass}'>{$pageNumber}</a> ";
+                    return "<a href='{$pageURL}' {$activeClass}>{$pageNumber}</a> ";
                 },
                 $this->jax->pages($numpages, $this->pageNumber + 1, 10),
             ));
         }
 
+        $newTopicURL = $this->router->url('post', ['fid' => $fid]);
         // Buttons.
         $forumbuttons = '&nbsp;'
-            . ($forumPerms['start'] ? '<a href="?act=post&amp;fid=' . $fid . '">'
+            . ($forumPerms['start'] ? "<a href='{$newTopicURL}'>"
                 . $this->template->meta(
                     $this->template->metaExists('button-newtopic')
                         ? 'button-newtopic' : 'forum-button-newtopic',
@@ -240,16 +246,16 @@ final class Forum implements Route
             $table = $this->template->meta('forum-table', $rows);
         } else {
             if ($this->pageNumber > 0) {
-                $this->router->redirect('?act=vf' . $fid);
+                $this->router->redirect('forum', [ 'id' => $fid ]);
 
                 return;
             }
 
             if ($forumPerms['start']) {
-                $table = $this->page->error(
-                    "This forum is empty! Don't like it? "
-                        . "<a href='?act=post&amp;fid=" . $fid . "'>Create a topic!</a>",
-                );
+                $newTopicURL = $this->router->url('post', ['fid' => $fid]);
+                $table = $this->page->error(<<<HTML
+                    This forum is empty! Don't like it? <a href='{$newTopicURL}'>Create a topic!</a>
+                HTML);
             }
         }
 
@@ -271,60 +277,70 @@ final class Forum implements Route
     {
         $pages = '';
         if ($topic->replies > 9) {
+            $pageArray = [];
             foreach ($this->jax->pages((int) ceil(($topic->replies + 1) / 10), 1, 10) as $pageNumber) {
-                $pages .= "<a href='?act=vt" . $topic->id
-                    . "&amp;page={$pageNumber}'>{$pageNumber}</a> ";
+                $pageURL = $this->router->url('topic', [
+                    'id' => $topic->id,
+                    'page' => $pageNumber,
+                    'slug' => $this->textFormatting->slugify($topic->title)
+                ]);
+                $pageArray[] = "<a href='{$pageURL}'>{$pageNumber}</a>";
             }
 
-            $pages = $this->template->meta('forum-topic-pages', $pages);
+            $pages = $this->template->meta('forum-topic-pages', implode(' ', $pageArray));
         }
 
         $author = $membersById[$topic->author];
         $lastPostAuthor = $membersById[$topic->lastPostUser] ?? null;
+        $topicSlug = $this->textFormatting->slugify($topic->title);
 
         $read = $this->isTopicRead($topic);
 
         return $this->template->meta(
             'forum-row',
-            $topic->id,
             // 1
-            $this->textFormatting->wordfilter($topic->title),
+            $topic->id,
             // 2
-            $this->textFormatting->wordfilter($topic->subtitle),
+            $this->textFormatting->wordfilter($topic->title),
             // 3
+            $this->textFormatting->wordfilter($topic->subtitle),
+            // 4
             $this->template->meta(
                 'user-link',
                 $author->id,
                 $author->groupID,
                 $author->displayName,
             ),
-            // 4
-            $topic->replies,
             // 5
-            number_format($topic->views),
+            $topic->replies,
             // 6
+            number_format($topic->views),
+            // 7
             $topic->lastPostDate
                 ? $this->date->autoDate($topic->lastPostDate)
                 : '',
-            // 7
+            // 8
             $lastPostAuthor ? $this->template->meta(
                 'user-link',
                 $lastPostAuthor->id,
                 $lastPostAuthor->groupID,
                 $lastPostAuthor->displayName,
             ) : '',
-            // 8
-            ($topic->pinned !== 0 ? 'pinned' : '') . ' ' . ($topic->locked !== 0 ? 'locked' : ''),
             // 9
-            $topic->summary !== '' ? $topic->summary . (mb_strlen($topic->summary) > 45 ? '...' : '') : '',
+            ($topic->pinned !== 0 ? 'pinned' : '') . ' ' . ($topic->locked !== 0 ? 'locked' : ''),
             // 10
-            $this->user->getGroup()?->canModerate ? '<a href="?act=modcontrols&do=modt&tid='
-                . $topic->id . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
+            $topic->summary !== '' ? $topic->summary . (mb_strlen($topic->summary) > 45 ? '...' : '') : '',
             // 11
-            $pages,
+            $this->user->getGroup()?->canModerate ? (
+                '<a href="' .
+                $this->router->url('modcontrols', ['do' => 'modt', 'tid' => $topic->id]) .
+                '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>'
+            ) : '',
             // 12
-            $read ? 'read' : 'unread',
+            $pages,
             // 13
+            $read ? 'read' : 'unread',
+            // 14
             $read ? (
                 $this->template->meta('topic-icon-read')
                 ?: $this->template->meta('icon-read')
@@ -333,7 +349,12 @@ final class Forum implements Route
                     $this->template->meta('topic-icon-unread')
                     ?: $this->template->meta('icon-read')
                 ),
-            // 14
+            // 15
+            $this->router->url('topic', ['id' => $topic->id, 'slug' => $topicSlug]),
+            // 16
+            $this->router->url('forum', ['id' => $topic->fid, 'replies' => $topic->id]),
+            // 17
+            $this->router->url('topic', ['id' => $topic->id, 'getlast' => '1', 'slug' => $topicSlug]),
         );
     }
 
@@ -342,7 +363,7 @@ final class Forum implements Route
         // Start building the nav path.
         $category = Category::selectOne($forum->category);
         $breadCrumbs = $category !== null
-            ? ["?act=vc{$forum->category}" => $category->title]
+            ? [$this->router->url('category', ['id' => $forum->category]) => $category->title]
             : [];
 
         // Subforum breadcrumbs
@@ -361,11 +382,11 @@ final class Forum implements Route
                 [],
             );
             foreach ($path as $pathId) {
-                $breadCrumbs["?act=vf{$pathId}"] = $forumTitles[$pathId];
+                $breadcrumbs[$this->router->url('forum', ['id' => $pathId])] = $forumTitles[$pathId];
             }
         }
 
-        $breadCrumbs["?act=vf{$forum->id}"] = $forum->title;
+        $breadcrumbs[$this->router->url('forum', ['id' => $forum->id])] = $forum->title;
         $this->page->setBreadCrumbs($breadCrumbs);
     }
 
@@ -399,6 +420,7 @@ final class Forum implements Route
             $lastPostDate = $subforum->lastPostDate
                 ? $this->date->autoDate($subforum->lastPostDate)
                 : '- - - - -';
+            $subforumSlug = $this->textFormatting->slugify($subforum->title);
 
             $rows .= $this->template->meta(
                 'forum-subforum-row',
@@ -407,7 +429,11 @@ final class Forum implements Route
                 $subforum->subtitle,
                 $this->template->meta(
                     'forum-subforum-lastpost',
-                    $subforum->lastPostTopic,
+                    $this->router->url('topic', [
+                        'id' => $subforum->lastPostTopic,
+                        'getlast' => '1',
+                        'slug' => $this->textFormatting->slugify($subforum->lastPostTopicTitle)
+                    ]),
                     $subforum->lastPostTopicTitle ?: '- - - - -',
                     $lastPostAuthor ? $this->template->meta(
                         'user-link',
@@ -427,6 +453,8 @@ final class Forum implements Route
                     $this->template->meta('subforum-icon-unread')
                     ?: $this->template->meta('icon-unread')
                 ),
+                $this->router->url('forum', ['id' => $subforum->id, 'slug' => $subforumSlug]),
+                $this->router->url('forum', ['id' => $subforum->id, 'markread' => '1', 'slug' => $subforumSlug]),
             );
         }
 

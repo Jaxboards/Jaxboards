@@ -76,6 +76,15 @@ final readonly class TextFormatting
     }
 
     /**
+     * Converts text into a URL slug
+     * Ex: "Welcome to Jaxboards!" becomes "welcome-to-jaxboards"
+     */
+    public function slugify(string $text): string
+    {
+        return substr(strtolower(trim(preg_replace('/\W+/', '-', $text), '-')), 0, 50);
+    }
+
+    /**
      * Handles badword replacements.
      */
     public function wordfilter(string $text): string

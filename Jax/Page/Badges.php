@@ -83,7 +83,7 @@ final readonly class Badges implements Route
     public function showTabBadges(Member $member): string
     {
         if (!$this->isEnabled()) {
-            $this->router->redirect("?act=vu{$member->id}");
+            $this->router->redirect('profile', [ 'id' => $member->id ]);
 
             return '';
         }
@@ -96,10 +96,11 @@ final readonly class Badges implements Route
 
         $badgesHTML = '<div class="badges">';
         foreach ($badgesPerMember[$member->id] as $badgeTuple) {
+            $badgeURL = $this->router->url('badges', ['badgeId' => $badgeTuple->badge->id]);
             $badgesHTML .= <<<HTML
                 <section class="badge">
                     <div class="badge-image">
-                        <a href="?act=badges&badgeId={$badgeTuple->badge->id}" title="View all users with this badge">
+                        <a href="{$badgeURL}" title="View all users with this badge">
                             <img src='{$badgeTuple->badge->imagePath}' title='{$badgeTuple->badge->badgeTitle}'>
                         </a>
                     </div>
@@ -125,7 +126,7 @@ final readonly class Badges implements Route
         $badge = Badge::selectOne($badgeId);
 
         if ($badge === null) {
-            $this->router->redirect('?');
+            $this->router->redirect('index');
 
             return;
         }
@@ -144,11 +145,12 @@ final readonly class Badges implements Route
         $badgesTable = '';
         foreach ($badgeAssociations as $badgeAssociation) {
             $member = $membersWithBadges[$badgeAssociation->user];
+            $profileURL = $this->router->url('profile', ['id' => $member->id]);
 
             $badgesTable .= <<<HTML
                 <tr>
                     <td>
-                        <a href="?act=vu{$member->id}"
+                        <a href="{$profileURL}"
                             class="user{$member->id} mgroup{$member->groupID}"
                             >{$member->name}</a>
                     </td>

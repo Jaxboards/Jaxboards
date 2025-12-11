@@ -10,6 +10,7 @@ use Jax\Database\Database;
 use Jax\Database\Utils as DatabaseUtils;
 use Jax\Models\Member;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session as JaxSession;
 use Jax\User;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -52,8 +53,9 @@ abstract class FeatureTestCase extends TestCase
         return $this->container->get($pageClass)->render() ?? '';
     }
 
-    public function assertRedirect(string $location, string $page): void
+    public function assertRedirect(string $name, array $params = [], ?string $page = null): void
     {
+        $location = $this->container->get(Router::class)->url($name, $params) ?? $name;
         $this->assertStringContainsString("Location: {$location}", $page);
     }
 

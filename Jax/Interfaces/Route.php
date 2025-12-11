@@ -9,5 +9,5 @@ interface Route
     /**
      * @param array<string,string> $params
      */
-    public function route(?array $params): void;
+    public function route(array $params): void;
 }

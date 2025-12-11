@@ -109,7 +109,7 @@ final class Post implements Route
             $this->postData !== null => $this->submitPost($this->tid),
             (bool) $this->fid => $this->showTopicForm(),
             (bool) $this->tid => $this->showPostForm(),
-            default => $this->router->redirect('?'),
+            default => $this->router->redirect('index'),
         };
 
         if ($error !== null) {
@@ -198,7 +198,7 @@ final class Post implements Route
         $forum = Forum::selectOne($fid);
 
         if ($forum === null) {
-            $this->router->redirect('?');
+            $this->router->redirect('index');
 
             return null;
         }
@@ -536,7 +536,7 @@ final class Post implements Route
                 return $error;
             }
 
-            $this->router->redirect("?act=vt{$post->tid}&findpost={$pid}");
+            $this->router->redirect('topic', [ 'id' => $post->tid, 'findpost' => $pid ]);
 
             return null;
         }
@@ -793,7 +793,7 @@ final class Post implements Route
             $this->page->command('closewindow', '#qreply');
             $this->page->command('refreshdata');
         } else {
-            $this->router->redirect('?act=vt' . $tid . '&getlast=1');
+            $this->router->redirect('topic', ['id' => $tid, 'getlast' => 1]);
         }
 
         return null;

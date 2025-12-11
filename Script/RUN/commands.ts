@@ -92,10 +92,11 @@ export default {
         table.appendChild(vtbody);
     },
     location(path: string) {
-        if (path.charAt(0) === '?') RUN.stream.location(path);
-        else {
-            document.location = path;
+        if (['?', '/'].includes(path.charAt(0))) {
+            RUN.stream.location(path);
+            return;
         }
+        document.location = path;
     },
     enable(selector: string) {
         const el = document.querySelector<HTMLButtonElement>(`#${selector}`);

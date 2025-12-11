@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\BotDetector;
+use Jax\Page;
+use Jax\Router;
+use Jax\Session;
+use Jax\Template;
 use Jax\API;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -54,6 +59,11 @@ use function json_decode;
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(TextFormatting::class)]
 #[CoversClass(User::class)]
+#[CoversClass(BotDetector::class)]
+#[CoversClass(Page::class)]
+#[CoversClass(Router::class)]
+#[CoversClass(Session::class)]
+#[CoversClass(Template::class)]
 final class APITest extends FeatureTestCase
 {
     protected function setUp(): void

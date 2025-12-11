@@ -24,7 +24,6 @@ use Jax\User;
 
 use function filter_var;
 use function gmdate;
-use function header;
 use function in_array;
 use function is_string;
 use function mb_strlen;
@@ -63,12 +62,14 @@ final readonly class UCP implements Route
             $this->user->isGuest()
             || $this->user->get()->groupID === Groups::Banned->value
         ) {
-            $this->router->redirect('?');
+            $this->router->redirect('index');
 
             return;
         }
 
-        $this->page->setBreadCrumbs(['?act=ucp' => 'UCP']);
+        $this->page->setBreadCrumbs([
+            $this->router->url('ucp') => 'UCP'
+        ]);
         $what = $this->request->asString->both('what');
 
         // Not a single settings page needs update functionality except inbox
@@ -136,7 +137,26 @@ final readonly class UCP implements Route
 
     private function showucp(string $page): void
     {
-        $page = $this->template->meta('ucp-wrapper', $page);
+        $page = $this->template->meta(
+            'ucp-wrapper',
+            // Settings links
+            $this->router->url('ucp'),
+            $this->router->url('ucp', ['what' => 'pass']),
+            $this->router->url('ucp', ['what' => 'email']),
+            $this->router->url('ucp', ['what' => 'avatar']),
+            $this->router->url('ucp', ['what' => 'signature']),
+            $this->router->url('ucp', ['what' => 'profile']),
+            $this->router->url('ucp', ['what' => 'sounds']),
+            $this->router->url('ucp', ['what' => 'board']),
+
+            // inbox links
+            $this->router->url('ucp', ['what' => 'inbox', 'view' => 'compose']),
+            $this->router->url('ucp', ['what' => 'inbox']),
+            $this->router->url('ucp', ['what' => 'inbox', 'view' => 'sent']),
+            $this->router->url('ucp', ['what' => 'inbox', 'view' => 'flagged']),
+
+            $page
+        );
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
     }
@@ -245,11 +265,12 @@ final readonly class UCP implements Route
             if ($error === null) {
                 $hashpass = password_hash((string) $newPass1, PASSWORD_DEFAULT);
                 $this->user->set('pass', $hashpass);
+                $backURL = $this->router->url('ucp', ['what' => 'pass']);
 
-                return <<<'HTML'
+                return <<<HTML
                     Password changed.
                         <br><br>
-                        <a href="?act=ucp&what=pass">Back</a>
+                        <a href="{$backURL}">Back</a>
                     HTML;
             }
 
@@ -287,14 +308,20 @@ final readonly class UCP implements Route
                 'emailSettings' => ($notifications ? 2 : 0) + ($adminEmails ? 1 : 0),
             ]);
 
-            return 'Email settings updated.'
-                . '<br><br><a href="?act=ucp&what=email">Back</a>';
+            $emailSettingsURL = $this->router->url('ucp', ['what' => 'email']);
+
+            return <<<HTML
+                Email settings updated.
+                <br><br>
+                <a href="{$emailSettingsURL}">Back</a>
+                HTML;
         }
 
         $email = $this->user->get()->email;
         $emailSettings = $this->user->get()->emailSettings;
         $notificationsChecked = ($emailSettings & 2) !== 0 ? 'checked' : '';
         $adminEmailsChecked = ($emailSettings & 1) !== 0 ? 'checked' : '';
+        $changeEmailURL = $this->router->url('ucp', ['what' => 'email', 'change' => '1']);
 
         return $this->template->meta(
             'ucp-email-settings',
@@ -312,7 +339,7 @@ final readonly class UCP implements Route
                     HTML,
                 (bool) $email => <<<HTML
                     <strong>{$email}</strong>
-                    <a href='?act=ucp&what=email&change=1'>Change</a>
+                    <a href='{$changeEmailURL}'>Change</a>
                     <input type='hidden' name='email' value='{$email}' />
                     HTML,
 
@@ -482,8 +509,13 @@ final readonly class UCP implements Route
                 return $this->template->meta('error', $updateResult);
             }
 
-            return 'Profile successfully updated.<br>'
-                . '<br><a href="?act=ucp&what=profile">Back</a>';
+            $editProfileURL = $this->router->url('ucp', ['what' => 'profile']);
+
+            return <<<HTML
+                Profile successfully updated.
+                <br><br>
+                <a href="{$editProfileURL}">Back</a>
+                HTML;
         }
 
         $genderselect = '<select name="gender" title="Your gender" aria-label="Gender">';
@@ -593,7 +625,7 @@ final readonly class UCP implements Route
             return null;
         }
 
-        header('Location: ?act=ucp&what=board');
+        $this->router->redirect('ucp', ['what' => 'board']);
 
         return null;
     }

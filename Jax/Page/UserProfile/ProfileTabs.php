@@ -13,6 +13,7 @@ use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Page\Badges;
 use Jax\Request;
+use Jax\Router;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
@@ -36,6 +37,7 @@ final readonly class ProfileTabs
         private Date $date,
         private Page $page,
         private Request $request,
+        private Router $router,
         private Template $template,
         private TextFormatting $textFormatting,
         private User $user,
@@ -75,13 +77,14 @@ final readonly class ProfileTabs
         };
 
         $tabs = array_map(
-            static function (string $tab) use ($selectedTab, $member): string {
+            function (string $tab) use ($selectedTab, $member): string {
                 $active = ($tab === $selectedTab ? ' class="active"' : '');
                 $uppercase = ucwords($tab);
                 $profileId = $member->id;
+                $profileURL = $this->router->url('profile', ['id' => $profileId, 'page' => $tab]);
 
                 return <<<HTML
-                    <a href="?act=vu{$profileId}&page={$tab}" {$active}>{$uppercase}</a>
+                    <a href="{$profileURL}" {$active}>{$uppercase}</a>
                     HTML;
             },
             $this->tabs,
@@ -127,7 +130,7 @@ final readonly class ProfileTabs
         foreach ($friends as $friend) {
             $tabHTML .= $this->template->meta(
                 'userprofile-friend',
-                $friend->id,
+                $this->router->url('profile', ['id' => $friend->id]),
                 $friend->avatar ?: $this->template->meta('default-avatar'),
                 $this->template->meta(
                     'user-link',
@@ -173,7 +176,7 @@ final readonly class ProfileTabs
 
             $tabHTML .= $this->template->meta(
                 'userprofile-topic',
-                $post->tid,
+                $this->router->url('topic', ['id' => $post->tid]),
                 $topic->title,
                 $this->date->autoDate($post->date),
                 $this->textFormatting->theWorks($post->post),
@@ -219,9 +222,9 @@ final readonly class ProfileTabs
 
             $tabHTML .= $this->template->meta(
                 'userprofile-post',
-                $post->tid,
+                $this->router->url('topic', ['id' => $post->tid]),
                 $topic->title,
-                $post->id,
+                $this->router->url('topic', ['id' => $post->tid, 'findpost' => $post->id]),
                 $this->date->autoDate($post->date),
                 $this->textFormatting->theWorks($post->post),
             );

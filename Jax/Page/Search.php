@@ -12,6 +12,7 @@ use Jax\Jax;
 use Jax\Models\Forum;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
@@ -53,6 +54,7 @@ final class Search implements Route
         private readonly Template $template,
         private readonly Jax $jax,
         private readonly Request $request,
+        private readonly Router $router,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
@@ -63,7 +65,7 @@ final class Search implements Route
     public function route($params): void
     {
         $this->page->setBreadCrumbs([
-            '?act=search' => 'Search',
+            $this->router->url('search') => 'Search',
         ]);
 
         $this->pageNum = (int) $this->request->asString->both('page') - 1;
@@ -323,9 +325,9 @@ final class Search implements Route
 
             $page .= $this->template->meta(
                 'search-result',
-                $postRow['tid'],
+                $this->router->url('topic', ['id' => $postRow['tid']]),
                 $title,
-                $postRow['id'],
+                $this->router->url('topic', ['id' => $postRow['tid'], 'findpost' => $postRow['id']]),
                 $post,
             );
         }
@@ -357,7 +359,8 @@ final class Search implements Route
                 10,
             );
             foreach ($resultsArray as $resultArray) {
-                $pages .= '<a href="?act=search&page=' . $resultArray . '">' . $resultArray . '</a> ';
+                $searchURL = $this->router->url('search', ['page' => $resultArray]);
+                $pages .= "<a href='{$searchURL}'>{$resultArray}</a> ";
             }
         }
 

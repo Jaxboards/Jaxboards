@@ -11,6 +11,7 @@ use Jax\Models\Activity;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 use Jax\User;
@@ -29,6 +30,7 @@ final readonly class BuddyList implements Route
         private Jax $jax,
         private Page $page,
         private Session $session,
+        private Router $router,
         private Request $request,
         private Template $template,
         private User $user,
@@ -39,9 +41,9 @@ final readonly class BuddyList implements Route
             'buddylist-contacts',
             <<<HTML
                     <div class="contacts">
-                        <form method="?" data-ajax-form="true">
+                        <form data-ajax-form="true">
                             {$buddylist}
-                            <a href="?act=logreg5" id="status" class="%s">
+                            <a href="%s" id="status" class="%s">
                             </a>
                             <input style="width:100%%;padding-left:20px;" type="text" name="status"
                                 onblur="this.form.onsubmit()" value="%s"/>
@@ -54,7 +56,7 @@ final readonly class BuddyList implements Route
             <<<'HTML'
                     <div
                         class="contact %3$s">
-                        <a href="?act=vu%1$s">
+                        <a href="%1$s">
                             <div class="avatar">
                                 <img src="%4$s" alt="Avatar"/>
                             </div>
@@ -122,7 +124,7 @@ final readonly class BuddyList implements Route
             foreach ($friends as $friend) {
                 $contacts .= $this->template->meta(
                     'buddylist-contact',
-                    $friend->id,
+                    $this->router->url('profile', ['id' => $friend->id]),
                     $friend->name,
                     array_key_exists($friend->id, $online) ? 'online' : 'offline',
                     $friend->avatar ?: $this->template->meta('default-avatar'),
@@ -160,6 +162,7 @@ final readonly class BuddyList implements Route
             [
                 'content' => $this->template->meta(
                     'buddylist-contacts',
+                    $this->router->url('toggleInvisibility'),
                     $this->session->get()->hide !== 0 ? 'invisible' : '',
                     $this->user->get()->usertitle,
                     $contacts,

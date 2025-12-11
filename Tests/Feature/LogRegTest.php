@@ -107,7 +107,7 @@ final class LogRegTest extends FeatureTestCase
             ],
         ));
 
-        $this->assertRedirect('/', $page);
+        $this->assertRedirect('index', [], $page);
         $this->assertEquals('Sean', Member::selectOne(1)->displayName);
         $this->assertEquals(1, Stats::selectOne()->last_register);
     }
@@ -146,7 +146,7 @@ final class LogRegTest extends FeatureTestCase
             ],
         ));
 
-        $this->assertRedirect('?', $page);
+        $this->assertRedirect('index', [], $page);
 
         // Ensure token inserted
         $token = Token::selectOne();

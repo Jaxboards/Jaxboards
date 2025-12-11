@@ -20,7 +20,6 @@ use function preg_replace_callback;
 use function preg_split;
 use function str_contains;
 use function trim;
-use function urlencode;
 
 final class BBCode
 {
@@ -60,6 +59,7 @@ final class BBCode
     public function __construct(
         private readonly DomainDefinitions $domainDefinitions,
         private readonly FileSystem $fileSystem,
+        private readonly Router $router,
     ) {}
 
     public function toHTML(string $text): string
@@ -169,10 +169,16 @@ final class BBCode
                 . '</a>';
         }
 
-        return '<div class="attachment">'
-            . '<a href="index.php?act=download&id='
-            . $file->id . '&name=' . urlencode($file->name) . '" class="name">'
-            . $file->name . '</a> Downloads: ' . $file->downloads . '</div>';
+        $downloadURL = $this->router->url('download', [
+            'id' => $file->id,
+            'name' => $file->name,
+        ]);
+        return <<<HTML
+            <div class="attachment">
+                <a href='{$downloadURL}' class='name'>{$file->name}</a>
+                Downloads: {$file->downloads}
+            </div>
+            HTML;
     }
 
     /**

@@ -163,7 +163,7 @@ final class App
             'Posting',
             [
                 'emoticons' => 'Emoticons',
-                'postrating' => 'Post Rating',
+                'postRating' => 'Post Rating',
                 'wordfilter' => 'Word Filter',
             ],
         );

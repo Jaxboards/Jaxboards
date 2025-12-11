@@ -12,6 +12,7 @@ use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\Request;
 use Jax\RequestStringGetter;
+use Jax\Router;
 use Jax\ServiceConfig;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
@@ -43,6 +44,8 @@ final class BBCodeTest extends UnitTestCase
     {
         parent::setUp();
 
+        // Router is used for URL generation, we don't care to test that here
+        $this->container->set(Router::class, $this->createStub(Router::class));
         $this->bbCode = $this->container->get(BBCode::class);
     }
 
