@@ -6,5 +6,8 @@ namespace Jax\Interfaces;
 
 interface Route
 {
-    public function render(): void;
+    /**
+     * @param array<string,string> $params
+     */
+    public function route(?array $params): void;
 }

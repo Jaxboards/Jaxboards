@@ -15,7 +15,7 @@ final readonly class Rainbow implements Route
         private DomainDefinitions $domainDefinitions,
     ) {}
 
-    public function render(): void
+    public function route($params): void
     {
         $this->page->command('softurl');
         $this->page->command('script', "(function() {

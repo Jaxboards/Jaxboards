@@ -55,7 +55,7 @@ final readonly class UCP implements Route
         $this->template->loadMeta('ucp');
     }
 
-    public function render(): void
+    public function route($params): void
     {
         if (
             $this->user->isGuest()

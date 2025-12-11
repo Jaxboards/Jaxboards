@@ -43,7 +43,6 @@ use function implode;
 use function in_array;
 use function json_encode;
 use function max;
-use function preg_match;
 
 use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
@@ -78,10 +77,9 @@ final class Topic implements Route
         $this->template->loadMeta('topic');
     }
 
-    public function render(): void
+    public function route($params): void
     {
-        preg_match('@\d+$@', (string) $this->request->asString->both('act'), $act);
-        $tid = $act !== [] ? (int) $act[0] : 0;
+        $tid = (int) $params['id'] ?? 0;
 
         $edit = (int) $this->request->asString->both('edit');
         $findPost = (int) $this->request->asString->both('findpost');

@@ -34,7 +34,6 @@ use function json_encode;
 use function max;
 use function mb_strlen;
 use function number_format;
-use function preg_match;
 
 use const JSON_THROW_ON_ERROR;
 
@@ -68,19 +67,19 @@ final class Forum implements Route
         $this->template->loadMeta('forum');
     }
 
-    public function render(): void
+    public function route($params): void
     {
         $page = (int) $this->request->asString->both('page');
         $replies = $this->request->asString->both('replies');
+        $forumId = (int) $params['id'];
 
         if ($page > 0) {
             $this->pageNumber = $page - 1;
         }
 
         // Guaranteed to match here because of the router
-        preg_match('@(\d+)$@', (string) $this->request->asString->get('act'), $act);
         if ($this->request->both('markread') !== null) {
-            $this->markRead((int) $act[1]);
+            $this->markRead($forumId);
 
             $this->page->location('?');
 
@@ -99,7 +98,7 @@ final class Forum implements Route
             return;
         }
 
-        $this->viewForum((int) $act[1]);
+        $this->viewForum($forumId);
     }
 
     private function viewForum(int $fid): void

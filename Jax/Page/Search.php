@@ -60,7 +60,7 @@ final class Search implements Route
         $this->template->loadMeta('search');
     }
 
-    public function render(): void
+    public function route($params): void
     {
         $this->page->setBreadCrumbs([
             '?act=search' => 'Search',

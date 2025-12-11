@@ -73,7 +73,7 @@ final class Post implements Route
         $this->template->addMeta('post-preview', $this->template->meta('box', '', 'Post Preview', '%s'));
     }
 
-    public function render(): void
+    public function route($params): void
     {
         $this->tid = (int) $this->request->asString->both('tid');
         $this->fid = (int) $this->request->asString->both('fid');

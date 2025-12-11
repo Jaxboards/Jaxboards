@@ -27,7 +27,7 @@ final readonly class Download implements Route
         private Page $page,
     ) {}
 
-    public function render(): void
+    public function route($params): void
     {
         $this->downloadFile((int) $this->request->asString->both('id'));
     }

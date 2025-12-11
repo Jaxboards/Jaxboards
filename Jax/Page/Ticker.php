@@ -33,7 +33,7 @@ final class Ticker implements Route
         $this->template->loadMeta('ticker');
     }
 
-    public function render(): void
+    public function route($params): void
     {
         if (
             $this->request->isJSNewLocation()

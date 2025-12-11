@@ -30,7 +30,7 @@ use Jax\Page\UCP;
 use Jax\Page\UserProfile;
 
 use function array_key_exists;
-use function preg_replace;
+use function preg_match;
 use function str_contains;
 
 final class Router
@@ -81,7 +81,11 @@ final class Router
 
     public function route(string $action): void
     {
-        $dynamicAction = (string) preg_replace('@\d+$@', '', $action);
+        $params = [];
+        if (preg_match('@(?<action>[\w]+)(?<id>(\d+))$@', $action, $match)) {
+            $action = $match['action'];
+            $params = ['id' => $match['id']];
+        }
 
         $pageClassName = match (true) {
             // Board offline
@@ -89,12 +93,12 @@ final class Router
             // Static actions
             array_key_exists($action, $this->staticRoutes) => $this->staticRoutes[$action],
             // Dynamic actions
-            array_key_exists($dynamicAction, $this->dynamicRoutes) => $this->dynamicRoutes[$dynamicAction],
+            array_key_exists($action, $this->dynamicRoutes) => $this->dynamicRoutes[$action],
             default => null,
         };
 
         if ($pageClassName !== null) {
-            $this->container->get($pageClassName)->render();
+            $this->container->get($pageClassName)->route($params);
 
             return;
         }

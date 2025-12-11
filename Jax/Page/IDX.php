@@ -82,7 +82,7 @@ final class IDX implements Route
         $this->template->loadMeta('idx');
     }
 
-    public function render(): void
+    public function route($params): void
     {
         if ($this->request->both('markread') !== null) {
             $this->page->command('softurl');

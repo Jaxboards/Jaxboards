@@ -30,7 +30,6 @@ use function http_build_query;
 use function is_string;
 use function json_decode;
 use function mb_strlen;
-use function mb_substr;
 use function openssl_random_pseudo_bytes;
 use function password_hash;
 use function preg_match;
@@ -66,9 +65,9 @@ final class LogReg implements Route
         $this->template->loadMeta('logreg');
     }
 
-    public function render(): void
+    public function route($params): void
     {
-        match ((int) mb_substr((string) $this->request->asString->both('act'), 6)) {
+        match ((int) ($params['id'] ?? 0)) {
             1 => $this->register(),
             2 => $this->logout(),
             5 => $this->toggleinvisible(),

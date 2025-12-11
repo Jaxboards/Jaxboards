@@ -51,7 +51,7 @@ final readonly class ModControls implements Route
         $this->template->loadMeta('modcp');
     }
 
-    public function render(): void
+    public function route($params): void
     {
         if (
             !$this->user->getGroup()?->canModerate

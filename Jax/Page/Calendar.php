@@ -30,7 +30,7 @@ final readonly class Calendar implements Route
         $this->template->loadMeta('calendar');
     }
 
-    public function render(): void
+    public function route($params): void
     {
         $this->page->setBreadCrumbs([
             '?act=calendar' => 'Calendar',

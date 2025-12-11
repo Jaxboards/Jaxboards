@@ -69,7 +69,7 @@ final readonly class BuddyList implements Route
         );
     }
 
-    public function render(): void
+    public function route($params): void
     {
         $this->page->command('softurl');
         if ($this->user->isGuest()) {

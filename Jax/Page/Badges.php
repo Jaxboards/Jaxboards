@@ -31,7 +31,7 @@ final readonly class Badges implements Route
         return (bool) $this->config->getSetting('badgesEnabled');
     }
 
-    public function render(): void
+    public function route($params): void
     {
         $badgeId = (int) $this->request->asString->get('badgeId');
         if ($badgeId === 0) {

@@ -22,7 +22,6 @@ use function array_map;
 use function explode;
 use function implode;
 use function in_array;
-use function preg_match;
 use function ucfirst;
 
 final readonly class UserProfile implements Route
@@ -41,10 +40,9 @@ final readonly class UserProfile implements Route
         $this->template->loadMeta('userprofile');
     }
 
-    public function render(): void
+    public function route($params): void
     {
-        preg_match('@\d+@', $this->request->asString->both('act') ?? '', $match);
-        $userId = $match !== [] ? (int) $match[0] : 0;
+        $userId = (int) $params['id'];
 
 
         // Nothing is live updating on the profile page

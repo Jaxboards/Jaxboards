@@ -40,7 +40,7 @@ final class Members implements Route
         $this->template->loadMeta('members');
     }
 
-    public function render(): void
+    public function route($params): void
     {
         $page = (int) $this->request->asString->both('page');
         if ($page > 0) {
