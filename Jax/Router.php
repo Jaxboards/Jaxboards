@@ -30,6 +30,7 @@ use Jax\Page\UCP;
 use Jax\Page\UserProfile;
 
 use function array_key_exists;
+use function header;
 use function preg_match;
 use function str_contains;
 
@@ -81,7 +82,7 @@ final class Router
     ) {}
 
     /**
-     * Redirect the user
+     * Redirect the user.
      */
     public function redirect(string $newLocation): void
     {
