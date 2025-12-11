@@ -16,6 +16,7 @@ use Jax\Models\Stats;
 use Jax\Models\Token;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
@@ -57,9 +58,10 @@ final class LogReg implements Route
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Request $request,
+        private readonly Router $router,
         private readonly Session $session,
-        private readonly TextFormatting $textFormatting,
         private readonly Template $template,
+        private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
         $this->template->loadMeta('logreg');
@@ -251,11 +253,11 @@ final class LogReg implements Route
                 $this->session->set('uid', $this->user->get()->id);
                 $this->session->act();
                 if ($this->registering) {
-                    $this->page->location('/');
+                    $this->router->redirect('/');
                 } elseif ($this->request->isJSAccess()) {
                     $this->page->command('reload');
                 } else {
-                    $this->page->location('?');
+                    $this->router->redirect('?');
 
                     return;
                 }

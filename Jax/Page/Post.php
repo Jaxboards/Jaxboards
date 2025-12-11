@@ -20,6 +20,7 @@ use Jax\Models\Stats;
 use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
@@ -65,6 +66,7 @@ final class Post implements Route
         private readonly IPAddress $ipAddress,
         private readonly Page $page,
         private readonly Request $request,
+        private readonly Router $router,
         private readonly Session $session,
         private readonly Template $template,
         private readonly TextFormatting $textFormatting,
@@ -107,7 +109,7 @@ final class Post implements Route
             $this->postData !== null => $this->submitPost($this->tid),
             (bool) $this->fid => $this->showTopicForm(),
             (bool) $this->tid => $this->showPostForm(),
-            default => $this->page->location('?'),
+            default => $this->router->redirect('?'),
         };
 
         if ($error !== null) {
@@ -196,7 +198,7 @@ final class Post implements Route
         $forum = Forum::selectOne($fid);
 
         if ($forum === null) {
-            $this->page->location('?');
+            $this->router->redirect('?');
 
             return null;
         }
@@ -534,7 +536,7 @@ final class Post implements Route
                 return $error;
             }
 
-            $this->page->location("?act=vt{$post->tid}&findpost={$pid}");
+            $this->router->redirect("?act=vt{$post->tid}&findpost={$pid}");
 
             return null;
         }
@@ -791,7 +793,7 @@ final class Post implements Route
             $this->page->command('closewindow', '#qreply');
             $this->page->command('refreshdata');
         } else {
-            $this->page->location('?act=vt' . $tid . '&getlast=1');
+            $this->router->redirect('?act=vt' . $tid . '&getlast=1');
         }
 
         return null;

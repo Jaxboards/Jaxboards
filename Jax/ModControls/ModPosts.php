@@ -10,6 +10,7 @@ use Jax\Models\Post;
 use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\User;
 
@@ -32,6 +33,7 @@ final readonly class ModPosts
         private ModTopics $modTopics,
         private Page $page,
         private Request $request,
+        private Router $router,
         private Session $session,
         private User $user,
     ) {}
@@ -217,7 +219,7 @@ final readonly class ModPosts
         }
 
         $this->updatePosts($pids, ['tid' => $tid]);
-        $this->page->location('?act=vt' . $tid);
+        $this->router->redirect('?act=vt' . $tid);
 
         return true;
     }

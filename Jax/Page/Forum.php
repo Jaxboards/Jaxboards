@@ -15,6 +15,7 @@ use Jax\Models\Member;
 use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
@@ -58,10 +59,11 @@ final class Forum implements Route
         private readonly Date $date,
         private readonly Jax $jax,
         private readonly Page $page,
-        private readonly Session $session,
         private readonly Request $request,
-        private readonly TextFormatting $textFormatting,
+        private readonly Router $router,
+        private readonly Session $session,
         private readonly Template $template,
+        private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
         $this->template->loadMeta('forum');
@@ -81,14 +83,14 @@ final class Forum implements Route
         if ($this->request->both('markread') !== null) {
             $this->markRead($forumId);
 
-            $this->page->location('?');
+            $this->router->redirect('?');
 
             return;
         }
 
         if (is_numeric($replies)) {
             if (!$this->request->isJSAccess()) {
-                $this->page->location('?');
+                $this->router->redirect('?');
 
                 return;
             }
@@ -105,7 +107,7 @@ final class Forum implements Route
     {
         // If no fid supplied, go to the index and halt execution.
         if ($fid === 0) {
-            $this->page->location('?');
+            $this->router->redirect('?');
 
             return;
         }
@@ -116,7 +118,7 @@ final class Forum implements Route
         $forum = ModelsForum::selectOne($fid);
 
         if ($forum === null) {
-            $this->page->location('?');
+            $this->router->redirect('?');
 
             return;
         }
@@ -127,7 +129,7 @@ final class Forum implements Route
             ++$forum->redirects;
             $forum->update();
 
-            $this->page->location($forum->redirect);
+            $this->router->redirect($forum->redirect);
 
             return;
         }
@@ -136,7 +138,7 @@ final class Forum implements Route
         if (!$forumPerms['read']) {
             $this->page->command('alert', 'no permission');
 
-            $this->page->location('?');
+            $this->router->redirect('?');
 
             return;
         }
@@ -238,7 +240,7 @@ final class Forum implements Route
             $table = $this->template->meta('forum-table', $rows);
         } else {
             if ($this->pageNumber > 0) {
-                $this->page->location('?act=vf' . $fid);
+                $this->router->redirect('?act=vf' . $fid);
 
                 return;
             }

@@ -15,6 +15,7 @@ use Jax\Models\Member;
 use Jax\Models\Shout;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
@@ -38,6 +39,7 @@ final class Shoutbox implements Module
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Request $request,
+        private readonly Router $router,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
         private readonly Template $template,
@@ -292,7 +294,7 @@ final class Shoutbox implements Module
         $candelete = !$this->user->isGuest() && $shout !== null && $this->canDelete($shout);
 
         if (!$candelete) {
-            $this->page->location('?');
+            $this->router->redirect('?');
 
             return;
         }

@@ -17,6 +17,7 @@ use Jax\Models\Post;
 use Jax\Models\Shout;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
@@ -43,6 +44,7 @@ final readonly class ModControls implements Route
         private ModPosts $modPosts,
         private Page $page,
         private Request $request,
+        private Router $router,
         private Session $session,
         private TextFormatting $textFormatting,
         private Template $template,
@@ -57,7 +59,7 @@ final readonly class ModControls implements Route
             !$this->user->getGroup()?->canModerate
             && !$this->user->get()->mod
         ) {
-            $this->page->location('?');
+            $this->router->redirect('?');
 
             return;
         }

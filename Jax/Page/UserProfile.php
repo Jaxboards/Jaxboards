@@ -13,6 +13,7 @@ use Jax\Models\Member;
 use Jax\Page;
 use Jax\Page\UserProfile\ProfileTabs;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 use Jax\User;
@@ -33,6 +34,7 @@ final readonly class UserProfile implements Route
         private Page $page,
         private ProfileTabs $profileTabs,
         private Request $request,
+        private Router $router,
         private Session $session,
         private Template $template,
         private User $user,
@@ -56,7 +58,7 @@ final readonly class UserProfile implements Route
             !$profile => $this->showProfileError(),
             $this->didComeFromForum() => $this->showContactCard($profile),
             (bool) $this->user->getGroup()?->canViewFullProfile => $this->showFullProfile($profile),
-            default => $this->page->location('?'),
+            default => $this->router->redirect('?'),
         };
     }
 

@@ -22,6 +22,7 @@ use Jax\Page;
 use Jax\Page\Topic\Poll;
 use Jax\Page\Topic\Reactions;
 use Jax\Request;
+use Jax\Router;
 use Jax\RSSFeed;
 use Jax\Session;
 use Jax\Template;
@@ -68,6 +69,7 @@ final class Topic implements Route
         private readonly Poll $poll,
         private readonly Reactions $reactions,
         private readonly Request $request,
+        private readonly Router $router,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
         private readonly Template $template,
@@ -94,7 +96,7 @@ final class Topic implements Route
             : [];
 
         if (!$topic || !$forumPerms['read']) {
-            $this->page->location('?');
+            $this->router->redirect('?');
 
             return;
         }
@@ -106,7 +108,7 @@ final class Topic implements Route
         match (true) {
             $quickReply && !$this->request->isJSUpdate() => match (true) {
                 $this->request->isJSAccess() && !$this->request->isJSDirectLink() => $this->quickReplyForm($topic),
-                default => $this->page->location('?act=post&tid=' . $topic->id),
+                default => $this->router->redirect('?act=post&tid=' . $topic->id),
             },
             $ratePost !== 0 => $this->reactions->toggleReaction($ratePost, (int) $this->request->both('niblet')),
             $findPost !== 0 => $this->findPost($topic, $findPost),
@@ -658,7 +660,7 @@ final class Topic implements Route
     private function quickEditPost(ModelsTopic $modelsTopic, int $pid): void
     {
         if (!$this->request->isJSAccess()) {
-            $this->page->location("?act=post&how=edit&tid={$modelsTopic->id}&pid={$pid}");
+            $this->router->redirect("?act=post&how=edit&tid={$modelsTopic->id}&pid={$pid}");
 
             return;
         }
@@ -778,13 +780,13 @@ final class Topic implements Route
         $this->database->disposeresult($result);
 
         if (!$post) {
-            $this->page->location('?');
+            $this->router->redirect('?');
 
             return;
         }
 
         $this->page->command('softurl');
-        $this->page->location(
+        $this->router->redirect(
             "?act=vt{$tid}&page=" . ceil($post['numposts'] / $this->numperpage)
                 . '&pid=' . $post['lastpid'] . '#pid_' . $post['lastpid'],
         );
@@ -816,7 +818,7 @@ final class Topic implements Route
         }
 
         $pageNumber = (int) ceil($postPosition / $this->numperpage);
-        $this->page->location(
+        $this->router->redirect(
             "?act=vt{$modelsTopic->id}&page={$pageNumber}&pid={$postId}#pid_{$postId}",
         );
     }

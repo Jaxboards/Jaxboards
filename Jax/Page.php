@@ -56,27 +56,6 @@ final class Page
     }
 
     /**
-     * Redirect the user and halt execution.
-     *
-     * @SuppressWarnings("ExitExpression")
-     */
-    public function location(string $newLocation): void
-    {
-        if (!$this->request->hasCookies() && $newLocation[0] === '?') {
-            $newLocation .= '&sessid=' . $this->session->get()->id;
-        }
-
-        if ($this->request->isJSAccess()) {
-            $this->command('location', $newLocation);
-
-            return;
-        }
-
-        header("Location: {$newLocation}");
-        $this->append('PAGE', "Should've redirected to Location: {$newLocation}");
-    }
-
-    /**
      * @param mixed $args
      */
     public function command(...$args): void

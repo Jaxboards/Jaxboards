@@ -11,6 +11,7 @@ use Jax\Models\Member;
 use Jax\Models\Message;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
@@ -38,6 +39,7 @@ final readonly class Inbox
         private Jax $jax,
         private Page $page,
         private Request $request,
+        private Router $router,
         private Template $template,
         private TextFormatting $textFormatting,
         private User $user,
@@ -249,7 +251,7 @@ final readonly class Inbox
             return;
         }
 
-        $this->page->location(
+        $this->router->redirect(
             '?act=ucp&what=inbox'
                 . ($this->request->both('prevpage') !== null
                     ? '&page=' . $this->request->asString->both('prevpage') : ''),
@@ -316,7 +318,7 @@ final readonly class Inbox
         }
 
         if (!$this->request->isJSAccess()) {
-            $this->page->location('?act=ucp&what=inbox');
+            $this->router->redirect('?act=ucp&what=inbox');
         }
 
         return null;

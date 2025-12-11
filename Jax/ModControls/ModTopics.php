@@ -10,6 +10,7 @@ use Jax\Models\Forum;
 use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\User;
 
@@ -32,6 +33,7 @@ final readonly class ModTopics
         private Page $page,
         private Jax $jax,
         private Request $request,
+        private Router $router,
         private Session $session,
         private User $user,
     ) {}
@@ -238,7 +240,7 @@ final readonly class ModTopics
             }
 
             $this->cancel();
-            $this->page->location('?act=vt' . $otherTopic);
+            $this->router->redirect('?act=vt' . $otherTopic);
 
             return;
         }
@@ -312,7 +314,7 @@ final readonly class ModTopics
             Forum::fixLastPost($fid);
         }
 
-        $this->page->location('?act=vf' . $forumId);
+        $this->router->redirect('?act=vf' . $forumId);
     }
 
     /**

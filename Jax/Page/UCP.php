@@ -17,6 +17,7 @@ use Jax\Models\Skin;
 use Jax\Page;
 use Jax\Page\UCP\Inbox;
 use Jax\Request;
+use Jax\Router;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
@@ -48,6 +49,7 @@ final readonly class UCP implements Route
         private Inbox $inbox,
         private Page $page,
         private Request $request,
+        private Router $router,
         private TextFormatting $textFormatting,
         private Template $template,
         private User $user,
@@ -61,7 +63,7 @@ final readonly class UCP implements Route
             $this->user->isGuest()
             || $this->user->get()->groupID === Groups::Banned->value
         ) {
-            $this->page->location('?');
+            $this->router->redirect('?');
 
             return;
         }

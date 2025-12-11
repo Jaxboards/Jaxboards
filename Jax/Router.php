@@ -76,8 +76,28 @@ final class Router
         private readonly Config $config,
         private readonly Container $container,
         private readonly Page $page,
+        private readonly Session $session,
         private readonly User $user,
     ) {}
+
+    /**
+     * Redirect the user
+     */
+    public function redirect(string $newLocation): void
+    {
+        if (!$this->request->hasCookies() && $newLocation[0] === '?') {
+            $newLocation .= '&sessid=' . $this->session->get()->id;
+        }
+
+        if ($this->request->isJSAccess()) {
+            $this->page->command('location', $newLocation);
+
+            return;
+        }
+
+        header("Location: {$newLocation}");
+        $this->page->append('PAGE', "Should've redirected to Location: {$newLocation}");
+    }
 
     public function route(string $action): void
     {
@@ -114,7 +134,7 @@ final class Router
             return;
         }
 
-        $this->page->location('?act=idx');
+        $this->redirect('?act=idx');
     }
 
     private function isBoardOffline(): bool

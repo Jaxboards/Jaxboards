@@ -12,6 +12,7 @@ use Jax\Models\BadgeAssociation;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\TextFormatting;
 
 use function array_key_exists;
@@ -23,6 +24,7 @@ final readonly class Badges implements Route
         private Date $date,
         private Page $page,
         private Request $request,
+        private Router $router,
         private TextFormatting $textFormatting,
     ) {}
 
@@ -81,7 +83,7 @@ final readonly class Badges implements Route
     public function showTabBadges(Member $member): string
     {
         if (!$this->isEnabled()) {
-            $this->page->location("?act=vu{$member->id}");
+            $this->router->redirect("?act=vu{$member->id}");
 
             return '';
         }
@@ -123,7 +125,7 @@ final readonly class Badges implements Route
         $badge = Badge::selectOne($badgeId);
 
         if ($badge === null) {
-            $this->page->location('?');
+            $this->router->redirect('?');
 
             return;
         }
