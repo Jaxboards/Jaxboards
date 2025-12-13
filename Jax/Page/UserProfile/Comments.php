@@ -6,7 +6,6 @@ namespace Jax\Page\UserProfile;
 
 use Jax\Database\Database;
 use Jax\Date;
-use Jax\Jax;
 use Jax\Models\Activity;
 use Jax\Models\Member;
 use Jax\Models\ProfileComment;
@@ -22,7 +21,6 @@ final readonly class Comments
     public function __construct(
         private Database $database,
         private Date $date,
-        private Jax $jax,
         private Page $page,
         private Request $request,
         private Router $router,
@@ -45,7 +43,7 @@ final readonly class Comments
             $tabHTML .= $this->template->meta(
                 'userprofile-comment-form',
                 $this->user->get()->name ?? '',
-                $this->user->get()->avatar ?: $this->template->meta('default-avatar')
+                $this->user->get()->avatar ?: $this->template->meta('default-avatar'),
             );
         }
 
