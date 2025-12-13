@@ -162,7 +162,7 @@ final readonly class BuddyList implements Route
             [
                 'content' => $this->template->meta(
                     'buddylist-contacts',
-                    $this->router->url('toggleInvisibility'),
+                    $this->router->url('toggleInvisible'),
                     $this->session->get()->hide !== 0 ? 'invisible' : '',
                     $this->user->get()->usertitle,
                     $contacts,
