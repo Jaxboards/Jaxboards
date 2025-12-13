@@ -53,21 +53,6 @@ final class Router
      * @var array<string,string>
      */
     private array $urls = [];
-
-    /**
-     * Legacy dynamic URLs, do not use.
-     *
-     * @deprecated
-     *
-     * @var array<string,class-string>
-     */
-    private array $dynamicRoutes = [
-        'logreg' => LogReg::class,
-        'vf' => Forum::class,
-        'vt' => Topic::class,
-        'vu' => UserProfile::class,
-    ];
-
     private array $paths = [];
 
     public function __construct(
@@ -156,8 +141,6 @@ final class Router
             $this->isBoardOffline() && !str_contains($action, 'logreg') => BoardOffline::class,
             // Static actions
             array_key_exists($action, $this->staticRoutes) => $this->staticRoutes[$action],
-            // Dynamic actions
-            array_key_exists($action, $this->dynamicRoutes) => $this->dynamicRoutes[$action],
             default => null,
         };
 
