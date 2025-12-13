@@ -93,7 +93,7 @@ final class PollTest extends FeatureTestCase
 
         $topic = $this->createPoll();
 
-        $page = $this->go('?act=vt' . $topic->id);
+        $page = $this->go('/topic/' . $topic->id);
 
         DOMAssert::assertSelectCount('#poll form input[type="radio"]', 3, $page);
         DOMAssert::assertSelectEquals('#poll .title', 'What is your favorite pet?', 1, $page);
@@ -109,7 +109,7 @@ final class PollTest extends FeatureTestCase
         $topic = $this->createPoll();
 
         $page = $this->go(new Request(
-            get: ['act' => 'vt' . $topic->id],
+            get: ['path' => "/topic/{$topic->id}"],
             post: ['choice' => '1', 'votepoll' => '1'],
         ));
 
@@ -125,7 +125,7 @@ final class PollTest extends FeatureTestCase
 
         $topic = $this->createPoll(['pollType' => 'multi']);
 
-        $page = $this->go('?act=vt' . $topic->id);
+        $page = $this->go('/topic/' . $topic->id);
 
         DOMAssert::assertSelectCount('#poll form input[type="checkbox"]', 3, $page);
         DOMAssert::assertSelectEquals('#poll .title', 'What is your favorite pet?', 1, $page);
@@ -141,7 +141,7 @@ final class PollTest extends FeatureTestCase
         $topic = $this->createPoll(['pollType' => 'multi']);
 
         $page = $this->go(new Request(
-            get: ['act' => 'vt' . $topic->id],
+            get: ['path' => '/topic/' . $topic->id],
             post: ['choice' => ['0', '1'], 'votepoll' => '1'],
         ));
 

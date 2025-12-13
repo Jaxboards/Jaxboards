@@ -95,7 +95,7 @@ class ModControls {
 
     checkLocation() {
         const { whichone } = this;
-        const regex = whichone ? /act=vt(\d+)/ : /act=vf(\d+)/;
+        const regex = whichone ? /topic\/(\d+)/ : /forum\/(\d+)/;
         const locationMatch = document.location.toString().match(regex);
         if (locationMatch) {
             this.moveto(locationMatch[1]);

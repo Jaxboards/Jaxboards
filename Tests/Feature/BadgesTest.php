@@ -125,7 +125,7 @@ final class BadgesTest extends FeatureTestCase
         $this->actingAs('admin');
         $this->awardBadgeToAdmin();
 
-        $page = $this->go('?act=vt1');
+        $page = $this->go('/topic/1');
 
         DOMAssert::assertSelectCount('#pid_1 .badges img[src="imagePath"][title="Badge Title"]', 1, $page);
     }

@@ -29,6 +29,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\UnitTestCase;
 
+use function DI\autowire;
+
 /**
  * @internal
  */
@@ -61,6 +63,8 @@ final class TextFormattingTest extends UnitTestCase
     {
         parent::setUp();
 
+        $this->container->set(Request::class, autowire()->constructorParameter('server', ['HTTP_HOST' => 'jaxboards.com']));
+
         // Router is used for URL generation, we don't care to test that here
         $this->container->set(Router::class, $this->createStub(Router::class));
         $databaseUtils = $this->container->get(DatabaseUtils::class);
@@ -92,5 +96,7 @@ final class TextFormattingTest extends UnitTestCase
     public function testLinkify(): void
     {
         $this->assertEquals($this->textFormatting->linkify('http://google.com'), '[url=http://google.com]http://google.com[/url]');
+        $this->assertEquals($this->textFormatting->linkify('http://jaxboards.com/topic/1'), '[url=/topic/1]Topic #1[/url]');
+        $this->assertEquals($this->textFormatting->linkify('http://jaxboards.com/topic/3?findpost=33&pid=33'), '[url=/topic/3?findpost=33&pid=33]Post #33[/url]');
     }
 }

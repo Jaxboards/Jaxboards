@@ -82,7 +82,7 @@ final class ForumIndexTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=vf1');
+        $page = $this->go('/forum/1');
 
         DOMAssert::assertSelectEquals('#fid_1_listing .title', 'Forum', 1, $page, 'Forum title');
         DOMAssert::assertSelectEquals('#fr_1 .topic', 'Welcome to Jaxboards!', 1, $page, 'Topic Title');

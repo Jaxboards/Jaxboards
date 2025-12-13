@@ -226,17 +226,16 @@ final readonly class TextFormatting
         if (
             is_array($parts)
             && array_key_exists('host', $parts)
-            && array_key_exists('query', $parts)
             && $parts['host'] === $this->request->server('HTTP_HOST')
         ) {
             $inner = match (true) {
-                (bool) preg_match('@pid=(\d+)@', $parts['query'], $postMatch) => "Post #{$postMatch[1]}",
-                (bool) preg_match('@act=vt(\d+)@', $parts['query'], $topicMatch) => "Topic #{$topicMatch[1]}",
+                (bool) preg_match('@pid=(\d+)@', $parts['query'] ?? '', $postMatch) => "Post #{$postMatch[1]}",
+                (bool) preg_match('@^/topic/(\d+)@', $parts['path'] ?? '', $topicMatch) => "Topic #{$topicMatch[1]}",
                 default => null,
             };
 
-
-            $stringURL = "?{$parts['query']}";
+            $stringURL = $parts['path'] .
+                (array_key_exists('query', $parts) ? "?{$parts['query']}" : '');
         }
 
         $inner ??= $stringURL;

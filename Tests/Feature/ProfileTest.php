@@ -234,7 +234,7 @@ final class ProfileTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['act' => 'vu1'],
+            get: ['path' => '/profile/1'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 

@@ -100,6 +100,8 @@ final class Topic implements Route
             return;
         }
 
+        $this->session->act('vt' . $tid);
+
         if ($this->request->both('votepoll') !== null) {
             $this->poll->vote($topic);
         }

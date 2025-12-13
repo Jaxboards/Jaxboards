@@ -196,7 +196,6 @@ final readonly class Poll
 
         $hiddenFields = $this->jax->hiddenFormFields(
             [
-                'act' => 'vt' . $topic->id,
                 'votepoll' => '1',
             ],
         );

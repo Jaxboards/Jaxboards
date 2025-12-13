@@ -100,7 +100,7 @@ final class ReactionsTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=vt1');
+        $page = $this->go('/topic/1');
         $url = $this->container->get(Router::class)->url('topic', ['id' => '1', 'ratepost' => '1', 'niblet' => '1']);
 
         DOMAssert::assertSelectCount(".postrating a[href^='{$url}']", 1, $page);
@@ -111,7 +111,7 @@ final class ReactionsTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $this->go('?act=vt1&ratepost=1&niblet=1');
+        $this->go('/topic/1?ratepost=1&niblet=1');
 
         $this->assertEquals(json_encode(['1' => [1]]), Post::selectOne(1)->rating);
     }
@@ -125,7 +125,7 @@ final class ReactionsTest extends FeatureTestCase
         $post->update();
 
         $page = $this->go(new Request(
-            get: ['act' => 'vt1', 'listrating' => '1'],
+            get: ['path' => '/topic/1', 'listrating' => '1'],
             server: ['HTTP_X_JSACCESS' => JSAccess::UPDATING->value],
         ));
 
