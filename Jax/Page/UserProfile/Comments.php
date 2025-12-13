@@ -45,14 +45,7 @@ final readonly class Comments
             $tabHTML .= $this->template->meta(
                 'userprofile-comment-form',
                 $this->user->get()->name ?? '',
-                $this->user->get()->avatar ?: $this->template->meta('default-avatar'),
-                $this->jax->hiddenFormFields(
-                    [
-                        'act' => 'vu' . $member->id,
-                        'page' => 'comments',
-                        'view' => 'profile',
-                    ],
-                ),
+                $this->user->get()->avatar ?: $this->template->meta('default-avatar')
             );
         }
 
