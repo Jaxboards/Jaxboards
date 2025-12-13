@@ -571,7 +571,7 @@ final class Topic implements Route
                     'id' => $modelsTopic->id,
                     'findpost' => $post->id,
                     'pid' => $post->id,
-                    'slug' => $this->textFormatting->slugify($modelsTopic->title)
+                    'slug' => $this->textFormatting->slugify($modelsTopic->title),
                 ]),
                 'iptools' => $this->router->url('modcontrols', [
                     'do' => 'iptools',
@@ -794,7 +794,7 @@ final class Topic implements Route
         $this->page->command('softurl');
     }
 
-    private function getLastPost(ModelsTopic $topic): void
+    private function getLastPost(ModelsTopic $modelsTopic): void
     {
         $result = $this->database->select(
             [
@@ -803,7 +803,7 @@ final class Topic implements Route
             ],
             'posts',
             'WHERE `tid`=?',
-            $topic->id,
+            $modelsTopic->id,
         );
         $post = $this->database->arow($result);
         $this->database->disposeresult($result);
@@ -818,10 +818,10 @@ final class Topic implements Route
         $this->router->redirect(
             'topic',
             [
-                'id' => $topic->id,
+                'id' => $modelsTopic->id,
                 'page' => ceil($post['numposts'] / $this->numperpage),
                 'pid' => $post['lastpid'],
-                'slug' => $this->textFormatting->slugify($topic->title),
+                'slug' => $this->textFormatting->slugify($modelsTopic->title),
             ],
             "#pid_{$post['lastpid']}",
         );
