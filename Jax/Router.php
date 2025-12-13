@@ -105,7 +105,7 @@ final class Router
      */
     public function redirect(string $newLocation, array $params = []): void
     {
-        $newLocation = $this->url($newLocation, $params) ?? $newLocation;
+        $newLocation = $this->url($newLocation, $params) ?: $newLocation;
 
         if (!$this->request->hasCookies() && $newLocation[0] === '?') {
             $newLocation .= '&sessid=' . $this->session->get()->id;
@@ -175,9 +175,9 @@ final class Router
      * params: ['id' => 1, 'getlast' => 1] becomes:
      * returns: /topic/1?getlast=1.
      *
-     * @param array<string,string> $params
+     * @param array<string,string|int> $params
      */
-    public function url(string $name, array $params = []): ?string
+    public function url(string $name, array $params = []): string
     {
         if (array_key_exists($name, $this->urls)) {
             $foundParams = [];
@@ -211,7 +211,7 @@ final class Router
             'register' => '?act=logreg1',
             'toggleInvisibility' => '?act=logreg5',
             'shoutbox' => '?module=shoutbox',
-            default => null,
+            default => '',
         };
     }
 

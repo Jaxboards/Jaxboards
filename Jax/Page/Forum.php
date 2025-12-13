@@ -382,11 +382,11 @@ final class Forum implements Route
                 [],
             );
             foreach ($path as $pathId) {
-                $breadcrumbs[$this->router->url('forum', ['id' => $pathId])] = $forumTitles[$pathId];
+                $breadCrumbs[$this->router->url('forum', ['id' => $pathId])] = $forumTitles[$pathId];
             }
         }
 
-        $breadcrumbs[$this->router->url('forum', ['id' => $forum->id])] = $forum->title;
+        $breadCrumbs[$this->router->url('forum', ['id' => $forum->id])] = $forum->title;
         $this->page->setBreadCrumbs($breadCrumbs);
     }
 
