@@ -6,13 +6,14 @@ const UPDATE_INTERVAL = 5000;
 class Stream {
     private request: Ajax;
 
-    private commands: Commands;
+    private commands: typeof Commands;
 
     private lastURL: string;
 
     constructor() {
         this.request = new Ajax({
-            callback: (request: XMLHttpRequest) => this.handleRequestData(request),
+            callback: (request: XMLHttpRequest) =>
+                this.handleRequestData(request),
         });
         this.lastURL = document.location.search.slice(1);
         this.commands = Commands;
@@ -32,13 +33,18 @@ class Stream {
                 console.error(e);
                 cmds = [];
             }
-            cmds.forEach(([cmd, ...args]: [string, ...any[]]) => {
-                if (cmd === 'softurl') {
-                    softurl = true;
-                } else if (this.commands[cmd]) {
-                    this.commands[cmd](...args);
-                }
-            });
+            cmds.forEach(
+                ([cmd, ...args]: [
+                    keyof typeof Commands | 'softurl',
+                    ...Array<number | string>,
+                ]) => {
+                    if (cmd === 'softurl') {
+                        softurl = true;
+                    } else if (this.commands[cmd]) {
+                        this.commands[cmd](...args);
+                    }
+                },
+            );
         }
 
         if (xmlobj.requestType === 2) {
