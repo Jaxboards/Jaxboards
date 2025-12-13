@@ -206,7 +206,7 @@ export default {
                 );
                 if (!link) {
                     link = document.createElement('a');
-                    link.href = `?act=vu${memberId}`;
+                    link.href = `/profile/${memberId}`;
                     link.onclick = () => {
                         RUN.location(link.getAttribute('href'));
                     };

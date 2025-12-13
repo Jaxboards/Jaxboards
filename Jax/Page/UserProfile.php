@@ -45,7 +45,7 @@ final readonly class UserProfile implements Route
     public function route($params): void
     {
         $userId = (int) $params['id'];
-
+        $page = (string) ($params['page'] ?? '');
 
         // Nothing is live updating on the profile page
         if ($this->request->isJSUpdate()) {
@@ -56,8 +56,8 @@ final readonly class UserProfile implements Route
 
         match (true) {
             !$profile => $this->showProfileError(),
-            $this->didComeFromForum() => $this->showContactCard($profile),
-            (bool) $this->user->getGroup()?->canViewFullProfile => $this->showFullProfile($profile),
+            $this->didComeFromForum() && $page === '' => $this->showContactCard($profile),
+            (bool) $this->user->getGroup()?->canViewFullProfile => $this->showFullProfile($page, $profile),
             default => $this->router->redirect('index'),
         };
     }
@@ -65,8 +65,7 @@ final readonly class UserProfile implements Route
     private function didComeFromForum(): bool
     {
         return $this->request->isJSNewLocation()
-            && !$this->request->isJSDirectLink()
-            && !$this->request->both('page');
+            && !$this->request->isJSDirectLink();
     }
 
     private function isUserInList(int $userId, string $list): bool
@@ -182,13 +181,16 @@ final readonly class UserProfile implements Route
         );
     }
 
-    private function showFullProfile(Member $member): void
+    private function showFullProfile(string $page, Member $member): void
     {
-        [$tabs, $tabHTML] = $this->profileTabs->render($member);
+        [$tabs, $tabHTML] = $this->profileTabs->render($page, $member);
 
         $this->page->setBreadCrumbs(
             [
-                $this->router->url('profile', ['id' => $member->id, 'page' => 'profile']) => "{$member->displayName}'s profile",
+                $this->router->url('profile', [
+                    'id' => $member->id,
+                    'page' => 'profile',
+                ]) => "{$member->displayName}'s profile",
             ],
         );
 

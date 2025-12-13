@@ -40,7 +40,9 @@ abstract class FeatureTestCase extends TestCase
         string $pageClass = App::class,
     ): string {
         if (is_string($request)) {
-            parse_str(parse_url($request)['query'], $getParameters);
+            $parsed = parse_url($request);
+            parse_str($parsed['query'] ?? '', $getParameters);
+            $getParameters['path'] = $parsed['path'] ?? '';
             $request = new Request(
                 get: $getParameters,
             );

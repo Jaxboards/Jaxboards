@@ -88,7 +88,7 @@ final class Router
         $this->get('modcontrols', '/modcontrols', ModControls::class);
         $this->get('forum', '/forum/{id}/{slug}', Forum::class);
         $this->get('post', '/post', Post::class);
-        $this->get('profile', '/profile/{id}', UserProfile::class);
+        $this->get('profile', '/profile/{id}/{page}', UserProfile::class);
         $this->get('rainbow', '/rainbow', Rainbow::class);
         $this->get('search', '/search', Search::class);
         $this->get('solitaire', '/solitaire', Solitaire::class);

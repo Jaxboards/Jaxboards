@@ -124,7 +124,7 @@ export function messageReceived({
     if (!fromMe) {
         document.querySelector(`#im_${fromId}`)?.classList.remove('offline');
     }
-    div.innerHTML = `<a href='?act=vu${
+    div.innerHTML = `<a href='/profile/${
         fromMe || fromId
     }' class='name'>${fromName}</a> ${!isAction ? ': ' : ''}${message}`;
     div.dataset.timestamp = `${timestamp}`;

@@ -101,7 +101,7 @@ final class BadgesTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=vu1&page=badges');
+        $page = $this->go('/profile/1/badges');
 
         DOMAssert::assertSelectEquals('#pfbox', 'No badges yet!', 1, $page);
     }
@@ -111,7 +111,7 @@ final class BadgesTest extends FeatureTestCase
         $this->actingAs('admin');
         $this->awardBadgeToAdmin();
 
-        $page = $this->go('?act=vu1&page=badges');
+        $page = $this->go('/profile/1/badges');
 
         DOMAssert::assertSelectCount('.badge .badge-image img[src=imagePath]', 1, $page);
         DOMAssert::assertSelectEquals('.badge .badge-title', 'Badge Title', 1, $page);

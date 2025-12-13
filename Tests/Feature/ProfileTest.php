@@ -98,7 +98,7 @@ final class ProfileTest extends FeatureTestCase
 
     public function testViewMissingUser(): void
     {
-        $page = $this->go('?act=vu5');
+        $page = $this->go('/profile/5');
 
         DOMAssert::assertSelectEquals('#page .error', "Sorry, this user doesn't exist.", 1, $page);
     }
@@ -107,7 +107,7 @@ final class ProfileTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=vu1');
+        $page = $this->go('/profile/1');
 
         // Breadcrumbs
         DOMAssert::assertSelectEquals('#path li a', 'Example Forums', 1, $page);
@@ -125,7 +125,7 @@ final class ProfileTest extends FeatureTestCase
 
         $this->actingAs('admin');
 
-        $page = $this->go('?act=vu1&page=activity&fmt=RSS');
+        $page = $this->go('/profile/1/activity?fmt=RSS');
 
         $this->assertStringContainsString("<title>Admin's recent activity</title>", $page);
         $this->assertStringContainsString('<link>//jaxboards.com/profile/1</link>', $page);
@@ -140,7 +140,7 @@ final class ProfileTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=vu1&page=activity');
+        $page = $this->go('/profile/1/activity');
 
         DOMAssert::assertSelectEquals('#pfbox', 'This user has yet to do anything noteworthy!', 1, $page);
     }
@@ -151,7 +151,7 @@ final class ProfileTest extends FeatureTestCase
 
         $this->actingAs('admin');
 
-        $page = $this->go('?act=vu1&page=activity');
+        $page = $this->go('/profile/1/activity');
 
         DOMAssert::assertSelectRegExp(
             '.profile_comment',
@@ -165,7 +165,7 @@ final class ProfileTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=vu1&page=posts');
+        $page = $this->go('/profile/1/posts');
 
         DOMAssert::assertSelectEquals('#pfbox .post a', 'Welcome to Jaxboards!', 1, $page);
     }
@@ -174,7 +174,7 @@ final class ProfileTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=vu1&page=topics');
+        $page = $this->go('/profile/1/topics');
 
         DOMAssert::assertSelectEquals('#pfbox a', 'Welcome to Jaxboards!', 1, $page);
     }
@@ -190,7 +190,7 @@ final class ProfileTest extends FeatureTestCase
 
         $this->actingAs('admin');
 
-        $page = $this->go('?act=vu1&page=comments');
+        $page = $this->go('/profile/1/comments');
 
         DOMAssert::assertSelectCount('textarea[name=comment]', 1, $page);
         DOMAssert::assertSelectRegExp('.commenttext', '/This is a profile comment./', 1, $page);
@@ -201,7 +201,7 @@ final class ProfileTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['act' => 'vu1', 'page' => 'comments'],
+            get: ['path' => '/profile/1/comments'],
             post: ['comment' => 'This is a profile comment.'],
         ));
 
@@ -213,7 +213,7 @@ final class ProfileTest extends FeatureTestCase
     {
         $this->actingAs('admin', ['friends' => '1']);
 
-        $page = $this->go('?act=vu1&page=friends');
+        $page = $this->go('/profile/1/friends');
 
         DOMAssert::assertSelectEquals('.contacts .contact .user1', 'Admin', 1, $page);
     }
@@ -223,7 +223,7 @@ final class ProfileTest extends FeatureTestCase
         $aboutText = "I'm a strong single admin that don't need no members";
         $this->actingAs('admin', ['friends' => '1', 'about' => $aboutText]);
 
-        $page = $this->go('?act=vu1&page=about');
+        $page = $this->go('/profile/1/about');
 
         DOMAssert::assertSelectRegExp('#pfbox', '/strong single/', 1, $page);
         DOMAssert::assertSelectRegExp('#pfbox', '/I like tacos/', 1, $page);

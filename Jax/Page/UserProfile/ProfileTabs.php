@@ -12,7 +12,6 @@ use Jax\Models\Post;
 use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Page\Badges;
-use Jax\Request;
 use Jax\Router;
 use Jax\Template;
 use Jax\TextFormatting;
@@ -36,7 +35,6 @@ final readonly class ProfileTabs
         private Comments $comments,
         private Date $date,
         private Page $page,
-        private Request $request,
         private Router $router,
         private Template $template,
         private TextFormatting $textFormatting,
@@ -61,9 +59,8 @@ final readonly class ProfileTabs
     /**
      * @return list{list<string>,string}
      */
-    public function render(Member $member): array
+    public function render(string $page, Member $member): array
     {
-        $page = $this->request->both('page');
         $selectedTab = in_array($page, $this->tabs, true) ? $page : 'activity';
 
         $tabHTML = match ($selectedTab) {
