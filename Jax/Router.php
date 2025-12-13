@@ -175,7 +175,7 @@ final class Router
      * params: ['id' => 1, 'getlast' => 1] becomes:
      * returns: /topic/1?getlast=1.
      *
-     * @param array<string,string|int> $params
+     * @param array<string,int|string> $params
      */
     public function url(string $name, array $params = []): string
     {
