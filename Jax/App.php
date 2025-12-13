@@ -69,7 +69,7 @@ final readonly class App
 
         $this->loadModules();
 
-        $this->loadPageFromAction();
+        $this->handleRouting();
 
         // Process temporary commands.
         if ($this->request->isJSAccess() && $this->session->get()->runonce) {
@@ -145,7 +145,7 @@ final readonly class App
         }
     }
 
-    private function loadPageFromAction(): void
+    private function handleRouting(): void
     {
         $action = mb_strtolower($this->request->asString->both('act') ?? '');
 
@@ -153,7 +153,7 @@ final readonly class App
             return;
         }
 
-        $this->router->route($action);
+        $this->router->route();
     }
 
     private function loadSkin(): void
@@ -204,9 +204,12 @@ final readonly class App
             $this->user->getGroup()?->canModerate
             || $this->user->get()->mod
         ) {
+            $loadModControlsURL = $this->router->url('modcontrols', ['do' => 'load']);
             $this->page->append(
                 'SCRIPT',
-                '<script type="text/javascript" src="?act=modcontrols&do=load" defer></script>',
+                <<<HTML
+                    <script type="text/javascript" src="{$loadModControlsURL}" defer></script>
+                    HTML,
             );
         }
 
@@ -231,31 +234,79 @@ final readonly class App
             'NAVIGATION',
             $this->template->meta(
                 'navigation',
+                $this->router->url('index'),
+                $this->router->url('buddylist'),
+                $this->router->url('search'),
+                $this->router->url('members'),
+                $this->router->url('ticker'),
+                $this->router->url('calendar'),
                 $this->user->getGroup()?->canModerate
-                ? '<li><a href="?act=modcontrols&do=cp">Mod CP</a></li>' : '',
+                    ? '<li><a href="' . $this->router->url('modcontrols', ['do' => 'cp']) . '">Mod CP</a></li>'
+                    : '',
                 $this->user->getGroup()?->canAccessACP
-                ? '<li><a href="./ACP/" target="_BLANK">ACP</a></li>' : '',
+                    ? '<li><a href="./ACP/" target="_BLANK">ACP</a></li>'
+                    : '',
                 $this->config->getSetting('navlinks') ?? '',
             ),
         );
-        $numMessages = 0;
+
+        $unreadMessages = $this->getUnreadMessages();
+        $this->renderFooter($unreadMessages);
+
+        $this->page->append(
+            'USERBOX',
+            $this->user->isGuest()
+            ? $this->template->meta(
+                'userbox-logged-out',
+                $this->router->url('forgotPassword'),
+                $this->router->url('register'),
+            )
+            : $this->template->meta(
+                'userbox-logged-in',
+                $this->template->meta(
+                    'user-link',
+                    $this->user->get()->id,
+                    $this->user->get()->groupID,
+                    $this->user->get()->displayName,
+                ),
+                $this->date->smallDate(
+                    $this->user->get()->lastVisit,
+                ),
+                $unreadMessages,
+                $this->router->url('logout'),
+                $this->router->url('ucp', ['what' => 'inbox']),
+                $this->router->url('ucp'),
+            ),
+        );
+    }
+
+    private function getUnreadMessages(): int
+    {
         if ($this->user->get()->id !== 0) {
-            $numMessages = Message::count(
+            return Message::count(
                 'WHERE `read`=0 AND `to`=?',
                 $this->user->get()->id,
             );
-
-            if ($numMessages) {
-                $this->page->append(
-                    'FOOTER',
-                    '<a href="?act=ucp&what=inbox"><div id="notification" class="newmessage" '
-                    . 'onclick="this.style.display=\'none\'">You have ' . $numMessages
-                    . ' new message' . ($numMessages === 1 ? '' : 's') . '</div></a>',
-                );
-            }
         }
+        return 0;
+    }
 
-        $this->template->addVar('inbox', (string) $numMessages);
+    private function renderFooter(int $unreadMessages): void
+    {
+        if ($unreadMessages !== 0) {
+            $inboxURL = $this->router->url('ucp', ['what' => 'inbox']);
+            $plural = ($unreadMessages === 1 ? '' : 's');
+            $this->page->append(
+                'FOOTER',
+                <<<HTML
+                    <a href="{$inboxURL}">
+                        <div id="notification" class="newmessage" onclick="this.style.display='none'">
+                            You have {$unreadMessages} new message{$plural}
+                        </div>
+                    </a>
+                    HTML,
+            );
+        }
 
         $version = json_decode(
             $this->fileSystem->getContents('composer.json') ?: '',
@@ -270,25 +321,6 @@ final readonly class App
             . "<a href=\"https://jaxboards.github.io\">Jaxboards</a> {$version}! "
             // Removed the defunct URL
             . '&copy; 2007-' . gmdate('Y') . '</div>',
-        );
-
-        $this->page->append(
-            'USERBOX',
-            $this->user->isGuest()
-            ? $this->template->meta('userbox-logged-out')
-            : $this->template->meta(
-                'userbox-logged-in',
-                $this->template->meta(
-                    'user-link',
-                    $this->user->get()->id,
-                    $this->user->get()->groupID,
-                    $this->user->get()->displayName,
-                ),
-                $this->date->smallDate(
-                    $this->user->get()->lastVisit,
-                ),
-                $numMessages,
-            ),
         );
     }
 
@@ -313,7 +345,11 @@ final readonly class App
 
     private function renderNavigation(): void
     {
-        $this->page->setBreadCrumbs(['?' => ($this->config->getSetting('boardname') ?: 'Home')]);
+        $this->page->setBreadCrumbs(
+            [
+                $this->router->url('index') => ($this->config->getSetting('boardname') ?: 'Home'),
+            ],
+        );
     }
 
     private function setPageVars(): void
@@ -325,7 +361,10 @@ final readonly class App
         $this->template->addVar(
             'modlink',
             $this->user->getGroup()?->canModerate
-                ? $this->template->meta('modlink')
+                ? $this->template->meta(
+                    'modlink',
+                    $this->router->url('modcontrols', ['do' => 'cp']),
+                )
                 : '',
         );
 

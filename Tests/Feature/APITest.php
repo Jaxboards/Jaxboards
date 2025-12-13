@@ -9,6 +9,7 @@ use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
 use Jax\BBCode;
+use Jax\BotDetector;
 use Jax\Config;
 use Jax\Database\Adapters\SQLite;
 use Jax\Database\Database;
@@ -19,9 +20,13 @@ use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Page;
 use Jax\Request;
 use Jax\RequestStringGetter;
+use Jax\Router;
 use Jax\ServiceConfig;
+use Jax\Session;
+use Jax\Template;
 use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
@@ -54,6 +59,11 @@ use function json_decode;
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(TextFormatting::class)]
 #[CoversClass(User::class)]
+#[CoversClass(BotDetector::class)]
+#[CoversClass(Page::class)]
+#[CoversClass(Router::class)]
+#[CoversClass(Session::class)]
+#[CoversClass(Template::class)]
 final class APITest extends FeatureTestCase
 {
     protected function setUp(): void

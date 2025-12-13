@@ -253,11 +253,11 @@ final class LogReg implements Route
                 $this->session->set('uid', $this->user->get()->id);
                 $this->session->act();
                 if ($this->registering) {
-                    $this->router->redirect('/');
+                    $this->router->redirect('index');
                 } elseif ($this->request->isJSAccess()) {
                     $this->page->command('reload');
                 } else {
-                    $this->router->redirect('?');
+                    $this->router->redirect('index');
 
                     return;
                 }
@@ -272,7 +272,10 @@ final class LogReg implements Route
             $this->session->erase('location');
         }
 
-        $this->page->append('PAGE', $this->template->meta('login-form'));
+        $this->page->append('PAGE', $this->template->meta(
+            'login-form',
+            $this->router->url('login'),
+        ));
     }
 
     private function logout(): void
@@ -293,8 +296,23 @@ final class LogReg implements Route
         $this->session->applyChanges();
         session_unset();
         session_destroy();
-        $this->template->reset('USERBOX', $this->template->meta('userbox-logged-out'));
-        $this->page->command('update', 'userbox', $this->template->meta('userbox-logged-out'));
+        $this->template->reset(
+            'USERBOX',
+            $this->template->meta(
+                'userbox-logged-out',
+                $this->router->url('forgotPassword'),
+                $this->router->url('register'),
+            ),
+        );
+        $this->page->command(
+            'update',
+            'userbox',
+            $this->template->meta(
+                'userbox-logged-out',
+                $this->router->url('forgotPassword'),
+                $this->router->url('register'),
+            ),
+        );
         $this->page->command('softurl');
         $this->page->append('PAGE', $this->template->meta('success', 'Logged out successfully'));
         if ($this->request->isJSAccess()) {
@@ -383,6 +401,7 @@ final class LogReg implements Route
             $page .= ($error !== null ? $this->page->error($error) : '')
                 . $this->template->meta(
                     'forgot-password2-form',
+                    $this->router->url('forgotPassword'),
                     $this->jax->hiddenFormFields(
                         [
                             'act' => 'logreg6',
@@ -413,8 +432,10 @@ final class LogReg implements Route
                     $token->uid = $member->id;
                     $token->insert();
 
-                    $link = $this->domainDefinitions->getBoardURL() . '?act=logreg6&uid='
-                        . $member->id . '&tokenId=' . rawurlencode($forgotpasswordtoken);
+                    $link = $this->domainDefinitions->getBoardURL() . $this->router->url('forgotPassword', [
+                        'uid' => $member->id,
+                        'tokenId' => rawurlencode($forgotpasswordtoken),
+                    ]);
                     $mailResult = $this->jax->mail(
                         $member->email,
                         'Recover Your Password!',
@@ -455,6 +476,7 @@ final class LogReg implements Route
 
             $page .= $this->template->meta(
                 'forgot-password-form',
+                $this->router->url('forgotPassword'),
                 $this->request->isJSAccess()
                     ? $this->jax->hiddenFormFields(
                         [

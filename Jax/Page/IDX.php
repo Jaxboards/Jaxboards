@@ -17,6 +17,7 @@ use Jax\Models\Member;
 use Jax\Models\Stats;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
@@ -40,7 +41,6 @@ use function mb_substr;
 use function nl2br;
 use function number_format;
 use function preg_match;
-use function sprintf;
 
 use const SORT_REGULAR;
 
@@ -73,6 +73,7 @@ final class IDX implements Route
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Request $request,
+        private readonly Router $router,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
         private readonly Template $template,
@@ -150,7 +151,7 @@ final class IDX implements Route
                     $this->subforumids[$subForumId][] = $forum->id;
                     $this->subforums[$subForumId] .= $this->template->meta(
                         'idx-subforum-link',
-                        $forum->id,
+                        $this->router->url('forum', ['id' => $forum->id, 'slug' => $this->textFormatting->slugify($forum->title)]),
                         $forum->title,
                         $this->textFormatting->blockhtml($forum->subtitle),
                     ) . $this->template->meta('idx-subforum-splitter');
@@ -193,7 +194,11 @@ final class IDX implements Route
             );
         }
 
-        $page .= $this->template->meta('idx-tools');
+        $page .= $this->template->meta(
+            'idx-tools',
+            $this->router->url('index', ['markread' => '1']),
+            $this->router->url('members', ['filter' => 'staff', 'sortby' => 'g_title']),
+        );
 
         $page .= $this->getBoardStats();
 
@@ -284,7 +289,7 @@ final class IDX implements Route
             if ($forum->redirect) {
                 $table .= $this->template->meta(
                     'idx-redirect-row',
-                    $forum->id,
+                    $this->router->url('forum', ['id' => $forum->id]),
                     $forum->title,
                     nl2br($forum->subtitle, false),
                     'Redirects: ' . $forum->redirects,
@@ -293,9 +298,9 @@ final class IDX implements Route
                 );
             } else {
                 $forumId = $forum->id;
-                $hrefCode = $read
+                $markReadURL = $read
                     ? ''
-                    : ' href="?act=vf' . $forum->id . '&amp;markread=1"';
+                    : $this->router->url('forum', ['id' => $forum->id, 'markread' => 1]);
                 $linkText = $read
                     ? (
                         $this->template->meta('icon-read')
@@ -325,7 +330,7 @@ final class IDX implements Route
                     $this->template->meta('idx-replies-count', $forum->posts),
                     $read ? 'read' : 'unread',
                     <<<HTML
-                        <a id="fid_{$forumId}_icon"{$hrefCode}>
+                        <a id="fid_{$forumId}_icon" href="{$markReadURL}">
                             {$linkText}
                         </a>
                         HTML,
@@ -334,6 +339,10 @@ final class IDX implements Route
                             'idx-ledby-wrapper',
                             $this->getmods($forum->mods),
                         ) : '',
+                    $this->router->url('forum', [
+                        'id' => $forum->id,
+                        'slug' => $this->textFormatting->slugify($forum->title),
+                    ]),
                 );
             }
         }
@@ -373,9 +382,10 @@ final class IDX implements Route
                 ? $userOnline->readDate
                 : $userOnline->lastUpdate;
             $lastOnlineDate = $this->date->relativeTime($lastOnline);
+            $profileURL = $this->router->url('profile', ['id' => $userOnline->uid]);
 
             return <<<HTML
-                <a href="?act=vu{$userOnline->uid}"
+                <a href="{$profileURL}"
                     class="user{$userOnline->uid} mgroup{$userOnline->groupID} {$birthdayClass}"
                     title="Last online: {$lastOnlineDate}"
                     data-use-tooltip="true"
@@ -429,21 +439,20 @@ final class IDX implements Route
                     . $userOnline->name . '</a>';
             } else {
                 ++$numMembers;
-                $html .= sprintf(
-                    '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '
-                        . 'title="%4$s" data-use-tooltip="true">'
-                        . '%3$s</a>',
-                    $userOnline->uid,
-                    $userOnline->groupID
-                        . (
-                            $userOnline->status === 'idle'
-                            ? " idle lastAction{$userOnline->lastAction}"
-                            : ''
-                        )
-                        . ($userOnline->birthday && $this->config->getSetting('birthdays') ? ' birthday' : ''),
-                    $userOnline->name,
-                    $title,
-                );
+                $profileURL = $this->router->url('profile', ['id' => $userOnline->uid]);
+                $idleStatus = $userOnline->status === 'idle'
+                    ? "idle lastAction{$userOnline->lastAction}"
+                    : '';
+                $birthday = $userOnline->birthday && $this->config->getSetting('birthdays')
+                    ? 'birthday'
+                    : '';
+                $html .= <<<HTML
+                    <a
+                        href="{$profileURL}"
+                        class="user{$userOnline->uid} mgroup{$userOnline->groupID} {$idleStatus} {$birthday}"
+                        title="{$title}"
+                        data-use-tooltip="true">{$userOnline->name}</a>
+                    HTML;
             }
         }
 
@@ -548,7 +557,11 @@ final class IDX implements Route
     {
         return $this->template->meta(
             'idx-row-lastpost',
-            $forum->lastPostTopic,
+            $this->router->url('topic', [
+                'id' => $forum->lastPostTopic,
+                'getlast' => '1',
+                'slug' => $this->textFormatting->slugify($forum->lastPostTopicTitle),
+            ]),
             $this->textFormatting->wordfilter($forum->lastPostTopicTitle) ?: '- - - - -',
             $member !== null ? $this->template->meta(
                 'user-link',

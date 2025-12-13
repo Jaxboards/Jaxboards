@@ -240,7 +240,7 @@ final readonly class ModTopics
             }
 
             $this->cancel();
-            $this->router->redirect('?act=vt' . $otherTopic);
+            $this->router->redirect('topic', ['id' => $otherTopic]);
 
             return;
         }
@@ -314,7 +314,7 @@ final readonly class ModTopics
             Forum::fixLastPost($fid);
         }
 
-        $this->router->redirect('?act=vf' . $forumId);
+        $this->router->redirect('forum', ['id' => $forumId]);
     }
 
     /**

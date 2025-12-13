@@ -219,7 +219,7 @@ final readonly class ModPosts
         }
 
         $this->updatePosts($pids, ['tid' => $tid]);
-        $this->router->redirect('?act=vt' . $tid);
+        $this->router->redirect('topic', ['id' => $tid]);
 
         return true;
     }

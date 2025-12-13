@@ -13,6 +13,7 @@ use Jax\Models\Group;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Template;
 
 use function _\keyBy;
@@ -34,6 +35,7 @@ final class Members implements Route
         private readonly Date $date,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Router $router,
         private readonly Template $template,
         private readonly Request $request,
     ) {
@@ -57,7 +59,7 @@ final class Members implements Route
     private function showmemberlist(): void
     {
         $this->page->setBreadCrumbs([
-            '?act=members' => 'Members',
+            $this->router->url('members') => 'Members',
         ]);
 
         $fields = [
@@ -127,21 +129,31 @@ final class Members implements Route
             $this->perpage,
         );
         foreach ($pageNumbers as $pageNumber) {
-            $pages .= "<a href='?act=members&amp;sortby="
-                . "{$sortby}&amp;how={$sorthow}&amp;page={$pageNumber}'"
+            $pageURL = $this->router->url('members', [
+                'sortby' => $sortby,
+                'how' => $sorthow,
+                'page' => $pageNumber,
+            ]);
+            $pages .= "<a href='{$pageURL}'"
                 . ($pageNumber - 1 === $this->pageNumber ? ' class="active"' : '') . ">{$pageNumber}</a> ";
         }
 
-        $url = '?act=members'
-            . ($this->pageNumber !== 0 ? '&page=' . ($this->pageNumber + 1) : '')
-            . ($filter ? '&filter=' . $filter : '');
+
 
         $links = [];
         foreach ($fields as $field => $fieldLabel) {
-            $links[] = "<a href=\"{$url}&amp;sortby={$field}"
-            . ($sortby === $field ? ($sorthow === 'ASC' ? '&amp;how=DESC' : '')
-                . '" class="sort' . ($sorthow === 'DESC' ? ' desc' : '') : '')
-                . "\">{$fieldLabel}</a>";
+            $url = $this->router->url(
+                'members',
+                [
+                    'page' => $this->pageNumber + 1,
+                    'filter' => $filter,
+                    'sortby' => $field,
+                    'how' => $sortby === $field && $sorthow === 'ASC' ? 'DESC' : 'ASC',
+                ],
+            );
+            $links[] = "<a href='{$url}'"
+                . ($sortby === $field ? "class='sort" . ($sorthow === 'DESC' ? ' desc' : '') . "'" : '')
+                . ">{$fieldLabel}</a>";
         }
 
         foreach ($members as $member) {
@@ -152,12 +164,16 @@ final class Members implements Route
                     HTML;
             }
 
+            $privateMessageURL = $this->router->url('ucp', [
+                'what' => 'inbox',
+                'view' => 'compose',
+                'mid' => $member->id,
+            ]);
             $contactdetails .= '<a title="PM this member" class="pm contact" '
-                . 'href="?act=ucp&amp;what=inbox&amp;view=compose&amp;mid='
-                . $member->id . '"></a>';
+                . "href='{$privateMessageURL}'></a>";
             $page .= $this->template->meta(
                 'members-row',
-                $member->id,
+                $this->router->url('profile', ['id' => $member->id]),
                 $member->avatar ?: $this->template->meta('default-avatar'),
                 $this->template->meta(
                     'user-link',

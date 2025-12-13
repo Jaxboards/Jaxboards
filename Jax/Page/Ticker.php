@@ -12,6 +12,7 @@ use Jax\Models\Post;
 use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
@@ -25,6 +26,7 @@ final class Ticker implements Route
         private readonly Date $date,
         private readonly Page $page,
         private readonly Request $request,
+        private readonly Router $router,
         private readonly Session $session,
         private readonly Template $template,
         private readonly TextFormatting $textFormatting,
@@ -50,7 +52,7 @@ final class Ticker implements Route
     private function index(): void
     {
         $this->page->setBreadCrumbs([
-            '?act=ticker' => 'Ticker',
+            $this->router->url('ticker') => 'Ticker',
         ]);
 
         $this->session->set('locationVerbose', 'Using the ticker!');
@@ -151,8 +153,7 @@ final class Ticker implements Route
                 $postAuthor->groupID,
                 $postAuthor->displayName,
             ),
-            $topic->id,
-            $post->id,
+            $this->router->url('topic', ['id' => $topic->id, 'findpost' => $post->id]),
             $this->textFormatting->wordfilter($topic->title),
         );
     }

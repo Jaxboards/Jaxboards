@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
+use Jax\BotDetector;
 use Jax\Config;
 use Jax\Database\Adapters\SQLite;
 use Jax\Database\Database;
@@ -16,11 +17,17 @@ use Jax\DebugLog;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\IPAddress;
+use Jax\Jax;
 use Jax\Models\Service\Directory;
+use Jax\Page;
 use Jax\Page\ServiceSignup;
 use Jax\Request;
 use Jax\RequestStringGetter;
+use Jax\Router;
 use Jax\ServiceConfig;
+use Jax\Session;
+use Jax\Template;
+use Jax\User;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
@@ -50,6 +57,13 @@ use Tests\FeatureTestCase;
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(ServiceConfig::class)]
+#[CoversClass(BotDetector::class)]
+#[CoversClass(Jax::class)]
+#[CoversClass(Page::class)]
+#[CoversClass(Router::class)]
+#[CoversClass(Session::class)]
+#[CoversClass(Template::class)]
+#[CoversClass(User::class)]
 final class ServiceSignupTest extends FeatureTestCase
 {
     protected function setUp(): void
@@ -120,7 +134,7 @@ final class ServiceSignupTest extends FeatureTestCase
             pageClass: ServiceSignup::class,
         );
 
-        $this->assertRedirect('https://boardname.jaxboards.com', $page);
+        $this->assertRedirect('https://boardname.jaxboards.com', [], $page);
 
         // Check board directory was added
         $database = $this->container->get(Database::class);

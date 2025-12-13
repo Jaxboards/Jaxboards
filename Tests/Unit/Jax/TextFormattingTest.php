@@ -20,6 +20,7 @@ use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Request;
 use Jax\RequestStringGetter;
+use Jax\Router;
 use Jax\ServiceConfig;
 use Jax\TextFormatting;
 use Jax\TextRules;
@@ -60,6 +61,8 @@ final class TextFormattingTest extends UnitTestCase
     {
         parent::setUp();
 
+        // Router is used for URL generation, we don't care to test that here
+        $this->container->set(Router::class, $this->createStub(Router::class));
         $databaseUtils = $this->container->get(DatabaseUtils::class);
         $databaseUtils->install();
 

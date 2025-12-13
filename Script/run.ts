@@ -20,11 +20,10 @@ export class AppState {
         this.stream.pollData();
         globalThis.addEventListener('popstate', ({ state }) => {
             if (state) {
-                const { queryParams } = state;
-                this.stream.updatePage(queryParams);
+                const { lastURL } = state;
+                this.stream.updatePage(lastURL);
             } else {
-                const queryParams = document.location.search.replace(/^\?/, '');
-                this.stream.updatePage(queryParams);
+                this.stream.updatePage(document.location);
             }
         });
 

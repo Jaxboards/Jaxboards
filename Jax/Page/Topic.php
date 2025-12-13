@@ -39,7 +39,6 @@ use function array_unique;
 use function ceil;
 use function explode;
 use function gmdate;
-use function header;
 use function implode;
 use function in_array;
 use function json_encode;
@@ -96,7 +95,7 @@ final class Topic implements Route
             : [];
 
         if (!$topic || !$forumPerms['read']) {
-            $this->router->redirect('?');
+            $this->router->redirect('index');
 
             return;
         }
@@ -108,7 +107,7 @@ final class Topic implements Route
         match (true) {
             $quickReply && !$this->request->isJSUpdate() => match (true) {
                 $this->request->isJSAccess() && !$this->request->isJSDirectLink() => $this->quickReplyForm($topic),
-                default => $this->router->redirect('?act=post&tid=' . $topic->id),
+                default => $this->router->redirect('post', ['tid' => $topic->id]),
             },
             $ratePost !== 0 => $this->reactions->toggleReaction($ratePost, (int) $this->request->both('niblet')),
             $findPost !== 0 => $this->findPost($topic, $findPost),
@@ -183,9 +182,9 @@ final class Topic implements Route
         // Fix this to work with subforums.
         $this->page->setBreadCrumbs(
             [
-                "?act=vc{$category?->id}" => $category->title ?? '',
-                "?act=vf{$forum?->id}" => $forum->title ?? '',
-                "?act=vt{$modelsTopic->id}" => $topicTitle,
+                $this->router->url('category', ['id' => $category?->id]) => $category->title ?? '',
+                $this->router->url('forum', ['id' => $forum?->id]) => $forum->title ?? '',
+                $this->router->url('topic', ['id' => $modelsTopic->id]) => $topicTitle,
             ],
         );
 
@@ -195,13 +194,13 @@ final class Topic implements Route
         $totalpages = (int) ceil($postCount / $this->numperpage);
         $pagelist = '';
         foreach ($this->jax->pages($totalpages, $this->pageNumber + 1, 10) as $pageNumber) {
-            $pagelist .= $this->template->meta(
-                'topic-pages-part',
-                $modelsTopic->id,
-                $pageNumber,
-                $pageNumber === $this->pageNumber + 1 ? ' class="active"' : '',
-                $pageNumber,
-            );
+            $pageURL = $this->router->url('topic', ['id' => $modelsTopic->id, 'page' => $pageNumber]);
+            $activeClass = $pageNumber === $this->pageNumber + 1
+                ? ' class="active"'
+                : '';
+            $pagelist .= <<<HTML
+                <a href="{$pageURL}"{$activeClass}>{$pageNumber}</a>
+                HTML;
         }
 
         // Are they on the last page? This stores a session variable.
@@ -219,7 +218,9 @@ final class Topic implements Route
             $topicTitle
                 . ($topicSubtitle !== '' ? ', ' . $topicSubtitle : ''),
             $page,
-            '<a href="./?act=vt' . $modelsTopic->id . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic" target="_blank">RSS</a>',
+            '<a href="'
+                . $this->router->url('topic', ['id' => $modelsTopic->id, 'fmt' => 'RSS'])
+                . '" class="social rss" title="RSS Feed for this Topic" target="_blank">RSS</a>',
         );
 
         // Add buttons.
@@ -231,7 +232,8 @@ final class Topic implements Route
 
         $forumPerms = $this->fetchForumPermissions($modelsTopic, $forum);
         if ($forumPerms['start']) {
-            $buttons[0] = "<a href='?act=post&fid=" . $modelsTopic->fid . "'>"
+            $newTopicURL = $this->router->url('post', ['fid' => $modelsTopic->fid]);
+            $buttons[0] = "<a href='{$newTopicURL}'>"
                 . $this->template->meta(
                     $this->template->metaExists('button-newtopic')
                         ? 'button-newtopic'
@@ -247,7 +249,8 @@ final class Topic implements Route
                 || $this->user->getGroup()?->canOverrideLockedTopics
             )
         ) {
-            $buttons[1] = "<a href='?act=vt{$modelsTopic->id}&qreply=1'>" . $this->template->meta(
+            $quickReplyURL = $this->router->url('topic', ['id' => $modelsTopic->id, 'qreply' => 1]);
+            $buttons[1] = "<a href='{$quickReplyURL}'>" . $this->template->meta(
                 $this->template->metaExists('button-qreply')
                     ? 'button-qreply'
                     : 'topic-button-qreply',
@@ -261,7 +264,8 @@ final class Topic implements Route
                 || $this->user->getGroup()?->canOverrideLockedTopics
             )
         ) {
-            $buttons[2] = "<a href='?act=post&tid={$modelsTopic->id}'>" . $this->template->meta(
+            $replyURL = $this->router->url('post', ['tid' => $modelsTopic->id]);
+            $buttons[2] = "<a href='{$replyURL}'>" . $this->template->meta(
                 $this->template->metaExists('button-reply')
                     ? 'button-reply'
                     : 'topic-button-reply',
@@ -425,8 +429,11 @@ final class Topic implements Route
             }
 
             foreach ($badgeTuples as $badgeTuple) {
+                $profileBadgesURL = $this->router->url('profile', ['id' => $authorId, 'page' => 'badges']);
                 $badgesPerAuthorHTML[$authorId] .= <<<HTML
-                    <a href="?act=vu{$authorId}&page=badges"><img src="{$badgeTuple->badge->imagePath}" title="{$badgeTuple->badge->badgeTitle}"></a>
+                    <a href="{$profileBadgesURL}">
+                        <img src="{$badgeTuple->badge->imagePath}" title="{$badgeTuple->badge->badgeTitle}">
+                    </a>
                     HTML;
             }
         }
@@ -530,28 +537,43 @@ final class Topic implements Route
 
             $author = $post->author ? $membersById[$post->author] : null;
             $editor = $post->editby ? $membersById[$post->editby] : null;
+
+            $editURL = $this->router->url('topic', ['id' => $modelsTopic->id, 'edit' => $post->id]);
+            $replyURL = $this->router->url('topic', ['id' => $modelsTopic->id, 'quote' => $post->id]);
+            $modPostURL = $this->router->url('modcontrols', ['do' => 'modp', 'pid' => $post->id]);
+
             $authorGroup = $author
                 ? $groups[$author->groupID]
                 : null;
             $postbuttons
                 // Adds the Edit button
                 = ($this->canEdit($modelsTopic, $post)
-                    ? "<a href='?act=vt" . $modelsTopic->id . '&amp;edit=' . $post->id
-                    . "' class='edit'>" . $this->template->meta('topic-edit-button')
+                    ? "<a href='{$editURL}' class='edit'>" . $this->template->meta('topic-edit-button')
                     . '</a>'
                     : '')
                 // Adds the Quote button
                 . ($forumPerms['reply']
-                    ? " <a href='?act=vt" . $modelsTopic->id . '&amp;quote=' . $post->id
-                    . "' onclick='RUN.handleQuoting(this);return false;' "
+                    ? " <a href='{$replyURL}' onclick='RUN.handleQuoting(this);return false;' "
                     . "class='quotepost'>" . $this->template->meta('topic-quote-button') . '</a> '
                     : '')
                 // Adds the Moderate options
                 . ($this->canModerate($modelsTopic)
-                    ? "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post->id
-                    . "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>"
+                    ? "<a href='{$modPostURL}' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>"
                     . $this->template->meta('topic-mod-button') . '</a>'
                     : '');
+
+            $urls = [
+                'findpost' => $this->router->url('topic', [
+                    'id' => $modelsTopic->id,
+                    'findpost' => $post->id,
+                    'pid' => $post->id,
+                    // TODO: why need "findpost" and "pid"?
+                ]),
+                'iptools' => $this->router->url('modcontrols', [
+                    'do' => 'iptools',
+                    'ip' => $this->ipAddress->asHumanReadable($post->ip),
+                ]),
+            ];
 
             $rows .= $this->template->meta(
                 'topic-post-row',
@@ -576,7 +598,7 @@ final class Topic implements Route
                 // ^10
                 $this->date->autoDate($post->date),
                 <<<HTML
-                    <a href="?act=vt{$modelsTopic->id}&amp;findpost={$post->id}&pid={$post->id}"
+                    <a href="{$urls['findpost']}"
                         onclick="prompt('Link to this post:',this.href);return false"
                         >{$this->template->meta('topic-perma-button')}</a>
                     HTML,
@@ -584,7 +606,7 @@ final class Topic implements Route
                 $authorGroup->canUseSignatures && $author?->sig
                     ? $this->textFormatting->theWorks($author->sig)
                     : '',
-                $post->author,
+                $this->router->url('profile', ['id' => $post->author]),
                 $editor ? $this->template->meta(
                     'topic-edit-by',
                     $this->template->meta(
@@ -596,8 +618,7 @@ final class Topic implements Route
                     $this->date->autoDate($post->editDate),
                 ) : '',
                 $this->user->getGroup()?->canModerate
-                    ? '<a href="?act=modcontrols&amp;do=iptools&amp;ip='
-                    . $this->ipAddress->asHumanReadable($post->ip) . '">' . $this->template->meta(
+                    ? "<a href='{$urls['iptools']}'>" . $this->template->meta(
                         'topic-mod-ipbutton',
                         $this->ipAddress->asHumanReadable($post->ip),
                     ) . '</a>'
@@ -660,7 +681,11 @@ final class Topic implements Route
     private function quickEditPost(ModelsTopic $modelsTopic, int $pid): void
     {
         if (!$this->request->isJSAccess()) {
-            $this->router->redirect("?act=post&how=edit&tid={$modelsTopic->id}&pid={$pid}");
+            $this->router->redirect('post', [
+                'how' => 'edit',
+                'tid' => $modelsTopic->id,
+                'pid' => $pid,
+            ]);
 
             return;
         }
@@ -758,7 +783,7 @@ final class Topic implements Route
             if ($this->request->isJSAccess()) {
                 $this->quickReplyForm($modelsTopic);
             } else {
-                header('Location:?act=post&tid=' . $modelsTopic->id);
+                $this->router->redirect('post', ['tid' => $modelsTopic->id]);
             }
         }
 
@@ -780,15 +805,20 @@ final class Topic implements Route
         $this->database->disposeresult($result);
 
         if (!$post) {
-            $this->router->redirect('?');
+            $this->router->redirect('index');
 
             return;
         }
 
         $this->page->command('softurl');
         $this->router->redirect(
-            "?act=vt{$tid}&page=" . ceil($post['numposts'] / $this->numperpage)
-                . '&pid=' . $post['lastpid'] . '#pid_' . $post['lastpid'],
+            'topic',
+            [
+                'id' => $tid,
+                'page' => ceil($post['numposts'] / $this->numperpage),
+                'pid' => $post['lastpid'],
+            ],
+            "#pid_{$post['lastpid']}",
         );
     }
 
@@ -819,7 +849,12 @@ final class Topic implements Route
 
         $pageNumber = (int) ceil($postPosition / $this->numperpage);
         $this->router->redirect(
-            "?act=vt{$modelsTopic->id}&page={$pageNumber}&pid={$postId}#pid_{$postId}",
+            'topic',
+            [
+                'id' => $modelsTopic->id,
+                'page' => $pageNumber,
+                'pid' => $postId,
+            ],
         );
     }
 
@@ -836,7 +871,7 @@ final class Topic implements Route
         $rssFeed = new RSSFeed(
             [
                 'description' => $this->textFormatting->wordfilter($modelsTopic->subtitle),
-                'link' => "{$boardURL}?act=vt{$modelsTopic->id}",
+                'link' => $boardURL . $this->router->url('topic', ['id' => $modelsTopic->id]),
                 'title' => $this->textFormatting->wordfilter($modelsTopic->title),
             ],
         );
@@ -851,7 +886,10 @@ final class Topic implements Route
                 [
                     'description' => $this->textFormatting->blockhtml($this->textFormatting->theWorks($post->post)),
                     'guid' => $post->id,
-                    'link' => "{$boardURL}?act=vt{$modelsTopic->id}&amp;findpost={$post->id}",
+                    'link' => $boardURL . $this->router->url('topic', [
+                        'id' => $modelsTopic->id,
+                        'findpost' => $post->id,
+                    ]),
                     'pubDate' => gmdate('r', $this->date->datetimeAsTimestamp($post->date)),
                     'title' => $authors[$post->author]->displayName . ':',
                 ],

@@ -10,6 +10,7 @@ use Jax\Models\Activity as ModelsActivity;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\RSSFeed;
 use Jax\Template;
 use Jax\TextFormatting;
@@ -26,6 +27,7 @@ final readonly class Activity
         private DomainDefinitions $domainDefinitions,
         private Page $page,
         private Request $request,
+        private Router $router,
         private TextFormatting $textFormatting,
         private Template $template,
         private User $user,
@@ -49,7 +51,7 @@ final readonly class Activity
         $rssFeed = new RSSFeed(
             [
                 'description' => $member->usertitle,
-                'link' => "{$boardURL}?act=vu{$member->id}",
+                'link' => $boardURL . $this->router->url('profile', ['id' => $member->id]),
                 'title' => $member->displayName . "'s recent activity",
             ],
         );
@@ -59,7 +61,8 @@ final readonly class Activity
                 [
                     'description' => $parsed['text'],
                     'guid' => $activity->id,
-                    'link' => $this->domainDefinitions->getBoardUrl() . $parsed['link'],
+                    'link' => $this->domainDefinitions->getBoardUrl()
+                        . $this->textFormatting->blockhtml($parsed['link']),
                     'pubDate' => $this->date->datetimeAsCarbon($activity->date)?->format('r') ?? '',
                     'title' => $parsed['text'],
                 ],
@@ -90,16 +93,22 @@ final readonly class Activity
         $date = $modelsActivity->date
             ? $this->date->smallDate($modelsActivity->date)
             : '';
+
+        $urls = [
+            'new_post' => $this->router->url('topic', ['id' => $modelsActivity->tid, 'findpost' => $modelsActivity->pid]),
+            'new_topic' => $this->router->url('topic', ['id' => $modelsActivity->tid]),
+        ];
+
         $text = match ($modelsActivity->type) {
             'profile_comment' => "{$user}  commented on  {$otherguy}'s profile",
             'new_post' => <<<HTML
                 {$user} posted in topic
-                <a href="?act=vt{$modelsActivity->tid}&findpost={$modelsActivity->pid}">{$modelsActivity->arg1}</a>
+                <a href="{$urls['new_post']}">{$modelsActivity->arg1}</a>
                 {$date}
                 HTML,
             'new_topic' => <<<HTML
                 {$user} created new topic
-                <a href="?act=vt{$modelsActivity->tid}">{$modelsActivity->arg1}</a>
+                <a href="{$urls['new_topic']}">{$modelsActivity->arg1}</a>
                 {$date}
                 HTML,
             'profile_name_change' => $this->template->meta(
@@ -130,23 +139,34 @@ final readonly class Activity
     ): array {
         return match ($modelsActivity->type) {
             'profile_comment' => [
-                'link' => $this->textFormatting->blockhtml('?act=vu' . $modelsActivity->affectedUser),
+                'link' => $this->router->url('profile', [
+                    'id' => $modelsActivity->affectedUser,
+                ]),
                 'text' => "{$user->displayName} commented on {$affectedUser->displayName}'s profile",
             ],
             'new_post' => [
-                'link' => $this->textFormatting->blockhtml("?act=vt{$modelsActivity->tid}&findpost={$modelsActivity->pid}"),
+                'link' => $this->router->url('topic', [
+                    'id' => $modelsActivity->tid,
+                    'findpost' => $modelsActivity->pid,
+                ]),
                 'text' => $user->displayName . ' posted in topic ' . $modelsActivity->arg1,
             ],
             'new_topic' => [
-                'link' => $this->textFormatting->blockhtml('?act=vt' . $modelsActivity->tid),
+                'link' => $this->router->url('topic', [
+                    'id' => $modelsActivity->tid,
+                ]),
                 'text' => $user->displayName . ' created new topic ' . $modelsActivity->arg1,
             ],
             'profile_name_change' => [
-                'link' => $this->textFormatting->blockhtml('?act=vu' . $modelsActivity->uid),
+                'link' => $this->router->url('profile', [
+                    'id' => $modelsActivity->uid,
+                ]),
                 'text' => $modelsActivity->arg1 . ' is now known as ' . $modelsActivity->arg2,
             ],
             'buddy_add' => [
-                'link' => $this->textFormatting->blockhtml('?act=vu' . $modelsActivity->uid),
+                'link' => $this->router->url('profile', [
+                    'id' => $modelsActivity->uid,
+                ]),
                 'text' => $user->displayName . ' made friends with ' . $affectedUser->displayName,
             ],
             default => ['link' => '', 'text' => ''],
@@ -161,10 +181,11 @@ final readonly class Activity
             $tabHTML .= $this->parseActivity($activity, $member, $affectedUser);
         }
 
+        $rssButtonURL = $this->router->url('profile', ['id' => $member->id, 'page' => 'activity', 'fmt' => 'RSS']);
+
         return $tabHTML !== ''
             ? <<<HTML
-                <a href="?act=vu{$member->id}&amp;page=activity&amp;fmt=RSS"
-                   target="_blank" class="social" style='float:right'
+                <a href="{$rssButtonURL}" target="_blank" class="social" style='float:right'
                 >RSS</a>{$tabHTML}
                 HTML
             : 'This user has yet to do anything noteworthy!';

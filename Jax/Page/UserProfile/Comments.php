@@ -12,6 +12,7 @@ use Jax\Models\Member;
 use Jax\Models\ProfileComment;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
@@ -24,6 +25,7 @@ final readonly class Comments
         private Jax $jax,
         private Page $page,
         private Request $request,
+        private Router $router,
         private Template $template,
         private TextFormatting $textFormatting,
         private User $user,
@@ -73,13 +75,18 @@ final readonly class Comments
         foreach ($comments as $comment) {
             $act = $this->request->asString->both('act');
 
-            $deleteLink = (
+            $deleteLink = '';
+            if (
                 $this->user->getGroup()?->canModerate
                 || ($this->user->getGroup()?->canDeleteComments && $comment->from === $this->user->get()->id)
-            ) ? <<<HTML
-                <a href="?act={$act}&page=comments&del={$comment->id}" class="delete">[X]</a>
-                HTML
-                : '';
+            ) {
+                $deleteCommentURL = $this->router->url('profile', [
+                    'id' => $member->id,
+                    'page' => 'comments',
+                    'del' => $comment->id,
+                ]);
+                $deleteLink = "<a href='{$deleteCommentURL}' class='delete'>[X]</a>";
+            }
 
             $fromMember = $membersById[$comment->from];
             $tabHTML .= $this->template->meta(

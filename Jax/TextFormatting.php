@@ -12,6 +12,7 @@ use function highlight_string;
 use function htmlspecialchars;
 use function implode;
 use function is_array;
+use function mb_strtolower;
 use function mb_substr;
 use function nl2br;
 use function parse_url;
@@ -22,6 +23,7 @@ use function preg_replace;
 use function preg_replace_callback;
 use function str_ireplace;
 use function str_replace;
+use function trim;
 
 use const ENT_QUOTES;
 
@@ -73,6 +75,15 @@ final readonly class TextFormatting
         );
 
         return mb_substr($text, 1);
+    }
+
+    /**
+     * Converts text into a URL slug
+     * Ex: "Welcome to Jaxboards!" becomes "welcome-to-jaxboards".
+     */
+    public function slugify(string $text): string
+    {
+        return mb_substr(mb_strtolower(trim((string) preg_replace('/\W+/', '-', $text), '-')), 0, 50);
     }
 
     /**

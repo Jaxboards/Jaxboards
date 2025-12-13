@@ -111,7 +111,7 @@ final class PostTest extends FeatureTestCase
             ],
         ));
 
-        $this->assertRedirect('?act=vt2&getlast=1', $page);
+        $this->assertRedirect('topic', ['id' => '2', 'getlast' => '1'], $page);
         $topic = Topic::selectOne(2);
         $post = ModelsPost::selectOne(2);
 
@@ -160,7 +160,7 @@ final class PostTest extends FeatureTestCase
             ],
         ));
 
-        $this->assertRedirect('?act=vt1&getlast=1', $page);
+        $this->assertRedirect('topic', ['id' => '1', 'getlast' => '1'], $page);
         $topic = Topic::selectOne(2);
         $post = ModelsPost::selectOne(2);
 
@@ -226,7 +226,7 @@ final class PostTest extends FeatureTestCase
         $this->assertEquals('updated description', $topic->subtitle);
         $this->assertEquals('updated post', $post->post);
 
-        $this->assertRedirect('?act=vt1&findpost=1', $page);
+        $this->assertRedirect('topic', ['id' => '1', 'findpost' => '1'], $page);
     }
 
     public function testAdminEditOtherPost(): void

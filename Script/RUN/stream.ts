@@ -4,17 +4,23 @@ import Commands from './commands';
 const UPDATE_INTERVAL = 5000;
 
 class Stream {
+    private request: Ajax;
+
+    private commands: typeof Commands;
+
+    private lastURL: string;
+
     constructor() {
         this.request = new Ajax({
-            callback: (request) => this.handleRequestData(request),
+            callback: (request: XMLHttpRequest) =>
+                this.handleRequestData(request),
         });
         this.lastURL = document.location.search.slice(1);
         this.commands = Commands;
     }
 
-    handleRequestData(xmlobj) {
+    handleRequestData(xmlobj: XMLHttpRequest & { requestType: number }) {
         if (xmlobj.status !== 200) return;
-        xmlobj.parsed = true;
         let { responseText } = xmlobj;
         let softurl = false;
         if (typeof responseText !== 'string') responseText = '';
@@ -27,36 +33,37 @@ class Stream {
                 console.error(e);
                 cmds = [];
             }
-            cmds.forEach(([cmd, ...args]) => {
-                if (cmd === 'softurl') {
-                    softurl = true;
-                } else if (this.commands[cmd]) {
-                    this.commands[cmd](...args);
-                }
-            });
+            cmds.forEach(
+                ([cmd, ...args]: [
+                    keyof typeof Commands | 'softurl',
+                    ...Array<number | string>,
+                ]) => {
+                    if (cmd === 'softurl') {
+                        softurl = true;
+                    } else if (this.commands[cmd]) {
+                        this.commands[cmd](...args);
+                    }
+                },
+            );
         }
 
         if (xmlobj.requestType === 2) {
-            const queryParams = xmlobj.url.substring(1);
             if (!softurl) {
                 globalThis.history.pushState(
-                    { queryParams },
+                    { lastURL: xmlobj.responseURL },
                     '',
-                    `?${queryParams}`,
+                    xmlobj.responseURL,
                 );
                 // pushstate is not a real browser event unfortunately, so I have to trigger it myself
                 globalThis.dispatchEvent(new Event('pushstate'));
-                this.lastURL = queryParams;
+                this.lastURL = xmlobj.responseURL;
             }
         }
         this.pollData();
     }
 
-    location(path, requestType = 2) {
-        let a = path.split('?');
-        a = a[1] || a[0];
-        this.request.load(`?${a}`, { requestType });
-        this.busy = true;
+    location(path: string, requestType = 2) {
+        this.request.load(path, { requestType });
         return false;
     }
 
@@ -65,7 +72,7 @@ class Stream {
     }
 
     loader() {
-        this.request.load(`?${this.lastURL}`);
+        this.request.load(this.lastURL);
         return true;
     }
 
@@ -79,11 +86,11 @@ class Stream {
         }
     }
 
-    updatePage(queryParams) {
+    updatePage(lastURL: string) {
         // this function makes the back/forward buttons actually do something,
         // using anchors
-        if (queryParams !== this.lastURL) {
-            this.location(queryParams, 3);
+        if (lastURL !== this.lastURL) {
+            this.location(lastURL, 3);
         }
     }
 }

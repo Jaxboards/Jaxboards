@@ -110,7 +110,7 @@ final class ModCPTest extends FeatureTestCase
         $page = $this->go('?act=modcontrols&do=cp');
 
         DOMAssert::assertSelectCount('.modcppage', 0, $page);
-        $this->assertRedirect('?', $page);
+        $this->assertRedirect('index', [], $page);
     }
 
     public function testEditMember(): void
@@ -395,7 +395,7 @@ final class ModCPTest extends FeatureTestCase
         $this->assertContainsEquals(['modcontrols_clearbox'], $json);
 
         $redirect = array_find($json, static fn($cmd): bool => $cmd[0] === 'location');
-        $this->assertStringContainsString("?act=vt{$otherTid}", $redirect[1]);
+        $this->assertStringContainsString($this->container->get(Router::class)->url('topic', ['id' => $otherTid]), $redirect[1]);
 
         $this->assertNull(Topic::selectOne(1), 'Original topic is deleted');
         $this->assertEquals($otherTid, Post::selectOne(1)->tid, 'OP moved to new topic');
