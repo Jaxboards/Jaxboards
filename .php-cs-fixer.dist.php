@@ -26,7 +26,7 @@ return (new Config())
         // Rules to improve code for PHP 7.4 compatibility.
         //
         // @see https://cs.symfony.com/doc/ruleSets/PHP74MigrationRisky.html
-        '@PHP7x4Migration:risky:risky' => true,
+        '@PHP7x4Migration:risky' => true,
         // Alias for the latest revision of PER-CS risky rules. Use it if you
         // always want to be in sync with newest PER-CS standard.
         //
