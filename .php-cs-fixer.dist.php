@@ -22,11 +22,11 @@ return (new Config())
         // Rules to improve code for PHP 8.4 compatibility.
         //
         // @see https://cs.symfony.com/doc/ruleSets/PHP84Migration.html
-        '@PHP84Migration' => true,
+        '@PHP8x4Migration' => true,
         // Rules to improve code for PHP 7.4 compatibility.
         //
         // @see https://cs.symfony.com/doc/ruleSets/PHP74MigrationRisky.html
-        '@PHP74Migration:risky' => true,
+        '@PHP7x4Migration:risky:risky' => true,
         // Alias for the latest revision of PER-CS risky rules. Use it if you
         // always want to be in sync with newest PER-CS standard.
         //
