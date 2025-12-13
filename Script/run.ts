@@ -75,7 +75,9 @@ export class AppState {
             names.push(submitButton.name);
             values.push(submitButton.value);
         }
-        this.stream.load(globalThis.location.search, { data: [names, values] });
+        this.stream.load(form.action || globalThis.location, {
+            data: [names, values],
+        });
         if (resetOnSubmit) {
             form.reset();
         }
