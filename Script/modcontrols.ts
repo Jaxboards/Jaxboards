@@ -87,7 +87,6 @@ class ModControls {
 
             modcontrols_clearbox: () => {
                 this.destroyModControls();
-                this.busy = false;
             },
         });
 

@@ -288,7 +288,6 @@ final readonly class App
                 $this->user->get()->id,
             );
         }
-
         return 0;
     }
 

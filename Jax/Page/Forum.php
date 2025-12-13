@@ -354,7 +354,11 @@ final class Forum implements Route
             // 16
             $this->router->url('forum', ['id' => $topic->fid, 'replies' => $topic->id]),
             // 17
-            $this->router->url('topic', ['id' => $topic->id, 'getlast' => '1', 'slug' => $topicSlug]),
+            $this->router->url('topic', [
+                'id' => $topic->id,
+                'getlast' => '1',
+                'slug' => $topicSlug
+            ]),
         );
     }
 

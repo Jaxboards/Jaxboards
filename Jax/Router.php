@@ -103,9 +103,9 @@ final class Router
      *
      * @param array<string,null|int|string> $params
      */
-    public function redirect(string $newLocation, array $params = []): void
+    public function redirect(string $newLocation, array $params = [], ?string $hash = null): void
     {
-        $newLocation = $this->url($newLocation, $params) ?: $newLocation;
+        $newLocation = ($this->url($newLocation, $params) ?: $newLocation) . ($hash ?? '');
 
         if (!$this->request->hasCookies() && $newLocation[0] === '?') {
             $newLocation .= '&sessid=' . $this->session->get()->id;

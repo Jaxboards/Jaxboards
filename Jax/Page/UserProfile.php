@@ -148,7 +148,10 @@ final readonly class UserProfile implements Route
             ? "<a href='{$buddyListURLs['unblock']}'>Unblock Contact</a>"
             : "<a href='{$buddyListURLs['block']}'>Block Contact</a>";
 
-        $viewProfileURL = $this->router->url('profile', ['id' => $member->id]);
+        $viewProfileURL = $this->router->url('profile', [
+            'id' => $member->id,
+            'page' => 'activity'
+        ]);
         $privateMessageURL = $this->router->url('ucp', [
             'what' => 'inbox',
             'view' => 'compose',

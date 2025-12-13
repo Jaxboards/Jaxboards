@@ -818,6 +818,7 @@ final class Topic implements Route
                 'page' => ceil($post['numposts'] / $this->numperpage),
                 'pid' => $post['lastpid'],
             ],
+            "#pid_{$post['lastpid']}",
         );
     }
 
