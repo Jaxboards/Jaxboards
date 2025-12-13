@@ -357,7 +357,7 @@ final class Forum implements Route
             $this->router->url('topic', [
                 'id' => $topic->id,
                 'getlast' => '1',
-                'slug' => $topicSlug
+                'slug' => $topicSlug,
             ]),
         );
     }

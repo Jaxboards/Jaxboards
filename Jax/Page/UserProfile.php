@@ -150,7 +150,7 @@ final readonly class UserProfile implements Route
 
         $viewProfileURL = $this->router->url('profile', [
             'id' => $member->id,
-            'page' => 'activity'
+            'page' => 'activity',
         ]);
         $privateMessageURL = $this->router->url('ucp', [
             'what' => 'inbox',
