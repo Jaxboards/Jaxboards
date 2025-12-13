@@ -282,15 +282,14 @@ final readonly class App
 
     private function getUnreadMessages(): int
     {
-        $unreadMessages = 0;
         if ($this->user->get()->id !== 0) {
-            $unreadMessages = Message::count(
+            return Message::count(
                 'WHERE `read`=0 AND `to`=?',
                 $this->user->get()->id,
             );
         }
 
-        return $unreadMessages;
+        return 0;
     }
 
     private function renderFooter(int $unreadMessages): void
