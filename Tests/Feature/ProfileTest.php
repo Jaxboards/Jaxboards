@@ -201,7 +201,7 @@ final class ProfileTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['path' => '/profile/1/comments'],
+            get: ['path' => 'profile/1/comments'],
             post: ['comment' => 'This is a profile comment.'],
         ));
 
@@ -234,7 +234,7 @@ final class ProfileTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['path' => '/profile/1'],
+            get: ['path' => 'profile/1'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 

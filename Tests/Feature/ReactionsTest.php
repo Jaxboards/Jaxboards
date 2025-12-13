@@ -125,7 +125,7 @@ final class ReactionsTest extends FeatureTestCase
         $post->update();
 
         $page = $this->go(new Request(
-            get: ['path' => '/topic/1', 'listrating' => '1'],
+            get: ['path' => 'topic/1', 'listrating' => '1'],
             server: ['HTTP_X_JSACCESS' => JSAccess::UPDATING->value],
         ));
 

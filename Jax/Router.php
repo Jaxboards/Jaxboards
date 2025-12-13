@@ -99,6 +99,12 @@ final class Router
         $this->get('ticker', '/ticker', Ticker::class);
         $this->get('topic', '/topic/{id}/{slug}', Topic::class);
         $this->get('ucp', '/ucp', UCP::class);
+
+        $this->get('register', '/register', LogReg::class);
+        $this->get('logout', '/logout', LogReg::class);
+        $this->get('login', '/login', LogReg::class);
+        $this->get('toggleInvisible', '/toggleInvisible', LogReg::class);
+        $this->get('forgotPassword', '/forgotPassword', LogReg::class);
     }
 
     /**
@@ -130,7 +136,7 @@ final class Router
     public function route(): void
     {
         $action = mb_strtolower($this->request->asString->both('act') ?? '');
-        $path = mb_strtolower($this->request->asString->both('path') ?? '');
+        $path = $this->request->asString->both('path') ?? '';
 
         if ($path !== '' && $action === '') {
             $this->routeByPath($path);
@@ -212,14 +218,6 @@ final class Router
         // These are aliases and will be removed soon
         return match ($name) {
             'category' => "?act=vc{$params['id']}",
-            'forgotPassword' => '?' . http_build_query([
-                'act' => 'logreg6',
-                ...$params,
-            ]),
-            'login' => '?act=logreg3',
-            'logout' => '?act=logreg2',
-            'register' => '?act=logreg1',
-            'toggleInvisibility' => '?act=logreg5',
             'shoutbox' => '?module=shoutbox',
             default => '',
         };

@@ -141,7 +141,7 @@ final class PollTest extends FeatureTestCase
         $topic = $this->createPoll(['pollType' => 'multi']);
 
         $page = $this->go(new Request(
-            get: ['path' => '/topic/' . $topic->id],
+            get: ['path' => 'topic/' . $topic->id],
             post: ['choice' => ['0', '1'], 'votepoll' => '1'],
         ));
 

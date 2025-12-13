@@ -69,11 +69,11 @@ final class LogReg implements Route
 
     public function route($params): void
     {
-        match ((int) ($params['id'] ?? 0)) {
-            1 => $this->register(),
-            2 => $this->logout(),
-            5 => $this->toggleinvisible(),
-            6 => $this->forgotpassword(),
+        match ($this->request->both('path')) {
+            'register' => $this->register(),
+            'logout' => $this->logout(),
+            'toggleInvisible' => $this->toggleInvisible(),
+            'forgotPassword' => $this->forgotPassword(),
             default => $this->login(
                 $this->request->asString->post('user'),
                 $this->request->asString->post('pass'),
@@ -322,7 +322,7 @@ final class LogReg implements Route
         $this->login();
     }
 
-    private function toggleinvisible(): void
+    private function toggleInvisible(): void
     {
         $this->session->set('hide', $this->session->get()->hide !== 0 ? 0 : 1);
 
@@ -383,7 +383,7 @@ final class LogReg implements Route
         return null;
     }
 
-    private function forgotpassword(): void
+    private function forgotPassword(): void
     {
         $uid = $this->request->asString->both('uid');
         $tokenId = $this->request->asString->both('tokenId');
@@ -404,7 +404,6 @@ final class LogReg implements Route
                     $this->router->url('forgotPassword'),
                     $this->jax->hiddenFormFields(
                         [
-                            'act' => 'logreg6',
                             'id' => $tokenId,
                             'uid' => $uid ?? '',
                         ],
@@ -477,12 +476,6 @@ final class LogReg implements Route
             $page .= $this->template->meta(
                 'forgot-password-form',
                 $this->router->url('forgotPassword'),
-                $this->request->isJSAccess()
-                    ? $this->jax->hiddenFormFields(
-                        [
-                            'act' => 'logreg6',
-                        ],
-                    ) : '',
             );
         }
 

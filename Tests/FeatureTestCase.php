@@ -42,7 +42,7 @@ abstract class FeatureTestCase extends TestCase
         if (is_string($request)) {
             $parsed = parse_url($request);
             parse_str($parsed['query'] ?? '', $getParameters);
-            $getParameters['path'] = $parsed['path'] ?? '';
+            $getParameters['path'] = ltrim($parsed['path'] ?? '', '/');
             $request = new Request(
                 get: $getParameters,
             );

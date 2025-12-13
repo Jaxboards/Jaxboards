@@ -124,7 +124,7 @@ final class TopicTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['path' => '/topic/1'],
+            get: ['path' => 'topic/1'],
             server: ['HTTP_X_JSACCESS' => JSAccess::UPDATING->value],
         ));
 
@@ -140,7 +140,7 @@ final class TopicTest extends FeatureTestCase
         $this->actingAs('admin', sessionOverrides: ['multiquote' => 1]);
 
         $page = $this->go(new Request(
-            get: ['path' => '/topic/1', 'qreply' => '1'],
+            get: ['path' => 'topic/1', 'qreply' => '1'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 

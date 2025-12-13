@@ -83,7 +83,7 @@ final class LogRegTest extends FeatureTestCase
 
     public function testRegistrationForm(): void
     {
-        $page = $this->go('?act=logreg1');
+        $page = $this->go('/register');
 
         DOMAssert::assertSelectEquals('.box.register', 'Registration', 1, $page);
         DOMAssert::assertSelectCount('input[name=name]', 1, $page);
@@ -96,7 +96,7 @@ final class LogRegTest extends FeatureTestCase
     public function testRegistration(): void
     {
         $page = $this->go(new Request(
-            get: ['act' => 'logreg1'],
+            get: ['path' => 'register'],
             post: [
                 'register' => 'true',
                 'name' => 'Sean',
@@ -116,7 +116,7 @@ final class LogRegTest extends FeatureTestCase
     {
         $this->actingAs('member');
 
-        $page = $this->go('?act=logreg2');
+        $page = $this->go('/logout');
 
         DOMAssert::assertSelectEquals('.success', 'Logged out successfully', 1, $page);
         DOMAssert::assertSelectEquals('.box.login', 'Login', 1, $page);
@@ -126,7 +126,7 @@ final class LogRegTest extends FeatureTestCase
     {
         $this->actingAs('member');
 
-        $page = $this->go('?act=logreg3');
+        $page = $this->go('/login');
 
         DOMAssert::assertSelectEquals('.box.login', 'Login', 1, $page);
         DOMAssert::assertSelectCount('input[name=user]', 1, $page);
@@ -139,7 +139,7 @@ final class LogRegTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['act' => 'logreg3'],
+            get: ['path' => '/login'],
             post: [
                 'user' => 'Admin',
                 'pass' => 'password',
@@ -161,7 +161,7 @@ final class LogRegTest extends FeatureTestCase
     {
         $this->actingAs('member');
 
-        $page = $this->go('?act=logreg6');
+        $page = $this->go('/forgotPassword');
 
         DOMAssert::assertSelectEquals('.box.login', 'Forgot Password', 1, $page);
         DOMAssert::assertSelectCount('input[name=user]', 1, $page);
