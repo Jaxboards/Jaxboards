@@ -53,6 +53,7 @@ final class Router
      * @var array<string,string>
      */
     private array $urls = [];
+
     private array $paths = [];
 
     public function __construct(
