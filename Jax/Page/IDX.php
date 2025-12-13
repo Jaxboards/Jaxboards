@@ -341,7 +341,7 @@ final class IDX implements Route
                         ) : '',
                     $this->router->url('forum', [
                         'id' => $forum->id,
-                        'slug' => $this->textFormatting->slugify($forum->title)
+                        'slug' => $this->textFormatting->slugify($forum->title),
                     ]),
                 );
             }

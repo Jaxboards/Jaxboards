@@ -101,7 +101,7 @@ final class Router
     /**
      * Redirect to a new URL.
      *
-     * @param array<string,string|int|null> $params
+     * @param array<string,null|int|string> $params
      */
     public function redirect(string $newLocation, array $params = []): void
     {
@@ -175,7 +175,7 @@ final class Router
      * params: ['id' => 1, 'getlast' => 1] becomes:
      * returns: /topic/1?getlast=1.
      *
-     * @param array<string,int|string|null> $params
+     * @param array<string,null|int|string> $params
      */
     public function url(string $name, array $params = []): string
     {
@@ -194,7 +194,7 @@ final class Router
                         ? "/{$params[$name]}"
                         : '';
                 },
-                $this->urls[$name]
+                $this->urls[$name],
             );
 
             // Anything not a path param gets added on as a query parameter
@@ -287,6 +287,7 @@ final class Router
      *
      * @param array<string,mixed> $array
      * @param array<string>       $keys
+     *
      * @return array<string,mixed>
      */
     private function without(array $array, array $keys): array

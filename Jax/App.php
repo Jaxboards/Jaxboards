@@ -288,15 +288,14 @@ final readonly class App
                 'WHERE `read`=0 AND `to`=?',
                 $this->user->get()->id,
             );
-
-
         }
+
         return $unreadMessages;
     }
 
     private function renderFooter(int $unreadMessages): void
     {
-        if ($unreadMessages) {
+        if ($unreadMessages !== 0) {
             $inboxURL = $this->router->url('ucp', ['what' => 'inbox']);
             $plural = ($unreadMessages === 1 ? '' : 's');
             $this->page->append(

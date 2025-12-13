@@ -887,7 +887,7 @@ final class Topic implements Route
                     'guid' => $post->id,
                     'link' => $boardURL . $this->router->url('topic', [
                         'id' => $modelsTopic->id,
-                        'findpost' => $post->id
+                        'findpost' => $post->id,
                     ]),
                     'pubDate' => gmdate('r', $this->date->datetimeAsTimestamp($post->date)),
                     'title' => $authors[$post->author]->displayName . ':',
