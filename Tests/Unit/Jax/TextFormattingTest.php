@@ -67,6 +67,7 @@ final class TextFormattingTest extends UnitTestCase
 
         // Router is used for URL generation, we don't care to test that here
         $this->container->set(Router::class, $this->createStub(Router::class));
+
         $databaseUtils = $this->container->get(DatabaseUtils::class);
         $databaseUtils->install();
 

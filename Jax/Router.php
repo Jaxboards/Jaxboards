@@ -55,9 +55,10 @@ final class Router
     private array $urls = [];
 
     /**
-     * Legacy dynamic URLs, do not use
+     * Legacy dynamic URLs, do not use.
      *
      * @deprecated
+     *
      * @var array<string,class-string>
      */
     private array $dynamicRoutes = [

@@ -234,8 +234,8 @@ final readonly class TextFormatting
                 default => null,
             };
 
-            $stringURL = $parts['path'] .
-                (array_key_exists('query', $parts) ? "?{$parts['query']}" : '');
+            $stringURL = $parts['path']
+                . (array_key_exists('query', $parts) ? "?{$parts['query']}" : '');
         }
 
         $inner ??= $stringURL;
