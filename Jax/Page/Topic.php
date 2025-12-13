@@ -113,7 +113,7 @@ final class Topic implements Route
             },
             $ratePost !== 0 => $this->reactions->toggleReaction($ratePost, (int) $this->request->both('niblet')),
             $findPost !== 0 => $this->findPost($topic, $findPost),
-            $this->request->both('getlast') !== null => $this->getLastPost($topic->id),
+            $this->request->both('getlast') !== null => $this->getLastPost($topic),
             $edit !== 0 => $this->quickEditPost($topic, $edit),
             $this->request->both('quote') !== null => $this->multiQuote($topic),
             $this->request->both('markread') !== null => $this->markRead($topic),
@@ -571,7 +571,7 @@ final class Topic implements Route
                     'id' => $modelsTopic->id,
                     'findpost' => $post->id,
                     'pid' => $post->id,
-                    // TODO: why need "findpost" and "pid"?
+                    'slug' => $this->textFormatting->slugify($modelsTopic->title)
                 ]),
                 'iptools' => $this->router->url('modcontrols', [
                     'do' => 'iptools',
@@ -794,7 +794,7 @@ final class Topic implements Route
         $this->page->command('softurl');
     }
 
-    private function getLastPost(int $tid): void
+    private function getLastPost(ModelsTopic $topic): void
     {
         $result = $this->database->select(
             [
@@ -803,7 +803,7 @@ final class Topic implements Route
             ],
             'posts',
             'WHERE `tid`=?',
-            $tid,
+            $topic->id,
         );
         $post = $this->database->arow($result);
         $this->database->disposeresult($result);
@@ -818,9 +818,10 @@ final class Topic implements Route
         $this->router->redirect(
             'topic',
             [
-                'id' => $tid,
+                'id' => $topic->id,
                 'page' => ceil($post['numposts'] / $this->numperpage),
                 'pid' => $post['lastpid'],
+                'slug' => $this->textFormatting->slugify($topic->title),
             ],
             "#pid_{$post['lastpid']}",
         );
