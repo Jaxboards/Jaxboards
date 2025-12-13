@@ -199,7 +199,9 @@ final class Topic implements Route
                 ? ' class="active"'
                 : '';
             $pagelist .= <<<HTML
-                <a href="{$pageURL}"{$activeClass}>{$pageNumber}</a>
+                <a href="{$pageURL}"{$activeClass}>
+                    {$pageNumber}
+                </a>
                 HTML;
         }
 
