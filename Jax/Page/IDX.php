@@ -339,7 +339,7 @@ final class IDX implements Route
                             'idx-ledby-wrapper',
                             $this->getmods($forum->mods),
                         ) : '',
-                    $this->router->url('forum', ['id' => $forum->id, 'slug' => $this->textFormatting->slugify($forum->title)])
+                    $this->router->url('forum', ['id' => $forum->id, 'slug' => $this->textFormatting->slugify($forum->title)]),
                 );
             }
         }
@@ -380,6 +380,7 @@ final class IDX implements Route
                 : $userOnline->lastUpdate;
             $lastOnlineDate = $this->date->relativeTime($lastOnline);
             $profileURL = $this->router->url('profile', ['id' => $userOnline->uid]);
+
             return <<<HTML
                 <a href="{$profileURL}"
                     class="user{$userOnline->uid} mgroup{$userOnline->groupID} {$birthdayClass}"
@@ -556,7 +557,7 @@ final class IDX implements Route
             $this->router->url('topic', [
                 'id' => $forum->lastPostTopic,
                 'getlast' => '1',
-                'slug' => $this->textFormatting->slugify($forum->lastPostTopicTitle)
+                'slug' => $this->textFormatting->slugify($forum->lastPostTopicTitle),
             ]),
             $this->textFormatting->wordfilter($forum->lastPostTopicTitle) ?: '- - - - -',
             $member !== null ? $this->template->meta(

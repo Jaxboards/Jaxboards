@@ -80,12 +80,12 @@ final readonly class Calendar implements Route
             $birthday = $this->date->dateAsCarbon($member->birthdate);
             $profileURL = $this->router->url('profile', ['id' => $member->id]);
             $birthdays[$birthday?->day][] = <<<HTML
-                <a
-                    href="{$profileURL}"
-                    class="user{$member->id} mgroup{$member->groupID}"
-                    title="{$birthday->age} years old!"
-                    data-use-tooltip="true">{$member->displayName}</a>
-            HTML;
+                    <a
+                        href="{$profileURL}"
+                        class="user{$member->id} mgroup{$member->groupID}"
+                        title="{$birthday->age} years old!"
+                        data-use-tooltip="true">{$member->displayName}</a>
+                HTML;
         }
 
         $prevMonthURL = $this->router->url('calendar', ['month' => $monthOffset - 1]);

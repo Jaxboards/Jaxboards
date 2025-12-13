@@ -136,7 +136,7 @@ final readonly class UserProfile implements Route
         $buddyListURLs = [
             'add' => $this->router->url('buddylist', ['add' => $member->id]),
             'block' => $this->router->url('buddylist', ['block' => $member->id]),
-            'remove' => $this->router->url('buddylist', [ 'remove' => $member->id ]),
+            'remove' => $this->router->url('buddylist', ['remove' => $member->id]),
             'unblock' => $this->router->url('buddylist', ['unblock' => $member->id]),
         ];
 
@@ -185,8 +185,7 @@ final readonly class UserProfile implements Route
 
         $this->page->setBreadCrumbs(
             [
-                $this->router->url('profile', ['id' => $member->id, 'page' => 'profile'])
-                    => "{$member->displayName}'s profile",
+                $this->router->url('profile', ['id' => $member->id, 'page' => 'profile']) => "{$member->displayName}'s profile",
             ],
         );
 

@@ -246,7 +246,7 @@ final class Forum implements Route
             $table = $this->template->meta('forum-table', $rows);
         } else {
             if ($this->pageNumber > 0) {
-                $this->router->redirect('forum', [ 'id' => $fid ]);
+                $this->router->redirect('forum', ['id' => $fid]);
 
                 return;
             }
@@ -254,8 +254,8 @@ final class Forum implements Route
             if ($forumPerms['start']) {
                 $newTopicURL = $this->router->url('post', ['fid' => $fid]);
                 $table = $this->page->error(<<<HTML
-                    This forum is empty! Don't like it? <a href='{$newTopicURL}'>Create a topic!</a>
-                HTML);
+                        This forum is empty! Don't like it? <a href='{$newTopicURL}'>Create a topic!</a>
+                    HTML);
             }
         }
 
@@ -282,7 +282,7 @@ final class Forum implements Route
                 $pageURL = $this->router->url('topic', [
                     'id' => $topic->id,
                     'page' => $pageNumber,
-                    'slug' => $this->textFormatting->slugify($topic->title)
+                    'slug' => $this->textFormatting->slugify($topic->title),
                 ]);
                 $pageArray[] = "<a href='{$pageURL}'>{$pageNumber}</a>";
             }
@@ -332,9 +332,9 @@ final class Forum implements Route
             $topic->summary !== '' ? $topic->summary . (mb_strlen($topic->summary) > 45 ? '...' : '') : '',
             // 11
             $this->user->getGroup()?->canModerate ? (
-                '<a href="' .
-                $this->router->url('modcontrols', ['do' => 'modt', 'tid' => $topic->id]) .
-                '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>'
+                '<a href="'
+                . $this->router->url('modcontrols', ['do' => 'modt', 'tid' => $topic->id])
+                . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>'
             ) : '',
             // 12
             $pages,
@@ -432,7 +432,7 @@ final class Forum implements Route
                     $this->router->url('topic', [
                         'id' => $subforum->lastPostTopic,
                         'getlast' => '1',
-                        'slug' => $this->textFormatting->slugify($subforum->lastPostTopicTitle)
+                        'slug' => $this->textFormatting->slugify($subforum->lastPostTopicTitle),
                     ]),
                     $subforum->lastPostTopicTitle ?: '- - - - -',
                     $lastPostAuthor ? $this->template->meta(

@@ -128,7 +128,7 @@ final readonly class Reactions
             $ratePostURL = $this->router->url('topic', [
                 'id' => $post->tid,
                 'ratepost' => $post->id,
-                'niblet' => $ratingNiblet->id
+                'niblet' => $ratingNiblet->id,
             ]);
             $postratingbuttons .= <<<HTML
                 <a href="{$ratePostURL}">{$nibletHTML}</a>

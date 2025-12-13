@@ -258,7 +258,7 @@ final class Shoutbox implements Module
         }
 
         $this->page->setBreadCrumbs([
-            $this->router->url('shoutbox') => 'Shoutbox History'
+            $this->router->url('shoutbox') => 'Shoutbox History',
         ]);
         if ($this->request->isJSUpdate()) {
             return;

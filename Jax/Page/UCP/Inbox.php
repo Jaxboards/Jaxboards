@@ -264,7 +264,7 @@ final readonly class Inbox
             [
                 'what' => 'inbox',
                 'page' => $this->request->asString->both('prevpage') ?? '',
-            ]
+            ],
         );
     }
 
@@ -412,7 +412,7 @@ final readonly class Inbox
             $pageURL = $this->router->url('ucp', [
                 'what' => 'inbox',
                 'view' => $view,
-                'page' => $pageNumber
+                'page' => $pageNumber,
             ]);
 
             return <<<HTML

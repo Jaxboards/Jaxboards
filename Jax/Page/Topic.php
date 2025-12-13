@@ -182,7 +182,7 @@ final class Topic implements Route
         // Fix this to work with subforums.
         $this->page->setBreadCrumbs(
             [
-                $this->router->url('category', ['id' => $category?->id])  => $category->title ?? '',
+                $this->router->url('category', ['id' => $category?->id]) => $category->title ?? '',
                 $this->router->url('forum', ['id' => $forum?->id]) => $forum->title ?? '',
                 $this->router->url('topic', ['id' => $modelsTopic->id]) => $topicTitle,
             ],
@@ -195,7 +195,9 @@ final class Topic implements Route
         $pagelist = '';
         foreach ($this->jax->pages($totalpages, $this->pageNumber + 1, 10) as $pageNumber) {
             $pageURL = $this->router->url('topic', ['id' => $modelsTopic->id, 'page' => $pageNumber]);
-            $activeClass = $pageNumber === $this->pageNumber + 1 ? ' class="active"' : '';
+            $activeClass = $pageNumber === $this->pageNumber + 1
+                ? ' class="active"'
+                : '';
             $pagelist .= <<<HTML
                 <a href="{$pageURL}"{$activeClass}>{$pageNumber}</a>
                 HTML;
@@ -216,9 +218,9 @@ final class Topic implements Route
             $topicTitle
                 . ($topicSubtitle !== '' ? ', ' . $topicSubtitle : ''),
             $page,
-            '<a href="'.
-                $this->router->url('topic', ['id' => $modelsTopic->id, 'fmt' => 'RSS']) .
-                '" class="social rss" title="RSS Feed for this Topic" target="_blank">RSS</a>',
+            '<a href="'
+                . $this->router->url('topic', ['id' => $modelsTopic->id, 'fmt' => 'RSS'])
+                . '" class="social rss" title="RSS Feed for this Topic" target="_blank">RSS</a>',
         );
 
         // Add buttons.
@@ -562,7 +564,8 @@ final class Topic implements Route
                 'findpost' => $this->router->url('topic', [
                     'id' => $modelsTopic->id,
                     'findpost' => $post->id,
-                    'pid' => $post->id, // TODO: why need "findpost" and "pid"?
+                    'pid' => $post->id,
+                    // TODO: why need "findpost" and "pid"?
                 ]),
                 'iptools' => $this->router->url('modcontrols', [
                     'do' => 'iptools',
@@ -679,7 +682,7 @@ final class Topic implements Route
             $this->router->redirect('post', [
                 'how' => 'edit',
                 'tid' => $modelsTopic->id,
-                'pid' => $pid
+                'pid' => $pid,
             ]);
 
             return;
@@ -814,7 +817,6 @@ final class Topic implements Route
                 'page' => ceil($post['numposts'] / $this->numperpage),
                 'pid' => $post['lastpid'],
             ],
-            '#pid_' . $post['lastpid'],
         );
     }
 
@@ -851,7 +853,6 @@ final class Topic implements Route
                 'page' => $pageNumber,
                 'pid' => $postId,
             ],
-            "#pid_{$postId}",
         );
     }
 

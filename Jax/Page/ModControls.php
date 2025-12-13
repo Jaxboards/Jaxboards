@@ -144,7 +144,7 @@ final readonly class ModControls implements Route
             'modcp-index',
             $this->router->url('modcontrols', ['do' => 'emem']),
             $this->router->url('modcontrols', ['do' => 'iptools']),
-            $cppage
+            $cppage,
         );
         $page = $this->template->meta('box', ' id="modcp"', 'Mod CP', $page);
 

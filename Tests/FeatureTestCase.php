@@ -53,8 +53,11 @@ abstract class FeatureTestCase extends TestCase
         return $this->container->get($pageClass)->render() ?? '';
     }
 
-    public function assertRedirect(string $name, array $params = [], ?string $page = null): void
-    {
+    public function assertRedirect(
+        string $name,
+        array $params = [],
+        ?string $page = null,
+    ): void {
         $location = $this->container->get(Router::class)->url($name, $params) ?? $name;
         $this->assertStringContainsString("Location: {$location}", $page);
     }

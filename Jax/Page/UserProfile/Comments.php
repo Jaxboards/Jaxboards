@@ -83,7 +83,7 @@ final readonly class Comments
                 $deleteCommentURL = $this->router->url('profile', [
                     'id' => $member->id,
                     'page' => 'comments',
-                    'del' => $comment->id
+                    'del' => $comment->id,
                 ]);
                 $deleteLink = "<a href='{$deleteCommentURL}' class='delete'>[X]</a>";
             }

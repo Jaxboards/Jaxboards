@@ -209,7 +209,7 @@ final readonly class App
                 'SCRIPT',
                 <<<HTML
                     <script type="text/javascript" src="{$loadModControlsURL}" defer></script>
-                    HTML
+                    HTML,
             );
         }
 
@@ -262,12 +262,12 @@ final readonly class App
                 $this->page->append(
                     'FOOTER',
                     <<<HTML
-                    <a href="{$inboxURL}">
-                        <div id="notification" class="newmessage" onclick="this.style.display='none'">
-                            You have {$numMessages} new message{$plural}
-                        </div>
-                    </a>
-                    HTML
+                        <a href="{$inboxURL}">
+                            <div id="notification" class="newmessage" onclick="this.style.display='none'">
+                                You have {$numMessages} new message{$plural}
+                            </div>
+                        </a>
+                        HTML,
                 );
             }
         }
@@ -311,7 +311,7 @@ final readonly class App
                 $numMessages,
                 $this->router->url('logout'),
                 $this->router->url('ucp', ['what' => 'inbox']),
-                $this->router->url('ucp')
+                $this->router->url('ucp'),
             ),
         );
     }
@@ -339,8 +339,8 @@ final readonly class App
     {
         $this->page->setBreadCrumbs(
             [
-                $this->router->url('index') => ($this->config->getSetting('boardname') ?: 'Home')
-            ]
+                $this->router->url('index') => ($this->config->getSetting('boardname') ?: 'Home'),
+            ],
         );
     }
 
@@ -355,7 +355,7 @@ final readonly class App
             $this->user->getGroup()?->canModerate
                 ? $this->template->meta(
                     'modlink',
-                    $this->router->url('modcontrols', ['do' => 'cp'])
+                    $this->router->url('modcontrols', ['do' => 'cp']),
                 )
                 : '',
         );

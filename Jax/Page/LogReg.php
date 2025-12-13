@@ -274,7 +274,7 @@ final class LogReg implements Route
 
         $this->page->append('PAGE', $this->template->meta(
             'login-form',
-            $this->router->url('login')
+            $this->router->url('login'),
         ));
     }
 
@@ -296,12 +296,13 @@ final class LogReg implements Route
         $this->session->applyChanges();
         session_unset();
         session_destroy();
-        $this->template->reset('USERBOX',
+        $this->template->reset(
+            'USERBOX',
             $this->template->meta(
                 'userbox-logged-out',
                 $this->router->url('forgotPassword'),
                 $this->router->url('register'),
-            )
+            ),
         );
         $this->page->command(
             'update',
@@ -310,7 +311,7 @@ final class LogReg implements Route
                 'userbox-logged-out',
                 $this->router->url('forgotPassword'),
                 $this->router->url('register'),
-            )
+            ),
         );
         $this->page->command('softurl');
         $this->page->append('PAGE', $this->template->meta('success', 'Logged out successfully'));
@@ -433,7 +434,7 @@ final class LogReg implements Route
 
                     $link = $this->domainDefinitions->getBoardURL() . $this->router->url('forgotPassword', [
                         'uid' => $member->id,
-                        'tokenId' => rawurlencode($forgotpasswordtoken)
+                        'tokenId' => rawurlencode($forgotpasswordtoken),
                     ]);
                     $mailResult = $this->jax->mail(
                         $member->email,

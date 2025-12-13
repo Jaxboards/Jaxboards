@@ -68,7 +68,7 @@ final readonly class UCP implements Route
         }
 
         $this->page->setBreadCrumbs([
-            $this->router->url('ucp') => 'UCP'
+            $this->router->url('ucp') => 'UCP',
         ]);
         $what = $this->request->asString->both('what');
 
@@ -148,14 +148,12 @@ final readonly class UCP implements Route
             $this->router->url('ucp', ['what' => 'profile']),
             $this->router->url('ucp', ['what' => 'sounds']),
             $this->router->url('ucp', ['what' => 'board']),
-
             // inbox links
             $this->router->url('ucp', ['what' => 'inbox', 'view' => 'compose']),
             $this->router->url('ucp', ['what' => 'inbox']),
             $this->router->url('ucp', ['what' => 'inbox', 'view' => 'sent']),
             $this->router->url('ucp', ['what' => 'inbox', 'view' => 'flagged']),
-
-            $page
+            $page,
         );
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);

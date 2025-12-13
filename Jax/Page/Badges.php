@@ -83,7 +83,7 @@ final readonly class Badges implements Route
     public function showTabBadges(Member $member): string
     {
         if (!$this->isEnabled()) {
-            $this->router->redirect('profile', [ 'id' => $member->id ]);
+            $this->router->redirect('profile', ['id' => $member->id]);
 
             return '';
         }

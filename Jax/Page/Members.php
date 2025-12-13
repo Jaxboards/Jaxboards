@@ -132,7 +132,7 @@ final class Members implements Route
             $pageURL = $this->router->url('members', [
                 'sortby' => $sortby,
                 'how' => $sorthow,
-                'page' => $pageNumber
+                'page' => $pageNumber,
             ]);
             $pages .= "<a href='{$pageURL}'"
                 . ($pageNumber - 1 === $this->pageNumber ? ' class="active"' : '') . ">{$pageNumber}</a> ";
@@ -149,11 +149,11 @@ final class Members implements Route
                     'filter' => $filter,
                     'sortby' => $field,
                     'how' => $sortby === $field && $sorthow === 'ASC' ? 'DESC' : 'ASC',
-                ]
+                ],
             );
-            $links[] = "<a href='{$url}'".
-                ($sortby === $field ? "class='sort" . ($sorthow === 'DESC' ? ' desc' : '') ."'" : '').
-                ">{$fieldLabel}</a>";
+            $links[] = "<a href='{$url}'"
+                . ($sortby === $field ? "class='sort" . ($sorthow === 'DESC' ? ' desc' : '') . "'" : '')
+                . ">{$fieldLabel}</a>";
         }
 
         foreach ($members as $member) {
@@ -164,7 +164,7 @@ final class Members implements Route
                     HTML;
             }
 
-            $privateMessageURL = $this->router->url('ucp', ['what' => 'inbox', 'view' => 'compose' , 'mid' => $member->id]);
+            $privateMessageURL = $this->router->url('ucp', ['what' => 'inbox', 'view' => 'compose', 'mid' => $member->id]);
             $contactdetails .= '<a title="PM this member" class="pm contact" '
                 . "href='{$privateMessageURL}'></a>";
             $page .= $this->template->meta(

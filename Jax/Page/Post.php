@@ -536,7 +536,7 @@ final class Post implements Route
                 return $error;
             }
 
-            $this->router->redirect('topic', [ 'id' => $post->tid, 'findpost' => $pid ]);
+            $this->router->redirect('topic', ['id' => $post->tid, 'findpost' => $pid]);
 
             return null;
         }
