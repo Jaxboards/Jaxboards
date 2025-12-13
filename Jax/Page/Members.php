@@ -164,7 +164,11 @@ final class Members implements Route
                     HTML;
             }
 
-            $privateMessageURL = $this->router->url('ucp', ['what' => 'inbox', 'view' => 'compose', 'mid' => $member->id]);
+            $privateMessageURL = $this->router->url('ucp', [
+                'what' => 'inbox',
+                'view' => 'compose',
+                'mid' => $member->id
+            ]);
             $contactdetails .= '<a title="PM this member" class="pm contact" '
                 . "href='{$privateMessageURL}'></a>";
             $page .= $this->template->meta(

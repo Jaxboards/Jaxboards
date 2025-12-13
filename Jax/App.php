@@ -249,45 +249,9 @@ final readonly class App
                 $this->config->getSetting('navlinks') ?? '',
             ),
         );
-        $numMessages = 0;
-        if ($this->user->get()->id !== 0) {
-            $numMessages = Message::count(
-                'WHERE `read`=0 AND `to`=?',
-                $this->user->get()->id,
-            );
 
-            if ($numMessages) {
-                $inboxURL = $this->router->url('ucp', ['what' => 'inbox']);
-                $plural = ($numMessages === 1 ? '' : 's');
-                $this->page->append(
-                    'FOOTER',
-                    <<<HTML
-                        <a href="{$inboxURL}">
-                            <div id="notification" class="newmessage" onclick="this.style.display='none'">
-                                You have {$numMessages} new message{$plural}
-                            </div>
-                        </a>
-                        HTML,
-                );
-            }
-        }
-
-        $this->template->addVar('inbox', (string) $numMessages);
-
-        $version = json_decode(
-            $this->fileSystem->getContents('composer.json') ?: '',
-            null,
-            512,
-            JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
-        )['version'] ?? 'Unknown';
-
-        $this->page->append(
-            'FOOTER',
-            '<div class="footer">'
-            . "<a href=\"https://jaxboards.github.io\">Jaxboards</a> {$version}! "
-            // Removed the defunct URL
-            . '&copy; 2007-' . gmdate('Y') . '</div>',
-        );
+        $unreadMessages = $this->getUnreadMessages();
+        $this->renderFooter($unreadMessages);
 
         $this->page->append(
             'USERBOX',
@@ -308,11 +272,58 @@ final readonly class App
                 $this->date->smallDate(
                     $this->user->get()->lastVisit,
                 ),
-                $numMessages,
+                $unreadMessages,
                 $this->router->url('logout'),
                 $this->router->url('ucp', ['what' => 'inbox']),
                 $this->router->url('ucp'),
             ),
+        );
+    }
+
+    private function getUnreadMessages(): int
+    {
+        $unreadMessages = 0;
+        if ($this->user->get()->id !== 0) {
+            $unreadMessages = Message::count(
+                'WHERE `read`=0 AND `to`=?',
+                $this->user->get()->id,
+            );
+
+
+        }
+        return $unreadMessages;
+    }
+
+    private function renderFooter(int $unreadMessages): void
+    {
+        if ($unreadMessages) {
+            $inboxURL = $this->router->url('ucp', ['what' => 'inbox']);
+            $plural = ($unreadMessages === 1 ? '' : 's');
+            $this->page->append(
+                'FOOTER',
+                <<<HTML
+                    <a href="{$inboxURL}">
+                        <div id="notification" class="newmessage" onclick="this.style.display='none'">
+                            You have {$unreadMessages} new message{$plural}
+                        </div>
+                    </a>
+                    HTML,
+            );
+        }
+
+        $version = json_decode(
+            $this->fileSystem->getContents('composer.json') ?: '',
+            null,
+            512,
+            JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
+        )['version'] ?? 'Unknown';
+
+        $this->page->append(
+            'FOOTER',
+            '<div class="footer">'
+            . "<a href=\"https://jaxboards.github.io\">Jaxboards</a> {$version}! "
+            // Removed the defunct URL
+            . '&copy; 2007-' . gmdate('Y') . '</div>',
         );
     }
 

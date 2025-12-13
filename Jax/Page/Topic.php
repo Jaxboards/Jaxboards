@@ -431,7 +431,9 @@ final class Topic implements Route
             foreach ($badgeTuples as $badgeTuple) {
                 $profileBadgesURL = $this->router->url('profile', ['id' => $authorId, 'page' => 'badges']);
                 $badgesPerAuthorHTML[$authorId] .= <<<HTML
-                    <a href="{$profileBadgesURL}"><img src="{$badgeTuple->badge->imagePath}" title="{$badgeTuple->badge->badgeTitle}"></a>
+                    <a href="{$profileBadgesURL}">
+                        <img src="{$badgeTuple->badge->imagePath}" title="{$badgeTuple->badge->badgeTitle}">
+                    </a>
                     HTML;
             }
         }
@@ -781,7 +783,6 @@ final class Topic implements Route
             if ($this->request->isJSAccess()) {
                 $this->quickReplyForm($modelsTopic);
             } else {
-                $postURL = $this->router->url('post', ['tid' => $modelsTopic->id]);
                 $this->router->redirect('post', ['tid' => $modelsTopic->id]);
             }
         }
@@ -884,7 +885,10 @@ final class Topic implements Route
                 [
                     'description' => $this->textFormatting->blockhtml($this->textFormatting->theWorks($post->post)),
                     'guid' => $post->id,
-                    'link' => $boardURL . $this->router->url('topic', ['id' => $modelsTopic->id, 'findpost' => $post->id]),
+                    'link' => $boardURL . $this->router->url('topic', [
+                        'id' => $modelsTopic->id,
+                        'findpost' => $post->id
+                    ]),
                     'pubDate' => gmdate('r', $this->date->datetimeAsTimestamp($post->date)),
                     'title' => $authors[$post->author]->displayName . ':',
                 ],

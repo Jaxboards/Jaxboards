@@ -61,7 +61,8 @@ final readonly class Activity
                 [
                     'description' => $parsed['text'],
                     'guid' => $activity->id,
-                    'link' => $this->domainDefinitions->getBoardUrl() . $this->textFormatting->blockhtml($parsed['link']),
+                    'link' => $this->domainDefinitions->getBoardUrl() .
+                        $this->textFormatting->blockhtml($parsed['link']),
                     'pubDate' => $this->date->datetimeAsCarbon($activity->date)?->format('r') ?? '',
                     'title' => $parsed['text'],
                 ],
@@ -138,23 +139,34 @@ final readonly class Activity
     ): array {
         return match ($modelsActivity->type) {
             'profile_comment' => [
-                'link' => $this->router->url('profile', ['id' => $modelsActivity->affectedUser]),
+                'link' => $this->router->url('profile', [
+                    'id' => $modelsActivity->affectedUser
+                ]),
                 'text' => "{$user->displayName} commented on {$affectedUser->displayName}'s profile",
             ],
             'new_post' => [
-                'link' => $this->router->url('topic', ['id' => $modelsActivity->tid, 'findpost' => $modelsActivity->pid]),
+                'link' => $this->router->url('topic', [
+                    'id' => $modelsActivity->tid,
+                    'findpost' => $modelsActivity->pid
+                ]),
                 'text' => $user->displayName . ' posted in topic ' . $modelsActivity->arg1,
             ],
             'new_topic' => [
-                'link' => $this->router->url('topic', ['id' => $modelsActivity->tid]),
+                'link' => $this->router->url('topic', [
+                    'id' => $modelsActivity->tid
+                ]),
                 'text' => $user->displayName . ' created new topic ' . $modelsActivity->arg1,
             ],
             'profile_name_change' => [
-                'link' => $this->router->url('profile', ['id' => $modelsActivity->uid]),
+                'link' => $this->router->url('profile', [
+                    'id' => $modelsActivity->uid
+                ]),
                 'text' => $modelsActivity->arg1 . ' is now known as ' . $modelsActivity->arg2,
             ],
             'buddy_add' => [
-                'link' => $this->router->url('profile', ['id' => $modelsActivity->uid]),
+                'link' => $this->router->url('profile', [
+                    'id' => $modelsActivity->uid
+                ]),
                 'text' => $user->displayName . ' made friends with ' . $affectedUser->displayName,
             ],
             default => ['link' => '', 'text' => ''],

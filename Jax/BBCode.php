@@ -174,12 +174,12 @@ final class BBCode
             'name' => $file->name,
         ]);
 
-        return <<<HTML
+        return <<<ATTACHMENT_HTML
             <div class="attachment">
                 <a href='{$downloadURL}' class='name'>{$file->name}</a>
                 Downloads: {$file->downloads}
             </div>
-            HTML;
+            ATTACHMENT_HTML;
     }
 
     /**

@@ -101,7 +101,7 @@ final class Router
     /**
      * Redirect to a new URL.
      *
-     * @param array<string> $params
+     * @param array<string,string|int|null> $params
      */
     public function redirect(string $newLocation, array $params = []): void
     {
@@ -175,7 +175,7 @@ final class Router
      * params: ['id' => 1, 'getlast' => 1] becomes:
      * returns: /topic/1?getlast=1.
      *
-     * @param array<string,int|string> $params
+     * @param array<string,int|string|null> $params
      */
     public function url(string $name, array $params = []): string
     {
@@ -183,15 +183,19 @@ final class Router
             $foundParams = [];
 
             // Replaces {param} values with their values from $params
-            $path = preg_replace_callback('/\/\{(\w+)\}/', static function ($match) use ($params, &$foundParams): string {
-                [$full, $name] = $match;
+            $path = preg_replace_callback(
+                '/\/\{(\w+)\}/',
+                static function ($match) use ($params, &$foundParams): string {
+                    [, $name] = $match;
 
-                $foundParams[] = $name;
+                    $foundParams[] = $name;
 
-                return array_key_exists($name, $params)
-                    ? "/{$params[$name]}"
-                    : '';
-            }, $this->urls[$name]);
+                    return array_key_exists($name, $params)
+                        ? "/{$params[$name]}"
+                        : '';
+                },
+                $this->urls[$name]
+            );
 
             // Anything not a path param gets added on as a query parameter
             $queryParams = $this->without($params, $foundParams);
@@ -283,12 +287,13 @@ final class Router
      *
      * @param array<string,mixed> $array
      * @param array<string>       $keys
+     * @return array<string,mixed>
      */
     private function without(array $array, array $keys): array
     {
         $newArray = [];
         foreach ($array as $key => $value) {
-            if (in_array($key, $keys)) {
+            if (in_array($key, $keys, true)) {
                 continue;
             }
 

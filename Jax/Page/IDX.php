@@ -339,7 +339,10 @@ final class IDX implements Route
                             'idx-ledby-wrapper',
                             $this->getmods($forum->mods),
                         ) : '',
-                    $this->router->url('forum', ['id' => $forum->id, 'slug' => $this->textFormatting->slugify($forum->title)]),
+                    $this->router->url('forum', [
+                        'id' => $forum->id,
+                        'slug' => $this->textFormatting->slugify($forum->title)
+                    ]),
                 );
             }
         }
