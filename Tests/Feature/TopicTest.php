@@ -107,7 +107,12 @@ final class TopicTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('#path li a', 'Forum', 2, $page);
         DOMAssert::assertSelectEquals('#path li a', 'Welcome to Jaxboards!', 1, $page);
 
-        DOMAssert::assertSelectRegExp('#page .box .title', '/Welcome to Jaxboards!, Your support is appreciated./', 1, $page);
+        DOMAssert::assertSelectRegExp(
+            '#page .box .title',
+            '/Welcome to Jaxboards!, Your support is appreciated./',
+            1,
+            $page,
+        );
 
         DOMAssert::assertSelectEquals('#pid_1 .username', 'Admin', 1, $page);
         DOMAssert::assertSelectEquals('#pid_1 .signature', 'I like tacos', 1, $page);
@@ -151,7 +156,13 @@ final class TopicTest extends FeatureTestCase
         $this->assertContainsEquals(['softurl'], $json);
         $window = array_find($json, static fn($item): bool => $item[0] === 'window');
 
-        DOMAssert::assertSelectRegExp('.topic-reply-form textarea[name="postdata"]', '/\[quote=Admin\]Now, /', 1, $window[1]['content']);
+        DOMAssert::assertSelectRegExp(
+            '.topic-reply-form textarea[name="postdata"]',
+            '/\[quote=Admin\]Now,
+            /',
+            1,
+            $window[1]['content'],
+        );
     }
 
     public function testTopicRSSFeed(): void

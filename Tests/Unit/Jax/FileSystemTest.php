@@ -90,6 +90,9 @@ final class FileSystemTest extends UnitTestCase
         $this->assertEquals($readable, $this->fileSystem->fileSizeHumanReadable($fileSize));
     }
 
+    /**
+     * @return array<array{int, string}>
+     */
     public static function fileSizeHumanReadableDataProvider(): array
     {
         return [

@@ -71,6 +71,9 @@ final class IPAddressTest extends UnitTestCase
         $this->assertEquals($ipAddress->isLocalHost(), $isLocalHost);
     }
 
+    /**
+     * @return array<array{string,bool}>
+     */
     public static function localHostDataProvider(): array
     {
         return [

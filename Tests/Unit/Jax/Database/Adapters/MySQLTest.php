@@ -92,7 +92,10 @@ final class MySQLTest extends UnitTestCase
                 PRIMARY KEY (`id`),
                 KEY `groupID` (`groupID`),
                 KEY `displayName` (`displayName`),
-                CONSTRAINT `members_fk_groupID` FOREIGN KEY (`groupID`) REFERENCES `jaxboards_member_groups` (`id`) ON DELETE SET NULL
+                CONSTRAINT `members_fk_groupID`
+                    FOREIGN KEY (`groupID`)
+                    REFERENCES `jaxboards_member_groups` (`id`)
+                    ON DELETE SET NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             SQL
             , $createTable);

@@ -49,9 +49,6 @@
     <exclude name="Squiz.Commenting.BlockComment.LastLineIndent" />
     <exclude name="Squiz.Commenting.BlockComment.NotCapital" />
   </rule>
-  <rule ref="SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys" phpcs-only="true">
-    <type>warning</type>
-  </rule>
   <rule ref="SlevomatCodingStandard.Arrays.ArrayAccess"/>
   <rule ref="SlevomatCodingStandard.Arrays.DisallowImplicitArrayCreation"/>
   <rule ref="SlevomatCodingStandard.Arrays.DisallowPartiallyKeyed"/>
@@ -213,8 +210,8 @@
         <element key="emoticons" value="emoticons"/>
         <element key="Jax" value="Jax"/>
         <element key="Service" value="Service"/>
-        <element key="Tests" value="Service"/>
-        <element key="Tools" value="tools"/>
+        <element key="Tests" value="Tests"/>
+        <element key="Tools" value="Tools"/>
       </property>
     </properties>
   </rule>
