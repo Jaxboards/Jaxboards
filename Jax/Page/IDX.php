@@ -9,7 +9,6 @@ use Jax\Config;
 use Jax\Database\Database;
 use Jax\Date;
 use Jax\Interfaces\Route;
-use Jax\Jax;
 use Jax\Models\Category;
 use Jax\Models\Forum;
 use Jax\Models\Group;
@@ -35,6 +34,7 @@ use function array_unique;
 use function count;
 use function explode;
 use function implode;
+use function json_decode;
 use function max;
 use function mb_strlen;
 use function mb_substr;
@@ -70,7 +70,6 @@ final class IDX implements Route
         private readonly Config $config,
         private readonly Database $database,
         private readonly Date $date,
-        private readonly Jax $jax,
         private readonly Page $page,
         private readonly Request $request,
         private readonly Router $router,

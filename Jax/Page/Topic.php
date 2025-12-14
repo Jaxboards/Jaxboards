@@ -41,6 +41,7 @@ use function explode;
 use function gmdate;
 use function implode;
 use function in_array;
+use function json_decode;
 use function json_encode;
 use function max;
 

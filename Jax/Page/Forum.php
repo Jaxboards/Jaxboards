@@ -31,6 +31,7 @@ use function ceil;
 use function explode;
 use function implode;
 use function is_numeric;
+use function json_decode;
 use function json_encode;
 use function max;
 use function mb_strlen;

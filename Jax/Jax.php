@@ -8,7 +8,6 @@ use function array_keys;
 use function array_reduce;
 use function count;
 use function floor;
-use function json_decode;
 use function mail;
 use function pack;
 use function str_replace;
