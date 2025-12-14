@@ -28,9 +28,9 @@ export class AppState {
         });
 
         // Load sounds
-        Sound.load('sbblip', './Sounds/blip.mp3', false);
-        Sound.load('imbeep', './Sounds/receive.mp3', false);
-        Sound.load('imnewwindow', './Sounds/receive.mp3', false);
+        Sound.load('sbblip', '/Sounds/blip.mp3', false);
+        Sound.load('imbeep', '/Sounds/receive.mp3', false);
+        Sound.load('imnewwindow', '/Sounds/receive.mp3', false);
     }
 
     submitForm(form: HTMLFormElement, resetOnSubmit = false) {
