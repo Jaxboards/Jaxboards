@@ -158,8 +158,7 @@ final class TopicTest extends FeatureTestCase
 
         DOMAssert::assertSelectRegExp(
             '.topic-reply-form textarea[name="postdata"]',
-            '/\[quote=Admin\]Now,
-            /',
+            '/\[quote=Admin\]Now,/',
             1,
             $window[1]['content'],
         );
@@ -167,6 +166,8 @@ final class TopicTest extends FeatureTestCase
 
     public function testTopicRSSFeed(): void
     {
+        $this->actingAs('admin');
+
         $page = $this->go('/topic/1?fmt=RSS');
 
         DOMAssert::assertSelectEquals('title', 'Welcome to Jaxboards!', 1, $page);

@@ -49,13 +49,18 @@ final readonly class MySQL implements Adapter
                 $foreignField = $this->database->quoteIdentifier($foreignKey->field);
                 $foreignTable = $this->database->ftable($foreignKey->table);
                 $onDelete = match ($foreignKey->onDelete) {
-                    'cascade' => ' ON DELETE CASCADE',
-                    'null' => ' ON DELETE SET NULL',
+                    'cascade' => 'ON DELETE CASCADE',
+                    'null' => 'ON DELETE SET NULL',
                     default => '',
                 };
                 $keys[] = "KEY {$fieldName} ({$fieldName})";
                 $constraintName = $this->database->quoteIdentifier("{$table}_fk_{$columnAttribute->name}");
-                $constraints[] = "CONSTRAINT {$constraintName} FOREIGN KEY ({$fieldName}) REFERENCES {$foreignTable} ({$foreignField}){$onDelete}";
+                $constraints[] = <<<SQL
+                    CONSTRAINT {$constraintName}
+                            FOREIGN KEY ({$fieldName})
+                            REFERENCES {$foreignTable} ({$foreignField})
+                            {$onDelete}
+                    SQL;
             }
 
             if ($primaryKeyAttributes !== []) {
