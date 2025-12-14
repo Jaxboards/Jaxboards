@@ -41,8 +41,8 @@ final class BBCode
         '@\[spoiler\](.*)\[/spoiler\]@Usi' => '<span class="spoilertext">$1</span>',
         '@\[u\](.*)\[/u\]@Usi' => '<span style="text-decoration:underline">$1</span>',
         // Consider adding nofollow if admin approval of new accounts is not enabled
-        '@\[url\](http|ftp|\?)(.*)\[/url\]@Ui' => '<a href="$1$2">$1$2</a>',
-        '@\[url=([?/]|http|ftp|mailto:)([^\]]+)\](.+?)\[/url\]@i' => '<a href="$1$2">$3</a>',
+        '@\[url\]([?/]|https?|ftp|mailto:)(.*)\[/url\]@Ui' => '<a href="$1$2">$1$2</a>',
+        '@\[url=([?/]|https?|ftp|mailto:)([^\]]+)\](.+?)\[/url\]@i' => '<a href="$1$2">$3</a>',
     ];
 
     /**
