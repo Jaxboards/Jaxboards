@@ -13,7 +13,6 @@ use Jax\Models\File;
 use Jax\Models\Member;
 use Jax\Models\Post;
 use Jax\Request;
-use PHP_CodeSniffer\Generators\HTML;
 
 use function array_key_exists;
 use function implode;
@@ -119,7 +118,7 @@ final readonly class FileManager
             $fileURL = in_array($ext, Jax::IMAGE_EXTENSIONS, true)
                 ? $this->domainDefinitions->getBoardPathUrl() . $this->fileSystem->pathJoin(
                     '/Uploads',
-                    "{$file->hash}.{$ext}"
+                    "{$file->hash}.{$ext}",
                 ) : "../download?id={$file->id}";
 
             $table .= $this->page->parseTemplate(

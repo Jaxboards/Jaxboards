@@ -30,7 +30,6 @@ use function unlink;
 
 use const GLOB_BRACE;
 use const GLOB_ONLYDIR;
-use const PHP_EOL;
 use const SEEK_END;
 
 /**

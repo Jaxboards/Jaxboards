@@ -179,7 +179,6 @@ final readonly class Utils implements Adapter
         $member->canModerate = 0;
         $member->canOverrideLockedTopics = 0;
         $member->canPM = 1;
-        $member->canPoll = 0;
         $member->canPoll = 1;
         $member->canPost = 1;
         $member->canShout = 1;
@@ -214,7 +213,6 @@ final readonly class Utils implements Adapter
         $admin->canModerate = 1;
         $admin->canOverrideLockedTopics = 1;
         $admin->canPM = 1;
-        $admin->canPoll = 0;
         $admin->canPoll = 1;
         $admin->canPost = 1;
         $admin->canShout = 1;

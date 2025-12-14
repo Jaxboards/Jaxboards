@@ -8,7 +8,6 @@ use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\Interfaces\Route;
 use Jax\Models\File;
-use Jax\Page;
 use Jax\Request;
 
 use function array_pop;
@@ -24,7 +23,6 @@ final readonly class Download implements Route
         private DomainDefinitions $domainDefinitions,
         private FileSystem $fileSystem,
         private Request $request,
-        private Page $page,
     ) {}
 
     public function route($params): void
@@ -58,6 +56,7 @@ final readonly class Download implements Route
                 "Content-Disposition: attachment; filename=\"{$file->name}\";",
             );
             echo $this->fileSystem->getContents($filePath);
+
             exit;
         }
     }
