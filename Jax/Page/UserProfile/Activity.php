@@ -98,7 +98,7 @@ final readonly class Activity
             'new_post' => $this->router->url('topic', [
                 'id' => $modelsActivity->tid,
                 'slug' => $this->textFormatting->slugify($modelsActivity->arg1),
-                'findpost' => $modelsActivity->pid
+                'findpost' => $modelsActivity->pid,
             ]),
             'new_topic' => $this->router->url('topic', [
                 'id' => $modelsActivity->tid,

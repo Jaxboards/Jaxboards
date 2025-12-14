@@ -191,7 +191,7 @@ final class Topic implements Route
                 ]) => $forum->title ?? '',
                 $this->router->url('topic', [
                     'id' => $modelsTopic->id,
-                    'slug' => $this->textFormatting->slugify($modelsTopic->title)
+                    'slug' => $this->textFormatting->slugify($modelsTopic->title),
                 ]) => $topicTitle,
             ],
         );

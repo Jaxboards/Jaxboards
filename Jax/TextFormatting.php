@@ -86,8 +86,8 @@ final readonly class TextFormatting
         $slug = (string) preg_replace('/\W+/', '-', $text ?? '');
         $slug = mb_substr($slug, 0, 50);
         $slug = trim($slug, '-');
-        $slug = mb_strtolower($slug);
-        return $slug;
+
+        return mb_strtolower($slug);
     }
 
     /**

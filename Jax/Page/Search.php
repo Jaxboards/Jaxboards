@@ -329,13 +329,13 @@ final class Search implements Route
                 'search-result',
                 $this->router->url('topic', [
                     'id' => $postRow['tid'],
-                    'slug' =>  $topicSlug,
+                    'slug' => $topicSlug,
                 ]),
                 $title,
                 $this->router->url('topic', [
                     'id' => $postRow['tid'],
                     'findpost' => $postRow['id'],
-                    'slug' =>  $topicSlug
+                    'slug' => $topicSlug,
                 ]),
                 $post,
             );
