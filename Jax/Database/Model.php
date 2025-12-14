@@ -87,7 +87,7 @@ abstract class Model
     /**
      * @param mixed $args
      */
-    public static function count(...$args): ?int
+    public static function count(...$args): int
     {
         $database = self::$database;
         $stmt = $database->select(
@@ -95,9 +95,8 @@ abstract class Model
             static::TABLE,
             ...$args,
         );
-        $result = $stmt?->fetch(PDO::FETCH_OBJ);
 
-        return $result?->count;
+        return $stmt?->fetch(PDO::FETCH_OBJ)?->count ?? 0;
     }
 
     /**

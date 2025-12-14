@@ -80,7 +80,7 @@ final class Topic implements Route
 
     public function route($params): void
     {
-        $tid = (int) $params['id'] ?? 0;
+        $tid = (int) ($params['id'] ?? 0);
 
         $edit = (int) $this->request->asString->both('edit');
         $findPost = (int) $this->request->asString->both('findpost');
