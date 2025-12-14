@@ -62,6 +62,8 @@ final class BBCodeTest extends UnitTestCase
             '[align=center]centered text[/align]' => '<p style="text-align:center">centered text</p>',
             '[url]http://example.com[/url]' => '<a href="http://example.com">http://example.com</a>',
             '[url=http://example.com]Example[/url]' => '<a href="http://example.com">Example</a>',
+            '[url=?act=katamari]Katamari[/url]' => '<a href="?act=katamari">Katamari</a>',
+            '[url=/katamari]Katamari[/url]' => '<a href="/katamari">Katamari</a>',
             '[img]http://example.com/image.jpg[/img]' => '<img src="http://example.com/image.jpg" title="" alt="" class="bbcodeimg" />',
             '[img=An image]http://example.com/image.jpg[/img]' => '<img src="http://example.com/image.jpg" title="An image" alt="An image" class="bbcodeimg" />',
             '[h2]Header 2[/h2]' => '<h2>Header 2</h2>',
