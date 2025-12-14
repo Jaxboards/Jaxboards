@@ -19,7 +19,7 @@ final class ContactDetails
     private const CONTACT_URLS = [
         'aim' => 'aim:goaim?screenname=%s',
         'bluesky' => 'https://bsky.app/profile/%s.bsky.social',
-        'discord' => 'discord:%s',
+        'discord' => 'discord://-/users/%s',
         'googlechat' => 'gchat:chat?jid=%s',
         'gtalk' => 'gchat:chat?jid=%s',
         'msn' => 'msnim:chat?contact=%s',
