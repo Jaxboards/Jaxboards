@@ -872,7 +872,7 @@ final class Topic implements Route
 
     private function markRead(ModelsTopic $modelsTopic): void
     {
-        $topicsread = $this->jax->parseReadMarkers($this->session->get()->topicsread);
+        $topicsread = json_decode($this->session->get()->topicsread, true);
         $topicsread[$modelsTopic->id] = Carbon::now('UTC')->getTimestamp();
         $this->session->set('topicsread', json_encode($topicsread, JSON_THROW_ON_ERROR));
     }

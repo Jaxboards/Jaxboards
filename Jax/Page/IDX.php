@@ -578,7 +578,7 @@ final class IDX implements Route
     private function isForumRead(Forum $forum): bool
     {
         if ($this->forumsread === null) {
-            $this->forumsread = $this->jax->parseReadMarkers($this->session->get()->forumsread);
+            $this->forumsread = json_decode($this->session->get()->forumsread, true);
         }
 
         if (!array_key_exists($forum->id, $this->forumsread)) {

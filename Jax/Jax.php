@@ -41,18 +41,6 @@ final readonly class Jax
     }
 
     /**
-     * @return array<int,int> Map of forum (or topic IDs) to time they were read
-     */
-    public function parseReadMarkers(?string $readMarkers): array
-    {
-        if ($readMarkers) {
-            return json_decode($readMarkers, true) ?? [];
-        }
-
-        return [];
-    }
-
-    /**
      * @param array<int,array<string,bool>> $forumPerms
      */
     public function serializeForumPerms(array $forumPerms): string
