@@ -13,6 +13,7 @@ use Jax\Models\File;
 use Jax\Models\Member;
 use Jax\Models\Post;
 use Jax\Request;
+use PHP_CodeSniffer\Generators\HTML;
 
 use function array_key_exists;
 use function implode;
@@ -115,11 +116,11 @@ final readonly class FileManager
         $table = '';
         foreach ($files as $file) {
             $ext = $this->fileSystem->getFileInfo($file->name)->getExtension();
-
-            $file->name = in_array($ext, Jax::IMAGE_EXTENSIONS, true) ? '<a href="'
-                    . $this->domainDefinitions->getBoardPathUrl() . 'Uploads/' . $file->hash . '.' . $ext . '">'
-                    . $file->name . '</a>' : '<a href="../?act=download&id='
-                    . $file->id . '">' . $file->name . '</a>';
+            $fileURL = in_array($ext, Jax::IMAGE_EXTENSIONS, true)
+                ? $this->domainDefinitions->getBoardPathUrl() . $this->fileSystem->pathJoin(
+                    '/Uploads',
+                    "{$file->hash}.{$ext}"
+                ) : "../download?id={$file->id}";
 
             $table .= $this->page->parseTemplate(
                 'tools/file-manager-row.html',
@@ -129,7 +130,7 @@ final readonly class FileManager
                     'id' => $file->id,
                     'linked_in' => array_key_exists($file->id, $linkedIn)
                         ? implode(', ', $linkedIn[$file->id]) : 'Not linked!',
-                    'title' => $file->name,
+                    'title' => "<a href='{$fileURL}'>{$file->name}</a>",
                     'username' => $members[$file->uid]->displayName,
                     'user_id' => $file->uid,
                 ],

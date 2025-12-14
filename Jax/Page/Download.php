@@ -46,20 +46,19 @@ final readonly class Download implements Route
         $ext = explode('.', $file->name);
         $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));
 
+        $filePath = $file->hash;
+
         if (in_array($ext, ['jpeg', 'jpg', 'png', 'gif', 'bmp'])) {
-            $file->hash .= '.' . $ext;
+            $filePath .= '.' . $ext;
         }
 
-        $filePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash;
+        $filePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $filePath;
         if ($this->fileSystem->getFileInfo($filePath)->isFile()) {
-            header('Content-type:application/idk');
             header(
-                'Content-disposition:attachment;filename="'
-                . ($file->name || 'unknown') . '"',
+                "Content-Disposition: attachment; filename=\"{$file->name}\";",
             );
-            $this->page->earlyFlush($this->fileSystem->getContents($filePath));
+            echo $this->fileSystem->getContents($filePath);
+            exit;
         }
-
-        exit;
     }
 }

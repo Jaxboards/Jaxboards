@@ -115,7 +115,14 @@ final readonly class FileSystem
 
     public function getContents(string $filename): string|false
     {
-        return implode(PHP_EOL, $this->getLines($filename));
+        $file = $this->getFileObject($filename);
+        $contents = '';
+
+        while (!$file->eof()) {
+            $contents .= $file->fgets();
+        }
+
+        return $contents;
     }
 
     /**
