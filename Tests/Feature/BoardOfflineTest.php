@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
 use Jax\BBCode;
 use Jax\BotDetector;
+use Jax\Config;
 use Jax\Database\Adapters\SQLite;
 use Jax\Database\Database;
 use Jax\Database\Model;
@@ -32,8 +34,6 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
-use Jax\App;
-use Jax\Config;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\FeatureTestCase;
 
@@ -82,7 +82,7 @@ final class BoardOfflineTest extends FeatureTestCase
             autowire()->constructorParameter('boardConfig', [
                 'boardoffline' => true,
                 'offlinetext' => 'pikachu',
-            ])
+            ]),
         );
     }
 
@@ -93,7 +93,7 @@ final class BoardOfflineTest extends FeatureTestCase
         $page = $this->go('index');
 
         $this->assertStringContainsString("You don't have permission to view the board.", $page);
-        $this->assertStringContainsString("pikachu", $page);
+        $this->assertStringContainsString('pikachu', $page);
     }
 
     public function testViewBoardWhenBoardOfflineAsAdmin(): void

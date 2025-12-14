@@ -94,19 +94,6 @@ final class Router
     }
 
     /**
-     * Add a new potential route
-     */
-    private function get(string $name, string $path, string $classString): void
-    {
-        $this->staticRoutes[$name] = $classString;
-        $this->urls[$name] = $path;
-
-        // Replaces {param} with a name-captured subgroup (?<param>.*) and makes a full regex
-        $regexedPath = '@^' . preg_replace('/\/\{(\w+)\}/', '(?:\/(?<$1>[^/]+))?', $path) . '$@';
-        $this->paths[$regexedPath] = $classString;
-    }
-
-    /**
      * Redirect to a new URL.
      *
      * @param array<string,null|int|string> $params
@@ -142,6 +129,61 @@ final class Router
             $action !== '' => $this->routeByAct($action),
             default => $this->routeByPath($path),
         };
+    }
+
+    /**
+     * This function will generate a URL for a given named route.
+     * Ex:
+     * path: /topic/{id}
+     * params: ['id' => 1, 'getlast' => 1] becomes:
+     * returns: /topic/1?getlast=1.
+     *
+     * @param array<string,null|int|string> $params
+     */
+    public function url(string $name, array $params = []): string
+    {
+        if (array_key_exists($name, $this->urls)) {
+            $foundParams = [];
+
+            // Replaces {param} values with their values from $params
+            $path = preg_replace_callback(
+                '/\/\{(\w+)\}/',
+                static function ($match) use ($params, &$foundParams): string {
+                    [, $name] = $match;
+
+                    $foundParams[] = $name;
+
+                    return array_key_exists($name, $params)
+                        ? "/{$params[$name]}"
+                        : '';
+                },
+                $this->urls[$name],
+            );
+
+            // Anything not a path param gets added on as a query parameter
+            $queryParams = $this->without($params, $foundParams);
+
+            return $path . ($queryParams !== [] ? '?' . http_build_query($queryParams) : '');
+        }
+
+        // These are aliases and will be removed soon
+        return match ($name) {
+            'shoutbox' => '?module=shoutbox',
+            default => '',
+        };
+    }
+
+    /**
+     * Add a new potential route.
+     */
+    private function get(string $name, string $path, string $classString): void
+    {
+        $this->staticRoutes[$name] = $classString;
+        $this->urls[$name] = $path;
+
+        // Replaces {param} with a name-captured subgroup (?<param>.*) and makes a full regex
+        $regexedPath = '@^' . preg_replace('/\/\{(\w+)\}/', '(?:\/(?<$1>[^/]+))?', $path) . '$@';
+        $this->paths[$regexedPath] = $classString;
     }
 
     /**
@@ -231,48 +273,6 @@ final class Router
         }
 
         return false;
-    }
-
-    /**
-     * This function will generate a URL for a given named route.
-     * Ex:
-     * path: /topic/{id}
-     * params: ['id' => 1, 'getlast' => 1] becomes:
-     * returns: /topic/1?getlast=1.
-     *
-     * @param array<string,null|int|string> $params
-     */
-    public function url(string $name, array $params = []): string
-    {
-        if (array_key_exists($name, $this->urls)) {
-            $foundParams = [];
-
-            // Replaces {param} values with their values from $params
-            $path = preg_replace_callback(
-                '/\/\{(\w+)\}/',
-                static function ($match) use ($params, &$foundParams): string {
-                    [, $name] = $match;
-
-                    $foundParams[] = $name;
-
-                    return array_key_exists($name, $params)
-                        ? "/{$params[$name]}"
-                        : '';
-                },
-                $this->urls[$name],
-            );
-
-            // Anything not a path param gets added on as a query parameter
-            $queryParams = $this->without($params, $foundParams);
-
-            return $path . ($queryParams !== [] ? '?' . http_build_query($queryParams) : '');
-        }
-
-        // These are aliases and will be removed soon
-        return match ($name) {
-            'shoutbox' => '?module=shoutbox',
-            default => '',
-        };
     }
 
     /**
