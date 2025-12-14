@@ -888,7 +888,7 @@ final class Topic implements Route
             ],
         );
         $posts = Post::selectMany(
-            Database::WHERE_ID_EQUALS,
+            'WHERE `tid` = ?',
             $modelsTopic->id,
         );
         $authors = $this->fetchMembersById(array_map(static fn(Post $post): int => $post->author, $posts));

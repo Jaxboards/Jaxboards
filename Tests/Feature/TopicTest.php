@@ -33,6 +33,7 @@ use Jax\Page\Topic\Reactions;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
+use Jax\RSSFeed;
 use Jax\ServiceConfig;
 use Jax\Session;
 use Jax\Template;
@@ -84,6 +85,7 @@ use function json_decode;
 #[CoversClass(Topic::class)]
 #[CoversClass(User::class)]
 #[CoversClass(UsersOnline::class)]
+#[CoversClass(RSSFeed::class)]
 final class TopicTest extends FeatureTestCase
 {
     protected function setUp(): void
@@ -150,6 +152,13 @@ final class TopicTest extends FeatureTestCase
         $window = array_find($json, static fn($item): bool => $item[0] === 'window');
 
         DOMAssert::assertSelectRegExp('.topic-reply-form textarea[name="postdata"]', '/\[quote=Admin\]Now, /', 1, $window[1]['content']);
+    }
+
+    public function testTopicRSSFeed(): void {
+        $page = $this->go('/topic/1?fmt=RSS');
+
+        DOMAssert::assertSelectEquals('title', 'Welcome to Jaxboards!', 1, $page);
+        DOMAssert::assertSelectRegExp('item description', '/only a matter of time/', 1, $page);
     }
 
     private function insertBotViewingTopic(): void
