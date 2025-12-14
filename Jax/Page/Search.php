@@ -323,11 +323,20 @@ final class Search implements Route
                 (string) $postRow['title'],
             );
 
+            $topicSlug = $this->textFormatting->slugify($postRow['title']);
+
             $page .= $this->template->meta(
                 'search-result',
-                $this->router->url('topic', ['id' => $postRow['tid']]),
+                $this->router->url('topic', [
+                    'id' => $postRow['tid'],
+                    'slug' =>  $topicSlug,
+                ]),
                 $title,
-                $this->router->url('topic', ['id' => $postRow['tid'], 'findpost' => $postRow['id']]),
+                $this->router->url('topic', [
+                    'id' => $postRow['tid'],
+                    'findpost' => $postRow['id'],
+                    'slug' =>  $topicSlug
+                ]),
                 $post,
             );
         }

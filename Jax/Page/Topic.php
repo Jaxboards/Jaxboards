@@ -185,8 +185,14 @@ final class Topic implements Route
         $this->page->setBreadCrumbs(
             [
                 $this->router->url('category', ['id' => $category?->id]) => $category->title ?? '',
-                $this->router->url('forum', ['id' => $forum?->id]) => $forum->title ?? '',
-                $this->router->url('topic', ['id' => $modelsTopic->id]) => $topicTitle,
+                $this->router->url('forum', [
+                    'id' => $forum?->id,
+                    'slug' => $this->textFormatting->slugify($forum?->title),
+                ]) => $forum->title ?? '',
+                $this->router->url('topic', [
+                    'id' => $modelsTopic->id,
+                    'slug' => $this->textFormatting->slugify($modelsTopic->title)
+                ]) => $topicTitle,
             ],
         );
 
@@ -194,18 +200,18 @@ final class Topic implements Route
         $postCount = Post::count('WHERE `tid`=?', $modelsTopic->id) ?? 0;
 
         $totalpages = (int) ceil($postCount / $this->numperpage);
-        $pagelist = '';
+        $pageLinks = [];
         foreach ($this->jax->pages($totalpages, $this->pageNumber + 1, 10) as $pageNumber) {
             $pageURL = $this->router->url('topic', ['id' => $modelsTopic->id, 'page' => $pageNumber]);
             $activeClass = $pageNumber === $this->pageNumber + 1
                 ? ' class="active"'
                 : '';
-            $pagelist .= <<<HTML
-                <a href="{$pageURL}"{$activeClass}>
-                    {$pageNumber}
-                </a>
+            $pageLinks[] = <<<HTML
+                <a href="{$pageURL}"{$activeClass}>{$pageNumber}</a>
                 HTML;
         }
+
+        $pagelist = implode(' ', $pageLinks);
 
         // Are they on the last page? This stores a session variable.
         $this->session->addVar('topic_lastpage', $this->pageNumber + 1 === $totalpages);
@@ -572,7 +578,7 @@ final class Topic implements Route
                     'findpost' => $post->id,
                     'pid' => $post->id,
                     'slug' => $this->textFormatting->slugify($modelsTopic->title),
-                ]),
+                ]) . '#pid_' . $post->id,
                 'iptools' => $this->router->url('modcontrols', [
                     'do' => 'iptools',
                     'ip' => $this->ipAddress->asHumanReadable($post->ip),
@@ -859,6 +865,7 @@ final class Topic implements Route
                 'id' => $modelsTopic->id,
                 'page' => $pageNumber,
                 'pid' => $postId,
+                'slug' => $this->textFormatting->slugify($modelsTopic->title),
             ],
         );
     }

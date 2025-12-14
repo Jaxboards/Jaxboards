@@ -81,9 +81,13 @@ final readonly class TextFormatting
      * Converts text into a URL slug
      * Ex: "Welcome to Jaxboards!" becomes "welcome-to-jaxboards".
      */
-    public function slugify(string $text): string
+    public function slugify(?string $text): string
     {
-        return mb_substr(mb_strtolower(trim((string) preg_replace('/\W+/', '-', $text), '-')), 0, 50);
+        $slug = (string) preg_replace('/\W+/', '-', $text ?? '');
+        $slug = mb_substr($slug, 0, 50);
+        $slug = trim($slug, '-');
+        $slug = mb_strtolower($slug);
+        return $slug;
     }
 
     /**

@@ -173,7 +173,10 @@ final readonly class ProfileTabs
 
             $tabHTML .= $this->template->meta(
                 'userprofile-topic',
-                $this->router->url('topic', ['id' => $post->tid]),
+                $this->router->url('topic', [
+                    'id' => $post->tid,
+                    'slug' => $this->textFormatting->slugify($topic->title),
+                ]),
                 $topic->title,
                 $this->date->autoDate($post->date),
                 $this->textFormatting->theWorks($post->post),
@@ -219,9 +222,16 @@ final readonly class ProfileTabs
 
             $tabHTML .= $this->template->meta(
                 'userprofile-post',
-                $this->router->url('topic', ['id' => $post->tid]),
+                $this->router->url('topic', [
+                    'id' => $post->tid,
+                    'slug' => $this->textFormatting->slugify($topic->title),
+                ]),
                 $topic->title,
-                $this->router->url('topic', ['id' => $post->tid, 'findpost' => $post->id]),
+                $this->router->url('topic', [
+                    'id' => $post->tid,
+                    'findpost' => $post->id,
+                    'slug' => $this->textFormatting->slugify($topic->title),
+                ]),
                 $this->date->autoDate($post->date),
                 $this->textFormatting->theWorks($post->post),
             );

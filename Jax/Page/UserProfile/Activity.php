@@ -95,8 +95,15 @@ final readonly class Activity
             : '';
 
         $urls = [
-            'new_post' => $this->router->url('topic', ['id' => $modelsActivity->tid, 'findpost' => $modelsActivity->pid]),
-            'new_topic' => $this->router->url('topic', ['id' => $modelsActivity->tid]),
+            'new_post' => $this->router->url('topic', [
+                'id' => $modelsActivity->tid,
+                'slug' => $this->textFormatting->slugify($modelsActivity->arg1),
+                'findpost' => $modelsActivity->pid
+            ]),
+            'new_topic' => $this->router->url('topic', [
+                'id' => $modelsActivity->tid,
+                'slug' => $this->textFormatting->slugify($modelsActivity->arg1),
+            ]),
         ];
 
         $text = match ($modelsActivity->type) {

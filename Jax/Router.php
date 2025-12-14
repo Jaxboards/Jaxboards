@@ -70,6 +70,7 @@ final class Router
         $this->get('boardoffline', '/boardoffline', BoardOffline::class);
         $this->get('buddylist', '/buddylist', BuddyList::class);
         $this->get('calendar', '/calendar', Calendar::class);
+        $this->get('category', '/', IDX::class);
         $this->get('download', '/download', Download::class);
         $this->get('earthbound', '/earthbound', Earthbound::class);
         $this->get('index', '/', IDX::class);
@@ -202,7 +203,6 @@ final class Router
 
         // These are aliases and will be removed soon
         return match ($name) {
-            'category' => "?act=vc{$params['id']}",
             'shoutbox' => '?module=shoutbox',
             default => '',
         };
