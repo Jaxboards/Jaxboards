@@ -13,7 +13,7 @@ final readonly class Asteroids implements Route
 
     public function route($params): void
     {
-        $this->page->command('loadscript', './Script/eggs/asteroids.min.js');
+        $this->page->command('loadscript', '/Script/eggs/asteroids.min.js');
         $this->page->command('softurl');
     }
 }
