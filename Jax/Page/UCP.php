@@ -448,7 +448,7 @@ final readonly class UCP implements Route
             [
                 'contactAIM' => 'AIM username',
                 'contactBlueSky' => 'Bluesky username',
-                'contactDiscord' => 'Discord username',
+                'contactDiscord' => 'Discord ID',
                 'contactGoogleChat' => 'Google Chat username',
                 'contactMSN' => 'MSN username',
                 'contactSkype' => 'Skype username',
