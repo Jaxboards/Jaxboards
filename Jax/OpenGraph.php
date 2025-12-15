@@ -33,6 +33,8 @@ class OpenGraph {
             $contents = file_get_contents($this->url);
             $metaValues = [];
 
+            libxml_use_internal_errors(true);
+
             // HTMLDocument is the better choice but only exists in >=8.4
             // Also looked at get_meta_tags but it seemed fragile so didn't use it
             if (class_exists(HTMLDocument::class)) {
@@ -56,6 +58,8 @@ class OpenGraph {
                     $metaValues[mb_substr($property, 3)] = $metumTag->getAttribute('content');
                 }
             }
+
+            libxml_clear_errors();
 
             return $metaValues;
 
