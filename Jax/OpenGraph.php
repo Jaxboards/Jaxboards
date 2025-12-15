@@ -39,7 +39,7 @@ class OpenGraph {
             // Also looked at get_meta_tags but it seemed fragile so didn't use it
             if (class_exists(HTMLDocument::class)) {
                 $doc = HTMLDocument::createFromString($contents);
-                $metaTags = $doc->querySelectorAll('meta[property^=og:]');
+                $metaTags = $doc->querySelectorAll('meta[property^="og:"]');
                 foreach ($metaTags as $metumTag) {
                     $metaValues[mb_substr((string) $metumTag->getAttribute('property'), 3)] = $metumTag->getAttribute('content');
                 }
