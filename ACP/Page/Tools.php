@@ -19,6 +19,7 @@ use function header;
 use function htmlspecialchars;
 use function implode;
 use function ini_get;
+use function readfile;
 use function sys_get_temp_dir;
 use function tempnam;
 
@@ -135,7 +136,7 @@ final readonly class Tools
         $zipArchive->addFromString('backup.sql', $fileContents);
         $zipArchive->close();
 
-       readfile($tempFile);
+        readfile($tempFile);
         $this->fileSystem->unlink($tempFile);
     }
 
