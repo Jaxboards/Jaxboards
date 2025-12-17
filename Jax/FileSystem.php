@@ -12,6 +12,8 @@ use function array_reverse;
 use function copy;
 use function count;
 use function dirname;
+use function file_get_contents;
+use function filter_var;
 use function glob;
 use function implode;
 use function is_string;
@@ -28,6 +30,7 @@ use function str_replace;
 use function trim;
 use function unlink;
 
+use const FILTER_VALIDATE_URL;
 use const GLOB_BRACE;
 use const GLOB_ONLYDIR;
 use const SEEK_END;

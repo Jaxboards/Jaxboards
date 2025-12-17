@@ -10,7 +10,6 @@ use Exception;
 
 use function array_slice;
 use function class_exists;
-use function file_get_contents;
 use function filter_var;
 use function is_string;
 use function libxml_clear_errors;
@@ -25,7 +24,7 @@ final readonly class OpenGraph
 {
     public function __construct(
         private BBCode $bbCode,
-        private FileSystem $fileSystem
+        private FileSystem $fileSystem,
     ) {}
 
     /**
