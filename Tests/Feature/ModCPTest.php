@@ -377,7 +377,7 @@ final class ModCPTest extends FeatureTestCase
 
     public function testMergeTopicsForm(): void
     {
-        $otherTid = $this->insertTopic();
+        $topic = $this->insertTopic();
 
         $this->actingAs(
             'admin',
@@ -385,7 +385,7 @@ final class ModCPTest extends FeatureTestCase
         );
 
         $page = $this->go(new Request(
-            post: ['act' => 'modcontrols', 'dot' => 'merge', 'id' => (string) $otherTid],
+            post: ['act' => 'modcontrols', 'dot' => 'merge', 'id' => (string) $topic],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -402,18 +402,18 @@ final class ModCPTest extends FeatureTestCase
 
     public function testMergeTopicsDoMerge(): void
     {
-        $otherTid = $this->insertTopic();
+        $topic = $this->insertTopic();
 
         $this->actingAs(
             'admin',
-            sessionOverrides: ['modtids' => implode(',', [1, $otherTid])],
+            sessionOverrides: ['modtids' => implode(',', [1, $topic])],
         );
 
         $page = $this->go(new Request(
             post: [
                 'act' => 'modcontrols',
                 'dot' => 'merge',
-                'ot' => (string) $otherTid,
+                'ot' => (string) $topic,
             ],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
@@ -423,10 +423,10 @@ final class ModCPTest extends FeatureTestCase
         $this->assertContainsEquals(['modcontrols_clearbox'], $json);
 
         $redirect = array_find($json, static fn($cmd): bool => $cmd[0] === 'location');
-        $this->assertStringContainsString($this->container->get(Router::class)->url('topic', ['id' => $otherTid]), $redirect[1]);
+        $this->assertStringContainsString($this->container->get(Router::class)->url('topic', ['id' => $topic]), $redirect[1]);
 
         $this->assertNull(Topic::selectOne(1), 'Original topic is deleted');
-        $this->assertEquals($otherTid, Post::selectOne(1)->tid, 'OP moved to new topic');
+        $this->assertEquals($topic, Post::selectOne(1)->tid, 'OP moved to new topic');
         $this->assertEquals(1, Post::selectOne(1)->newtopic, 'Older post becomes OP');
         $this->assertEquals(0, Post::selectOne(2)->newtopic, 'Newer post gets demoted to reply');
     }
