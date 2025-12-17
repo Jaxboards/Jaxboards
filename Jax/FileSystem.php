@@ -14,7 +14,6 @@ use function count;
 use function dirname;
 use function file_get_contents;
 use function filter_var;
-use function floor;
 use function glob;
 use function implode;
 use function is_string;
@@ -103,7 +102,7 @@ final readonly class FileSystem
      */
     public function fileSizeHumanReadable(int $sizeInBytes): string
     {
-        $magnitude = (int) floor(log($sizeInBytes, 1 << 10));
+        $magnitude = (int) log($sizeInBytes, 1 << 10);
 
         return round($sizeInBytes / (1 << 10) ** $magnitude, 2)
             . ($magnitude !== 0 ? mb_substr(' KMGTE', $magnitude, 1) : '') . 'B';
