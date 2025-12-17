@@ -50,45 +50,6 @@ Once you've met all the requirements, head to:
 This page gives you the option of installing the service or a standalone
 Jaxboards - pick whatever suits your needs.
 
-The install script at `Service/install.php` handles configuration and setting up
-a new install. It does the following:
-
-- Saves configuration settings from the installer. Mainly this is database
-  information, but it also saves the domain you're running the board on.
-  Basically copies `config.default.php` to `config.php` and updates the values.
-  Here's the direct PHP code what values are being set specifically:
-    ```php
-    // Update with our settings.
-    $CFG['boardname'] = 'Jaxboards';
-    $CFG['domain'] = $request->post('domain');
-    $CFG['mail_from'] = $request->post('admin_username') . ' <' .
-        $request->post('admin_email') . '>';
-    $CFG['sql_db'] = $request->post('sql_db');
-    $CFG['sql_host'] = $request->post('sql_host');
-    $CFG['sql_username'] = $request->post('sql_username');
-    $CFG['sql_password'] = $request->post('sql_password');
-    $CFG['service'] = $service; // boolean if it's a service or not
-    $CFG['prefix'] = $service ? '' : 'jaxboards';
-    $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'] . '_' : '';
-    ```
-- Figures out if you're installing a service (multiple boards) or a single-board
-  install.
-- If it's a service install, install those special service tables.
-- Copy over the MySQL tables here. Service installs have an additional step of
-  adding each board installed to the directory table. Once the database is
-  imported, the admin user is created as well.
-
-After install the MySQL credentials are saved in `config.php`. This is copied
-over from `config.default.php` so you can see what the format looks like there.
-
-`Service/schema.sql` contains the base tables and base data for the database
-for a single-board install. Every table is prefixed with `blueprint_` (and
-should be updated to match what the `sql_prefix` setting is in the `config.php`
-file before importing). In addition, a service install (multiple boards) has two
-additional tables, `directory` (containing a list of all the registered boards)
-and `banlist` (containing a list of IP addresses to ban). These are both
-described in the `Service/install.php` file.
-
 ### Troubleshooting
 
 Permissions issues are a major source of bugs during installation. If you
