@@ -216,8 +216,6 @@ final readonly class TextFormatting
 
     /**
      * @param array<string> $match
-     *
-     * @SuppressWarnings("PHPMD.Superglobals")
      */
     private function linkifyCallback(array $match): string
     {

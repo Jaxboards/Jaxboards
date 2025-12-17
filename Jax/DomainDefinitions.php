@@ -19,9 +19,6 @@ final class DomainDefinitions
 
     private readonly ?string $prefix;
 
-    /**
-     * @SuppressWarnings("PHPMD.Superglobals")
-     */
     public function __construct(
         private readonly FileSystem $fileSystem,
         private readonly ServiceConfig $serviceConfig,
