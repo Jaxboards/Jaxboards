@@ -372,8 +372,6 @@ final readonly class Forums
                             ? $forum->mods . ',' . $modId
                             : (string) $modId;
                     }
-
-                    $this->updatePerForumModFlag();
                 } else {
                     $error = "You tried to add a moderator that doesn't exist!";
                 }
@@ -383,6 +381,9 @@ final readonly class Forums
             if ($error !== null) {
                 $page .= $this->page->error($error);
             } else {
+                if ($modId !== 0) {
+                    $this->updatePerForumModFlag();
+                }
                 $page .= $this->page->success('Forum saved.');
             }
         }
@@ -843,6 +844,10 @@ final readonly class Forums
 
                 $mods[$modId] = 1;
             }
+        }
+
+        if ($mods === []) {
+            return;
         }
 
         $this->database->update(

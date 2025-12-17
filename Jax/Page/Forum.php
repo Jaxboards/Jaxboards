@@ -230,7 +230,7 @@ final class Forum implements Route
 
         $rows = implode(
             '',
-            array_map(fn(Topic $topic): string => $this->renderForumRow($topic, $membersById), $topics),
+            array_map(fn(Topic $topic): string => $this->renderForumRow($topic, $membersById, $this->isForumModerator($forum)), $topics),
         );
 
         // If they're on the first page and all topics are read
@@ -274,7 +274,7 @@ final class Forum implements Route
     /**
      * @param array<Member> $membersById
      */
-    private function renderForumRow(Topic $topic, array $membersById): string
+    private function renderForumRow(Topic $topic, array $membersById, bool $isForumModerator = false): string
     {
         $pages = '';
         if ($topic->replies > 9) {
@@ -332,7 +332,7 @@ final class Forum implements Route
             // 10
             $topic->summary !== '' ? $topic->summary . (mb_strlen($topic->summary) > 45 ? '...' : '') : '',
             // 11
-            $this->user->getGroup()?->canModerate ? (
+            $isForumModerator ? (
                 '<a href="'
                 . $this->router->url('modcontrols', ['do' => 'modt', 'tid' => $topic->id])
                 . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>'
@@ -546,6 +546,12 @@ final class Forum implements Route
             ?: $this->date->datetimeAsTimestamp($this->session->get()->readDate)
             ?: $this->date->datetimeAsTimestamp($this->user->get()->lastVisit)
         );
+    }
+
+    private function isForumModerator(ModelsForum $forum): bool
+    {
+        return $this->user->getGroup()?->canModerate
+            || in_array((string) $this->user->get()->id, explode(',', $forum->mods), true);
     }
 
     private function markRead(int $id): void
