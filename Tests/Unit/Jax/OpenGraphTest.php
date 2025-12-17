@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jax;
 
+use Jax\BBCode;
 use Jax\FileSystem;
 use Jax\OpenGraph;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use Tests\UnitTestCase;
 
 /**
  * @internal
  */
-#[CoversNothing]
+#[CoversClass(OpenGraph::class)]
 final class OpenGraphTest extends UnitTestCase
 {
     private OpenGraph $openGraph;
@@ -41,6 +43,7 @@ final class OpenGraphTest extends UnitTestCase
         ;
 
         $this->container->set(FileSystem::class, $fileSystemStub);
+        $this->container->set(BBCode::class, $this->createStub(BBCode::class));
 
         $this->openGraph = $this->container->get(OpenGraph::class);
     }
