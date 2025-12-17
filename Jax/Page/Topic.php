@@ -198,7 +198,7 @@ final class Topic implements Route
         );
 
         // Generate pages.
-        $postCount = Post::count('WHERE `tid`=?', $modelsTopic->id) ?? 0;
+        $postCount = Post::count('WHERE `tid`=?', $modelsTopic->id);
 
         $totalpages = (int) ceil($postCount / $this->numperpage);
         $pageLinks = [];

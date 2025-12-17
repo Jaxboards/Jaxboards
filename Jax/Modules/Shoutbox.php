@@ -234,7 +234,7 @@ final class Shoutbox implements Module
             --$pageNumber;
         }
 
-        $numShouts = Shout::count() ?? 0;
+        $numShouts = Shout::count();
 
         if ($numShouts > 1000) {
             $numShouts = 1000;

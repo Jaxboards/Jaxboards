@@ -151,7 +151,7 @@ final readonly class RecountStats
         }
 
         // Get # of members.
-        $stat['members'] = Member::count() ?? 0;
+        $stat['members'] = Member::count();
 
         $this->database->disposeresult($result);
 

@@ -288,7 +288,7 @@ final readonly class Inbox
             default => 'WHERE `to`=? AND `deletedRecipient`=0',
         };
 
-        return Message::count($criteria, $this->user->get()->id) ?? 0;
+        return Message::count($criteria, $this->user->get()->id);
     }
 
     /**
