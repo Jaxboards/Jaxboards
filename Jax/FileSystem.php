@@ -112,7 +112,7 @@ final readonly class FileSystem
             ? $sizes[$magnitude]
             : '';
 
-        return round($sizeInBytes / (1 << 10) ** ($magnitude * 1.0), 2) . "{$prefix}B";
+        return round($sizeInBytes / (1 << 10) ** $magnitude, 2) . "{$prefix}B";
     }
 
     public function getContents(string $filenameOrURL): string
