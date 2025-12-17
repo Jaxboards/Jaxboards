@@ -701,11 +701,7 @@ final class Post implements Route
         $post->newtopic = $newtopic ? 1 : 0;
         $post->post = $postData ?? '';
         $post->tid = $tid;
-        $post->openGraphMetadata = json_encode(
-            // Limit # of embeddings to prevent abuse
-            array_slice($this->openGraph->fetchFromBBCode($postData), 0, 3),
-            JSON_THROW_ON_ERROR,
-        );
+        $post->openGraphMetadata = json_encode($this->openGraph->fetchFromBBCode($postData), JSON_THROW_ON_ERROR);
         $post->insert();
 
         $this->hooks->dispatch('post', $post);

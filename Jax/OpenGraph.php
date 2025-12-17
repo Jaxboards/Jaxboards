@@ -80,7 +80,11 @@ final readonly class OpenGraph
     public function fetchFromBBCode(string $text): array
     {
         $openGraphData = [];
-        foreach ($this->bbCode->getURLs($text) as $url) {
+
+        // Limit # of embeddings to prevent abuse
+        $urls = array_slice($this->bbCode->getURLs($text), 0, 3);
+
+        foreach ($urls as $url) {
             $data = $this->fetch($url);
             if ($data === []) {
                 continue;

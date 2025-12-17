@@ -22,6 +22,7 @@ use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Models\Post;
 use Jax\Models\Session as ModelsSession;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
@@ -124,6 +125,44 @@ final class TopicTest extends FeatureTestCase
         DOMAssert::assertSelectRegExp('#pid_1 .userstats', '/Member: #1/', 1, $page);
 
         DOMAssert::assertSelectEquals('#statusers .userGoogleBot', 'GoogleBot', 1, $page);
+    }
+
+    public function testOpenGraphEmbed(): void
+    {
+        $this->actingAs('admin');
+
+        // Insert a post with opengraph embedding
+        $post = new Post();
+        $post->author = 1;
+        $post->post = 'hello';
+        $post->tid = 1;
+        $post->openGraphMetadata = <<<JSON
+            {
+                "https:\/\/www.youtube.com\/watch?v=qjqPT89KaCc": {
+                    "site_name":"YouTube",
+                    "url":"https:\/\/www.youtube.com\/watch?v=qjqPT89KaCc",
+                    "title":"Uber Freight Dropped my Mainframe... Let's Fix it!",
+                    "image":"https:\/\/i.ytimg.com\/vi\/qjqPT89KaCc\/hqdefault.jpg",
+                    "image:width":"480",
+                    "image:height":"360",
+                    "description":"Dave chronicles the destruction and restoration of a rare PDP-11\/44 system.",
+                    "type":"video.other",
+                    "video:url":"https:\/\/www.youtube.com\/embed\/qjqPT89KaCc",
+                    "video:secure_url":"https:\/\/www.youtube.com\/embed\/qjqPT89KaCc",
+                    "video:type":"text\/html",
+                    "video:width":"1280",
+                    "video:height":"720"
+                }
+            }
+            JSON;
+        $post->insert();
+
+        $page = $this->go('/topic/1');
+
+        DOMAssert::assertSelectCount('.opengraph a[href="https://www.youtube.com/watch?v=qjqPT89KaCc"]', 2, $page);
+        DOMAssert::assertSelectEquals('.opengraph h4', "YouTube - Uber Freight Dropped my Mainframe... Let's Fix it!", 1, $page);
+        DOMAssert::assertSelectRegExp('.opengraph p', '/chronicles the destruction and restoration/', 1, $page);
+        DOMAssert::assertSelectCount('.opengraph img[src="https://i.ytimg.com/vi/qjqPT89KaCc/hqdefault.jpg"]', 1, $page);
     }
 
     public function testTopicUpdate(): void
