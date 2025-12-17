@@ -6,13 +6,13 @@ namespace Tests\Unit\Jax;
 
 use Jax\FileSystem;
 use Jax\OpenGraph;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use Tests\UnitTestCase;
 
 /**
  * @internal
- *
- * @coversNothing
  */
+#[CoversNothing]
 final class OpenGraphTest extends UnitTestCase
 {
     private OpenGraph $openGraph;
