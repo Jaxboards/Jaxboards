@@ -1,15 +1,23 @@
 <?php
 
- namespace Tests\Unit\Jax;
+declare(strict_types=1);
+
+namespace Tests\Unit\Jax;
 
 use Jax\FileSystem;
 use Jax\OpenGraph;
 use Tests\UnitTestCase;
 
- class OpenGraphTest extends UnitTestCase {
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class OpenGraphTest extends UnitTestCase
+{
     private OpenGraph $openGraph;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,14 +37,16 @@ use Tests\UnitTestCase;
                         <meta property="og:description" content="description">
                     </head>
                 </html>
-                HTML);
+                HTML)
+        ;
 
         $this->container->set(FileSystem::class, $fileSystemStub);
 
         $this->openGraph = $this->container->get(OpenGraph::class);
     }
 
-    public function testFetch(): void {
+    public function testFetch(): void
+    {
         $this->assertEqualsCanonicalizing(
             [
                 'title' => 'Open Graph protocol',
@@ -47,9 +57,9 @@ use Tests\UnitTestCase;
                 'image:width' => '300',
                 'image:height' => '300',
                 'image:alt' => 'The Open Graph logo',
-                'description' => 'description'
+                'description' => 'description',
             ],
             $this->openGraph->fetch('http://dev.null'),
         );
     }
- }
+}
