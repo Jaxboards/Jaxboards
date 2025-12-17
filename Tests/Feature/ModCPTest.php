@@ -413,7 +413,7 @@ final class ModCPTest extends FeatureTestCase
             post: [
                 'act' => 'modcontrols',
                 'dot' => 'merge',
-                'ot' => (string) $topic,
+                'ot' => (string) $topic->id,
             ],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
