@@ -121,7 +121,8 @@ final readonly class Tools
 
         $tempFile = tempnam(sys_get_temp_dir(), $this->database->getPrefix());
 
-        $boardPath = $this->domainDefinitions->getBoardPath();
+        $boardPath = $this->fileSystem->pathFromRoot($this->domainDefinitions->getBoardPath());
+
         $zipArchive = new ZipArchive();
         $zipArchive->open($tempFile, ZipArchive::OVERWRITE);
         // I tried glob star star and it just doesn't work in some environments
@@ -134,7 +135,7 @@ final readonly class Tools
         $zipArchive->addFromString('backup.sql', $fileContents);
         $zipArchive->close();
 
-        echo $this->fileSystem->getContents($tempFile);
+       readfile($tempFile);
         $this->fileSystem->unlink($tempFile);
     }
 
