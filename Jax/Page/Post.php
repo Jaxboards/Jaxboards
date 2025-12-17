@@ -29,6 +29,7 @@ use Jax\User;
 
 use function array_filter;
 use function array_map;
+use function array_slice;
 use function count;
 use function explode;
 use function filesize;
@@ -703,7 +704,7 @@ final class Post implements Route
         $post->openGraphMetadata = json_encode(
             // Limit # of embeddings to prevent abuse
             array_slice($this->openGraph->fetchFromBBCode($postData), 0, 3),
-            JSON_THROW_ON_ERROR
+            JSON_THROW_ON_ERROR,
         );
         $post->insert();
 
