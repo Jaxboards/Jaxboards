@@ -384,6 +384,7 @@ final readonly class Forums
                 if ($modId !== 0) {
                     $this->updatePerForumModFlag();
                 }
+
                 $page .= $this->page->success('Forum saved.');
             }
         }

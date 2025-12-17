@@ -30,6 +30,7 @@ use function array_reduce;
 use function ceil;
 use function explode;
 use function implode;
+use function in_array;
 use function is_numeric;
 use function json_decode;
 use function json_encode;
@@ -274,8 +275,11 @@ final class Forum implements Route
     /**
      * @param array<Member> $membersById
      */
-    private function renderForumRow(Topic $topic, array $membersById, bool $isForumModerator = false): string
-    {
+    private function renderForumRow(
+        Topic $topic,
+        array $membersById,
+        bool $isForumModerator = false,
+    ): string {
         $pages = '';
         if ($topic->replies > 9) {
             $pageArray = [];
@@ -548,10 +552,10 @@ final class Forum implements Route
         );
     }
 
-    private function isForumModerator(ModelsForum $forum): bool
+    private function isForumModerator(ModelsForum $modelsForum): bool
     {
         return $this->user->getGroup()?->canModerate
-            || in_array((string) $this->user->get()->id, explode(',', $forum->mods), true);
+            || in_array((string) $this->user->get()->id, explode(',', $modelsForum->mods), true);
     }
 
     private function markRead(int $id): void
