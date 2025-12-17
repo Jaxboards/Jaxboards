@@ -89,7 +89,7 @@ final class Forum implements Route
     }
 
     /**
-     * View the forum listing
+     * View the forum listing.
      */
     private function viewForum(int $fid): void
     {
@@ -239,7 +239,8 @@ final class Forum implements Route
     }
 
     /**
-     * Renders all topics in the forum
+     * Renders all topics in the forum.
+     *
      * @param array<Topic> $topics
      */
     private function renderTopicListing(
@@ -248,9 +249,9 @@ final class Forum implements Route
     ): string {
         $memberIds = array_merge(
             ...array_map(
-                static fn(Topic $topic) => [$topic->author, $topic->lastPostUser],
+                static fn(Topic $topic): array => [$topic->author, $topic->lastPostUser],
                 $topics,
-            )
+            ),
         );
 
         $membersById = $memberIds !== [] ? keyBy(
@@ -343,7 +344,7 @@ final class Forum implements Route
     }
 
     /**
-     * Renders page links next to topics
+     * Renders page links next to topics.
      */
     private function renderTopicPages(Topic $topic): string
     {
