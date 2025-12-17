@@ -14,7 +14,6 @@ use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
 use Jax\ServiceConfig;
-use PhpParser\Comment\Doc;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Small;
@@ -58,13 +57,13 @@ final class BBCodeTest extends UnitTestCase
                 'http://cnn.com',
                 'http://twitch.com',
             ],
-            $this->bbCode->getURLs(<<<BBCODE
+            $this->bbCode->getURLs(<<<'BBCODE'
                 [url]http://cnn.com[/url]
 
                 http://foxnews.com
 
                 [url=http://twitch.com]http://google.com[/url]
-                BBCODE)
+                BBCODE),
         );
     }
 

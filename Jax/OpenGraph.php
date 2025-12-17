@@ -4,15 +4,25 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use DI\Container;
 use Dom\HTMLDocument;
 use DOMDocument;
 use Exception;
 
-class OpenGraph {
-    public function __construct(private BBCode $bbCode) {
+use function class_exists;
+use function file_get_contents;
+use function filter_var;
+use function is_string;
+use function libxml_clear_errors;
+use function libxml_use_internal_errors;
+use function mb_substr;
+use function str_starts_with;
 
-    }
+use const FILTER_NULL_ON_FAILURE;
+use const FILTER_VALIDATE_URL;
+
+final class OpenGraph
+{
+    public function __construct(private readonly BBCode $bbCode) {}
 
     /**
      * Fetches document and returns a key/value pair of open graph property/content pairs.
@@ -44,7 +54,7 @@ class OpenGraph {
                     $metaValues[mb_substr((string) $metumTag->getAttribute('property'), 3)] = $metumTag->getAttribute('content');
                 }
 
-            // Fall back to DOMDocument
+                // Fall back to DOMDocument
             } else {
                 $doc = new DOMDocument();
                 $doc->loadHTML($contents);
@@ -62,7 +72,6 @@ class OpenGraph {
             libxml_clear_errors();
 
             return $metaValues;
-
         } catch (Exception) {
             return [];
         }
@@ -76,15 +85,24 @@ class OpenGraph {
             if ($data === []) {
                 continue;
             }
+
             $openGraphData[$url] = $data;
         }
+
         return $openGraphData;
     }
 
-    private function filterHTTPURL(?string $url): ?string {
+    private function filterHTTPURL(?string $url): ?string
+    {
         $url = filter_var($url, FILTER_VALIDATE_URL, FILTER_NULL_ON_FAILURE);
 
-        if (!is_string($url) || (!str_starts_with($url, 'http:') && !str_starts_with($url, 'https:'))) {
+        if (
+            !is_string($url)
+            || (
+                !str_starts_with($url, 'http:')
+                && !str_starts_with($url, 'https:')
+            )
+        ) {
             return null;
         }
 

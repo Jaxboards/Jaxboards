@@ -749,7 +749,6 @@ textarea {
     border: 1px solid #35485e;
 }
 
-
 .userprofile .contacts .contact .avatar img {
     max-width: 50px;
     max-height: 50px;
@@ -794,7 +793,6 @@ textarea {
 .badges .badge .reason {
     grid-area: reason;
 }
-
 
 /* Activity (global) */
 .activity {

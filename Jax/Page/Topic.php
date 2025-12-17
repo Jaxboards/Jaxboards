@@ -597,7 +597,7 @@ final class Topic implements Route
                         $data['site_name'] ?? '',
                         $data['title'] ?? '',
                         $data['description'] ?? '',
-                        $data['image'] ? '<img src="' . $this->textFormatting->blockhtml($data['image']) . '">' : ''
+                        $data['image'] ? '<img src="' . $this->textFormatting->blockhtml($data['image']) . '">' : '',
                     );
                 }
             }
@@ -658,7 +658,7 @@ final class Topic implements Route
                 $postrating,
                 // ^20
                 $badgesPerAuthor[$author?->id] ?? '',
-                $postEmbeds
+                $postEmbeds,
             );
             $lastpid = $post->id;
         }

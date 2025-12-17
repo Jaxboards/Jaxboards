@@ -10,11 +10,14 @@ use function array_filter;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
+use function array_merge;
+use function array_unique;
 use function array_values;
 use function implode;
 use function in_array;
 use function is_string;
 use function preg_match;
+use function preg_match_all;
 use function preg_replace;
 use function preg_replace_callback;
 use function preg_split;
@@ -46,7 +49,7 @@ final class BBCode
         'urls' => [
             '@\[url\](?P<url>(?:[?/]|https?|ftp|mailto:).*)\[/url\]@Ui' => '<a href="$1">$1</a>',
             '@\[url=(?P<url>(?:[?/]|https?|ftp|mailto:)[^\]]+)\](.+?)\[/url\]@i' => '<a href="$1">$2</a>',
-        ]
+        ],
     ];
 
     /**
@@ -67,7 +70,7 @@ final class BBCode
     ) {}
 
     /**
-     * Returns list of all URLs (extracted from BBCode) in the $text
+     * Returns list of all URLs (extracted from BBCode) in the $text.
      *
      * @returns string[]
      */
@@ -78,6 +81,7 @@ final class BBCode
             preg_match_all($regex, $text, $matches);
             $urls = array_merge($matches['url'], $urls);
         }
+
         return array_unique($urls);
     }
 
