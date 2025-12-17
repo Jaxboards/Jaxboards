@@ -42,6 +42,7 @@ use function nl2br;
 use function number_format;
 use function preg_match;
 
+use const JSON_THROW_ON_ERROR;
 use const SORT_REGULAR;
 
 final class IDX implements Route

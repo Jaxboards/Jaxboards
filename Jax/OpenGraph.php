@@ -8,6 +8,7 @@ use Dom\HTMLDocument;
 use DOMDocument;
 use Exception;
 
+use function array_filter;
 use function array_slice;
 use function class_exists;
 use function filter_var;

@@ -181,7 +181,9 @@ final readonly class Reactions
             return;
         }
 
-        $ratings = $post->rating ? json_decode($post->rating, true, flags: JSON_THROW_ON_ERROR) : [];
+        $ratings = $post->rating !== '' && $post->rating !== '0'
+            ? json_decode($post->rating, true, flags: JSON_THROW_ON_ERROR)
+            : [];
 
         if (!array_key_exists($nibletid, $ratings)) {
             $ratings[$nibletid] = [];

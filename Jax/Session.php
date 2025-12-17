@@ -13,14 +13,18 @@ use function array_key_exists;
 use function base64_encode;
 use function ini_set;
 use function is_numeric;
+use function json_decode;
+use function json_encode;
 use function mb_strlen;
 use function mb_substr;
 use function mktime;
 use function openssl_random_pseudo_bytes;
 use function preg_replace_callback;
-use function serialize;
 use function session_start;
+use function str_starts_with;
 use function unserialize;
+
+use const JSON_THROW_ON_ERROR;
 
 final class Session
 {
@@ -99,10 +103,11 @@ final class Session
             $this->modelsSession = $session;
             // This str_starts_with can be removed after a time.
             // Only exists to replace serialize with json_encode
-            $this->vars = (str_starts_with($session->vars, '{') ?
-                    json_decode($session->vars, true, flags: JSON_THROW_ON_ERROR) :
-                    unserialize($session->vars)
-                )?: [];
+            $this->vars = (
+                str_starts_with($session->vars, '{')
+                ? json_decode($session->vars, true, flags: JSON_THROW_ON_ERROR)
+                : unserialize($session->vars)
+            ) ?: [];
 
             return;
         }

@@ -24,6 +24,8 @@ use function is_numeric;
 use function json_decode;
 use function round;
 
+use const JSON_THROW_ON_ERROR;
+
 final readonly class Poll
 {
     public function __construct(

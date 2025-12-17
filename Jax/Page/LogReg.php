@@ -44,6 +44,7 @@ use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
 use const CURLOPT_URL;
 use const FILTER_VALIDATE_EMAIL;
+use const JSON_THROW_ON_ERROR;
 use const PASSWORD_DEFAULT;
 
 final class LogReg implements Route
