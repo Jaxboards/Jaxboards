@@ -45,6 +45,7 @@ final readonly class OpenGraph
 
         try {
             $contents = $this->fileSystem->getContents($url);
+
             $metaValues = [];
 
             libxml_use_internal_errors(true);
@@ -61,7 +62,10 @@ final readonly class OpenGraph
                 // Fall back to DOMDocument
             } else {
                 $doc = new DOMDocument();
-                $doc->loadHTML($contents);
+
+                // This incantation prevents loadHTML from assuming ISO-8859-1
+                $doc->loadHTML(mb_encode_numericentity($contents, [0x80, 0x10FFFF, 0, ~0], 'UTF-8'));
+
                 $metaTags = $doc->getElementsByTagName('meta');
                 foreach ($metaTags as $metumTag) {
                     $property = $metumTag->getAttribute('property');

@@ -27,7 +27,7 @@ final class OpenGraphTest extends UnitTestCase
             ->willReturn(<<<'HTML'
                 <html>
                     <head>
-                        <meta property="og:title" content="Open Graph protocol">
+                        <meta property="og:title" content="Dick Van Dyke is turning 100. Here’s what he’s been up to lately">
                         <meta property="og:type" content="website">
                         <meta property="og:url" content="https://ogp.me/">
                         <meta property="og:image" content="https://ogp.me/logo.png">
@@ -51,7 +51,7 @@ final class OpenGraphTest extends UnitTestCase
     {
         $this->assertEqualsCanonicalizing(
             [
-                'title' => 'Open Graph protocol',
+                'title' => 'Dick Van Dyke is turning 100. Here’s what he’s been up to lately',
                 'type' => 'website',
                 'url' => 'https://ogp.me/',
                 'image' => 'https://ogp.me/logo.png',
