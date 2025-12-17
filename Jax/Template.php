@@ -13,7 +13,6 @@ use function array_reduce;
 use function array_values;
 use function explode;
 use function in_array;
-use function is_string;
 use function mb_strtolower;
 use function preg_match;
 use function preg_replace_callback;
