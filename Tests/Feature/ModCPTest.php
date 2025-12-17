@@ -200,7 +200,7 @@ final class ModCPTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $pid = (string) $this->insertReply();
+        $pid = (string) $this->insertReply()->id;
 
         $page = $this->go(new Request(
             get: ['act' => 'modcontrols', 'do' => 'modp', 'pid' => $pid],
@@ -232,9 +232,37 @@ final class ModCPTest extends FeatureTestCase
         $this->assertEquals(json_encode(['modtids' => '1']), $sessionData->vars);
     }
 
+    public function testDeletePostsWithTrashcan(): void
+    {
+        $trashcanId = $this->insertForum(['trashcan' => 1])->id;
+        $pid = $this->insertReply()->id;
+
+        $this->actingAs(
+            'admin',
+            sessionOverrides: ['modpids' => (string) $pid],
+        );
+
+        $page = $this->go(new Request(
+            post: ['act' => 'modcontrols', 'dop' => 'delete'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        $this->assertContainsEquals(['removeel', '#pid_2'], $json);
+        $this->assertContainsEquals(['modcontrols_clearbox'], $json);
+        $this->assertContainsEquals(['location', '/topic/2'], $json, 'Mod redirected to trashcan topic');
+
+        $trashcanTopic = Topic::selectOne(2);
+        $post = Post::selectOne($pid);
+
+        $this->assertEquals($trashcanTopic->fid, $trashcanId, 'New topic is created in trashcan');
+        $this->assertEquals($post->tid, $trashcanTopic->id, 'Post is moved to new trashcan topic');
+    }
+
     public function testDeletePostsWithoutTrashcan(): void
     {
-        $pid = $this->insertReply();
+        $pid = $this->insertReply()->id;
 
         $this->actingAs(
             'admin',
@@ -307,8 +335,8 @@ final class ModCPTest extends FeatureTestCase
 
     public function testMovePosts(): void
     {
-        $pid = $this->insertReply();
-        $tid = $this->insertTopic();
+        $pid = $this->insertReply()->id;
+        $tid = $this->insertTopic()->id;
 
         $this->actingAs(
             'admin',
@@ -329,7 +357,7 @@ final class ModCPTest extends FeatureTestCase
 
     public function testMoveTopics(): void
     {
-        $fid = $this->insertForum();
+        $fid = $this->insertForum()->id;
 
         $this->actingAs(
             'admin',
@@ -497,18 +525,18 @@ final class ModCPTest extends FeatureTestCase
         $this->assertStringContainsString('modcontrols', $page);
     }
 
-    private function insertForum(): int
+    private function insertForum(array $forumProperties = []): Forum
     {
-        $forum = new Forum();
+        $forum = new Forum($forumProperties);
         $forum->title = 'Other forum';
         $forum->insert();
 
-        return $forum->id;
+        return $forum;
     }
 
-    private function insertTopic(): int
+    private function insertTopic($topicProperties = []): Topic
     {
-        $topic = new Topic();
+        $topic = new Topic($topicProperties);
         $topic->insert();
 
         $post = new Post();
@@ -517,10 +545,10 @@ final class ModCPTest extends FeatureTestCase
         $post->post = 'OP';
         $post->insert();
 
-        return $topic->id;
+        return $topic;
     }
 
-    private function insertReply(): int
+    private function insertReply(): Post
     {
         $post = new Post();
         $post->author = 1;
@@ -528,6 +556,6 @@ final class ModCPTest extends FeatureTestCase
         $post->tid = 1;
         $post->insert();
 
-        return $post->id;
+        return $post;
     }
 }
