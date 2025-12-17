@@ -104,7 +104,7 @@ final class LogReg implements Route
             return false;
         }
 
-        $responseData = json_decode($response);
+        $responseData = json_decode($response, flags: JSON_THROW_ON_ERROR);
 
         return (bool) $responseData->success;
     }

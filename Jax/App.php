@@ -312,8 +312,7 @@ final readonly class App
         $version = json_decode(
             $this->fileSystem->getContents('composer.json') ?: '',
             null,
-            512,
-            JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
+            flags: JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
         )['version'] ?? 'Unknown';
 
         $this->page->append(

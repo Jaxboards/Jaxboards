@@ -64,7 +64,7 @@ final readonly class Reactions
         $post = Post::selectOne($pid);
 
         $ratings = $post !== null && $post->rating !== ''
-            ? json_decode($post->rating, true)
+            ? json_decode($post->rating, true, flags: JSON_THROW_ON_ERROR)
             : [];
 
         if ($ratings === []) {
@@ -114,7 +114,7 @@ final readonly class Reactions
         }
 
         $prating = $post->rating !== ''
-            ? json_decode($post->rating, true)
+            ? json_decode($post->rating, true, flags: JSON_THROW_ON_ERROR)
             : [];
         $postratingbuttons = '';
         $showrating = '';
@@ -181,10 +181,7 @@ final readonly class Reactions
             return;
         }
 
-        $ratings = json_decode($post->rating, true);
-        if (!$ratings) {
-            $ratings = [];
-        }
+        $ratings = $post->rating ? json_decode($post->rating, true, flags: JSON_THROW_ON_ERROR) : [];
 
         if (!array_key_exists($nibletid, $ratings)) {
             $ratings[$nibletid] = [];

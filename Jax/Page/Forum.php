@@ -504,12 +504,12 @@ final class Forum implements Route
     private function isTopicRead(Topic $topic): bool
     {
         if ($this->topicsRead === []) {
-            $this->topicsRead = json_decode($this->session->get()->topicsread, true);
+            $this->topicsRead = json_decode($this->session->get()->topicsread, true, flags: JSON_THROW_ON_ERROR);
         }
 
         $forumReadTime = 0;
         if ($this->forumsRead === null) {
-            $forumsRead = json_decode($this->session->get()->forumsread, true);
+            $forumsRead = json_decode($this->session->get()->forumsread, true, flags: JSON_THROW_ON_ERROR);
             if ($topic->fid && array_key_exists($topic->fid, $forumsRead)) {
                 $forumReadTime = $forumsRead[$topic->fid];
             }
@@ -537,7 +537,7 @@ final class Forum implements Route
 
 
         if ($this->forumsRead === null) {
-            $this->forumsRead = json_decode($this->session->get()->forumsread, true);
+            $this->forumsRead = json_decode($this->session->get()->forumsread, true, flags: JSON_THROW_ON_ERROR);
         }
 
 
@@ -550,7 +550,7 @@ final class Forum implements Route
 
     private function markRead(int $id): void
     {
-        $forumsread = json_decode($this->session->get()->forumsread, true);
+        $forumsread = json_decode($this->session->get()->forumsread, true, flags: JSON_THROW_ON_ERROR);
         $forumsread[$id] = Carbon::now('UTC')->getTimestamp();
         $this->session->set('forumsread', json_encode($forumsread, JSON_THROW_ON_ERROR));
     }

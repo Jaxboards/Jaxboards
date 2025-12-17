@@ -49,7 +49,7 @@ use function array_find;
 use function array_key_exists;
 use function implode;
 use function json_decode;
-use function serialize;
+use function json_encode;
 
 /**
  * @internal
@@ -193,7 +193,7 @@ final class ModCPTest extends FeatureTestCase
 
         $this->assertContainsEquals(['softurl'], $json);
         $this->assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
-        $this->assertEquals(serialize(['modtids' => '1']), $sessionData->vars);
+        $this->assertEquals(json_encode(['modtids' => '1']), $sessionData->vars);
     }
 
     public function testAddPostReplyToModerate(): void
@@ -212,7 +212,7 @@ final class ModCPTest extends FeatureTestCase
 
         $this->assertContainsEquals(['softurl'], $json);
         $this->assertContainsEquals(['modcontrols_postsync', $pid, ''], $json);
-        $this->assertEquals(serialize(['modpids' => $pid]), $sessionData->vars);
+        $this->assertEquals(json_encode(['modpids' => $pid]), $sessionData->vars);
     }
 
     public function testAddTopicToModerate(): void
@@ -229,7 +229,7 @@ final class ModCPTest extends FeatureTestCase
 
         $this->assertContainsEquals(['softurl'], $json);
         $this->assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
-        $this->assertEquals(serialize(['modtids' => '1']), $sessionData->vars);
+        $this->assertEquals(json_encode(['modtids' => '1']), $sessionData->vars);
     }
 
     public function testDeletePostsWithoutTrashcan(): void

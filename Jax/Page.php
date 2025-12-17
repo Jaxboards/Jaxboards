@@ -79,7 +79,7 @@ final class Page
     public function commandsFromString(string $script): void
     {
         foreach (explode(PHP_EOL, $script) as $line) {
-            $decoded = json_decode($line);
+            $decoded = json_decode($line, flags: JSON_THROW_ON_ERROR);
             if (!is_array($decoded)) {
                 continue;
             }

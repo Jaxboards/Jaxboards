@@ -215,7 +215,7 @@ final class Topic implements Route
         $pagelist = implode(' ', $pageLinks);
 
         // Are they on the last page? This stores a session variable.
-        $this->session->addVar('topic_lastpage', $this->pageNumber + 1 === $totalpages);
+        $this->session->addVar('topic_lastpage', ($this->pageNumber + 1) === $totalpages);
 
         // If it's a poll, put it in.
         $poll = $modelsTopic->pollType !== ''
@@ -589,7 +589,7 @@ final class Topic implements Route
             $postEmbeds = '';
             // Add OpenGraph Embeddings
             if ($post->openGraphMetadata) {
-                $openGraphData = json_decode($post->openGraphMetadata, true);
+                $openGraphData = json_decode($post->openGraphMetadata, true, flags: JSON_THROW_ON_ERROR);
                 foreach ($openGraphData as $url => $data) {
                     $postEmbeds .= $this->template->meta(
                         'topic-post-opengraph',
@@ -890,7 +890,7 @@ final class Topic implements Route
 
     private function markRead(ModelsTopic $modelsTopic): void
     {
-        $topicsread = json_decode($this->session->get()->topicsread, true);
+        $topicsread = json_decode($this->session->get()->topicsread, true, flags: JSON_THROW_ON_ERROR);
         $topicsread[$modelsTopic->id] = Carbon::now('UTC')->getTimestamp();
         $this->session->set('topicsread', json_encode($topicsread, JSON_THROW_ON_ERROR));
     }

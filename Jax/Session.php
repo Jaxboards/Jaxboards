@@ -97,7 +97,12 @@ final class Session
 
         if ($session !== null) {
             $this->modelsSession = $session;
-            $this->vars = unserialize($session->vars) ?: [];
+            // This str_starts_with can be removed after a time.
+            // Only exists to replace serialize with json_encode
+            $this->vars = (str_starts_with($session->vars, '{') ?
+                    json_decode($session->vars, true, flags: JSON_THROW_ON_ERROR) :
+                    unserialize($session->vars)
+                )?: [];
 
             return;
         }
@@ -144,7 +149,7 @@ final class Session
         }
 
         $this->vars[$varName] = $value;
-        $this->set('vars', serialize($this->vars));
+        $this->set('vars', json_encode($this->vars, JSON_THROW_ON_ERROR));
     }
 
     public function deleteVar(string $varName): void
@@ -154,7 +159,7 @@ final class Session
         }
 
         unset($this->vars[$varName]);
-        $this->set('vars', serialize($this->vars));
+        $this->set('vars', json_encode($this->vars, JSON_THROW_ON_ERROR));
     }
 
     public function getVar(string $varName): mixed
