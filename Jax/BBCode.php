@@ -29,20 +29,24 @@ final class BBCode
     private array $attachmentData = [];
 
     /**
-     * @var array<string,string>
+     * @var array<string,array<string,string>>
      */
     private array $inlineBBCodes = [
-        '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi' => '<span style="background:$2">$3</span>',
-        '@\[b\](.*)\[/b\]@Usi' => '<strong>$1</strong>',
-        '@\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[/color\]@Usi' => '<span style="color:$1">$2</span>',
-        '@\[font=([\s\w]+)](.*)\[/font\]@Usi' => '<span style="font-family:$1">$2</span>',
-        '@\[i\](.*)\[/i\]@Usi' => '<em>$1</em>',
-        '@\[s\](.*)\[/s\]@Usi' => '<span style="text-decoration:line-through">$1</span>',
-        '@\[spoiler\](.*)\[/spoiler\]@Usi' => '<span class="spoilertext">$1</span>',
-        '@\[u\](.*)\[/u\]@Usi' => '<span style="text-decoration:underline">$1</span>',
+        'text' => [
+            '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi' => '<span style="background:$2">$3</span>',
+            '@\[b\](.*)\[/b\]@Usi' => '<strong>$1</strong>',
+            '@\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[/color\]@Usi' => '<span style="color:$1">$2</span>',
+            '@\[font=([\s\w]+)](.*)\[/font\]@Usi' => '<span style="font-family:$1">$2</span>',
+            '@\[i\](.*)\[/i\]@Usi' => '<em>$1</em>',
+            '@\[s\](.*)\[/s\]@Usi' => '<span style="text-decoration:line-through">$1</span>',
+            '@\[u\](.*)\[/u\]@Usi' => '<span style="text-decoration:underline">$1</span>',
+            '@\[spoiler\](.*)\[/spoiler\]@Usi' => '<span class="spoilertext">$1</span>',
+        ],
         // Consider adding nofollow if admin approval of new accounts is not enabled
-        '@\[url\]([?/]|https?|ftp|mailto:)(.*)\[/url\]@Ui' => '<a href="$1$2">$1$2</a>',
-        '@\[url=([?/]|https?|ftp|mailto:)([^\]]+)\](.+?)\[/url\]@i' => '<a href="$1$2">$3</a>',
+        'urls' => [
+            '@\[url\](?P<url>(?:[?/]|https?|ftp|mailto:).*)\[/url\]@Ui' => '<a href="$1">$1</a>',
+            '@\[url=(?P<url>(?:[?/]|https?|ftp|mailto:)[^\]]+)\](.+?)\[/url\]@i' => '<a href="$1">$2</a>',
+        ]
     ];
 
     /**
@@ -61,6 +65,21 @@ final class BBCode
         private readonly FileSystem $fileSystem,
         private readonly Router $router,
     ) {}
+
+    /**
+     * Returns list of all URLs (extracted from BBCode) in the $text
+     *
+     * @returns string[]
+     */
+    public function getURLs(string $text): array
+    {
+        $urls = [];
+        foreach (array_keys($this->inlineBBCodes['urls']) as $regex) {
+            preg_match_all($regex, $text, $matches);
+            $urls = array_merge($matches['url'], $urls);
+        }
+        return $urls;
+    }
 
     public function toHTML(string $text): string
     {
@@ -96,6 +115,7 @@ final class BBCode
             $this->attachmentCallback(...),
         );
 
+        // [video]
         return (string) preg_replace_callback(
             '@\[video\](.*)\[/video\]@Ui',
             $this->bbcodeVideoCallback(...),
@@ -105,7 +125,7 @@ final class BBCode
 
     public function toInlineHTML(string $text): string
     {
-        return $this->replaceWithRules($text, $this->inlineBBCodes);
+        return $this->replaceWithRules($text, array_merge(...array_values($this->inlineBBCodes)));
     }
 
     /**

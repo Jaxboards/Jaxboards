@@ -14,6 +14,7 @@ use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
 use Jax\ServiceConfig;
+use PhpParser\Comment\Doc;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Small;
@@ -48,6 +49,23 @@ final class BBCodeTest extends UnitTestCase
         // Router is used for URL generation, we don't care to test that here
         $this->container->set(Router::class, $this->createStub(Router::class));
         $this->bbCode = $this->container->get(BBCode::class);
+    }
+
+    public function testGetURLS(): void
+    {
+        $this->assertEqualsCanonicalizing(
+            [
+                'http://cnn.com',
+                'http://twitch.com',
+            ],
+            $this->bbCode->getURLs(<<<BBCODE
+                [url]http://cnn.com[/url]
+
+                http://foxnews.com
+
+                [url=http://twitch.com]http://google.com[/url]
+                BBCODE)
+        );
     }
 
     #[DataProvider('bbcodeToHTMLDataProvider')]
