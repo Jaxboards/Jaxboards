@@ -105,8 +105,8 @@ final readonly class FileSystem
     {
         $magnitude = (int) floor(log($sizeInBytes, 1 << 10));
 
-        return round($sizeInBytes / (1 << 10) ** $magnitude, 2) .
-            ($magnitude ? substr(' KMGTE', $magnitude, 1) : '') . 'B';
+        return round($sizeInBytes / (1 << 10) ** $magnitude, 2)
+            . ($magnitude !== 0 ? mb_substr(' KMGTE', $magnitude, 1) : '') . 'B';
     }
 
     public function getContents(string $filenameOrURL): string
