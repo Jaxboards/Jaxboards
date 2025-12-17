@@ -31,7 +31,6 @@ use function ceil;
 use function explode;
 use function implode;
 use function in_array;
-use function is_numeric;
 use function json_decode;
 use function json_encode;
 use function max;
@@ -82,7 +81,7 @@ final class Forum implements Route
             $this->pageNumber = $page - 1;
         }
 
-        match(true) {
+        match (true) {
             $markRead !== null => $this->markForumAsRead($forumId),
             $replies !== 0 => $this->getReplySummary($replies),
             default => $this->viewForum($forumId),
@@ -185,11 +184,12 @@ final class Forum implements Route
                 : 'DESC'
         );
 
-        $topics = Topic::selectMany(<<<SQL
-            WHERE `fid`=?
-            ORDER BY `pinned` DESC,{$orderby}
-            LIMIT ?,?
-            SQL,
+        $topics = Topic::selectMany(
+            <<<SQL
+                WHERE `fid`=?
+                ORDER BY `pinned` DESC,{$orderby}
+                LIMIT ?,?
+                SQL,
             $fid,
             $this->pageNumber * $this->numperpage,
             $this->numperpage,
@@ -238,8 +238,10 @@ final class Forum implements Route
     /**
      * @param array<Topic> $topics
      */
-    private function renderTopicListing(ModelsForum $forum, array $topics): string
-    {
+    private function renderTopicListing(
+        ModelsForum $modelsForum,
+        array $topics,
+    ): string {
         $memberIds = array_merge(
             array_map(
                 static fn(Topic $topic): ?int => $topic->author,
@@ -259,7 +261,7 @@ final class Forum implements Route
             static fn(Member $member): int => $member->id,
         ) : [];
 
-        $isForumModerator = $this->isForumModerator($forum);
+        $isForumModerator = $this->isForumModerator($modelsForum);
 
         $html = '';
         foreach ($topics as $topic) {
@@ -466,6 +468,7 @@ final class Forum implements Route
 
             return;
         }
+
         $result = $this->database->special(
             <<<'SQL'
                 SELECT
