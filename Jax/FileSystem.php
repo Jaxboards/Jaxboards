@@ -14,10 +14,12 @@ use function count;
 use function dirname;
 use function file_get_contents;
 use function filter_var;
+use function floor;
 use function glob;
 use function implode;
 use function is_string;
 use function iterator_to_array;
+use function log;
 use function mb_strlen;
 use function mb_substr;
 use function mkdir;
@@ -104,13 +106,13 @@ final readonly class FileSystem
         $magnitude = 0;
         $sizes = ' KMGTE';
 
-        $magnitude = floor(log($sizeInBytes, 1<<10));
+        $magnitude = floor(log($sizeInBytes, 1 << 10));
 
         $prefix = $magnitude > 0 && $magnitude <= 5
             ? $sizes[$magnitude]
             : '';
 
-        return round($sizeInBytes / pow(1<<10, $magnitude * 1.0), 2) . "{$prefix}B";
+        return round($sizeInBytes / (1 << 10) ** ($magnitude * 1.0), 2) . "{$prefix}B";
     }
 
     public function getContents(string $filenameOrURL): string
