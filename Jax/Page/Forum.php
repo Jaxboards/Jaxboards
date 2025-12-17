@@ -348,7 +348,7 @@ final class Forum implements Route
      */
     private function renderTopicPages(Topic $topic): string
     {
-        if ($topic->replies > 9) {
+        if ($topic->replies <= 10) {
             return '';
         }
 
