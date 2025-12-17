@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use DI\Container;
 use Dom\HTMLDocument;
 use DOMDocument;
 use Exception;
 
 class OpenGraph {
+    public function __construct(private BBCode $bbCode) {
 
-    private readonly ?string $url;
-
-    public function __construct(string $url) {
-        $this->url = $this->filterHTTPURL($url);
     }
 
     /**
@@ -23,14 +21,16 @@ class OpenGraph {
      *
      * @return array<string,string> Property/Content pairs for OpenGraph data
      */
-    public function fetch(): array
+    public function fetch(string $url): array
     {
-        if ($this->url === null) {
+        $url = $this->filterHTTPURL($url);
+
+        if ($url === null) {
             return [];
         }
 
         try {
-            $contents = file_get_contents($this->url);
+            $contents = file_get_contents($url);
             $metaValues = [];
 
             libxml_use_internal_errors(true);
@@ -66,6 +66,19 @@ class OpenGraph {
         } catch (Exception) {
             return [];
         }
+    }
+
+    public function fetchFromBBCode(string $text): array
+    {
+        $openGraphData = [];
+        foreach ($this->bbCode->getURLs($text) as $url) {
+            $data = $this->fetch($url);
+            if ($data === []) {
+                continue;
+            }
+            $openGraphData[$url] = $data;
+        }
+        return $openGraphData;
     }
 
     private function filterHTTPURL(?string $url): ?string {

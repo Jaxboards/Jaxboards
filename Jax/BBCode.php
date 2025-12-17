@@ -78,7 +78,7 @@ final class BBCode
             preg_match_all($regex, $text, $matches);
             $urls = array_merge($matches['url'], $urls);
         }
-        return $urls;
+        return array_unique($urls);
     }
 
     public function toHTML(string $text): string

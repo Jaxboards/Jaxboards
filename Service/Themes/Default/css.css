@@ -1513,6 +1513,26 @@ textarea {
     opacity: 1;
 }
 
+#intopic .opengraph {
+    border: 1px solid #192c44;
+    border-left-width: 5px;
+    background: #eef;
+    max-width: 80%;
+    margin: 10px 0;
+    padding: 10px;
+}
+#intopic .opengraph img {
+    max-width: 100%;
+    max-height: 160px;
+}
+#intopic .opengraph h4 {
+    margin: 1em 0;
+    font-size: 1.2rem;
+}
+#intopic .opengraph p {
+    font-size: 1.2rem;
+}
+
 /* stylelint-disable-next-line selector-class-pattern */
 .postrating_list {
     position: absolute;

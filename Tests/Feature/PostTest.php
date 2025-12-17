@@ -26,6 +26,7 @@ use Jax\Models\Post as ModelsPost;
 use Jax\Models\Topic;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
+use Jax\OpenGraph;
 use Jax\Page;
 use Jax\Page\Post;
 use Jax\Request;
@@ -44,36 +45,38 @@ use Tests\FeatureTestCase;
 /**
  * @internal
  */
-#[CoversClass(Post::class)]
 #[CoversClass(App::class)]
-#[CoversClass(FileSystem::class)]
-#[CoversClass(Column::class)]
-#[CoversClass(ForeignKey::class)]
-#[CoversClass(Key::class)]
 #[CoversClass(BBCode::class)]
 #[CoversClass(BotDetector::class)]
+#[CoversClass(Column::class)]
 #[CoversClass(Config::class)]
 #[CoversClass(Database::class)]
 #[CoversClass(DatabaseUtils::class)]
-#[CoversClass(SQLite::class)]
 #[CoversClass(Date::class)]
 #[CoversClass(DebugLog::class)]
 #[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FileSystem::class)]
+#[CoversClass(ForeignKey::class)]
 #[CoversClass(Hooks::class)]
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
+#[CoversClass(Key::class)]
 #[CoversClass(Model::class)]
-#[CoversClass(PrivateMessage::class)]
-#[CoversClass(Shoutbox::class)]
+#[CoversClass(OpenGraph::class)]
+#[CoversClass(OpenGraph::class)]
 #[CoversClass(Page::class)]
-#[CoversClass(TextRules::class)]
+#[CoversClass(Post::class)]
+#[CoversClass(PrivateMessage::class)]
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(Router::class)]
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(Session::class)]
+#[CoversClass(Shoutbox::class)]
+#[CoversClass(SQLite::class)]
 #[CoversClass(Template::class)]
 #[CoversClass(TextFormatting::class)]
+#[CoversClass(TextRules::class)]
 #[CoversClass(User::class)]
 final class PostTest extends FeatureTestCase
 {

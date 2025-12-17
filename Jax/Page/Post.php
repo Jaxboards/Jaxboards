@@ -18,6 +18,7 @@ use Jax\Models\Member;
 use Jax\Models\Post as ModelsPost;
 use Jax\Models\Stats;
 use Jax\Models\Topic;
+use Jax\OpenGraph;
 use Jax\Page;
 use Jax\Request;
 use Jax\Router;
@@ -64,6 +65,7 @@ final class Post implements Route
         private readonly FileSystem $fileSystem,
         private readonly Hooks $hooks,
         private readonly IPAddress $ipAddress,
+        private readonly OpenGraph $openGraph,
         private readonly Page $page,
         private readonly Request $request,
         private readonly Router $router,
@@ -698,6 +700,7 @@ final class Post implements Route
         $post->newtopic = $newtopic ? 1 : 0;
         $post->post = $postData ?? '';
         $post->tid = $tid;
+        $post->openGraphMetadata = json_encode($this->openGraph->fetchFromBBCode($postData), JSON_THROW_ON_ERROR);
         $post->insert();
 
         $this->hooks->dispatch('post', $post);

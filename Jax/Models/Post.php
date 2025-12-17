@@ -26,6 +26,9 @@ final class Post extends Model
     #[Key(fulltext: true)]
     public string $post = '';
 
+    #[Column(name: 'openGraphMetadata', type: 'json', default: '{}', nullable: false)]
+    public string $openGraphMetadata = '{}';
+
     #[Column(name: 'date', type: 'datetime')]
     public ?string $date = null;
 
