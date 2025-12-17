@@ -586,6 +586,22 @@ final class Topic implements Route
                 ]),
             ];
 
+            $postEmbeds = '';
+            // Add OpenGraph Embeddings
+            if ($post->openGraphMetadata) {
+                $openGraphData = json_decode($post->openGraphMetadata, true);
+                foreach ($openGraphData as $url => $data) {
+                    $postEmbeds .= $this->template->meta(
+                        'topic-post-opengraph',
+                        $data['url'] ?? $url,
+                        $data['site_name'] ?? '',
+                        $data['title'] ?? '',
+                        $data['description'] ?? '',
+                        $data['image'] ? '<img src="' . $this->textFormatting->blockhtml($data['image']) . '">' : '',
+                    );
+                }
+            }
+
             $rows .= $this->template->meta(
                 'topic-post-row',
                 $post->id,
@@ -642,6 +658,7 @@ final class Topic implements Route
                 $postrating,
                 // ^20
                 $badgesPerAuthor[$author?->id] ?? '',
+                $postEmbeds,
             );
             $lastpid = $post->id;
         }

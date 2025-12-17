@@ -50,6 +50,23 @@ final class BBCodeTest extends UnitTestCase
         $this->bbCode = $this->container->get(BBCode::class);
     }
 
+    public function testGetURLS(): void
+    {
+        $this->assertEqualsCanonicalizing(
+            [
+                'http://cnn.com',
+                'http://twitch.com',
+            ],
+            $this->bbCode->getURLs(<<<'BBCODE'
+                [url]http://cnn.com[/url]
+
+                http://foxnews.com
+
+                [url=http://twitch.com]http://google.com[/url]
+                BBCODE),
+        );
+    }
+
     #[DataProvider('bbcodeToHTMLDataProvider')]
     public function testToHTML(string $input, string $output): void
     {
