@@ -426,7 +426,7 @@ final class ModCPTest extends FeatureTestCase
         $this->assertStringContainsString($this->container->get(Router::class)->url('topic', ['id' => $topic->id]), $redirect[1]);
 
         $this->assertNull(Topic::selectOne(1), 'Original topic is deleted');
-        $this->assertEquals($topic, Post::selectOne(1)->tid, 'OP moved to new topic');
+        $this->assertEquals($topic->id, Post::selectOne(1)->tid, 'OP moved to new topic');
         $this->assertEquals(1, Post::selectOne(1)->newtopic, 'Older post becomes OP');
         $this->assertEquals(0, Post::selectOne(2)->newtopic, 'Newer post gets demoted to reply');
     }
