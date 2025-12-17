@@ -103,16 +103,10 @@ final readonly class FileSystem
      */
     public function fileSizeHumanReadable(int $sizeInBytes): string
     {
-        $magnitude = 0;
-        $sizes = ' KMGTE';
+        $magnitude = (int) floor(log($sizeInBytes, 1 << 10));
 
-        $magnitude = floor(log($sizeInBytes, 1 << 10));
-
-        $prefix = $magnitude > 0 && $magnitude <= 5
-            ? $sizes[$magnitude]
-            : '';
-
-        return round($sizeInBytes / (1 << 10) ** $magnitude, 2) . "{$prefix}B";
+        return round($sizeInBytes / (1 << 10) ** $magnitude, 2) .
+            ($magnitude ? substr(' KMGTE', $magnitude, 1) : '') . 'B';
     }
 
     public function getContents(string $filenameOrURL): string
