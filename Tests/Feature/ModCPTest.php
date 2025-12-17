@@ -385,7 +385,7 @@ final class ModCPTest extends FeatureTestCase
         );
 
         $page = $this->go(new Request(
-            post: ['act' => 'modcontrols', 'dot' => 'merge', 'id' => (string) $topic],
+            post: ['act' => 'modcontrols', 'dot' => 'merge', 'id' => (string) $topic->id],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -406,7 +406,7 @@ final class ModCPTest extends FeatureTestCase
 
         $this->actingAs(
             'admin',
-            sessionOverrides: ['modtids' => implode(',', [1, $topic])],
+            sessionOverrides: ['modtids' => implode(',', [1, $topic->id])],
         );
 
         $page = $this->go(new Request(
@@ -423,7 +423,7 @@ final class ModCPTest extends FeatureTestCase
         $this->assertContainsEquals(['modcontrols_clearbox'], $json);
 
         $redirect = array_find($json, static fn($cmd): bool => $cmd[0] === 'location');
-        $this->assertStringContainsString($this->container->get(Router::class)->url('topic', ['id' => $topic]), $redirect[1]);
+        $this->assertStringContainsString($this->container->get(Router::class)->url('topic', ['id' => $topic->id]), $redirect[1]);
 
         $this->assertNull(Topic::selectOne(1), 'Original topic is deleted');
         $this->assertEquals($topic, Post::selectOne(1)->tid, 'OP moved to new topic');
