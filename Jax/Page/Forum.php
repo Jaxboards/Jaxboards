@@ -88,6 +88,9 @@ final class Forum implements Route
         };
     }
 
+    /**
+     * View the forum listing
+     */
     private function viewForum(int $fid): void
     {
         // If no fid supplied, go to the index and halt execution.
@@ -236,6 +239,7 @@ final class Forum implements Route
     }
 
     /**
+     * Renders all topics in the forum
      * @param array<Topic> $topics
      */
     private function renderTopicListing(
@@ -243,14 +247,10 @@ final class Forum implements Route
         array $topics,
     ): string {
         $memberIds = array_merge(
-            array_map(
-                static fn(Topic $topic): ?int => $topic->author,
+            ...array_map(
+                static fn(Topic $topic) => [$topic->author, $topic->lastPostUser],
                 $topics,
-            ),
-            array_map(
-                static fn(Topic $topic): ?int => $topic->lastPostUser,
-                $topics,
-            ),
+            )
         );
 
         $membersById = $memberIds !== [] ? keyBy(
@@ -265,20 +265,7 @@ final class Forum implements Route
 
         $html = '';
         foreach ($topics as $topic) {
-            $pages = '';
-            if ($topic->replies > 9) {
-                $pageArray = [];
-                foreach ($this->jax->pages((int) ceil(($topic->replies + 1) / 10), 1, 10) as $pageNumber) {
-                    $pageURL = $this->router->url('topic', [
-                        'id' => $topic->id,
-                        'page' => $pageNumber,
-                        'slug' => $this->textFormatting->slugify($topic->title),
-                    ]);
-                    $pageArray[] = "<a href='{$pageURL}'>{$pageNumber}</a>";
-                }
-
-                $pages = $this->template->meta('forum-topic-pages', implode(' ', $pageArray));
-            }
+            $pages = $this->renderTopicPages($topic);
 
             $author = $membersById[$topic->author];
             $lastPostAuthor = $membersById[$topic->lastPostUser] ?? null;
@@ -353,6 +340,28 @@ final class Forum implements Route
         }
 
         return $html;
+    }
+
+    /**
+     * Renders page links next to topics
+     */
+    private function renderTopicPages(Topic $topic): string
+    {
+        if ($topic->replies > 9) {
+            return '';
+        }
+
+        $pageArray = [];
+        foreach ($this->jax->pages((int) ceil(($topic->replies + 1) / 10), 1, 10) as $pageNumber) {
+            $pageURL = $this->router->url('topic', [
+                'id' => $topic->id,
+                'page' => $pageNumber,
+                'slug' => $this->textFormatting->slugify($topic->title),
+            ]);
+            $pageArray[] = "<a href='{$pageURL}'>{$pageNumber}</a>";
+        }
+
+        return $this->template->meta('forum-topic-pages', implode(' ', $pageArray));
     }
 
     private function setBreadCrumbs(ModelsForum $forum): void
