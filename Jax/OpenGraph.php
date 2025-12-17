@@ -23,7 +23,10 @@ use const FILTER_VALIDATE_URL;
 
 final readonly class OpenGraph
 {
-    public function __construct(private BBCode $bbCode) {}
+    public function __construct(
+        private BBCode $bbCode,
+        private FileSystem $fileSystem
+    ) {}
 
     /**
      * Fetches document and returns a key/value pair of open graph property/content pairs.
@@ -41,7 +44,7 @@ final readonly class OpenGraph
         }
 
         try {
-            $contents = file_get_contents($url);
+            $contents = $this->fileSystem->getContents($url);
             $metaValues = [];
 
             libxml_use_internal_errors(true);

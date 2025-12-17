@@ -112,9 +112,15 @@ final readonly class FileSystem
         return round($sizeInBytes, 2) . "{$prefix}B";
     }
 
-    public function getContents(string $filename): string|false
+    public function getContents(string $filenameOrURL): string
     {
-        $file = $this->getFileObject($filename);
+        // Get URL contents
+        if (filter_var($filenameOrURL, FILTER_VALIDATE_URL) !== false) {
+            return file_get_contents($filenameOrURL) ?: '';
+        }
+
+        // Get File contents
+        $file = $this->getFileObject($filenameOrURL);
         $contents = '';
 
         while (!$file->eof()) {
