@@ -29,7 +29,6 @@ use Jax\User;
 
 use function array_filter;
 use function array_map;
-use function array_slice;
 use function count;
 use function explode;
 use function filesize;

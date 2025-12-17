@@ -136,7 +136,7 @@ final class TopicTest extends FeatureTestCase
         $post->author = 1;
         $post->post = 'hello';
         $post->tid = 1;
-        $post->openGraphMetadata = <<<JSON
+        $post->openGraphMetadata = <<<'JSON'
             {
                 "https:\/\/www.youtube.com\/watch?v=qjqPT89KaCc": {
                     "site_name":"YouTube",
