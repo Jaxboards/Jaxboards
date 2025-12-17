@@ -74,35 +74,19 @@ final class Forum implements Route
     public function route($params): void
     {
         $page = (int) $this->request->asString->both('page');
-        $replies = $this->request->asString->both('replies');
+        $replies = (int) $this->request->asString->both('replies');
+        $markRead = $this->request->both('markread');
         $forumId = (int) $params['id'];
 
         if ($page > 0) {
             $this->pageNumber = $page - 1;
         }
 
-        // Guaranteed to match here because of the router
-        if ($this->request->both('markread') !== null) {
-            $this->markRead($forumId);
-
-            $this->router->redirect('index');
-
-            return;
-        }
-
-        if (is_numeric($replies)) {
-            if (!$this->request->isJSAccess()) {
-                $this->router->redirect('index');
-
-                return;
-            }
-
-            $this->getReplySummary((int) $replies);
-
-            return;
-        }
-
-        $this->viewForum($forumId);
+        match(true) {
+            $markRead !== null => $this->markForumAsRead($forumId),
+            $replies !== 0 => $this->getReplySummary($replies),
+            default => $this->viewForum($forumId),
+        };
     }
 
     private function viewForum(int $fid): void
@@ -201,38 +185,17 @@ final class Forum implements Route
                 : 'DESC'
         );
 
-        $topics = Topic::selectMany(
-            'WHERE `fid`=? '
-            . "ORDER BY `pinned` DESC,{$orderby} "
-            . 'LIMIT ?,? ',
+        $topics = Topic::selectMany(<<<SQL
+            WHERE `fid`=?
+            ORDER BY `pinned` DESC,{$orderby}
+            LIMIT ?,?
+            SQL,
             $fid,
             $this->pageNumber * $this->numperpage,
             $this->numperpage,
         );
 
-        $memberIds = array_merge(
-            array_map(
-                static fn(Topic $topic): ?int => $topic->author,
-                $topics,
-            ),
-            array_map(
-                static fn(Topic $topic): ?int => $topic->lastPostUser,
-                $topics,
-            ),
-        );
-
-        $membersById = $memberIds !== [] ? keyBy(
-            Member::selectMany(
-                Database::WHERE_ID_IN,
-                $memberIds,
-            ),
-            static fn(Member $member): int => $member->id,
-        ) : [];
-
-        $rows = implode(
-            '',
-            array_map(fn(Topic $topic): string => $this->renderForumRow($topic, $membersById, $this->isForumModerator($forum)), $topics),
-        );
+        $topicListing = $this->renderTopicListing($forum, $topics);
 
         // If they're on the first page and all topics are read
         // mark the whole forum as read
@@ -244,8 +207,8 @@ final class Forum implements Route
         }
 
         $table = '';
-        if ($rows !== '') {
-            $table = $this->template->meta('forum-table', $rows);
+        if ($topicListing !== '') {
+            $table = $this->template->meta('forum-table', $topicListing);
         } else {
             if ($this->pageNumber > 0) {
                 $this->router->redirect('forum', ['id' => $fid]);
@@ -273,98 +236,121 @@ final class Forum implements Route
     }
 
     /**
-     * @param array<Member> $membersById
+     * @param array<Topic> $topics
      */
-    private function renderForumRow(
-        Topic $topic,
-        array $membersById,
-        bool $isForumModerator = false,
-    ): string {
-        $pages = '';
-        if ($topic->replies > 9) {
-            $pageArray = [];
-            foreach ($this->jax->pages((int) ceil(($topic->replies + 1) / 10), 1, 10) as $pageNumber) {
-                $pageURL = $this->router->url('topic', [
-                    'id' => $topic->id,
-                    'page' => $pageNumber,
-                    'slug' => $this->textFormatting->slugify($topic->title),
-                ]);
-                $pageArray[] = "<a href='{$pageURL}'>{$pageNumber}</a>";
+    private function renderTopicListing(ModelsForum $forum, array $topics): string
+    {
+        $memberIds = array_merge(
+            array_map(
+                static fn(Topic $topic): ?int => $topic->author,
+                $topics,
+            ),
+            array_map(
+                static fn(Topic $topic): ?int => $topic->lastPostUser,
+                $topics,
+            ),
+        );
+
+        $membersById = $memberIds !== [] ? keyBy(
+            Member::selectMany(
+                Database::WHERE_ID_IN,
+                $memberIds,
+            ),
+            static fn(Member $member): int => $member->id,
+        ) : [];
+
+        $isForumModerator = $this->isForumModerator($forum);
+
+        $html = '';
+        foreach ($topics as $topic) {
+            $pages = '';
+            if ($topic->replies > 9) {
+                $pageArray = [];
+                foreach ($this->jax->pages((int) ceil(($topic->replies + 1) / 10), 1, 10) as $pageNumber) {
+                    $pageURL = $this->router->url('topic', [
+                        'id' => $topic->id,
+                        'page' => $pageNumber,
+                        'slug' => $this->textFormatting->slugify($topic->title),
+                    ]);
+                    $pageArray[] = "<a href='{$pageURL}'>{$pageNumber}</a>";
+                }
+
+                $pages = $this->template->meta('forum-topic-pages', implode(' ', $pageArray));
             }
 
-            $pages = $this->template->meta('forum-topic-pages', implode(' ', $pageArray));
+            $author = $membersById[$topic->author];
+            $lastPostAuthor = $membersById[$topic->lastPostUser] ?? null;
+            $topicSlug = $this->textFormatting->slugify($topic->title);
+
+            $read = $this->isTopicRead($topic);
+
+            $html .= $this->template->meta(
+                'forum-row',
+                // 1
+                $topic->id,
+                // 2
+                $this->textFormatting->wordfilter($topic->title),
+                // 3
+                $this->textFormatting->wordfilter($topic->subtitle),
+                // 4
+                $this->template->meta(
+                    'user-link',
+                    $author->id,
+                    $author->groupID,
+                    $author->displayName,
+                ),
+                // 5
+                $topic->replies,
+                // 6
+                number_format($topic->views),
+                // 7
+                $topic->lastPostDate
+                    ? $this->date->autoDate($topic->lastPostDate)
+                    : '',
+                // 8
+                $lastPostAuthor ? $this->template->meta(
+                    'user-link',
+                    $lastPostAuthor->id,
+                    $lastPostAuthor->groupID,
+                    $lastPostAuthor->displayName,
+                ) : '',
+                // 9
+                ($topic->pinned !== 0 ? 'pinned' : '') . ' ' . ($topic->locked !== 0 ? 'locked' : ''),
+                // 10
+                $topic->summary !== '' ? $topic->summary . (mb_strlen($topic->summary) > 45 ? '...' : '') : '',
+                // 11
+                $isForumModerator ? (
+                    '<a href="'
+                    . $this->router->url('modcontrols', ['do' => 'modt', 'tid' => $topic->id])
+                    . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>'
+                ) : '',
+                // 12
+                $pages,
+                // 13
+                $read ? 'read' : 'unread',
+                // 14
+                $read ? (
+                    $this->template->meta('topic-icon-read')
+                    ?: $this->template->meta('icon-read')
+                )
+                    : (
+                        $this->template->meta('topic-icon-unread')
+                        ?: $this->template->meta('icon-read')
+                    ),
+                // 15
+                $this->router->url('topic', ['id' => $topic->id, 'slug' => $topicSlug]),
+                // 16
+                $this->router->url('forum', ['id' => $topic->fid, 'replies' => $topic->id]),
+                // 17
+                $this->router->url('topic', [
+                    'id' => $topic->id,
+                    'getlast' => '1',
+                    'slug' => $topicSlug,
+                ]),
+            );
         }
 
-        $author = $membersById[$topic->author];
-        $lastPostAuthor = $membersById[$topic->lastPostUser] ?? null;
-        $topicSlug = $this->textFormatting->slugify($topic->title);
-
-        $read = $this->isTopicRead($topic);
-
-        return $this->template->meta(
-            'forum-row',
-            // 1
-            $topic->id,
-            // 2
-            $this->textFormatting->wordfilter($topic->title),
-            // 3
-            $this->textFormatting->wordfilter($topic->subtitle),
-            // 4
-            $this->template->meta(
-                'user-link',
-                $author->id,
-                $author->groupID,
-                $author->displayName,
-            ),
-            // 5
-            $topic->replies,
-            // 6
-            number_format($topic->views),
-            // 7
-            $topic->lastPostDate
-                ? $this->date->autoDate($topic->lastPostDate)
-                : '',
-            // 8
-            $lastPostAuthor ? $this->template->meta(
-                'user-link',
-                $lastPostAuthor->id,
-                $lastPostAuthor->groupID,
-                $lastPostAuthor->displayName,
-            ) : '',
-            // 9
-            ($topic->pinned !== 0 ? 'pinned' : '') . ' ' . ($topic->locked !== 0 ? 'locked' : ''),
-            // 10
-            $topic->summary !== '' ? $topic->summary . (mb_strlen($topic->summary) > 45 ? '...' : '') : '',
-            // 11
-            $isForumModerator ? (
-                '<a href="'
-                . $this->router->url('modcontrols', ['do' => 'modt', 'tid' => $topic->id])
-                . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>'
-            ) : '',
-            // 12
-            $pages,
-            // 13
-            $read ? 'read' : 'unread',
-            // 14
-            $read ? (
-                $this->template->meta('topic-icon-read')
-                ?: $this->template->meta('icon-read')
-            )
-                : (
-                    $this->template->meta('topic-icon-unread')
-                    ?: $this->template->meta('icon-read')
-                ),
-            // 15
-            $this->router->url('topic', ['id' => $topic->id, 'slug' => $topicSlug]),
-            // 16
-            $this->router->url('forum', ['id' => $topic->fid, 'replies' => $topic->id]),
-            // 17
-            $this->router->url('topic', [
-                'id' => $topic->id,
-                'getlast' => '1',
-                'slug' => $topicSlug,
-            ]),
-        );
+        return $html;
     }
 
     private function setBreadCrumbs(ModelsForum $forum): void
@@ -475,6 +461,11 @@ final class Forum implements Route
 
     private function getReplySummary(int $tid): void
     {
+        if (!$this->request->isJSAccess()) {
+            $this->router->redirect('index');
+
+            return;
+        }
         $result = $this->database->special(
             <<<'SQL'
                 SELECT
@@ -563,5 +554,11 @@ final class Forum implements Route
         $forumsread = json_decode($this->session->get()->forumsread, true, flags: JSON_THROW_ON_ERROR);
         $forumsread[$id] = Carbon::now('UTC')->getTimestamp();
         $this->session->set('forumsread', json_encode($forumsread, JSON_THROW_ON_ERROR));
+    }
+
+    private function markForumAsRead(int $id): void
+    {
+        $this->markRead($id);
+        $this->router->redirect('index');
     }
 }
