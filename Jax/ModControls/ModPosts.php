@@ -242,6 +242,7 @@ final readonly class ModPosts
         $topic = new Topic();
         $topic->author = $this->user->get()->id;
         $topic->fid = $trashCanForum->id;
+        $topic->date = $this->database->datetime();
         $topic->lastPostDate = $this->database->datetime();
         $topic->lastPostUser = $lastPost?->author;
         $topic->op = $pids[0];
