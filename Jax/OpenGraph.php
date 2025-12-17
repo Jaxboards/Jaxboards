@@ -20,9 +20,9 @@ use function str_starts_with;
 use const FILTER_NULL_ON_FAILURE;
 use const FILTER_VALIDATE_URL;
 
-final class OpenGraph
+final readonly class OpenGraph
 {
-    public function __construct(private readonly BBCode $bbCode) {}
+    public function __construct(private BBCode $bbCode) {}
 
     /**
      * Fetches document and returns a key/value pair of open graph property/content pairs.
