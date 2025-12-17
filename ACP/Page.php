@@ -158,10 +158,6 @@ final class Page
 
         $template = $this->fileSystem->getContents($templateFile);
 
-        if ($template === false) {
-            return '';
-        }
-
         return str_replace(
             array_map(static fn(string $name): string => '{{ ' . $name . ' }}', array_keys($data)),
             array_map(static fn(float|int|string|null $content): string => "{$content}", $data),

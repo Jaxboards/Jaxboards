@@ -415,27 +415,7 @@ final class Post implements Route
             return true;
         }
 
-        return $this->canModerate($topic);
-    }
-
-    private function canModerate(Topic $topic): bool
-    {
-        if ($this->user->getGroup()?->canModerate) {
-            return true;
-        }
-
-        if ($this->user->get()->mod !== 0) {
-            $forum = Forum::selectOne($topic);
-
-            if (
-                $forum
-                && in_array((string) $this->user->get()->id, explode(',', $forum->mods), true)
-            ) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->user->isModeratorOfTopic($topic);
     }
 
     private function validatePost(?string $postData): ?string

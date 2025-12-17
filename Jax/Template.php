@@ -257,10 +257,6 @@ final class Template
             $metaName = $fileInfo->getBasename('.' . $fileInfo->getExtension());
             $metaContent = $this->fileSystem->getContents($metaFile);
 
-            if (!is_string($metaContent)) {
-                return $meta;
-            }
-
             $this->checkExtended($metaContent, $metaName);
             $meta[$metaName] = $metaContent;
 

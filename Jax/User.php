@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Jax;
 
 use Jax\Constants\Groups;
+use Jax\Models\Forum;
 use Jax\Models\Group;
 use Jax\Models\Member;
+use Jax\Models\Topic;
 
 use function password_hash;
 use function password_needs_rehash;
@@ -147,6 +149,26 @@ final class User
     public function isGuest(): bool
     {
         return $this->member->groupID === Groups::Guest->value;
+    }
+
+    public function isModeratorOfTopic(Topic $modelsTopic): bool
+    {
+        if ($this->getGroup()?->canModerate) {
+            return true;
+        }
+
+        if ($this->member->mod !== 0) {
+            $forum = Forum::selectOne($modelsTopic->fid);
+
+            if (
+                $forum !== null
+                && in_array((string) $this->member->id, explode(',', $forum->mods), true)
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

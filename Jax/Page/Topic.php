@@ -529,6 +529,7 @@ final class Topic implements Route
         );
 
         $forumPerms = $this->fetchForumPermissions($modelsTopic);
+        $canModerateTopic = $this->user->isModeratorOfTopic($modelsTopic);
 
         $badgesPerAuthor = $this->renderBadges($posts);
 
@@ -568,7 +569,7 @@ final class Topic implements Route
                     . "class='quotepost'>" . $this->template->meta('topic-quote-button') . '</a> '
                     : '')
                 // Adds the Moderate options
-                . ($this->canModerate($modelsTopic)
+                . ($canModerateTopic
                     ? "<a href='{$modPostURL}' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>"
                     . $this->template->meta('topic-mod-button') . '</a>'
                     : '');
@@ -670,7 +671,7 @@ final class Topic implements Route
 
     private function canEdit(ModelsTopic $modelsTopic, Post $post): bool
     {
-        if ($this->canModerate($modelsTopic)) {
+        if ($this->user->isModeratorOfTopic($modelsTopic)) {
             return true;
         }
 
@@ -679,31 +680,6 @@ final class Topic implements Route
                 ? $this->user->getGroup()?->canEditTopics
                 : $this->user->getGroup()?->canEditPosts)
             && $post->author === $this->user->get()->id;
-    }
-
-    private function canModerate(ModelsTopic $modelsTopic): bool
-    {
-        static $canMod;
-        if ($canMod !== null) {
-            return $canMod;
-        }
-
-        if ($this->user->getGroup()?->canModerate) {
-            return $canMod = true;
-        }
-
-        if ($this->user->get()->mod !== 0) {
-            $forum = Forum::selectOne($modelsTopic->fid);
-
-            if (
-                $forum !== null
-                && in_array((string) $this->user->get()->id, explode(',', $forum->mods), true)
-            ) {
-                return $canMod = true;
-            }
-        }
-
-        return $canMod = false;
     }
 
     private function quickEditPost(ModelsTopic $modelsTopic, int $pid): void
