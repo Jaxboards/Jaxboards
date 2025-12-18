@@ -73,11 +73,11 @@ final readonly class OpenGraph
                     // Some websites incorrectly use name attribute
                     ?: $metumTag->getAttribute('name');
 
-                if (!str_starts_with($property, 'og:')) {
+                if (!str_starts_with((string) $property, 'og:')) {
                     continue;
                 }
 
-                $metaValues[mb_substr($property, 3)] = $metumTag->getAttribute('content');
+                $metaValues[mb_substr((string) $property, 3)] = $metumTag->getAttribute('content');
             }
 
             libxml_clear_errors();
