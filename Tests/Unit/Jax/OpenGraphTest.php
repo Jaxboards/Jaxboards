@@ -35,7 +35,8 @@ final class OpenGraphTest extends UnitTestCase
                         <meta property="og:image:width" content="300">
                         <meta property="og:image:height" content="300">
                         <meta property="og:image:alt" content="The Open Graph logo">
-                        <meta property="og:description" content="description">
+                        <!-- Some sites incorrectly use "name" attribute -->
+                        <meta name="og:description" content="description">
                     </head>
                 </html>
                 HTML)

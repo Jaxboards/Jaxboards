@@ -55,10 +55,7 @@ final readonly class OpenGraph
             // Also looked at get_meta_tags but it seemed fragile so didn't use it
             if (class_exists(HTMLDocument::class)) {
                 $doc = HTMLDocument::createFromString($contents);
-                $metaTags = $doc->querySelectorAll('meta[property^="og:"]');
-                foreach ($metaTags as $metumTag) {
-                    $metaValues[mb_substr((string) $metumTag->getAttribute('property'), 3)] = $metumTag->getAttribute('content');
-                }
+                $metaTags = $doc->querySelectorAll('meta');
 
                 // Fall back to DOMDocument
             } else {
@@ -68,14 +65,19 @@ final readonly class OpenGraph
                 $doc->loadHTML(mb_encode_numericentity($contents, [0x80, 0x10FFFF, 0, ~0], 'UTF-8'));
 
                 $metaTags = $doc->getElementsByTagName('meta');
-                foreach ($metaTags as $metumTag) {
-                    $property = $metumTag->getAttribute('property');
-                    if (!str_starts_with($property, 'og:')) {
-                        continue;
-                    }
+            }
 
-                    $metaValues[mb_substr($property, 3)] = $metumTag->getAttribute('content');
+            // Extract key values
+            foreach ($metaTags as $metumTag) {
+                $property = $metumTag->getAttribute('property')
+                    // Some websites incorrectly use name attribute
+                    ?: $metumTag->getAttribute('name');
+
+                if (!str_starts_with($property, 'og:')) {
+                    continue;
                 }
+
+                $metaValues[mb_substr($property, 3)] = $metumTag->getAttribute('content');
             }
 
             libxml_clear_errors();

@@ -588,7 +588,6 @@ final class Topic implements Route
             ];
 
             $postEmbeds = '';
-            // Add OpenGraph Embeddings
             if ($post->openGraphMetadata) {
                 $openGraphData = json_decode($post->openGraphMetadata, true, flags: JSON_THROW_ON_ERROR);
                 foreach ($openGraphData as $url => $data) {
