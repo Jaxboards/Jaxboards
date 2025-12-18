@@ -1,4 +1,3 @@
-/* global RUN */
 import gracefulDegrade from './JAX/graceful-degrade';
 import Commands from './RUN/commands';
 
