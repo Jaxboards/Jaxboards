@@ -20,30 +20,30 @@ export function emojiTime(unixTimestamp: number): string {
     );
 }
 
+/**
+ * Add idle clock to an element
+ *
+ * @param {HTMLAnchorElement} element Element to add the idle clock to
+ */
+export function addIdleClock(element: HTMLAnchorElement) {
+    const lastActionClass = Array.from(element.classList).find((classItem) =>
+        classItem.startsWith('lastAction'),
+    );
+    if (lastActionClass === undefined) {
+        return;
+    }
+    element.prepend(
+        emojiTime(
+            Number.parseInt(lastActionClass.slice('lastAction'.length), 10),
+        ),
+    );
+    element.classList.remove(lastActionClass);
+}
+
 export default class IdleClock {
     static selector(container: HTMLElement): void {
         container
             .querySelectorAll<HTMLAnchorElement>('.idle')
-            .forEach((element) => new this(element));
-    }
-
-    /**
-     * Add idle clock to an element
-     *
-     * @param {HTMLAnchorElement} element Element to add the idle clock to
-     */
-    constructor(element: HTMLAnchorElement) {
-        const lastActionClass = Array.from(element.classList).find(
-            (classItem) => classItem.startsWith('lastAction'),
-        );
-        if (lastActionClass === undefined) {
-            return;
-        }
-        element.prepend(
-            emojiTime(
-                Number.parseInt(lastActionClass.slice('lastAction'.length), 10),
-            ),
-        );
-        element.classList.remove(lastActionClass);
+            .forEach((element) => addIdleClock(element));
     }
 }
