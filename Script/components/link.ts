@@ -1,11 +1,14 @@
+import register, { Component } from '../JAX/component';
 import tooltip from '../JAX/tooltip';
 
-export default class Link {
+export default class Link extends Component<HTMLAnchorElement> {
     static hydrate(container: HTMLElement): void {
-        container.querySelectorAll('a').forEach((link) => new this(link));
+        register('Link', container.querySelectorAll('a'), this);
     }
 
     constructor(link: HTMLAnchorElement) {
+        super(link);
+
         // Special rules for all links
         // Handle links with tooltips
         if (link.dataset.useTooltip) {
@@ -42,9 +45,9 @@ export default class Link {
             });
 
             return;
-            // Open external links in a new window
         }
 
+        // Open external links in a new window
         link.target = '_BLANK';
     }
 }

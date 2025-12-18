@@ -1,6 +1,6 @@
-export default class ImageGallery {
-    element: HTMLDivElement;
+import register, { Component } from '../JAX/component';
 
+export default class ImageGallery extends Component<HTMLDivElement> {
     index: number;
 
     images: NodeListOf<HTMLImageElement>;
@@ -8,13 +8,15 @@ export default class ImageGallery {
     max: number;
 
     static hydrate(container: HTMLElement): void {
-        container
-            .querySelectorAll<HTMLDivElement>('.image_gallery')
-            .forEach((el) => new this(el));
+        register(
+            'ImageGallery',
+            container.querySelectorAll<HTMLDivElement>('.image_gallery'),
+            this,
+        );
     }
 
     constructor(element: HTMLDivElement) {
-        this.element = element;
+        super(element);
 
         const controls = document.createElement('div');
         const next = document.createElement('button');

@@ -1,35 +1,30 @@
+import register, { Component } from '../JAX/component';
 import { getComputedStyle, getCoordinates, insertBefore } from '../JAX/el';
 import Event from '../JAX/event';
 import { onImagesLoaded } from '../JAX/util';
 
 const maxDimension = '999999px';
 
-export default class ImageResizer {
-    private img: HTMLImageElement;
-
+export default class ImageResizer extends Component<HTMLImageElement> {
     static hydrate(container: HTMLElement): void {
-        const bbcodeImages = Array.from(
-            container.querySelectorAll<HTMLImageElement>('.bbcodeimg'),
-        );
-        onImagesLoaded(bbcodeImages).then(() =>
-            bbcodeImages.forEach((el) => new this(el)),
+        const bbcodeImages =
+            container.querySelectorAll<HTMLImageElement>('.bbcodeimg');
+
+        onImagesLoaded(Array.from(bbcodeImages)).then(() =>
+            register('ImageResizer', bbcodeImages, this),
         );
     }
 
-    constructor(img: HTMLImageElement) {
-        this.img = img;
-
-        if (img.dataset.madeResized) {
-            return;
-        }
+    constructor(element: HTMLImageElement) {
+        super(element);
 
         let p = 1;
         let p2 = 1;
 
-        const { naturalWidth, naturalHeight } = img;
+        const { naturalWidth, naturalHeight } = element;
         let imageWidth = naturalWidth;
         let imageHeight = naturalHeight;
-        const style = getComputedStyle(img);
+        const style = getComputedStyle(element);
         const maxWidth =
             Number.parseInt(style.width, 10) ||
             Number.parseInt(style.maxWidth, 10);
@@ -49,7 +44,7 @@ export default class ImageResizer {
     }
 
     makeResizer(imageWidth: number, imageHeight: number) {
-        const { img } = this;
+        const { element: img } = this;
         img.style.maxWidth = maxDimension;
         img.style.maxHeight = maxDimension;
         img.dataset.madeResized = 'true';

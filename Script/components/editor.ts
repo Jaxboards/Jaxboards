@@ -4,16 +4,15 @@
 import Ajax from '../JAX/ajax';
 import { bbcodeToHTML, htmlToBBCode } from '../JAX/bbcode-utils';
 import Browser from '../JAX/browser';
+import register, { Component } from '../JAX/component';
 import { getComputedStyle, insertAfter, insertBefore } from '../JAX/el';
 import { replaceSelection } from '../JAX/selection';
 
 const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
 const isURL = (text: string) => URL_REGEX.test(text);
 
-export default class Editor {
+export default class Editor extends Component<HTMLTextAreaElement> {
     iframe: HTMLIFrameElement;
-
-    element: HTMLTextAreaElement;
 
     colorWindow?: HTMLTableElement;
 
@@ -28,13 +27,17 @@ export default class Editor {
     window?: Window;
 
     static hydrate(container: HTMLElement): void {
-        container
-            .querySelectorAll<HTMLTextAreaElement>('textarea.bbcode-editor')
-            .forEach((el) => new this(el));
+        register(
+            'Editor',
+            container.querySelectorAll<HTMLTextAreaElement>(
+                'textarea.bbcode-editor',
+            ),
+            this,
+        );
     }
 
     constructor(element: HTMLTextAreaElement) {
-        this.element = element;
+        super(element);
 
         this.iframe = document.createElement('iframe');
         this.iframe.addEventListener('load', () => this.iframeLoaded());

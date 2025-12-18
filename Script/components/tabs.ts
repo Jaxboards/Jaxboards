@@ -1,16 +1,18 @@
+import register, { Component } from '../JAX/component';
+
 const ACTIVE_CLASS = 'active';
 
-export default class Tabs {
-    element: HTMLDivElement;
-
+export default class Tabs extends Component<HTMLDivElement> {
     static hydrate(container: HTMLElement): void {
-        container
-            .querySelectorAll<HTMLDivElement>('.tabs')
-            .forEach((el) => new this(el));
+        register(
+            'Tabs',
+            container.querySelectorAll<HTMLDivElement>('.tabs'),
+            this,
+        );
     }
 
     constructor(element: HTMLDivElement) {
-        this.element = element;
+        super(element);
 
         element.addEventListener('click', (event) => this.click(event));
     }

@@ -1,3 +1,4 @@
+import { Component } from '../JAX/component';
 import { fromUnixTimestamp } from '../JAX/date';
 
 /**
@@ -40,7 +41,7 @@ export function addIdleClock(element: HTMLAnchorElement) {
     element.classList.remove(lastActionClass);
 }
 
-export default class IdleClock {
+export default class IdleClock extends Component<HTMLAnchorElement> {
     static hydrate(container: HTMLElement): void {
         container
             .querySelectorAll<HTMLAnchorElement>('.idle')

@@ -1,12 +1,11 @@
 import Ajax from '../JAX/ajax';
+import register, { Component } from '../JAX/component';
 import { getCoordinates, getHighestZIndex } from '../JAX/el';
 
 const VALID_CLASS = 'valid';
 const INVALID_CLASS = 'invalid';
 
-export default class AutoComplete {
-    element: HTMLInputElement;
-
+export default class AutoComplete extends Component<HTMLInputElement> {
     action?: string;
 
     outputElement: HTMLInputElement;
@@ -14,15 +13,17 @@ export default class AutoComplete {
     indicatorElement?: HTMLElement | null;
 
     static hydrate(container: HTMLElement): void {
-        container
-            .querySelectorAll<HTMLInputElement>(
+        register(
+            'AutoComplete',
+            container.querySelectorAll<HTMLInputElement>(
                 'input[data-autocomplete-action]',
-            )
-            .forEach((el) => new this(el));
+            ),
+            this,
+        );
     }
 
     constructor(element: HTMLInputElement) {
-        this.element = element;
+        super(element);
 
         // Disable native autocomplete behavior
         element.autocomplete = 'off';

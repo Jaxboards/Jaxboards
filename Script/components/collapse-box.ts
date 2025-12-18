@@ -1,16 +1,17 @@
 import Animation from '../JAX/animation';
+import register, { Component } from '../JAX/component';
 
-export default class CollapseBox {
-    element: HTMLDivElement;
-
+export default class CollapseBox extends Component<HTMLDivElement> {
     static hydrate(container: HTMLElement): void {
-        container
-            .querySelectorAll<HTMLDivElement>('.collapse-box')
-            .forEach((el) => new this(el));
+        register(
+            'CollapseBox',
+            container.querySelectorAll<HTMLDivElement>('.collapse-box'),
+            this,
+        );
     }
 
     constructor(element: HTMLDivElement) {
-        this.element = element;
+        super(element);
 
         element
             .querySelector('.collapse-button')

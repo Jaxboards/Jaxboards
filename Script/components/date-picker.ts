@@ -1,11 +1,10 @@
+import register, { Component } from '../JAX/component';
 import { daysShort, months } from '../JAX/date';
 import { getCoordinates, getHighestZIndex } from '../JAX/el';
 import { supportsDateInput } from '../JAX/util';
 
-export default class DatePicker {
+export default class DatePicker extends Component<HTMLInputElement> {
     picker: HTMLTableElement;
-
-    element: HTMLInputElement;
 
     selectedDate?: number[];
 
@@ -15,13 +14,17 @@ export default class DatePicker {
         if (supportsDateInput()) {
             return;
         }
-        container
-            .querySelectorAll<HTMLInputElement>('input[type=date]')
-            .forEach((el) => new this(el));
+
+        register(
+            'DatePicker',
+            container.querySelectorAll<HTMLInputElement>('input[type=date]'),
+            this,
+        );
     }
 
     constructor(element: HTMLInputElement) {
-        this.element = element;
+        super(element);
+
         this.picker = this.getPicker();
 
         // Disable browser autocomplete

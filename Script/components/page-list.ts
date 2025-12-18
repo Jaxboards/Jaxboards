@@ -1,14 +1,16 @@
-export default class PageList {
-    element: HTMLDivElement;
+import register, { Component } from '../JAX/component';
 
+export default class PageList extends Component<HTMLDivElement> {
     static hydrate(container: HTMLElement): void {
-        container
-            .querySelectorAll<HTMLDivElement>('.pages')
-            .forEach((el) => new this(el));
+        register(
+            'PageList',
+            container.querySelectorAll<HTMLDivElement>('.pages'),
+            this,
+        );
     }
 
     constructor(element: HTMLDivElement) {
-        this.element = element;
+        super(element);
         element.addEventListener('wheel', (event) => this.wheel(event));
     }
 

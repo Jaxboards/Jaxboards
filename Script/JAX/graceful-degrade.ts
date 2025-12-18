@@ -45,6 +45,4 @@ export default function gracefulDegrade(container: HTMLElement) {
     ].forEach((Component) => {
         Component.hydrate(container);
     });
-
-    // Wire up AJAX forms
 }

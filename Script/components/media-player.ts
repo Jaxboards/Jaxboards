@@ -1,16 +1,17 @@
+import register, { Component } from '../JAX/component';
 import Window from '../JAX/window';
 
-export default class MediaPlayer {
-    element: HTMLDivElement;
-
+export default class MediaPlayer extends Component<HTMLDivElement> {
     static hydrate(container: HTMLElement): void {
-        container
-            .querySelectorAll<HTMLDivElement>('.media')
-            .forEach((el) => new this(el));
+        register(
+            'MediaPlayer',
+            container.querySelectorAll<HTMLDivElement>('.media'),
+            this,
+        );
     }
 
     constructor(element: HTMLDivElement) {
-        this.element = element;
+        super(element);
 
         const popoutLink = element.querySelector<HTMLAnchorElement>('a.popout');
         const inlineLink = element.querySelector<HTMLAnchorElement>('a.inline');

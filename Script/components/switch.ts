@@ -1,16 +1,18 @@
+import register, { Component } from '../JAX/component';
 import { insertAfter } from '../JAX/el';
 
-export default class Switch {
-    element: HTMLInputElement;
-
+export default class Switch extends Component<HTMLInputElement> {
     static hydrate(container: HTMLElement): void {
-        container
-            .querySelectorAll<HTMLInputElement>('input.switch')
-            .forEach((el) => new this(el));
+        register(
+            'Switch',
+            container.querySelectorAll<HTMLInputElement>('input.switch'),
+            this,
+        );
     }
 
     constructor(element: HTMLInputElement) {
-        this.element = element;
+        super(element);
+
         // Hide original checkbox
         element.style.display = 'none';
 
