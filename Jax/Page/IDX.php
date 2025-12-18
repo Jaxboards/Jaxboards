@@ -108,7 +108,7 @@ final class IDX implements Route
     {
         $forums = Forum::selectMany(
             'WHERE `path` = "" '
-            . 'ORDER BY `order`, `title` ASC',
+                . 'ORDER BY `order`, `title` ASC',
         );
 
         return array_filter(

@@ -1,4 +1,5 @@
-import { date, emojiTime } from './date';
+import { emojiTime } from '../components/idle-clock';
+import { date } from './date';
 import { getCoordinates, getHighestZIndex } from './el';
 
 export default function toolTip(el: HTMLElement) {

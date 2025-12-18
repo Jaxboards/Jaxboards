@@ -3,13 +3,13 @@ import AutoComplete from '../components/auto-complete';
 import CollapseBox from '../components/collapse-box';
 import DatePicker from '../components/date-picker';
 import Editor from '../components/editor';
+import IdleClock from '../components/idle-clock';
 import ImageGallery from '../components/image-gallery';
 import ImageResizer from '../components/image-resizer';
 import MediaPlayer from '../components/media-player';
 import PageList from '../components/page-list';
 import Switch from '../components/switch';
 import Tabs from '../components/tabs';
-import { addIdleClock } from './date';
 import { selectAll } from './selection';
 import tooltip from './tooltip';
 import { updateDates } from './util';
@@ -45,7 +45,7 @@ export default function gracefulDegrade(container: HTMLElement) {
         if (isLocalLink) {
             const oldclick = link.onclick;
             link.onclick = null;
-            link.addEventListener('click', (event: MouseEvent) => {
+            link.addEventListener('click', (event: PointerEvent) => {
                 event.preventDefault();
                 // Some links have an onclick that returns true/false based on whether
                 // or not the link should execute.
@@ -74,6 +74,7 @@ export default function gracefulDegrade(container: HTMLElement) {
         CollapseBox,
         DatePicker,
         Editor,
+        IdleClock,
         ImageGallery,
         ImageResizer,
         MediaPlayer,
@@ -97,9 +98,4 @@ export default function gracefulDegrade(container: HTMLElement) {
             RUN.submitForm(ajaxForm, resetOnSubmit);
         });
     });
-
-    // Add idle clocks to user lists
-    Array.from(document.querySelectorAll<HTMLAnchorElement>('.idle')).forEach(
-        (element) => addIdleClock(element),
-    );
 }

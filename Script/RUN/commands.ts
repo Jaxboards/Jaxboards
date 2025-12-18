@@ -1,7 +1,7 @@
 /* global RUN, globalSettings */
 /* eslint-disable no-alert */
+import IdleClock from '../components/idle-clock';
 import Animation from '../JAX/animation';
-import { addIdleClock } from '../JAX/date';
 import { getComputedStyle, getCoordinates } from '../JAX/el';
 import gracefulDegrade from '../JAX/graceful-degrade';
 import { messageReceived } from '../JAX/instant-messaging-window';
@@ -220,7 +220,8 @@ export default {
                     link.onmouseover = () => openTooltip(link, tooltip);
                 }
                 if (status === 'idle') {
-                    addIdleClock(link);
+                    // eslint-disable-next-line no-new
+                    new IdleClock(link);
 
                     return;
                 }
