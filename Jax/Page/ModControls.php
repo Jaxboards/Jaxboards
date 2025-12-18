@@ -6,7 +6,6 @@ namespace Jax\Page;
 
 use Carbon\Carbon;
 use Jax\Config;
-use Jax\FileSystem;
 use Jax\Interfaces\Route;
 use Jax\IPAddress;
 use Jax\Jax;
@@ -27,7 +26,6 @@ use function array_map;
 use function count;
 use function filter_var;
 use function gmdate;
-use function header;
 use function implode;
 use function nl2br;
 
@@ -37,7 +35,6 @@ final readonly class ModControls implements Route
 {
     public function __construct(
         private Config $config,
-        private FileSystem $fileSystem,
         private IPAddress $ipAddress,
         private Jax $jax,
         private ModTopics $modTopics,
@@ -87,7 +84,6 @@ final readonly class ModControls implements Route
         match ($this->request->both('do')) {
             'modp' => $this->modPosts->addPost((int) $this->request->both('pid')),
             'modt' => $this->modTopics->addTopic((int) $this->request->both('tid')),
-            'load' => $this->load(),
             'cp' => $this->showModCP(),
             'emem' => $this->showModCP(match (true) {
                 $this->request->post('submit') === 'showform'
@@ -97,23 +93,6 @@ final readonly class ModControls implements Route
             'iptools' => $this->showModCP($this->ipTools()),
             default => null,
         };
-    }
-
-    private function load(): void
-    {
-        $script = $this->fileSystem->getContents('dist/modcontrols.js');
-
-        if (!$this->request->isJSAccess()) {
-            header('Content-Type: application/javascript; charset=utf-8');
-            header('Expires: ' . Carbon::now('UTC')->addMonth()->format(Carbon::RFC7231));
-
-            $this->page->earlyFlush($script);
-
-            return;
-        }
-
-        $this->page->command('softurl');
-        $this->page->command('script', $script);
     }
 
     private function cancel(): void

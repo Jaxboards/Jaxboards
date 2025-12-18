@@ -516,15 +516,6 @@ final class ModCPTest extends FeatureTestCase
         $this->assertEquals(1, Topic::selectOne(1)->pinned);
     }
 
-    public function testLoadModControlsJS(): void
-    {
-        $this->actingAs('admin');
-
-        $page = $this->go('?act=modcontrols&do=load');
-
-        $this->assertStringContainsString('modcontrols', $page);
-    }
-
     private function insertForum(array $forumProperties = []): Forum
     {
         $forum = new Forum($forumProperties);

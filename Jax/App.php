@@ -201,19 +201,6 @@ final readonly class App
         );
 
         if (
-            $this->user->getGroup()?->canModerate
-            || $this->user->get()->mod
-        ) {
-            $loadModControlsURL = $this->router->url('modcontrols', ['do' => 'load']);
-            $this->page->append(
-                'SCRIPT',
-                <<<HTML
-                    <script type="text/javascript" src="{$loadModControlsURL}" defer></script>
-                    HTML,
-            );
-        }
-
-        if (
             $this->template->meta('favicon') !== ''
         ) {
             $this->page->append(

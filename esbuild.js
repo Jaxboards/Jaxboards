@@ -13,10 +13,3 @@ await esbuild.build({
     outfile: 'dist/acp.js',
     minify: true,
 });
-
-await esbuild.build({
-    entryPoints: ['Script/modcontrols.ts'],
-    bundle: true,
-    outfile: 'dist/modcontrols.js',
-    minify: true,
-});

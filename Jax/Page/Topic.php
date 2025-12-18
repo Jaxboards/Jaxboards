@@ -570,7 +570,7 @@ final class Topic implements Route
                     : '')
                 // Adds the Moderate options
                 . ($canModerateTopic
-                    ? "<a href='{$modPostURL}' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>"
+                    ? "<a href='{$modPostURL}' class='modpost' onclick='ModControls.togbutton(this)'>"
                     . $this->template->meta('topic-mod-button') . '</a>'
                     : '');
 

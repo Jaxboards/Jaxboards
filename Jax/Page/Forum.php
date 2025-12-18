@@ -312,7 +312,7 @@ final class Forum implements Route
                 $isForumModerator ? (
                     '<a href="'
                     . $this->router->url('modcontrols', ['do' => 'modt', 'tid' => $topic->id])
-                    . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>'
+                    . '" class="moderate" onclick="ModControls.togbutton(this)"></a>'
                 ) : '',
                 // 12
                 $pages,

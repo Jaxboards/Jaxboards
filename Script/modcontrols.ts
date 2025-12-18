@@ -1,25 +1,25 @@
 /* global RUN */
 import gracefulDegrade from './JAX/graceful-degrade';
-import { onDOMReady } from './JAX/util';
+import Commands from './RUN/commands';
 
-const postIDs = function fetchPIDs(strPIDs: string) {
+function postIDs(strPIDs: string) {
     const pids = strPIDs ? strPIDs.split(',') : [];
     const pl = pids ? pids.length : 0;
     const pluralPosts = pids.length === 1 ? '' : 's';
     const andPosts = pl ? ' and <br />' : '';
     return [pids, pl, pluralPosts, andPosts];
-};
+}
 
-const threadIDs = function fetchTIDs(strTIDs: string) {
+function threadIDs(strTIDs: string) {
     const tids = strTIDs ? strTIDs.split(',') : [];
     const tl = tids ? tids.length : 0;
     const pluralThreads = tl === 1 ? '' : 's';
     return [tids, tl, pluralThreads];
-};
+}
 
-class ModControls {
-    constructor(commands) {
-        Object.assign(commands, {
+export default class ModControls {
+    constructor() {
+        Object.assign(Commands, {
             /**
              * @param {[string,string]} param0
              */
@@ -144,7 +144,3 @@ class ModControls {
         button.classList.toggle('selected');
     }
 }
-
-onDOMReady(() => {
-    RUN.modcontrols = new ModControls(RUN.stream.commands);
-});
