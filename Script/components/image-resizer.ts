@@ -7,7 +7,7 @@ const maxDimension = '999999px';
 export default class ImageResizer {
     private img: HTMLImageElement;
 
-    static selector(container: HTMLElement): void {
+    static hydrate(container: HTMLElement): void {
         const bbcodeImages = Array.from(
             container.querySelectorAll<HTMLImageElement>('.bbcodeimg'),
         );

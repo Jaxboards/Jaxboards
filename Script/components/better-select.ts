@@ -18,7 +18,7 @@ export default class BetterSelect extends HTMLElement {
 
     value: string;
 
-    static selector() {
+    static hydrate() {
         customElements.define('better-select', BetterSelect);
 
         customElements.define(

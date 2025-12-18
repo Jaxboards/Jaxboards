@@ -6,60 +6,16 @@ import Editor from '../components/editor';
 import IdleClock from '../components/idle-clock';
 import ImageGallery from '../components/image-gallery';
 import ImageResizer from '../components/image-resizer';
+import Link from '../components/link';
 import MediaPlayer from '../components/media-player';
 import PageList from '../components/page-list';
 import Switch from '../components/switch';
 import Tabs from '../components/tabs';
 import { selectAll } from './selection';
-import tooltip from './tooltip';
 import { updateDates } from './util';
 
 export default function gracefulDegrade(container: HTMLElement) {
     updateDates();
-
-    // Special rules for all links
-    const links = container.querySelectorAll('a');
-    links.forEach((link) => {
-        // Handle links with tooltips
-        if (link.dataset.useTooltip) {
-            link.addEventListener('mouseover', () => tooltip(link));
-        }
-
-        // Make all links load through AJAX
-        if (!link.href) {
-            return;
-        }
-
-        const href = link.getAttribute('href');
-        const isLocalLink =
-            !link.target &&
-            href &&
-            (href.startsWith('/') || href.startsWith('?'));
-
-        const isJavascriptLink = href?.startsWith('javascript');
-
-        if (isJavascriptLink) {
-            return;
-        }
-
-        if (isLocalLink) {
-            const oldclick = link.onclick;
-            link.onclick = null;
-            link.addEventListener('click', (event: PointerEvent) => {
-                event.preventDefault();
-                // Some links have an onclick that returns true/false based on whether
-                // or not the link should execute.
-                if (!oldclick || oldclick.call(link, event) !== false) {
-                    RUN.stream.location(href);
-                }
-            });
-
-            return;
-            // Open external links in a new window
-        }
-
-        link.target = '_BLANK';
-    });
 
     // Make BBCode code blocks selectable when clicked
     container
@@ -77,12 +33,13 @@ export default function gracefulDegrade(container: HTMLElement) {
         IdleClock,
         ImageGallery,
         ImageResizer,
+        Link,
         MediaPlayer,
         PageList,
         Switch,
         Tabs,
     ].forEach((Component) => {
-        Component.selector(container);
+        Component.hydrate(container);
     });
 
     // Wire up AJAX forms

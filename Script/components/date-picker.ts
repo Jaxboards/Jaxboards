@@ -11,7 +11,7 @@ export default class DatePicker {
 
     lastDate?: number[];
 
-    static selector(container: HTMLElement): void {
+    static hydrate(container: HTMLElement): void {
         if (supportsDateInput()) {
             return;
         }

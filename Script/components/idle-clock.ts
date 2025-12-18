@@ -41,7 +41,7 @@ export function addIdleClock(element: HTMLAnchorElement) {
 }
 
 export default class IdleClock {
-    static selector(container: HTMLElement): void {
+    static hydrate(container: HTMLElement): void {
         container
             .querySelectorAll<HTMLAnchorElement>('.idle')
             .forEach((element) => addIdleClock(element));

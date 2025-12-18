@@ -1,7 +1,7 @@
 export default class PageList {
     element: HTMLDivElement;
 
-    static selector(container: HTMLElement): void {
+    static hydrate(container: HTMLElement): void {
         container
             .querySelectorAll<HTMLDivElement>('.pages')
             .forEach((el) => new this(el));

@@ -3,7 +3,7 @@ const ACTIVE_CLASS = 'active';
 export default class Tabs {
     element: HTMLDivElement;
 
-    static selector(container: HTMLElement): void {
+    static hydrate(container: HTMLElement): void {
         container
             .querySelectorAll<HTMLDivElement>('.tabs')
             .forEach((el) => new this(el));

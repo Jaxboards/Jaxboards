@@ -7,7 +7,7 @@ export default class ImageGallery {
 
     max: number;
 
-    static selector(container: HTMLElement): void {
+    static hydrate(container: HTMLElement): void {
         container
             .querySelectorAll<HTMLDivElement>('.image_gallery')
             .forEach((el) => new this(el));

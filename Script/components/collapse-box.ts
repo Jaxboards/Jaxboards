@@ -3,7 +3,7 @@ import Animation from '../JAX/animation';
 export default class CollapseBox {
     element: HTMLDivElement;
 
-    static selector(container: HTMLElement): void {
+    static hydrate(container: HTMLElement): void {
         container
             .querySelectorAll<HTMLDivElement>('.collapse-box')
             .forEach((el) => new this(el));

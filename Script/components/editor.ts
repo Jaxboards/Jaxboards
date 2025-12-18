@@ -27,7 +27,7 @@ export default class Editor {
 
     window?: Window;
 
-    static selector(container: HTMLElement): void {
+    static hydrate(container: HTMLElement): void {
         container
             .querySelectorAll<HTMLTextAreaElement>('textarea.bbcode-editor')
             .forEach((el) => new this(el));
