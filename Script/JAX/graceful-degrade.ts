@@ -1,8 +1,8 @@
-/* global RUN */
 import AutoComplete from '../components/auto-complete';
 import CollapseBox from '../components/collapse-box';
 import DatePicker from '../components/date-picker';
 import Editor from '../components/editor';
+import Form from '../components/form';
 import IdleClock from '../components/idle-clock';
 import ImageGallery from '../components/image-gallery';
 import ImageResizer from '../components/image-resizer';
@@ -38,21 +38,13 @@ export default function gracefulDegrade(container: HTMLElement) {
         PageList,
         Switch,
         Tabs,
+
+        // NOTE: This needs to come after editors, since they both hook into form onsubmit
+        // and the editor hook needs to fire first.
+        Form,
     ].forEach((Component) => {
         Component.hydrate(container);
     });
 
     // Wire up AJAX forms
-    // NOTE: This needs to come after editors, since they both hook into form onsubmit
-    // and the editor hook needs to fire first
-    const ajaxForms = container.querySelectorAll<HTMLFormElement>(
-        'form[data-ajax-form]',
-    );
-    ajaxForms.forEach((ajaxForm) => {
-        const resetOnSubmit = ajaxForm.dataset.ajaxForm === 'resetOnSubmit';
-        ajaxForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            RUN.submitForm(ajaxForm, resetOnSubmit);
-        });
-    });
 }
