@@ -4,15 +4,15 @@ import CollapseBox from '../components/collapse-box';
 import DatePicker from '../components/date-picker';
 import Editor from '../components/editor';
 import ImageGallery from '../components/image-gallery';
+import ImageResizer from '../components/image-resizer';
 import MediaPlayer from '../components/media-player';
 import PageList from '../components/page-list';
 import Switch from '../components/switch';
 import Tabs from '../components/tabs';
 import { addIdleClock } from './date';
-import { imageResizer } from './image-resizer';
 import { selectAll } from './selection';
 import tooltip from './tooltip';
-import { onImagesLoaded, updateDates } from './util';
+import { updateDates } from './util';
 
 export default function gracefulDegrade(container: HTMLElement) {
     updateDates();
@@ -61,17 +61,6 @@ export default function gracefulDegrade(container: HTMLElement) {
         link.target = '_BLANK';
     });
 
-    // Handle image hover magnification
-    const bbcodeimgs = Array.from(
-        container.querySelectorAll<HTMLImageElement>('.bbcodeimg'),
-    );
-    if (bbcodeimgs.length) {
-        onImagesLoaded(bbcodeimgs).then(() => {
-            // resizer on large images
-            imageResizer(bbcodeimgs);
-        });
-    }
-
     // Make BBCode code blocks selectable when clicked
     container
         .querySelectorAll<HTMLDivElement>('.bbcode.code')
@@ -86,6 +75,7 @@ export default function gracefulDegrade(container: HTMLElement) {
         DatePicker,
         Editor,
         ImageGallery,
+        ImageResizer,
         MediaPlayer,
         PageList,
         Switch,

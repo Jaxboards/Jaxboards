@@ -100,7 +100,7 @@ export default class ModControls {
         if (locationMatch) {
             this.moveto(locationMatch[1]);
         } else {
-            RUN.stream.commands.modcontrols_move();
+            Commands.modcontrols_move();
         }
     }
 
