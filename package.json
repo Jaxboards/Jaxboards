@@ -1,7 +1,6 @@
 {
     "name": "jaxboards",
     "devDependencies": {
-        "concurrently": "^9.2.1",
         "@eslint/eslintrc": "^3.3.1",
         "@eslint/js": "^9.26.0",
         "esbuild": "^0.25.3",
@@ -29,10 +28,8 @@
     "private": true,
     "scripts": {
         "autofix": "npm run-script prettier && npm run-script eslint-fix && npm run-script stylelint-fix && npm run-script rector && npm run-script phpcbf && npm run-script php-cs-fixer",
-        "dev": "concurrently \"npm run build:app -- --watch\" \"npm run build:acp -- --watch\"",
-        "build": "node ./esbuild",
-        "build:app": "esbuild Script/app.ts --outfile=dist/app.js --bundle --minify",
-        "build:acp": "esbuild Script/acp.ts --outfile=dist/acp.js --bundle --minify",
+        "dev": "npm run build -- --watch",
+        "build": "esbuild Script/app.ts Script/acp.ts --outdir=dist/ --bundle --minify",
         "ci-lint": "npm run-script eslint-report && npm run-script stylelint-report && npm run-script parallel-lint-report && npm run-script phpcs-report && npm run-script phpstan-report && npm run-script psalm-report && npm run-script phpmd-report",
         "eslint": "eslint \"Script/**/*.ts\"",
         "eslint-fix": "eslint \"Script/**/*.ts\" --fix",

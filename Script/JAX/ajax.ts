@@ -57,9 +57,7 @@ class Ajax {
         method: 'POST',
     };
 
-    constructor(setup = {}) {
-        Object.assign(this.setup, setup);
-    }
+    constructor(setup = {}) {}
 
     load(
         url: string,
