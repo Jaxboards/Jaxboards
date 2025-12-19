@@ -386,19 +386,9 @@ export default class Editor extends Component<HTMLTextAreaElement> {
                 throw new Error(`Unsupported editor command ${command}`);
         }
         if (this.htmlMode) {
-            if (realCommand === 'inserthtml' && Browser.ie) {
-                rng = this.doc?.selection.createRange();
-                if (!rng.text.length) this.doc.body.innerHTML += arg1;
-                else {
-                    rng.pasteHTML(arg1);
-                    rng.collapse(false);
-                    rng.select();
-                }
-            } else {
-                this.doc.execCommand(realCommand, false, arg1 || false);
-                if (this.iframe.contentWindow.focus) {
-                    this.iframe.contentWindow.focus();
-                }
+            this.doc.execCommand(realCommand, false, arg1 || false);
+            if (this.iframe.contentWindow.focus) {
+                this.iframe.contentWindow.focus();
             }
         } else replaceSelection(this.element, bbcode);
     }
