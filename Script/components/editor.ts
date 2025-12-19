@@ -47,9 +47,6 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         this.iframe.style.display = 'none';
 
         // Attach Event Listeners
-        element.closest('form')?.addEventListener('submit', () => {
-            this.submit();
-        });
         this.iframe.addEventListener('load', () => this.iframeLoaded(), {
             once: true,
         });
@@ -77,6 +74,11 @@ export default class Editor extends Component<HTMLTextAreaElement> {
             Browser.mobile || Browser.n3ds ? false : globalSettings.wysiwyg;
         this.window = iframe.contentWindow || undefined;
         this.doc = iframe.contentWindow?.document;
+
+        this.doc?.addEventListener('input', () => {
+            // keep textarea updated with BBCode in real time
+            this.element.value = htmlToBBCode(this.getSource() || '');
+        });
 
         if (!this.doc) {
             return;
@@ -400,7 +402,6 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     switchMode(htmlMode: boolean) {
         const { element, iframe } = this;
         if (!htmlMode) {
-            element.value = htmlToBBCode(this.getSource() || '');
             element.style.display = '';
             iframe.style.display = 'none';
         } else {
@@ -409,12 +410,5 @@ export default class Editor extends Component<HTMLTextAreaElement> {
             iframe.style.display = '';
         }
         this.htmlMode = htmlMode;
-    }
-
-    submit() {
-        if (this.htmlMode) {
-            this.switchMode(false);
-            this.switchMode(true);
-        }
     }
 }

@@ -30,6 +30,7 @@ export default function gracefulDegrade(container: HTMLElement) {
         CollapseBox,
         DatePicker,
         Editor,
+        Form,
         IdleClock,
         ImageGallery,
         ImageResizer,
@@ -38,10 +39,6 @@ export default function gracefulDegrade(container: HTMLElement) {
         PageList,
         Switch,
         Tabs,
-
-        // NOTE: This needs to come after editors, since they both hook into form onsubmit
-        // and the editor hook needs to fire first.
-        Form,
     ].forEach((Component) => {
         Component.hydrate(container);
     });
