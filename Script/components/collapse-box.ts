@@ -1,7 +1,8 @@
-import Animation from '../JAX/animation';
 import register, { Component } from '../JAX/component';
 
 export default class CollapseBox extends Component<HTMLDivElement> {
+    private fullHeight: number = 0;
+
     static hydrate(container: HTMLElement): void {
         register(
             'CollapseBox',
@@ -13,41 +14,40 @@ export default class CollapseBox extends Component<HTMLDivElement> {
     constructor(element: HTMLDivElement) {
         super(element);
 
-        element
-            .querySelector('.collapse-button')
-            ?.addEventListener('click', () => this.click());
+        // Set up initial height
+        const { collapseContent } = this;
+        if (collapseContent) {
+            this.fullHeight =
+                collapseContent.clientHeight || collapseContent.offsetHeight;
+
+            Object.assign(collapseContent.style, {
+                height: `${this.fullHeight}px`,
+                transition: 'height 200ms ease-in-out',
+                overflow: 'hidden',
+            });
+        }
+
+        this.element.addEventListener('click', (event) => {
+            if (
+                event.target instanceof HTMLElement &&
+                event.target.matches('.collapse-button')
+            ) {
+                this.toggle();
+            }
+        });
     }
 
-    click() {
-        const collapseContent =
-            this.element.querySelector<HTMLDivElement>('.collapse-content');
+    get collapseContent() {
+        return this.element.querySelector<HTMLDivElement>('.collapse-content');
+    }
+
+    toggle() {
+        const { collapseContent } = this;
 
         if (!collapseContent) return;
 
         const { style } = collapseContent;
-        let { fullHeight } = collapseContent.dataset;
-        const collapseBox = this.element;
-        style.overflow = 'hidden';
-        if (style.height === '0px' && fullHeight) {
-            new Animation(collapseContent, 5, 10, 0)
-                .add('height', '0px', fullHeight)
-                .andThen(() => {
-                    collapseBox.classList.remove('collapsed');
-                })
-                .play();
-        } else {
-            if (!fullHeight) {
-                fullHeight = `${
-                    collapseContent.clientHeight || collapseContent.offsetHeight
-                }px`;
-                collapseContent.dataset.fullHeight = fullHeight;
-            }
-            new Animation(collapseContent, 5, 10, 0)
-                .add('height', fullHeight, '0px')
-                .andThen(() => {
-                    collapseBox.classList.add('collapsed');
-                })
-                .play();
-        }
+
+        style.height = `${style.height === '0px' ? this.fullHeight : 0}px`;
     }
 }
