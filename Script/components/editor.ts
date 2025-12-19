@@ -18,15 +18,11 @@ export default class Editor extends Component<HTMLTextAreaElement> {
 
     container: HTMLDivElement;
 
-    doc?: Document;
-
     htmlMode: boolean = false;
 
     editbar?: HTMLDivElement;
 
     emoteWindow?: HTMLDivElement;
-
-    window?: Window;
 
     static hydrate(container: HTMLElement): void {
         register(
@@ -65,6 +61,14 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         this.container.appendChild(this.iframe);
     }
 
+    get doc() {
+        return this.window?.document;
+    }
+
+    get window() {
+        return this.iframe.contentWindow;
+    }
+
     iframeLoaded() {
         const { iframe, element } = this;
 
@@ -72,8 +76,6 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         // 1 for html editing mode, 0 for textarea mode
         this.htmlMode =
             Browser.mobile || Browser.n3ds ? false : globalSettings.wysiwyg;
-        this.window = iframe.contentWindow || undefined;
-        this.doc = iframe.contentWindow?.document;
 
         this.doc?.addEventListener('input', () => {
             // keep textarea updated with BBCode in real time
@@ -275,7 +277,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         const selection = this.getSelection();
         let bbcode = '';
         let realCommand = command;
-        let arg1 = arg || '';
+        let arg1 = arg;
         switch (command.toLowerCase()) {
             case 'bold':
                 bbcode = `[b]${selection}[/b]`;
@@ -368,16 +370,14 @@ export default class Editor extends Component<HTMLTextAreaElement> {
                 bbcode = arg1;
                 break;
             case 'inserthtml':
-                bbcode = arg1;
+                bbcode = arg1 || '';
                 break;
             default:
                 throw new Error(`Unsupported editor command ${command}`);
         }
         if (this.htmlMode) {
-            this.doc.execCommand(realCommand, false, arg1 || false);
-            if (this.iframe.contentWindow.focus) {
-                this.iframe.contentWindow.focus();
-            }
+            this.doc?.execCommand(realCommand, false, arg1);
+            this.window?.focus();
         } else replaceSelection(this.element, bbcode);
     }
 
