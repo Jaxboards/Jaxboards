@@ -503,9 +503,11 @@ final class Topic implements Route
 
         $topicPostCounter = $this->pageNumber * $this->numperpage;
         $posts = Post::selectMany(
-            'WHERE tid = ? AND id > ? '
-            . 'ORDER BY `id` '
-            . 'LIMIT ?,?',
+            <<<'SQL'
+                WHERE tid = ? AND id > ?
+                ORDER BY `newtopic` DESC, `id`
+                LIMIT ?,?
+                SQL,
             $modelsTopic->id,
             $lastpid,
             $lastpid !== 0 ? 0 : $topicPostCounter,
