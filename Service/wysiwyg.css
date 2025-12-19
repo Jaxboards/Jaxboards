@@ -20,6 +20,7 @@ body {
     background: url('wysiwygbar.png');
     height: 24px;
     display: inline-block;
+    cursor: pointer;
 }
 
 .editbar a:hover {

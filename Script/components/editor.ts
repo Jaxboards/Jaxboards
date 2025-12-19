@@ -5,7 +5,7 @@ import Ajax from '../JAX/ajax';
 import { bbcodeToHTML, htmlToBBCode } from '../JAX/bbcode-utils';
 import Browser from '../JAX/browser';
 import register, { Component } from '../JAX/component';
-import { getComputedStyle, insertAfter, insertBefore } from '../JAX/el';
+import { getComputedStyle, insertBefore } from '../JAX/el';
 import { replaceSelection } from '../JAX/selection';
 
 const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
@@ -15,6 +15,8 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     iframe: HTMLIFrameElement;
 
     colorWindow?: HTMLTableElement;
+
+    container: HTMLDivElement;
 
     doc?: Document;
 
@@ -39,14 +41,31 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     constructor(element: HTMLTextAreaElement) {
         super(element);
 
+        // Create DOM
+        this.container = document.createElement('div');
         this.iframe = document.createElement('iframe');
-        this.iframe.addEventListener('load', () => this.iframeLoaded());
         this.iframe.style.display = 'none';
-        insertAfter(this.iframe, element);
 
+        // Attach Event Listeners
         element.closest('form')?.addEventListener('submit', () => {
             this.submit();
         });
+        this.iframe.addEventListener('load', () => this.iframeLoaded(), {
+            once: true,
+        });
+        this.container.addEventListener('click', (evt) => {
+            if (
+                evt.target instanceof HTMLElement &&
+                evt.target.matches('.editbar a')
+            ) {
+                this.editbarCommand(evt, evt.target.className);
+            }
+        });
+
+        // Update DOM
+        insertBefore(this.container, element);
+        this.container.appendChild(element);
+        this.container.appendChild(this.iframe);
     }
 
     iframeLoaded() {
@@ -73,7 +92,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
 
         this.doc.designMode = 'on';
 
-        this.editbar = this.buildEditBar();
+        this.editbar = Editor.buildEditBar();
 
         iframe.style.height = `${element.clientHeight}px`;
 
@@ -87,64 +106,32 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         }, 100);
     }
 
-    buildEditBar(): HTMLDivElement {
+    static buildEditBar(): HTMLDivElement {
         const editbar = document.createElement('div');
         editbar.className = 'editbar';
-        const cmds = [
-            'bold',
-            'italic',
-            'underline',
-            'strikethrough',
-            'forecolor',
-            'backcolor',
-            'insertimage',
-            'createlink',
-            'c_email',
-            'justifyleft',
-            'justifycenter',
-            'justifyright',
-            'c_youtube',
-            'c_code',
-            'c_quote',
-            'c_spoiler',
-            'insertorderedlist',
-            'insertunorderedlist',
-            'c_smileys',
-            'c_switcheditmode',
-        ];
+        editbar.innerHTML = [
+            `<a class="bold" title="Bold"></a>`,
+            `<a class="italic" title="Italic"></a>`,
+            `<a class="underline" title="Underline"></a>`,
+            `<a class="strikethrough" title="Strike-Through"></a>`,
+            `<a class="forecolor" title="Foreground Color"></a>`,
+            `<a class="backcolor" title="Background Color"></a>`,
+            `<a class="insertimage" title="Insert Image"></a>`,
+            `<a class="createlink" title="Insert Link"></a>`,
+            `<a class="c_email" title="Insert Email"></a>`,
+            `<a class="justifyleft" title="Align Left"></a>`,
+            `<a class="justifycenter" title="Center"></a>`,
+            `<a class="justifyright" title="Align Right"></a>`,
+            `<a class="c_youtube" title="Insert video from any of your favorite video services!"></a>`,
+            `<a class="c_code" title="Insert code"></a>`,
+            `<a class="c_quote" title="Insert Quote"></a>`,
+            `<a class="c_spoiler" title="Insert Spoiler"></a>`,
+            `<a class="insertorderedlist" title="Create Ordered List"></a>`,
+            `<a class="insertunorderedlist" title="Create Unordered List"></a>`,
+            `<a class="c_smileys" title="Insert Emoticon"></a>`,
+            `<a class="c_switcheditmode" title="Switch editor mode"></a>`,
+        ].join('');
 
-        const cmddesc = [
-            'Bold',
-            'Italic',
-            'Underline',
-            'Strike-Through',
-            'Foreground Color',
-            'Background Color',
-            'Insert Image',
-            'Insert Link',
-            'Insert email',
-            'Align left',
-            'Center',
-            'Align right',
-            'Insert video from any of your favorite video services!',
-            'Insert code',
-            'Insert Quote',
-            'Insert Spoiler',
-            'Create Ordered List',
-            'Create Unordered List',
-            'Insert Emoticon',
-            'Switch editor mode',
-        ];
-
-        for (let i = 0; i < cmds.length; i += 1) {
-            const a = document.createElement('a');
-            a.className = cmds[i];
-            a.title = cmddesc[i];
-            a.href = 'javascript:void(0)';
-            a.onclick = (event: MouseEvent) =>
-                this.editbarCommand(event, cmds[i]);
-            editbar.appendChild(a);
-        }
         return editbar;
     }
 
