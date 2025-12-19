@@ -115,8 +115,6 @@ export default class ModControls {
         const locationMatch = document.location.toString().match(regex);
         if (locationMatch) {
             this.moveto(Number(locationMatch[1]));
-        } else {
-            Commands.modcontrols_move();
         }
     }
 
