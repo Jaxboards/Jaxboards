@@ -1,5 +1,5 @@
 import register, { Component } from '../JAX/component';
-import tooltip from '../JAX/tooltip';
+import toolTip from '../JAX/tooltip';
 
 export default class Link extends Component<HTMLAnchorElement> {
     static hydrate(container: HTMLElement): void {
@@ -12,7 +12,7 @@ export default class Link extends Component<HTMLAnchorElement> {
         // Special rules for all links
         // Handle links with tooltips
         if (link.dataset.useTooltip) {
-            link.addEventListener('mouseover', () => tooltip(link));
+            link.addEventListener('mouseover', () => toolTip(link));
         }
 
         // Make all links load through AJAX

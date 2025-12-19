@@ -21,18 +21,15 @@ export default function register<
     T extends HTMLElement,
     TT extends typeof Component<T>,
 >(className: string, nodeList: NodeListOf<T>, ComponentClass: TT) {
-    let instances = registry.get(className);
-
-    if (!instances) {
-        instances = new WeakMap();
-        registry.set(className, instances);
+    if (!registry.has(className)) {
+        registry.set(className, new WeakMap());
     }
 
-    nodeList.forEach((element) => {
-        if (instances.has(element)) {
+    nodeList.forEach(function registerLoop(element) {
+        if (registry.get(className)?.has(element)) {
             return;
         }
 
-        instances.set(element, new ComponentClass(element));
+        registry.get(className)?.set(element, new ComponentClass(element));
     });
 }
