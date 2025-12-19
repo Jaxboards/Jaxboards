@@ -324,7 +324,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
             case 'createlink':
                 arg1 = prompt('Link:') || '';
                 if (!arg1) return;
-                if (!arg1.match(/^(https?|ftp|mailto):/))
+                if (!/^(https?|ftp|mailto):/.test(arg1))
                     arg1 = `https://${arg1}`;
                 bbcode = `[url=${arg1}]${selection}[/url]`;
                 break;
@@ -352,7 +352,8 @@ export default class Editor extends Component<HTMLTextAreaElement> {
             case 'c_quote':
                 realCommand = 'inserthtml';
                 arg1 = prompt('Who said this?') || '';
-                arg1 = `[quote${arg1 ? `=${arg1}` : ''}]${selection}[/quote]`;
+                arg1 = arg1 ? `=${arg1}` : '';
+                arg1 = `[quote${arg1}]${selection}[/quote]`;
                 bbcode = arg1;
                 break;
             case 'c_spoiler':
@@ -381,7 +382,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         } else replaceSelection(this.element, bbcode);
     }
 
-    getSelection(): string {
+    getSelection() {
         if (this.htmlMode) {
             return this.window?.getSelection()?.toString() || '';
         }
@@ -391,23 +392,23 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         );
     }
 
-    getSource(): string | undefined {
+    getSource() {
         return this.doc?.body.innerHTML;
     }
 
     setSource(innerHTML: string) {
-        if (this.doc && this.doc.body) this.doc.body.innerHTML = innerHTML;
+        if (this.doc) this.doc.body.innerHTML = innerHTML;
     }
 
     switchMode(htmlMode: boolean) {
         const { element, iframe } = this;
-        if (!htmlMode) {
-            element.style.display = '';
-            iframe.style.display = 'none';
-        } else {
+        if (htmlMode) {
             this.setSource(bbcodeToHTML(element.value));
             element.style.display = 'none';
             iframe.style.display = '';
+        } else {
+            element.style.display = '';
+            iframe.style.display = 'none';
         }
         this.htmlMode = htmlMode;
     }

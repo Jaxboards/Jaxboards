@@ -14,8 +14,6 @@ export default class BetterSelect extends HTMLElement {
 
     hiddenFormField: HTMLInputElement;
 
-    static formAssociated = true;
-
     value: string;
 
     static hydrate() {

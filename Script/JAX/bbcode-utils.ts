@@ -63,19 +63,19 @@ export function htmlToBBCode(html: string) {
             }
 
             if (italicMatch || lcTag === 'i' || lcTag === 'em') {
-                innerhtml = `[I]${innerhtml}[/I]`;
+                innerhtml = `[i]${innerhtml}[/i]`;
             }
 
             if (underlineMatch || lcTag === 'u') {
-                innerhtml = `[U]${innerhtml}[/U]`;
+                innerhtml = `[u]${innerhtml}[/u]`;
             }
 
             if (lineThroughMatch || lcTag === 's' || lcTag === 'strike') {
-                innerhtml = `[S]${innerhtml}[/S]`;
+                innerhtml = `[s]${innerhtml}[/s]`;
             }
 
             if (fontWeightMatch || lcTag === 'strong' || lcTag === 'b') {
-                innerhtml = `[B]${innerhtml}[/B]`;
+                innerhtml = `[b]${innerhtml}[/b]`;
             }
 
             if (att.size || fontSizeMatch) {

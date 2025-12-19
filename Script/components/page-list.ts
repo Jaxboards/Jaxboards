@@ -19,7 +19,7 @@ export default class PageList extends Component<HTMLDivElement> {
         const direction = Math.sign(event.deltaY);
         const pages = Array.from(this.element.querySelectorAll('a'));
         const startPage = Number.parseInt(pages[1].innerHTML, 10);
-        const lastPage = Number.parseInt(pages[pages.length - 1].innerHTML, 10);
+        const lastPage = Number.parseInt(pages.at(-1)?.innerHTML || '', 10);
         const between = pages.length - 2;
 
         if (

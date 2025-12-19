@@ -3,7 +3,7 @@
 import register, { Component } from '../JAX/component';
 
 export default class Form extends Component<HTMLFormElement> {
-    private resetOnSubmit: boolean;
+    private readonly resetOnSubmit: boolean;
 
     static hydrate(container: HTMLElement): void {
         register(

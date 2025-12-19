@@ -1,7 +1,7 @@
 import register, { Component } from '../JAX/component';
 
 export default class CollapseBox extends Component<HTMLDivElement> {
-    private fullHeight: number = 0;
+    private readonly fullHeight: number = 0;
 
     static hydrate(container: HTMLElement): void {
         register(

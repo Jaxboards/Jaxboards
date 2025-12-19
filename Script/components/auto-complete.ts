@@ -119,7 +119,7 @@ export default class AutoComplete extends Component<HTMLInputElement> {
             }
         }
 
-        const relativePath = document.location.toString().match('/ACP/')
+        const relativePath = /ACP/.test(document.location.toString())
             ? '../'
             : '';
         const searchTerm = encodeURIComponent(this.element.value);
@@ -128,16 +128,15 @@ export default class AutoComplete extends Component<HTMLInputElement> {
             callback: (xml: XMLHttpRequest) => {
                 const data = JSON.parse(xml.responseText);
                 resultsContainer.innerHTML = '';
-                if (!data.length) {
-                    resultsContainer.style.display = 'none';
-                } else {
+
+                if (data.length) {
                     resultsContainer.style.display = '';
                     const [ids, values] = data;
                     ids.forEach((key: number, i: number) => {
                         const value = values[i];
                         const div = document.createElement('div');
                         div.innerHTML = value;
-                        div.onclick = () => {
+                        div.addEventListener('click', () => {
                             resultsContainer.style.display = 'none';
                             if (this.indicatorElement) {
                                 this.indicatorElement.classList.add(
@@ -149,10 +148,14 @@ export default class AutoComplete extends Component<HTMLInputElement> {
                                 new Event('change'),
                             );
                             this.element.value = value;
-                        };
+                        });
                         resultsContainer.appendChild(div);
                     });
+
+                    return;
                 }
+
+                resultsContainer.style.display = 'none';
             },
         });
     }
