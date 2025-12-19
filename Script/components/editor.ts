@@ -283,7 +283,6 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     }
 
     cmd(command: string, arg?: string) {
-        let rng;
         const selection = this.getSelection();
         let bbcode = '';
         let realCommand = command;
