@@ -29,83 +29,11 @@ export default class ModControls {
     constructor() {
         this.boundCheckLocation = () => this.checkLocation();
 
+        // Register commands to be received from backend
         Object.assign(Commands, {
-            /**
-             * @param {[string,string]} param0
-             */
-            modcontrols_postsync: (postIds: string, threadIds: string) => {
-                const [pids, pluralPosts, andPosts] = postIDs(postIds);
-                const [tids, pluralThreads] = threadIDs(threadIds);
-
-                this.tids = tids;
-                this.pids = pids;
-
-                if (!tids.length && !pids.length) {
-                    this.destroyModControls();
-
-                    return;
-                }
-
-                const topicOptions = tids.length
-                    ? `
-                    <select name='dot'>
-                        <option value='delete'>Delete</option>
-                        <option value='merge'>Merge</option>
-                        <option value='move'>Move</option>
-                        <option value='pin'>Pin</option>
-                        <option value='unpin'>Unpin</option>
-                        <option value='lock'>Lock</option>
-                        <option value='unlock'>Unlock</option>
-                    </select> &nbsp; &nbsp;
-                    <strong>${tids.length}</strong> topic${pluralThreads}${andPosts}`
-                    : '';
-
-                const postOptions = pids.length
-                    ? `
-                    <select name='dop'>
-                        <option value='delete'>Delete</option>
-                        <option value='move'>Move</option>
-                    </select> &nbsp; &nbsp;
-                    <strong>${pids.length}</strong> post${pluralPosts}`
-                    : '';
-                const spacing =
-                    pids.length && tids.length ? '<br>' : ' &nbsp; &nbsp; ';
-
-                const html = `
-                <form method='post' data-ajax-form='true'>
-                    <input type='hidden' name='act' value='modcontrols'>
-                    ${topicOptions}
-                    ${postOptions}
-                    ${spacing}
-                    <input type='submit' value='Go'>
-                    <input
-                        name='cancel' type='submit'
-                        onclick='this.form.submitButton=this;' value='Cancel'>
-                </form>`;
-
-                this.createModControls(html);
-            },
-
-            modcontrols_move: (whichone: number) => {
-                this.whichone = whichone;
-                globalThis.addEventListener(
-                    'pushstate',
-                    this.boundCheckLocation,
-                );
-                this.createModControls(
-                    `Ok, now browse to the ${
-                        this.whichone ? 'topic' : 'forum'
-                    } you want to move the ${
-                        this.whichone
-                            ? `${this.pids.length} posts`
-                            : `${this.tids.length} topics`
-                    } to...`,
-                );
-            },
-
-            modcontrols_clearbox: () => {
-                this.destroyModControls();
-            },
+            modcontrols_clearbox: this.destroyModControls.bind(this),
+            modcontrols_move: this.showMoveControls.bind(this),
+            modcontrols_postsync: this.postSync.bind(this),
         });
     }
 
@@ -114,13 +42,15 @@ export default class ModControls {
         const regex = whichone ? /topic\/(\d+)/ : /forum\/(\d+)/;
         const locationMatch = document.location.toString().match(regex);
         if (locationMatch) {
-            this.moveto(Number(locationMatch[1]));
+            this.moveTo(Number(locationMatch[1]));
+        } else {
+            this.showMoveControls(whichone);
         }
     }
 
-    moveto(id: number) {
+    moveTo(id: number) {
         const { whichone } = this;
-        this.createModControls(
+        this.renderModControls(
             `<form method="post" data-ajax-form="true">
                 move ${whichone ? 'posts' : 'topics'} here?
             <input type="hidden" name="act" value="modcontrols">
@@ -134,7 +64,7 @@ export default class ModControls {
         );
     }
 
-    createModControls(html: string) {
+    renderModControls(html: string) {
         this.modb = this.modb || document.querySelector('#modbox') || undefined;
 
         if (!this.modb) {
@@ -158,5 +88,71 @@ export default class ModControls {
     // eslint-disable-next-line class-methods-use-this
     togbutton(button: HTMLButtonElement) {
         button.classList.toggle('selected');
+    }
+
+    postSync(postIds: string, threadIds: string) {
+        const [pids, pluralPosts, andPosts] = postIDs(postIds);
+        const [tids, pluralThreads] = threadIDs(threadIds);
+
+        this.tids = tids;
+        this.pids = pids;
+
+        if (!tids.length && !pids.length) {
+            this.destroyModControls();
+
+            return;
+        }
+
+        const topicOptions = tids.length
+            ? `
+            <select name='dot'>
+                <option value='delete'>Delete</option>
+                <option value='merge'>Merge</option>
+                <option value='move'>Move</option>
+                <option value='pin'>Pin</option>
+                <option value='unpin'>Unpin</option>
+                <option value='lock'>Lock</option>
+                <option value='unlock'>Unlock</option>
+            </select> &nbsp; &nbsp;
+            <strong>${tids.length}</strong> topic${pluralThreads}${andPosts}`
+            : '';
+
+        const postOptions = pids.length
+            ? `
+            <select name='dop'>
+                <option value='delete'>Delete</option>
+                <option value='move'>Move</option>
+            </select> &nbsp; &nbsp;
+            <strong>${pids.length}</strong> post${pluralPosts}`
+            : '';
+        const spacing = pids.length && tids.length ? '<br>' : ' &nbsp; &nbsp; ';
+
+        const html = `
+        <form method='post' data-ajax-form='true'>
+            <input type='hidden' name='act' value='modcontrols'>
+            ${topicOptions}
+            ${postOptions}
+            ${spacing}
+            <input type='submit' value='Go'>
+            <input
+                name='cancel' type='submit'
+                onclick='this.form.submitButton=this;' value='Cancel'>
+        </form>`;
+
+        this.renderModControls(html);
+    }
+
+    showMoveControls(whichone: number) {
+        this.whichone = whichone;
+        globalThis.addEventListener('pushstate', this.boundCheckLocation);
+        this.renderModControls(
+            `Ok, now browse to the ${
+                this.whichone ? 'topic' : 'forum'
+            } you want to move the ${
+                this.whichone
+                    ? `${this.pids.length} posts`
+                    : `${this.tids.length} topics`
+            } to...`,
+        );
     }
 }
