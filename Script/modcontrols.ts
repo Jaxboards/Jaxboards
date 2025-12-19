@@ -3,34 +3,45 @@ import Commands from './RUN/commands';
 
 function postIDs(strPIDs: string) {
     const pids = strPIDs ? strPIDs.split(',') : [];
-    const pl = pids ? pids.length : 0;
     const pluralPosts = pids.length === 1 ? '' : 's';
-    const andPosts = pl ? ' and <br />' : '';
-    return [pids, pl, pluralPosts, andPosts];
+    const andPosts = pids.length ? ' and <br />' : '';
+    return [pids, pluralPosts, andPosts] as const;
 }
 
 function threadIDs(strTIDs: string) {
     const tids = strTIDs ? strTIDs.split(',') : [];
     const tl = tids ? tids.length : 0;
     const pluralThreads = tl === 1 ? '' : 's';
-    return [tids, tl, pluralThreads];
+    return [tids, tl, pluralThreads] as const;
 }
 
 export default class ModControls {
+    private whichone = 0;
+
+    private boundCheckLocation;
+
+    private pids: string[] = [];
+
+    private tids: string[] = [];
+
+    private modb?: HTMLDivElement;
+
     constructor() {
+        this.boundCheckLocation = () => this.checkLocation();
+
         Object.assign(Commands, {
             /**
              * @param {[string,string]} param0
              */
             modcontrols_postsync: (postIds: string, threadIds: string) => {
-                const [pids, pl, pluralPosts, andPosts] = postIDs(postIds);
-                const [tids, tl, pluralThreads] = threadIDs(threadIds);
+                const [pids, pluralPosts, andPosts] = postIDs(postIds);
+                const [tids, pluralThreads] = threadIDs(threadIds);
                 const html =
                     `${
                         "<form method='post' data-ajax-form='true'>" +
                         "<input type='hidden' name='act' value='modcontrols' />"
                     }${
-                        tl
+                        tids.length
                             ? `${
                                   "<select name='dot'>" +
                                   "<option value='delete'>Delete</option>" +
@@ -42,34 +53,33 @@ export default class ModControls {
                                   "<option value='unlock'>Unlock</option>" +
                                   '</select>' +
                                   '&nbsp; &nbsp; <strong>'
-                              }${tl}</strong> topic${pluralThreads}${andPosts}`
+                              }${tids.length}</strong> topic${pluralThreads}${andPosts}`
                             : ''
                     }${
-                        pl
+                        pids.length
                             ? `${
                                   "<select name='dop'>" +
                                   "<option value='delete'>Delete</option>" +
                                   "<option value='move'>Move</option>" +
                                   '</select> &nbsp; &nbsp; <strong>'
-                              }${pl}</strong> post${pluralPosts}`
+                              }${pids.length}</strong> post${pluralPosts}`
                             : ''
                     }${
-                        pl && tl ? '<br />' : ' &nbsp; &nbsp; '
+                        pids.length && tids.length
+                            ? '<br />'
+                            : ' &nbsp; &nbsp; '
                     }<input type='submit' value='Go' /> ` +
                     "<input name='cancel' type='submit' " +
                     "onclick='this.form.submitButton=this;' value='Cancel' /></form>";
                 Object.assign(this, {
                     tids,
-                    tidl: tl,
                     pids,
-                    pidl: pl,
                 });
-                if (tl || pl) this.createModControls(html);
+                if (tids.length || pids.length) this.createModControls(html);
                 else this.destroyModControls();
             },
 
-            modcontrols_move: (act: string) => {
-                const whichone = Number.parseInt(act || this.whichone, 10);
+            modcontrols_move: (whichone: number) => {
                 this.whichone = whichone;
                 globalThis.addEventListener(
                     'pushstate',
@@ -77,9 +87,11 @@ export default class ModControls {
                 );
                 this.createModControls(
                     `Ok, now browse to the ${
-                        whichone ? 'topic' : 'forum'
+                        this.whichone ? 'topic' : 'forum'
                     } you want to move the ${
-                        whichone ? `${this.pidl} posts` : `${this.tidl} topics`
+                        this.whichone
+                            ? `${this.pids.length} posts`
+                            : `${this.tids.length} topics`
                     } to...`,
                 );
             },
@@ -88,8 +100,6 @@ export default class ModControls {
                 this.destroyModControls();
             },
         });
-
-        this.boundCheckLocation = () => this.checkLocation();
     }
 
     checkLocation() {
@@ -97,7 +107,7 @@ export default class ModControls {
         const regex = whichone ? /topic\/(\d+)/ : /forum\/(\d+)/;
         const locationMatch = document.location.toString().match(regex);
         if (locationMatch) {
-            this.moveto(locationMatch[1]);
+            this.moveto(Number(locationMatch[1]));
         } else {
             Commands.modcontrols_move();
         }
@@ -118,16 +128,16 @@ export default class ModControls {
     }
 
     createModControls(html: string) {
-        let modb = this.modb || document.querySelector('#modbox');
+        this.modb = this.modb || document.querySelector('#modbox') || undefined;
+
         if (!this.modb) {
-            modb = document.createElement('div');
-            modb.id = 'modbox';
-            document.body.appendChild(modb);
+            this.modb = document.createElement('div');
+            this.modb.id = 'modbox';
+            document.body.appendChild(this.modb);
         }
-        modb.style.display = 'block';
-        modb.innerHTML = html;
-        gracefulDegrade(modb);
-        this.modb = modb;
+        this.modb.style.display = 'block';
+        this.modb.innerHTML = html;
+        gracefulDegrade(this.modb);
     }
 
     destroyModControls() {
