@@ -15,7 +15,7 @@ class Stream {
             callback: (request: XMLHttpRequest) =>
                 this.handleRequestData(request),
         });
-        this.lastURL = document.location.search.slice(1);
+        this.lastURL = `${document.location.pathname}${document.location.search}`;
         this.commands = Commands;
     }
 
