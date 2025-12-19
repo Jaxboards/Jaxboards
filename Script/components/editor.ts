@@ -1,7 +1,6 @@
 /* global globalSettings */
 /* eslint-disable no-script-url, no-alert */
 
-import Ajax from '../JAX/ajax';
 import { bbcodeToHTML, htmlToBBCode } from '../JAX/bbcode-utils';
 import Browser from '../JAX/browser';
 import register, { Component } from '../JAX/component';
@@ -159,19 +158,19 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         }
     }
 
-    showEmotes(x: number, y: number) {
+    async showEmotes(x: number, y: number) {
         const emotewin = this.emoteWindow;
         if (!emotewin) {
-            new Ajax().load('/api/?act=emotes', {
-                callback: (response) =>
-                    this.createEmoteWindow(response, { x, y }),
-            });
+            const res = await fetch('/api/?act=emotes');
+            if (res.ok) {
+                this.createEmoteWindow(await res.json(), { x, y });
+            }
             return;
         }
         if (emotewin.style.display === 'none') {
             emotewin.style.display = '';
-            emotewin.style.top = `${y}px`;
             emotewin.style.left = `${x}px`;
+            emotewin.style.top = `${y}px`;
         } else {
             this.hideEmotes();
         }
@@ -183,8 +182,10 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         }
     }
 
-    createEmoteWindow(xml: XMLHttpRequest, position: { x: number; y: number }) {
-        const [smileyText, images] = JSON.parse(xml.responseText);
+    createEmoteWindow(
+        [smileyText, images]: [string[], string[]],
+        position: { x: number; y: number },
+    ) {
         const emotewin = document.createElement('div');
         emotewin.className = 'emotewin';
 

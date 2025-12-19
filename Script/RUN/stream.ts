@@ -19,7 +19,7 @@ class Stream {
         this.commands = Commands;
     }
 
-    handleRequestData(xmlobj: XMLHttpRequest & { requestType: number }) {
+    handleRequestData(xmlobj: XMLHttpRequest & { requestType?: number }) {
         if (xmlobj.status !== 200) return;
         let { responseText } = xmlobj;
         let softurl = false;

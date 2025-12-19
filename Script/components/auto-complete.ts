@@ -1,4 +1,3 @@
-import Ajax from '../JAX/ajax';
 import register, { Component } from '../JAX/component';
 import { getCoordinates, getHighestZIndex } from '../JAX/el';
 
@@ -119,44 +118,48 @@ export default class AutoComplete extends Component<HTMLInputElement> {
             }
         }
 
+        this.doSearch();
+    }
+
+    async doSearch() {
+        const resultsContainer = this.getResultsContainer();
+
         const relativePath = /ACP/.test(document.location.toString())
             ? '../'
             : '';
         const searchTerm = encodeURIComponent(this.element.value);
         const queryParams = `act=${this.action}&term=${searchTerm}`;
-        new Ajax().load(`${relativePath}api/?${queryParams}`, {
-            callback: (xml: XMLHttpRequest) => {
-                const data = JSON.parse(xml.responseText);
-                resultsContainer.innerHTML = '';
 
-                if (data.length) {
-                    resultsContainer.style.display = '';
-                    const [ids, values] = data;
-                    ids.forEach((key: number, i: number) => {
-                        const value = values[i];
-                        const div = document.createElement('div');
-                        div.innerHTML = value;
-                        div.addEventListener('click', () => {
-                            resultsContainer.style.display = 'none';
-                            if (this.indicatorElement) {
-                                this.indicatorElement.classList.add(
-                                    VALID_CLASS,
-                                );
-                            }
-                            this.outputElement.value = `${key}`;
-                            this.outputElement.dispatchEvent(
-                                new Event('change'),
-                            );
-                            this.element.value = value;
-                        });
-                        resultsContainer.appendChild(div);
-                    });
+        const res = await fetch(`${relativePath}api/?${queryParams}`);
+        if (!res.ok) {
+            return;
+        }
 
-                    return;
-                }
+        const data = await res.json();
+        resultsContainer.innerHTML = '';
 
-                resultsContainer.style.display = 'none';
-            },
-        });
+        if (data.length) {
+            resultsContainer.style.display = '';
+            const [ids, values] = data;
+            ids.forEach((key: number, i: number) => {
+                const value = values[i];
+                const div = document.createElement('div');
+                div.innerHTML = value;
+                div.addEventListener('click', () => {
+                    resultsContainer.style.display = 'none';
+                    if (this.indicatorElement) {
+                        this.indicatorElement.classList.add(VALID_CLASS);
+                    }
+                    this.outputElement.value = `${key}`;
+                    this.outputElement.dispatchEvent(new Event('change'));
+                    this.element.value = value;
+                });
+                resultsContainer.appendChild(div);
+            });
+
+            return;
+        }
+
+        resultsContainer.style.display = 'none';
     }
 }
