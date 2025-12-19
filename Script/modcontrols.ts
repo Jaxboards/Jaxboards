@@ -4,7 +4,7 @@ import Commands from './RUN/commands';
 function postIDs(strPIDs: string) {
     const pids = strPIDs ? strPIDs.split(',') : [];
     const pluralPosts = pids.length === 1 ? '' : 's';
-    const andPosts = pids.length ? ' and <br />' : '';
+    const andPosts = pids.length ? ' and <br>' : '';
     return [pids, pluralPosts, andPosts] as const;
 }
 
@@ -12,7 +12,7 @@ function threadIDs(strTIDs: string) {
     const tids = strTIDs ? strTIDs.split(',') : [];
     const tl = tids ? tids.length : 0;
     const pluralThreads = tl === 1 ? '' : 's';
-    return [tids, tl, pluralThreads] as const;
+    return [tids, pluralThreads] as const;
 }
 
 export default class ModControls {
@@ -36,47 +36,54 @@ export default class ModControls {
             modcontrols_postsync: (postIds: string, threadIds: string) => {
                 const [pids, pluralPosts, andPosts] = postIDs(postIds);
                 const [tids, pluralThreads] = threadIDs(threadIds);
-                const html =
-                    `${
-                        "<form method='post' data-ajax-form='true'>" +
-                        "<input type='hidden' name='act' value='modcontrols' />"
-                    }${
-                        tids.length
-                            ? `${
-                                  "<select name='dot'>" +
-                                  "<option value='delete'>Delete</option>" +
-                                  "<option value='merge'>Merge</option>" +
-                                  "<option value='move'>Move</option>" +
-                                  "<option value='pin'>Pin</option>" +
-                                  "<option value='unpin'>Unpin</option>" +
-                                  "<option value='lock'>Lock</option>" +
-                                  "<option value='unlock'>Unlock</option>" +
-                                  '</select>' +
-                                  '&nbsp; &nbsp; <strong>'
-                              }${tids.length}</strong> topic${pluralThreads}${andPosts}`
-                            : ''
-                    }${
-                        pids.length
-                            ? `${
-                                  "<select name='dop'>" +
-                                  "<option value='delete'>Delete</option>" +
-                                  "<option value='move'>Move</option>" +
-                                  '</select> &nbsp; &nbsp; <strong>'
-                              }${pids.length}</strong> post${pluralPosts}`
-                            : ''
-                    }${
-                        pids.length && tids.length
-                            ? '<br />'
-                            : ' &nbsp; &nbsp; '
-                    }<input type='submit' value='Go' /> ` +
-                    "<input name='cancel' type='submit' " +
-                    "onclick='this.form.submitButton=this;' value='Cancel' /></form>";
-                Object.assign(this, {
-                    tids,
-                    pids,
-                });
-                if (tids.length || pids.length) this.createModControls(html);
-                else this.destroyModControls();
+
+                this.tids = tids;
+                this.pids = pids;
+
+                if (!tids.length && !pids.length) {
+                    this.destroyModControls();
+
+                    return;
+                }
+
+                const topicOptions = tids.length
+                    ? `
+                    <select name='dot'>
+                        <option value='delete'>Delete</option>
+                        <option value='merge'>Merge</option>
+                        <option value='move'>Move</option>
+                        <option value='pin'>Pin</option>
+                        <option value='unpin'>Unpin</option>
+                        <option value='lock'>Lock</option>
+                        <option value='unlock'>Unlock</option>
+                    </select> &nbsp; &nbsp;
+                    <strong>${tids.length}</strong> topic${pluralThreads}${andPosts}`
+                    : '';
+
+                const postOptions = pids.length
+                    ? `
+                    <select name='dop'>
+                        <option value='delete'>Delete</option>
+                        <option value='move'>Move</option>
+                    </select> &nbsp; &nbsp;
+                    <strong>${pids.length}</strong> post${pluralPosts}`
+                    : '';
+                const spacing =
+                    pids.length && tids.length ? '<br>' : ' &nbsp; &nbsp; ';
+
+                const html = `
+                <form method='post' data-ajax-form='true'>
+                    <input type='hidden' name='act' value='modcontrols'>
+                    ${topicOptions}
+                    ${postOptions}
+                    ${spacing}
+                    <input type='submit' value='Go'>
+                    <input
+                        name='cancel' type='submit'
+                        onclick='this.form.submitButton=this;' value='Cancel'>
+                </form>`;
+
+                this.createModControls(html);
             },
 
             modcontrols_move: (whichone: number) => {
@@ -116,14 +123,16 @@ export default class ModControls {
     moveto(id: number) {
         const { whichone } = this;
         this.createModControls(
-            `<form method="post" data-ajax-form="true">move ${
-                whichone ? 'posts' : 'topics'
-            } here? <input type="hidden" name="act" value="modcontrols" />` +
-                `<input type="hidden" name="${
-                    whichone ? 'dop' : 'dot'
-                }" value="moveto" /><input type="hidden" name="id" value="${id}" /><input type="submit" value="Yes" />` +
-                '<input type="submit" name="cancel" value="Cancel" ' +
-                'onclick="this.form.submitButton=this" /></form>',
+            `<form method="post" data-ajax-form="true">
+                move ${whichone ? 'posts' : 'topics'} here?
+            <input type="hidden" name="act" value="modcontrols">
+            <input type="hidden"
+                name="${whichone ? 'dop' : 'dot'}"
+                value="moveto">
+            <input type="hidden" name="id" value="${id}">
+            <input type="submit" value="Yes">
+            <input type="submit" name="cancel" value="Cancel" onclick="this.form.submitButton=this">
+            </form>`,
         );
     }
 
