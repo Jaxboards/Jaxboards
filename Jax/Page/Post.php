@@ -214,7 +214,7 @@ final class Post implements Route
         $forumPerms = $this->user->getForumPerms($forum->perms);
 
         $pollForm = $forumPerms['poll'] ? <<<'HTML'
-            <label class="addpoll" for="addpoll">
+            <label class="addpoll" for="pollType">
                 Add a Poll
             </label>
             <select name="pollType" title="Add a poll"
@@ -293,8 +293,6 @@ final class Post implements Route
         if ($forumPerms['upload']) {
             $this->page->command('attachfiles');
         }
-
-        $this->page->command('SCRIPT', "document.querySelector('#pollchoices').style.display='none'");
 
         return null;
     }
@@ -604,11 +602,11 @@ final class Post implements Route
         $topic->lastPostDate = $postDate;
         $topic->lastPostUser = $uid;
         $topic->pollChoices = $pollChoices !== []
-                    ? (json_encode($pollChoices, JSON_THROW_ON_ERROR))
-                    : '';
+            ? (json_encode($pollChoices, JSON_THROW_ON_ERROR))
+            : '';
         $topic->pollQuestion = $pollQuestion !== null
-                    ? $this->textFormatting->blockhtml($pollQuestion)
-                    : '';
+            ? $this->textFormatting->blockhtml($pollQuestion)
+            : '';
         $topic->pollType = $pollType ?? '';
         $topic->replies = 0;
         $topic->subtitle = $this->textFormatting->blockhtml($topicDescription ?? '');
