@@ -48,6 +48,6 @@ export default class Link extends Component<HTMLAnchorElement> {
         }
 
         // Open external links in a new window
-        link.target = '_BLANK';
+        link.target = '_blank';
     }
 }

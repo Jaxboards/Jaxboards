@@ -160,7 +160,7 @@ final readonly class App
     {
         $this->page->loadSkin(
             $this->session->getVar('skinID')
-            ?: $this->user->get()->skinID,
+                ?: $this->user->get()->skinID,
         );
         $this->template->loadMeta('global');
 
@@ -187,9 +187,9 @@ final readonly class App
         $this->page->append(
             'NAVIGATION',
             '<div class="success" '
-            . 'style="position:fixed;bottom:0;left:0;width:100%;">'
-            . 'Skin UCP setting being overridden. '
-            . '<a href="?skinID=0">Revert</a></div>',
+                . 'style="position:fixed;bottom:0;left:0;width:100%;">'
+                . 'Skin UCP setting being overridden. '
+                . '<a href="?skinID=0">Revert</a></div>',
         );
     }
 
@@ -214,7 +214,7 @@ final readonly class App
             $this->template->meta(
                 'logo',
                 $this->config->getSetting('logourl')
-                ?: $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default/img/logo.png',
+                    ?: $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default/img/logo.png',
             ),
         );
         $this->page->append(
@@ -231,7 +231,7 @@ final readonly class App
                     ? '<li><a href="' . $this->router->url('modcontrols', ['do' => 'cp']) . '">Mod CP</a></li>'
                     : '',
                 $this->user->getGroup()?->canAccessACP
-                    ? '<li><a href="./ACP/" target="_BLANK">ACP</a></li>'
+                    ? '<li><a href="./ACP/" target="_blank">ACP</a></li>'
                     : '',
                 $this->config->getSetting('navlinks') ?? '',
             ),
@@ -243,27 +243,27 @@ final readonly class App
         $this->page->append(
             'USERBOX',
             $this->user->isGuest()
-            ? $this->template->meta(
-                'userbox-logged-out',
-                $this->router->url('forgotPassword'),
-                $this->router->url('register'),
-            )
-            : $this->template->meta(
-                'userbox-logged-in',
-                $this->template->meta(
-                    'user-link',
-                    $this->user->get()->id,
-                    $this->user->get()->groupID,
-                    $this->user->get()->displayName,
+                ? $this->template->meta(
+                    'userbox-logged-out',
+                    $this->router->url('forgotPassword'),
+                    $this->router->url('register'),
+                )
+                : $this->template->meta(
+                    'userbox-logged-in',
+                    $this->template->meta(
+                        'user-link',
+                        $this->user->get()->id,
+                        $this->user->get()->groupID,
+                        $this->user->get()->displayName,
+                    ),
+                    $this->date->smallDate(
+                        $this->user->get()->lastVisit,
+                    ),
+                    $unreadMessages,
+                    $this->router->url('logout'),
+                    $this->router->url('ucp', ['what' => 'inbox']),
+                    $this->router->url('ucp'),
                 ),
-                $this->date->smallDate(
-                    $this->user->get()->lastVisit,
-                ),
-                $unreadMessages,
-                $this->router->url('logout'),
-                $this->router->url('ucp', ['what' => 'inbox']),
-                $this->router->url('ucp'),
-            ),
         );
     }
 
@@ -305,9 +305,9 @@ final readonly class App
         $this->page->append(
             'FOOTER',
             '<div class="footer">'
-            . "<a href=\"https://jaxboards.github.io\">Jaxboards</a> {$version}! "
-            // Removed the defunct URL
-            . '&copy; 2007-' . gmdate('Y') . '</div>',
+                . "<a href=\"https://jaxboards.github.io\">Jaxboards</a> {$version}! "
+                // Removed the defunct URL
+                . '&copy; 2007-' . gmdate('Y') . '</div>',
         );
     }
 

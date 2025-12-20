@@ -45,7 +45,7 @@ export default class ImageResizer extends Component<HTMLImageElement> {
         img.style.maxHeight = maxDimension;
         img.dataset.madeResized = 'true';
         const link = Object.assign(document.createElement('a'), {
-            target: '_BLANK',
+            target: '_blank',
             href: img.src,
         });
         Object.assign(link.style, {
