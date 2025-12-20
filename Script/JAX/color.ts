@@ -1,5 +1,5 @@
 class Color {
-    private rgb: number[];
+    private rgb?: number[];
 
     constructor(_colorToParse: string | number[]) {
         let colorToParse = _colorToParse;
@@ -15,7 +15,6 @@ class Color {
             );
             const hexMatch = colorToParse.match(/#?[^\da-fA-F]/);
             if (rgbMatch) {
-                rgbMatch.shift();
                 this.rgb = [
                     Number.parseFloat(rgbMatch[1]),
                     Number.parseFloat(rgbMatch[2]),
@@ -51,12 +50,16 @@ class Color {
                 }
             }
         }
-
-        this.rgb = [0, 0, 0];
     }
 
     invert() {
-        this.rgb = [255 - this.rgb[0], 255 - this.rgb[1], 255 - this.rgb[2]];
+        if (this.rgb) {
+            this.rgb = [
+                255 - this.rgb[0],
+                255 - this.rgb[1],
+                255 - this.rgb[2],
+            ];
+        }
         return this;
     }
 
@@ -66,7 +69,7 @@ class Color {
 
     toHex() {
         return this.rgb
-            .map((dec) => dec.toString(16).padStart(2, '0'))
+            ?.map((dec) => dec.toString(16).padStart(2, '0'))
             .join('');
     }
 }

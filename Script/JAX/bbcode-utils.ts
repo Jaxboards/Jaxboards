@@ -8,7 +8,7 @@ const italicRegex = /font-style: ?italic/i;
 const underlineRegex = /text-decoration:[^;]*underline/i;
 const lineThroughRegex = /text-decoration:[^;]*line-through/i;
 const fontSizeRegex = /font-size: ?([^;]+)/i;
-const fontColorRegex = /color: ?([^;]+)/i;
+const fontColorRegex = /(?:^|;)color: ?([^;]+)/i;
 const fontWeightRegex = /font-weight: ?bold/i;
 
 export function htmlToBBCode(html: string) {
@@ -54,9 +54,9 @@ export function htmlToBBCode(html: string) {
             const fontWeightMatch = fontWeightRegex.exec(style);
 
             if (backgroundColorMatch) {
-                innerhtml = `[bgcolor=#${new Color(
-                    backgroundColorMatch[2],
-                ).toHex()}]${innerhtml}[/bgcolor]`;
+                const color = backgroundColorMatch[2];
+                const hex = new Color(color).toHex();
+                innerhtml = `[bgcolor=${hex ? `#${hex}` : color}]${innerhtml}[/bgcolor]`;
             }
             if (textAlignMatch) {
                 innerhtml = `[align=${textAlignMatch[1]}]${innerhtml}[/align]`;
@@ -83,7 +83,10 @@ export function htmlToBBCode(html: string) {
             }
 
             if (att.color || fontColorMatch) {
-                innerhtml = `[color=${att.color || fontColorMatch?.[1]}]${innerhtml}[/color]`;
+                const color = att.color || fontColorMatch?.[1];
+                const hex = color && new Color(color).toHex();
+
+                innerhtml = `[color=${hex ? `#${hex}` : color}]${innerhtml}[/color]`;
             }
 
             if (lcTag === 'a' && att.href) {
@@ -144,7 +147,7 @@ export function bbcodeToHTML(bbcode: string) {
     );
     html = html.replaceAll(
         /\[bgcolor=([^\]]+)\](.*?)\[\/bgcolor\]/gi,
-        '<span style="backgroun-color:$1">$2</span>',
+        '<span style="background-color:$1">$2</span>',
     );
     html = html.replaceAll(/\[h(\d)\](.*?)\[\/h\1\]/g, '<h$1>$2</h$1>');
     html = html.replaceAll(
