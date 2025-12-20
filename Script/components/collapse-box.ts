@@ -1,7 +1,9 @@
 import register, { Component } from '../JAX/component';
 
 export default class CollapseBox extends Component<HTMLDivElement> {
-    private readonly fullHeight: number = 0;
+    private fullHeight: number = 0;
+
+    private animationLengthInMs: number = 200;
 
     static hydrate(container: HTMLElement): void {
         register(
@@ -17,13 +19,8 @@ export default class CollapseBox extends Component<HTMLDivElement> {
         // Set up initial height
         const { collapseContent } = this;
         if (collapseContent) {
-            this.fullHeight =
-                collapseContent.clientHeight || collapseContent.offsetHeight;
-
             Object.assign(collapseContent.style, {
-                height: `${this.fullHeight}px`,
-                transition: 'height 200ms ease-in-out',
-                overflow: 'hidden',
+                transition: `height ${this.animationLengthInMs}ms ease-in-out`,
             });
         }
 
@@ -48,6 +45,20 @@ export default class CollapseBox extends Component<HTMLDivElement> {
 
         const { style } = collapseContent;
 
-        style.height = `${style.height === '0px' ? this.fullHeight : 0}px`;
+        if (style.height === '0px') {
+            style.height = `${this.fullHeight}px`;
+            setTimeout(() => {
+                style.removeProperty('height');
+                style.removeProperty('overflow');
+            }, this.animationLengthInMs);
+        } else {
+            this.fullHeight =
+                collapseContent.clientHeight || collapseContent.offsetHeight;
+            style.height = `${this.fullHeight}px`;
+            style.overflow = 'hidden';
+            requestAnimationFrame(() => {
+                style.height = '0px';
+            });
+        }
     }
 }
