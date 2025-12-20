@@ -23,7 +23,7 @@ export class AppState {
                 const { lastURL } = state;
                 this.stream.updatePage(lastURL);
             } else {
-                this.stream.updatePage(document.location);
+                this.stream.updatePage(document.location.toString());
             }
         });
 

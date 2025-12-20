@@ -10,6 +10,8 @@ class Stream {
 
     private lastURL: string;
 
+    private timeout: number = 0;
+
     constructor() {
         this.request = new Ajax({
             callback: (request: XMLHttpRequest) =>
@@ -64,25 +66,22 @@ class Stream {
 
     location(path: string, requestType = 2) {
         this.request.load(path, { requestType });
-        return false;
     }
 
-    load(...args) {
+    load(...args: Parameters<typeof this.request.load>) {
         this.request.load(...args);
-    }
-
-    loader() {
-        this.request.load(this.lastURL);
-        return true;
     }
 
     pollData(isEager = false) {
         if (isEager) {
-            this.loader();
+            this.request.load(this.lastURL);
         }
         clearTimeout(this.timeout);
         if (document.cookie.includes(`actw=${globalThis.name}`)) {
-            this.timeout = setTimeout(() => this.loader(), UPDATE_INTERVAL);
+            this.timeout = setTimeout(
+                () => this.request.load(this.lastURL),
+                UPDATE_INTERVAL,
+            );
         }
     }
 
