@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-$CFG = [
+return [
     'boardoffline' => 0,
     'badgesEnabled' => 0,
     'birthdays' => 1,

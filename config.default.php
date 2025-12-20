@@ -12,7 +12,7 @@ declare(strict_types=1);
  */
 
 // phpcs:disable SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable
-$CFG = json_decode(
+return json_decode(
     <<<'JSON'
         {
             "badnamechars": "@[^\\w' ?]@",

@@ -51,13 +51,10 @@ final class ServiceConfig
             return $this->serviceConfig;
         }
 
-        $CFG = [];
 
-        require_once $this->installed
+        $this->serviceConfig = require_once $this->installed
             ? $this->fileSystem->pathFromRoot('config.php')
-            : $this->fileSystem->pathFromRoot('config.default.php');
-
-        $this->serviceConfig = $CFG;
+            : $this->fileSystem->pathFromRoot('config.default.php');;
 
         return $this->serviceConfig;
     }
@@ -108,7 +105,7 @@ final class ServiceConfig
 
         return <<<EOT
             <?php
-            \$CFG = json_decode(
+            \return json_decode(
             <<<'JSON'
             {$dataString}
             JSON
