@@ -54,7 +54,8 @@ final class ServiceConfig
 
         $this->serviceConfig = require_once $this->installed
             ? $this->fileSystem->pathFromRoot('config.php')
-            : $this->fileSystem->pathFromRoot('config.default.php');;
+            : $this->fileSystem->pathFromRoot('config.default.php');
+
 
         return $this->serviceConfig;
     }

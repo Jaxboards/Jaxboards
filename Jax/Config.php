@@ -41,7 +41,7 @@ final class Config
         $boardConfigPath = $this->fileSystem->pathJoin($this->domainDefinitions->getBoardPath(), '/config.php');
 
         if ($this->fileSystem->getFileInfo($boardConfigPath)->isFile()) {
-            $this->boardConfig = require_once $this->fileSystem->pathFromRoot($boardConfigPath);;
+            $this->boardConfig = require_once $this->fileSystem->pathFromRoot($boardConfigPath);
         }
 
         return $this->boardConfig;
