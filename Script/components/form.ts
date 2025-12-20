@@ -65,7 +65,7 @@ export default class Form extends Component<HTMLFormElement> {
             names.push(submitButton.name);
             values.push(submitButton.value);
         }
-        RUN.stream.load(element.action || globalThis.location, {
+        RUN.stream.load(element.action || globalThis.location.toString(), {
             data: [names, values],
         });
         if (resetOnSubmit) {

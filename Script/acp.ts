@@ -1,4 +1,4 @@
-import Ajax from './JAX/ajax';
+import { buildQueryString } from './JAX/buildQueryString';
 import { getCoordinates } from './JAX/el';
 import { replaceSelection } from './JAX/selection';
 import sortableTree from './JAX/sortable-tree';
@@ -44,7 +44,7 @@ function dropdownMenu(e) {
     }
 }
 
-function submitForm(form) {
+async function submitForm(form) {
     const names = [];
     const values = [];
     const elements = Array.from(form.elements);
@@ -65,7 +65,15 @@ function submitForm(form) {
         names.push(submit.name);
         values.push(submit.value);
     }
-    new Ajax().load(document.location.search, { data: [names, values] });
+    await fetch(document.location.search, {
+        method: 'POST',
+        body: buildQueryString(names, values),
+        headers: {
+            'X-JSACCESS': `1`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+    });
+
     // eslint-disable-next-line no-alert
     alert("Saved. Ajax-submitted so you don't lose your place");
 }
@@ -84,9 +92,9 @@ function gracefulDegrade() {
     );
 
     // Initialize components
-    AutoComplete.selector(document.body);
-    Switch.selector(document.body);
-    BetterSelect.selector(document.body);
+    AutoComplete.hydrate(document.body);
+    Switch.hydrate(document.body);
+    BetterSelect.hydrate(document.body);
 
     // Makes editors capable of tabbing for indenting
     const editor = document.querySelector('.editor');
