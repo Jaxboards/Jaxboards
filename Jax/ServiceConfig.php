@@ -106,7 +106,7 @@ final class ServiceConfig
 
         return <<<EOT
             <?php
-            \return json_decode(
+            return json_decode(
             <<<'JSON'
             {$dataString}
             JSON
