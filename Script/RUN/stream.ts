@@ -15,6 +15,7 @@ class Stream {
         this.commands = Commands;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleRequestData(url: string, cmds: Array<any>, requestType = 1) {
         let softurl = false;
         cmds.forEach(
