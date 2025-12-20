@@ -1,4 +1,3 @@
-import { buildQueryString } from '../JAX/buildQueryString';
 import Commands from './commands';
 
 const UPDATE_INTERVAL = 5000;
@@ -49,23 +48,15 @@ class Stream {
     async load(
         url: string,
         {
-            data,
+            body,
             method = 'POST',
             requestType = 1,
         }: {
-            data?: Record<string, string> | [string[], string[]];
+            body?: URLSearchParams;
             method?: string;
             requestType?: number;
         } = {},
     ) {
-        let body: string | undefined;
-
-        if (Array.isArray(data)) {
-            body = buildQueryString(data[0], data[1]);
-        } else if (data) {
-            body = buildQueryString(data);
-        }
-
         const request = await fetch(url, {
             method,
             body,

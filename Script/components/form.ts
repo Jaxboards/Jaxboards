@@ -24,6 +24,7 @@ export default class Form extends Component<HTMLFormElement> {
 
     submitForm() {
         const { element, resetOnSubmit } = this;
+        const postBody = new URLSearchParams();
         const names = [];
         const values = [];
         const { submitButton } = element;
@@ -57,16 +58,14 @@ export default class Form extends Component<HTMLFormElement> {
                 ) {
                     return;
                 }
-                names.push(inputField.name);
-                values.push(inputField.value);
+                postBody.append(inputField.name, inputField.value);
             });
 
         if (submitButton) {
-            names.push(submitButton.name);
-            values.push(submitButton.value);
+            postBody.append(submitButton.name, submitButton.value);
         }
         RUN.stream.load(element.action || globalThis.location.toString(), {
-            data: [names, values],
+            body: postBody,
         });
         if (resetOnSubmit) {
             element.reset();
