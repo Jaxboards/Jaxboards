@@ -110,7 +110,7 @@ export default {
         );
         const span = document.createElement('span');
         span.innerHTML = message;
-        const div = span.firstElementChild;
+        const div = span.firstElementChild as HTMLDivElement;
         if (!div) return;
         shouts[0].parentNode?.insertBefore(div, shouts[0]);
         while (shouts.length > globalSettings.shoutLimit - 1) {
@@ -207,9 +207,9 @@ export default {
                 if (!link) {
                     link = document.createElement('a');
                     link.href = `/profile/${memberId}`;
-                    link.onclick = () => {
-                        RUN.location(link.getAttribute('href'));
-                    };
+                    link.addEventListener('click', function click() {
+                        RUN.stream.location(this.getAttribute('href')!);
+                    });
                 }
                 link.innerHTML = name;
                 link.className = `user${memberId} mgroup${groupId} ${
@@ -217,7 +217,7 @@ export default {
                 } lastAction${lastAction}`;
                 if (tooltip) {
                     link.title = tooltip;
-                    link.onmouseover = () => openTooltip(link, tooltip);
+                    link.addEventListener('mouseover', () => openTooltip(link));
                 }
                 if (status === 'idle') {
                     addIdleClock(link);
@@ -263,7 +263,8 @@ export default {
         }
     },
     newmessage(message: string, fromMID: number) {
-        let notification = document.querySelector('#notification');
+        let notification =
+            document.querySelector<HTMLDivElement>('#notification');
         const num = document.querySelector<HTMLAnchorElement>('#num-messages');
         if (num) num.innerHTML = `${Number.parseInt(num.innerHTML, 10) + 1}`;
         if (!notification) {
@@ -273,10 +274,10 @@ export default {
         }
         notification.style.display = '';
         notification.className = 'newmessage';
-        notification.onclick = () => {
+        notification.addEventListener('click', () => {
             notification.style.display = 'none';
             RUN.stream.location(`/ucp?what=inbox&view=${fromMID}`, 3);
-        };
+        });
         notification.innerHTML = message;
     },
 
@@ -299,7 +300,7 @@ export default {
                 new Animation(prdiv)
                     .add('height', '200px', '0px')
                     .andThen(() => {
-                        prdiv.style.display = 'none';
+                        prdiv!.style.display = 'none';
                     })
                     .play();
                 return;
@@ -309,9 +310,13 @@ export default {
             prdiv = document.createElement('div');
             prdiv.className = 'postrating_list';
             prdiv.id = `postrating_${postId}`;
-            c = getCoordinates(
-                document.querySelector(`#pid_${postId} .postrating`),
+            const postRating = document.querySelector<HTMLDivElement>(
+                `#pid_${postId} .postrating`,
             );
+            if (!postRating) {
+                return;
+            }
+            c = getCoordinates(postRating);
             prdiv.style.top = `${c.yh}px`;
             prdiv.style.left = `${c.x}px`;
             document.querySelector<HTMLDivElement>('#page')?.appendChild(prdiv);

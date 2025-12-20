@@ -1,5 +1,9 @@
 // eslint-disable-next-line max-classes-per-file
 export default class BetterSelect extends HTMLElement {
+    // This is accessed by the browser to mark this as a form element
+    // do not remove
+    static formAssociated = true;
+
     shadow: ShadowRoot;
 
     internals: ElementInternals;
@@ -67,11 +71,13 @@ export default class BetterSelect extends HTMLElement {
         results.className = 'results';
 
         search.autocomplete = 'off';
-        search.onfocus = () => results.classList.toggle('open', true);
-        search.oninput = () => {
+        search.addEventListener('focus', () =>
+            results.classList.toggle('open', true),
+        );
+        search.addEventListener('input', () => {
             this.renderOptions(search.value);
-        };
-        search.onkeydown = (event) => {
+        });
+        search.addEventListener('keydown', (event) => {
             switch (event.key) {
                 case 'ArrowUp':
                     this.shadow
@@ -90,8 +96,8 @@ export default class BetterSelect extends HTMLElement {
                 default:
                     break;
             }
-        };
-        search.onblur = this.leaveHandler;
+        });
+        search.addEventListener('blur', this.leaveHandler);
 
         shadow.appendChild(search);
         shadow.appendChild(this.hiddenFormField);
@@ -138,7 +144,7 @@ export default class BetterSelect extends HTMLElement {
             )
             .map((betterOption) => {
                 const button = document.createElement('button');
-                button.onclick = () => {
+                button.addEventListener('click', () => {
                     if (!this.hasAttribute('multiple')) {
                         this.clear();
                         this.close();
@@ -149,8 +155,8 @@ export default class BetterSelect extends HTMLElement {
                         button.classList.contains('selected'),
                     );
                     this.updateValue();
-                };
-                button.onkeydown = this.optionKeyboardHandler;
+                });
+                button.addEventListener('keydown', this.optionKeyboardHandler);
                 button.classList.toggle(
                     'selected',
                     betterOption.hasAttribute('selected'),
@@ -167,7 +173,7 @@ export default class BetterSelect extends HTMLElement {
                     ` ${betterOption.innerText}`,
                 );
                 button.appendChild(label);
-                button.onblur = this.leaveHandler;
+                button.addEventListener('blur', this.leaveHandler);
 
                 return button;
             })

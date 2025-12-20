@@ -91,10 +91,10 @@ class Window {
         contentContainer.className = 'content';
         if (this.minimizable) {
             minimizeButton.innerHTML = '-';
-            minimizeButton.onclick = () => this.minimize();
+            minimizeButton.addEventListener('click', () => this.minimize());
         }
         closeButton.innerHTML = 'X';
-        closeButton.onclick = () => this.close();
+        closeButton.addEventListener('click', () => this.close());
         windowControls.appendChild(minimizeButton);
         windowControls.appendChild(closeButton);
         windowControls.className = 'controls';

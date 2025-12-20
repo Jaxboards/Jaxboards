@@ -46,7 +46,7 @@ final readonly class BuddyList implements Route
                             <a href="%s" id="status" class="%s">
                             </a>
                             <input style="width:100%%;padding-left:20px;" type="text" name="status"
-                                onblur="this.form.onsubmit()" value="%s"/>
+                                onblur="this.form.requestSubmit()" value="%s"/>
                             %s
                     </div>
                 HTML,

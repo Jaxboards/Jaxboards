@@ -193,10 +193,10 @@ export default class Editor extends Component<HTMLTextAreaElement> {
             const image = images[i];
             const link = document.createElement('a');
             link.href = 'javascript:void(0)';
-            link.onclick = () => {
+            link.addEventListener('click', () => {
                 this.cmd('inserthtml', image);
                 this.hideEmotes();
-            };
+            });
             link.innerHTML = `${image} ${smiley}`;
             emotewin.appendChild(link);
         });
@@ -251,7 +251,9 @@ export default class Editor extends Component<HTMLTextAreaElement> {
                 c.style.padding = '0px';
                 const a = document.createElement('a');
                 a.href = 'javascript:void(0)';
-                a.onclick = () => this.colorHandler(cmd, color);
+                a.addEventListener('click', () =>
+                    this.colorHandler(cmd, color),
+                );
                 c.appendChild(a);
                 Object.assign(a.style, {
                     display: 'block',

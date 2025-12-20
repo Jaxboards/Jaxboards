@@ -49,8 +49,8 @@ export default function toolTip(el: HTMLElement) {
     tooltip.style.top = `${pos.y - tooltip.clientHeight}px`;
     tooltip.style.left = `${pos.x}px`;
     tooltip.style.zIndex = `${getHighestZIndex()}`;
-    el.onmouseout = () => {
+    el.addEventListener('mouseout', () => {
         el.title = title;
         tooltip.style.display = 'none';
-    };
+    });
 }

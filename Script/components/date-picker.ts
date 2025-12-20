@@ -114,7 +114,7 @@ export default class DatePicker extends Component<HTMLInputElement> {
         cell = row.insertCell(0);
         cell.innerHTML = '&lt;';
         cell.className = 'control';
-        cell.onclick = () => this.lastYear();
+        cell.addEventListener('click', () => this.lastYear());
 
         // current year heading
         cell = row.insertCell(1);
@@ -126,14 +126,14 @@ export default class DatePicker extends Component<HTMLInputElement> {
         cell = row.insertCell(2);
         cell.innerHTML = '>';
         cell.className = 'control';
-        cell.onclick = () => this.nextYear();
+        cell.addEventListener('click', () => this.nextYear());
 
         // month title
         row = dp.insertRow(1);
         cell = row.insertCell(0);
         cell.innerHTML = '<';
         cell.className = 'control';
-        cell.onclick = () => this.lastMonth();
+        cell.addEventListener('click', () => this.lastMonth());
 
         cell = row.insertCell(1);
         cell.colSpan = 5;
@@ -142,7 +142,7 @@ export default class DatePicker extends Component<HTMLInputElement> {
         cell = row.insertCell(2);
         cell.innerHTML = '>';
         cell.className = 'control';
-        cell.onclick = () => this.nextMonth();
+        cell.addEventListener('click', () => this.nextMonth());
 
         // weekdays
         row = dp.insertRow(2);
@@ -163,7 +163,7 @@ export default class DatePicker extends Component<HTMLInputElement> {
                 row = dp.insertRow(dp.rows.length);
             }
             cell = row.insertCell((first + x) % 7);
-            cell.onclick = this.insert.bind(this, cell);
+            cell.addEventListener('click', this.insert.bind(this, cell));
 
             const isSelected =
                 !!this.selectedDate &&
