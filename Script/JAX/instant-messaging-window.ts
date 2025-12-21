@@ -1,5 +1,6 @@
 /* global RUN, globalSettings */
 
+import commands from '../RUN/commands';
 import Sound from '../sound';
 import { flashTitle } from './flashing-title';
 import gracefulDegrade from './graceful-degrade';
@@ -83,7 +84,7 @@ export default function IMWindow(uid: number, uname: string) {
         return;
     }
 
-    RUN.stream.commands.im(uid, uname, '');
+    commands.im(uid, uname, '', 1, Date.now());
 }
 
 export function messageReceived({

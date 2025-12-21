@@ -70,7 +70,7 @@ export default {
     },
     removeel(selector: string) {
         const el = document.querySelector(selector);
-        if (el) el.parentNode?.removeChild(el);
+        if (el) el.remove();
     },
     back() {
         globalThis.history.back();
@@ -148,7 +148,7 @@ export default {
                     new Animation(tick, 30, 500)
                         .add('opacity', '1', '0')
                         .andThen((el: HTMLElement) => {
-                            el.parentNode?.removeChild(el);
+                            el.remove();
                         })
                         .play();
                     tick.dataset.bonked = 'true';
@@ -179,7 +179,7 @@ export default {
         win.title = options.title;
         win.content = options.content;
         win.minimizable = options.minimizable || false;
-        win.animate = options.animate !== undefined ? options.animate : true;
+        win.animate = options.animate ?? true;
         win.resize = options.resize || undefined;
         win.className = options.className || '';
         if (options.pos) win.pos = options.pos;
@@ -236,7 +236,7 @@ export default {
         ids.forEach((id) => {
             const link = document.querySelector(`#statusers .user${id}`);
             if (link && statusers) {
-                statusers.removeChild(link);
+                link.remove();
             }
         });
     },

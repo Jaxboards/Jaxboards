@@ -40,7 +40,7 @@ export class AppState {
     }
 
     setWindowActive() {
-        document.cookie = `actw=${globalThis.name}; SameSite:Lax`;
+        document.cookie = `actw=${window.name}; SameSite:Lax`;
         stopTitleFlashing();
         this.stream.pollData();
     }
@@ -52,7 +52,7 @@ onDOMReady(() => {
     RUN.onAppReady();
 });
 onDOMReady(() => {
-    globalThis.name = `${Math.random()}`;
+    window.name = `${Math.random()}`;
     RUN.setWindowActive();
     globalThis.addEventListener('focus', () => {
         RUN.setWindowActive();

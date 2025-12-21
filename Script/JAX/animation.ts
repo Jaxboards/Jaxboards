@@ -6,7 +6,7 @@ import { getComputedStyle } from './el';
  * It should be replaced.
  */
 class Animation {
-    private el: Element;
+    private el: HTMLElement;
 
     private delay: number;
 
@@ -26,7 +26,7 @@ class Animation {
         >
     >;
 
-    constructor(el: Element, steps = 30, delay = 20, loop = 0) {
+    constructor(el: HTMLElement, steps = 30, delay = 20, loop = 0) {
         this.el = el;
         this.steps = steps;
         this.delay = delay;
@@ -41,11 +41,20 @@ class Animation {
         return this;
     }
 
-    morph(from, percent, to) {
-        if (Array.isArray(from) && from.length === to.length) {
-            return from.map((value, i) =>
+    morph(from: number[], percent: number, to: number | number[]): number[];
+
+    morph(from: number, percent: number, to: number): number;
+
+    morph(from: number | number[], percent: number, to: number | number[]) {
+        // Handles [R,G,B] values
+        if (Array.isArray(from) && Array.isArray(to)) {
+            return from.map((value: number, i): number =>
                 Math.round(this.morph(value, percent, to[i])),
             );
+        }
+        if (Array.isArray(from) || Array.isArray(to)) {
+            // unhandled case
+            return 0;
         }
         return (to - from) * percent + from;
     }
@@ -121,7 +130,7 @@ class Animation {
     }
 
     andThen(
-        what: string | ((el: Element) => void),
+        what: string | ((el: HTMLElement) => void),
         from = undefined,
         to = undefined,
         steps = undefined,

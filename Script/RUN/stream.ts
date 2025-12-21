@@ -2,8 +2,8 @@ import Commands from './commands';
 
 const UPDATE_INTERVAL = 5000;
 
-class Stream {
-    private commands: typeof Commands;
+export default class Stream {
+    private readonly commands: typeof Commands;
 
     private lastURL: string;
 
@@ -17,18 +17,14 @@ class Stream {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleRequestData(url: string, cmds: Array<any>, requestType = 1) {
         let softurl = false;
-        cmds.forEach(
-            ([cmd, ...args]: [
-                keyof typeof Commands | 'softurl',
-                ...Array<number | string>,
-            ]) => {
-                if (cmd === 'softurl') {
-                    softurl = true;
-                } else if (this.commands[cmd]) {
-                    this.commands[cmd](...args);
-                }
-            },
-        );
+        cmds.forEach(([cmd, ...args]: [string, ...unknown[]]) => {
+            if (cmd === 'softurl') {
+                softurl = true;
+            } else if (cmd in this.commands) {
+                // @ts-expect-error I tried for 30 minutes to fix this type error
+                this.commands[cmd].apply(null, args);
+            }
+        });
 
         if (requestType === 2) {
             if (!softurl) {
@@ -77,7 +73,7 @@ class Stream {
             this.load(this.lastURL);
         }
         clearTimeout(this.timeout);
-        if (document.cookie.includes(`actw=${globalThis.name}`)) {
+        if (document.cookie.includes(`actw=${window.name}`)) {
             this.timeout = setTimeout(
                 () => this.load(this.lastURL),
                 UPDATE_INTERVAL,
@@ -93,5 +89,3 @@ class Stream {
         }
     }
 }
-
-export default Stream;

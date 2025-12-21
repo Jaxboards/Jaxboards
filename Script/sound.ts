@@ -1,9 +1,7 @@
 class Sound {
-    constructor() {
-        this.soundCache = {};
-    }
+    private soundCache: Record<string, HTMLAudioElement> = {};
 
-    load(title, file, autoplay) {
+    load(title: string, file: string, autoplay: boolean) {
         let audio = this.soundCache[title];
 
         if (audio) {
@@ -21,11 +19,11 @@ class Sound {
         audio.src = file;
     }
 
-    play(title) {
+    play(title: string) {
         this.soundCache[title].play();
     }
 
-    loadAndPlay(title, file) {
+    loadAndPlay(title: string, file: string) {
         this.load(title, file, true);
     }
 }

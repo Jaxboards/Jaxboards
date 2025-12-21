@@ -80,7 +80,10 @@ export default function sortableTree(
                     next.parentNode?.removeChild(next);
                 }
                 if (next.className !== 'spacer') {
-                    insertAfter(sess.el.previousSibling!, sess.droptarget);
+                    insertAfter(
+                        sess.el.previousSibling as HTMLLIElement,
+                        sess.droptarget,
+                    );
                 } else {
                     sess.el.previousSibling?.parentNode?.removeChild(
                         sess.el.previousSibling,

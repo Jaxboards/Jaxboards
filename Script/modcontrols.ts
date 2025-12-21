@@ -18,7 +18,7 @@ function threadIDs(strTIDs: string) {
 export default class ModControls {
     private whichone = 0;
 
-    private boundCheckLocation;
+    private readonly boundCheckLocation;
 
     private pids: string[] = [];
 
@@ -40,7 +40,7 @@ export default class ModControls {
     checkLocation() {
         const { whichone } = this;
         const regex = whichone ? /topic\/(\d+)/ : /forum\/(\d+)/;
-        const locationMatch = document.location.toString().match(regex);
+        const locationMatch = regex.exec(document.location.toString());
         if (locationMatch) {
             this.moveTo(Number(locationMatch[1]));
         } else {
