@@ -20,7 +20,6 @@ use function json_decode;
 use function json_encode;
 use function trim;
 
-use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
 
 final readonly class PrivateMessage implements Module

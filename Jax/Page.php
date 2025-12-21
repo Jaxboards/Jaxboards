@@ -8,12 +8,14 @@ use Exception;
 use Jax\Models\Skin;
 
 use function array_merge;
+use function error_log;
 use function explode;
 use function header;
 use function headers_sent;
 use function is_array;
 use function json_decode;
 use function json_encode;
+use function trim;
 
 use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
@@ -81,15 +83,21 @@ final class Page
     {
         foreach (explode(PHP_EOL, $script) as $line) {
             $line = trim($line);
-            if (!$line) {
+            if ($line === '') {
                 continue;
             }
+            if ($line === '0') {
+                continue;
+            }
+
             try {
                 $decoded = json_decode($line, flags: JSON_THROW_ON_ERROR);
-            } catch (Exception $e) {
+            } catch (Exception) {
                 error_log('Invalid JSON in session: ' . $script);
+
                 continue;
             }
+
             if (!is_array($decoded)) {
                 continue;
             }
