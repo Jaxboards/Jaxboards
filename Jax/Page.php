@@ -86,6 +86,7 @@ final class Page
             if ($line === '') {
                 continue;
             }
+
             if ($line === '0') {
                 continue;
             }
