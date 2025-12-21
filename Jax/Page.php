@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Exception;
 use Jax\Models\Skin;
 
 use function array_merge;
@@ -79,7 +80,16 @@ final class Page
     public function commandsFromString(string $script): void
     {
         foreach (explode(PHP_EOL, $script) as $line) {
-            $decoded = json_decode($line, flags: JSON_THROW_ON_ERROR);
+            $line = trim($line);
+            if (!$line) {
+                continue;
+            }
+            try {
+                $decoded = json_decode($line, flags: JSON_THROW_ON_ERROR);
+            } catch (Exception $e) {
+                error_log('Invalid JSON in session: ' . $script);
+                continue;
+            }
             if (!is_array($decoded)) {
                 continue;
             }

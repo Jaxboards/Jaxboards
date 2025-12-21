@@ -61,7 +61,7 @@ final readonly class PrivateMessage implements Module
         $enemies = explode(',', $enemies);
         $commands = explode(PHP_EOL, $this->session->get()->runonce);
         foreach ($commands as $index => $command) {
-            $command = json_decode($command, flags: JSON_THROW_ON_ERROR);
+            $command = json_decode($command);
             if (!$command) {
                 continue;
             }
@@ -78,7 +78,7 @@ final readonly class PrivateMessage implements Module
             $this->page->command(...$command);
         }
 
-        $this->session->set('runonce', implode(PHP_EOL, $commands));
+        $this->session->set('runonce', implode(PHP_EOL, $commands) . PHP_EOL);
     }
 
     public function message(int $uid, string $instantMessage): void

@@ -33,6 +33,8 @@ final class Session extends Model
     #[Column(name: 'lastAction', type: 'datetime')]
     public ?string $lastAction = null;
 
+    // This field is a PHP_EOL separated list of JSON expressions.
+    // Should probably just be a full JSON array but that makes appending harder.
     #[Column(name: 'runonce', type: 'text', default: '', nullable: false)]
     public string $runonce = '';
 
