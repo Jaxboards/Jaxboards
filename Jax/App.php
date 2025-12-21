@@ -56,7 +56,7 @@ final readonly class App
 
         $this->startSession();
 
-        $this->loadSkin();
+        $this->page->loadSkin();
 
         // Set Navigation.
         $this->renderNavigation();
@@ -154,43 +154,6 @@ final readonly class App
         }
 
         $this->router->route();
-    }
-
-    private function loadSkin(): void
-    {
-        $this->page->loadSkin(
-            $this->session->getVar('skinID')
-                ?: $this->user->get()->skinID,
-        );
-        $this->template->loadMeta('global');
-
-
-        // Skin selector.
-        if ($this->request->both('skinID') !== null) {
-            if (!$this->request->both('skinID')) {
-                $this->session->deleteVar('skinID');
-                $this->page->command('reload');
-            } else {
-                $this->session->addVar('skinID', $this->request->both('skinID'));
-                if ($this->request->isJSAccess()) {
-                    $this->page->command('reload');
-                }
-            }
-        }
-
-        if (
-            !$this->session->getVar('skinID')
-        ) {
-            return;
-        }
-
-        $this->page->append(
-            'NAVIGATION',
-            '<div class="success" '
-                . 'style="position:fixed;bottom:0;left:0;width:100%;">'
-                . 'Skin UCP setting being overridden. '
-                . '<a href="?skinID=0">Revert</a></div>',
-        );
     }
 
     private function renderBaseHTML(): void

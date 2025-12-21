@@ -43,8 +43,9 @@ final class Page
         private readonly DomainDefinitions $domainDefinitions,
         private readonly FileSystem $fileSystem,
         private readonly Request $request,
-        private readonly Template $template,
         private readonly Session $session,
+        private readonly Template $template,
+        private readonly User $user,
     ) {}
 
     public function append(string $part, string $content): void
@@ -150,8 +151,12 @@ final class Page
         return $this->template->meta('error', $error);
     }
 
-    public function loadSkin(?int $skinId): void
+    public function loadSkin(): void
     {
+        $skinId = $this->user->get()->skinID;
+
+        $this->template->loadMeta('global');
+
         $skin = $this->getSelectedSkin($skinId);
 
         $themePath = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardPath() : '') . '/Themes/' . $skin->title;
