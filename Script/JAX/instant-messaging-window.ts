@@ -1,4 +1,4 @@
-/* global RUN, globalSettings */
+/* global globalSettings */
 
 import commands from '../RUN/commands';
 import Sound from '../sound';
