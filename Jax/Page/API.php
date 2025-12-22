@@ -34,7 +34,7 @@ final readonly class API implements Route
                 'searchmembers' => $this->searchMembers(),
                 'emotes' => $this->emotes(),
                 default => '',
-            }
+            },
         );
     }
 
