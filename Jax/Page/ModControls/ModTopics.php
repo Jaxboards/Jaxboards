@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Jax\ModControls;
+namespace Jax\Page\ModControls;
 
 use Jax\Database\Database;
 use Jax\Jax;
