@@ -2,9 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Jax;
+namespace Jax\Page;
 
+use Jax\Interfaces\Route;
 use Jax\Models\Member;
+use Jax\Page;
+use Jax\Request;
+use Jax\TextFormatting;
 
 use function array_keys;
 use function array_values;
@@ -15,20 +19,23 @@ use function str_replace;
 use const ENT_QUOTES;
 use const JSON_THROW_ON_ERROR;
 
-final readonly class API
+final readonly class API implements Route
 {
     public function __construct(
+        private Page $page,
         private Request $request,
         private TextFormatting $textFormatting,
     ) {}
 
-    public function render(): string
+    public function route(array $params): void
     {
-        return match ($this->request->get('act')) {
-            'searchmembers' => $this->searchMembers(),
-            'emotes' => $this->emotes(),
-            default => '',
-        };
+        $this->page->earlyFlush(
+            match ($params['method']) {
+                'searchmembers' => $this->searchMembers(),
+                'emotes' => $this->emotes(),
+                default => '',
+            }
+        );
     }
 
     private function searchMembers(): string

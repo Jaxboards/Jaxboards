@@ -6,6 +6,7 @@ namespace Jax;
 
 use DI\Container;
 use Jax\Models\Page as ModelsPage;
+use Jax\Page\API;
 use Jax\Page\Asteroids;
 use Jax\Page\Badges;
 use Jax\Page\BoardOffline;
@@ -64,6 +65,7 @@ final class Router
         private readonly User $user,
     ) {
         $this->get('', '/', IDX::class);
+        $this->get('api', '/api/{method}', API::class);
         $this->get('asteroids', '/asteroids', Asteroids::class);
         $this->get('badges', '/badges', Badges::class);
         $this->get('buddylist', '/buddylist', BuddyList::class);
@@ -249,7 +251,7 @@ final class Router
         }
 
         return $this->config->getSetting('boardoffline')
-        && !$this->user->getGroup()->canViewOfflineBoard;
+            && !$this->user->getGroup()->canViewOfflineBoard;
     }
 
     /**

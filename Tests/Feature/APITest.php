@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Jax\API;
+use Jax\App;
+use Jax\Date;
+use Jax\Modules\PrivateMessage;
+use Jax\Modules\Shoutbox;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
@@ -21,6 +24,7 @@ use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Page\API;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
@@ -64,6 +68,10 @@ use function json_decode;
 #[CoversClass(Router::class)]
 #[CoversClass(Session::class)]
 #[CoversClass(Template::class)]
+#[CoversClass(App::class)]
+#[CoversClass(Date::class)]
+#[CoversClass(PrivateMessage::class)]
+#[CoversClass(Shoutbox::class)]
 final class APITest extends FeatureTestCase
 {
     protected function setUp(): void
@@ -75,7 +83,7 @@ final class APITest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=searchmembers&term=admin', API::class);
+        $page = $this->go('/api/searchmembers?term=admin');
 
         $this->assertEquals([[1], ['Admin']], json_decode($page, true));
     }
@@ -84,7 +92,7 @@ final class APITest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=emotes', API::class);
+        $page = $this->go('/api/emotes');
 
         $this->assertContains(':)', json_decode($page, true)[0]);
     }

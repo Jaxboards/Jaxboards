@@ -5,7 +5,7 @@ const VALID_CLASS = 'valid';
 const INVALID_CLASS = 'invalid';
 
 export default class AutoComplete extends Component<HTMLInputElement> {
-    action?: string;
+    method?: string;
 
     outputElement: HTMLInputElement;
 
@@ -27,7 +27,7 @@ export default class AutoComplete extends Component<HTMLInputElement> {
         // Disable native autocomplete behavior
         element.autocomplete = 'off';
 
-        this.action = element.dataset.autocompleteAction;
+        this.method = element.dataset.autocompleteAction;
         const output = element.dataset.autocompleteOutput;
         const indicator = element.dataset.autocompleteIndicator;
 
@@ -128,9 +128,11 @@ export default class AutoComplete extends Component<HTMLInputElement> {
             ? '../'
             : '';
         const searchTerm = encodeURIComponent(this.element.value);
-        const queryParams = `act=${this.action}&term=${searchTerm}`;
+        const queryParams = `term=${searchTerm}`;
 
-        const res = await fetch(`${relativePath}api/?${queryParams}`);
+        const res = await fetch(
+            `${relativePath}/api/${this.method}?${queryParams}`,
+        );
         if (!res.ok) {
             return;
         }

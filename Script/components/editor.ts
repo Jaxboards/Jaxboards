@@ -161,7 +161,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     async showEmotes(x: number, y: number) {
         const emotewin = this.emoteWindow;
         if (!emotewin) {
-            const res = await fetch('/api/?act=emotes');
+            const res = await fetch('/api/emotes');
             if (res.ok) {
                 this.createEmoteWindow(await res.json(), { x, y });
             }
