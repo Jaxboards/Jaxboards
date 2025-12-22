@@ -348,9 +348,6 @@ final readonly class ModControls implements Route
                     </form>
                     IP Lookup Services: <ul>
                         <li><a href="https://whois.domaintools.com/{$ipAddress}">DomainTools Whois</a></li>
-                        <li><a href="https://www.domaintools.com/research/traceroute/?query={$ipAddress}">
-                            DomainTools Traceroute
-                        </a></li>
                         <li><a href="https://www.ip2location.com/{$ipAddress}">IP2Location Lookup</a></li>
                         <li><a href="https://www.dan.me.uk/torcheck?ip={$ipAddress}">IP2Location Lookup</a></li>
                         <li><a href="https://metrics.torproject.org/exonerator.html?ip={$ipAddress}&timestamp={$torDate}">
