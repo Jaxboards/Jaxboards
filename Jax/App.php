@@ -160,7 +160,7 @@ final readonly class App
     {
         $this->page->append(
             'SCRIPT',
-            '<script src="' . $this->domainDefinitions->getBoardURL() . '/dist/app.js" defer></script>',
+            '<script src="' . $this->domainDefinitions->getBoardURL() . '/dist/app.js?christmas" defer></script>',
         );
 
         if (
