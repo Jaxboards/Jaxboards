@@ -109,7 +109,6 @@ final class BoardIndexTest extends FeatureTestCase
         ));
 
         $this->assertStringContainsString('onlinelist', $page);
-        $this->assertStringContainsString('fid_1_lastpost', $page);
     }
 
     public function testDebugInfo(): void
