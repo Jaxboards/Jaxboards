@@ -32,6 +32,8 @@ abstract class FeatureTestCase extends TestCase
 {
     protected function setUp(): void
     {
+        session_id('paratest-' . getenv('TEST_TOKEN'));
+
         $this->setupDB();
         parent::setUp();
     }

@@ -11,7 +11,6 @@ use Jax\Models\Session as ModelsSession;
 use Jax\Models\Token;
 
 use function array_key_exists;
-use function base64_encode;
 use function ini_set;
 use function is_numeric;
 use function json_decode;
@@ -21,7 +20,6 @@ use function libxml_use_internal_errors;
 use function mb_strlen;
 use function mb_substr;
 use function mktime;
-use function openssl_random_pseudo_bytes;
 use function session_start;
 use function str_contains;
 use function str_starts_with;
@@ -67,7 +65,7 @@ final class Session
 
     public function loginWithToken(): ?int
     {
-        $this->fetchSessionData($this->getPHPSessionValue('sid') ?? $this->request->get('sessid') ?? null);
+        $this->fetchSessionData(session_id() ?? $this->request->get('sessid') ?? null);
 
         if ($this->modelsSession->isBot !== 0) {
             return null;
@@ -333,7 +331,7 @@ final class Session
         $sid = $botName;
 
         if (!$sid) {
-            $sid = base64_encode(openssl_random_pseudo_bytes(128));
+            $sid = session_id();
             $this->setPHPSessionValue('sid', $sid);
         }
 

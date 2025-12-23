@@ -244,6 +244,7 @@ final class ModCPTest extends FeatureTestCase
 
         $page = $this->go(new Request(
             post: ['act' => 'modcontrols', 'dop' => 'delete'],
+            cookie: ['PHPSESSID' => 'paratest'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
