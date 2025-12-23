@@ -13,8 +13,6 @@ export default class CodeBlock extends Component<HTMLDivElement> {
     constructor(element: HTMLDivElement) {
         super(element);
 
-        console.log(element);
-
         // Make BBCode code blocks selectable when clicked
         element.addEventListener('click', () => selectAll(element));
     }
