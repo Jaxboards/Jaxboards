@@ -67,7 +67,7 @@ final class Session
 
     public function loginWithToken(): ?int
     {
-        $this->fetchSessionData($this->getPHPSessionValue('sid') ?? null);
+        $this->fetchSessionData($this->getPHPSessionValue('sid') ?? $this->request->get('sessid') ?? null);
 
         if ($this->modelsSession->isBot !== 0) {
             return null;
