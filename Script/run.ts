@@ -1,3 +1,4 @@
+import createSnow from './eggs/snow';
 import { stopTitleFlashing } from './JAX/flashing-title';
 import gracefulDegrade from './JAX/graceful-degrade';
 import { onDOMReady, supportsEmoji, updateDates } from './JAX/util';
@@ -12,6 +13,14 @@ export class AppState {
     onAppReady() {
         if (useJSLinks) {
             gracefulDegrade(document.body);
+        }
+
+        // Add snow for Christmas
+        const today = new Date();
+        const isChristmas =
+            today.getMonth() === 11 && [23, 24, 25].includes(today.getDate());
+        if (isChristmas) {
+            createSnow();
         }
 
         updateDates();
