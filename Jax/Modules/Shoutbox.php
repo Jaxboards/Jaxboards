@@ -159,7 +159,7 @@ final class Shoutbox implements Module
 
         $shoutHTML = '';
         foreach ($shouts as $shout) {
-            $shoutHTML .= $this->formatShout($shout, $members[$shout->uid]);
+            $shoutHTML .= $this->formatShout($shout, $members[$shout->uid] ?? null);
         }
 
         $this->session->addVar('sb_id', $shouts[0]->id ?? 0);
@@ -277,7 +277,7 @@ final class Shoutbox implements Module
 
         $shoutHTML = '';
         foreach ($shouts as $shout) {
-            $shoutHTML .= $this->formatShout($shout, $membersById[$shout->uid]);
+            $shoutHTML .= $this->formatShout($shout, $membersById[$shout->uid] ?? null);
         }
 
         $page = $this->template->meta(
