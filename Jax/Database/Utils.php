@@ -12,6 +12,7 @@ use Jax\Models\Category;
 use Jax\Models\Forum;
 use Jax\Models\Group;
 use Jax\Models\Post;
+use Jax\Models\Shout;
 use Jax\Models\Skin;
 use Jax\Models\Stats;
 use Jax\Models\Topic;
@@ -374,5 +375,11 @@ final readonly class Utils implements Adapter
         $topic->summary = " Now, it's only a matter of time";
         $topic->op = 1;
         $topic->insert();
+
+        $shout = new Shout();
+        $shout->uid = 1;
+        $shout->date = $this->database->datetime();
+        $shout->shout = "Welcome to jaxboards!";
+        $shout->insert();
     }
 }
