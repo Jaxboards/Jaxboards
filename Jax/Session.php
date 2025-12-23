@@ -16,12 +16,14 @@ use function ini_set;
 use function is_numeric;
 use function json_decode;
 use function json_encode;
+use function libxml_clear_errors;
+use function libxml_use_internal_errors;
 use function mb_strlen;
 use function mb_substr;
 use function mktime;
 use function openssl_random_pseudo_bytes;
-use function preg_replace_callback;
 use function session_start;
+use function str_contains;
 use function str_starts_with;
 use function unserialize;
 
@@ -305,21 +307,24 @@ final class Session
         }
 
         libxml_use_internal_errors(true);
-        $doc = new DOMDocument();
-        $doc->loadHTML($html);
-        $links = $doc->getElementsByTagName('a');
+        $domDocument = new DOMDocument();
+        $domDocument->loadHTML($html);
 
-        foreach ($links as $link) {
+        $domNodeList = $domDocument->getElementsByTagName('a');
+
+        foreach ($domNodeList as $link) {
             $href = $link->getAttribute('href');
             $separator = str_contains($href, '?') ? '&' : '?';
             if (str_starts_with($href, '/')) {
                 $href .= "{$separator}sessid={$this->modelsSession->id}";
             }
+
             $link->setAttribute('href', $href);
         }
+
         libxml_clear_errors();
 
-        return $doc->saveHTML();
+        return $domDocument->saveHTML();
     }
 
     private function createSession(): void
