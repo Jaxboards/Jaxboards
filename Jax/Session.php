@@ -20,6 +20,7 @@ use function libxml_use_internal_errors;
 use function mb_strlen;
 use function mb_substr;
 use function mktime;
+use function session_id;
 use function session_start;
 use function str_contains;
 use function str_starts_with;

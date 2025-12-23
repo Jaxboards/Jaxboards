@@ -16,11 +16,13 @@ use Jax\User;
 use PHPUnit\Framework\Attributes\CoversNothing;
 
 use function DI\autowire;
+use function getenv;
 use function is_string;
 use function ltrim;
 use function parse_str;
 use function parse_url;
 use function password_hash;
+use function session_id;
 
 use const PASSWORD_DEFAULT;
 
