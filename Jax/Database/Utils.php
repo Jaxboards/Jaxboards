@@ -379,7 +379,7 @@ final readonly class Utils implements Adapter
         $shout = new Shout();
         $shout->uid = 1;
         $shout->date = $this->database->datetime();
-        $shout->shout = "Welcome to jaxboards!";
+        $shout->shout = 'Welcome to jaxboards!';
         $shout->insert();
     }
 }

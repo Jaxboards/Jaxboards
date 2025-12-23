@@ -25,11 +25,11 @@ use Jax\Models\Member;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
-use Jax\Routes\UCP;
-use Jax\Routes\UCP\Inbox;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
+use Jax\Routes\UCP;
+use Jax\Routes\UCP\Inbox;
 use Jax\ServiceConfig;
 use Jax\Session;
 use Jax\Template;
@@ -262,7 +262,8 @@ final class UCPTest extends FeatureTestCase
         $this->assertEquals('http://google.com', $member->website);
 
         $birthdate = $this->container->get(Date::class)
-            ->datetimeAsCarbon($member->birthdate);
+            ->datetimeAsCarbon($member->birthdate)
+        ;
 
         $this->assertEquals(1, $birthdate->month);
         $this->assertEquals(1, $birthdate->day);
