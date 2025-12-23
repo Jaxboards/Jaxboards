@@ -170,7 +170,7 @@ final class Shoutbox implements Module
             'SHOUTBOX',
             $this->template->meta(
                 'collapsebox',
-                " id='shoutbox'",
+                '',
                 $this->template->meta(
                     'shoutbox-title',
                 ),

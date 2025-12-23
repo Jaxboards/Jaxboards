@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use Carbon\Carbon;
+use DOMDocument;
 use Jax\Database\Database;
 use Jax\Models\Session as ModelsSession;
 use Jax\Models\Token;
@@ -303,11 +304,22 @@ final class Session
             return $html;
         }
 
-        return (string) preg_replace_callback(
-            "@href=['\"]?([^'\"]+)['\"]?@",
-            $this->addSessIDCB(...),
-            $html,
-        );
+        libxml_use_internal_errors(true);
+        $doc = new DOMDocument();
+        $doc->loadHTML($html);
+        $links = $doc->getElementsByTagName('a');
+
+        foreach ($links as $link) {
+            $href = $link->getAttribute('href');
+            $separator = str_contains($href, '?') ? '&' : '?';
+            if (str_starts_with($href, '/')) {
+                $href .= "{$separator}sessid={$this->modelsSession->id}";
+            }
+            $link->setAttribute('href', $href);
+        }
+        libxml_clear_errors();
+
+        return $doc->saveHTML();
     }
 
     /**
@@ -315,11 +327,12 @@ final class Session
      */
     public function addSessIDCB(array $match): string
     {
-        if ($match[1][0] === '?') {
-            $match[1] .= '&amp;sessid=' . $this->modelsSession->id;
+        $href = $match['href'];
+        if (str_starts_with($href, '?') || str_starts_with($href, '/')) {
+            $href .= '&amp;sessid=' . $this->modelsSession->id;
         }
 
-        return 'href="' . $match[1] . '"';
+        return 'href="' . $href . '"';
     }
 
     private function createSession(): void
