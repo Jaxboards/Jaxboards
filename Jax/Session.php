@@ -322,19 +322,6 @@ final class Session
         return $doc->saveHTML();
     }
 
-    /**
-     * @param array<string> $match
-     */
-    public function addSessIDCB(array $match): string
-    {
-        $href = $match['href'];
-        if (str_starts_with($href, '?') || str_starts_with($href, '/')) {
-            $href .= '&amp;sessid=' . $this->modelsSession->id;
-        }
-
-        return 'href="' . $href . '"';
-    }
-
     private function createSession(): void
     {
         $botName = $this->botDetector->getBotName();
