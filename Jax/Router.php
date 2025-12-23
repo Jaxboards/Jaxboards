@@ -15,7 +15,7 @@ use Jax\Routes\Calendar;
 use Jax\Routes\Download;
 use Jax\Routes\Earthbound;
 use Jax\Routes\Forum;
-use Jax\Routes\IDX;
+use Jax\Routes\BoardIndex;
 use Jax\Routes\Katamari;
 use Jax\Routes\LogReg;
 use Jax\Routes\Members;
@@ -64,16 +64,16 @@ final class Router
         private readonly Session $session,
         private readonly User $user,
     ) {
-        $this->get('', '/', IDX::class);
+        $this->get('', '/', BoardIndex::class);
         $this->get('api', '/api/{method}', API::class);
         $this->get('asteroids', '/asteroids', Asteroids::class);
         $this->get('badges', '/badges', Badges::class);
         $this->get('buddylist', '/buddylist', BuddyList::class);
         $this->get('calendar', '/calendar', Calendar::class);
-        $this->get('category', '/', IDX::class);
+        $this->get('category', '/', BoardIndex::class);
         $this->get('download', '/download', Download::class);
         $this->get('earthbound', '/earthbound', Earthbound::class);
-        $this->get('index', '/', IDX::class);
+        $this->get('index', '/', BoardIndex::class);
         $this->get('katamari', '/katamari', Katamari::class);
         $this->get('members', '/members', Members::class);
         $this->get('modcontrols', '/modcontrols', ModControls::class);

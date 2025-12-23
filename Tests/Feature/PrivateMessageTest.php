@@ -28,7 +28,7 @@ use Jax\Page;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
-use Jax\Routes\IDX;
+use Jax\Routes\BoardIndex;
 use Jax\ServiceConfig;
 use Jax\Session;
 use Jax\Template;
@@ -65,7 +65,7 @@ use function json_decode;
 #[CoversClass(Model::class)]
 #[CoversClass(Shoutbox::class)]
 #[CoversClass(Page::class)]
-#[CoversClass(IDX::class)]
+#[CoversClass(BoardIndex::class)]
 #[CoversClass(TextRules::class)]
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]

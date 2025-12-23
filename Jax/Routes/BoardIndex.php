@@ -45,7 +45,7 @@ use function preg_match;
 use const JSON_THROW_ON_ERROR;
 use const SORT_REGULAR;
 
-final class IDX implements Route
+final class BoardIndex implements Route
 {
     /**
      * @var ?array<int,int> Map of forum IDs to their last read timestamp
@@ -95,7 +95,7 @@ final class IDX implements Route
         if ($this->request->isJSUpdate()) {
             $this->update();
         } else {
-            $this->viewidx();
+            $this->viewBoardIndex();
         }
     }
 
@@ -130,7 +130,7 @@ final class IDX implements Route
         );
     }
 
-    private function viewidx(): void
+    private function viewBoardIndex(): void
     {
         $this->session->set('locationVerbose', 'Viewing board index');
         $page = '';

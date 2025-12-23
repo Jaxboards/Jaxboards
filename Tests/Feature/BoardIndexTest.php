@@ -28,7 +28,7 @@ use Jax\Page;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
-use Jax\Routes\IDX;
+use Jax\Routes\BoardIndex;
 use Jax\ServiceConfig;
 use Jax\Session;
 use Jax\Template;
@@ -55,7 +55,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(DebugLog::class)]
 #[CoversClass(DomainDefinitions::class)]
 #[CoversClass(ForeignKey::class)]
-#[CoversClass(IDX::class)]
+#[CoversClass(BoardIndex::class)]
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
 #[CoversClass(Key::class)]
