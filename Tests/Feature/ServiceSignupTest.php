@@ -20,7 +20,7 @@ use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Models\Service\Directory;
 use Jax\Page;
-use Jax\Page\ServiceSignup;
+use Jax\Routes\ServiceSignup;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;

@@ -92,7 +92,10 @@
         "psalm": "psalm",
         "psalm-report": "psalm --output-format=sonarqube > psalm-report.json",
         "rector": "rector",
-        "test": "paratest"
+        "test": [
+            "@putenv XDEBUG_MODE=coverage",
+            "paratest"
+        ]
     },
     "version": "2.1.10"
 }

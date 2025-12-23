@@ -27,7 +27,7 @@ use Jax\Models\Member;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
-use Jax\Page\BuddyList;
+use Jax\Routes\BuddyList;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;

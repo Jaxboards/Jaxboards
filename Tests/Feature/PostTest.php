@@ -28,7 +28,7 @@ use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\OpenGraph;
 use Jax\Page;
-use Jax\Page\Post;
+use Jax\Routes\Post;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;

@@ -1,0 +1,97 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Jax\Routes;
+
+use Jax\DomainDefinitions;
+use Jax\Interfaces\Route;
+use Jax\Page;
+
+final readonly class Rainbow implements Route
+{
+    public function __construct(
+        private Page $page,
+        private DomainDefinitions $domainDefinitions,
+    ) {}
+
+    public function route($params): void
+    {
+        $this->page->command('softurl');
+        $this->page->command('script', "(function() {
+            let i = 0;
+
+            document.body.style.background = `radial-gradient(
+                rgba(255, 0, 0, 1) 0%,
+                rgba(255, 154, 0, 1) 10%,
+                rgba(208, 222, 33, 1) 20%,
+                rgba(79, 220, 74, 1) 30%,
+                rgba(63, 218, 216, 1) 40%,
+                rgba(47, 201, 226, 1) 50%,
+                rgba(28, 127, 238, 1) 60%,
+                rgba(95, 21, 242, 1) 70%,
+                rgba(186, 12, 248, 1) 80%,
+                rgba(251, 7, 217, 1) 90%,
+                rgba(255, 0, 0, 1) 100%
+            )`;
+
+            // If you look closely enough you might be able to see the unicorn
+
+            document.body.style.cursor = 'url(\"data:image/x-icon;base64,AAACAAEAICAAAAAAAACoDAAAFgAAACgAAAAgAAAAQ' +
+            'AAAAAEAGAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' +
+            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' +
+            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' +
+            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZa4yffJ8AAAAAAAAAAAAAAAAAAAAAA' +
+            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB8TF2DQn' +
+            'SOUZWgaaurgbQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACLWHh5OWN3QWMAAAAAAAAAAAAAAAAAAAA' +
+            'AAAAAAAAAAAAAAAAAAAB4O1WGSn+WYKKre7m+ls3Lq9jKvM4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACNXnCFR2+KSnaD' +
+            'PG58LWRpFFClgpEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB6O1uOVoehcKq5ksXIqdTXu+DIP733Kvf3Kvf3Kvf3Kve/RLMAAAAAA' +
+            'AAAAAAAAAC1nZGFTGqJSHOMTXqMS3yJQ3mBOW2dVXqQTGi1k50AAAAAAAAAAAAAAAAAAACvmpqDRl6bZI2xhLDFo8nVudrhyuXhyu' +
+            'bcuN72iPC3O6q8R5G2KqQAAAAAAAAAAAAAAACXdVqJS26QTX6TVIWXVomueaXKs7q0lKCjd42VXXWXXXCUUGGWVGGVVGCaXml/RUh' +
+            '+PkOcYXe1jKrOsMjcxNvm0OLkzeLizOTTXMfgTdKtJKG5RIYAAAAAAAAAAAAAAACTa1dcDz9GDDGbWo61ha3g2dbVzcrJury8qq+1' +
+            'nqe0m6O4oaa8o6a6n6K1kpmmcn2YUGGGRU6xgJHTs8ThyNbnz97nz97lzOHattqmE5OaFYuNEXYAAAAAAAAAAAAAAACoinqiX4mqY' +
+            '5uzf6rq5eLg2dbY0c7RycbOxMHLwb/Lwr/Lw7/Lwr/Ow77Lv73It7a6lpqeW2mgZXPOrbjiytXnz9vnzt3jydqzkZx6EmffY9OzJa' +
+            'LluckAAAAAAAAAAAAAAACeaWircJXv7Onq5eLh2tfb1NPXz83Wz8zVzcvVzMjTzMjWzsvb0s/c1NPb0s/Vx8bAnqWkaXfCnqfiydT' +
+            'nz9vly9m+oqePPIbWQceuHqC0H6S+SIsAAAAAAAAAAAAAAAC1noW6ipjs5+Ls6eXn5ODi3tvi3trh2tjg2dbd2NPg2dfi2drn3uDr' +
+            '4uPq4eHm393ez9DCm6XCnqjhytPq0t/bw9F3J2vUP8WbEInDK7S4Iau1QoQAAAAAAAAAAAAAAAAAAAC4jHnj1s3v6+Xv7Ojt6ubu6' +
+            '+ju6+ns5uTs5uPu6+jw6+ry6ev06uzx6uzw6uvs5eTeys7Utr7exdDnz9uZf3GyNqbVMMLCLLPTO8S8JqvRhIUAAAAAAAAAAAAAAA' +
+            'AAAAC4nHTTtavs5t/w7+jy8Ovz8e/29PH29PD59/T8+ff8+vj7+fn59Pb48vL18PD08O/r4ePiz9W7fqKCT2KFNWrOM77OLr3YPMn' +
+            'bRs2yGZ/qxsQAAAAAAAAAAAAAAAAAAAAAAAC7m3bi1Mvt6+Lx8Ov29vD5+fT7+fj+/fr//v///////////v7++fr69vb59PTz7O3p' +
+            '2t3n2NvrY+CYLIvFJbHJL7fiTtXiUNamMnsAAAAAAAAAAAAAAAAAAAAAAAAAAADi2snNqpvo4Njz8Ov69/P9/fr///7//////////' +
+            '////////////v7/+/z9+fn59PX17O7w5emlIJfRRsWXEITKM7rpWdu5H6WvHI4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC2nmzawL' +
+            'bx7+f7+vb///7///////8qKCgAAAAxMDD+/v///////////vz//f389/jLua2PEHuPB3uDAHCtGpjMObvEIK+xJYwAAAAAAAAAAAA' +
+            'AAAAAAAAAAAAAAAAAAAAAAADKooPr3NL9+vP////////17O0GBQYAAAAAAADs3uD//////////v7+/Pybf3GXKomlKpeVDYZ9AGvM' +
+            'Mbu/H6vSML3bfJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADNvYXivav57+n////////37O8eHBwAAAAUExPz6+v//fz//vr+/' +
+            'f2cfXSvPqTxaOXwaePsV9/uWeCxK6LTPsPGJqoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC1jF7nzL7//vz+/v7x6+' +
+            'fo3NvUu7716ur//v76+Pf59/T17+qkLZjYMMCvG5irEZTDH67UOMPNLb3LM7nsnpoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' +
+            'AAAAAAAC4PoTPKbrxbOp9SFijAo/+/vv+/v7+///8+vj49PTz7uywmZO1E5p/AGqABG6XC4KtE5i6G6fKKbbdeJoAAAAAAAAAAAAA' +
+            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAADDSpDrAKXtUur+9f6eGJKwFJro4NKqdoOtGqHAlKrDqtPHt7KaWHiqN5btfOX6j/XuWuPHO' +
+            '7zSIr7deJoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADmzb3AKzH8Zvv98f37vP24IKnXS8mjD4qdB4r1jO+fX9tbQK' +
+            'vYz86zgZ70XeTfPcvWKsbWJsPOI7vdeJoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACXdg3+7I/99Pr8Ute/G62' +
+            'yHqXtWuCGAGW5F6aqKaaLU9FTOqTSydTOUMDpStTLH7fUL8HsVd/NLbkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' +
+            'AABboBXApkL//ur3UGf5r+EAAACvVbTZNsj4hPGMAG+xTM9+TcVQOKDp4+bVOsCnCpD2b+z6hfLiTM/ljJUAAAAAAAAAAAAAAAAAA' +
+            'AAAAAAAAAAAAAAAAAAAAAAAAAAKYkvA/tjF/pTdxFgAAAAAAAAAAACOUMpcPpbMO6PhXNKvTst2R7lPNJj77fTZRMDvcN7kVszWT5' +
+            'sAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHkPe/f4t27QAAAAAAAAAAAAAAAAAAACMT7tWNpJuXKHx7/KhX9B' +
+            'yRLRSOJHl1tX98eEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABcZZDa+P5rrs8AAAAAAAAAAAAAAAAA' +
+            'AAAAAACBQKxYNZDe2+EAAAAAAABwRLKAZaYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABbW6Bic' +
+            'egAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADCqtpcOI4AAAAAAAAAAAB4TbYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' +
+            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZc78AAAAAAAAAAAAAAAA' +
+            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' +
+            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' +
+            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///' +
+            '//////////5////8H/+P/Af+A/wAPAD4ADwAAAA8AAAAPAAAAB4AAAAeAAAAHwAAAB8AAAAfgAAAP4AAAD/AAAA/4AAAP+AgAH/wA' +
+            'AB/8AAA/+AAAf/AAAP/wAAH/4IAB/8OAB/+PgD//H4z//n+d/////f////////////w==\"), auto';
+
+            if (window.rainbow) {
+                clearInterval(window.rainbow);
+                window.rainbow = null;
+            } else {
+                window.rainbow=setInterval(
+                    () => document.documentElement.style.filter = 'hue-rotate(' + (++i) + 'deg)',
+                    1000/60
+                );
+            }
+        })()");
+        $this->page->command('playsound', 'always', $this->domainDefinitions->getSoundsUrl() . '/always.mp3');
+    }
+}

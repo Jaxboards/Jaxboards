@@ -19,7 +19,7 @@ use Jax\IPAddress;
 use Jax\Models\Member;
 use Jax\Models\Post;
 use Jax\Models\Service\Directory;
-use Jax\Page\ServiceInstall;
+use Jax\Routes\ServiceInstall;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\ServiceConfig;

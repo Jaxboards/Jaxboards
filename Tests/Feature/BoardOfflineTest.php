@@ -24,7 +24,7 @@ use Jax\Jax;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
-use Jax\Page\BoardOffline;
+use Jax\Routes\BoardOffline;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;

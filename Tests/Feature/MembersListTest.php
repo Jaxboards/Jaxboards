@@ -25,7 +25,7 @@ use Jax\Jax;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Page;
-use Jax\Page\Members;
+use Jax\Routes\Members;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
