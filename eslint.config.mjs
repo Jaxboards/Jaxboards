@@ -1,27 +1,26 @@
-import { FlatCompat } from '@eslint/eslintrc';
+import eslint from '@eslint/js';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import { defineConfig } from 'eslint/config';
 import globals from 'globals';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import tseslint from 'typescript-eslint';
 
 // mimic CommonJS variables -- not needed if using CommonJS
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-});
-
-export default tseslint.config(
-    compat.extends('airbnb-base'),
-    eslintPluginPrettierRecommended,
+export default defineConfig(
+    eslint.configs.recommended,
     tseslint.configs.recommended,
+    // tseslint.configs.strict,
+    // tseslint.configs.stylistic,
+    // tseslint.configs.recommendedTypeChecked,
+    eslintPluginPrettierRecommended,
     {
         files: ['**/*.ts'],
         languageOptions: {
             globals: {
                 ...globals.browser,
+            },
+            parserOptions: {
+                projectService: true,
             },
         },
         rules: {

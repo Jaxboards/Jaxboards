@@ -5,7 +5,6 @@
         "@eslint/js": "^9.26.0",
         "esbuild": "^0.25.3",
         "eslint": "^9.39.1",
-        "eslint-config-airbnb-base": "^15.0.0",
         "eslint-config-prettier": "^10.1.1",
         "eslint-import-resolver-node": "^0.3.9",
         "eslint-plugin-import": "^2.31.0",
