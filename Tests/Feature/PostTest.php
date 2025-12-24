@@ -139,14 +139,15 @@ final class PostTest extends FeatureTestCase
         $this->actingAs('member');
 
         // Create a callback to test the post hook
-        function hookStub($arg = null)
+        function hookStub($arg = null): ?ModelsPost
         {
             static $postHookPostArg;
-            if ($arg === null) {
-                return $postHookPostArg;
+
+            if ($arg !== null) {
+                $postHookPostArg = $arg;
             }
 
-            $postHookPostArg = $arg;
+            return $postHookPostArg;
         }
 
         $this->container->get(Hooks::class)

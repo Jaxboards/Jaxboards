@@ -68,7 +68,7 @@ final class IPAddressTest extends UnitTestCase
     ): void {
         $ipAddress = $this->getIPAddress($ipHumanReadable);
 
-        $this->assertEquals($ipAddress->isLocalHost(), $isLocalHost);
+        $this->assertEquals($isLocalHost, $ipAddress->isLocalHost());
     }
 
     /**
