@@ -97,14 +97,6 @@ final readonly class UCP implements Route
         $this->showucp($page);
     }
 
-    private function getlocationforform(): string
-    {
-        return $this->jax->hiddenFormFields([
-            'act' => 'ucp',
-            'what' => $this->request->asString->both('what') ?? '',
-        ]);
-    }
-
     private function showMain(): ?string
     {
         $error = null;
@@ -323,7 +315,7 @@ final readonly class UCP implements Route
 
         return $this->template->meta(
             'ucp-email-settings',
-            $this->getlocationforform() . $this->jax->hiddenFormFields(
+            $this->jax->hiddenFormFields(
                 ['submit' => 'true'],
             ),
             match (true) {
@@ -370,7 +362,6 @@ final readonly class UCP implements Route
         }
 
         $avatarURL = $avatar ?: trim($this->template->meta('default-avatar'));
-        $locationForForm = $this->getlocationforform();
         $errorDisplay = $error !== null ? $this->page->error($error) : '';
         $avatarInputValue = $this->textFormatting->blockhtml($avatar);
 
@@ -378,7 +369,6 @@ final readonly class UCP implements Route
             Your avatar: <span class="avatar"><img src="{$avatarURL}" alt="Your avatar"></span>
             <br><br>
             <form data-ajax-form="true" method="post">
-                {$locationForForm}
                 {$errorDisplay}
                 <input type="text" name="changedava" title="Your avatar" value="{$avatarInputValue}">
                 <input type="submit" value="Edit">
@@ -657,7 +647,7 @@ final readonly class UCP implements Route
 
         return $page . $this->template->meta(
             'ucp-board-settings',
-            $this->getlocationforform(),
+            '',
             $select,
             '<input type="checkbox" name="usewordfilter" title="Use Word Filter"'
                 . ($this->user->get()->nowordfilter !== 0 ? '' : ' checked="checked"')
