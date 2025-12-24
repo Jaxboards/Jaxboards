@@ -184,7 +184,7 @@ final readonly class UCP implements Route
         }
 
         $checkboxes = [
-            $this->getlocationforform() . $this->jax->hiddenFormFields(
+            $this->jax->hiddenFormFields(
                 ['submit' => 'true'],
             ),
         ];
@@ -214,7 +214,7 @@ final readonly class UCP implements Route
 
         return $this->template->meta(
             'ucp-sig-settings',
-            $this->getlocationforform(),
+            '',
             $sig !== ''
                 ? $this->textFormatting->theWorks($sig) : '( none )',
             $this->textFormatting->blockhtml($sig),
@@ -270,8 +270,7 @@ final readonly class UCP implements Route
 
         return $page . $this->template->meta(
             'ucp-pass-settings',
-            $this->getlocationforform()
-                . $this->jax->hiddenFormFields(['passchange' => 'true']),
+            $this->jax->hiddenFormFields(['passchange' => 'true']),
         );
     }
 
@@ -567,8 +566,7 @@ final readonly class UCP implements Route
 
         return $this->template->meta(
             'ucp-profile-settings',
-            $this->getlocationforform()
-                . $this->jax->hiddenFormFields(['submit' => 'true']),
+            $this->jax->hiddenFormFields(['submit' => 'true']),
             $this->user->get()->name,
             $this->user->get()->displayName,
             $this->user->get()->full_name,
