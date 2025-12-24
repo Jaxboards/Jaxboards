@@ -205,9 +205,10 @@ export default {
                 );
                 if (!link) {
                     link = document.createElement('a');
-                    link.href = `/profile/${memberId}`;
+                    const href = `/profile/${memberId}`;
+                    link.href = href;
                     link.addEventListener('click', function click() {
-                        RUN.stream.location(this.getAttribute('href')!);
+                        RUN.stream.location(href);
                     });
                 }
                 link.innerHTML = name;
@@ -298,8 +299,8 @@ export default {
             if (prdiv.style.display !== 'none') {
                 new Animation(prdiv)
                     .add('height', '200px', '0px')
-                    .andThen(() => {
-                        prdiv!.style.display = 'none';
+                    .andThen((el) => {
+                        el.style.display = 'none';
                     })
                     .play();
                 return;

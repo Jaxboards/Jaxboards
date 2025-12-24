@@ -22,7 +22,9 @@ class Animation {
 
     private lineup: Array<
         Array<
-            (el: Element) => void | [string, string | number, string | number]
+            (
+                el: Element,
+            ) => undefined | [string, string | number, string | number]
         >
     >;
 
@@ -99,7 +101,7 @@ class Animation {
             fromParsed = new Color(from).toRGB();
             t[1] = new Color(to).toRGB();
         } else {
-            t = to.match(/(\D*)(-?\d+)(\D*)/)!;
+            t = /(\D*)(-?\d+)(\D*)/.exec(to);
             t.shift();
             fromParsed = Number.parseFloat(from.match(/-?\d+/)?.[0] ?? '');
         }
@@ -130,7 +132,7 @@ class Animation {
     }
 
     andThen(
-        what: string | ((el: HTMLElement) => void),
+        what: string | ((el: HTMLElement) => undefined),
         from = undefined,
         to = undefined,
         steps = undefined,

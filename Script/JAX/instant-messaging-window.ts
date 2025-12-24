@@ -67,7 +67,9 @@ function createMessagingWindow({
     };
     win.onclick = focus;
     focus();
-    messagesContainer = document.querySelector(`#im_${fromId} .ims`)!;
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    messagesContainer = win.querySelector('.ims')!;
 
     const test = getComputedStyle(messagesContainer);
     messagesContainer.style.width = test.width;

@@ -9,7 +9,7 @@ import tseslint from 'typescript-eslint';
 export default defineConfig(
     eslint.configs.recommended,
     tseslint.configs.recommended,
-    // tseslint.configs.strict,
+    tseslint.configs.strict,
     // tseslint.configs.stylistic,
     // tseslint.configs.recommendedTypeChecked,
     eslintPluginPrettierRecommended,

@@ -98,6 +98,7 @@ export default function sortableTree(
                     tmp = document.createElement('ul');
                     sess.droptarget.appendChild(tmp);
                 }
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 tmp.appendChild(sess.el.previousSibling!);
                 tmp.appendChild(sess.el);
                 sess.droptarget.appendChild(tmp);

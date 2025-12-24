@@ -16,7 +16,11 @@ function dropdownMenu(e: MouseEvent) {
     if (el?.tagName.toLowerCase() === 'a') {
         const menu = document.querySelector<HTMLDivElement>(
             `#menu_${el.classList[0]}`,
-        )!;
+        );
+        if (!menu) {
+            return;
+        }
+
         el.classList.add('active');
         const s = menu.style;
         s.display = 'block';

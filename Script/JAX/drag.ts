@@ -146,7 +146,7 @@ class Drag {
             document.removeEventListener('mouseup', this.boundEvents.drop);
             document.removeEventListener('mousemove', this.boundEvents.drag);
         }
-        this.ondrop?.(this.sess.info!);
+        this.ondrop?.(this.sess.info ?? {});
         if (this.autoZIndex) {
             this.sess.el.style.zIndex = this.sess.zIndex ?? '';
         }
