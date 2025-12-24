@@ -9,9 +9,9 @@ type LineupEntry = (
  * It should be replaced.
  */
 class Animation {
-    private el: HTMLElement;
+    private readonly el: HTMLElement;
 
-    private delay: number;
+    private readonly delay: number;
 
     private steps: number;
 
@@ -21,17 +21,14 @@ class Animation {
 
     private stepCount: number;
 
-    private loop: number;
+    private readonly lineup: LineupEntry[][];
 
-    private lineup: LineupEntry[][];
-
-    constructor(el: HTMLElement, steps = 30, delay = 20, loop = 0) {
+    constructor(el: HTMLElement, steps = 30, delay = 20) {
         this.el = el;
         this.steps = steps;
         this.delay = delay;
         this.curLineup = 0;
         this.stepCount = 0;
-        this.loop = loop;
         this.lineup = [[]];
     }
 
@@ -72,7 +69,7 @@ class Animation {
                     sc / this.steps,
                     keyFrame[2],
                 );
-                if (keyFrame[0].match(/color/i)) {
+                if (/color/i.test(keyFrame[0])) {
                     toValue = `#${new Color(toValue).toHex()}`;
                 } else if (keyFrame[0] !== 'opacity')
                     toValue = Math.round(toValue);
@@ -84,9 +81,6 @@ class Animation {
             if (this.lineup.length - 1 > this.curLineup) {
                 this.stepCount = 0;
                 this.curLineup += 1;
-            } else if (this.loop === 1) {
-                this.stepCount = 0;
-                this.curLineup = 0;
             } else clearInterval(this.interval);
         }
     }
@@ -100,15 +94,9 @@ class Animation {
         } else {
             t = /(\D*)(-?\d+)(\D*)/.exec(to);
             t.shift();
-            fromParsed = Number.parseFloat(from.match(/-?\d+/)?.[0] ?? '');
+            fromParsed = Number.parseFloat(/-?\d+/.exec(from)?.[0] ?? '');
         }
-        this.lineup[this.lineup.length - 1].push([
-            what,
-            fromParsed,
-            t[1],
-            t[0],
-            t[2],
-        ]);
+        this.lineup.at(-1)?.push([what, fromParsed, t[1], t[0], t[2]]);
         return this;
     }
 
@@ -137,7 +125,7 @@ class Animation {
         this.lineup.push([]);
         if (steps) this.steps = steps;
         if (typeof what === 'function') {
-            this.lineup[this.lineup.length - 1].push(what);
+            this.lineup.at(-1)?.push(what);
         } else if (from !== undefined && to !== undefined) {
             this.add(what, from, to);
         }
