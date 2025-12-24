@@ -3,22 +3,35 @@ import Drag, { DragSession } from './drag';
 import { getHighestZIndex } from './el';
 import { onImagesLoaded } from './util';
 
-class Window {
+type WindowOptions = Partial<{
     title: string;
-
     wait: boolean;
-
     content: string;
-
     open: boolean;
-
     minimizable: boolean;
+    resize: string;
+    className: string;
+    pos: 'center';
+    zIndex: number;
+    animate: false;
+}>;
+
+class Window {
+    title: string = 'Title';
+
+    wait: boolean = true;
+
+    content: string = 'Content';
+
+    open: boolean = false;
+
+    minimizable: boolean = true;
 
     resize?: string;
 
-    className: string;
+    className: string = '';
 
-    pos: string;
+    pos: string = 'center';
 
     zIndex: number;
 
@@ -28,23 +41,12 @@ class Window {
 
     onclose?: () => void;
 
-    animate: boolean;
+    animate: boolean = false;
 
     private oldpos?: string;
 
-    constructor(options = {}) {
-        this.title = 'Title';
-        this.wait = true;
-        this.title = 'Title';
-        this.wait = true;
-        this.content = 'Content';
-        this.open = false;
-        this.minimizable = true;
-        this.resize = undefined;
-        this.className = '';
-        this.pos = 'center';
+    constructor(options: WindowOptions = {}) {
         this.zIndex = getHighestZIndex();
-        this.animate = false;
 
         Object.assign(this, options);
     }
@@ -55,7 +57,7 @@ class Window {
      * @param  {Element} windowElementDescendant window element or child element of a window
      * @return {Void}
      */
-    static close = function close(window: HTMLElement) {
+    static close(window: HTMLElement) {
         let element: HTMLElement | null = window;
         do {
             if ('close' in element && typeof element.close === 'function') {
@@ -64,7 +66,7 @@ class Window {
             }
             element = element.parentElement;
         } while (element);
-    };
+    }
 
     create() {
         if (this.windowContainer) {
@@ -185,7 +187,7 @@ class Window {
         if (!this.windowContainer) {
             return;
         }
-        document.body.removeChild(this.windowContainer);
+        this.windowContainer.remove();
         this.windowContainer = undefined;
         if (this.onclose) this.onclose();
     }
@@ -219,7 +221,7 @@ class Window {
         let y = 0;
         const cH = document.documentElement.clientHeight;
         const cW = document.documentElement.clientWidth;
-        const position = pos.match(/(\d+) (\d+)/);
+        const position = /(\d+) (\d+)/.exec(pos);
         if (position) {
             x = Number(position[1]);
             y = Number(position[2]);
