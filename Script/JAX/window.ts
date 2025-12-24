@@ -5,15 +5,17 @@ import { onImagesLoaded } from './util';
 
 type WindowOptions = Partial<{
     title: string;
-    wait: boolean;
     content: string;
+
+    animate: boolean;
+    wait: boolean;
     open: boolean;
     minimizable: boolean;
+
     resize: string;
     className: string;
     pos: 'center';
     zIndex: number;
-    animate: false;
 }>;
 
 class Window {

@@ -113,7 +113,7 @@ export function messageReceived({
     }
 
     const div = document.createElement('div');
-    const isAction = message.substring(0, 3) === '/me';
+    const isAction = message.startsWith('/me');
     if (isAction) {
         div.className = 'action';
         /* eslint-disable no-param-reassign */
@@ -127,7 +127,7 @@ export function messageReceived({
     }
     div.innerHTML = `<a href='/profile/${
         fromMe || fromId
-    }' class='name'>${fromName}</a> ${!isAction ? ': ' : ''}${message}`;
+    }' class='name'>${fromName}</a> ${isAction ? '' : ': '}${message}`;
     div.dataset.timestamp = `${timestamp}`;
     const test =
         messagesContainer.scrollTop >

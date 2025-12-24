@@ -22,23 +22,23 @@ export function getCoordinates(el: HTMLElement) {
     };
 }
 
-export function isChildOf(a: HTMLElement, b: HTMLElement) {
-    return b.contains(a);
+export function isChildOf(
+    targetElement: HTMLElement,
+    parentElement: HTMLElement,
+) {
+    return parentElement.contains(targetElement);
 }
 
-export function insertBefore(a: Element, b: Element) {
-    a.remove();
-    b.parentNode?.insertBefore(a, b);
+export function insertBefore(targetElement: Element, insertElement: Element) {
+    insertElement.before(targetElement);
 }
 
-export function insertAfter(a: Element, b: Element) {
-    a.remove();
-    b.parentNode?.insertBefore(a, b.nextSibling);
+export function insertAfter(targetElement: Element, insertElement: Element) {
+    insertElement.after(targetElement);
 }
 
-export function replace(a: Element, b: Element) {
-    insertBefore(b, a);
-    a.remove();
+export function replace(targetElement: Element, replaceElement: Element) {
+    targetElement.replaceWith(replaceElement);
 }
 
 export function getHighestZIndex() {
@@ -51,13 +51,3 @@ export function getHighestZIndex() {
     }, 0);
     return max + 1;
 }
-
-export default {
-    getComputedStyle,
-    getCoordinates,
-    isChildOf,
-    insertBefore,
-    insertAfter,
-    replace,
-    getHighestZIndex,
-};
