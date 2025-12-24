@@ -134,7 +134,7 @@ export default class BetterSelect extends HTMLElement {
         );
     }
 
-    getOptions(searchTerm = ''): Array<HTMLElement> {
+    getOptions(searchTerm = ''): HTMLElement[] {
         return Array.from(this.querySelectorAll<HTMLElement>('better-option'))
             .filter((betterOption) =>
                 betterOption.innerText

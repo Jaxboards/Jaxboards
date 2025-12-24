@@ -7,7 +7,7 @@ export default class Stream {
 
     private lastURL: string;
 
-    private timeout: number = 0;
+    private timeout = 0;
 
     constructor() {
         this.lastURL = `${document.location.pathname}${document.location.search}`;
@@ -15,7 +15,7 @@ export default class Stream {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    handleRequestData(url: string, cmds: Array<any>, requestType = 1) {
+    handleRequestData(url: string, cmds: any[], requestType = 1) {
         let softurl = false;
         cmds.forEach(([cmd, ...args]: [string, ...unknown[]]) => {
             if (cmd === 'softurl') {

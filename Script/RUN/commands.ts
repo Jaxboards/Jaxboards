@@ -10,6 +10,8 @@ import { onImagesLoaded } from '../JAX/util';
 import Window from '../JAX/window';
 import Sound from '../sound';
 
+type UserOnlineArgs = [number, number, string, string, string, number];
+
 /**
  * These are all of the possible commands
  * that the server can send to the client.
@@ -29,7 +31,7 @@ export default {
     alert(message: string) {
         alert([message]);
     },
-    reload(timeout: number = 0) {
+    reload(timeout = 0) {
         setTimeout(() => globalThis.location.reload(), timeout);
     },
     refreshdata() {
@@ -193,7 +195,7 @@ export default {
             Window.close(el);
         }
     },
-    onlinelist(users: Array<[number, number, string, string, string, number]>) {
+    onlinelist(users: UserOnlineArgs[]) {
         const statusers = document.querySelector('#statusers');
         if (!statusers) {
             return;

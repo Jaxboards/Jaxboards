@@ -1,6 +1,6 @@
 import { date, smalldate } from './date';
 
-export function onImagesLoaded(imgs: Array<HTMLImageElement>, timeout = 1000) {
+export function onImagesLoaded(imgs: HTMLImageElement[], timeout = 1000) {
     return new Promise<void>((resolve) => {
         const images = new Set();
         const imagesToWaitOn = Array.from(imgs).filter((img) => !img.complete);

@@ -29,7 +29,7 @@ class Drag {
 
     droppables: HTMLElement[];
 
-    noChild: boolean = false;
+    noChild = false;
 
     bounds?: number[];
 
@@ -43,7 +43,7 @@ class Drag {
 
     ondrop?: (sess: object) => void;
 
-    autoZIndex: boolean = true;
+    autoZIndex = true;
 
     constructor() {
         this.droppables = [];

@@ -10,7 +10,7 @@ export default defineConfig(
     eslint.configs.recommended,
     tseslint.configs.recommended,
     tseslint.configs.strict,
-    // tseslint.configs.stylistic,
+    tseslint.configs.stylistic,
     // tseslint.configs.recommendedTypeChecked,
     eslintPluginPrettierRecommended,
     {
@@ -28,6 +28,7 @@ export default defineConfig(
             'no-param-reassign': [2, { props: false }],
             'prettier/prettier': ['error', { singleQuote: true }],
             'import/extensions': 0,
+            '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
         },
 
         settings: {

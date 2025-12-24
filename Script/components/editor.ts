@@ -16,7 +16,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
 
     container: HTMLDivElement;
 
-    htmlMode: boolean = false;
+    htmlMode = false;
 
     editbar?: HTMLDivElement;
 

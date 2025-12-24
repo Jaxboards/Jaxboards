@@ -1,6 +1,9 @@
 import Color from './color';
 import { getComputedStyle } from './el';
 
+type LineupEntry = (
+    el: Element,
+) => undefined | [string, string | number, string | number];
 /**
  * This class was written before CSS animations existed.
  * It should be replaced.
@@ -20,13 +23,7 @@ class Animation {
 
     private loop: number;
 
-    private lineup: Array<
-        Array<
-            (
-                el: Element,
-            ) => undefined | [string, string | number, string | number]
-        >
-    >;
+    private lineup: LineupEntry[][];
 
     constructor(el: HTMLElement, steps = 30, delay = 20, loop = 0) {
         this.el = el;

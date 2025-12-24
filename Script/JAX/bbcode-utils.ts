@@ -96,9 +96,7 @@ function parseStyleToBBCode(style: string, _inner: string): string {
     const dummyEl = document.createElement('div');
     dummyEl.setAttribute('style', style);
 
-    for (let i = 0; i < dummyEl.style.length; i += 1) {
-        const prop = dummyEl.style[i];
-
+    for (const prop of dummyEl.style) {
         if (prop in styleToBBCode) {
             inner = styleToBBCode[prop](
                 dummyEl.style.getPropertyValue(prop),

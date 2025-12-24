@@ -19,21 +19,21 @@ type WindowOptions = Partial<{
 }>;
 
 class Window {
-    title: string = 'Title';
+    title = 'Title';
 
-    wait: boolean = true;
+    wait = true;
 
-    content: string = 'Content';
+    content = 'Content';
 
-    open: boolean = false;
+    open = false;
 
-    minimizable: boolean = true;
+    minimizable = true;
 
     resize?: string;
 
-    className: string = '';
+    className = '';
 
-    pos: string = 'center';
+    pos = 'center';
 
     zIndex: number;
 
@@ -43,7 +43,7 @@ class Window {
 
     onclose?: () => void;
 
-    animate: boolean = false;
+    animate = false;
 
     private oldpos?: string;
 

@@ -1,9 +1,9 @@
 import register, { Component } from '../JAX/component';
 
 export default class CollapseBox extends Component<HTMLDivElement> {
-    private fullHeight: number = 0;
+    private fullHeight = 0;
 
-    private animationLengthInMs: number = 200;
+    private animationLengthInMs = 200;
 
     static hydrate(container: HTMLElement): void {
         register(
