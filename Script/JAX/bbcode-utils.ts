@@ -2,14 +2,114 @@ import Color from './color';
 
 const DISALLOWED_TAGS = new Set(['script', 'style', 'hr']);
 
-const textAlignRegex = /text-align: ?(right|center|left)/i;
-const backgroundColorRegex = /background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i;
-const italicRegex = /font-style: ?italic/i;
-const underlineRegex = /text-decoration:[^;]*underline/i;
-const lineThroughRegex = /text-decoration:[^;]*line-through/i;
-const fontSizeRegex = /font-size: ?([^;]+)/i;
-const fontColorRegex = /(?:^|;)color: ?([^;]+)/i;
-const fontWeightRegex = /font-weight: ?bold/i;
+const tagsToBBCode: Record<
+    string,
+    (inner: string, attrs?: Record<string, string>) => string
+> = {
+    a: (inner, attrs) => `[url=${attrs?.href}]${inner}[/url]`,
+
+    b(...args) {
+        return this.strong(...args);
+    },
+
+    div: (inner) => `\n${inner}`,
+
+    em: (inner) => `[i]${inner}[/i]`,
+
+    h1: (inner) => `[h1]${inner}[/h1]`,
+    h2: (inner) => `[h2]${inner}[/h2]`,
+    h3: (inner) => `[h3]${inner}[/h3]`,
+    h4: (inner) => `[h4]${inner}[/h4]`,
+    h5: (inner) => `[h5]${inner}[/h5]`,
+    h6: (inner) => `[h6]${inner}[/h6]`,
+
+    i(...args) {
+        return this.em(...args);
+    },
+
+    li: (inner) => `*${inner.replace(/[\n\r]+/, '')}\n`,
+
+    ol: (inner) => `[ol]${inner}[/ol]`,
+
+    p: (inner) => `\n${inner === '&nbsp' ? '' : inner}\n`,
+
+    strike: (inner) => `[s]${inner}[/s]`,
+
+    strong: (inner) => `[b]${inner}[/b]`,
+
+    u: (inner) => `[u]${inner}[/u]`,
+
+    ul: (inner) => `[ul]${inner}[/ul]`,
+};
+
+const styleToBBCode: Record<
+    string,
+    (attrValue: string, inner: string) => string
+> = {
+    'background-color': (bgColor, inner) =>
+        `[bgcolor=${bgColor}]${inner}[/bgcolor]`,
+
+    color(color, inner) {
+        console.log(color);
+        const hex = color && new Color(color).toHex();
+        const colorAttribute = hex ? `${hex}` : color;
+
+        return `[color=${colorAttribute}]${inner}[/color]`;
+    },
+
+    'font-style': (fontStyle, inner) => `[i]${inner}[/i]`,
+
+    'font-size': (size, inner) => `[size=${size}]${inner}[/size]`,
+
+    'font-weight': (weight, inner) => tagsToBBCode.strong(inner),
+
+    'text-align': (align, inner) => `[align=${align}]${inner}[/align]`,
+
+    'text-decoration': function textDecoration(value, inner) {
+        return value === 'line-through'
+            ? `[strike]${inner}[/strike]`
+            : `[u]${inner}[/u]`;
+    },
+};
+
+function parseTagToBBCode(
+    tag: string,
+    _inner: string,
+    attrs: Record<string, string>,
+) {
+    let inner = _inner;
+
+    const lcTag = tag.toLowerCase();
+    if (DISALLOWED_TAGS.has(lcTag)) {
+        return '';
+    }
+
+    if (lcTag in tagsToBBCode) {
+        inner = tagsToBBCode[lcTag](inner, attrs);
+    }
+
+    return inner;
+}
+
+function parseStyleToBBCode(style: string, _inner: string): string {
+    let inner = _inner;
+
+    const dummyEl = document.createElement('div');
+    dummyEl.setAttribute('style', style);
+
+    for (let i = 0; i < dummyEl.style.length; i += 1) {
+        const prop = dummyEl.style[i];
+
+        if (prop in styleToBBCode) {
+            inner = styleToBBCode[prop](
+                dummyEl.style.getPropertyValue(prop),
+                inner,
+            );
+        }
+    }
+
+    return inner;
+}
 
 // TODO: this function should not use RegEx to parse HTML
 export function htmlToBBCode(html: string) {
@@ -29,96 +129,31 @@ export function htmlToBBCode(html: string) {
             let innerhtml = nestedTagRegex.test(innerHTML)
                 ? htmlToBBCode(innerHTML)
                 : innerHTML;
-            const att: Record<string, string> = {};
+            const attrs: Record<string, string> = {};
             attributes.replaceAll(
                 /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
                 (__: string, attr: string, q: string, value: string) => {
-                    att[attr] = value;
+                    attrs[attr] = value;
                     return '';
                 },
             );
-            const { style = '' } = att;
 
-            const lcTag = tag.toLowerCase();
-            if (DISALLOWED_TAGS.has(lcTag)) {
-                return '';
+            if (attrs.style) {
+                innerhtml = parseStyleToBBCode(attrs.style, innerhtml);
             }
 
-            const textAlignMatch = textAlignRegex.exec(style);
-            const backgroundColorMatch = backgroundColorRegex.exec(style);
-            const italicMatch = italicRegex.exec(style);
-            const underlineMatch = underlineRegex.exec(style);
-            const lineThroughMatch = lineThroughRegex.exec(style);
-
-            const fontSizeMatch = fontSizeRegex.exec(style);
-            const fontColorMatch = fontColorRegex.exec(style);
-            const fontWeightMatch = fontWeightRegex.exec(style);
-
-            if (backgroundColorMatch) {
-                const color = backgroundColorMatch[2];
-                const hex = new Color(color).toHex();
-                const colorAttribute = hex ? `#${hex}` : color;
-                innerhtml = `[bgcolor=${colorAttribute}]${innerhtml}[/bgcolor]`;
-            }
-            if (textAlignMatch) {
-                innerhtml = `[align=${textAlignMatch[1]}]${innerhtml}[/align]`;
+            if (attrs.size) {
+                innerhtml = styleToBBCode.fontSize(attrs.size, innerhtml);
             }
 
-            if (italicMatch || lcTag === 'i' || lcTag === 'em') {
-                innerhtml = `[i]${innerhtml}[/i]`;
+            if (attrs.color) {
+                innerhtml = styleToBBCode.color(attrs.color, innerhtml);
             }
 
-            if (underlineMatch || lcTag === 'u') {
-                innerhtml = `[u]${innerhtml}[/u]`;
-            }
-
-            if (lineThroughMatch || lcTag === 's' || lcTag === 'strike') {
-                innerhtml = `[s]${innerhtml}[/s]`;
-            }
-
-            if (fontWeightMatch || lcTag === 'strong' || lcTag === 'b') {
-                innerhtml = `[b]${innerhtml}[/b]`;
-            }
-
-            if (att.size || fontSizeMatch) {
-                innerhtml = `[size=${att.size || fontSizeMatch?.[1]}]${innerhtml}[/size]`;
-            }
-
-            if (att.color || fontColorMatch) {
-                const color = att.color || fontColorMatch?.[1];
-                const hex = color && new Color(color).toHex();
-                const colorAttribute = hex ? `#${hex}` : color;
-
-                innerhtml = `[color=${colorAttribute}]${innerhtml}[/color]`;
-            }
-
-            if (lcTag === 'a' && att.href) {
-                innerhtml = `[url=${att.href}]${innerhtml}[/url]`;
-            }
-
-            if (lcTag === 'ol') innerhtml = `[ol]${innerhtml}[/ol]`;
-            if (lcTag === 'ul') innerhtml = `[ul]${innerhtml}[/ul]`;
-
-            // h1-h6
-            if (/h\d/i.test(lcTag)) {
-                innerhtml = `[${lcTag}]${innerhtml}[/${lcTag}]`;
-            }
-
-            if (lcTag === 'li') {
-                innerhtml = `*${innerhtml.replace(/[\n\r]+/, '')}\n`;
-            }
-
-            if (lcTag === 'p') {
-                innerhtml = `\n${innerhtml === '&nbsp' ? '' : innerhtml}\n`;
-            }
-
-            if (lcTag === 'div') {
-                innerhtml = `\n${innerhtml}`;
-            }
-
-            return innerhtml;
+            return parseTagToBBCode(tag, innerhtml, attrs);
         },
     );
+
     return bbcode
         .replaceAll('&amp;', '&')
         .replaceAll('&gt;', '>')
