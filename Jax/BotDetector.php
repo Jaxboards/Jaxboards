@@ -52,6 +52,7 @@ final readonly class BotDetector
         'Qwantbot' => 'Qwant',
         'scrapedia' => 'ByteDance-ImageSpider',
         'SemrushBot' => 'Semrush',
+        'SERankingBacklinksBot' => 'SERankingBacklinksBot',
         'SeznamBot' => 'Seznam',
         'Sogou web spider' => 'Sogou',
         'Teoma' => 'Ask.com',
