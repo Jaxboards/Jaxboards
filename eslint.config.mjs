@@ -29,6 +29,7 @@ export default defineConfig(
             'prettier/prettier': ['error', { singleQuote: true }],
             'import/extensions': 0,
             '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+            'no-console': 'error',
         },
 
         settings: {
