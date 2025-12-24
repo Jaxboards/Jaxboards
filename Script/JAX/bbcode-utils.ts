@@ -144,47 +144,44 @@ export function htmlToBBCode(html: HTMLElement): string {
 }
 
 export function bbcodeToHTML(bbcode: string) {
-    let html = bbcode
+    return bbcode
         .replaceAll('<', '&lt;')
         .replaceAll('>', '&gt;')
-        .replaceAll(/(\s) /g, '$1&nbsp;');
-    html = html.replaceAll(/\[b\]([^]*?)\[\/b\]/gi, '<b>$1</b>');
-    html = html.replaceAll(/\[i\]([^]*?)\[\/i\]/gi, '<i>$1</i>');
-    html = html.replaceAll(/\[u\]([^]*?)\[\/u\]/gi, '<u>$1</u>');
-    html = html.replaceAll(/\[s\]([^]*?)\[\/s\]/gi, '<s>$1</s>');
-    html = html.replaceAll(/\[img\]([^'"[]+)\[\/img\]/gi, '<img src="$1">');
-    html = html.replaceAll(
-        /\[color=([^\]]+)\](.*?)\[\/color\]/gi,
-        '<span style="color:$1">$2</span>',
-    );
-    html = html.replaceAll(
-        /\[size=([^\]]+)\](.*?)\[\/size\]/gi,
-        '<span style="font-size:$1">$2</span>',
-    );
-    html = html.replaceAll(
-        /\[url=([^\]]+)\](.*?)\[\/url\]/gi,
-        '<a href="$1">$2</a>',
-    );
-    html = html.replaceAll(
-        /\[bgcolor=([^\]]+)\](.*?)\[\/bgcolor\]/gi,
-        '<span style="background-color:$1">$2</span>',
-    );
-    html = html.replaceAll(/\[h(\d)\](.*?)\[\/h\1\]/g, '<h$1>$2</h$1>');
-    html = html.replaceAll(
-        /\[align=(left|right|center)\](.*?)\[\/align\]/g,
-        '<div style="text-align:$1">$2</div>',
-    );
-    html = html.replaceAll(
-        /\[(ul|ol)\]([^]*?)\[\/\1\]/gi,
-        (_, tag: string, contents: string) => {
-            const listItems = contents.split(/(^|[\r\n]+)\*/);
-            const lis = listItems
-                .filter((text: string) => text.trim())
-                .map((text: string) => `<li>${text}</li>`)
-                .join('');
-            return `<${tag}>${lis}</${tag}>`;
-        },
-    );
-    html = html.replaceAll('\n', '<br />');
-    return html;
+        .replaceAll(/(\s) /g, '$1&nbsp;')
+
+        .replaceAll(/\[b\]([^]*?)\[\/b\]/gi, '<b>$1</b>')
+        .replaceAll(/\[i\]([^]*?)\[\/i\]/gi, '<i>$1</i>')
+        .replaceAll(/\[u\]([^]*?)\[\/u\]/gi, '<u>$1</u>')
+        .replaceAll(/\[s\]([^]*?)\[\/s\]/gi, '<s>$1</s>')
+        .replaceAll(/\[img\]([^'"[]+)\[\/img\]/gi, '<img src="$1">')
+        .replaceAll(
+            /\[color=([^\]]+)\](.*?)\[\/color\]/gi,
+            '<span style="color:$1">$2</span>',
+        )
+        .replaceAll(
+            /\[size=([^\]]+)\](.*?)\[\/size\]/gi,
+            '<span style="font-size:$1">$2</span>',
+        )
+        .replaceAll(/\[url=([^\]]+)\](.*?)\[\/url\]/gi, '<a href="$1">$2</a>')
+        .replaceAll(
+            /\[bgcolor=([^\]]+)\](.*?)\[\/bgcolor\]/gi,
+            '<span style="background-color:$1">$2</span>',
+        )
+        .replaceAll(/\[h(\d)\](.*?)\[\/h\1\]/g, '<h$1>$2</h$1>')
+        .replaceAll(
+            /\[align=(left|right|center)\](.*?)\[\/align\]/g,
+            '<div style="text-align:$1">$2</div>',
+        )
+        .replaceAll(
+            /\[(ul|ol)\]([^]*?)\[\/\1\]/gi,
+            (_, tag: string, contents: string) => {
+                const listItems = contents.split(/(^|[\r\n]+)\*/);
+                const lis = listItems
+                    .filter((text: string) => text.trim())
+                    .map((text: string) => `<li>${text}</li>`)
+                    .join('');
+                return `<${tag}>${lis}</${tag}>`;
+            },
+        )
+        .replaceAll('\n', '<br />');
 }
