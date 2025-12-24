@@ -84,7 +84,7 @@ final class MembersListTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=members');
+        $page = $this->go('/members');
 
         // Breadcrumbs
         DOMAssert::assertSelectEquals('#path a', 'Example Forums', 1, $page);

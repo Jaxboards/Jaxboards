@@ -84,7 +84,7 @@ final class SearchTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=search');
+        $page = $this->go('/search');
 
         DOMAssert::assertSelectCount('input[name=searchterm]', 1, $page);
         DOMAssert::assertSelectEquals('select[name=fids] option[value=1]', 'Forum', 1, $page);

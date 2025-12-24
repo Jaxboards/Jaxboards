@@ -140,8 +140,8 @@ final class BBCodeTest extends UnitTestCase
                 '<a href="https://example.com">Example</a>',
             ],
             [
-                '[url=?act=katamari]Katamari[/url]',
-                '<a href="?act=katamari">Katamari</a>',
+                '[url=/katamari]Katamari[/url]',
+                '<a href="/katamari">Katamari</a>',
             ],
             [
                 '[url=/katamari]Katamari[/url]',

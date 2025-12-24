@@ -82,7 +82,7 @@ final class TickerTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=ticker');
+        $page = $this->go('/ticker');
 
         DOMAssert::assertSelectRegExp('#ticker .tick .date', '/\d+:\d+[ap]m, \d+\/\d+\/\d+/', 1, $page);
         DOMAssert::assertSelectEquals('#ticker .tick .tick-title', 'Welcome to Jaxboards!', 1, $page);

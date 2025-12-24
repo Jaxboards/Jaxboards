@@ -89,7 +89,7 @@ final class PostTest extends FeatureTestCase
     {
         $this->actingAs('member');
 
-        $page = $this->go('?act=post&fid=1');
+        $page = $this->go('/post?fid=1');
 
         DOMAssert::assertSelectCount('input[name=ttitle]', 1, $page);
         DOMAssert::assertSelectCount('input[name=tdesc]', 1, $page);
@@ -127,7 +127,7 @@ final class PostTest extends FeatureTestCase
     {
         $this->actingAs('member', sessionOverrides: ['multiquote' => 1]);
 
-        $page = $this->go('?act=post&tid=1&how=qreply');
+        $page = $this->go('/post?tid=1&how=qreply');
 
         DOMAssert::assertSelectCount('input[name=ttitle]', 0, $page);
         DOMAssert::assertSelectCount('input[name=tdesc]', 0, $page);
@@ -204,7 +204,7 @@ final class PostTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=post&how=edit&tid=1&pid=1');
+        $page = $this->go('/post?how=edit&tid=1&pid=1');
 
         DOMAssert::assertSelectRegExp('textarea[name=postdata]', '/matter of time/', 1, $page);
     }
@@ -248,7 +248,7 @@ final class PostTest extends FeatureTestCase
         $post->author = 2;
         $post->insert();
 
-        $page = $this->go('?act=post&how=edit&tid=1&pid=2');
+        $page = $this->go('/post?how=edit&tid=1&pid=2');
 
         DOMAssert::assertSelectEquals('textarea[name=postdata]', 'post', 1, $page);
     }
@@ -264,7 +264,7 @@ final class PostTest extends FeatureTestCase
         $post->author = 1;
         $post->insert();
 
-        $page = $this->go('?act=post&how=edit&tid=1&pid=2');
+        $page = $this->go('/post?how=edit&tid=1&pid=2');
 
         DOMAssert::assertSelectEquals('.error', "You don't have permission to edit that post!", 1, $page);
         DOMAssert::assertSelectCount('textarea[name=postdata]', 0, $page);

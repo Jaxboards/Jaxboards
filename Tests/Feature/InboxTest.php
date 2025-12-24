@@ -80,7 +80,7 @@ final class InboxTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=ucp&what=inbox');
+        $page = $this->go('/ucp/inbox');
 
         $this->assertStringContainsString('No messages.', $page);
     }
@@ -91,7 +91,7 @@ final class InboxTest extends FeatureTestCase
 
         $this->actingAs('admin');
 
-        $page = $this->go('?act=ucp&what=inbox');
+        $page = $this->go('/ucp/inbox');
         $url = $this->container->get(Router::class)->url('ucp', ['what' => 'inbox', 'view' => '1']);
 
         DOMAssert::assertSelectEquals(".unread a[href^='{$url}']", 'Test Message', 1, $page);
@@ -103,7 +103,7 @@ final class InboxTest extends FeatureTestCase
 
         $this->actingAs('admin');
 
-        $page = $this->go('?act=ucp&what=inbox&view=1');
+        $page = $this->go('/ucp/inbox?view=1');
 
         DOMAssert::assertSelectEquals('.message', 'This is a test message.', 1, $page);
     }
@@ -114,7 +114,7 @@ final class InboxTest extends FeatureTestCase
 
         $this->actingAs('admin');
 
-        $page = $this->go('?act=ucp&what=inbox&page=Reply&messageid=1');
+        $page = $this->go('/ucp/inbox?page=Reply&messageid=1');
 
         DOMAssert::assertSelectRegExp('#message', '/\[quote=Admin\]This is a test message.\[\/quote\]/', 1, $page);
     }
@@ -161,7 +161,7 @@ final class InboxTest extends FeatureTestCase
 
         $this->actingAs('admin');
 
-        $page = $this->go('?act=ucp&what=inbox&flag=1&tog=1');
+        $page = $this->go('/ucp/inbox?flag=1&tog=1');
 
         $this->assertRedirect('ucp', ['what' => 'inbox'], $page);
 
@@ -175,7 +175,7 @@ final class InboxTest extends FeatureTestCase
 
         $this->actingAs('admin');
 
-        $page = $this->go('?act=ucp&what=inbox&flag=1&tog=0');
+        $page = $this->go('/ucp/inbox?flag=1&tog=0');
 
         $this->assertRedirect('ucp', ['what' => 'inbox'], $page);
 

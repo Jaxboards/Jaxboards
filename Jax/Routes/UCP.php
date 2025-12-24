@@ -70,7 +70,7 @@ final readonly class UCP implements Route
         $this->page->setBreadCrumbs([
             $this->router->url('ucp') => 'UCP',
         ]);
-        $what = $this->request->asString->both('what');
+        $what = $params['what'] ?? $this->request->asString->both('what');
 
         // Not a single settings page needs update functionality except inbox
         if ($this->request->isJSUpdate()) {

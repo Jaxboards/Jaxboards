@@ -277,7 +277,7 @@ export default {
         notification.className = 'newmessage';
         notification.addEventListener('click', () => {
             notification.style.display = 'none';
-            RUN.stream.location(`/ucp?what=inbox&view=${fromMID}`, 3);
+            RUN.stream.location(`/ucp/inbox?view=${fromMID}`, 3);
         });
         notification.innerHTML = message;
     },

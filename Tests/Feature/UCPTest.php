@@ -92,7 +92,7 @@ final class UCPTest extends FeatureTestCase
     {
         $this->actingAs('member');
 
-        $page = $this->go('?act=ucp');
+        $page = $this->go('/ucp');
 
         DOMAssert::assertSelectEquals('#notepad', 'Personal notes go here.', 1, $page);
     }
@@ -113,7 +113,7 @@ final class UCPTest extends FeatureTestCase
     {
         $this->actingAs('member', ['sig' => 'I like tacos']);
 
-        $page = $this->go('?act=ucp&what=signature');
+        $page = $this->go('/ucp/signature');
 
         DOMAssert::assertSelectEquals('#changesig', 'I like tacos', 1, $page);
     }
@@ -134,7 +134,7 @@ final class UCPTest extends FeatureTestCase
     {
         $this->actingAs('member');
 
-        $page = $this->go('?act=ucp&what=email');
+        $page = $this->go('/ucp/email');
 
         $this->assertStringContainsString('Your current email: --none--', $page);
     }
@@ -143,7 +143,7 @@ final class UCPTest extends FeatureTestCase
     {
         $this->actingAs('member', ['email' => 'jaxboards@jaxboards.com']);
 
-        $page = $this->go('?act=ucp&what=email');
+        $page = $this->go('/ucp/email');
 
         $this->assertStringContainsString('Your current email: <strong>jaxboards@jaxboards.com</strong>', $page);
     }
@@ -206,7 +206,7 @@ final class UCPTest extends FeatureTestCase
     {
         $this->actingAs('member');
 
-        $page = $this->go('?act=ucp&what=profile');
+        $page = $this->go('/ucp/profile');
 
         foreach (array_keys($this->getProfileFormData()) as $field) {
             match (true) {
@@ -259,8 +259,7 @@ final class UCPTest extends FeatureTestCase
         $this->assertEquals('http://google.com', $member->website);
 
         $birthdate = $this->container->get(Date::class)
-            ->datetimeAsCarbon($member->birthdate)
-        ;
+            ->datetimeAsCarbon($member->birthdate);
 
         $this->assertEquals(1, $birthdate->month);
         $this->assertEquals(1, $birthdate->day);
@@ -271,7 +270,7 @@ final class UCPTest extends FeatureTestCase
     {
         $this->actingAs('member');
 
-        $page = $this->go('?act=ucp&what=avatar');
+        $page = $this->go('/ucp/avatar');
 
         DOMAssert::assertSelectCount('.avatar img[src="/Service/Themes/Default/avatars/default.gif"]', 1, $page);
     }
@@ -292,7 +291,7 @@ final class UCPTest extends FeatureTestCase
     {
         $this->actingAs('member');
 
-        $page = $this->go('?act=ucp&what=sounds');
+        $page = $this->go('/ucp/sounds');
 
         DOMAssert::assertSelectCount('input[name=soundShout][checked]', 1, $page);
     }
@@ -316,7 +315,7 @@ final class UCPTest extends FeatureTestCase
     {
         $this->actingAs('member');
 
-        $page = $this->go('?act=ucp&what=board');
+        $page = $this->go('/ucp/board');
 
         DOMAssert::assertSelectCount('select[name=skin]', 1, $page);
         DOMAssert::assertSelectCount('input[name=usewordfilter][checked]', 1, $page);

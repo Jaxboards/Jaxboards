@@ -86,7 +86,7 @@ final class Router
         $this->get('tardis', '/tardis', Tardis::class);
         $this->get('ticker', '/ticker', Ticker::class);
         $this->get('topic', '/topic/{id}/{slug}', Topic::class);
-        $this->get('ucp', '/ucp', UCP::class);
+        $this->get('ucp', '/ucp/{what}', UCP::class);
 
         $this->get('register', '/register', LogReg::class);
         $this->get('logout', '/logout', LogReg::class);

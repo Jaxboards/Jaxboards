@@ -440,7 +440,7 @@ final readonly class Inbox
             $otherMember = $membersById[$getMessageMemberId($message)];
 
             $dmessageOnchange = "RUN.stream.location('"
-                . '?act=ucp&what=inbox&flag=' . $message->id . "&tog='+" . '
+                . '/ucp/inbox?flag=' . $message->id . "&tog='+" . '
                 (this.checked?1:0), 2)';
             $html .= $this->template->meta(
                 'inbox-messages-row',
