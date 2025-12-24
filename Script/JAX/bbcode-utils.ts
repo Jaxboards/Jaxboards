@@ -50,7 +50,6 @@ const styleToBBCode: Record<
         `[bgcolor=${bgColor}]${inner}[/bgcolor]`,
 
     color(color, inner) {
-        console.log(color);
         const hex = color && new Color(color).toHex();
         const colorAttribute = hex ? `${hex}` : color;
 
