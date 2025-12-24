@@ -332,6 +332,18 @@ textarea {
     height: 100px;
 }
 
+#modcp .onlinesessions {
+    border-collapse: collapse;
+}
+
+#modcp .onlinesessions td {
+    border: 1px solid #000;
+    padding: 5px;
+}
+#modcp .onlinesessions td:nth-child(2) {
+    text-align: center;
+}
+
 .inbox .listing {
     border: 1px solid #99c;
     font-size: 1.4rem;

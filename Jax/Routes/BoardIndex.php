@@ -401,11 +401,23 @@ final class BoardIndex implements Route
             $legend .= "<a href='?' class='mgroup {$group->id}'>{$group->title}</a> ";
         }
 
+        $guestCount = $usersonline[2];
+        $guestsText = '';
+        if ($guestCount > 0) {
+            $modURL = $this->user->getGroup()?->canModerate
+                ? "href='" . $this->router->url('modcontrols', ['do' => 'onlineSessions']) . "'"
+                : null;
+            $plural = ($guestCount > 1 ? 's' : '');
+            $guestsText = $guestCount > 0
+                ? "<a $modURL>{$guestCount} guest{$plural}</a>"
+                : '';
+        }
+
         return $page . $this->template->meta(
             'idx-stats',
             $usersonline[1],
             $usersonline[0],
-            $usersonline[2],
+            $guestsText,
             count($usersOnlineToday),
             $userstoday,
             number_format($stats->members ?? 0),

@@ -11,6 +11,7 @@ use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Models\Member;
 use Jax\Models\Post;
+use Jax\Models\Session as ModelsSession;
 use Jax\Models\Shout;
 use Jax\Page;
 use Jax\Request;
@@ -22,6 +23,7 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function _\countBy;
 use function array_map;
 use function count;
 use function filter_var;
@@ -90,6 +92,7 @@ final readonly class ModControls implements Route
                 default => $this->selectMemberToEdit(),
             }),
             'iptools' => $this->showModCP($this->ipTools()),
+            'onlineSessions' => $this->showModCP($this->showOnlineSessions()),
             default => $this->showModCP(),
         };
     }
@@ -122,6 +125,7 @@ final readonly class ModControls implements Route
             'modcp-index',
             $this->router->url('modcontrols', ['do' => 'emem']),
             $this->router->url('modcontrols', ['do' => 'iptools']),
+            $this->router->url('modcontrols', ['do' => 'onlineSessions']),
             $cppage,
         );
         $page = $this->template->meta('box', ' id="modcp"', 'Mod CP', $page);
@@ -418,6 +422,31 @@ final readonly class ModControls implements Route
         }
 
         return $form . $page;
+    }
+
+    private function showOnlineSessions(): string
+    {
+        $allSessions = ModelsSession::selectMany(
+            'ORDER BY lastUpdate LIMIT 100'
+        );
+        $countSessions = countBy($allSessions, fn(ModelsSession $session) => $session->useragent);
+
+        $rows = '';
+        foreach ($countSessions as $userAgent => $count) {
+            $rows .= <<<HTML
+                <tr><td>{$userAgent}</td><td>{$count}</td></tr>
+                HTML;
+        }
+
+        return $this->box(
+            'Most Active User Agents',
+            <<<HTML
+                <table class="onlinesessions">
+                    <tr><th>User Agent</th><th>Count</th></tr>
+                    {$rows}
+                </table>
+                HTML
+        );
     }
 
     private function box(string $title, string $content): string
