@@ -60,8 +60,15 @@ const styleToBBCode: Record<
     string,
     (attrValue: string, inner: string) => string
 > = {
-    'background-color': (bgColor, inner) =>
-        `[bgcolor=${bgColor}]${inner}[/bgcolor]`,
+    'background-color': (bgColor, inner) => {
+        const hex = bgColor && new Color(bgColor).toHex();
+        const colorAttribute = hex ? `${hex}` : bgColor;
+        // ignore white/transparent bg
+        if (['ffffff', 'white', 'transparent'].includes(colorAttribute)) {
+            return inner;
+        }
+        return `[bgcolor=${colorAttribute}]${inner}[/bgcolor]`;
+    },
 
     color(color, inner) {
         const hex = color && new Color(color).toHex();
