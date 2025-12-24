@@ -1,6 +1,6 @@
 import Color from './color';
 
-const DISALLOWED_TAGS = ['SCRIPT', 'STYLE', 'HR'];
+const DISALLOWED_TAGS = new Set(['script', 'style', 'hr']);
 
 const textAlignRegex = /text-align: ?(right|center|left)/i;
 const backgroundColorRegex = /background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i;
@@ -11,6 +11,7 @@ const fontSizeRegex = /font-size: ?([^;]+)/i;
 const fontColorRegex = /(?:^|;)color: ?([^;]+)/i;
 const fontWeightRegex = /font-weight: ?bold/i;
 
+// TODO: this function should not use RegEx to parse HTML
 export function htmlToBBCode(html: string) {
     let bbcode = html;
     const nestedTagRegex = /<(\w+)([^>]*)>([^]*?)<\/\1>/gi;
@@ -39,7 +40,7 @@ export function htmlToBBCode(html: string) {
             const { style = '' } = att;
 
             const lcTag = tag.toLowerCase();
-            if (DISALLOWED_TAGS.includes(lcTag)) {
+            if (DISALLOWED_TAGS.has(lcTag)) {
                 return '';
             }
 
@@ -56,7 +57,8 @@ export function htmlToBBCode(html: string) {
             if (backgroundColorMatch) {
                 const color = backgroundColorMatch[2];
                 const hex = new Color(color).toHex();
-                innerhtml = `[bgcolor=${hex ? `#${hex}` : color}]${innerhtml}[/bgcolor]`;
+                const colorAttribute = hex ? `#${hex}` : color;
+                innerhtml = `[bgcolor=${colorAttribute}]${innerhtml}[/bgcolor]`;
             }
             if (textAlignMatch) {
                 innerhtml = `[align=${textAlignMatch[1]}]${innerhtml}[/align]`;
@@ -85,8 +87,9 @@ export function htmlToBBCode(html: string) {
             if (att.color || fontColorMatch) {
                 const color = att.color || fontColorMatch?.[1];
                 const hex = color && new Color(color).toHex();
+                const colorAttribute = hex ? `#${hex}` : color;
 
-                innerhtml = `[color=${hex ? `#${hex}` : color}]${innerhtml}[/color]`;
+                innerhtml = `[color=${colorAttribute}]${innerhtml}[/color]`;
             }
 
             if (lcTag === 'a' && att.href) {
