@@ -191,7 +191,7 @@ export function bbcodeToHTML(bbcode: string) {
     );
     html = html.replaceAll(
         /\[(ul|ol)\]([^]*?)\[\/\1\]/gi,
-        (_, tag, contents) => {
+        (_, tag: string, contents: string) => {
             const listItems = contents.split(/(^|[\r\n]+)\*/);
             const lis = listItems
                 .filter((text: string) => text.trim())

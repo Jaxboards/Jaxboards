@@ -118,7 +118,7 @@ export default class AutoComplete extends Component<HTMLInputElement> {
             }
         }
 
-        this.doSearch();
+        void this.doSearch();
     }
 
     async doSearch() {
@@ -137,7 +137,7 @@ export default class AutoComplete extends Component<HTMLInputElement> {
             return;
         }
 
-        const data = await res.json();
+        const data = (await res.json()) as [number[], string[]];
         resultsContainer.innerHTML = '';
 
         if (data.length) {

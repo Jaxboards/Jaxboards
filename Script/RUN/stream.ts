@@ -38,7 +38,7 @@ export default class Stream {
     }
 
     location(path: string, requestType = 2) {
-        this.load(path, { requestType });
+        void this.load(path, { requestType });
     }
 
     async load(
@@ -63,14 +63,14 @@ export default class Stream {
         });
 
         if (request.ok) {
-            const json = await request.json();
+            const json = (await request.json()) as [unknown[]];
             this.handleRequestData(url, json, requestType);
         }
     }
 
     pollData(isEager = false) {
         if (isEager) {
-            this.load(this.lastURL);
+            void this.load(this.lastURL);
         }
         clearTimeout(this.timeout);
         if (document.cookie.includes(`actw=${window.name}`)) {

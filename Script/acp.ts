@@ -4,6 +4,7 @@ import sortableTree from './JAX/sortable-tree';
 import { onDOMReady } from './JAX/util';
 import AutoComplete from './components/auto-complete';
 import BetterSelect from './components/better-select';
+import type { HTMLFormWithSubmit } from './components/form';
 import Switch from './components/switch';
 
 function dropdownMenu(e: MouseEvent) {
@@ -51,7 +52,7 @@ function dropdownMenu(e: MouseEvent) {
     }
 }
 
-async function submitForm(form: HTMLFormElement) {
+async function submitForm(form: HTMLFormWithSubmit) {
     const postBody = new URLSearchParams();
     const elements = Array.from(form.elements);
     const submit = form.submitButton;
@@ -97,15 +98,17 @@ function gracefulDegrade() {
         .querySelector<HTMLDivElement>('#nav')
         ?.addEventListener('mouseover', dropdownMenu);
 
-    Array.from(document.querySelectorAll('form')).forEach((form) => {
-        if (!form.dataset.useAjaxSubmit) {
-            return;
-        }
-        form.addEventListener('submit', (event) => {
-            event.preventDefault();
-            submitForm(form);
-        });
-    });
+    Array.from(document.querySelectorAll<HTMLFormWithSubmit>('form')).forEach(
+        (form) => {
+            if (!form.dataset.useAjaxSubmit) {
+                return;
+            }
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                void submitForm(form);
+            });
+        },
+    );
 
     // Initialize components
     AutoComplete.hydrate(document.body);

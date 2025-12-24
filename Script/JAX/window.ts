@@ -162,7 +162,7 @@ class Window {
         s.zIndex = `${this.zIndex + 5}`;
 
         if (this.wait) {
-            onImagesLoaded(
+            void onImagesLoaded(
                 Array.from(windowContainer.querySelectorAll('img')),
             ).then(() => {
                 this.setPosition(pos);
@@ -181,7 +181,7 @@ class Window {
             .apply(windowContainer, titleBar);
         return Object.assign(windowContainer, {
             close: () => this.close(),
-            minimize: this.minimize,
+            minimize: () => this.minimize(),
         });
     }
 

@@ -146,7 +146,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
                 this.showColors(event.pageX, event.pageY, cmd);
                 break;
             case 'c_smileys':
-                this.showEmotes(event.pageX, event.pageY);
+                void this.showEmotes(event.pageX, event.pageY);
                 break;
             case 'c_switcheditmode':
                 this.switchMode(!this.htmlMode);
@@ -161,8 +161,9 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         const emotewin = this.emoteWindow;
         if (!emotewin) {
             const res = await fetch('/api/emotes');
+            const json = (await res.json()) as [string[], string[]];
             if (res.ok) {
-                this.createEmoteWindow(await res.json(), { x, y });
+                void this.createEmoteWindow(json, { x, y });
             }
             return;
         }
@@ -204,7 +205,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         emotewin.style.display = 'none';
         this.emoteWindow = emotewin;
         document.querySelector('#page')?.appendChild(emotewin);
-        this.showEmotes(position.x, position.y);
+        void this.showEmotes(position.x, position.y);
     }
 
     colorHandler(cmd: string, color: string) {

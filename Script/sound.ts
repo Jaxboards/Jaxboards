@@ -20,7 +20,7 @@ class Sound {
     }
 
     play(title: string) {
-        this.soundCache[title].play();
+        void this.soundCache[title].play();
     }
 
     loadAndPlay(title: string, file: string) {

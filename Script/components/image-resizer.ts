@@ -5,13 +5,13 @@ import { onImagesLoaded } from '../JAX/util';
 const maxDimension = '999999px';
 
 export default class ImageResizer extends Component<HTMLImageElement> {
-    static hydrate(container: HTMLElement): void {
+    static async hydrate(container: HTMLElement) {
         const bbcodeImages =
             container.querySelectorAll<HTMLImageElement>('.bbcodeimg');
 
-        onImagesLoaded(Array.from(bbcodeImages)).then(() =>
-            register('ImageResizer', bbcodeImages, this),
-        );
+        await onImagesLoaded(Array.from(bbcodeImages));
+
+        register('ImageResizer', bbcodeImages, this);
     }
 
     constructor(element: HTMLImageElement) {

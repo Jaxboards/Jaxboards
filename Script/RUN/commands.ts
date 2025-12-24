@@ -243,17 +243,16 @@ export default {
         });
     },
 
-    scrollToPost(postId: number) {
+    async scrollToPost(postId: number) {
         const el = document.getElementById(`pid_${postId}`);
         if (!el) {
             return false;
         }
-        onImagesLoaded(Array.from(document.querySelectorAll('#page img'))).then(
-            () => {
-                const pos = getCoordinates(el);
-                globalThis.scrollTo({ top: pos.y });
-            },
+        await onImagesLoaded(
+            Array.from(document.querySelectorAll('#page img')),
         );
+        const pos = getCoordinates(el);
+        globalThis.scrollTo({ top: pos.y });
         return true;
     },
     updateqreply(content: string) {

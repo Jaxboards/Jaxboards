@@ -2,7 +2,11 @@
 
 import register, { Component } from '../JAX/component';
 
-export default class Form extends Component<HTMLFormElement> {
+export type HTMLFormWithSubmit = HTMLFormElement & {
+    submitButton: HTMLButtonElement;
+};
+
+export default class Form extends Component<HTMLFormWithSubmit> {
     private readonly resetOnSubmit: boolean;
 
     static hydrate(container: HTMLElement): void {
@@ -13,7 +17,7 @@ export default class Form extends Component<HTMLFormElement> {
         );
     }
 
-    constructor(element: HTMLFormElement) {
+    constructor(element: HTMLFormWithSubmit) {
         super(element);
         this.resetOnSubmit = element.dataset.ajaxForm === 'resetOnSubmit';
         element.addEventListener('submit', (event) => {
@@ -64,7 +68,7 @@ export default class Form extends Component<HTMLFormElement> {
         if (submitButton) {
             postBody.append(submitButton.name, submitButton.value);
         }
-        RUN.stream.load(element.action || globalThis.location.toString(), {
+        void RUN.stream.load(element.action || globalThis.location.toString(), {
             body: postBody,
         });
         if (resetOnSubmit) {

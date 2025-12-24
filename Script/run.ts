@@ -27,14 +27,17 @@ export class AppState {
         setInterval(updateDates, 1000 * 30);
 
         this.stream.pollData();
-        globalThis.addEventListener('popstate', ({ state }) => {
-            if (state) {
-                const { lastURL } = state;
-                this.stream.updatePage(lastURL);
-            } else {
-                this.stream.updatePage(document.location.toString());
-            }
-        });
+        globalThis.addEventListener(
+            'popstate',
+            ({ state }: { state: { lastURL: string } }) => {
+                if (state) {
+                    const { lastURL } = state;
+                    this.stream.updatePage(lastURL);
+                } else {
+                    this.stream.updatePage(document.location.toString());
+                }
+            },
+        );
 
         // Load sounds
         Sound.load('sbblip', '/Sounds/blip.mp3', false);
@@ -43,7 +46,7 @@ export class AppState {
     }
 
     handleQuoting(link: HTMLLinkElement) {
-        this.stream.load(
+        void this.stream.load(
             `${link.href}&qreply=${document.querySelector('#qreply') ? '1' : '0'}`,
         );
     }

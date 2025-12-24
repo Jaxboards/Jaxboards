@@ -63,7 +63,9 @@ function createMessagingWindow({
     const win = imWindow.create();
     gracefulDegrade(win);
     const focus = () => {
-        win.querySelector('form')?.im_im.focus();
+        win.querySelector<HTMLInputElement>(
+            'form input[name="im_im"]',
+        )?.focus();
     };
     win.onclick = focus;
     focus();

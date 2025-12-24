@@ -201,7 +201,7 @@ class Drag {
         return this;
     }
 
-    apply(el: HTMLElement, target?: HTMLElement) {
+    apply(el: HTMLElement | HTMLElement[], target?: HTMLElement) {
         if (Array.isArray(el)) {
             el.forEach((el2) => this.apply(el2));
             return this;
