@@ -10,10 +10,10 @@ class Color {
         }
 
         if (typeof colorToParse === 'string') {
-            const rgbMatch = colorToParse.match(
-                /^rgb\((\d+),\s?(\d+),\s?(\d+)\)/i,
+            const rgbMatch = /^rgb\((\d+),\s?(\d+),\s?(\d+)\)/i.exec(
+                colorToParse,
             );
-            const hexMatch = colorToParse.match(/#?[^\da-fA-F]/);
+            const hexMatch = /#?[^\da-fA-F]/.exec(colorToParse);
             if (rgbMatch) {
                 this.rgb = [
                     Number.parseFloat(rgbMatch[1]),
@@ -24,7 +24,7 @@ class Color {
             }
 
             if (hexMatch) {
-                if (colorToParse.charAt(0) === '#') {
+                if (colorToParse.startsWith('#')) {
                     colorToParse = colorToParse.slice(1);
                 }
                 if (colorToParse.length === 3) {
