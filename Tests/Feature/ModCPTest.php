@@ -424,7 +424,10 @@ final class ModCPTest extends FeatureTestCase
         $this->assertContainsEquals(['modcontrols_clearbox'], $json);
 
         $redirect = array_find($json, static fn($cmd): bool => $cmd[0] === 'location');
-        $this->assertStringContainsString($this->container->get(Router::class)->url('topic', ['id' => $topic->id]), $redirect[1]);
+        $this->assertStringContainsString(
+            $this->container->get(Router::class)->url('topic', ['id' => $topic->id]),
+            $redirect[1],
+        );
 
         $this->assertNull(Topic::selectOne(1), 'Original topic is deleted');
         $this->assertEquals($topic->id, Post::selectOne(1)->tid, 'OP moved to new topic');

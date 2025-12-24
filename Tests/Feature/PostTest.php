@@ -139,13 +139,17 @@ final class PostTest extends FeatureTestCase
         $this->actingAs('member');
 
         // Create a callback to test the post hook
-        $postHookCalled = true;
-        $postHookPost = null;
+        function hookStub($arg = null)
+        {
+            static $postHookPostArg;
+            if ($arg === null) {
+                return $postHookPostArg;
+            }
+            $postHookPostArg = $arg;
+        }
+
         $this->container->get(Hooks::class)
-            ->addListener('post', static function ($postHookPostArg) use (&$postHookCalled, &$postHookPost): void {
-                $postHookCalled = true;
-                $postHookPost = $postHookPostArg;
-            })
+            ->addListener('post', hookStub(...))
         ;
 
 
@@ -169,8 +173,7 @@ final class PostTest extends FeatureTestCase
 
         $this->assertNull($topic);
         $this->assertEquals('Post data', $post->post);
-        $this->assertTrue($postHookCalled);
-        $this->assertEquals($post->asArray(), $postHookPost?->asArray());
+        $this->assertEquals($post->asArray(), hookStub()?->asArray());
     }
 
     public function testPostReplySubmitPreview(): void

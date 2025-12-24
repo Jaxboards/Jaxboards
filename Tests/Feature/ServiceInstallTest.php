@@ -175,7 +175,7 @@ final class ServiceInstallTest extends TestCase
 
         // Do some spot checking to see if the installer
         // set up the tables based on form data
-        $this->assertEquals(Post::selectOne(1)->author, 1);
+        $this->assertEquals(1, Post::selectOne(1)->author);
 
         $member = Member::selectOne(1);
         $this->assertEquals('Sean', $member->displayName);
