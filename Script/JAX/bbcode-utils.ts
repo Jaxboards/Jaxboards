@@ -116,8 +116,6 @@ export function htmlToBBCode(html: HTMLElement): string {
               .join('')
         : '';
 
-    console.log(html, inner);
-
     // Don't inherit body styles
     if (tagName === 'body') {
         return inner;
