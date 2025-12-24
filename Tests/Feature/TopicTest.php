@@ -160,9 +160,18 @@ final class TopicTest extends FeatureTestCase
         $page = $this->go('/topic/1');
 
         DOMAssert::assertSelectCount('.opengraph a[href="https://www.youtube.com/watch?v=qjqPT89KaCc"]', 2, $page);
-        DOMAssert::assertSelectEquals('.opengraph h4', "YouTube - Uber Freight Dropped my Mainframe... Let's Fix it!", 1, $page);
+        DOMAssert::assertSelectEquals(
+            '.opengraph h4',
+            "YouTube - Uber Freight Dropped my Mainframe... Let's Fix it!",
+            1,
+            $page
+        );
         DOMAssert::assertSelectRegExp('.opengraph p', '/chronicles the destruction and restoration/', 1, $page);
-        DOMAssert::assertSelectCount('.opengraph img[src="https://i.ytimg.com/vi/qjqPT89KaCc/hqdefault.jpg"]', 1, $page);
+        DOMAssert::assertSelectCount(
+            '.opengraph img[src="https://i.ytimg.com/vi/qjqPT89KaCc/hqdefault.jpg"]',
+            1,
+            $page
+        );
     }
 
     public function testTopicUpdate(): void
@@ -177,8 +186,8 @@ final class TopicTest extends FeatureTestCase
         $json = json_decode($page, true);
 
         // TODO: Test that there are new posts
-        $this->assertEquals($json[0][0], 'onlinelist');
-        $this->assertEquals($json[0][1][0][0], 'GoogleBot');
+        $this->assertEquals('onlinelist', $json[0][0]);
+        $this->assertEquals('GoogleBot', $json[0][1][0][0]);
     }
 
     public function testQuickReplyWindow(): void

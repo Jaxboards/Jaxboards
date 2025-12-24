@@ -178,8 +178,8 @@ final class ServiceInstallTest extends TestCase
         $this->assertEquals(Post::selectOne(1)->author, 1);
 
         $member = Member::selectOne(1);
-        $this->assertEquals($member->displayName, 'Sean');
-        $this->assertEquals($member->email, 'admin_email@jaxboards.com');
+        $this->assertEquals('Sean', $member->displayName);
+        $this->assertEquals('admin_email@jaxboards.com', $member->email);
         $this->assertTrue(password_verify('password', $member->pass));
 
         $this->assertStringContainsString('Redirecting', $page);
@@ -201,7 +201,7 @@ final class ServiceInstallTest extends TestCase
                     static fn($path): bool => in_array($path, [
                         'boards/test',
                         'boards/support',
-                    ]),
+                    ], true),
                 ),
             )
         ;
@@ -239,7 +239,7 @@ final class ServiceInstallTest extends TestCase
 
         // Do some spot checking to see if the installer
         // set up the tables based on form data
-        $this->assertEquals(Post::selectOne(1)->author, 1);
+        $this->assertEquals(1, Post::selectOne(1)->author);
 
         $member = Member::selectOne(1);
         $this->assertEquals('Sean', $member->displayName);
@@ -254,7 +254,7 @@ final class ServiceInstallTest extends TestCase
         $this->assertStringContainsString('Redirecting', $page);
     }
 
-    private function goServiceInstall(?Request $request = null)
+    private function goServiceInstall(?Request $request = null): string
     {
         if ($request instanceof Request) {
             $this->container->set(

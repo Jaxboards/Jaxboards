@@ -209,23 +209,20 @@ final class UCPTest extends FeatureTestCase
         $page = $this->go('?act=ucp&what=profile');
 
         foreach (array_keys($this->getProfileFormData()) as $field) {
-            if ($field === 'submit') {
-                continue;
-            }
+            match (true) {
+                $field === 'submit' => '',
 
-            if (in_array($field, ['dob_month', 'dob_day', 'dob_year', 'gender'])) {
-                DOMAssert::assertSelectCount("select[name={$field}]", 1, $page);
+                in_array($field, [
+                    'dob_month',
+                    'dob_day',
+                    'dob_year',
+                    'gender'
+                ], true) => DOMAssert::assertSelectCount("select[name={$field}]", 1, $page),
 
-                continue;
-            }
+                $field === 'about' => DOMAssert::assertSelectCount("textarea[name={$field}]", 1, $page),
 
-            if ($field === 'about') {
-                DOMAssert::assertSelectCount("textarea[name={$field}]", 1, $page);
-
-                continue;
-            }
-
-            DOMAssert::assertSelectCount("input[name={$field}]", 1, $page);
+                default => DOMAssert::assertSelectCount("input[name={$field}]", 1, $page)
+            };
         }
     }
 
@@ -262,12 +259,11 @@ final class UCPTest extends FeatureTestCase
         $this->assertEquals('http://google.com', $member->website);
 
         $birthdate = $this->container->get(Date::class)
-            ->datetimeAsCarbon($member->birthdate)
-        ;
+            ->datetimeAsCarbon($member->birthdate);
 
         $this->assertEquals(1, $birthdate->month);
         $this->assertEquals(1, $birthdate->day);
-        $this->assertEquals(2000, $birthdate->year);
+        $this->assertEquals(2_000, $birthdate->year);
     }
 
     public function testAvatarSettings(): void
@@ -344,6 +340,9 @@ final class UCPTest extends FeatureTestCase
         DOMAssert::assertSelectCount('input[name=wysiwyg][checked]', 0, $page);
     }
 
+    /**
+     * @return array<string,string>
+     */
     private function getProfileFormData(): array
     {
         return [
