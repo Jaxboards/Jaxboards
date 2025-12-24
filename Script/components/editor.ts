@@ -406,11 +406,11 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         const { element, iframe } = this;
         if (htmlMode) {
             this.setSource(bbcodeToHTML(element.value));
-            // element.style.display = 'none';
+            element.style.display = 'none';
             iframe.style.display = '';
         } else {
             element.style.display = '';
-            // iframe.style.display = 'none';
+            iframe.style.display = 'none';
         }
         this.htmlMode = htmlMode;
     }
