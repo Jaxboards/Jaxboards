@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Database;
 
+use DateTime;
 use Exception;
 use Jax\DebugLog;
 use Jax\ServiceConfig;
@@ -37,8 +38,6 @@ final class Database
     public const WHERE_ID_IN = 'WHERE `id` IN ?';
 
     public const DATE = 'Y-m-d';
-
-    public const DATE_TIME = 'Y-m-d H:i:s';
 
     public string $driver = 'mysql';
 
@@ -328,7 +327,7 @@ final class Database
 
     public function datetime(?int $timestamp = null): string
     {
-        return gmdate(self::DATE_TIME, $timestamp);
+        return gmdate(DateTime::ATOM, $timestamp);
     }
 
     /**
