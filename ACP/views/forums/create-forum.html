@@ -11,7 +11,7 @@
         <tr>
             <th scope="row">
                 Description:
-                </td>
+            </th>
             <td>
                 <textarea name="description" title="Forum Description">{{ description }}</textarea>
             </td>
@@ -19,7 +19,7 @@
         <tr>
             <th scope="row">
                 Redirect URL:
-                </td>
+            </th>
             <td>
                 <input type="text" name="redirect" title="Redirect URL" value="{{ redirect_url }}">
             </td>
@@ -27,7 +27,7 @@
         <tr>
             <th scope="row">
                 Show Subforums:
-                </td>
+            </th>
             <td>
                 <select name="showSubForums" title="Show Subforums Toggle">
                     {{ subforum_options }}
@@ -37,7 +37,7 @@
         <tr>
             <th scope="row">
                 Order Topics By:
-                </td>
+            </th>
             <td>
                 <select name="orderby" title="How to Order Topic List">
                     {{ order_by_options }}
@@ -47,7 +47,7 @@
         <tr>
             <th scope="row">
                 Posts count towards post count?
-                </td>
+            </th>
             <td>
                 <input {{ count }} type="checkbox" class="switch yn" name="count" title="Post Count Toggle">
             </td>
@@ -55,7 +55,7 @@
         <tr>
             <th scope="row">
                 Trashcan?
-                </td>
+            </th>
             <td>
                 <input {{ trashcan }} type="checkbox" class="switch yn" name="trashcan" title="Trashcan Toggle" />
             </td>
