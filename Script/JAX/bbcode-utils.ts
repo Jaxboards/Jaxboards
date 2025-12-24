@@ -27,10 +27,16 @@ const tagsToBBCode: Record<string, (inner: string, el: HTMLElement) => string> =
             return this.em(...args);
         },
 
-        img(inner, img) {
+        img: (inner, img) => {
             const alt = img.getAttribute('alt') ?? '';
             const src = img.getAttribute('src');
-            return src ? `[img]${src}[/img]` : alt;
+            if (img.dataset.emoji) {
+                return ` ${img.dataset.emoji}`;
+            }
+            if (src) {
+                return `[img]${src}[/img]`;
+            }
+            return alt;
         },
 
         li: (inner) => `*${inner.replace(/[\n\r]+/, '')}\n`,

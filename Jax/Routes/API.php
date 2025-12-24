@@ -61,7 +61,8 @@ final readonly class API implements Route
     {
         $rules = $this->textFormatting->rules->getEmotes();
         foreach ($rules as $text => $image) {
-            $rules[$text] = '<img src="' . $image . '" alt="' . $this->textFormatting->blockhtml($text) . '" />';
+            $safeText = $this->textFormatting->blockhtml($text);
+            $rules[$text] = "<img src=\"{$image}\" data-emoji=\"{$safeText}\" alt=\"{$safeText}\">";
         }
 
         return json_encode([array_keys($rules), array_values($rules)], JSON_THROW_ON_ERROR);

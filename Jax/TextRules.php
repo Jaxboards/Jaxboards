@@ -69,7 +69,7 @@ final class TextRules
 
         $emotes = [];
         foreach ($rules as $emote => $path) {
-            $emotes[$emote] = "emoticons/{$emotePack}/{$path}";
+            $emotes[$emote] = "/emoticons/{$emotePack}/{$path}";
         }
 
         $this->emotePack = $emotePack;

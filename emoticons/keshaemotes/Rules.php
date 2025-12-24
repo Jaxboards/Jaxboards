@@ -12,7 +12,7 @@ final class Rules
     public function get(): array
     {
         return [
-            '&gt;:(' => 'angry.gif',
+            ':angry:' => 'angry.gif',
             '(!)' => 'exclamation.gif',
             '(?)' => 'question.gif',
             '-_-' => 'unamused.gif',
