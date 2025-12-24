@@ -6,6 +6,7 @@ import { onImagesLoaded } from './util';
 type WindowOptions = Partial<{
     title: string;
     content: string;
+    id: string;
 
     animate: boolean;
     wait: boolean;
