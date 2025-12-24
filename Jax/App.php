@@ -191,7 +191,7 @@ final readonly class App
                 $this->router->url('ticker'),
                 $this->router->url('calendar'),
                 $this->user->getGroup()?->canModerate
-                    ? '<li><a href="' . $this->router->url('modcontrols', ['do' => 'cp']) . '">Mod CP</a></li>'
+                    ? '<li><a href="' . $this->router->url('modcontrols') . '">Mod CP</a></li>'
                     : '',
                 $this->user->getGroup()?->canAccessACP
                     ? '<li><a href="./ACP/" target="_blank">ACP</a></li>'

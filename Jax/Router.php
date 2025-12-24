@@ -76,7 +76,7 @@ final class Router
         $this->get('index', '/', BoardIndex::class);
         $this->get('katamari', '/katamari', Katamari::class);
         $this->get('members', '/members', Members::class);
-        $this->get('modcontrols', '/modcontrols', ModControls::class);
+        $this->get('modcontrols', '/modcontrols/{do}', ModControls::class);
         $this->get('forum', '/forum/{id}/{slug}', Forum::class);
         $this->get('post', '/post', Post::class);
         $this->get('profile', '/profile/{id}/{page}', UserProfile::class);

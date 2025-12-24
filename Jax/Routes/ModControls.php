@@ -81,17 +81,16 @@ final readonly class ModControls implements Route
             $this->modPosts->doPosts($dop);
         }
 
-        match ($this->request->both('do')) {
+        match ($params['do'] ?? $this->request->both('do')) {
             'modp' => $this->modPosts->addPost((int) $this->request->both('pid')),
             'modt' => $this->modTopics->addTopic((int) $this->request->both('tid')),
-            'cp' => $this->showModCP(),
             'emem' => $this->showModCP(match (true) {
                 $this->request->post('submit') === 'showform'
                     || $this->request->both('mid') !== null => $this->editMember(),
                 default => $this->selectMemberToEdit(),
             }),
             'iptools' => $this->showModCP($this->ipTools()),
-            default => null,
+            default => $this->showModCP(),
         };
     }
 

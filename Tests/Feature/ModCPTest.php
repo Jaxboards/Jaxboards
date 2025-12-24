@@ -98,7 +98,7 @@ final class ModCPTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=modcontrols&do=cp');
+        $page = $this->go('/modcontrols');
 
         DOMAssert::assertSelectEquals('.modcppage', 'Choose an option on the left.', 1, $page);
     }
@@ -107,7 +107,7 @@ final class ModCPTest extends FeatureTestCase
     {
         $this->actingAs('member');
 
-        $page = $this->go('?act=modcontrols&do=cp');
+        $page = $this->go('/modcontrols');
 
         DOMAssert::assertSelectCount('.modcppage', 0, $page);
         $this->assertRedirect('index', [], $page);
@@ -117,7 +117,7 @@ final class ModCPTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=modcontrols&do=emem');
+        $page = $this->go('/modcontrols/emem');
 
         DOMAssert::assertSelectCount('input[name=mname]', 1, $page);
     }
@@ -157,7 +157,7 @@ final class ModCPTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?act=modcontrols&do=iptools');
+        $page = $this->go('/modcontrols/iptools');
 
         DOMAssert::assertSelectCount('input[name=ip]', 1, $page);
     }
