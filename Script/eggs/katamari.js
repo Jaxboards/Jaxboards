@@ -6042,26 +6042,26 @@ Katamari!</a></h1>\
 <option value="-5">Touch</option>\
 </select></b> to control the ball!</p>\
 <div><label>Background Music? \
-<input id="bgmusicc" type="checkbox" checked="checked" /></label></div>\
+<input id="bgmusicc" type="checkbox" checked="checked"></label></div>\
 <div style="text-align:right; color:gray;">\
 <label>Katamari Color: <select id="khcolor">\
 <option value="#ff0000" style="background-color:#ff0000;color:#ff0000"> r </option>\
 <option value="#00ff00" style="background-color:#00ff00;color:#00ff00"> g </option>\
 <option value="#0000ff" style="background-color:#0000ff;color:#0000ff"> b </option>\
 <option selected="selected" value="#7D26CD" style="background-color:#7D26CD;color:#7D26CD"> p \
-</option></select></label><br />\
+</option></select></label><br>\
  <label title="Lower this if the game gets slow.">\
 Max Attached Objects: <select id="maxAtt">\
 <option>25</option>\
 <option>50</option>\
 <option selected="selected">75</option>\
 <option>100</option>\
-<option>9000</option></select></label><br />\
+<option>9000</option></select></label><br>\
 <label title="How much to grow when an object is picked up.">\
-Growth Speed: <input id="vol_mult" type="text" size="6" value="1.0" />\
-</label><br />\
+Growth Speed: <input id="vol_mult" type="text" size="6" value="1.0">\
+</label><br>\
 <label title="Bigger objects require a bigger katamari to pick up.">\
-Realistic Pickups? <input id="checkv" type="checkbox" checked="checked" />\
+Realistic Pickups? <input id="checkv" type="checkbox" checked="checked">\
 </label></div>\
 <p id="loadingp">Loading!</p>';
     gameDiv.appendChild(d);

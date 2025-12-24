@@ -333,12 +333,12 @@ final readonly class UCP implements Route
                         name="email"
                         aria-label="Email"
                         title="Enter your new email address"
-                        value="{$this->user->get()->email}" />
+                        value="{$this->user->get()->email}">
                     HTML,
                 (bool) $email => <<<HTML
                     <strong>{$email}</strong>
                     <a href='{$changeEmailURL}'>Change</a>
-                    <input type='hidden' name='email' value='{$email}' />
+                    <input type='hidden' name='email' value='{$email}'>
                     HTML,
 
                 default => '--none--',
@@ -661,10 +661,10 @@ final readonly class UCP implements Route
             $select,
             '<input type="checkbox" name="usewordfilter" title="Use Word Filter"'
                 . ($this->user->get()->nowordfilter !== 0 ? '' : ' checked="checked"')
-                . ' />',
+                . '>',
             '<input type="checkbox" name="wysiwyg" title="WYSIWYG Enabled"'
                 . ($this->user->get()->wysiwyg !== 0 ? ' checked="checked"' : '')
-                . ' />',
+                . '>',
         );
     }
 }

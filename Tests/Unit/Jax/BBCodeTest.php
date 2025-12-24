@@ -149,11 +149,11 @@ final class BBCodeTest extends UnitTestCase
             ],
             [
                 '[img]http://example.com/image.jpg[/img]',
-                '<img src="http://example.com/image.jpg" title="" alt="" class="bbcodeimg" />',
+                '<img src="http://example.com/image.jpg" title="" alt="" class="bbcodeimg">',
             ],
             [
                 '[img=An image]http://example.com/image.jpg[/img]',
-                '<img src="http://example.com/image.jpg" title="An image" alt="An image" class="bbcodeimg" />',
+                '<img src="http://example.com/image.jpg" title="An image" alt="An image" class="bbcodeimg">',
             ],
             [
                 '[h2]Header 2[/h2]',

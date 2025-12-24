@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
-    <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="{{ css_url }}" />
-    <link rel="stylesheet" type="text/css" href="{{ bbcode_css_url }}" />
-    <link rel="stylesheet" type="text/css" href="{{ themes_css_url }}" />
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="{{ css_url }}">
+    <link rel="stylesheet" type="text/css" href="{{ bbcode_css_url }}">
+    <link rel="stylesheet" type="text/css" href="{{ themes_css_url }}">
     <script type="text/javascript" src="{{ admin_js_url }}"></script>
     <title>{{ title }}</title>
-  </head>
+</head>
 
-  <body>
+<body>
     <a id="header" href="admin.php" title="Return to Admin Homepage"></a>
     <div id="userbox">Logged in as:
-      {{ username }}
-      <a href="../">Back to Board</a></div>
+        {{ username }}
+        <a href="../">Back to Board</a>
+    </div>
     {{ nav }}
     <div id="page">
-      {{ sidebar }}
-      <div class="right">
-        {{ content }}
-      </div>
+        {{ sidebar }}
+        <div class="right">
+            {{ content }}
+        </div>
     </div>
-  </body>
+</body>
 
 </html>

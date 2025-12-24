@@ -219,7 +219,7 @@ final readonly class ModControls implements Route
                                 <textarea name="{$name}" id="m_{$name}">{$value}</textarea>
                             HTML
                         : <<<HTML
-                                <input type="text" id="m_{$name}" name="{$name}" value="{$value}" />
+                                <input type="text" id="m_{$name}" name="{$name}" value="{$value}">
                             HTML;
 
                     return <<<HTML
@@ -255,7 +255,7 @@ final readonly class ModControls implements Route
                 <table>
                     {$fieldRows}
                 </table>
-                <input type="submit" value="Save" />
+                <input type="submit" value="Save">
             </form>
             HTML;
     }
@@ -277,10 +277,10 @@ final readonly class ModControls implements Route
                 <input type="text" title="Enter member name" name="mname"
                     data-autocomplete-action="searchmembers"
                     data-autocomplete-output="#mid"
-                    data-autocomplete-indicator="#validname" />
+                    data-autocomplete-indicator="#validname">
                 <span id="validname"></span>
-                <input type="hidden" name="mid" id="mid" onchange="this.form.onsubmit();" />
-                <input type="submit" type="View member details" value="Go" />
+                <input type="hidden" name="mid" id="mid" onchange="this.form.onsubmit();">
+                <input type="submit" type="View member details" value="Go">
             </form>
             HTML;
     }
@@ -310,8 +310,8 @@ final readonly class ModControls implements Route
             <form method='post' data-ajax-form='true'>
                 {$hiddenFields}
                 <label>IP:
-                <input type='text' name='ip' title="Enter IP address" value='{$ipAddress}' /></label>
-                <input type='submit' value='Submit' title="Search for IP" />
+                <input type='text' name='ip' title="Enter IP address" value='{$ipAddress}'></label>
+                <input type='submit' value='Submit' title="Search for IP">
             </form>
             EOT;
         if ($ipAddress !== '') {
@@ -329,13 +329,13 @@ final readonly class ModControls implements Route
                     banned
                 </span>
                 <input type="submit" name="unban"
-                    onclick="this.form.submitButton=this" value="Unban" />
+                    onclick="this.form.submitButton=this" value="Unban">
                 HTML : <<<'HTML'
                 <span style="color:#090">
                     not banned
                 </span>
                 <input type="submit" name="ban"
-                    onclick="this.form.submitButton=this" value="Ban" />
+                    onclick="this.form.submitButton=this" value="Ban">
                 HTML;
 
             $torDate = gmdate('Y-m-d', Carbon::now('UTC')->subDays(2)->getTimestamp());

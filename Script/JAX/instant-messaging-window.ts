@@ -48,9 +48,9 @@ function createMessagingWindow({
             <div class='offline'>This user may be offline</div>
             <div>
                 <form data-ajax-form='resetOnSubmit' method='post'>
-                    <input type='hidden' name='im_uid' value='%s' />
-                    <input type='text' name='im_im' autocomplete='off' />
-                    <input type='hidden' name='act' value='blank' />
+                    <input type='hidden' name='im_uid' value='%s'>
+                    <input type='text' name='im_im' autocomplete='off'>
+                    <input type='hidden' name='act' value='blank'>
                 </form>
             </div>
         `.replaceAll('%s', `${fromId}`),

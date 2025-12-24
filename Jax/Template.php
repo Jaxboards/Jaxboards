@@ -32,7 +32,7 @@ use function vsprintf;
  *    piece of data going into a template can be referenced using full sprintf syntax.
  *
  * 2. Theme templates can overwrite meta definitions through their board template using "<M>" tags.
- *    An example would look like this: `<M name="logo"><img src="logo.png" /></M>`
+ *    An example would look like this: `<M name="logo"><img src="logo.png"></M>`
  *
  * 3. There is a "variable" syntax that templates can use:
  *    <%varname%>

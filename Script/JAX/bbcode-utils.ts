@@ -183,5 +183,5 @@ export function bbcodeToHTML(bbcode: string) {
                 return `<${tag}>${lis}</${tag}>`;
             },
         )
-        .replaceAll('\n', '<br />');
+        .replaceAll('\n', '<br>');
 }

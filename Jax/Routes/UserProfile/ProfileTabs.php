@@ -138,7 +138,7 @@ final readonly class ProfileTabs
             );
         }
 
-        return "<div class='contacts'>{$tabHTML}<br clear='all' /></div>";
+        return "<div class='contacts'>{$tabHTML}<br clear='all'></div>";
     }
 
     private function showTabTopics(Member $member): string

@@ -1,14 +1,12 @@
 <form method="post" data-ajax-form="true">
   %s
-  <div class="pages pages-top">%s</div><div class="forum-buttons-top">&nbsp;</div>
+  <div class="pages pages-top">%s</div>
+  <div class="forum-buttons-top">&nbsp;</div>
   <table class="listing">
     <tr>
       <th class="center" style="width:5%%">
-        <input
-          onChange="document.querySelectorAll('.check').forEach(checkbox => checkbox.checked = this.checked)"
-          title="Select All Messages"
-          type="checkbox"
-          />
+        <input onChange="document.querySelectorAll('.check').forEach(checkbox => checkbox.checked = this.checked)"
+          title="Select All Messages" type="checkbox">
       </th>
       <th style="width:5%%">
         Flag
@@ -28,7 +26,7 @@
       <td>
       </td>
       <td colspan="4">
-        <input type="submit" value="Delete Messages" title="Delete Messages" />
+        <input type="submit" value="Delete Messages" title="Delete Messages">
       </td>
     </tr>
   </table>

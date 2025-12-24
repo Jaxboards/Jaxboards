@@ -355,7 +355,7 @@ final class Search implements Route
             }
 
             if ($omitted !== []) {
-                $error .= '<br /><br />'
+                $error .= '<br><br>'
                     . 'The following terms were omitted due to length: '
                     . implode(', ', $omitted);
             }

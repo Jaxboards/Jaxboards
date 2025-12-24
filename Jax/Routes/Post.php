@@ -235,7 +235,7 @@ final class Post implements Route
             ? ''
             : <<<'HTML'
                 <div id="attachfiles" class="addfile">
-                    Add Files <input type="file" name="Filedata" title="Browse for file" />
+                    Add Files <input type="file" name="Filedata" title="Browse for file">
                 </div>
                 HTML;
 
@@ -244,12 +244,12 @@ final class Post implements Route
             <form method="post" data-ajax-form="true"
                             onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;">
             <div class="topicform">
-                <input type="hidden" name="act" value="post" />
-                <input type="hidden" name="how" value="{$how}" />
-                <input type="hidden" name="fid" value="{$fid}" />
-                <input type="hidden" name="tid" value="{$tid}" />
+                <input type="hidden" name="act" value="post">
+                <input type="hidden" name="how" value="{$how}">
+                <input type="hidden" name="fid" value="{$fid}">
+                <input type="hidden" name="tid" value="{$tid}">
                 <label for="ttitle">Topic title:</label>
-                <input type="text" name="ttitle" id="ttitle" title="Topic Title" value="{$topic->title}" />
+                <input type="text" name="ttitle" id="ttitle" title="Topic Title" value="{$topic->title}">
                 <br>
                 <label for="tdesc">Description:</label>
                 <input
@@ -258,7 +258,7 @@ final class Post implements Route
                     title="Topic Description (extra information about your topic)"
                     type="text"
                     value="{$topic->subtitle}"
-                    />
+                   >
                 <br>
                 <textarea
                     name="postdata"
@@ -336,7 +336,7 @@ final class Post implements Route
 
         $vars = '';
         foreach ($varsarray as $k => $v) {
-            $vars .= '<input type="hidden" name="' . $k . '" value="' . $v . '" />';
+            $vars .= '<input type="hidden" name="' . $k . '" value="' . $v . '">';
         }
 
         if ($this->session->getVar('multiquote')) {
@@ -363,7 +363,7 @@ final class Post implements Route
         $uploadForm = $topicPerms['upload'] ? <<<'HTML'
             <div id="attachfiles">
                 Add Files
-                <input type="file" name="Filedata" title="Browse for file" />
+                <input type="file" name="Filedata" title="Browse for file">
             </div>
             HTML : '';
 
@@ -383,7 +383,7 @@ final class Post implements Route
                         <input type="submit" name="submit"  id="submitbutton"
                             value="Post" title="Submit your post"
                             onclick="this.form.submitButton=this"
-                            />
+                           >
                         <input type="submit" name="submit" value="Preview"
                             title="See a preview of your post"
                             onclick="this.form.submitButton=this"/>

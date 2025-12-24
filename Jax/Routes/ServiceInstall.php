@@ -127,8 +127,8 @@ final readonly class ServiceInstall
             <!DOCTYPE html>
             <html lang="en">
                 <head>
-                <link media="all" rel="stylesheet" href="./css/main.css" />
-                <meta name="description" content="The world's very first instant forum." />
+                <link media="all" rel="stylesheet" href="./css/main.css">
+                <meta name="description" content="The world's very first instant forum.">
                 <title>Jaxboards - The free AJAX powered forum host</title>
                 </head>
                 <body onload="if(top.location!=self.location) top.location=self.location">
@@ -144,7 +144,7 @@ final readonly class ServiceInstall
                                         <br>
                                         {$formFields}
                                         <div class="center">
-                                            <input type="submit" name="submit" value="Start your service!" />
+                                            <input type="submit" name="submit" value="Start your service!">
                                         </div>
                                     </form>
                                     <strong>Bring a Jaxboards service of your own to life.</strong>

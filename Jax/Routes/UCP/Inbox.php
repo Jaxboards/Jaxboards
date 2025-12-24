@@ -446,10 +446,10 @@ final readonly class Inbox
                 'inbox-messages-row',
                 $message->read ? 'read' : 'unread',
                 '<input class="check" type="checkbox" title="PM Checkbox" name="dmessage[]" '
-                    . 'value="' . $message->id . '" />',
+                    . 'value="' . $message->id . '">',
                 '<input type="checkbox" '
                     . ($message->flag ? 'checked="checked" ' : '')
-                    . 'class="switch flag" onchange="' . $dmessageOnchange . '" />',
+                    . 'class="switch flag" onchange="' . $dmessageOnchange . '">',
                 $this->router->url('ucp', ['what' => 'inbox', 'view' => $message->id]),
                 $message->title,
                 $otherMember->displayName,

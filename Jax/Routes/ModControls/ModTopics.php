@@ -269,12 +269,12 @@ final readonly class ModTopics
                     continue;
                 }
 
-                $page .= '<input type="radio" name="ot" value="' . $topicId . '" /> '
+                $page .= '<input type="radio" name="ot" value="' . $topicId . '"> '
                     . $topics[$topicId]->title . '<br>';
             }
         }
 
-        $page .= '<input type="submit" value="Merge" /></form>';
+        $page .= '<input type="submit" value="Merge"></form>';
         $page = $this->page->collapseBox('Merging Topics', $page);
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);

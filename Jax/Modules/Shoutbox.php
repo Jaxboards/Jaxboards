@@ -112,7 +112,7 @@ final class Shoutbox implements Module
         ) : 'Guest';
         $avatarUrl = $member?->avatar ?: $this->template->meta('default-avatar');
         $avatar = $this->config->getSetting('shoutboxava')
-            ? "<img src='{$avatarUrl}' class='avatar' alt='avatar' />" : '';
+            ? "<img src='{$avatarUrl}' class='avatar' alt='avatar'>" : '';
         $deletelink = $this->template->meta('shout-delete', $shout->id);
         if (!$this->canDelete($shout)) {
             $deletelink = '';

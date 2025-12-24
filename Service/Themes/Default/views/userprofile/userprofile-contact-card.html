@@ -3,7 +3,7 @@
     %1$s
   </div>
   <div class="avatar">
-    <img src="%2$s" alt="Contact's avatar"/>
+    <img src="%2$s" alt="Contact's avatar" />
   </div>
   <div class="usertitle">
     %3$s
@@ -11,29 +11,25 @@
 </div>
 <div class="right">
   {if <%isguest%>!=true}
-    <button
-      data-window-close="true"
-      onClick="IMWindow('%4$s',this.innerHTML.match(/IM (.+)/)[1]);"
-      type="button"
-      >
+    <button data-window-close="true" onClick="IMWindow('%4$s',this.innerHTML.match(/IM (.+)/)[1]);" type="button">
       IM %1$s
     </button>
-    <br />
+    <br>
     <a href="%9$s" data-window-close="true">
       PM %1$s
     </a>
-    <br />
-    <br />
+    <br>
+    <br>
     %6$s
-    <br />
+    <br>
     %7$s
-    <br />
-    <br />
-  {/if}
-  <a href="%8$s" data-window-close="true">
-    Full Profile
-  </a>
-  <div class="contact_details">
-    %5$s
-  </div>
+    <br>
+    <br>
+    {/if}
+    <a href="%8$s" data-window-close="true">
+      Full Profile
+    </a>
+    <div class="contact_details">
+      %5$s
+    </div>
 </div>

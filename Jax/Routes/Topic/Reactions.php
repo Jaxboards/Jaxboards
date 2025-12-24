@@ -89,7 +89,7 @@ final readonly class Reactions
         $page = '';
         foreach ($ratings as $index => $rating) {
             $page .= '<div class="column">';
-            $page .= '<img src="' . $niblets[$index]->img . '" /> '
+            $page .= '<img src="' . $niblets[$index]->img . '"> '
                 . $niblets[$index]->title . '<ul>';
             foreach ($rating as $mid) {
                 $page .= '<li>' . $this->template->meta(

@@ -252,6 +252,6 @@ final readonly class TextFormatting
     {
         [, $space, $emoteText] = $match;
 
-        return "{$space}<img src='{$this->rules->getEmotes()[$emoteText]}' alt='{$this->blockhtml($emoteText)}' />";
+        return "{$space}<img src='{$this->rules->getEmotes()[$emoteText]}' alt='{$this->blockhtml($emoteText)}'>";
     }
 }

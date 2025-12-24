@@ -59,7 +59,7 @@ final class BBCode
         '@\[align=(center|left|right)\](.*)\[/align\]@Usi' => '<p style="text-align:$1">$2</p>',
         '@\[h([1-5])\](.*)\[/h\1\]@Usi' => '<h$1>$2</h$1>',
         '@\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[/img\]@Ui' => <<<'HTML'
-            <img src="$2" title="$1" alt="$1" class="bbcodeimg" />
+            <img src="$2" title="$1" alt="$1" class="bbcodeimg">
             HTML,
     ];
 
@@ -189,7 +189,7 @@ final class BBCode
             $attachmentURL = $this->domainDefinitions->getBoardPathUrl() . '/Uploads/' . $file->hash . '.' . $ext;
 
             return "<a href='{$attachmentURL}'>"
-                . "<img src='{$attachmentURL}' alt='attachment' class='bbcodeimg' />"
+                . "<img src='{$attachmentURL}' alt='attachment' class='bbcodeimg'>"
                 . '</a>';
         }
 

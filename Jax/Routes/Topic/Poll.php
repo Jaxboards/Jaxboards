@@ -205,8 +205,8 @@ final readonly class Poll
         $choicesHTML = '';
         foreach ($choices as $index => $value) {
             $input = $type === 'multi'
-                ? "<input type='checkbox' name='choice[]' value='{$index}' id='poll_{$index}' />"
-                : "<input type='radio' name='choice' value='{$index}' id='poll_{$index}' /> ";
+                ? "<input type='checkbox' name='choice[]' value='{$index}' id='poll_{$index}'>"
+                : "<input type='radio' name='choice' value='{$index}' id='poll_{$index}'> ";
 
             $choicesHTML .= <<<HTML
                 <div class='choice'>

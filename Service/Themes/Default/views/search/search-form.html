@@ -6,12 +6,12 @@
   </div>
   <div class="content">
     <form method="post" data-ajax-form="true">
-      <input type="hidden" name="act" value="search" />
+      <input type="hidden" name="act" value="search">
       <label for="searchterm">
         Search Terms:
       </label>
-      <input type="text" id="searchterm" name="searchterm" value="%1$s" />
-      <input type="submit" value="Search" />
+      <input type="text" id="searchterm" name="searchterm" value="%1$s">
+      <input type="submit" value="Search">
       &nbsp; &nbsp;
       <button type="button" onclick="document.querySelector('#searchadvanced').classList.toggle('display-none')">
         Advanced
@@ -36,30 +36,18 @@
             <label for="datestart">
               From:
             </label>
-            <input
-              id="datestart"
-              name="datestart"
-              title="From Date"
-              type="date"
-              />
-            <br />
+            <input id="datestart" name="datestart" title="From Date" type="date">
+            <br>
             <label for="dateend">
               To:
             </label>
-            <input
-              id="dateend"
-              name="dateend"
-              title="To Date"
-              type="date"
-              />
+            <input id="dateend" name="dateend" title="To Date" type="date">
           </td>
           <td>
             Posted by:
-            <input type="text" title="Posted By"
-              data-autocomplete-action="searchmembers"
-              data-autocomplete-output="#mid"
-            />
-            <input type="hidden" id="mid" name="mid" />
+            <input type="text" title="Posted By" data-autocomplete-action="searchmembers"
+              data-autocomplete-output="#mid">
+            <input type="hidden" id="mid" name="mid">
           </td>
         </tr>
       </table>

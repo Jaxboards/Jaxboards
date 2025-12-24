@@ -2,29 +2,21 @@
   <label for="sbe">
     Shoutbox enabled:
   </label>
-  <input {{ shoutbox_checked }} id="sbe" type="checkbox" name="sbe" class="switch yn" title="Shoutbox Enabled Toggle" />
+  <input {{ shoutbox_checked }} id="sbe" type="checkbox" name="sbe" class="switch yn" title="Shoutbox Enabled Toggle">
   <br>
   <label for="sbava">
     Shoutbox avatars:
   </label>
-  <input {{ shoutbox_avatar_checked }} type="checkbox" id="sbava" name="sbava" class="switch yn" title="Shoutbox Avatars Toggle" />
+  <input {{ shoutbox_avatar_checked }} type="checkbox" id="sbava" name="sbava" class="switch yn"
+    title="Shoutbox Avatars Toggle">
   <br>
   <label for="sbnum">
     Shouts to show:
     <br>
     (Max 10)
   </label>
-  <input
-    type="range"
-    id="sbnum"
-    name="sbnum"
-    title="Number of shouts to show"
-    value="{{ show_shouts }}"
-    min="1"
-    max="10"
-    step="1"
-    list="markers"
-    />
+  <input type="range" id="sbnum" name="sbnum" title="Number of shouts to show" value="{{ show_shouts }}" min="1"
+    max="10" step="1" list="markers">
   <datalist id="markers">
     <option value="1" label="1"></option>
     <option value="5" label="5"></option>
@@ -39,5 +31,5 @@
     onclick="return confirm('Are you sure you want to wipe your shoutbox?');">
   <br>
   <br>
-  <input type="submit" name="submit" value="Save" />
+  <input type="submit" name="submit" value="Save">
 </form>
