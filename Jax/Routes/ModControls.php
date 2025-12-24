@@ -430,6 +430,7 @@ final readonly class ModControls implements Route
             'ORDER BY lastUpdate LIMIT 100',
         );
         $countSessions = countBy($allSessions, static fn(ModelsSession $modelsSession): string => $modelsSession->useragent);
+        arsort($countSessions);
 
         $rows = '';
         foreach ($countSessions as $userAgent => $count) {
