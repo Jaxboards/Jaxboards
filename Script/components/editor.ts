@@ -77,7 +77,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
 
         this.doc?.addEventListener('input', () => {
             // keep textarea updated with BBCode in real time
-            this.element.value = htmlToBBCode(this.getSource() || '');
+            this.element.value = htmlToBBCode(this.doc.body);
         });
 
         if (!this.doc) {
@@ -406,11 +406,11 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         const { element, iframe } = this;
         if (htmlMode) {
             this.setSource(bbcodeToHTML(element.value));
-            element.style.display = 'none';
+            // element.style.display = 'none';
             iframe.style.display = '';
         } else {
             element.style.display = '';
-            iframe.style.display = 'none';
+            // iframe.style.display = 'none';
         }
         this.htmlMode = htmlMode;
     }

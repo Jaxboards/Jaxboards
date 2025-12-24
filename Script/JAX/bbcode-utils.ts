@@ -1,46 +1,54 @@
 import Color from './color';
 
-const DISALLOWED_TAGS = new Set(['script', 'style', 'hr']);
+const tagsToBBCode: Record<string, (inner: string, el: HTMLElement) => string> =
+    {
+        a: (inner, el) => `[url=${el?.getAttribute('href')}]${inner}[/url]`,
 
-const tagsToBBCode: Record<
-    string,
-    (inner: string, attrs?: Record<string, string>) => string
-> = {
-    a: (inner, attrs) => `[url=${attrs?.href}]${inner}[/url]`,
+        b(...args) {
+            return this.strong(...args);
+        },
 
-    b(...args) {
-        return this.strong(...args);
-    },
+        br: () => '\n',
 
-    div: (inner) => `\n${inner}`,
+        div: (inner) => `\n${inner}`,
 
-    em: (inner) => `[i]${inner}[/i]`,
+        em: (inner) => `[i]${inner}[/i]`,
 
-    h1: (inner) => `[h1]${inner}[/h1]`,
-    h2: (inner) => `[h2]${inner}[/h2]`,
-    h3: (inner) => `[h3]${inner}[/h3]`,
-    h4: (inner) => `[h4]${inner}[/h4]`,
-    h5: (inner) => `[h5]${inner}[/h5]`,
-    h6: (inner) => `[h6]${inner}[/h6]`,
+        h1: (inner) => `[h1]${inner}[/h1]`,
+        h2: (inner) => `[h2]${inner}[/h2]`,
+        h3: (inner) => `[h3]${inner}[/h3]`,
+        h4: (inner) => `[h4]${inner}[/h4]`,
+        h5: (inner) => `[h5]${inner}[/h5]`,
+        h6: (inner) => `[h6]${inner}[/h6]`,
 
-    i(...args) {
-        return this.em(...args);
-    },
+        hr: () => '\n',
 
-    li: (inner) => `*${inner.replace(/[\n\r]+/, '')}\n`,
+        i(...args) {
+            return this.em(...args);
+        },
 
-    ol: (inner) => `[ol]${inner}[/ol]`,
+        img(inner, img) {
+            const alt = img.getAttribute('alt') ?? '';
+            const src = img.getAttribute('src');
+            return src ? `[img]${src}[/img]` : alt;
+        },
 
-    p: (inner) => `\n${inner === '&nbsp' ? '' : inner}\n`,
+        li: (inner) => `*${inner.replace(/[\n\r]+/, '')}\n`,
 
-    strike: (inner) => `[s]${inner}[/s]`,
+        meta: () => '\n',
 
-    strong: (inner) => `[b]${inner}[/b]`,
+        ol: (inner) => `[ol]${inner}[/ol]`,
 
-    u: (inner) => `[u]${inner}[/u]`,
+        p: (inner) => `\n${inner === '&nbsp' ? '' : inner}\n`,
 
-    ul: (inner) => `[ul]${inner}[/ul]`,
-};
+        strike: (inner) => `[s]${inner}[/s]`,
+
+        strong: (inner) => `[b]${inner}[/b]`,
+
+        u: (inner) => `[u]${inner}[/u]`,
+
+        ul: (inner) => `[ul]${inner}[/ul]`,
+    };
 
 const styleToBBCode: Record<
     string,
@@ -60,7 +68,7 @@ const styleToBBCode: Record<
 
     'font-size': (size, inner) => `[size=${size}]${inner}[/size]`,
 
-    'font-weight': (weight, inner) => tagsToBBCode.strong(inner),
+    'font-weight': (weight, inner) => `[b]${inner}[/b]`,
 
     'text-align': (align, inner) => `[align=${align}]${inner}[/align]`,
 
@@ -71,91 +79,69 @@ const styleToBBCode: Record<
     },
 };
 
-function parseTagToBBCode(
-    tag: string,
+function parseStyleToBBCode(
+    style: CSSStyleDeclaration,
     _inner: string,
-    attrs: Record<string, string>,
-) {
+): string {
     let inner = _inner;
 
-    const lcTag = tag.toLowerCase();
-    if (DISALLOWED_TAGS.has(lcTag)) {
-        return '';
-    }
-
-    if (lcTag in tagsToBBCode) {
-        inner = tagsToBBCode[lcTag](inner, attrs);
-    }
-
-    return inner;
-}
-
-function parseStyleToBBCode(style: string, _inner: string): string {
-    let inner = _inner;
-
-    const dummyEl = document.createElement('div');
-    dummyEl.setAttribute('style', style);
-
-    for (const prop of dummyEl.style) {
+    for (const prop of style) {
         if (prop in styleToBBCode) {
-            inner = styleToBBCode[prop](
-                dummyEl.style.getPropertyValue(prop),
-                inner,
-            );
+            inner = styleToBBCode[prop](style.getPropertyValue(prop), inner);
         }
     }
 
     return inner;
 }
 
-// TODO: this function should not use RegEx to parse HTML
-export function htmlToBBCode(html: string) {
-    let bbcode = html;
-    const nestedTagRegex = /<(\w+)([^>]*)>([^]*?)<\/\1>/gi;
-    bbcode = bbcode.replaceAll(/[\r\n]+/g, '');
-    bbcode = bbcode.replaceAll(/<(hr|br|meta)[^>]*>/gi, '\n');
-    // images and emojis
-    bbcode = bbcode.replaceAll(
-        /<img.*?src=["']?([^'"]+)["'](?: alt=["']?([^"']+)["'])?[^>]*\/?>/g,
-        (_: string, src: string, alt: string) => alt || `[img]${src}[/img]`,
-    );
-    bbcode = bbcode.replaceAll(
-        nestedTagRegex,
-        (_: string, tag: string, attributes: string, innerHTML: string) => {
-            // Recursively handle nested tags
-            let innerhtml = nestedTagRegex.test(innerHTML)
-                ? htmlToBBCode(innerHTML)
-                : innerHTML;
-            const attrs: Record<string, string> = {};
-            attributes.replaceAll(
-                /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
-                (__: string, attr: string, q: string, value: string) => {
-                    attrs[attr] = value;
-                    return '';
-                },
-            );
-
-            if (attrs.style) {
-                innerhtml = parseStyleToBBCode(attrs.style, innerhtml);
-            }
-
-            if (attrs.size) {
-                innerhtml = styleToBBCode.fontSize(attrs.size, innerhtml);
-            }
-
-            if (attrs.color) {
-                innerhtml = styleToBBCode.color(attrs.color, innerhtml);
-            }
-
-            return parseTagToBBCode(tag, innerhtml, attrs);
-        },
-    );
-
-    return bbcode
+function parseTextToBBCode(text: string) {
+    return text
+        .replaceAll(/[\r\n]+/g, '')
         .replaceAll('&amp;', '&')
         .replaceAll('&gt;', '>')
         .replaceAll('&lt;', '<')
         .replaceAll('&nbsp;', ' ');
+}
+
+export function htmlToBBCode(html: HTMLElement): string {
+    const tagName = html.tagName.toLowerCase();
+
+    let inner = html.childNodes.length
+        ? Array.from(html.childNodes)
+              .map((child) =>
+                  child.nodeType === Node.ELEMENT_NODE
+                      ? htmlToBBCode(child as HTMLElement)
+                      : parseTextToBBCode(child.textContent ?? ''),
+              )
+              .join('')
+        : '';
+
+    console.log(html, inner);
+
+    // Don't inherit body styles
+    if (tagName === 'body') {
+        return inner;
+    }
+
+    if (html.style) {
+        inner = parseStyleToBBCode(html.style, inner);
+    }
+
+    const sizeAttribute = html.getAttribute('size');
+    if (sizeAttribute) {
+        inner = styleToBBCode.fontSize(sizeAttribute, inner);
+    }
+
+    const colorAttribute = html.getAttribute('color');
+    if (colorAttribute) {
+        inner = styleToBBCode.color(colorAttribute, inner);
+    }
+
+    if (tagName in tagsToBBCode) {
+        inner = tagsToBBCode[tagName](inner, html);
+    }
+
+    return inner;
 }
 
 export function bbcodeToHTML(bbcode: string) {
