@@ -85,22 +85,7 @@ const styleToBBCode: Record<
     },
 };
 
-function parseStyleToBBCode(
-    style: CSSStyleDeclaration,
-    _inner: string,
-): string {
-    let inner = _inner;
-
-    for (const prop of style) {
-        if (prop in styleToBBCode) {
-            inner = styleToBBCode[prop](style.getPropertyValue(prop), inner);
-        }
-    }
-
-    return inner;
-}
-
-function parseTextToBBCode(text: string) {
+function unescapeEntities(text: string) {
     return text
         .replaceAll(/[\r\n]+/g, '')
         .replaceAll('&amp;', '&')
@@ -111,36 +96,46 @@ function parseTextToBBCode(text: string) {
 
 export function htmlToBBCode(html: HTMLElement): string {
     const tagName = html.tagName.toLowerCase();
+    let inner = '';
 
-    let inner = html.childNodes.length
-        ? Array.from(html.childNodes)
-              .map((child) =>
-                  child.nodeType === Node.ELEMENT_NODE
-                      ? htmlToBBCode(child as HTMLElement)
-                      : parseTextToBBCode(child.textContent ?? ''),
-              )
-              .join('')
-        : '';
+    // Depth-first traversal
+    for (const childNode of html.childNodes) {
+        inner +=
+            childNode.nodeType === Node.ELEMENT_NODE
+                ? htmlToBBCode(childNode as HTMLElement)
+                : unescapeEntities(childNode.textContent ?? '');
+    }
 
     // Don't inherit body styles
     if (tagName === 'body') {
         return inner;
     }
 
+    // Inline styles
     if (html.style) {
-        inner = parseStyleToBBCode(html.style, inner);
+        for (const prop of html.style) {
+            if (prop in styleToBBCode) {
+                inner = styleToBBCode[prop](
+                    html.style.getPropertyValue(prop),
+                    inner,
+                );
+            }
+        }
     }
 
+    // Legacy size attribute
     const sizeAttribute = html.getAttribute('size');
     if (sizeAttribute) {
         inner = styleToBBCode.fontSize(sizeAttribute, inner);
     }
 
+    // Legacy color attribute
     const colorAttribute = html.getAttribute('color');
     if (colorAttribute) {
         inner = styleToBBCode.color(colorAttribute, inner);
     }
 
+    // Infer bbcode from tagName
     if (tagName in tagsToBBCode) {
         inner = tagsToBBCode[tagName](inner, html);
     }
