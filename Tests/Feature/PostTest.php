@@ -145,6 +145,7 @@ final class PostTest extends FeatureTestCase
             if ($arg === null) {
                 return $postHookPostArg;
             }
+
             $postHookPostArg = $arg;
         }
 
