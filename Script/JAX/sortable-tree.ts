@@ -9,11 +9,50 @@ function parsetree(tree: HTMLElement, prefix: string) {
         if (node.className !== 'seperator' && node.parentNode === tree) {
             gotsomethin = 1;
             const [sub] = node.getElementsByTagName('ul');
-            order[`_${node.id.slice(prefix.length)}`] =
-                sub !== undefined ? parsetree(sub, prefix) : 1;
+            order[`_${node.id.slice(prefix.length)}`] = sub
+                ? parsetree(sub, prefix)
+                : 1;
         }
     });
     return gotsomethin ? order : 1;
+}
+
+function dropOnSeparator(sess: DragSession, drag: Drag) {
+    if (!sess.droptarget) {
+        return;
+    }
+
+    const parentlock = sess.el.classList.contains('parentlock');
+    const nofirstlevel = sess.el.classList.contains('nofirstlevel');
+
+    if (parentlock && sess.droptarget.parentNode !== sess.el.parentNode) {
+        drag.reset(sess.el);
+        return;
+    }
+    if (
+        nofirstlevel &&
+        (sess.droptarget.parentNode as HTMLElement)?.className === 'tree'
+    ) {
+        drag.reset(sess.el);
+        return;
+    }
+    if (
+        isChildOf(sess.droptarget, sess.el) ||
+        sess.el === sess.droptarget.nextSibling
+    ) {
+        drag.reset(sess.el);
+        return;
+    }
+    const next = sess.droptarget.nextSibling as HTMLElement;
+    if (next.className === 'spacer') {
+        next.remove();
+    }
+    if (next.className === 'spacer') {
+        sess.el.previousSibling?.remove();
+    } else {
+        insertAfter(sess.el.previousSibling as HTMLLIElement, sess.droptarget);
+    }
+    insertAfter(sess.el, sess.droptarget);
 }
 
 export default function sortableTree(
@@ -46,50 +85,13 @@ export default function sortableTree(
         ondrop(sess: DragSession) {
             let tmp;
             const parentlock = sess.el.classList.contains('parentlock');
-            const nofirstlevel = sess.el.classList.contains('nofirstlevel');
             drag.reset(sess.el);
             if (!sess.droptarget) {
                 return;
             }
             sess.droptarget.style.border = 'none';
             if (sess.droptarget.className === 'seperator') {
-                if (
-                    parentlock &&
-                    sess.droptarget.parentNode !== sess.el.parentNode
-                ) {
-                    drag.reset(sess.el);
-                    return;
-                }
-                if (
-                    nofirstlevel &&
-                    (sess.droptarget.parentNode as HTMLElement)?.className ===
-                        'tree'
-                ) {
-                    drag.reset(sess.el);
-                    return;
-                }
-                if (
-                    isChildOf(sess.droptarget, sess.el) ||
-                    sess.el === sess.droptarget.nextSibling
-                ) {
-                    drag.reset(sess.el);
-                    return;
-                }
-                const next = sess.droptarget.nextSibling as HTMLElement;
-                if (next.className === 'spacer') {
-                    next.parentNode?.removeChild(next);
-                }
-                if (next.className !== 'spacer') {
-                    insertAfter(
-                        sess.el.previousSibling as HTMLLIElement,
-                        sess.droptarget,
-                    );
-                } else {
-                    sess.el.previousSibling?.parentNode?.removeChild(
-                        sess.el.previousSibling,
-                    );
-                }
-                insertAfter(sess.el, sess.droptarget);
+                dropOnSeparator(sess, drag);
             } else if (!parentlock && sess.droptarget.tagName === 'LI') {
                 [tmp] = sess.droptarget.getElementsByTagName('ul');
                 if (!tmp) {
