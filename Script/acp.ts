@@ -84,7 +84,6 @@ async function submitForm(form: HTMLFormElement) {
         },
     });
 
-    // eslint-disable-next-line no-alert
     alert("Saved. Ajax-submitted so you don't lose your place");
 }
 

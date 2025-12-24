@@ -1,4 +1,3 @@
-// eslint-disable-next-line max-classes-per-file
 export default class BetterSelect extends HTMLElement {
     // This is accessed by the browser to mark this as a form element
     // do not remove
@@ -192,7 +191,6 @@ export default class BetterSelect extends HTMLElement {
         this.dispatchEvent(new Event('change'));
     }
 
-    // eslint-disable-next-line class-methods-use-this
     stylesheet() {
         const style = new CSSStyleSheet();
 

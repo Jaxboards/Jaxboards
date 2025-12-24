@@ -1,5 +1,5 @@
 /* global RUN, globalSettings */
-/* eslint-disable no-alert */
+
 import { addIdleClock } from '../components/idle-clock';
 import Animation from '../JAX/animation';
 import { getComputedStyle, getCoordinates } from '../JAX/el';
@@ -21,7 +21,6 @@ export default {
         );
     },
     script(script: string) {
-        // eslint-disable-next-line
         (0, eval)(script);
     },
     error(message: string) {

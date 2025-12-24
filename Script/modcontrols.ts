@@ -85,7 +85,6 @@ export default class ModControls {
         }
     }
 
-    // eslint-disable-next-line class-methods-use-this
     togbutton(button: HTMLButtonElement) {
         button.classList.toggle('selected');
     }

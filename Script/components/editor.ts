@@ -1,5 +1,4 @@
 /* global globalSettings */
-/* eslint-disable no-script-url, no-alert */
 
 import { bbcodeToHTML, htmlToBBCode } from '../JAX/bbcode-utils';
 import Browser from '../JAX/browser';
@@ -244,7 +243,6 @@ export default class Editor extends Component<HTMLTextAreaElement> {
                 const c = r.insertCell(x);
                 const color = colors[x + y * sq];
                 if (!color) {
-                    // eslint-disable-next-line no-continue
                     continue;
                 }
                 c.style.border = '1px solid #000';

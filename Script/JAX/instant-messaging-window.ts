@@ -79,7 +79,6 @@ function createMessagingWindow({
 
 export default function IMWindow(uid: number, uname: string) {
     if (!globalSettings.canIM) {
-        // eslint-disable-next-line no-alert
         alert('You do not have permission to use this feature.');
         return;
     }
