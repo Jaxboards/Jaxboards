@@ -164,13 +164,13 @@ final class TopicTest extends FeatureTestCase
             '.opengraph h4',
             "YouTube - Uber Freight Dropped my Mainframe... Let's Fix it!",
             1,
-            $page
+            $page,
         );
         DOMAssert::assertSelectRegExp('.opengraph p', '/chronicles the destruction and restoration/', 1, $page);
         DOMAssert::assertSelectCount(
             '.opengraph img[src="https://i.ytimg.com/vi/qjqPT89KaCc/hqdefault.jpg"]',
             1,
-            $page
+            $page,
         );
     }
 

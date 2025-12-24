@@ -216,12 +216,12 @@ final class UCPTest extends FeatureTestCase
                     'dob_month',
                     'dob_day',
                     'dob_year',
-                    'gender'
+                    'gender',
                 ], true) => DOMAssert::assertSelectCount("select[name={$field}]", 1, $page),
 
                 $field === 'about' => DOMAssert::assertSelectCount("textarea[name={$field}]", 1, $page),
 
-                default => DOMAssert::assertSelectCount("input[name={$field}]", 1, $page)
+                default => DOMAssert::assertSelectCount("input[name={$field}]", 1, $page),
             };
         }
     }
@@ -259,7 +259,8 @@ final class UCPTest extends FeatureTestCase
         $this->assertEquals('http://google.com', $member->website);
 
         $birthdate = $this->container->get(Date::class)
-            ->datetimeAsCarbon($member->birthdate);
+            ->datetimeAsCarbon($member->birthdate)
+        ;
 
         $this->assertEquals(1, $birthdate->month);
         $this->assertEquals(1, $birthdate->day);
