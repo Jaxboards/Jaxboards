@@ -404,12 +404,12 @@ final class BoardIndex implements Route
         $guestCount = $usersonline[2];
         $guestsText = '';
         if ($guestCount > 0) {
-            $modURL = $this->user->getGroup()?->canModerate
+            $modURL = $this->user->getGroup()?->canModerate !== 0
                 ? "href='" . $this->router->url('modcontrols', ['do' => 'onlineSessions']) . "'"
                 : null;
             $plural = ($guestCount > 1 ? 's' : '');
             $guestsText = $guestCount > 0
-                ? "<a $modURL>{$guestCount} guest{$plural}</a>"
+                ? "<a {$modURL}>{$guestCount} guest{$plural}</a>"
                 : '';
         }
 

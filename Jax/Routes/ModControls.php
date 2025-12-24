@@ -427,9 +427,9 @@ final readonly class ModControls implements Route
     private function showOnlineSessions(): string
     {
         $allSessions = ModelsSession::selectMany(
-            'ORDER BY lastUpdate LIMIT 100'
+            'ORDER BY lastUpdate LIMIT 100',
         );
-        $countSessions = countBy($allSessions, fn(ModelsSession $session) => $session->useragent);
+        $countSessions = countBy($allSessions, static fn(ModelsSession $modelsSession): string => $modelsSession->useragent);
 
         $rows = '';
         foreach ($countSessions as $userAgent => $count) {
@@ -445,7 +445,7 @@ final readonly class ModControls implements Route
                     <tr><th>User Agent</th><th>Count</th></tr>
                     {$rows}
                 </table>
-                HTML
+                HTML,
         );
     }
 
