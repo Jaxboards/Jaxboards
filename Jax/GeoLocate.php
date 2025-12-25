@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use GeoIp2\Database\Reader;
+use GeoIp2\Exception\AddressNotFoundException;
 use GeoIp2\Model\City;
 
 use function array_map;
@@ -21,9 +22,13 @@ final readonly class GeoLocate
         $this->cityReader = new Reader($fileSystem->pathFromRoot('Service/maxmind/GeoLite2-City_20251223/GeoLite2-City.mmdb'));
     }
 
-    public function lookup(string $ip): City
+    public function lookup(string $ip): ?City
     {
-        return $this->cityReader->city($ip);
+        try {
+            return $this->cityReader->city($ip);
+        } catch (AddressNotFoundException) {
+            return null;
+        }
     }
 
     public function getFlagEmoji(string $isoCode): string

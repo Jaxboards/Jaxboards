@@ -345,7 +345,12 @@ final readonly class ModControls implements Route
                 HTML;
 
             $geo = $this->geoLocate->lookup($ipAddress);
-            $flag = $this->geoLocate->getFlagEmoji($geo->country->isoCode);
+
+            $location = "Unknown";
+            if ($geo !== null) {
+                $flag = $this->geoLocate->getFlagEmoji($geo->country->isoCode);
+                $location = "{$geo->city->name}, {$geo->country->name} {$flag}";
+            }
 
             $torDate = gmdate('Y-m-d', Carbon::now('UTC')->subDays(2)->getTimestamp());
             $page .= $this->box(
@@ -354,7 +359,7 @@ final readonly class ModControls implements Route
                     <form method='post' data-ajax-form='true'>
                         {$hiddenFields}
                         IP ban status: {$banCode}<br>
-                        Location: {$geo->city->name}, {$geo->country->name} {$flag}
+                        Location: {$location}
                     </form>
                     IP Lookup Services: <ul>
                         <li><a href="https://whois.domaintools.com/{$ipAddress}">DomainTools Whois</a></li>
