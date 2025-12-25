@@ -435,10 +435,10 @@ final readonly class ModControls implements Route
         foreach ($groupedSessions as $userAgent => $sessions) {
             $count = count($sessions);
 
-            $ips = implode('<br>', array_map(function (ModelsSession $session) {
+            $ips = implode('<br>', array_map(function (ModelsSession $session): string {
                 $ip = $this->ipAddress->asHumanReadable($session->ip);
 
-                if ($ip === '') return;
+                if ($ip === '') return '';
 
                 $geo = $this->geoLocate->lookup($ip);
                 $flag = $geo ? $this->geoLocate->getFlagEmoji($geo->country->isoCode) : null;

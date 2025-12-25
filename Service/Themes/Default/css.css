@@ -337,12 +337,16 @@ textarea {
 }
 
 #modcp .onlinesessions td {
+    max-width: 70%;
     border: 1px solid #000;
     padding: 5px;
 }
 
 #modcp .onlinesessions td:nth-child(2) {
     text-align: center;
+}
+#modcp .onlinesessions td:nth-child(3) {
+    width: 25%;
 }
 
 .inbox .listing {
