@@ -64,7 +64,8 @@
         "symfony/polyfill-php83": "^1.32",
         "symfony/polyfill-php84": "^1.32",
         "nesbot/carbon": "^3.9",
-        "lodash-php/lodash-php": "^0.1.0"
+        "lodash-php/lodash-php": "^0.1.0",
+        "geoip2/geoip2": "^3.3"
     },
     "scripts": {
         "lint": [

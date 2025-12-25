@@ -6,6 +6,7 @@ namespace Jax\Routes;
 
 use Carbon\Carbon;
 use Jax\Config;
+use Jax\GeoLocate;
 use Jax\Interfaces\Route;
 use Jax\IPAddress;
 use Jax\Jax;
@@ -38,6 +39,7 @@ final readonly class ModControls implements Route
 {
     public function __construct(
         private Config $config,
+        private GeoLocate $geoLocate,
         private IPAddress $ipAddress,
         private Jax $jax,
         private ModTopics $modTopics,
@@ -342,6 +344,8 @@ final readonly class ModControls implements Route
                     onclick="this.form.submitButton=this" value="Ban">
                 HTML;
 
+            $geo = $this->geoLocate->lookup($ipAddress);
+
             $torDate = gmdate('Y-m-d', Carbon::now('UTC')->subDays(2)->getTimestamp());
             $page .= $this->box(
                 'Info',
@@ -349,6 +353,7 @@ final readonly class ModControls implements Route
                     <form method='post' data-ajax-form='true'>
                         {$hiddenFields}
                         IP ban status: {$banCode}<br>
+                        Location: {$geo->city->name} {$geo->country->name}
                     </form>
                     IP Lookup Services: <ul>
                         <li><a href="https://whois.domaintools.com/{$ipAddress}">DomainTools Whois</a></li>
