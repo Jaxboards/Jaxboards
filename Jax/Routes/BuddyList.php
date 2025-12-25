@@ -36,7 +36,7 @@ final readonly class BuddyList implements Route
     ) {
         $this->template->addMeta(
             'buddylist-contacts',
-            <<<HTML
+            <<<'HTML'
                     <div class="contacts">
                         <form action="/buddylist" data-ajax-form="true">
                             <a href="%s" id="status" class="%s">

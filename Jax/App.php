@@ -12,7 +12,6 @@ use function header;
 use function implode;
 use function json_decode;
 use function json_encode;
-use function mb_strtolower;
 use function microtime;
 use function round;
 
