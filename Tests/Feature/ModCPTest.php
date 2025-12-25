@@ -20,6 +20,7 @@ use Jax\Date;
 use Jax\DebugLog;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
+use Jax\GeoLocate;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Models\Forum;
@@ -67,6 +68,7 @@ use function json_encode;
 #[CoversClass(FileSystem::class)]
 #[CoversClass(ForeignKey::class)]
 #[CoversClass(Forum::class)]
+#[CoversClass(GeoLocate::class)]
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
 #[CoversClass(Key::class)]
