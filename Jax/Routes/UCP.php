@@ -10,7 +10,6 @@ use Jax\Constants\Groups;
 use Jax\Database\Database;
 use Jax\Date;
 use Jax\Interfaces\Route;
-use Jax\Jax;
 use Jax\Models\Activity;
 use Jax\Models\Member;
 use Jax\Models\Skin;
@@ -44,7 +43,6 @@ final readonly class UCP implements Route
         private Config $config,
         private Database $database,
         private Date $date,
-        private Jax $jax,
         private Inbox $inbox,
         private Page $page,
         private Request $request,
@@ -119,7 +117,7 @@ final readonly class UCP implements Route
 
         return ($error !== null ? $this->template->meta('error', $error) : '') . $this->template->meta(
             'ucp-index',
-            $this->jax->hiddenFormFields(['act' => 'ucp']),
+            '',
             $this->user->get()->displayName,
             $this->user->get()->avatar ?: $this->template->meta('default-avatar'),
             trim($ucpnotepad) !== ''
@@ -184,7 +182,7 @@ final readonly class UCP implements Route
         }
 
         $checkboxes = [
-            $this->jax->hiddenFormFields(
+            Template::hiddenFormFields(
                 ['submit' => 'true'],
             ),
         ];
@@ -270,7 +268,7 @@ final readonly class UCP implements Route
 
         return $page . $this->template->meta(
             'ucp-pass-settings',
-            $this->jax->hiddenFormFields(['passchange' => 'true']),
+            Template::hiddenFormFields(['passchange' => 'true']),
         );
     }
 
@@ -314,7 +312,7 @@ final readonly class UCP implements Route
 
         return $this->template->meta(
             'ucp-email-settings',
-            $this->jax->hiddenFormFields(
+            Template::hiddenFormFields(
                 ['submit' => 'true'],
             ),
             match (true) {
@@ -566,7 +564,7 @@ final readonly class UCP implements Route
 
         return $this->template->meta(
             'ucp-profile-settings',
-            $this->jax->hiddenFormFields(['submit' => 'true']),
+            Template::hiddenFormFields(['submit' => 'true']),
             $this->user->get()->name,
             $this->user->get()->displayName,
             $this->user->get()->full_name,

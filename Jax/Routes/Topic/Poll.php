@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Routes\Topic;
 
-use Jax\Jax;
 use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Request;
@@ -29,7 +28,6 @@ use const JSON_THROW_ON_ERROR;
 final readonly class Poll
 {
     public function __construct(
-        private Jax $jax,
         private Page $page,
         private Request $request,
         private Template $template,
@@ -196,7 +194,7 @@ final readonly class Poll
                 HTML;
         }
 
-        $hiddenFields = $this->jax->hiddenFormFields(
+        $hiddenFields = Template::hiddenFormFields(
             [
                 'votepoll' => '1',
             ],

@@ -698,7 +698,7 @@ final class Topic implements Route
         $this->page->command('softurl');
         $post = Post::selectOne($pid);
 
-        $hiddenfields = $this->jax->hiddenFormFields(
+        $hiddenfields = Template::hiddenFormFields(
             [
                 'act' => 'post',
                 'how' => 'edit',
@@ -723,7 +723,7 @@ final class Topic implements Route
         }
 
         if ($post->newtopic !== 0) {
-            $hiddenfields .= $this->jax->hiddenFormFields(
+            $hiddenfields .= Template::hiddenFormFields(
                 [
                     'tid' => (string) $post->tid,
                 ],

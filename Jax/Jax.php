@@ -27,19 +27,6 @@ final readonly class Jax
     ) {}
 
     /**
-     * @param array<string,string> $fields
-     */
-    public function hiddenFormFields(array $fields): string
-    {
-        $html = '';
-        foreach ($fields as $key => $value) {
-            $html .= "<input type='hidden' name='{$key}' value='{$value}'>";
-        }
-
-        return $html;
-    }
-
-    /**
      * @param array<int,array<string,bool>> $forumPerms
      */
     public function serializeForumPerms(array $forumPerms): string
@@ -137,8 +124,8 @@ final readonly class Jax
                 $message,
             ),
             'MIME-Version: 1.0' . PHP_EOL
-            . 'Content-type:text/html;charset=iso-8859-1' . PHP_EOL
-            . 'From: ' . $this->config->getSetting('mail_from') . PHP_EOL,
+                . 'Content-type:text/html;charset=iso-8859-1' . PHP_EOL
+                . 'From: ' . $this->config->getSetting('mail_from') . PHP_EOL,
         );
     }
 }

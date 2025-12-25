@@ -9,7 +9,6 @@ use Jax\Config;
 use Jax\GeoLocate;
 use Jax\Interfaces\Route;
 use Jax\IPAddress;
-use Jax\Jax;
 use Jax\Models\Member;
 use Jax\Models\Post;
 use Jax\Models\Session as ModelsSession;
@@ -41,7 +40,6 @@ final readonly class ModControls implements Route
         private Config $config,
         private GeoLocate $geoLocate,
         private IPAddress $ipAddress,
-        private Jax $jax,
         private ModTopics $modTopics,
         private ModPosts $modPosts,
         private Page $page,
@@ -207,7 +205,7 @@ final readonly class ModControls implements Route
             return $this->page->error('You do not have permission to edit this profile.');
         }
 
-        $hiddenFormFields = $this->jax->hiddenFormFields(
+        $hiddenFormFields = Template::hiddenFormFields(
             [
                 'mid' => (string) $member->id,
                 'submit' => 'save',
@@ -266,7 +264,7 @@ final readonly class ModControls implements Route
 
     private function selectMemberToEdit(): string
     {
-        $hiddenFormFields = $this->jax->hiddenFormFields(
+        $hiddenFormFields = Template::hiddenFormFields(
             [
                 'submit' => 'showform',
             ],
@@ -312,7 +310,7 @@ final readonly class ModControls implements Route
         if ($ipAddress !== '') {
             $page .= "<h3>Data for {$ipAddress}:</h3>";
 
-            $hiddenFields = $this->jax->hiddenFormFields(
+            $hiddenFields = Template::hiddenFormFields(
                 [
                     'ip' => $ipAddress,
                 ],

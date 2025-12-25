@@ -6,7 +6,6 @@ namespace Jax\Routes;
 
 use Jax\Database\Database;
 use Jax\Interfaces\Route;
-use Jax\Jax;
 use Jax\Models\Activity;
 use Jax\Models\Member;
 use Jax\Page;
@@ -27,7 +26,6 @@ use function in_array;
 final readonly class BuddyList implements Route
 {
     public function __construct(
-        private Jax $jax,
         private Page $page,
         private Session $session,
         private Router $router,
@@ -36,7 +34,7 @@ final readonly class BuddyList implements Route
         private User $user,
         private UsersOnline $usersOnline,
     ) {
-        $buddylist = $this->jax->hiddenFormFields(['act' => 'buddylist']);
+        $buddylist = Template::hiddenFormFields(['act' => 'buddylist']);
         $this->template->addMeta(
             'buddylist-contacts',
             <<<HTML

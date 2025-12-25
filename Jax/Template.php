@@ -137,6 +137,20 @@ final class Template
         $this->parts[$part] .= $content;
     }
 
+    /**
+     * Utility method for generating input[hidden]
+     * @param array<string,string> $fields
+     */
+    public static function hiddenFormFields(array $fields): string
+    {
+        $html = '';
+        foreach ($fields as $key => $value) {
+            $html .= "<input type='hidden' name='{$key}' value='{$value}'>";
+        }
+
+        return $html;
+    }
+
     public function load(string $file): void
     {
         $this->template = $this->fileSystem->getContents($file) ?: '';

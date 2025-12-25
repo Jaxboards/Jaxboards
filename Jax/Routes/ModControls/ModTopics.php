@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Jax\Routes\ModControls;
 
 use Jax\Database\Database;
-use Jax\Jax;
 use Jax\Models\Forum;
 use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Request;
 use Jax\Router;
 use Jax\Session;
+use Jax\Template;
 use Jax\User;
 
 use function _\keyBy;
@@ -31,7 +31,6 @@ final readonly class ModTopics
     public function __construct(
         private Database $database,
         private Page $page,
-        private Jax $jax,
         private Request $request,
         private Router $router,
         private Session $session,
@@ -248,7 +247,7 @@ final readonly class ModTopics
         $page .= '<form method="post" data-ajax-form="true" '
             . 'style="padding:10px;">'
             . 'Which topic should the topics be merged into?<br>';
-        $page .= $this->jax->hiddenFormFields(
+        $page .= Template::hiddenFormFields(
             [
                 'act' => 'modcontrols',
                 'dot' => 'merge',

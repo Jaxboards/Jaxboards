@@ -214,7 +214,7 @@ final readonly class Inbox
 
         return $this->template->meta(
             'inbox-composeform',
-            $this->jax->hiddenFormFields(
+            Template::hiddenFormFields(
                 [
                     'submit' => '1',
                     'what' => 'inbox',
@@ -380,7 +380,7 @@ final readonly class Inbox
             $this->textFormatting->theWorks($message->message),
             $otherMember?->avatar ?: $this->template->meta('default-avatar'),
             $otherMember?->usertitle,
-            $this->jax->hiddenFormFields(
+            Template::hiddenFormFields(
                 [
                     'messageid' => (string) $message->id,
                     'sender' => (string) $message->from,
@@ -469,7 +469,7 @@ final readonly class Inbox
 
         $html = $this->template->meta(
             'inbox-messages-listing',
-            $this->jax->hiddenFormFields(
+            Template::hiddenFormFields(
                 [
                     'act' => 'ucp',
                     'what' => 'inbox',

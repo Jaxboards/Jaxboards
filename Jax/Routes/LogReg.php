@@ -403,7 +403,7 @@ final class LogReg implements Route
                 . $this->template->meta(
                     'forgot-password2-form',
                     $this->router->url('forgotPassword'),
-                    $this->jax->hiddenFormFields(
+                    Template::hiddenFormFields(
                         [
                             'id' => $tokenId,
                             'uid' => $uid ?? '',
