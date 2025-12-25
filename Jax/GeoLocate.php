@@ -7,6 +7,11 @@ namespace Jax;
 use GeoIp2\Database\Reader;
 use GeoIp2\Model\City;
 
+use function array_map;
+use function implode;
+use function mb_chr;
+use function mb_ord;
+
 final readonly class GeoLocate
 {
     private Reader $cityReader;
@@ -27,11 +32,11 @@ final readonly class GeoLocate
         $letterA = 127462;
 
         $letters = array_map(
-            fn($letter) => mb_chr(ord($letter) - $asciiA + $letterA),
+            static fn($letter): string => mb_chr(mb_ord($letter) - $asciiA + $letterA),
             [
                 $isoCode[0],
                 $isoCode[1],
-            ]
+            ],
         );
 
         return implode('', $letters);
