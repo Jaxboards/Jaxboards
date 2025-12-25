@@ -346,7 +346,7 @@ final readonly class ModControls implements Route
 
             $geo = $this->geoLocate->lookup($ipAddress);
 
-            $location = "Unknown";
+            $location = 'Unknown';
             if ($geo !== null) {
                 $flag = $this->geoLocate->getFlagEmoji($geo->country->isoCode);
                 $location = "{$geo->city->name}, {$geo->country->name} {$flag}";
