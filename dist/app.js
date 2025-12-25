@@ -13,12 +13,10 @@ ${s==="&nbsp"?"":s}
                 <form data-ajax-form='resetOnSubmit' method='post'>
                     <input type='hidden' name='im_uid' value='%s'>
                     <input type='text' name='im_im' autocomplete='off'>
-                    <input type='hidden' name='act' value='blank'>
                 </form>
             </div>
-        `.replaceAll("%s",`${s}`),className:"im",resize:".ims",animate:!0,id:`im_${s}`}).create();g(o);let r=()=>{o.querySelector('form input[name="im_im"]')?.focus()};o.onclick=r,r(),n=o.querySelector(".ims");let a=getComputedStyle(n);return n.style.width=a.width,n.style.height=a.height,t&&globalSettings.soundIM&&L.play("imnewwindow"),n}function ge(s,e){if(!globalSettings.canIM){alert("You do not have permission to use this feature.");return}H.im(s,e,"",1,Date.now())}function Se({fromId:s,fromName:e,message:t,fromMe:n,timestamp:i}){je(e,t);let o=Oe({fromId:s,fromName:e,message:t});if(!t)return;let r=document.createElement("div"),a=t.startsWith("/me");a&&(r.className="action",t=t.substring(3),e=`***${e}`),r.classList.add(n?"you":"them"),n||document.querySelector(`#im_${s}`)?.classList.remove("offline"),r.innerHTML=`<a href='/profile/${n||s}' class='name'>${e}</a> ${a?"":": "}${t}`,r.dataset.timestamp=`${i}`;let l=o.scrollTop>o.scrollHeight-o.clientHeight-50;o.appendChild(r),l&&(o.scrollTop=o.scrollHeight),g(r),globalSettings.soundIM&&L.play("imbeep")}function Fe(s){let e=s?s.split(","):[],t=e.length===1?"":"s",n=e.length?" and <br>":"";return[e,t,n]}function Be(s){let e=s?s.split(","):[],n=(e?e.length:0)===1?"":"s";return[e,n]}var Z=class{whichone=0;boundCheckLocation;pids=[];tids=[];modb;constructor(){this.boundCheckLocation=()=>this.checkLocation(),Object.assign(H,{modcontrols_clearbox:this.destroyModControls.bind(this),modcontrols_move:this.showMoveControls.bind(this),modcontrols_postsync:this.postSync.bind(this)})}checkLocation(){let{whichone:e}=this,n=(e?/topic\/(\d+)/:/forum\/(\d+)/).exec(document.location.toString());n?this.moveTo(Number(n[1])):this.showMoveControls(e)}moveTo(e){let{whichone:t}=this;this.renderModControls(`<form method="post" data-ajax-form="true">
+        `.replaceAll("%s",`${s}`),className:"im",resize:".ims",animate:!0,id:`im_${s}`}).create();g(o);let r=()=>{o.querySelector('form input[name="im_im"]')?.focus()};o.onclick=r,r(),n=o.querySelector(".ims");let a=getComputedStyle(n);return n.style.width=a.width,n.style.height=a.height,t&&globalSettings.soundIM&&L.play("imnewwindow"),n}function ge(s,e){if(!globalSettings.canIM){alert("You do not have permission to use this feature.");return}H.im(s,e,"",1,Date.now())}function Se({fromId:s,fromName:e,message:t,fromMe:n,timestamp:i}){je(e,t);let o=Oe({fromId:s,fromName:e,message:t});if(!t)return;let r=document.createElement("div"),a=t.startsWith("/me");a&&(r.className="action",t=t.substring(3),e=`***${e}`),r.classList.add(n?"you":"them"),n||document.querySelector(`#im_${s}`)?.classList.remove("offline"),r.innerHTML=`<a href='/profile/${n||s}' class='name'>${e}</a> ${a?"":": "}${t}`,r.dataset.timestamp=`${i}`;let l=o.scrollTop>o.scrollHeight-o.clientHeight-50;o.appendChild(r),l&&(o.scrollTop=o.scrollHeight),g(r),globalSettings.soundIM&&L.play("imbeep")}function Fe(s){let e=s?s.split(","):[],t=e.length===1?"":"s",n=e.length?" and <br>":"";return[e,t,n]}function Be(s){let e=s?s.split(","):[],n=(e?e.length:0)===1?"":"s";return[e,n]}var Z=class{whichone=0;boundCheckLocation;pids=[];tids=[];modb;constructor(){this.boundCheckLocation=()=>this.checkLocation(),Object.assign(H,{modcontrols_clearbox:this.destroyModControls.bind(this),modcontrols_move:this.showMoveControls.bind(this),modcontrols_postsync:this.postSync.bind(this)})}checkLocation(){let{whichone:e}=this,n=(e?/topic\/(\d+)/:/forum\/(\d+)/).exec(document.location.toString());n?this.moveTo(Number(n[1])):this.showMoveControls(e)}moveTo(e){let{whichone:t}=this;this.renderModControls(`<form method="post" action="/modcontrols" data-ajax-form="true">
                 move ${t?"posts":"topics"} here?
-            <input type="hidden" name="act" value="modcontrols">
             <input type="hidden"
                 name="${t?"dop":"dot"}"
                 value="moveto">
@@ -26,30 +24,29 @@ ${s==="&nbsp"?"":s}
             <input type="submit" value="Yes">
             <input type="submit" name="cancel" value="Cancel" onclick="this.form.submitButton=this">
             </form>`)}renderModControls(e){this.modb=this.modb||document.querySelector("#modbox")||void 0,this.modb||(this.modb=document.createElement("div"),this.modb.id="modbox",document.body.appendChild(this.modb)),this.modb.style.display="block",this.modb.innerHTML=e,g(this.modb)}destroyModControls(){globalThis.removeEventListener("pushstate",this.boundCheckLocation),this.modb&&(this.modb.innerHTML="",this.modb.style.display="none")}togbutton(e){e.classList.toggle("selected")}postSync(e,t){let[n,i,o]=Fe(e),[r,a]=Be(t);if(this.tids=r,this.pids=n,!r.length&&!n.length){this.destroyModControls();return}let l=r.length?`
-            <select name='dot'>
-                <option value='delete'>Delete</option>
-                <option value='merge'>Merge</option>
-                <option value='move'>Move</option>
-                <option value='pin'>Pin</option>
-                <option value='unpin'>Unpin</option>
-                <option value='lock'>Lock</option>
-                <option value='unlock'>Unlock</option>
+            <select name="dot">
+                <option value="delete">Delete</option>
+                <option value="merge">Merge</option>
+                <option value="move">Move</option>
+                <option value="pin">Pin</option>
+                <option value="unpin">Unpin</option>
+                <option value="lock">Lock</option>
+                <option value="unlock">Unlock</option>
             </select> &nbsp; &nbsp;
             <strong>${r.length}</strong> topic${a}${o}`:"",d=n.length?`
-            <select name='dop'>
-                <option value='delete'>Delete</option>
-                <option value='move'>Move</option>
+            <select name="dop">
+                <option value="delete">Delete</option>
+                <option value="move">Move</option>
             </select> &nbsp; &nbsp;
             <strong>${n.length}</strong> post${i}`:"",c=n.length&&r.length?"<br>":" &nbsp; &nbsp; ",p=`
-        <form method='post' data-ajax-form='true'>
-            <input type='hidden' name='act' value='modcontrols'>
+        <form method="post" action="/modcontrols" data-ajax-form="true">
             ${l}
             ${d}
             ${c}
-            <input type='submit' value='Go'>
+            <input type="submit" value="Go">
             <input
-                name='cancel' type='submit'
-                onclick='this.form.submitButton=this;' value='Cancel'>
+                name="cancel" type="submit"
+                onclick="this.form.submitButton=this;" value="Cancel">
         </form>`;this.renderModControls(p)}showMoveControls(e){this.whichone=e,globalThis.addEventListener("pushstate",this.boundCheckLocation),this.renderModControls(`Ok, now browse to the ${this.whichone?"topic":"forum"} you want to move the ${this.whichone?`${this.pids.length} posts`:`${this.tids.length} topics`} to...`)}};function _e(s=200){let e=document.querySelector("#snow");if(e===null){e=document.createElement("div"),e.id="snow",Object.assign(e.style,{position:"fixed",top:0,left:0,zIndex:1});let t=document.createElement("style");t.appendChild(document.createTextNode(`
             .snowflake {
                 position: absolute;

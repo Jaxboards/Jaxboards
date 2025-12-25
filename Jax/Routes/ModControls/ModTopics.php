@@ -244,12 +244,11 @@ final readonly class ModTopics
             return;
         }
 
-        $page .= '<form method="post" data-ajax-form="true" '
+        $page .= '<form method="post" action="/modcontrols" data-ajax-form="true" '
             . 'style="padding:10px;">'
             . 'Which topic should the topics be merged into?<br>';
         $page .= Template::hiddenFormFields(
             [
-                'act' => 'modcontrols',
                 'dot' => 'merge',
             ],
         );

@@ -12,12 +12,12 @@ use Jax\Database\Database;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\IPAddress;
-use Jax\Jax;
 use Jax\Models\Forum;
 use Jax\Models\Group;
 use Jax\Models\Member;
 use Jax\Models\Message;
 use Jax\Request;
+use Jax\Template;
 use Jax\User;
 
 use function array_map;
@@ -38,7 +38,6 @@ final readonly class Members
         private DomainDefinitions $domainDefinitions,
         private FileSystem $fileSystem,
         private IPAddress $ipAddress,
-        private Jax $jax,
         private Page $page,
         private Request $request,
         private User $user,
@@ -150,7 +149,7 @@ final readonly class Members
             ) {
                 $page = $this->page->error('You do not have permission to edit this profile. ');
             } else {
-                $page .= $this->jax->hiddenFormFields(['mid' => (string) $member->id]);
+                $page .= Template::hiddenFormFields(['mid' => (string) $member->id]);
                 $page .= $this->inputText('Display Name:', 'displayName', $member->displayName);
                 $page .= $this->inputText('Username:', 'name', $member->name);
                 $page .= $this->inputText('Real Name:', 'full_name', $member->full_name);
@@ -308,8 +307,8 @@ final readonly class Members
         if ($this->request->post('submit') !== null) {
             $error = $this->preRegisterSubmit();
             $page .= $error
-             ? $this->page->error($error)
-             : $this->page->success('Member registered.');
+                ? $this->page->error($error)
+                : $this->page->success('Member registered.');
         }
 
         $page .= $this->page->parseTemplate('members/pre-register.html');

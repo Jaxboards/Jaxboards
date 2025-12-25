@@ -245,7 +245,8 @@ final class ModCPTest extends FeatureTestCase
         );
 
         $page = $this->go(new Request(
-            post: ['act' => 'modcontrols', 'dop' => 'delete'],
+            get: ['path' => '/modcontrols'],
+            post: ['dop' => 'delete'],
             cookie: ['PHPSESSID' => 'paratest'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
@@ -273,7 +274,8 @@ final class ModCPTest extends FeatureTestCase
         );
 
         $page = $this->go(new Request(
-            post: ['act' => 'modcontrols', 'dop' => 'delete'],
+            get: ['path' => '/modcontrols'],
+            post: ['dop' => 'delete'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -293,7 +295,8 @@ final class ModCPTest extends FeatureTestCase
         );
 
         $page = $this->go(new Request(
-            post: ['act' => 'modcontrols', 'dot' => 'delete'],
+            get: ['path' => '/modcontrols'],
+            post: ['dot' => 'delete'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -313,7 +316,8 @@ final class ModCPTest extends FeatureTestCase
         );
 
         $page = $this->go(new Request(
-            post: ['act' => 'modcontrols', 'dop' => 'move'],
+            get: ['path' => '/modcontrols'],
+            post: ['dop' => 'move'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -327,7 +331,8 @@ final class ModCPTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            post: ['act' => 'modcontrols', 'dot' => 'move'],
+            get: ['path' => '/modcontrols'],
+            post: ['dot' => 'move'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -347,7 +352,8 @@ final class ModCPTest extends FeatureTestCase
         );
 
         $page = $this->go(new Request(
-            post: ['act' => 'modcontrols', 'dop' => 'moveto', 'id' => (string) $tid],
+            get: ['path' => '/modcontrols'],
+            post: ['dop' => 'moveto', 'id' => (string) $tid],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -368,7 +374,8 @@ final class ModCPTest extends FeatureTestCase
         );
 
         $page = $this->go(new Request(
-            post: ['act' => 'modcontrols', 'dot' => 'moveto', 'id' => (string) $fid],
+            get: ['path' => '/modcontrols'],
+            post: ['dot' => 'moveto', 'id' => (string) $fid],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -388,7 +395,8 @@ final class ModCPTest extends FeatureTestCase
         );
 
         $page = $this->go(new Request(
-            post: ['act' => 'modcontrols', 'dot' => 'merge', 'id' => (string) $topic->id],
+            get: ['path' => '/modcontrols'],
+            post: ['dot' => 'merge', 'id' => (string) $topic->id],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -413,8 +421,8 @@ final class ModCPTest extends FeatureTestCase
         );
 
         $page = $this->go(new Request(
+            get: ['path' => '/modcontrols'],
             post: [
-                'act' => 'modcontrols',
                 'dot' => 'merge',
                 'ot' => (string) $topic->id,
             ],
@@ -445,7 +453,8 @@ final class ModCPTest extends FeatureTestCase
         );
 
         $page = $this->go(new Request(
-            post: ['act' => 'modcontrols', 'dot' => 'lock'],
+            get: ['path' => '/modcontrols'],
+            post: ['dot' => 'lock'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -469,7 +478,8 @@ final class ModCPTest extends FeatureTestCase
         $topic->update();
 
         $page = $this->go(new Request(
-            post: ['act' => 'modcontrols', 'dot' => 'unlock'],
+            get: ['path' => '/modcontrols'],
+            post: ['dot' => 'unlock'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -492,7 +502,8 @@ final class ModCPTest extends FeatureTestCase
         $topic->update();
 
         $page = $this->go(new Request(
-            post: ['act' => 'modcontrols', 'dot' => 'unpin'],
+            get: ['path' => '/modcontrols'],
+            post: ['dot' => 'unpin'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -511,7 +522,8 @@ final class ModCPTest extends FeatureTestCase
         );
 
         $page = $this->go(new Request(
-            post: ['act' => 'modcontrols', 'dot' => 'pin'],
+            get: ['path' => '/modcontrols'],
+            post: ['dot' => 'pin'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 

@@ -64,8 +64,6 @@ final readonly class Comments
         }
 
         foreach ($comments as $comment) {
-            $act = $this->request->asString->both('act');
-
             $deleteLink = '';
             if (
                 $this->user->getGroup()?->canModerate

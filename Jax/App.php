@@ -125,7 +125,7 @@ final readonly class App
             return;
         }
 
-        $this->session->act($this->request->asString->both('act'));
+        $this->session->act();
     }
 
     private function loadModules(): void
@@ -147,9 +147,7 @@ final readonly class App
 
     private function handleRouting(): void
     {
-        $action = mb_strtolower($this->request->asString->both('act') ?? '');
-
-        if ($action === '' && $this->request->both('module') !== null) {
+        if ($this->request->both('module') !== null) {
             return;
         }
 

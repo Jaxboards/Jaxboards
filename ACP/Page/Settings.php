@@ -7,12 +7,12 @@ namespace ACP\Page;
 use ACP\Page;
 use Jax\Config;
 use Jax\Database\Database;
-use Jax\Jax;
 use Jax\Models\Badge;
 use Jax\Models\BadgeAssociation;
 use Jax\Models\Member;
 use Jax\Models\Page as ModelsPage;
 use Jax\Request;
+use Jax\Template;
 use Jax\TextFormatting;
 
 use function _\keyBy;
@@ -29,7 +29,6 @@ final readonly class Settings
     public function __construct(
         private Config $config,
         private Database $database,
-        private Jax $jax,
         private Page $page,
         private Request $request,
         private TextFormatting $textFormatting,
@@ -175,9 +174,9 @@ final readonly class Settings
             );
         }
 
-        $hiddenFields = $this->jax->hiddenFormFields(
+        $hiddenFields = Template::hiddenFormFields(
             [
-                'act' => 'settings',
+                'act' => 'Settings',
                 'do' => 'pages',
             ],
         );
@@ -212,7 +211,7 @@ final readonly class Settings
             $pageRecord->upsert();
 
             $page .= $this->page->success(
-                "Page saved. Preview <a href='/?act={$pageurl}'>here</a>",
+                "Page saved. Preview <a href='/{$pageurl}'>here</a>",
             );
         }
 

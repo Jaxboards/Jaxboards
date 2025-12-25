@@ -88,7 +88,7 @@ final class CustomPageTest extends FeatureTestCase
 
         $this->actingAs('admin');
 
-        $page = $this->go('?act=custompage');
+        $page = $this->go('/custompage');
 
         DOMAssert::assertSelectEquals('#page', 'Hello World', 1, $page);
     }

@@ -1,33 +1,33 @@
-<form method="post" data-ajax-form="true">
-  %s
-  <div class="pages pages-top">%s</div>
-  <div class="forum-buttons-top">&nbsp;</div>
-  <table class="listing">
-    <tr>
-      <th class="center" style="width:5%%">
-        <input onChange="document.querySelectorAll('.check').forEach(checkbox => checkbox.checked = this.checked)"
-          title="Select All Messages" type="checkbox">
-      </th>
-      <th style="width:5%%">
-        Flag
-      </th>
-      <th style="width:45%%">
-        Title
-      </th>
-      <th style="width:20%%">
+<form action="/ucp/inbox" method="post" data-ajax-form="true">
+    <div class="pages pages-top">%s</div>
+    <div class="forum-buttons-top">&nbsp;</div>
+    <table class="listing">
+        <tr>
+            <th class="center" style="width:5%%">
+                <input
+                    onChange="document.querySelectorAll('.check').forEach(checkbox => checkbox.checked = this.checked)"
+                    title="Select All Messages" type="checkbox">
+            </th>
+            <th style="width:5%%">
+                Flag
+            </th>
+            <th style="width:45%%">
+                Title
+            </th>
+            <th style="width:20%%">
+                %s
+            </th>
+            <th style="width:25%%">
+                Date Sent
+            </th>
+        </tr>
         %s
-      </th>
-      <th style="width:25%%">
-        Date Sent
-      </th>
-    </tr>
-    %s
-    <tr>
-      <td>
-      </td>
-      <td colspan="4">
-        <input type="submit" value="Delete Messages" title="Delete Messages">
-      </td>
-    </tr>
-  </table>
+        <tr>
+            <td>
+            </td>
+            <td colspan="4">
+                <input type="submit" value="Delete Messages" title="Delete Messages">
+            </td>
+        </tr>
+    </table>
 </form>

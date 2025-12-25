@@ -700,7 +700,6 @@ final class Topic implements Route
 
         $hiddenfields = Template::hiddenFormFields(
             [
-                'act' => 'post',
                 'how' => 'edit',
                 'pid' => (string) $pid,
             ],

@@ -241,10 +241,9 @@ final class Post implements Route
 
         $submitLabel = $isEditing ? 'Edit Topic' : 'Post New Topic';
         $form = <<<HTML
-            <form method="post" data-ajax-form="true"
+            <form method="post" action="/post" data-ajax-form="true"
                             onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;">
             <div class="topicform">
-                <input type="hidden" name="act" value="post">
                 <input type="hidden" name="how" value="{$how}">
                 <input type="hidden" name="fid" value="{$fid}">
                 <input type="hidden" name="tid" value="{$tid}">
@@ -325,7 +324,6 @@ final class Post implements Route
         $page .= '<div id="post-preview">' . $this->postpreview . '</div>';
         $postData = $this->textFormatting->blockhtml($this->postData ?? '');
         $varsarray = [
-            'act' => 'post',
             'how' => 'fullpost',
         ];
         if ($this->pid !== 0) {
@@ -369,7 +367,7 @@ final class Post implements Route
 
         $form = <<<HTML
             <div class="postform">
-                <form method="post" data-ajax-form="true"
+                <form method="post" action="/post" data-ajax-form="true"
                     onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;"
                     enctype="multipart/form-data"
                     >

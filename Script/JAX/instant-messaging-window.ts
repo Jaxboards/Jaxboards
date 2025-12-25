@@ -50,7 +50,6 @@ function createMessagingWindow({
                 <form data-ajax-form='resetOnSubmit' method='post'>
                     <input type='hidden' name='im_uid' value='%s'>
                     <input type='text' name='im_im' autocomplete='off'>
-                    <input type='hidden' name='act' value='blank'>
                 </form>
             </div>
         `.replaceAll('%s', `${fromId}`),

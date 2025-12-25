@@ -469,12 +469,6 @@ final readonly class Inbox
 
         $html = $this->template->meta(
             'inbox-messages-listing',
-            Template::hiddenFormFields(
-                [
-                    'act' => 'ucp',
-                    'what' => 'inbox',
-                ],
-            ),
             $pages,
             $view === 'sent' ? 'Recipient' : 'Sender',
             $html,

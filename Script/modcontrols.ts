@@ -51,9 +51,8 @@ export default class ModControls {
     moveTo(id: number) {
         const { whichone } = this;
         this.renderModControls(
-            `<form method="post" data-ajax-form="true">
+            `<form method="post" action="/modcontrols" data-ajax-form="true">
                 move ${whichone ? 'posts' : 'topics'} here?
-            <input type="hidden" name="act" value="modcontrols">
             <input type="hidden"
                 name="${whichone ? 'dop' : 'dot'}"
                 value="moveto">
@@ -104,38 +103,37 @@ export default class ModControls {
 
         const topicOptions = tids.length
             ? `
-            <select name='dot'>
-                <option value='delete'>Delete</option>
-                <option value='merge'>Merge</option>
-                <option value='move'>Move</option>
-                <option value='pin'>Pin</option>
-                <option value='unpin'>Unpin</option>
-                <option value='lock'>Lock</option>
-                <option value='unlock'>Unlock</option>
+            <select name="dot">
+                <option value="delete">Delete</option>
+                <option value="merge">Merge</option>
+                <option value="move">Move</option>
+                <option value="pin">Pin</option>
+                <option value="unpin">Unpin</option>
+                <option value="lock">Lock</option>
+                <option value="unlock">Unlock</option>
             </select> &nbsp; &nbsp;
             <strong>${tids.length}</strong> topic${pluralThreads}${andPosts}`
             : '';
 
         const postOptions = pids.length
             ? `
-            <select name='dop'>
-                <option value='delete'>Delete</option>
-                <option value='move'>Move</option>
+            <select name="dop">
+                <option value="delete">Delete</option>
+                <option value="move">Move</option>
             </select> &nbsp; &nbsp;
             <strong>${pids.length}</strong> post${pluralPosts}`
             : '';
         const spacing = pids.length && tids.length ? '<br>' : ' &nbsp; &nbsp; ';
 
         const html = `
-        <form method='post' data-ajax-form='true'>
-            <input type='hidden' name='act' value='modcontrols'>
+        <form method="post" action="/modcontrols" data-ajax-form="true">
             ${topicOptions}
             ${postOptions}
             ${spacing}
-            <input type='submit' value='Go'>
+            <input type="submit" value="Go">
             <input
-                name='cancel' type='submit'
-                onclick='this.form.submitButton=this;' value='Cancel'>
+                name="cancel" type="submit"
+                onclick="this.form.submitButton=this;" value="Cancel">
         </form>`;
 
         this.renderModControls(html);

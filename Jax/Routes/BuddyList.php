@@ -34,13 +34,11 @@ final readonly class BuddyList implements Route
         private User $user,
         private UsersOnline $usersOnline,
     ) {
-        $buddylist = Template::hiddenFormFields(['act' => 'buddylist']);
         $this->template->addMeta(
             'buddylist-contacts',
             <<<HTML
                     <div class="contacts">
-                        <form data-ajax-form="true">
-                            {$buddylist}
+                        <form action="/buddylist" data-ajax-form="true">
                             <a href="%s" id="status" class="%s">
                             </a>
                             <input style="width:100%%;padding-left:20px;" type="text" name="status"
