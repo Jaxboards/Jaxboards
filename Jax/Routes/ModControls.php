@@ -23,7 +23,7 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function _\countBy;
+use function _\groupBy;
 use function array_map;
 use function arsort;
 use function count;
@@ -426,13 +426,24 @@ final readonly class ModControls implements Route
         $allSessions = ModelsSession::selectMany(
             'ORDER BY lastUpdate LIMIT 100',
         );
-        $countSessions = countBy($allSessions, static fn(ModelsSession $modelsSession): string => $modelsSession->useragent);
-        arsort($countSessions);
+
+        /** @var Array<string,ModelsSession[]> **/
+        $groupedSessions = groupBy($allSessions, static fn(ModelsSession $modelsSession): string => $modelsSession->useragent);
+        arsort($groupedSessions);
 
         $rows = '';
-        foreach ($countSessions as $userAgent => $count) {
+        foreach ($groupedSessions as $userAgent => $sessions) {
+            $count = count($sessions);
+
+            $ips = implode('<br>', array_map(function (ModelsSession $session) {
+                $ip = $this->ipAddress->asHumanReadable($session->ip);
+                $geo = $this->geoLocate->lookup($ip);
+                $flag = $geo ? $this->geoLocate->getFlagEmoji($geo->country->isoCode) : null;
+                return "{$ip} {$flag}";
+            }, $sessions));
+
             $rows .= <<<HTML
-                <tr><td>{$userAgent}</td><td>{$count}</td></tr>
+                <tr><td>{$userAgent}</td><td>{$count}</td><td>{$ips}</td></tr>
                 HTML;
         }
 
@@ -440,7 +451,7 @@ final readonly class ModControls implements Route
             'Most Active User Agents',
             <<<HTML
                 <table class="onlinesessions">
-                    <tr><th>User Agent</th><th>Count</th></tr>
+                    <tr><th>User Agent</th><th>Count</th><th>IPs</th></tr>
                     {$rows}
                 </table>
                 HTML,
