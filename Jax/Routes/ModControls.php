@@ -94,7 +94,8 @@ final readonly class ModControls implements Route
             }),
             'iptools' => $this->showModCP($this->ipTools()),
             'onlineSessions' => $this->showModCP($this->showOnlineSessions()),
-            default => $this->showModCP(),
+            $dot === null && $dop === null => $this->showModCP(),
+            default => null,
         };
     }
 
