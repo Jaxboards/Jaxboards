@@ -89,7 +89,7 @@ use function json_encode;
 #[CoversClass(TextFormatting::class)]
 #[CoversClass(TextRules::class)]
 #[CoversClass(User::class)]
-final class ModCPTest extends FeatureTestCase
+final class ModControlsTest extends FeatureTestCase
 {
     protected function setUp(): void
     {
@@ -179,6 +179,23 @@ final class ModCPTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Last 5 shouts:', 1, $page);
         DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Last 5 posts:', 1, $page);
         DOMAssert::assertSelectEquals('.modcppage .minibox .content', '--No Data--', 3, $page);
+    }
+
+    public function testOnlineSessions(): void
+    {
+        $this->actingAs('admin');
+
+        $session = new ModelsSession();
+        $session->useragent = 'Firefox';
+        $session->ip = inet_pton('64.233.160.0');
+        $session->insert();
+
+        $page = $this->go(new Request(
+            get: ['path' => '/modcontrols/onlineSessions'],
+        ));
+
+        DOMAssert::assertSelectEquals('.onlinesessions td', 'Firefox', 1, $page);
+        DOMAssert::assertSelectRegExp('.onlinesessions td', '/64.233.160.0/', 1, $page);
     }
 
     public function testAddOriginalPostToModerate(): void

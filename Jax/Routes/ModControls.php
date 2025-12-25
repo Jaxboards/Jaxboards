@@ -437,6 +437,9 @@ final readonly class ModControls implements Route
 
             $ips = implode('<br>', array_map(function (ModelsSession $session) {
                 $ip = $this->ipAddress->asHumanReadable($session->ip);
+
+                if ($ip === '') return;
+
                 $geo = $this->geoLocate->lookup($ip);
                 $flag = $geo ? $this->geoLocate->getFlagEmoji($geo->country->isoCode) : null;
                 return "{$ip} {$flag}";
