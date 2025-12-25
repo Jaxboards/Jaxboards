@@ -116,6 +116,21 @@ final class Template
         $this->themePath = $this->domainDefinitions->getDefaultThemePath();
     }
 
+    /**
+     * Utility method for generating input[hidden].
+     *
+     * @param array<string,string> $fields
+     */
+    public static function hiddenFormFields(array $fields): string
+    {
+        $html = '';
+        foreach ($fields as $key => $value) {
+            $html .= "<input type='hidden' name='{$key}' value='{$value}'>";
+        }
+
+        return $html;
+    }
+
     public function addMeta(string $meta, string $content): void
     {
         $this->metaDefs[$meta] = $content;
@@ -135,20 +150,6 @@ final class Template
         }
 
         $this->parts[$part] .= $content;
-    }
-
-    /**
-     * Utility method for generating input[hidden]
-     * @param array<string,string> $fields
-     */
-    public static function hiddenFormFields(array $fields): string
-    {
-        $html = '';
-        foreach ($fields as $key => $value) {
-            $html .= "<input type='hidden' name='{$key}' value='{$value}'>";
-        }
-
-        return $html;
     }
 
     public function load(string $file): void

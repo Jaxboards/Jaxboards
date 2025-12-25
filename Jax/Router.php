@@ -38,6 +38,7 @@ use function preg_match;
 use function preg_replace;
 use function preg_replace_callback;
 use function str_contains;
+use function trim;
 
 final class Router
 {

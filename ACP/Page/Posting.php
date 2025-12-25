@@ -48,7 +48,7 @@ final readonly class Posting
     {
         $page = '';
 
-        // @var array<string,TextRule> $badWords
+        /** @var array<string,TextRule> $badWords */
         $badWords = keyBy(
             TextRule::selectMany("WHERE `type`='badword'"),
             static fn($textRule) => $textRule->needle,
@@ -101,7 +101,7 @@ final readonly class Posting
                     'posting/word-filter-row.html',
                     [
                         'filter' => $textRule->needle,
-                        'filter_url_encoded' => rawurlencode($textRule->needle),
+                        'filter_url_encoded' => rawurlencode((string) $textRule->needle),
                         'result_code' => $this->textFormatting->blockhtml($textRule->replacement),
                     ],
                 );
@@ -138,7 +138,7 @@ final readonly class Posting
             );
         }
 
-        // @var array<TextRule> $emoticons
+        /** @var array<TextRule> $emoticons */
         $emoticons = keyBy(
             TextRule::selectMany("WHERE `type`='emote'"),
             static fn($textRule) => $textRule->needle,
@@ -190,7 +190,7 @@ final readonly class Posting
                     'posting/emoticon-row.html',
                     [
                         'emoticon' => $emoticon->needle,
-                        'emoticon_url_encoded' => rawurlencode($emoticon->needle),
+                        'emoticon_url_encoded' => rawurlencode((string) $emoticon->needle),
                         'smiley_url' => $this->textFormatting->blockhtml($emoticon->replacement),
                     ],
                 );
