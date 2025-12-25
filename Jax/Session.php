@@ -318,9 +318,11 @@ final class Session
                 $href .= "{$separator}sessid={$this->modelsSession->id}";
             }
 
-            if ($href !== '') {
-                $link->setAttribute('href', $href);
+            if ($href === '') {
+                continue;
             }
+
+            $link->setAttribute('href', $href);
         }
 
         libxml_clear_errors();
