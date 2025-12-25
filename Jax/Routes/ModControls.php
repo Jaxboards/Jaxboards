@@ -448,7 +448,12 @@ final readonly class ModControls implements Route
                     ? $this->geoLocate->getFlagEmoji($geo->country->isoCode)
                     : null;
 
-                return "{$ip} {$flag}";
+                $ipToolsURL = $this->router->url('modcontrols', [
+                    'do' => 'iptools',
+                    'ip' => $ip,
+                ]);
+
+                return "<a href=\"{$ipToolsURL}\">{$ip} {$flag}</a>";
             }, $sessions));
 
             $rows .= <<<HTML
