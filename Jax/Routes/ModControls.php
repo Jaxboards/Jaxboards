@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Routes;
 
 use Carbon\Carbon;
+use GeoIp2\Model\City;
 use Jax\Config;
 use Jax\GeoLocate;
 use Jax\Interfaces\Route;
@@ -427,7 +428,7 @@ final readonly class ModControls implements Route
             'ORDER BY lastUpdate LIMIT 100',
         );
 
-        /** @var Array<string,ModelsSession[]> **/
+        /** @var array<string,ModelsSession[]> */
         $groupedSessions = groupBy($allSessions, static fn(ModelsSession $modelsSession): string => $modelsSession->useragent);
         arsort($groupedSessions);
 
@@ -435,13 +436,18 @@ final readonly class ModControls implements Route
         foreach ($groupedSessions as $userAgent => $sessions) {
             $count = count($sessions);
 
-            $ips = implode('<br>', array_map(function (ModelsSession $session): string {
-                $ip = $this->ipAddress->asHumanReadable($session->ip);
+            $ips = implode('<br>', array_map(function (ModelsSession $modelsSession): string {
+                $ip = $this->ipAddress->asHumanReadable($modelsSession->ip);
 
-                if ($ip === '') return '';
+                if ($ip === '') {
+                    return '';
+                }
 
                 $geo = $this->geoLocate->lookup($ip);
-                $flag = $geo ? $this->geoLocate->getFlagEmoji($geo->country->isoCode) : null;
+                $flag = $geo instanceof City
+                    ? $this->geoLocate->getFlagEmoji($geo->country->isoCode)
+                    : null;
+
                 return "{$ip} {$flag}";
             }, $sessions));
 

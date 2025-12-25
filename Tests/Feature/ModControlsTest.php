@@ -49,6 +49,7 @@ use Tests\FeatureTestCase;
 use function array_find;
 use function array_key_exists;
 use function implode;
+use function inet_pton;
 use function json_decode;
 use function json_encode;
 
