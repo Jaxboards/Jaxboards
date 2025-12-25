@@ -101,9 +101,8 @@ final class PostTest extends FeatureTestCase
         $this->actingAs('member');
 
         $page = $this->go(new Request(
-            get: ['act' => 'post', 'fid' => '1'],
+            get: ['path' => '/post', 'fid' => '1'],
             post: [
-                'act' => 'post',
                 'how' => 'newtopic',
                 'fid' => '1',
                 'tid' => '',
@@ -156,9 +155,8 @@ final class PostTest extends FeatureTestCase
 
 
         $page = $this->go(new Request(
-            get: ['act' => 'post', 'tid' => '1'],
+            get: ['path' => '/post', 'tid' => '1'],
             post: [
-                'act' => 'post',
                 'how' => 'fullpost',
                 'fid' => '',
                 'tid' => '1',
@@ -183,9 +181,8 @@ final class PostTest extends FeatureTestCase
         $this->actingAs('member');
 
         $page = $this->go(new Request(
-            get: ['act' => 'post', 'tid' => '1'],
+            get: ['path' => '/post', 'tid' => '1'],
             post: [
-                'act' => 'post',
                 'how' => 'fullpost',
                 'fid' => '',
                 'tid' => '1',
@@ -214,9 +211,8 @@ final class PostTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['act' => 'post', 'how' => 'edit', 'tid' => '1', 'pid' => '1'],
+            get: ['path' => '/post', 'how' => 'edit', 'tid' => '1', 'pid' => '1'],
             post: [
-                'act' => 'post',
                 'how' => 'edit',
                 'fid' => '1',
                 'tid' => '1',

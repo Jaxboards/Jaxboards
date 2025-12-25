@@ -209,8 +209,6 @@ final readonly class ModControls implements Route
 
         $hiddenFormFields = $this->jax->hiddenFormFields(
             [
-                'act' => 'modcontrols',
-                'do' => 'emem',
                 'mid' => (string) $member->id,
                 'submit' => 'save',
             ],
@@ -270,8 +268,6 @@ final readonly class ModControls implements Route
     {
         $hiddenFormFields = $this->jax->hiddenFormFields(
             [
-                'act' => 'modcontrols',
-                'do' => 'emem',
                 'submit' => 'showform',
             ],
         );
@@ -306,15 +302,8 @@ final readonly class ModControls implements Route
             $this->ipAddress->unBan($ipAddress);
         }
 
-        $hiddenFields = $this->jax->hiddenFormFields(
-            [
-                'act' => 'modcontrols',
-                'do' => 'iptools',
-            ],
-        );
         $form = <<<EOT
             <form method='post' data-ajax-form='true'>
-                {$hiddenFields}
                 <label>IP:
                 <input type='text' name='ip' title="Enter IP address" value='{$ipAddress}'></label>
                 <input type='submit' value='Submit' title="Search for IP">
@@ -325,8 +314,6 @@ final readonly class ModControls implements Route
 
             $hiddenFields = $this->jax->hiddenFormFields(
                 [
-                    'act' => 'modcontrols',
-                    'do' => 'iptools',
                     'ip' => $ipAddress,
                 ],
             );

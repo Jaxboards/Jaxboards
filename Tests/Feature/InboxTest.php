@@ -126,7 +126,7 @@ final class InboxTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['act' => 'ucp', 'what' => 'inbox'],
+            get: ['path' => '/ucp/inbox'],
             post: ['dmessage' => ['1']],
         ));
 
@@ -138,7 +138,7 @@ final class InboxTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['act' => 'ucp', 'what' => 'inbox', 'view' => 'compose'],
+            get: ['path' => '/ucp/inbox', 'view' => 'compose'],
             post: [
                 'submit' => '1',
                 'mid' => '1',

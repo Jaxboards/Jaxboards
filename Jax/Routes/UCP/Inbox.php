@@ -216,8 +216,6 @@ final readonly class Inbox
             'inbox-composeform',
             $this->jax->hiddenFormFields(
                 [
-                    'act' => 'ucp',
-                    'view' => 'compose',
                     'submit' => '1',
                     'what' => 'inbox',
                 ],
@@ -384,7 +382,6 @@ final readonly class Inbox
             $otherMember?->usertitle,
             $this->jax->hiddenFormFields(
                 [
-                    'act' => 'ucp',
                     'messageid' => (string) $message->id,
                     'sender' => (string) $message->from,
                     'what' => 'inbox',

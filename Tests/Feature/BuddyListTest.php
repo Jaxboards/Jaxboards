@@ -91,7 +91,7 @@ final class BuddyListTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['act' => 'buddylist'],
+            get: ['path' => '/buddylist'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -109,7 +109,7 @@ final class BuddyListTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['act' => 'buddylist', 'add' => '1'],
+            get: ['path' => '/buddylist', 'add' => '1'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -133,7 +133,7 @@ final class BuddyListTest extends FeatureTestCase
         $this->actingAs('admin', ['friends' => '1']);
 
         $page = $this->go(new Request(
-            get: ['act' => 'buddylist', 'remove' => '1'],
+            get: ['path' => '/buddylist', 'remove' => '1'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -155,7 +155,7 @@ final class BuddyListTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['act' => 'buddylist', 'block' => '1'],
+            get: ['path' => '/buddylist', 'block' => '1'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -179,7 +179,7 @@ final class BuddyListTest extends FeatureTestCase
         $this->actingAs('admin', ['enemies' => '1']);
 
         $page = $this->go(new Request(
-            get: ['act' => 'buddylist', 'unblock' => '1'],
+            get: ['path' => '/buddylist', 'unblock' => '1'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 

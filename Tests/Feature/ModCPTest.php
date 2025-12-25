@@ -129,7 +129,7 @@ final class ModCPTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['act' => 'modcontrols', 'do' => 'emem'],
+            get: ['path' => '/modcontrols/emem'],
             post: ['mid' => '1', 'submit' => 'showform'],
         ));
 
@@ -141,7 +141,7 @@ final class ModCPTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['act' => 'modcontrols', 'do' => 'emem'],
+            get: ['path' => '/modcontrols/emem'],
             post: [
                 'mid' => '1',
                 'displayName' => 'New Name',
@@ -169,7 +169,7 @@ final class ModCPTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['act' => 'modcontrols', 'do' => 'iptools'],
+            get: ['path' => '/modcontrols/iptools'],
             post: ['ip' => '::1'],
         ));
 
@@ -186,7 +186,7 @@ final class ModCPTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['act' => 'modcontrols', 'do' => 'modp', 'pid' => '1'],
+            get: ['path' => '/modcontrols/modp', 'pid' => '1'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -205,7 +205,7 @@ final class ModCPTest extends FeatureTestCase
         $pid = (string) $this->insertReply()->id;
 
         $page = $this->go(new Request(
-            get: ['act' => 'modcontrols', 'do' => 'modp', 'pid' => $pid],
+            get: ['path' => '/modcontrols/modp', 'pid' => $pid],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 
@@ -222,7 +222,7 @@ final class ModCPTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go(new Request(
-            get: ['act' => 'modcontrols', 'do' => 'modt', 'tid' => '1'],
+            get: ['path' => '/modcontrols/modt', 'tid' => '1'],
             server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
         ));
 

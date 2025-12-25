@@ -102,7 +102,7 @@ final class UCPTest extends FeatureTestCase
         $this->actingAs('member');
 
         $page = $this->go(new Request(
-            get: ['act' => 'ucp'],
+            get: ['path' => '/ucp'],
             post: ['ucpnotepad' => 'howdy'],
         ));
 
@@ -123,7 +123,7 @@ final class UCPTest extends FeatureTestCase
         $this->actingAs('member');
 
         $page = $this->go(new Request(
-            get: ['act' => 'ucp', 'what' => 'signature'],
+            get: ['path' => '/ucp', 'what' => 'signature'],
             post: ['changesig' => 'I made jaxboards'],
         ));
 
@@ -153,7 +153,7 @@ final class UCPTest extends FeatureTestCase
         $this->actingAs('member');
 
         $page = $this->go(new Request(
-            get: ['act' => 'ucp', 'what' => 'email'],
+            get: ['path' => '/ucp', 'what' => 'email'],
             post: ['email' => 'jaxboards@jaxboards.com', 'submit' => 'true'],
         ));
 
@@ -169,7 +169,7 @@ final class UCPTest extends FeatureTestCase
         ]);
 
         $page = $this->go(new Request(
-            get: ['act' => 'ucp', 'what' => 'pass'],
+            get: ['path' => '/ucp', 'what' => 'pass'],
             post: [
                 'curpass' => 'oldpass',
                 'newpass1' => 'newpass',
@@ -189,7 +189,7 @@ final class UCPTest extends FeatureTestCase
         ]);
 
         $page = $this->go(new Request(
-            get: ['act' => 'ucp', 'what' => 'pass'],
+            get: ['path' => '/ucp', 'what' => 'pass'],
             post: [
                 'curpass' => 'wrong',
                 'newpass1' => 'newpass',
@@ -233,7 +233,7 @@ final class UCPTest extends FeatureTestCase
         $formData = $this->getProfileFormData();
 
         $page = $this->go(new Request(
-            get: ['act' => 'ucp', 'what' => 'profile'],
+            get: ['path' => '/ucp', 'what' => 'profile'],
             post: $formData,
         ));
 
@@ -259,8 +259,7 @@ final class UCPTest extends FeatureTestCase
         $this->assertEquals('http://google.com', $member->website);
 
         $birthdate = $this->container->get(Date::class)
-            ->datetimeAsCarbon($member->birthdate)
-        ;
+            ->datetimeAsCarbon($member->birthdate);
 
         $this->assertEquals(1, $birthdate->month);
         $this->assertEquals(1, $birthdate->day);
@@ -281,7 +280,7 @@ final class UCPTest extends FeatureTestCase
         $this->actingAs('member');
 
         $page = $this->go(new Request(
-            get: ['act' => 'ucp', 'what' => 'avatar'],
+            get: ['path' => '/ucp', 'what' => 'avatar'],
             post: ['changedava' => 'http://jaxboards.com'],
         ));
 
@@ -302,7 +301,7 @@ final class UCPTest extends FeatureTestCase
         $this->actingAs('member');
 
         $page = $this->go(new Request(
-            get: ['act' => 'ucp', 'what' => 'sounds'],
+            get: ['path' => '/ucp', 'what' => 'sounds'],
             post: [
                 // clear all checkboxes
                 'submit' => 'true',
@@ -328,7 +327,7 @@ final class UCPTest extends FeatureTestCase
         $this->actingAs('member');
 
         $page = $this->go(new Request(
-            get: ['act' => 'ucp', 'what' => 'board'],
+            get: ['path' => '/ucp', 'what' => 'board'],
             post: [
                 'skin' => '1',
                 // clear all checkboxes
