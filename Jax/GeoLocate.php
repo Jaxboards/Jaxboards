@@ -20,4 +20,20 @@ final readonly class GeoLocate
     {
         return $this->cityReader->city($ip);
     }
+
+    public function getFlagEmoji(string $isoCode): string
+    {
+        $asciiA = 65;
+        $letterA = 127462;
+
+        $letters = array_map(
+            fn($letter) => mb_chr(ord($letter) - $asciiA + $letterA),
+            [
+                $isoCode[0],
+                $isoCode[1],
+            ]
+        );
+
+        return implode('', $letters);
+    }
 }
