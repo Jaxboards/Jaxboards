@@ -104,10 +104,10 @@ final class BoardIndex implements Route
      */
     private function fetchIDXForums(): array
     {
-        $forums = Forum::selectMany(
-            'WHERE `path` = "" '
-                . 'ORDER BY `order`, `title` ASC',
-        );
+        $forums = Forum::selectMany(<<<'SQL'
+            WHERE `path` = ""
+            ORDER BY `order`, `title` ASC
+        SQL);
 
         return array_filter(
             $forums,
@@ -152,7 +152,7 @@ final class BoardIndex implements Route
                         $this->router->url('forum', ['id' => $forum->id, 'slug' => $this->textFormatting->slugify($forum->title)]),
                         $forum->title,
                         $this->textFormatting->blockhtml($forum->subtitle),
-                    ) . $this->template->render('idx/idx-subforum-splitter');
+                    ) . $this->template->meta('idx/subforum-splitter');
                 }
             }
 
@@ -193,7 +193,7 @@ final class BoardIndex implements Route
         }
 
         $page .= $this->template->render(
-            'idx/idx-tools',
+            'idx/tools',
             [
                 'markReadURL' => $this->router->url('index', ['markread' => '1']),
                 'staffURL' => $this->router->url('members', ['filter' => 'staff', 'sortby' => 'g_title'])
@@ -235,7 +235,7 @@ final class BoardIndex implements Route
     /**
      * @param string $modids a comma separated list
      */
-    private function getmods(string $modids): string
+    private function getMods(string $modids): string
     {
         static $moderatorinfo = null;
 
@@ -273,6 +273,7 @@ final class BoardIndex implements Route
         foreach ($forums as $forum) {
             $read = $this->isForumRead($forum);
             $subforumHTML = '';
+
             if (
                 $forum->showSubForums >= 1
                 && array_key_exists($forum->id, $this->subforums)
@@ -294,7 +295,7 @@ final class BoardIndex implements Route
                     nl2br($forum->subtitle, false),
                     'Redirects: ' . $forum->redirects,
                     $this->template->meta('icon-redirect')
-                        ?: $this->template->meta('idx-icon-redirect'),
+                        ?: $this->template->render('idx/icon-redirect'),
                 );
             } else {
                 $forumId = $forum->id;
@@ -304,10 +305,10 @@ final class BoardIndex implements Route
                 $linkText = $read
                     ? (
                         $this->template->meta('icon-read')
-                        ?: $this->template->meta('idx-icon-read')
+                        ?: $this->template->render('idx/icon-read')
                     ) : (
                         $this->template->meta('icon-unread')
-                        ?: $this->template->meta('idx-icon-unread')
+                        ?: $this->template->render('idx/icon-unread')
                     );
                 $table .= $this->template->meta(
                     'idx-row',
@@ -337,7 +338,7 @@ final class BoardIndex implements Route
                     $forum->showLedBy && $forum->mods
                         ? $this->template->meta(
                             'idx-ledby-wrapper',
-                            $this->getmods($forum->mods),
+                            $this->getMods($forum->mods),
                         ) : '',
                     $this->router->url('forum', [
                         'id' => $forum->id,
@@ -372,7 +373,7 @@ final class BoardIndex implements Route
         $legendGroups = Group::selectMany('WHERE `legend`=1 ORDER BY `title`');
 
         return $this->template->render(
-            'idx/idx-stats',
+            'idx/stats',
             [
                 'usersOnline' => $usersOnline,
                 'usersOnlineCount' => $usersOnlineCount,
