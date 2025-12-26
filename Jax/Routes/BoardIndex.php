@@ -485,23 +485,20 @@ final class BoardIndex implements Route
 
     private function formatLastPost(Forum $forum, ?Member $member): string
     {
-        return $this->template->meta(
-            'idx-row-lastpost',
-            $this->router->url('topic', [
-                'id' => $forum->lastPostTopic,
-                'getlast' => '1',
-                'slug' => $this->textFormatting->slugify($forum->lastPostTopicTitle),
-            ]),
-            $this->textFormatting->wordfilter($forum->lastPostTopicTitle) ?: '- - - - -',
-            $member !== null ? $this->template->meta(
-                'user-link',
-                $member->id,
-                $member->groupID,
-                $member->displayName,
-            ) : 'None',
-            $forum->lastPostDate !== null
-                ? $this->date->autoDate($forum->lastPostDate)
-                : '- - - - -',
+        return $this->template->render(
+            'idx/row-lastpost',
+            [
+                'topicURL' => $this->router->url('topic', [
+                    'id' => $forum->lastPostTopic,
+                    'getlast' => '1',
+                    'slug' => $this->textFormatting->slugify($forum->lastPostTopicTitle),
+                ]),
+                'lastPostTitle' => $this->textFormatting->wordfilter($forum->lastPostTopicTitle),
+                'lastPostUser' => $member,
+                'lastPostDate' => $forum->lastPostDate !== null
+                    ? $this->date->autoDate($forum->lastPostDate)
+                    : null,
+            ]
         );
     }
 

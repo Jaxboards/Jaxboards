@@ -1,0 +1,20 @@
+Last Post:
+<a href="{{ topicURL }}">
+    {%- if lastPostTitle -%}
+        {{- lastPostTitle -}}
+    {%- else -%}
+        - - - - -
+    {%- endif -%}
+</a><br>
+By
+{% if lastPostUser -%}
+    {%- include 'global/user-link.html.twig' with { user: lastPostUser } only -%}
+{%- else -%}
+    None
+{%- endif -%},
+
+{% if lastPostDate -%}
+    {{- lastPostDate|raw -}}
+{%- else -%}
+    - - - - -s
+{%- endif -%}
