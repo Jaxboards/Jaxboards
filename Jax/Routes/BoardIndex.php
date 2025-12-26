@@ -154,7 +154,7 @@ final class BoardIndex implements Route
                         $this->router->url('forum', ['id' => $forum->id, 'slug' => $this->textFormatting->slugify($forum->title)]),
                         $forum->title,
                         $this->textFormatting->blockhtml($forum->subtitle),
-                    ) . $this->template->meta('idx-subforum-splitter');
+                    ) . $this->template->render('idx/idx-subforum-splitter');
                 }
             }
 
@@ -194,10 +194,12 @@ final class BoardIndex implements Route
             );
         }
 
-        $page .= $this->template->meta(
-            'idx-tools',
-            $this->router->url('index', ['markread' => '1']),
-            $this->router->url('members', ['filter' => 'staff', 'sortby' => 'g_title']),
+        $page .= $this->template->render(
+            'idx/idx-tools',
+            [
+                'markReadURL' => $this->router->url('index', ['markread' => '1']),
+                'staffURL' => $this->router->url('members', ['filter' => 'staff', 'sortby' => 'g_title'])
+            ]
         );
 
         $page .= $this->getBoardStats();

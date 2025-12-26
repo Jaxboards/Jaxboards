@@ -135,7 +135,7 @@ final class Page
         $this->append('PATH', $this->buildPath());
         $this->append('TITLE', $this->getPageTitle());
 
-        return $this->session->addSessId($this->template->render());
+        return $this->session->addSessId($this->template->out());
     }
 
     public function collapseBox(

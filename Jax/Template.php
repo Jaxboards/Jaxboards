@@ -216,6 +216,11 @@ final class Template
         return $formatted;
     }
 
+    public function render($name, array $context = []): string
+    {
+        return $this->twig->render($name . '.html.twig', $context);
+    }
+
     public function metaExists(string $meta): bool
     {
         return array_key_exists($meta, $this->userMetaDefs)
@@ -227,7 +232,7 @@ final class Template
         $this->parts[$part] = $content;
     }
 
-    public function render(): string
+    public function out(): string
     {
         $header = ['CSS', 'SCRIPT', 'TITLE'];
 
