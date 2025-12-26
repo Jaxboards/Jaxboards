@@ -19,6 +19,11 @@ final class UserOnline
 
     public int $lastUpdate;
 
+    public function getLastOnline(): int
+    {
+        return $this->hide  ? $this->readDate : $this->lastUpdate;
+    }
+
     public string $lastOnlineRelative;
 
     public string $location;

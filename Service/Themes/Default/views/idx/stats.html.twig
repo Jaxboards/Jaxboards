@@ -47,9 +47,9 @@
                 {% for user in usersOnlineToday %}
                     <a href="{{ user.profileURL }}"
                     class="user{{ user.uid }} mgroup{{ user.groupID }} {% if user.birthday %}birthday{% endif %}"
-                    title="Last online: {$lastOnlineDate}"
+                    title="Last online: {{ user.lastOnlineRelative }}"
                     data-use-tooltip="true"
-                    data-last-online="{$lastOnline}"
+                    data-last-online="{{ user.lastOnline }}"
                     >{{ user.name }}</a>{% if not loop.last %}, {% endif %}
                 {% endfor %}
 
