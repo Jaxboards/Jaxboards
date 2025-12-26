@@ -460,7 +460,6 @@ textarea {
     font:
         1.4rem Arial,
         sans-serif;
-    max-width: 700px;
     flex: 1;
     min-width: 200px;
 }
@@ -841,7 +840,7 @@ textarea {
 #container {
     background: #fff;
     margin: 5px auto;
-    max-width: 940px;
+    max-width: 1280px;
     text-align: left;
     box-shadow:
         rgb(0 0 0 / 20%) -5px 0 2px,
