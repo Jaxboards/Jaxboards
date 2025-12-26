@@ -256,11 +256,12 @@ final class Template
     public function setThemePath(string $themePath): void
     {
         $this->themePath = $themePath;
-        $paths = [$this->fileSystem->pathFromRoot($this->themePath, 'views')];
 
-        $skinViews = $this->fileSystem->pathFromRoot($this->domainDefinitions->getDefaultThemePath(), 'views');
-        if ($this->fileSystem->getFileInfo($skinViews)->isDir()) {
-            $paths[] = $skinViews;
+        $paths = [$this->fileSystem->pathFromRoot($this->domainDefinitions->getDefaultThemePath(), 'views')];
+
+        $themeViews = $this->fileSystem->pathFromRoot($this->themePath, 'views');
+        if ($this->fileSystem->getFileInfo($themeViews)->isDir()) {
+            $paths[] = $themeViews;
         }
 
         $this->filesystemLoader->setPaths($paths);
