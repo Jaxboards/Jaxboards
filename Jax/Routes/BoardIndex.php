@@ -498,7 +498,7 @@ final class BoardIndex implements Route
                 'lastPostDate' => $forum->lastPostDate !== null
                     ? $this->date->autoDate($forum->lastPostDate)
                     : null,
-            ]
+            ],
         );
     }
 
