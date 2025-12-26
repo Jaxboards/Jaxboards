@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+
 use function array_key_exists;
 use function array_keys;
 use function array_map;
@@ -108,12 +111,21 @@ final class Template
      */
     private array $vars = [];
 
+    private Environment $twig;
+
+    private FilesystemLoader $loader;
+
     public function __construct(
         private readonly DebugLog $debugLog,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly FileSystem $fileSystem,
     ) {
-        $this->themePath = $this->domainDefinitions->getDefaultThemePath();
+
+        $this->loader = new FilesystemLoader();
+        $this->twig = new Environment($this->loader, [
+            'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
+        ]);
+        $this->setThemePath($this->domainDefinitions->getDefaultThemePath());
     }
 
     /**
@@ -239,6 +251,12 @@ final class Template
     public function setThemePath(string $themePath): void
     {
         $this->themePath = $themePath;
+        $this->loader->setPaths(
+            [
+                $this->fileSystem->pathFromRoot($this->themePath, 'views'),
+                $this->fileSystem->pathJoin($this->domainDefinitions->getDefaultThemePath(), 'views'),
+            ]
+        );
     }
 
     public function has(string $part): false|int
