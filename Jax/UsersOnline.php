@@ -36,7 +36,8 @@ final class UsersOnline
     ) {
         $this->idleTimestamp = Carbon::now('UTC')
             ->subSeconds($this->serviceConfig->getSetting('timetoidle') ?? 300)
-            ->getTimestamp();
+            ->getTimestamp()
+        ;
         $this->fetchUsersOnline();
     }
 
@@ -81,6 +82,7 @@ final class UsersOnline
 
         return array_map(function (UserOnline $userOnline): UserOnline {
             $userOnline->lastOnlineRelative = $this->date->relativeTime($userOnline->getLastOnline());
+
             return $userOnline;
         }, $this->sessionsToUsersOnline($sessions));
     }

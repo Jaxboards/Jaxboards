@@ -19,11 +19,6 @@ final class UserOnline
 
     public int $lastUpdate;
 
-    public function getLastOnline(): int
-    {
-        return $this->hide  ? $this->readDate : $this->lastUpdate;
-    }
-
     public string $lastOnlineRelative;
 
     public string $location;
@@ -39,6 +34,11 @@ final class UserOnline
     public string $status;
 
     public int|string|null $uid = null;
+
+    public function getLastOnline(): int
+    {
+        return $this->hide ? $this->readDate : $this->lastUpdate;
+    }
 }
 
 // phpcs:enable
