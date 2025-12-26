@@ -10,7 +10,7 @@
     bootstrap="Tests/bootstrap.php"
     colors="true"
     columns="max"
-    cacheDirectory=".phpunit.cache"
+    cacheDirectory=".cache/.phpunit.cache"
     defaultTestSuite="Jax"
     displayDetailsOnAllIssues="true"
     enforceTimeLimit="true"

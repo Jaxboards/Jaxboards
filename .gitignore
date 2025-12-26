@@ -2,7 +2,7 @@
 .DS_Store
 /.php-cs-fixer.cache
 /.phpunit.result.cache
-/.phpunit.cache
+/.cache
 Thumbs.db
 
 # Config files
