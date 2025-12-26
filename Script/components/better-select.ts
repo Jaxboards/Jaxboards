@@ -1,7 +1,7 @@
 export default class BetterSelect extends HTMLElement {
     // This is accessed by the browser to mark this as a form element
     // do not remove
-    static formAssociated = true;
+    static readonly formAssociated = true;
 
     shadow: ShadowRoot;
 

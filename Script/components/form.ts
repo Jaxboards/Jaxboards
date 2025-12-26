@@ -29,8 +29,6 @@ export default class Form extends Component<HTMLFormWithSubmit> {
     submitForm() {
         const { element, resetOnSubmit } = this;
         const postBody = new URLSearchParams();
-        const names = [];
-        const values = [];
         const { submitButton } = element;
 
         const inputFields = ['input', 'select', 'button', 'textarea'] as const;
@@ -49,8 +47,10 @@ export default class Form extends Component<HTMLFormWithSubmit> {
                     Array.from(inputField.options)
                         .filter((option) => option.selected)
                         .forEach((option) => {
-                            names.push(`${inputField.name}[]`);
-                            values.push(option.value);
+                            postBody.append(
+                                `${inputField.name}[]`,
+                                option.value,
+                            );
                         });
                     return;
                 }

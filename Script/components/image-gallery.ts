@@ -63,7 +63,7 @@ export default class ImageGallery extends Component<HTMLDivElement> {
                 : img;
 
             if (container) {
-                container.style.display = i !== this.index ? 'none' : 'block';
+                container.style.display = i === this.index ? 'block' : 'none';
             }
         });
     }

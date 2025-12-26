@@ -86,39 +86,43 @@ export default class AutoComplete extends Component<HTMLInputElement> {
         );
 
         // Handle arrow key selection
-        if (results) {
-            switch (event.key) {
-                case 'ArrowUp':
-                    if (selectedIndex >= 0) {
-                        results[selectedIndex].classList.remove('selected');
-                        results[selectedIndex - 1].classList.add('selected');
-                    }
-                    return;
-                case 'ArrowDown':
-                    if (selectedIndex === -1) {
-                        results[0].classList.add('selected');
-                    } else if (selectedIndex < results.length - 1) {
-                        results[selectedIndex].classList.remove('selected');
-                        results[selectedIndex + 1].classList.add('selected');
-                    }
-                    return;
-                case 'Enter':
-                    if (selectedIndex >= 0) {
-                        results[selectedIndex].dispatchEvent(
-                            new Event('click'),
-                        );
-                    }
-                    return;
-                default:
-                    if (this.indicatorElement) {
-                        this.indicatorElement.classList.remove(VALID_CLASS);
-                        this.indicatorElement.classList.add(INVALID_CLASS);
-                    }
-                    break;
-            }
-        }
+        switch (event.key) {
+            case 'ArrowUp':
+            case 'ArrowDown':
+                results.at(selectedIndex)?.classList.remove('selected');
+                results
+                    .at(
+                        (selectedIndex + (event.key === 'ArrowDown' ? 1 : -1)) %
+                            results.length,
+                    )
+                    ?.classList.add('selected');
+                return;
+            case 'Enter':
+                if (selectedIndex >= 0) {
+                    results
+                        .at(selectedIndex)
+                        ?.dispatchEvent(new Event('click'));
+                }
+                return;
+            default:
+                if (this.indicatorElement) {
+                    this.indicatorElement.classList.remove(VALID_CLASS);
+                    this.indicatorElement.classList.add(INVALID_CLASS);
+                }
 
-        void this.doSearch();
+                this.clearResults();
+
+                if (this.element.value) {
+                    void this.doSearch();
+                }
+                break;
+        }
+    }
+
+    clearResults() {
+        const resultsContainer = this.getResultsContainer();
+        resultsContainer.style.display = 'none';
+        resultsContainer.innerHTML = '';
     }
 
     async doSearch() {
@@ -128,6 +132,7 @@ export default class AutoComplete extends Component<HTMLInputElement> {
             ? '../'
             : '';
         const searchTerm = encodeURIComponent(this.element.value);
+
         const queryParams = `term=${searchTerm}`;
 
         const res = await fetch(

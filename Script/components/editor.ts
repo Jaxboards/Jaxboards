@@ -163,7 +163,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
             const res = await fetch('/api/emotes');
             const json = (await res.json()) as [string[], string[]];
             if (res.ok) {
-                void this.createEmoteWindow(json, { x, y });
+                this.createEmoteWindow(json, { x, y });
             }
             return;
         }
