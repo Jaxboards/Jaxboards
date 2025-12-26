@@ -28,7 +28,6 @@ use function _\groupBy;
 use function array_filter;
 use function array_flip;
 use function array_key_exists;
-use function array_map;
 use function array_merge;
 use function array_unique;
 use function count;
@@ -39,7 +38,6 @@ use function max;
 use function mb_strlen;
 use function mb_substr;
 use function nl2br;
-use function number_format;
 use function preg_match;
 
 use const JSON_THROW_ON_ERROR;
@@ -364,113 +362,30 @@ final class BoardIndex implements Route
             return '';
         }
 
-        $legend = '';
-        $page = '';
-
         $stats = Stats::selectOne();
         $lastRegisteredMember = $stats?->last_register !== null
             ? Member::selectOne($stats->last_register)
             : null;
 
-        $usersOnlineToday = $this->usersOnline->getUsersOnlineToday();
+        $usersOnline = $this->usersOnline->getUsersOnline();
+        $usersOnlineCount = count(array_filter($usersOnline, static fn(UserOnline $userOnline): bool => !$userOnline->isBot));
+        $legendGroups = Group::selectMany('WHERE `legend`=1 ORDER BY `title`');
 
-        $birthdaysEnabled = $this->config->getSetting('birthdays');
-
-        $userstoday = implode(', ', array_map(function (UserOnline $userOnline) use ($birthdaysEnabled): string {
-            $birthdayClass = $userOnline->birthday && $birthdaysEnabled
-                ? 'birthday'
-                : '';
-            $lastOnline = $userOnline->hide
-                ? $userOnline->readDate
-                : $userOnline->lastUpdate;
-            $lastOnlineDate = $this->date->relativeTime($lastOnline);
-            $profileURL = $this->router->url('profile', ['id' => $userOnline->uid]);
-
-            return <<<HTML
-                <a href="{$profileURL}"
-                    class="user{$userOnline->uid} mgroup{$userOnline->groupID} {$birthdayClass}"
-                    title="Last online: {$lastOnlineDate}"
-                    data-use-tooltip="true"
-                    data-last-online="{$lastOnline}"
-                    >{$userOnline->name}</a>
-                HTML;
-        }, $usersOnlineToday));
-
-        $usersonline = $this->getUsersOnlineList();
-        $groups = Group::selectMany('WHERE `legend`=1 ORDER BY `title`');
-
-        foreach ($groups as $group) {
-            $legend .= "<a href='?' class='mgroup {$group->id}'>{$group->title}</a> ";
-        }
-
-        $guestCount = $usersonline[2];
-        $guestsText = '';
-        if ($guestCount > 0) {
-            $modURL = $this->user->getGroup()?->canModerate !== 0
-                ? "href='" . $this->router->url('modcontrols', ['do' => 'onlineSessions']) . "'"
-                : null;
-            $plural = ($guestCount > 1 ? 's' : '');
-            $guestsText = $guestCount > 0
-                ? "<a {$modURL}>{$guestCount} guest{$plural}</a>"
-                : '';
-        }
-
-        return $page . $this->template->meta(
-            'idx-stats',
-            $usersonline[1],
-            $usersonline[0],
-            $guestsText,
-            count($usersOnlineToday),
-            $userstoday,
-            number_format($stats->members ?? 0),
-            number_format($stats->topics ?? 0),
-            number_format($stats->posts ?? 0),
-            $lastRegisteredMember !== null ? $this->template->meta(
-                'user-link',
-                $lastRegisteredMember->id,
-                $lastRegisteredMember->groupID,
-                $lastRegisteredMember->displayName,
-            ) : '',
-            $legend,
+        return $this->template->render(
+            'idx/idx-stats',
+            [
+                'usersOnline' => $usersOnline,
+                'usersOnlineCount' => $usersOnlineCount,
+                'usersOnlineToday' => $this->usersOnline->getUsersOnlineToday(),
+                'guestCount' => $this->usersOnline->getGuestCount(),
+                'modURL' => $this->user->getGroup()?->canModerate !== 0
+                    ? $this->router->url('modcontrols', ['do' => 'onlineSessions'])
+                    : null,
+                'stats' => $stats,
+                'lastRegisteredMember' => $lastRegisteredMember,
+                'legend' => $legendGroups,
+            ]
         );
-    }
-
-    /**
-     * @return array{string,int,int}
-     */
-    private function getUsersOnlineList(): array
-    {
-        $html = '';
-        $numMembers = 0;
-
-        foreach ($this->usersOnline->getUsersOnline() as $userOnline) {
-            $title = $this->textFormatting->blockhtml(
-                $userOnline->locationVerbose ?: 'Viewing the board.',
-            );
-            if ($userOnline->isBot) {
-                $html .= '<a class="user' . $userOnline->uid . '" '
-                    . 'title="' . $title . '" data-use-tooltip="true">'
-                    . $userOnline->name . '</a>';
-            } else {
-                ++$numMembers;
-                $profileURL = $this->router->url('profile', ['id' => $userOnline->uid]);
-                $idleStatus = $userOnline->status === 'idle'
-                    ? "idle lastAction{$userOnline->lastAction}"
-                    : '';
-                $birthday = $userOnline->birthday && $this->config->getSetting('birthdays')
-                    ? 'birthday'
-                    : '';
-                $html .= <<<HTML
-                    <a
-                        href="{$profileURL}"
-                        class="user{$userOnline->uid} mgroup{$userOnline->groupID} {$idleStatus} {$birthday}"
-                        title="{$title}"
-                        data-use-tooltip="true">{$userOnline->name}</a>
-                    HTML;
-            }
-        }
-
-        return [$html, $numMembers, $this->usersOnline->getGuestCount()];
     }
 
     private function updateStats(): void

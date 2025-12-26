@@ -19,11 +19,15 @@ final class UserOnline
 
     public int $lastUpdate;
 
+    public string $lastOnlineRelative;
+
     public string $location;
 
     public string $locationVerbose;
 
     public string $name;
+
+    public string $profileURL;
 
     public int $readDate;
 

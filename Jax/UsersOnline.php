@@ -26,8 +26,10 @@ final class UsersOnline
     private array $usersOnlineCache = [];
 
     public function __construct(
+        private readonly Config $config,
         private readonly Database $database,
         private readonly Date $date,
+        private readonly Router $router,
         private readonly User $user,
         private readonly ServiceConfig $serviceConfig,
     ) {
@@ -77,7 +79,13 @@ final class UsersOnline
             'WHERE uid AND hide = 0',
         );
 
-        return $this->sessionsToUsersOnline($sessions);
+        return array_map(function (UserOnline $userOnline): UserOnline {
+            $lastOnline = $userOnline->hide
+                ? $userOnline->readDate
+                : $userOnline->lastUpdate;
+            $userOnline->lastOnlineRelative = $this->date->relativeTime($lastOnline);
+            return $userOnline;
+        }, $this->sessionsToUsersOnline($sessions));
     }
 
     /**
@@ -101,7 +109,9 @@ final class UsersOnline
 
             $birthday = !$session->isBot
                 && $member?->birthdate
+                && $this->config->getSetting('birthdays')
                 && $this->date->dateAsCarbon($member->birthdate)?->format('n j') === $today;
+
             $uid = $session->isBot ? $session->id : $session->uid;
             $name = ($session->isBot ? $session->id : $member?->displayName);
 
@@ -121,9 +131,10 @@ final class UsersOnline
             $userOnline->locationVerbose = $session->locationVerbose;
             $userOnline->name = ($session->hide ? '* ' : '') . $name;
             $userOnline->readDate = $this->date->datetimeAsTimestamp($session->readDate);
+            $userOnline->profileURL = $this->router->url('profile', ['id' => $uid]);
             $userOnline->status = $session->lastAction < $this->idleTimestamp
-                    ? 'idle'
-                    : 'active';
+                ? 'idle'
+                : 'active';
             $userOnline->uid = $uid;
 
             $usersOnline[$uid] = $userOnline;

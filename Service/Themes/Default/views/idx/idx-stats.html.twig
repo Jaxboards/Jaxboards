@@ -1,0 +1,70 @@
+<div class="box collapse-box" id="stats">
+    <div class="title">
+        <div class="x collapse-button">
+            -/+
+        </div>
+        Statistics
+    </div>
+    <div class="collapse-content">
+        <div class="content_top">
+        </div>
+        <div class="content">
+            {{ usersOnlineCount }} User{% if usersOnlineCount > 1 %}s{% endif %} Online:
+            <div id="statusers">
+                {% for user in usersOnline %}
+                    {% if user.isBot %}
+                        <a
+                            class="user {{ user.uid }}"
+                            title="{{ user.locationVerbose|default('Viewing the board.') }}"
+                            data-use-tooltip="true"
+                        >{{ user.name }}</a>
+                    {% else %}
+                        <a
+                            href="{{ user.profileURL }}"
+                            class="user{{ user.uid }} mgroup{{ user.groupID }}
+                            {% if user.status == 'idle' %}
+                                idle lastAction{{ user.lastAction }}
+                            {% endif %}
+                            {% if user.birthday %}
+                                birthday
+                            {% endif %}"
+                            title="{{ user.locationVerbose|default('Viewing the board.') }}"
+                            data-use-tooltip="true"
+                        >{{ user.name }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if guestCount %}
+                    {% if modURL %}
+                        <a href="{{ modURL }}">{{ guestCount }} guest{% if guestCount>0 %}s{% endif %}</a>
+                    {% else %}
+                        {{ guestCount }} guest{% if guestCount>1 %}s{% endif %}
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="userstoday">
+                {{ usersOnlineToday|length }} User{% if usersOnlineToday|length != 1 %}s{% endif %} Online Today:
+
+                {% for user in usersOnlineToday %}
+                    <a href="{{ user.profileURL }}"
+                    class="user{{ user.uid }} mgroup{{ user.groupID }} {% if user.birthday %}birthday{% endif %}"
+                    title="Last online: {$lastOnlineDate}"
+                    data-use-tooltip="true"
+                    data-last-online="{$lastOnline}"
+                    >{{ user.name }}</a>{% if not loop.last %}, {% endif %}
+                {% endfor %}
+
+                <br>
+                {% for group in legend %}
+                    <a href='#' class='mgroup{{ group.id }}'>{{ group.title }}</a>
+                {% endfor %}
+            </div>
+            <div class="stats">
+                Our <strong>{{ stats.members }}</strong> {% if stats.members == 1 %}user has{% else %}users have{% endif %} made
+                <strong>{{ stats.topics }}</strong> topics with <strong>{{ stats.posts }}</strong> posts.
+                Newest Member: {% include 'global/user-link.html.twig' with { user: lastRegisteredMember } only %}
+            </div>
+        </div>
+        <div class="content_bottom">
+        </div>
+    </div>
+</div>

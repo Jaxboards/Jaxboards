@@ -111,9 +111,9 @@ final class Template
      */
     private array $vars = [];
 
-    private Environment $twig;
+    private readonly Environment $twigEnvironment;
 
-    private FilesystemLoader $loader;
+    private readonly FilesystemLoader $filesystemLoader;
 
     public function __construct(
         private readonly DebugLog $debugLog,
@@ -121,9 +121,9 @@ final class Template
         private readonly FileSystem $fileSystem,
     ) {
 
-        $this->loader = new FilesystemLoader();
-        $this->twig = new Environment($this->loader, [
-            'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
+        $this->filesystemLoader = new FilesystemLoader();
+        $this->twigEnvironment = new Environment($this->filesystemLoader, [
+            // 'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
         ]);
         $this->setThemePath($this->domainDefinitions->getDefaultThemePath());
     }
@@ -216,9 +216,9 @@ final class Template
         return $formatted;
     }
 
-    public function render($name, array $context = []): string
+    public function render(string $name, array $context = []): string
     {
-        return $this->twig->render($name . '.html.twig', $context);
+        return $this->twigEnvironment->render($name . '.html.twig', $context);
     }
 
     public function metaExists(string $meta): bool
@@ -256,10 +256,10 @@ final class Template
     public function setThemePath(string $themePath): void
     {
         $this->themePath = $themePath;
-        $this->loader->setPaths(
+        $this->filesystemLoader->setPaths(
             [
                 $this->fileSystem->pathFromRoot($this->themePath, 'views'),
-                $this->fileSystem->pathJoin($this->domainDefinitions->getDefaultThemePath(), 'views'),
+                $this->fileSystem->pathFromRoot($this->domainDefinitions->getDefaultThemePath(), 'views'),
             ]
         );
     }
