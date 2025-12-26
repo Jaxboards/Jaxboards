@@ -35,6 +35,7 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
+use Jax\UserOnline;
 use Jax\UsersOnline;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
@@ -46,8 +47,8 @@ use function DI\autowire;
  * @internal
  */
 #[CoversClass(App::class)]
-#[CoversClass(FileSystem::class)]
 #[CoversClass(BBCode::class)]
+#[CoversClass(BoardIndex::class)]
 #[CoversClass(BotDetector::class)]
 #[CoversClass(Column::class)]
 #[CoversClass(Config::class)]
@@ -56,9 +57,9 @@ use function DI\autowire;
 #[CoversClass(Date::class)]
 #[CoversClass(DebugLog::class)]
 #[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FileSystem::class)]
 #[CoversClass(ForeignKey::class)]
 #[CoversClass(Hooks::class)]
-#[CoversClass(BoardIndex::class)]
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
 #[CoversClass(Key::class)]
@@ -76,6 +77,7 @@ use function DI\autowire;
 #[CoversClass(TextFormatting::class)]
 #[CoversClass(TextRules::class)]
 #[CoversClass(User::class)]
+#[CoversClass(UserOnline::class)]
 #[CoversClass(UsersOnline::class)]
 final class ShoutboxTest extends FeatureTestCase
 {

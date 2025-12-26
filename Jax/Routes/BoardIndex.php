@@ -327,8 +327,8 @@ final class BoardIndex implements Route
                             ),
                         ) : '',
                     $this->formatLastPost($forum, $lastPostMembers[$forum->lastPostUser] ?? null),
-                    $this->template->meta('idx-topics-count', $forum->topics),
-                    $this->template->meta('idx-replies-count', $forum->posts),
+                    $this->template->render('idx/topics-count', ['count' => $forum->topics]),
+                    $this->template->render('idx/replies-count', ['count' => $forum->posts]),
                     $read ? 'read' : 'unread',
                     <<<HTML
                         <a id="fid_{$forumId}_icon" href="{$markReadURL}">
@@ -462,7 +462,7 @@ final class BoardIndex implements Route
                 'update',
                 '#fid_' . $unreadForum->id . '_icon',
                 $this->template->meta('icon-unread')
-                    ?: $this->template->meta('idx-icon-unread'),
+                    ?: $this->template->render('idx/icon-unread'),
             );
             $this->page->command(
                 'update',
@@ -473,12 +473,12 @@ final class BoardIndex implements Route
             $this->page->command(
                 'update',
                 '#fid_' . $unreadForum->id . '_topics',
-                $this->template->meta('idx-topics-count', $unreadForum->topics),
+                $this->template->render('idx/topics-count', ['count' => $unreadForum->topics]),
             );
             $this->page->command(
                 'update',
                 '#fid_' . $unreadForum->id . '_replies',
-                $this->template->meta('idx-replies-count', $unreadForum->posts),
+                $this->template->render('idx/replies-count', ['count' => $unreadForum->posts]),
             );
         }
     }
