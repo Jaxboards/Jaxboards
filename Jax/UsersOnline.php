@@ -11,6 +11,7 @@ use Jax\Models\Member;
 use Jax\Models\Session;
 
 use function array_filter;
+use function array_map;
 use function count;
 use function gmdate;
 
@@ -84,6 +85,7 @@ final class UsersOnline
                 ? $userOnline->readDate
                 : $userOnline->lastUpdate;
             $userOnline->lastOnlineRelative = $this->date->relativeTime($lastOnline);
+
             return $userOnline;
         }, $this->sessionsToUsersOnline($sessions));
     }

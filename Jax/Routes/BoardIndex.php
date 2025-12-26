@@ -105,9 +105,9 @@ final class BoardIndex implements Route
     private function fetchIDXForums(): array
     {
         $forums = Forum::selectMany(<<<'SQL'
-            WHERE `path` = ""
-            ORDER BY `order`, `title` ASC
-        SQL);
+                WHERE `path` = ""
+                ORDER BY `order`, `title` ASC
+            SQL);
 
         return array_filter(
             $forums,
@@ -196,8 +196,8 @@ final class BoardIndex implements Route
             'idx/tools',
             [
                 'markReadURL' => $this->router->url('index', ['markread' => '1']),
-                'staffURL' => $this->router->url('members', ['filter' => 'staff', 'sortby' => 'g_title'])
-            ]
+                'staffURL' => $this->router->url('members', ['filter' => 'staff', 'sortby' => 'g_title']),
+            ],
         );
 
         $page .= $this->getBoardStats();
@@ -385,7 +385,7 @@ final class BoardIndex implements Route
                 'stats' => $stats,
                 'lastRegisteredMember' => $lastRegisteredMember,
                 'legend' => $legendGroups,
-            ]
+            ],
         );
     }
 

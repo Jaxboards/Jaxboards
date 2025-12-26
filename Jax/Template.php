@@ -260,7 +260,7 @@ final class Template
             [
                 $this->fileSystem->pathFromRoot($this->themePath, 'views'),
                 $this->fileSystem->pathFromRoot($this->domainDefinitions->getDefaultThemePath(), 'views'),
-            ]
+            ],
         );
     }
 
