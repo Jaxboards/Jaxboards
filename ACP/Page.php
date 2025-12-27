@@ -11,13 +11,8 @@ use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 use function array_key_exists;
-use function array_keys;
-use function array_map;
 use function header;
 use function mb_substr;
-use function str_replace;
-
-use const PHP_EOL;
 
 final class Page
 {
@@ -40,17 +35,6 @@ final class Page
         private readonly Request $request,
     ) {
         $this->initializeTwig();
-    }
-
-    private function initializeTwig()
-    {
-        $this->filesystemLoader = new FilesystemLoader($this->fileSystem->pathFromRoot('ACP/views/'));
-        $this->twigEnvironment = new Environment($this->filesystemLoader, [
-            'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
-            // TODO: autoescaping should be turned on, but we previously did it manually
-            // and this is the easiest migration strategy at the moment
-            'autoescape' => false,
-        ]);
     }
 
     public function append(string $partName, string $content): void
@@ -176,5 +160,16 @@ final class Page
         }
 
         return $this->twigEnvironment->render($templateFile . '.twig', $data);
+    }
+
+    private function initializeTwig(): void
+    {
+        $this->filesystemLoader = new FilesystemLoader($this->fileSystem->pathFromRoot('ACP/views/'));
+        $this->twigEnvironment = new Environment($this->filesystemLoader, [
+            'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
+            // TODO: autoescaping should be turned on, but we previously did it manually
+            // and this is the easiest migration strategy at the moment
+            'autoescape' => false,
+        ]);
     }
 }
