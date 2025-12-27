@@ -87,7 +87,7 @@ final class BoardIndexTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('?');
+        $page = $this->go('/');
 
         DOMAssert::assertSelectEquals('#userbox .welcome', 'Admin', 1, $page);
 

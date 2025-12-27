@@ -29,6 +29,7 @@ use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
 use Jax\Routes\Calendar;
+use Jax\Routes\CustomPage;
 use Jax\ServiceConfig;
 use Jax\Session;
 use Jax\Template;
@@ -50,6 +51,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(BBCode::class)]
 #[CoversClass(BotDetector::class)]
 #[CoversClass(Config::class)]
+#[CoversClass(CustomPage::class)]
 #[CoversClass(Database::class)]
 #[CoversClass(DatabaseUtils::class)]
 #[CoversClass(SQLite::class)]

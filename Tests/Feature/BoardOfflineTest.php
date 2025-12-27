@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\Routes\BoardIndex;
+use Jax\UserOnline;
+use Jax\UsersOnline;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -72,6 +75,9 @@ use function DI\autowire;
 #[CoversClass(TextFormatting::class)]
 #[CoversClass(TextRules::class)]
 #[CoversClass(User::class)]
+#[CoversClass(BoardIndex::class)]
+#[CoversClass(UserOnline::class)]
+#[CoversClass(UsersOnline::class)]
 final class BoardOfflineTest extends FeatureTestCase
 {
     protected function setUp(): void
@@ -90,7 +96,7 @@ final class BoardOfflineTest extends FeatureTestCase
     {
         $this->actingAs('member');
 
-        $page = $this->go('index');
+        $page = $this->go('/');
 
         $this->assertStringContainsString("You don't have permission to view the board.", $page);
         $this->assertStringContainsString('pikachu', $page);
@@ -100,7 +106,7 @@ final class BoardOfflineTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go('index');
+        $page = $this->go('/');
 
         $this->assertStringNotContainsString("You don't have permission to view the board.", $page);
     }
