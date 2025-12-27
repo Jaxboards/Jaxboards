@@ -118,7 +118,7 @@ final class Shoutbox implements Module
                     'shout' => $shout,
                     'timestamp' => $this->date->datetimeAsTimestamp($shout->date),
                     'user' => $member,
-                ]
+                ],
             );
         }
 
@@ -166,8 +166,8 @@ final class Shoutbox implements Module
                 $this->template->render(
                     'shoutbox/shoutbox',
                     [
-                        'shouts' => $shoutHTML
-                    ]
+                        'shouts' => $shoutHTML,
+                    ],
                 ),
             ) . <<<HTML
                 <script type='text/javascript'>
