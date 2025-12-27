@@ -121,7 +121,7 @@ final class LogReg implements Route
         $email = $this->request->asString->post('email') ?? '';
 
         $page = $this->template->render('logreg/register-form', [
-            'hCaptchaSitekey' => $this->config->getSetting('hcaptcha_sitekey')
+            'hCaptchaSitekey' => $this->config->getSetting('hcaptcha_sitekey'),
         ]);
 
         // Show registration form.
@@ -403,7 +403,7 @@ final class LogReg implements Route
                                 'uid' => $uid ?? '',
                             ],
                         ),
-                    ]
+                    ],
                 );
         } else {
             if ($user) {
