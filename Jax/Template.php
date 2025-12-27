@@ -279,21 +279,31 @@ final class Template
             'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
         ]);
 
-        $functions = [
-            'url' => fn(...$args) => $this->container->get(Router::class)->url(...$args),
-        ];
+        array_map(
+            $this->twigEnvironment->addFunction(...),
+            [
+                new TwigFunction('url', fn(...$args) => $this->container->get(Router::class)->url(...$args)),
+            ]
+        );
 
-        $filters = [
-            'slugify' => fn(string $string) => $this->container->get(TextFormatting::class)->slugify($string),
-        ];
-
-        foreach ($functions as $name => $callable) {
-            $this->twigEnvironment->addFunction(new TwigFunction($name, $callable));
-        }
-
-        foreach ($filters as $name => $callable) {
-            $this->twigEnvironment->addFilter(new TwigFilter($name, $callable));
-        }
+        array_map(
+            $this->twigEnvironment->addFilter(...),
+            [
+                new TwigFilter(
+                    'autodate',
+                    fn(?string $string) => $this->container->get(Date::class)->autoDate($string),
+                    ['is_safe' => ['html']]
+                ),
+                new TwigFilter(
+                    'slugify',
+                    fn(?string $string) => $this->container->get(TextFormatting::class)->slugify($string)
+                ),
+                new TwigFilter(
+                    'wordfilter',
+                    fn(?string $string) => $this->container->get(TextFormatting::class)->wordfilter($string)
+                ),
+            ]
+        );
     }
 
     private function checkExtended(string $data, ?string $meta = null): bool

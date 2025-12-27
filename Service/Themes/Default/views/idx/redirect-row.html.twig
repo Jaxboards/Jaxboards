@@ -3,7 +3,7 @@
     {% include "idx/icon-redirect.html.twig" %}
   </td>
   <td class="forum">
-    <a href="{{ forumURL }}">
+    <a href="{{ url('forum', { id: forum.id, slug: forum.title|slugify }) }}">
       {{ forum.title }}
     </a>
     <div class="description">

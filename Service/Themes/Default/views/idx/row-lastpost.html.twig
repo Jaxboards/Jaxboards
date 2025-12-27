@@ -1,7 +1,7 @@
 Last Post:
-<a href="{{ topicURL }}">
-    {%- if lastPostTitle -%}
-        {{- lastPostTitle -}}
+<a href="{{ url('topic', { id: forum.lastPostTopic, slug: form.lastPost|slugify, getlast: 1 }) }}">
+    {%- if forum.lastPostTopicTitle -%}
+        {{- forum.lastPostTopicTitle -}}
     {%- else -%}
         - - - - -
     {%- endif -%}
@@ -13,8 +13,8 @@ By
     None
 {%- endif -%},
 
-{% if lastPostDate -%}
-    {{- lastPostDate|raw -}}
+{% if forum.lastPostDate -%}
+    {{- forum.lastPostDate|autodate -}}
 {%- else -%}
     - - - - -s
 {%- endif -%}

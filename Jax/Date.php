@@ -18,8 +18,6 @@ final class Date
      */
     public function autoDate(int|string|null $date): string
     {
-        // Some old forums have nullable fields that are no longer nullable
-        // This needs to stay for data backwards compatibility
         if (!$date) {
             return '';
         }

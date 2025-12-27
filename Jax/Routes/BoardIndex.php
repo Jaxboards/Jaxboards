@@ -224,10 +224,6 @@ final class BoardIndex implements Route
                     'idx/redirect-row',
                     [
                         'forum' => $forum,
-                        'forumURL' => $this->router->url('forum', [
-                            'id' => $forum->id,
-                            'slug' => $this->textFormatting->slugify($forum->title),
-                        ]),
                     ],
                 );
             } else {
@@ -376,16 +372,8 @@ final class BoardIndex implements Route
         return $this->template->render(
             'idx/row-lastpost',
             [
-                'topicURL' => $this->router->url('topic', [
-                    'id' => $forum->lastPostTopic,
-                    'getlast' => '1',
-                    'slug' => $this->textFormatting->slugify($forum->lastPostTopicTitle),
-                ]),
-                'lastPostTitle' => $this->textFormatting->wordfilter($forum->lastPostTopicTitle),
+                'forum' => $forum,
                 'lastPostUser' => $member,
-                'lastPostDate' => $forum->lastPostDate !== null
-                    ? $this->date->autoDate($forum->lastPostDate)
-                    : null,
             ],
         );
     }

@@ -93,10 +93,10 @@ final readonly class TextFormatting
     /**
      * Handles badword replacements.
      */
-    public function wordfilter(string $text): string
+    public function wordfilter(?string $text): string
     {
         if ($this->user->get()->nowordfilter !== 0) {
-            return $text;
+            return (string) $text;
         }
 
         $badwords = $this->rules->getBadwords();
@@ -104,7 +104,7 @@ final readonly class TextFormatting
         return str_ireplace(
             array_keys($badwords),
             array_values($badwords),
-            $text,
+            (string) $text,
         );
     }
 
