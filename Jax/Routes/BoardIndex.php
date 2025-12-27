@@ -350,7 +350,7 @@ final class BoardIndex implements Route
             $this->page->command(
                 'update',
                 '#fid_' . $unreadForum->id . '_icon',
-                $this->template->render('idx/icon-unread'),
+                $this->template->render('idx/icon-unread', ['forum' => $unreadForum]),
             );
             $this->page->command(
                 'update',
