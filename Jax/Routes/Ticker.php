@@ -15,7 +15,6 @@ use Jax\Request;
 use Jax\Router;
 use Jax\Session;
 use Jax\Template;
-use Jax\TextFormatting;
 use Jax\User;
 
 final class Ticker implements Route
@@ -29,7 +28,6 @@ final class Ticker implements Route
         private readonly Router $router,
         private readonly Session $session,
         private readonly Template $template,
-        private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
         $this->template->loadMeta('ticker');
@@ -153,7 +151,7 @@ final class Ticker implements Route
                 'user' => $postAuthor,
                 'topic' => $topic,
                 'post' => $post,
-            ]
+            ],
         );
     }
 }
