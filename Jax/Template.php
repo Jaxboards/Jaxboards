@@ -278,8 +278,21 @@ final class Template
         $this->twigEnvironment = new Environment($this->filesystemLoader, [
             'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
         ]);
-        $this->twigEnvironment->addFunction(new TwigFunction('url', fn(...$args) => $this->container->get(Router::class)->url(...$args)));
-        $this->twigEnvironment->addFilter(new TwigFilter('slugify', fn(string $string) => $this->container->get(TextFormatting::class)->slugify($string)));
+
+        $functions = [
+            'url' => fn(...$args) => $this->container->get(Router::class)->url(...$args),
+        ];
+
+        $filters = [
+            'slugify' => fn(string $string) => $this->container->get(TextFormatting::class)->slugify($string),
+        ];
+
+        foreach ($functions as $name => $callable) {
+            $this->twigEnvironment->addFunction(new TwigFunction($name, $callable));
+        }
+        foreach ($filters as $name => $callable) {
+            $this->twigEnvironment->addFilter(new TwigFilter($name, $callable));
+        }
     }
 
     private function checkExtended(string $data, ?string $meta = null): bool
