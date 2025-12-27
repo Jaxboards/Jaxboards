@@ -543,12 +543,9 @@ final class Post implements Route
         $topicDescription = $this->request->asString->post('tdesc');
         $subTitle = $this->request->asString->post('subtitle');
         $pollQuestion = $this->request->asString->post('pollq');
-        $pollChoices = $inputPollChoices !== null ? array_map(
-            $this->textFormatting->blockhtml(...),
-            array_filter(
-                preg_split("@[\r\n]+@", $inputPollChoices) ?: [],
-                static fn(string $line): bool => trim($line) !== '',
-            ),
+        $pollChoices = $inputPollChoices !== null ? array_filter(
+            preg_split("@[\r\n]+@", $inputPollChoices) ?: [],
+            static fn(string $line): bool => trim($line) !== '',
         ) : [];
         $pollType = $this->request->asString->post('pollType');
 
@@ -600,20 +597,16 @@ final class Post implements Route
         $topic->pollChoices = $pollChoices !== []
             ? (json_encode($pollChoices, JSON_THROW_ON_ERROR))
             : '';
-        $topic->pollQuestion = $pollQuestion !== null
-            ? $this->textFormatting->blockhtml($pollQuestion)
-            : '';
+        $topic->pollQuestion = $pollQuestion ?: '';
         $topic->pollType = $pollType ?? '';
         $topic->replies = 0;
-        $topic->subtitle = $this->textFormatting->blockhtml($topicDescription ?? '');
+        $topic->subtitle = $topicDescription ?? '';
         $topic->summary = mb_substr(
             (string) preg_replace(
                 '@\s+@',
                 ' ',
-                $this->textFormatting->blockhtml(
-                    $this->textFormatting->textOnly(
-                        $this->postData ?? '',
-                    ),
+                $this->textFormatting->textOnly(
+                    $this->postData ?? '',
                 ),
             ),
             0,
