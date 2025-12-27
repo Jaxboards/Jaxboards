@@ -1,0 +1,33 @@
+<nav class="navigation tabs" data-tab-selector="li">
+    <ul>
+        <li class="active">
+            <a href="{{ url('index') }}">Home</a>
+        </li>
+        <li>
+            <a href="{{ url('buddylist') }}">Contacts</a>
+        </li>
+        <li>
+            <a href="{{ url('search') }}">Search</a>
+        </li>
+        <li>
+            <a href="{{ url('members') }}">Members</a>
+        </li>
+        <li>
+            <a href="{{ url('ticker') }}">Ticker</a>
+        </li>
+        <li>
+            <a href="{{ url('calendar') }}">Calendar</a>
+        </li>
+        {% if perms.canModerate %}
+        <li>
+            <a href="{{ url('calendar') }}">Mod CP</a>
+        </li>
+        {% endif %}
+        {% if perms.canAccessACP %}
+        <li>
+            <a href="{{ url('acp') }}">ACP</a>
+        </li>
+        {% endif %}
+        <li class="spacer">&nbsp;</li>
+    </ul>
+</nav>

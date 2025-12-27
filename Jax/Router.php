@@ -181,6 +181,7 @@ final class Router
         return match ($name) {
             'shoutbox' => '?module=shoutbox',
             'inbox' => '/ucp/inbox',
+            'acp' => '/ACP/',
             default => '',
         } . ($params !== [] ? '&' . http_build_query($params) : '');
     }

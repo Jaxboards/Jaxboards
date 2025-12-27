@@ -259,18 +259,15 @@ final class Page
 
     private function buildPath(): string
     {
-        $first = true;
-        $path = '';
-        foreach ($this->breadCrumbs as $link => $value) {
-            $path .= $this->template->meta(
-                $first
-                    && $this->template->metaExists('path-home') ? 'path-home' : 'path-part',
-                $link,
-                $value,
-            );
-            $first = false;
-        }
-
-        return $this->template->meta('path', $path);
+        return $this->template->render('global/breadcrumbs', [
+            'crumbs' => array_map(
+                fn($url, $text) => [
+                    'url' => $url,
+                    'text' => $text,
+                ],
+                array_keys($this->breadCrumbs),
+                array_values($this->breadCrumbs),
+            )
+        ]);
     }
 }

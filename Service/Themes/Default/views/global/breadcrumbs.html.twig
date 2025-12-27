@@ -1,0 +1,8 @@
+<ul>
+    {% for crumb in crumbs %}
+        <li>
+            <a href="{{ crumb.url }}">{{ crumb.text }}</a>
+        </li>
+    {% endfor %}
+</ul>
+<div class="clear"></div>

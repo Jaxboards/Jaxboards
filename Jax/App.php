@@ -176,29 +176,21 @@ final readonly class App
 
         $this->page->append(
             'LOGO',
-            $this->template->meta(
-                'logo',
-                $this->config->getSetting('logourl')
-                    ?: $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default/img/logo.png',
+            $this->template->render(
+                'global/logo',
+                [
+                    'logoURL' => $this->config->getSetting('logourl')
+                        ?: $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default/img/logo.png',
+                ]
             ),
         );
         $this->page->append(
             'NAVIGATION',
-            $this->template->meta(
-                'navigation',
-                $this->router->url('index'),
-                $this->router->url('buddylist'),
-                $this->router->url('search'),
-                $this->router->url('members'),
-                $this->router->url('ticker'),
-                $this->router->url('calendar'),
-                $this->user->getGroup()?->canModerate
-                    ? '<li><a href="' . $this->router->url('modcontrols') . '">Mod CP</a></li>'
-                    : '',
-                $this->user->getGroup()?->canAccessACP
-                    ? '<li><a href="./ACP/" target="_blank">ACP</a></li>'
-                    : '',
-                $this->config->getSetting('navlinks') ?? '',
+            $this->template->render(
+                'global/navigation',
+                [
+                    'perms' => $this->user->getGroup()
+                ]
             ),
         );
 
@@ -297,25 +289,8 @@ final readonly class App
     private function setPageVars(): void
     {
         $this->template->addVar('ismod', $this->user->getGroup()?->canModerate ? 'true' : 'false');
-        $this->template->addVar('isguest', $this->user->isGuest() ? 'true' : 'false');
         $this->template->addVar('isadmin', $this->user->getGroup()?->canAccessACP ? 'true' : 'false');
-
-        $this->template->addVar(
-            'modlink',
-            $this->user->getGroup()?->canModerate
-                ? $this->template->meta(
-                    'modlink',
-                    $this->router->url('modcontrols', ['do' => 'cp']),
-                )
-                : '',
-        );
-
-        $this->template->addVar(
-            'acplink',
-            $this->user->getGroup()?->canAccessACP
-                ? $this->template->meta('acplink')
-                : '',
-        );
+        $this->template->addVar('isguest', $this->user->isGuest() ? 'true' : 'false');
         $this->template->addVar('boardname', $this->config->getSetting('boardname'));
 
         $globalSettings = $this->user->isGuest() ? [] : [
