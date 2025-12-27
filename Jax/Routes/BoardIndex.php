@@ -28,6 +28,7 @@ use function _\keyBy;
 use function array_filter;
 use function array_flip;
 use function array_key_exists;
+use function array_map;
 use function array_unique;
 use function count;
 use function explode;
@@ -201,9 +202,11 @@ final class BoardIndex implements Route
         $returnedMods = [];
 
         foreach (explode(',', $modids) as $modId) {
-            if (array_key_exists($modId, $this->mods)) {
-                $returnedMods[] = $this->mods[$modId];
+            if (!array_key_exists($modId, $this->mods)) {
+                continue;
             }
+
+            $returnedMods[] = $this->mods[$modId];
         }
 
         return $returnedMods;
@@ -217,7 +220,7 @@ final class BoardIndex implements Route
     {
         return $this->template->render('idx/table', [
             'rows' => array_map(
-                fn($forum) => [
+                fn(Forum $forum): array => [
                     'forum' => $forum,
                     'lastPostHTML' => $this->formatLastPost(
                         $forum,
@@ -226,8 +229,8 @@ final class BoardIndex implements Route
                     'isRead' => $this->isForumRead($forum),
                     'mods' => $this->getMods($forum->mods),
                 ],
-                $forums
-            )
+                $forums,
+            ),
         ]);
     }
 
