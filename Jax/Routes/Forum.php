@@ -198,8 +198,6 @@ final class Forum implements Route
             $this->numperpage,
         );
 
-        $topicListing = $this->renderTopicListing($forum, $topics);
-
         // If they're on the first page and all topics are read
         // mark the whole forum as read
         if (
@@ -209,28 +207,10 @@ final class Forum implements Route
             $this->markRead($fid);
         }
 
-        $table = '';
-        if ($topicListing !== '') {
-            $table = $this->template->meta('forum-table', $topicListing);
-        } else {
-            if ($this->pageNumber > 0) {
-                $this->router->redirect('forum', ['id' => $fid]);
-
-                return;
-            }
-
-            if ($forumPerms['start']) {
-                $newTopicURL = $this->router->url('post', ['fid' => $fid]);
-                $table = $this->page->error(<<<HTML
-                        This forum is empty! Don't like it? <a href='{$newTopicURL}'>Create a topic!</a>
-                    HTML);
-            }
-        }
-
         $page .= $this->template->render('global/box', [
             'boxID' => "fid_{$fid}_listing",
             'title' => $forum->title,
-            'content' => $table,
+            'content' => $this->renderTopicListing($forum, $topics),
         ]);
         $page .= $this->template->meta('forum-pages-bottom', $forumpages);
         $page .= $this->template->meta('forum-buttons-bottom', $forumbuttons);
@@ -268,73 +248,19 @@ final class Forum implements Route
 
         $isForumModerator = $this->isForumModerator($modelsForum);
 
-        $html = '';
-        foreach ($topics as $topic) {
-            $pages = $this->renderTopicPages($topic);
+        $rows = array_map(fn($topic) => [
+            'author' => $membersById[$topic->author],
+            'topic' => $topic,
+            'lastPostUser' => $membersById[$topic->lastPostUser] ?? null,
+            'isRead' => $this->isTopicRead($topic),
+            'isForumModerator' => $isForumModerator,
+            'pages' => $this->renderTopicPages($topic),
+        ], $topics);
 
-            $author = $membersById[$topic->author];
-            $lastPostUser = $membersById[$topic->lastPostUser] ?? null;
-            $topicSlug = $this->textFormatting->slugify($topic->title);
-
-            $read = $this->isTopicRead($topic);
-
-            $html .= $this->template->meta(
-                'forum-row',
-                // 1
-                $topic->id,
-                // 2
-                $this->textFormatting->wordfilter($topic->title),
-                // 3
-                $this->textFormatting->wordfilter($topic->subtitle),
-                // 4
-                $this->template->render('user-link', ['user' => $author]),
-                // 5
-                $topic->replies,
-                // 6
-                number_format($topic->views),
-                // 7
-                $topic->lastPostDate
-                    ? $this->date->autoDate($topic->lastPostDate)
-                    : '',
-                // 8
-                $lastPostUser ? $this->template->render('user-link', ['user' => $lastPostUser]) : '',
-                // 9
-                ($topic->pinned !== 0 ? 'pinned' : '') . ' ' . ($topic->locked !== 0 ? 'locked' : ''),
-                // 10
-                $topic->summary !== '' ? $topic->summary . (mb_strlen($topic->summary) > 45 ? '...' : '') : '',
-                // 11
-                $isForumModerator ? (
-                    '<a href="'
-                    . $this->router->url('modcontrols', ['do' => 'modt', 'tid' => $topic->id])
-                    . '" class="moderate" onclick="ModControls.togbutton(this)"></a>'
-                ) : '',
-                // 12
-                $pages,
-                // 13
-                $read ? 'read' : 'unread',
-                // 14
-                $read ? (
-                    $this->template->meta('topic-icon-read')
-                    ?: $this->template->meta('icon-read')
-                )
-                    : (
-                        $this->template->meta('topic-icon-unread')
-                        ?: $this->template->meta('icon-read')
-                    ),
-                // 15
-                $this->router->url('topic', ['id' => $topic->id, 'slug' => $topicSlug]),
-                // 16
-                $this->router->url('forum', ['id' => $topic->fid, 'replies' => $topic->id]),
-                // 17
-                $this->router->url('topic', [
-                    'id' => $topic->id,
-                    'getlast' => '1',
-                    'slug' => $topicSlug,
-                ]),
-            );
-        }
-
-        return $html;
+        return $this->template->render('forum/table', [
+            'forum' => $modelsForum,
+            'rows' => $rows
+        ]);
     }
 
     /**

@@ -1,0 +1,10 @@
+<table role="presentation" class="forumindex">
+    {% for row in rows %}
+        {% include "forum/row.html.twig" with row %}
+    {% else %}
+        <div class="error">
+            This forum is empty! Don't like it?
+            <a href="{{ url('post', { fid: forum.id }) }}">Create a topic!</a>
+        </div>
+    {% endfor %}
+</table>

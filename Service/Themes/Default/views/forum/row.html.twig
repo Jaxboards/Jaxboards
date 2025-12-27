@@ -1,0 +1,40 @@
+<tr id="fr_{{ forum.id }}" class="
+    {%- if topic.pinned %}pinned{% endif -%}
+    {%- if topic.locked %}locked{% endif -%}
+    {%- if isRead %}read{% endif -%}
+    ">
+    <td class="f_icon">
+        {# {% if isRead %}
+            {% include "topic/icon-read" %}
+        {% else %}
+            {% include "topic/icon-unread" %}
+        {% endif %} #}
+    </td>
+    <td class="topic">
+        <a href="{{ url('topic', { id: topic.id, slug: topic.title|slugify }) }}" title="{{ topic.summary }}" data-use-tooltip="true">{{ topic.title|wordfilter }}</a>
+        {% if isForumModerator %}
+        <a
+            href="{{ url('modcontrols', { do: 'modt', tid: topic.id }) }}"
+            class="moderate"
+            onclick="ModControls.togbutton(this)"
+        ></a>
+        {% endif %}
+        <br>
+        {{ topic.subtitle|wordfilter }} {{ pages|raw }}
+    </td>
+    <td class="item_1">
+        {% include "user-link.html.twig" with { user: author } %}
+    </td>
+    <td class="item_2">
+        <a href="{{ url('forum', { id: topic.fid, replies: topic.id }) }}" rel="nofollow">Replies: {{ topic.replies }}</a>
+        <br>
+        Views:&nbsp;{{ topic.views|number_format }}
+    </td>
+    <td class="last_post">
+        <a href="{{ url('topic', { id: topic.id, getlast: 1, slug: topic.title|slugify }) }}">{{ topic.lastPostDate|autodate }}</a>
+        {% if lastPostUser %}
+        <br>
+        By {% include "user-link.html.twig" with { user: lastPostUser } %}
+        {% endif %}
+    </td>
+</tr>
