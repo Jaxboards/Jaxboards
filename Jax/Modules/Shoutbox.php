@@ -166,7 +166,7 @@ final class Shoutbox implements Module
                     [
                         'shouts' => $shoutHTML,
                     ],
-                )
+                ),
             ) . <<<HTML
                 <script type='text/javascript'>
                     Object.assign(globalSettings, {
@@ -274,7 +274,7 @@ final class Shoutbox implements Module
             [
                 'title' => 'Shoutbox' . $pages,
                 'content' => '<div class="sbhistory">' . $shoutHTML . '</div>',
-            ]
+            ],
         );
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);

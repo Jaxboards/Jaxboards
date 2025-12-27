@@ -230,7 +230,7 @@ final class Forum implements Route
         $page .= $this->template->render('global/box', [
             'boxID' => "fid_{$fid}_listing",
             'title' => $forum->title,
-            'content' => $table
+            'content' => $table,
         ]);
         $page .= $this->template->meta('forum-pages-bottom', $forumpages);
         $page .= $this->template->meta('forum-buttons-bottom', $forumbuttons);

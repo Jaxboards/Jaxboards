@@ -144,7 +144,7 @@ final readonly class Reactions
                 'postratingbuttons' => $postratingbuttons,
                 'isAnonymousReactionsEnabled' => $this->isAnonymousReactionsEnabled(),
                 'showrating' => $showrating,
-            ]
+            ],
         );
     }
 

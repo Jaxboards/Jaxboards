@@ -149,7 +149,7 @@ final class Page
         return $this->template->render('global/collapsebox', [
             'boxID' => $boxID,
             'title' => $title,
-            'content' => $contents
+            'content' => $contents,
         ]);
     }
 

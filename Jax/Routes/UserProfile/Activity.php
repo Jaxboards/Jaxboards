@@ -82,10 +82,12 @@ final readonly class Activity
             ['user' => [
                 'id' => $modelsActivity->uid,
                 'groupID' => $member->groupID,
-                'displayName' => $this->user->get()->id === $modelsActivity->uid ? 'You' : $member->displayName
+                'displayName' => $this->user->get()->id === $modelsActivity->uid ? 'You' : $member->displayName,
             ]],
         );
-        $otherguy = $affectedUser instanceof Member ? $this->template->render('user-link', ['user' => $affectedUser]) : '';
+        $otherguy = $affectedUser instanceof Member
+            ? $this->template->render('user-link', ['user' => $affectedUser])
+            : '';
 
         $date = $modelsActivity->date
             ? $this->date->smallDate($modelsActivity->date)
@@ -120,15 +122,15 @@ final readonly class Activity
                 [
                     'id' => $modelsActivity->uid,
                     'groupID' => $member->groupID,
-                    'displayName' => $modelsActivity->arg1
-                ]
+                    'displayName' => $modelsActivity->arg1,
+                ],
             ) . ' is now known as ' . $this->template->render(
                 'user-link',
                 [
                     'id' => $modelsActivity->uid,
                     'groupID' => $member->groupID,
-                    'displayName' => $modelsActivity->arg2
-                ]
+                    'displayName' => $modelsActivity->arg2,
+                ],
             ) . ', ' . $date,
             'buddy_add' => $user . ' made friends with ' . $otherguy,
             default => '',

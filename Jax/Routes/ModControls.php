@@ -391,7 +391,9 @@ final readonly class ModControls implements Route
 
                 foreach ($shouts as $shout) {
                     $member = $members[$shout->uid] ?? null;
-                    $content .= $member ? $this->template->render('user-link', ['user' => $member]) : '';
+                    $content .= $member
+                        ? $this->template->render('user-link', ['user' => $member])
+                        : '';
                     $content .= ': ' . $shout->shout . '<br>';
                 }
 

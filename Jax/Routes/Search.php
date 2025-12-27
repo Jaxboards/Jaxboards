@@ -375,7 +375,7 @@ final class Search implements Route
 
         $page = $this->template->render('global/box', [
             'title' => 'Search Results - ' . $pages,
-            'content' => $page
+            'content' => $page,
         ]);
 
         if (

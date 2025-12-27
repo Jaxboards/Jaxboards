@@ -283,7 +283,7 @@ final class Post implements Route
             HTML;
         $page .= $this->template->render('global/box', [
             'title' => $forum->title . ' > New Topic',
-            'content' => $form
+            'content' => $form,
         ]);
 
         $this->page->append('PAGE', $page);
@@ -392,7 +392,7 @@ final class Post implements Route
 
         $page .= $this->template->render('global/box', [
             'title' => $topic->title . ' &gt; Reply',
-            'content' => $form
+            'content' => $form,
         ]);
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
