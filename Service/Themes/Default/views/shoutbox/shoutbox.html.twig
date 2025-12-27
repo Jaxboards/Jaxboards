@@ -1,6 +1,8 @@
 <form method="post" action="" data-ajax-form="resetOnSubmit">
   <section class="shoutbox">
-    <div class="shouts">%s</div>
+    <div class="shouts">
+        {{ shouts|raw }}
+    </div>
     <div class="shoutform">
       <input type="text" name="shoutbox_shout" title="Type your shout here" aria-label="Shoutbox input"
         autocomplete="off">

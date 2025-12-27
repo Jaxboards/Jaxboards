@@ -276,7 +276,7 @@ final class Template
     {
         $this->filesystemLoader = new FilesystemLoader();
         $this->twigEnvironment = new Environment($this->filesystemLoader, [
-            'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
+            // 'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
         ]);
 
         array_map(
@@ -297,6 +297,16 @@ final class Template
                 new TwigFilter(
                     'slugify',
                     fn(?string $string) => $this->container->get(TextFormatting::class)->slugify($string),
+                ),
+                new TwigFilter(
+                    'theWorks',
+                    fn(?string $string) => $this->container->get(TextFormatting::class)->theWorks($string),
+                    ['is_safe' => ['html']],
+                ),
+                new TwigFilter(
+                    'theWorksInline',
+                    fn(?string $string) => $this->container->get(TextFormatting::class)->theWorksInline($string),
+                    ['is_safe' => ['html']],
                 ),
                 new TwigFilter(
                     'wordfilter',

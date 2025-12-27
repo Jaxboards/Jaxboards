@@ -179,7 +179,7 @@ final class Router
 
         // These are aliases and will be removed soon
         return match ($name) {
-            'shoutbox' => '?module=shoutbox',
+            'shoutbox' => '?module=shoutbox' . ($params !== [] ? '&' . http_build_query($params) : ''),
             default => '',
         };
     }

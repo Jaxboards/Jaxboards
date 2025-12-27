@@ -104,44 +104,33 @@ final class Shoutbox implements Module
 
     public function formatShout(Shout $shout, ?Member $member): string
     {
-        $user = $member !== null ? $this->template->meta(
-            'user-link',
-            $member->id,
-            $member->groupID,
-            $member->displayName,
-        ) : 'Guest';
-        $avatarUrl = $member?->avatar ?: $this->template->meta('default-avatar');
-        $avatar = $this->config->getSetting('shoutboxava')
-            ? "<img src='{$avatarUrl}' class='avatar' alt='avatar'>" : '';
-        $deletelink = $this->template->meta('shout-delete', $shout->id);
-        if (!$this->canDelete($shout)) {
-            $deletelink = '';
-        }
+        $avatarURL = $this->config->getSetting('shoutboxava')
+            ? ($member?->avatar ?: $this->template->meta('default-avatar'))
+            : null;
 
         $message = $this->textFormatting->theWorksInline($shout->shout);
         if (mb_substr($message, 0, 4) === '/me ') {
-            return $this->template->meta(
-                'shout-action',
-                $shout->date ? $this->date->smallDate(
-                    $shout->date,
-                    ['seconds' => true],
-                ) : '',
-                $user,
-                mb_substr(
-                    $message,
-                    3,
-                ),
-                $deletelink,
+            return $this->template->render(
+                'shoutbox/action',
+                [
+                    'avatarURL' => $avatarURL,
+                    'canDelete' => $this->canDelete($shout),
+                    'shout' => $shout,
+                    'timestamp' => $this->date->datetimeAsTimestamp($shout->date),
+                    'user' => $member,
+                ]
             );
         }
 
-        return $this->template->meta(
-            'shout',
-            $this->date->datetimeAsTimestamp($shout->date),
-            $user,
-            $message,
-            $deletelink,
-            $avatar,
+        return $this->template->render(
+            'shoutbox/shout',
+            [
+                'avatarURL' => $avatarURL,
+                'canDelete' => $this->canDelete($shout),
+                'shout' => $shout,
+                'timestamp' => $this->date->datetimeAsTimestamp($shout->date),
+                'user' => $member,
+            ],
         );
     }
 
@@ -171,12 +160,14 @@ final class Shoutbox implements Module
             $this->template->meta(
                 'collapsebox',
                 '',
-                $this->template->meta(
-                    'shoutbox-title',
+                $this->template->render(
+                    'shoutbox/title',
                 ),
-                $this->template->meta(
-                    'shoutbox',
-                    $shoutHTML,
+                $this->template->render(
+                    'shoutbox/shoutbox',
+                    [
+                        'shouts' => $shoutHTML
+                    ]
                 ),
             ) . <<<HTML
                 <script type='text/javascript'>

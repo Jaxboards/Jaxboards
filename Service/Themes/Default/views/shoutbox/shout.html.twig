@@ -1,0 +1,10 @@
+<div class="shout" data-timestamp="{{ timestamp }}">
+    {%- if avatarURL -%}
+        <img src="{{ avatarURL }}" class="avatar" alt="avatar">
+    {%- endif -%}
+    {%- include 'global/user-link.html.twig' with { user: user } only -%}
+    : {{ shout.shout|theWorksInline }}
+    {%- if canDelete -%}
+        {%- include 'shoutbox/shout-delete.html.twig' with { shout } -%}
+    {%- endif -%}
+</div>
