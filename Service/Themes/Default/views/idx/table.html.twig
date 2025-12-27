@@ -1,3 +1,9 @@
-<table class="boardindex">
-    {{ rows|raw }}
+<table role="presentation" class="boardindex">
+    {% for row in rows %}
+        {% if row.forum.redirect %}
+            {% include 'idx/redirect-row.html.twig' with row %}
+        {% else %}
+            {% include 'idx/row.html.twig' with row %}
+        {% endif %}
+    {% endfor %}
 </table>

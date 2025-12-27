@@ -199,8 +199,11 @@ final class BoardIndex implements Route
     private function getMods(string $modids): array
     {
         $returnedMods = [];
+
         foreach (explode(',', $modids) as $modId) {
-            $returnedMods[] = $this->mods[$modId];
+            if (array_key_exists($modId, $this->mods)) {
+                $returnedMods[] = $this->mods[$modId];
+            }
         }
 
         return $returnedMods;
@@ -212,36 +215,19 @@ final class BoardIndex implements Route
      */
     private function buildTable(array $forums, array $lastPostMembers): string
     {
-        $table = '';
-
-        foreach ($forums as $forum) {
-            $read = $this->isForumRead($forum);
-
-            if ($forum->redirect) {
-                $table .= $this->template->render(
-                    'idx/redirect-row',
-                    [
-                        'forum' => $forum,
-                    ],
-                );
-            } else {
-                $table .= $this->template->render(
-                    'idx/row',
-                    [
-                        'forum' => $forum,
-                        'lastPostHTML' => $this->formatLastPost(
-                            $forum,
-                            $lastPostMembers[$forum->lastPostUser] ?? null,
-                        ),
-                        'isRead' => $read,
-                        'mods' => $forum->showLedBy && $forum->mods ? $this->getMods($forum->mods) : [],
-                    ],
-                );
-            }
-        }
-
         return $this->template->render('idx/table', [
-            'rows' => $table,
+            'rows' => array_map(
+                fn($forum) => [
+                    'forum' => $forum,
+                    'lastPostHTML' => $this->formatLastPost(
+                        $forum,
+                        $lastPostMembers[$forum->lastPostUser] ?? null,
+                    ),
+                    'isRead' => $this->isForumRead($forum),
+                    'mods' => $this->getMods($forum->mods),
+                ],
+                $forums
+            )
         ]);
     }
 
