@@ -290,6 +290,7 @@ final class Template
         foreach ($functions as $name => $callable) {
             $this->twigEnvironment->addFunction(new TwigFunction($name, $callable));
         }
+
         foreach ($filters as $name => $callable) {
             $this->twigEnvironment->addFilter(new TwigFilter($name, $callable));
         }
