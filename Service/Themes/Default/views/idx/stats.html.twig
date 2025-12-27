@@ -14,7 +14,7 @@
                 {% for user in usersOnline %}
                     {% if user.isBot %}
                         <a
-                            class="user {{ user.uid }}"
+                            class="user{{ user.uid }}"
                             title="{{ user.locationVerbose|default('Viewing the board.') }}"
                             data-use-tooltip="true"
                         >{{ user.name }}</a>

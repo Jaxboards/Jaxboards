@@ -21,7 +21,7 @@ type UserOnline = {
     location: string;
     locationVerbose: string;
     name: string;
-    profileURL: string;
+    profileURL: string | null;
     readDate: number;
     status: string;
     uid: number;
@@ -221,15 +221,21 @@ export default {
             );
             if (!link) {
                 link = document.createElement('a');
+            }
+            link.innerHTML = userOnline.name;
+            link.className = [
+                `user${userOnline.uid}`,
+                `mgroup${userOnline.groupID}`,
+                userOnline.status,
+                `lastAction${userOnline.lastAction}`,
+            ].join(' ');
+
+            if (userOnline.profileURL) {
                 link.href = userOnline.profileURL;
                 link.addEventListener('click', function click() {
                     RUN.stream.location(this.href);
                 });
             }
-            link.innerHTML = userOnline.name;
-            link.className = `user${userOnline.uid} mgroup${userOnline.groupID} ${
-                userOnline.status ? ` ${userOnline.status}` : ''
-            } lastAction${userOnline.lastAction}`;
             if (userOnline.locationVerbose) {
                 link.title = userOnline.locationVerbose;
                 link.addEventListener('mouseover', () => openTooltip(link));
