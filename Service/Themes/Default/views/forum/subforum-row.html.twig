@@ -1,0 +1,32 @@
+<tr id="fid_{{ subforum.id }}" class="{% if isRead %}read{% else %}unread{% endif %}">
+  <td class="f_icon" rowspan="2">
+    <a
+        id="fid_{{ subforum.id }}_icon"
+        href="{{ url('forum', { id: subforum.id, markread: 1, slug: subforum.title|slugify }) }}">
+      {%if isRead %}
+        {% include "forum/icon-read.html.twig" %}
+      {% else %}
+        {% include "forum/icon-unread.html.twig" %}
+      {% endif %}
+    </a>
+  </td>
+  <td class="forum" rowspan="2">
+    <a href="{{ url('forum', { id: subforum.id, slug: subforum.title|slugify }) }}">
+      {{ subforum.title }}
+    </a>
+    <div class="description">
+      {{ subforum.subtitle }}
+    </div>
+  </td>
+  <td class="last_post" colspan="2">
+    {% include 'forum/subforum-lastpost.html.twig' with { subforum, lastPostUser } only %}
+  </td>
+</tr>
+<tr>
+  <td class="item_1">
+    Topics: {{ subforum.topics }}
+  </td>
+  <td class="item_2">
+    Replies: {{ subforum.posts }}
+  </td>
+</tr>

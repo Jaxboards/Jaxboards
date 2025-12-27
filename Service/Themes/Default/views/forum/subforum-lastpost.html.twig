@@ -1,0 +1,18 @@
+Last Post:
+{% if subforum.lastPostTopic %}
+    <a
+        href="{{ url('topic', {
+            id: subforum.lastPostTopic,
+            getlast: 1,
+            slug: subforum.lastPostTopicTitle|slugify
+        }) }}">
+        {{ subforum.lastPostTopicTitle}}
+    </a>
+{% else %}
+  None
+{% endif %}
+<br>
+{% if lastPostUser %}
+    By {% include 'global/user-link.html.twig' with { user: lastPostUser } only -%},
+    {{ subforum.lastPostDate|autodate }}
+{% endif %}

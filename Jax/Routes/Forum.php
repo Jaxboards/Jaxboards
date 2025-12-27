@@ -269,7 +269,7 @@ final class Forum implements Route
             $pages = $this->renderTopicPages($topic);
 
             $author = $membersById[$topic->author];
-            $lastPostAuthor = $membersById[$topic->lastPostUser] ?? null;
+            $lastPostUser = $membersById[$topic->lastPostUser] ?? null;
             $topicSlug = $this->textFormatting->slugify($topic->title);
 
             $read = $this->isTopicRead($topic);
@@ -298,11 +298,11 @@ final class Forum implements Route
                     ? $this->date->autoDate($topic->lastPostDate)
                     : '',
                 // 8
-                $lastPostAuthor ? $this->template->meta(
+                $lastPostUser ? $this->template->meta(
                     'user-link',
-                    $lastPostAuthor->id,
-                    $lastPostAuthor->groupID,
-                    $lastPostAuthor->displayName,
+                    $lastPostUser->id,
+                    $lastPostUser->groupID,
+                    $lastPostUser->displayName,
                 ) : '',
                 // 9
                 ($topic->pinned !== 0 ? 'pinned' : '') . ' ' . ($topic->locked !== 0 ? 'locked' : ''),
@@ -406,13 +406,13 @@ final class Forum implements Route
             "% {$forum->id}",
         );
 
-        $lastPostAuthors = Member::joinedOn(
+        $lastPostUsers = Member::joinedOn(
             $subforums,
             static fn($modelsForum): ?int => $modelsForum->lastPostUser,
         );
 
         // lastPostDate needs timestamp
-        $rows = '';
+        $rows = [];
         foreach ($subforums as $subforum) {
             $forum->topics -= $subforum->topics;
 
@@ -420,55 +420,19 @@ final class Forum implements Route
                 continue;
             }
 
-            $lastPostAuthor = $subforum->lastPostUser
-                ? $lastPostAuthors[$subforum->lastPostUser]
-                : null;
-
-            $lastPostDate = $subforum->lastPostDate
-                ? $this->date->autoDate($subforum->lastPostDate)
-                : '- - - - -';
-            $subforumSlug = $this->textFormatting->slugify($subforum->title);
-
-            $rows .= $this->template->meta(
-                'forum-subforum-row',
-                $subforum->id,
-                $subforum->title,
-                $subforum->subtitle,
-                $this->template->meta(
-                    'forum-subforum-lastpost',
-                    $this->router->url('topic', [
-                        'id' => $subforum->lastPostTopic,
-                        'getlast' => '1',
-                        'slug' => $this->textFormatting->slugify($subforum->lastPostTopicTitle),
-                    ]),
-                    $subforum->lastPostTopicTitle ?: '- - - - -',
-                    $lastPostAuthor ? $this->template->meta(
-                        'user-link',
-                        $subforum->lastPostUser,
-                        $lastPostAuthor->groupID,
-                        $lastPostAuthor->displayName,
-                    ) : 'None',
-                    $lastPostDate,
-                ),
-                $subforum->topics,
-                $subforum->posts,
-                ($read = $this->isForumRead($subforum)) ? 'read' : 'unread',
-                $read ? (
-                    $this->template->meta('subforum-icon-read')
-                    ?: $this->template->meta('icon-read')
-                ) : (
-                    $this->template->meta('subforum-icon-unread')
-                    ?: $this->template->meta('icon-unread')
-                ),
-                $this->router->url('forum', ['id' => $subforum->id, 'slug' => $subforumSlug]),
-                $this->router->url('forum', ['id' => $subforum->id, 'markread' => '1', 'slug' => $subforumSlug]),
-            );
+            $rows[] = [
+                'subforum' => $subforum,
+                'lastPostUser' => $lastPostUsers[$subforum->lastPostUser] ?? null,
+                'isRead' => $this->isForumRead($subforum),
+            ];
         }
 
-        return $rows !== '' ? $this->page->collapseBox(
+        return $rows === [] ? '' : $this->page->collapseBox(
             'Subforums',
-            $this->template->meta('forum-subforum-table', $rows),
-        ) : '';
+            $this->template->render('forum/subforum-table', [
+                'rows' => $rows,
+            ]),
+        );
     }
 
     private function getReplySummary(int $tid): void
