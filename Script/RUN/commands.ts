@@ -10,7 +10,22 @@ import { onImagesLoaded } from '../JAX/util';
 import Window from '../JAX/window';
 import Sound from '../sound';
 
-type UserOnlineArgs = [number, number, string, string, string, number];
+// Comes from UserOnline struct/class
+type UserOnline = {
+    birthday: boolean;
+    groupID: number;
+    hide: boolean;
+    isBot: boolean;
+    lastAction: number;
+    lastUpdate: number;
+    location: string;
+    locationVerbose: string;
+    name: string;
+    profileURL: string;
+    readDate: number;
+    status: string;
+    uid: number;
+};
 
 /**
  * These are all of the possible commands
@@ -195,42 +210,39 @@ export default {
             Window.close(el);
         }
     },
-    onlinelist(users: UserOnlineArgs[]) {
+    onlinelist(users: UserOnline[]) {
         const statusers = document.querySelector('#statusers');
         if (!statusers) {
             return;
         }
-        users.forEach(
-            ([memberId, groupId, status, name, tooltip, lastAction]) => {
-                let link = document.querySelector<HTMLAnchorElement>(
-                    `#statusers .user${memberId}`,
-                );
-                if (!link) {
-                    link = document.createElement('a');
-                    const href = `/profile/${memberId}`;
-                    link.href = href;
-                    link.addEventListener('click', function click() {
-                        RUN.stream.location(href);
-                    });
-                }
-                link.innerHTML = name;
-                link.className = `user${memberId} mgroup${groupId} ${
-                    status ? ` ${status}` : ''
-                } lastAction${lastAction}`;
-                if (tooltip) {
-                    link.title = tooltip;
-                    link.addEventListener('mouseover', () => openTooltip(link));
-                }
-                if (status === 'idle') {
-                    addIdleClock(link);
+        users.forEach((userOnline) => {
+            let link = document.querySelector<HTMLAnchorElement>(
+                `#statusers .user${userOnline.uid}`,
+            );
+            if (!link) {
+                link = document.createElement('a');
+                link.href = userOnline.profileURL;
+                link.addEventListener('click', function click() {
+                    RUN.stream.location(this.href);
+                });
+            }
+            link.innerHTML = userOnline.name;
+            link.className = `user${userOnline.uid} mgroup${userOnline.groupID} ${
+                userOnline.status ? ` ${userOnline.status}` : ''
+            } lastAction${userOnline.lastAction}`;
+            if (userOnline.locationVerbose) {
+                link.title = userOnline.locationVerbose;
+                link.addEventListener('mouseover', () => openTooltip(link));
+            }
+            if (userOnline.status === 'idle') {
+                addIdleClock(link);
 
-                    return;
-                }
-                if (statusers.firstChild) {
-                    statusers.insertBefore(link, statusers.firstChild);
-                } else statusers.appendChild(link);
-            },
-        );
+                return;
+            }
+            if (statusers.firstChild) {
+                statusers.insertBefore(link, statusers.firstChild);
+            } else statusers.appendChild(link);
+        });
     },
     setoffline(userIds: string) {
         const statusers = document.querySelector('#statusers');

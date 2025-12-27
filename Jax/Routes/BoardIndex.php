@@ -322,18 +322,7 @@ final class BoardIndex implements Route
                 || $userOnline->status === 'idle'
                 && $userOnline->lastAction > $lastActionIdle
             ) {
-                $list[] = [
-                    $userOnline->uid,
-                    $userOnline->groupID,
-
-                    $userOnline->status !== 'active'
-                        ? $userOnline->status
-                        : ($userOnline->birthday && ($this->config->getSetting('birthdays') & 1)
-                            ? ' birthday' : ''),
-                    $userOnline->name,
-                    $userOnline->locationVerbose,
-                    $userOnline->lastAction,
-                ];
+                $list[] = $userOnline;
             }
 
             if ($oldcache !== null) {
