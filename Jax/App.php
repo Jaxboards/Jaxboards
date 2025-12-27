@@ -181,7 +181,7 @@ final readonly class App
                 [
                     'logoURL' => $this->config->getSetting('logourl')
                         ?: $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default/img/logo.png',
-                ]
+                ],
             ),
         );
         $this->page->append(
@@ -189,8 +189,8 @@ final readonly class App
             $this->template->render(
                 'global/navigation',
                 [
-                    'perms' => $this->user->getGroup()
-                ]
+                    'perms' => $this->user->getGroup(),
+                ],
             ),
         );
 

@@ -7,7 +7,10 @@ namespace Jax;
 use Exception;
 use Jax\Models\Skin;
 
+use function array_keys;
+use function array_map;
 use function array_merge;
+use function array_values;
 use function error_log;
 use function explode;
 use function header;
@@ -261,13 +264,13 @@ final class Page
     {
         return $this->template->render('global/breadcrumbs', [
             'crumbs' => array_map(
-                fn($url, $text) => [
+                static fn($url, $text): array => [
                     'url' => $url,
                     'text' => $text,
                 ],
                 array_keys($this->breadCrumbs),
                 array_values($this->breadCrumbs),
-            )
+            ),
         ]);
     }
 }
