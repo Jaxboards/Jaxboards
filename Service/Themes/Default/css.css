@@ -280,7 +280,9 @@ textarea {
 }
 
 /* Mod CP */
-#modcp .content {
+#modcp > .content {
+    display: flex;
+    flex-wrap: wrap;
     background: #ccf;
 }
 
@@ -305,14 +307,13 @@ textarea {
 }
 
 #modcp .leftbar {
-    float: left;
     padding: 10px;
     width: 150px;
 }
 
 #modcp .modcppage {
+    flex: 1;
     border-left: 1px solid #000;
-    margin-left: 170px;
     padding: 10px;
     background: #fff;
     min-height: 200px;
