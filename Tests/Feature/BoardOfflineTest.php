@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Jax\Routes\BoardIndex;
-use Jax\UserOnline;
-use Jax\UsersOnline;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -30,6 +27,7 @@ use Jax\Page;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
+use Jax\Routes\BoardIndex;
 use Jax\Routes\BoardOffline;
 use Jax\ServiceConfig;
 use Jax\Session;
@@ -37,6 +35,8 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
+use Jax\UserOnline;
+use Jax\UsersOnline;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\FeatureTestCase;
 
