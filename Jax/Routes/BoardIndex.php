@@ -171,9 +171,11 @@ final class BoardIndex implements Route
             if (!$forum->showLedBy) {
                 continue;
             }
+
             if (!$forum->mods) {
                 continue;
             }
+
             foreach (explode(',', $forum->mods) as $modId) {
                 if ($modId === '') {
                     continue;
