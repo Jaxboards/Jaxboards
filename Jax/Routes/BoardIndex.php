@@ -19,7 +19,6 @@ use Jax\Request;
 use Jax\Router;
 use Jax\Session;
 use Jax\Template;
-use Jax\TextFormatting;
 use Jax\User;
 use Jax\UserOnline;
 use Jax\UsersOnline;
@@ -60,7 +59,6 @@ final class BoardIndex implements Route
         private readonly Request $request,
         private readonly Router $router,
         private readonly Session $session,
-        private readonly TextFormatting $textFormatting,
         private readonly Template $template,
         private readonly User $user,
         private readonly UsersOnline $usersOnline,

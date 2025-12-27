@@ -283,7 +283,7 @@ final class Template
             $this->twigEnvironment->addFunction(...),
             [
                 new TwigFunction('url', fn(...$args) => $this->container->get(Router::class)->url(...$args)),
-            ]
+            ],
         );
 
         array_map(
@@ -292,17 +292,17 @@ final class Template
                 new TwigFilter(
                     'autodate',
                     fn(?string $string) => $this->container->get(Date::class)->autoDate($string),
-                    ['is_safe' => ['html']]
+                    ['is_safe' => ['html']],
                 ),
                 new TwigFilter(
                     'slugify',
-                    fn(?string $string) => $this->container->get(TextFormatting::class)->slugify($string)
+                    fn(?string $string) => $this->container->get(TextFormatting::class)->slugify($string),
                 ),
                 new TwigFilter(
                     'wordfilter',
-                    fn(?string $string) => $this->container->get(TextFormatting::class)->wordfilter($string)
+                    fn(?string $string) => $this->container->get(TextFormatting::class)->wordfilter($string),
                 ),
-            ]
+            ],
         );
     }
 
