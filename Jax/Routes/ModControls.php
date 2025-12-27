@@ -123,12 +123,11 @@ final readonly class ModControls implements Route
             return;
         }
 
-        $page = $this->template->meta(
-            'modcp-index',
-            $this->router->url('modcontrols', ['do' => 'emem']),
-            $this->router->url('modcontrols', ['do' => 'iptools']),
-            $this->router->url('modcontrols', ['do' => 'onlineSessions']),
-            $cppage,
+        $page = $this->template->render(
+            'modcp/index',
+            [
+                'content' => $cppage,
+            ]
         );
         $page = $this->template->meta('box', ' id="modcp"', 'Mod CP', $page);
 

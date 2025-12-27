@@ -1,0 +1,16 @@
+<div class="leftbar">
+    <a href="{{ url('modcontrols', { do: 'emem' }) }}">
+        Edit Members
+    </a>
+    <br>
+    <a href="{{ url('modcontrols', { do: 'iptools' }) }}">
+        IP Tools
+    </a>
+    <br>
+    <a href="{{ url('modcontrols', { do: 'onlineSessions' }) }}">
+        Online Sessions
+    </a>
+</div>
+<div class="modcppage">
+    {{ content|raw }}
+</div>
