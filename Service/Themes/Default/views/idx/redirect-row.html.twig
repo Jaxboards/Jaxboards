@@ -1,0 +1,16 @@
+<tr>
+  <td class="f_icon">
+    {% include "idx/icon-redirect.html.twig" %}
+  </td>
+  <td class="forum">
+    <a href="{{ forumURL }}">
+      {{ forum.title }}
+    </a>
+    <div class="description">
+      {{ forum.subtitle|nl2br }}
+    </div>
+  </td>
+  <td class="last_post" colspan="2">
+    Redirects: {{ forum.redirects }}
+  </td>
+</tr>

@@ -25,6 +25,7 @@ use Jax\UserOnline;
 use Jax\UsersOnline;
 
 use function _\groupBy;
+use function _\keyBy;
 use function array_filter;
 use function array_flip;
 use function array_key_exists;
@@ -51,19 +52,9 @@ final class BoardIndex implements Route
     private ?array $forumsread = null;
 
     /**
-     * @var array<int> List of all moderator user IDs
+     * @var array<int,Member> List of all moderators by ID
      */
     private array $mods = [];
-
-    /**
-     * @var array<int,array<int>> a map of forum IDs to the subforums they contain
-     */
-    private array $subforumids = [];
-
-    /**
-     * @var array<int,string> map of forum IDs to their compiled HTML link lists
-     */
-    private array $subforums = [];
 
     public function __construct(
         private readonly Config $config,
@@ -137,45 +128,8 @@ final class BoardIndex implements Route
         $lastPostMembers = $this->fetchLastPostMembers($forums);
         $forumsByCatID = groupBy($forums, static fn(Forum $forum): ?int => $forum->category);
 
-        foreach ($forums as $forum) {
-            // Store subforum details for later.
-            if ($forum->path) {
-                preg_match('@\d+$@', $forum->path, $match);
-                $subForumId = $match !== [] ? (int) $match[0] : null;
-                if (
-                    $subForumId
-                    && array_key_exists($subForumId, $this->subforums)
-                ) {
-                    $this->subforumids[$subForumId][] = $forum->id;
-                    $this->subforums[$subForumId] .= $this->template->meta(
-                        'idx-subforum-link',
-                        $this->router->url('forum', ['id' => $forum->id, 'slug' => $this->textFormatting->slugify($forum->title)]),
-                        $forum->title,
-                        $this->textFormatting->blockhtml($forum->subtitle),
-                    ) . $this->template->meta('idx/subforum-splitter');
-                }
-            }
+        $this->setModsFromForums($forums);
 
-            // Store mod details for later.
-            if (!$forum->showLedBy) {
-                continue;
-            }
-
-            if (!$forum->mods) {
-                continue;
-            }
-
-            foreach (explode(',', $forum->mods) as $modId) {
-                if ($modId === '') {
-                    continue;
-                }
-
-                $this->mods[] = (int) $modId;
-            }
-        }
-
-        // Remove duplicates
-        $this->mods = array_unique($this->mods, SORT_REGULAR);
         $categories = Category::selectMany('ORDER BY `order`,`title` ASC');
         foreach ($categories as $category) {
             if (!array_key_exists($category->id, $forumsByCatID)) {
@@ -210,56 +164,47 @@ final class BoardIndex implements Route
     }
 
     /**
-     * @return array<mixed>
+     * Selects Member records for all forum moderators and stores them
+     * @param Forum[] $forums
      */
-    private function getsubs(int $forumId): array
+    private function setModsFromForums(array $forums): void
     {
-        if (
-            !array_key_exists($forumId, $this->subforumids)
-        ) {
-            return [];
-        }
-
-        $forum = $this->subforumids[$forumId];
-        foreach ($forum as $forumId) {
-            if (!$this->subforumids[$forumId]) {
+        $modIDs = [];
+        foreach ($forums as $forum) {
+            if (!$forum->showLedBy || !$forum->mods) {
                 continue;
             }
 
-            $forum = array_merge($forum, $this->getsubs($forumId));
+            foreach (explode(',', $forum->mods) as $modId) {
+                if ($modId === '') {
+                    continue;
+                }
+
+                $modIDs[] = (int) $modId;
+            }
         }
 
-        return $forum;
+        $modIDs = array_unique($modIDs, SORT_REGULAR);
+
+        $this->mods = $modIDs === [] ? [] : keyBy(
+            Member::selectMany(Database::WHERE_ID_IN, $modIDs),
+            static fn(Member $member) => $member->id
+        );
     }
 
     /**
      * @param string $modids a comma separated list
+     *
+     * @return Member[]
      */
-    private function getMods(string $modids): string
+    private function getMods(string $modids): array
     {
-        static $moderatorinfo = null;
-
-        if ($moderatorinfo === null) {
-            $moderatorinfo = [];
-            $members = $this->mods !== []
-                ? Member::selectMany(Database::WHERE_ID_IN, $this->mods)
-                : $this->mods;
-            foreach ($members as $member) {
-                $moderatorinfo[$member->id] = $this->template->meta(
-                    'user-link',
-                    $member->id,
-                    $member->groupID,
-                    $member->displayName,
-                );
-            }
-        }
-
-        $forum = '';
+        $returnedMods = [];
         foreach (explode(',', $modids) as $modId) {
-            $forum .= $moderatorinfo[(int) $modId] . $this->template->meta('idx-ledby-splitter');
+            $returnedMods[] = $this->mods[$modId];
         }
 
-        return mb_substr($forum, 0, -mb_strlen($this->template->meta('idx-ledby-splitter')));
+        return $returnedMods;
     }
 
     /**
@@ -272,83 +217,45 @@ final class BoardIndex implements Route
 
         foreach ($forums as $forum) {
             $read = $this->isForumRead($forum);
-            $subforumHTML = '';
-
-            if (
-                $forum->showSubForums >= 1
-                && array_key_exists($forum->id, $this->subforums)
-            ) {
-                $subforumHTML = $this->subforums[$forum->id];
-            }
-
-            if ($forum->showSubForums === 2) {
-                foreach ($this->getsubs($forum->id) as $i) {
-                    $subforumHTML .= $this->subforums[$i];
-                }
-            }
 
             if ($forum->redirect) {
-                $table .= $this->template->meta(
-                    'idx-redirect-row',
-                    $this->router->url('forum', ['id' => $forum->id]),
-                    $forum->title,
-                    nl2br($forum->subtitle, false),
-                    'Redirects: ' . $forum->redirects,
-                    $this->template->meta('icon-redirect')
-                        ?: $this->template->render('idx/icon-redirect'),
+                $table .= $this->template->render(
+                    'idx/redirect-row',
+                    [
+                        'forum' => $forum,
+                        'forumURL' => $this->router->url('forum', [
+                            'id' => $forum->id,
+                            'slug' => $this->textFormatting->slugify($forum->title),
+                        ]),
+                    ]
                 );
             } else {
-                $forumId = $forum->id;
                 $markReadURL = $read
                     ? ''
                     : $this->router->url('forum', ['id' => $forum->id, 'markread' => 1]);
-                $linkText = $read
-                    ? (
-                        $this->template->meta('icon-read')
-                        ?: $this->template->render('idx/icon-read')
-                    ) : (
-                        $this->template->meta('icon-unread')
-                        ?: $this->template->render('idx/icon-unread')
-                    );
-                $table .= $this->template->meta(
-                    'idx-row',
-                    $forum->id,
-                    $this->textFormatting->wordfilter($forum->title),
-                    nl2br($forum->subtitle, false),
-                    $subforumHTML !== ''
-                        ? $this->template->meta(
-                            'idx-subforum-wrapper',
-                            mb_substr(
-                                $subforumHTML,
-                                0,
-                                -1 * mb_strlen(
-                                    $this->template->meta('idx-subforum-splitter'),
-                                ),
-                            ),
-                        ) : '',
-                    $this->formatLastPost($forum, $lastPostMembers[$forum->lastPostUser] ?? null),
-                    $this->template->render('idx/topics-count', ['count' => $forum->topics]),
-                    $this->template->render('idx/replies-count', ['count' => $forum->posts]),
-                    $read ? 'read' : 'unread',
-                    <<<HTML
-                        <a id="fid_{$forumId}_icon" href="{$markReadURL}">
-                            {$linkText}
-                        </a>
-                        HTML,
-                    $forum->showLedBy && $forum->mods
-                        ? $this->template->meta(
-                            'idx-ledby-wrapper',
-                            $this->getMods($forum->mods),
-                        ) : '',
-                    $this->router->url('forum', [
-                        'id' => $forum->id,
-                        'slug' => $this->textFormatting->slugify($forum->title),
-                    ]),
+                $table .= $this->template->render(
+                    'idx/row',
+                    [
+                        'forum' => $forum,
+                        'forumURL' => $this->router->url('forum', [
+                            'id' => $forum->id,
+                            'slug' => $this->textFormatting->slugify($forum->title),
+                        ]),
+                        'lastPostHTML' => $this->formatLastPost(
+                            $forum,
+                            $lastPostMembers[$forum->lastPostUser] ?? null,
+                        ),
+                        'isRead' => $read,
+                        'markReadURL' => $markReadURL,
+                        'mods' => $forum->showLedBy && $forum->mods ? $this->getMods($forum->mods) : [],
+                    ],
                 );
             }
         }
 
-        return $this->template->meta('idx-table', $table);
+        return $this->template->render('idx/table', [
+            'rows' => $table,
+        ]);
     }
 
     private function update(): void
@@ -461,8 +368,7 @@ final class BoardIndex implements Route
             $this->page->command(
                 'update',
                 '#fid_' . $unreadForum->id . '_icon',
-                $this->template->meta('icon-unread')
-                    ?: $this->template->render('idx/icon-unread'),
+                $this->template->render('idx/icon-unread'),
             );
             $this->page->command(
                 'update',

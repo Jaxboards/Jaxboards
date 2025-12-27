@@ -1,0 +1,38 @@
+<tr id="fid_{{ forum.id }}" class="{% if isRead %}read{% else %}unread{% endif %}">
+  <td class="f_icon" rowspan="2">
+    <a id="fid_{{ forum.id }}_icon" href="{{ markReadURL }}">
+        {% if isRead %}
+            {% include [ 'icon-read', 'idx/icon-read.html.twig' ]%}
+        {% else %}
+            {% include [ 'icon-unread', 'idx/icon-unread.html.twig' ]%}
+        {% endif %}
+    </a>
+  </td>
+  <td class="forum" rowspan="2">
+    <a href="{{ forumURL }}">{{ forum.title }}</a>
+    <div class="description">
+      {{ forum.subtitle|nl2br }}
+    </div>
+    {% if mods %}
+        <div class="ledby">
+            Led by:
+            {% for mod in mods %}
+                {%- include 'global/user-link.html.twig' with { user: mod } only -%}
+                {%- if not loop.last %}, {% endif -%}
+            {% endfor %}
+        </div>
+    {% endif %}
+    {# TODO: subforum list #}
+  </td>
+  <td class="last_post" id="fid_{{ forum.id }}_lastpost" colspan="2">
+    {{ lastPostHTML|raw }}
+  </td>
+</tr>
+<tr>
+  <td class="item_1" id="fid_{{ forum.id }}_topics">
+    {% include 'idx/topics-count.html.twig' with { count: forum.topics } %}
+  </td>
+  <td class="item_2" id="fid_{{ forum.id }}_replies">
+    {% include 'idx/replies-count.html.twig' with { count: forum.replies } %}
+  </td>
+</tr>
