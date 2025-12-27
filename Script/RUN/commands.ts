@@ -2,7 +2,7 @@
 
 import { addIdleClock } from '../components/idle-clock';
 import Animation from '../JAX/animation';
-import { getComputedStyle, getCoordinates } from '../JAX/el';
+import { getCoordinates } from '../JAX/el';
 import gracefulDegrade from '../JAX/graceful-degrade';
 import { messageReceived } from '../JAX/instant-messaging-window';
 import openTooltip from '../JAX/tooltip';
@@ -142,34 +142,15 @@ export default {
         const ticker = document.querySelector('#ticker');
         if (!ticker) return;
         let tick = document.createElement('div');
-        tick.className = 'tick';
         tick.innerHTML = html;
-        tick.style.display = 'none';
-        tick.style.overflow = 'hidden';
+        tick = tick.firstElementChild as HTMLDivElement;
+
         ticker.insertBefore(tick, ticker.firstChild);
-        const tickStyle = getComputedStyle(tick);
-        tick.style.height = '0px';
-        new Animation(tick).add('height', '0px', tickStyle.height).play();
         const ticks = Array.from(
             ticker.querySelectorAll<HTMLDivElement>('.tick'),
         );
-        const l = ticks.length;
-        tick.style.display = 'block';
-
-        if (l > 100) {
-            for (let x = 100; x < l; x += 100) {
-                tick = ticks[x];
-                if (!tick.dataset.removed) {
-                    tick = ticks[x];
-                    new Animation(tick, 30, 500)
-                        .add('opacity', '1', '0')
-                        .andThen((el: HTMLElement) => {
-                            el.remove();
-                        })
-                        .play();
-                    tick.dataset.bonked = 'true';
-                }
-            }
+        for (let x = 100; x < ticks.length; x += 100) {
+            ticks[x].remove();
         }
     },
     im(
