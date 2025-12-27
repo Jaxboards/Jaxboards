@@ -120,8 +120,9 @@ final class LogReg implements Route
         $pass2 = $this->request->asString->post('pass2') ?? '';
         $email = $this->request->asString->post('email') ?? '';
 
-        $hCaptchaSitekey = $this->config->getSetting('hcaptcha_sitekey');
-        $page = $this->template->meta('register-form', $hCaptchaSitekey);
+        $page = $this->template->render('logreg/register-form', [
+            'hCaptchaSitekey' => $this->config->getSetting('hcaptcha_sitekey')
+        ]);
 
         // Show registration form.
         if ($this->request->post('register') === null) {
@@ -273,10 +274,7 @@ final class LogReg implements Route
             $this->session->erase('location');
         }
 
-        $this->page->append('PAGE', $this->template->meta(
-            'login-form',
-            $this->router->url('login'),
-        ));
+        $this->page->append('PAGE', $this->template->render('logreg/login-form'));
     }
 
     private function logout(): void
@@ -396,15 +394,16 @@ final class LogReg implements Route
         if ($tokenId !== null && $tokenId !== '') {
             $error = $this->forgotPasswordHasToken($tokenId);
             $page .= ($error !== null ? $this->page->error($error) : '')
-                . $this->template->meta(
-                    'forgot-password2-form',
-                    $this->router->url('forgotPassword'),
-                    Template::hiddenFormFields(
-                        [
-                            'id' => $tokenId,
-                            'uid' => $uid ?? '',
-                        ],
-                    ),
+                . $this->template->render(
+                    'logreg/forgot-password2-form',
+                    [
+                        'hiddenFields' => Template::hiddenFormFields(
+                            [
+                                'id' => $tokenId,
+                                'uid' => $uid ?? '',
+                            ],
+                        ),
+                    ]
                 );
         } else {
             if ($user) {
@@ -470,10 +469,7 @@ final class LogReg implements Route
                 }
             }
 
-            $page .= $this->template->meta(
-                'forgot-password-form',
-                $this->router->url('forgotPassword'),
-            );
+            $page .= $this->template->render('logreg/forgot-password-form');
         }
 
         $this->page->append('PAGE', $page);

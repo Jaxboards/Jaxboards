@@ -1,7 +1,7 @@
 <div class="box register">
-    {if %1$s!=""}
-    <script src='https://www.hCaptcha.com/1/api.js' async defer></script>
-    {/if}
+    {% if hCaptchaSitekey %}
+        <script src='https://www.hCaptcha.com/1/api.js' async defer></script>
+    {% endif %}
     <div class="title">
         Registration
     </div>
@@ -35,11 +35,11 @@
                 Email:
             </label>
             <input type="text" name="email" id="email">
-            {if %1$s!=""}
-            <br>
-            <br>
-            <div class="h-captcha" data-sitekey="753ac29e-dd30-49ac-9c5a-6aea4b0011ec"></div>
-            {/if}
+            {% if hCaptchaSitekey %}
+                <br>
+                <br>
+                <div class="h-captcha" data-sitekey="{{ hCaptchaSitekey }}"></div>
+            {% endif %}
             <br>
             <input type="submit" value="Register">
         </form>
