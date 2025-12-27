@@ -11,14 +11,14 @@
         <div class="content">
             {{ usersOnlineCount }} User{% if usersOnlineCount > 1 %}s{% endif %} Online:
             <div id="statusers">
-                {% for user in usersOnline %}
-                    {% if user.isBot %}
+                {%- for user in usersOnline -%}
+                    {%- if user.isBot -%}
                         <a
                             class="user{{ user.uid }}"
                             title="{{ user.locationVerbose|default('Viewing the board.') }}"
                             data-use-tooltip="true"
                         >{{ user.name }}</a>
-                    {% else %}
+                    {%- else -%}
                         <a
                             href="{{ user.profileURL }}"
                             class="user{{ user.uid }} mgroup{{ user.groupID }}
@@ -31,15 +31,15 @@
                             title="{{ user.locationVerbose|default('Viewing the board.') }}"
                             data-use-tooltip="true"
                         >{{ user.name }}</a>
-                    {% endif %}
-                {% endfor %}
-                {% if guestCount %}
-                    {% if modURL %}
+                    {%- endif -%}
+                {%- endfor -%}
+                {%- if guestCount -%}
+                    {%- if modURL -%}
                         <a href="{{ modURL }}">{{ guestCount }} guest{% if guestCount>0 %}s{% endif %}</a>
-                    {% else %}
+                    {%- else -%}
                         {{ guestCount }} guest{% if guestCount>1 %}s{% endif %}
-                    {% endif %}
-                {% endif %}
+                    {%- endif -%}
+                {%- endif -%}
             </div>
             <div class="userstoday">
                 {{ usersOnlineToday|length }} User{% if usersOnlineToday|length != 1 %}s{% endif %} Online Today:
