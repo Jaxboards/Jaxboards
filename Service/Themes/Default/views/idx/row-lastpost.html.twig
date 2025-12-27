@@ -1,7 +1,7 @@
 Last Post:
-<a href="{{ url('topic', { id: forum.lastPostTopic, slug: form.lastPost|slugify, getlast: 1 }) }}">
+<a href="{{ url('topic', { id: forum.lastPostTopic, slug: forum.lastPostTopicTitle|slugify, getlast: 1 }) }}">
     {%- if forum.lastPostTopicTitle -%}
-        {{- forum.lastPostTopicTitle -}}
+        {{- forum.lastPostTopicTitle|wordfilter -}}
     {%- else -%}
         - - - - -
     {%- endif -%}
