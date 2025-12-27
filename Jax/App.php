@@ -214,10 +214,10 @@ final readonly class App
                     [
                         'user' => $this->user->get(),
                         'lastVisit' => $this->date->smallDate(
-                            $this->user->get()->lastVisit
+                            $this->user->get()->lastVisit,
                         ),
                         'unreadMessages' => $unreadMessages,
-                    ]
+                    ],
                 ),
         );
     }
