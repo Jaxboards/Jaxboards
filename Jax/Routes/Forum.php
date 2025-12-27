@@ -34,8 +34,6 @@ use function in_array;
 use function json_decode;
 use function json_encode;
 use function max;
-use function mb_strlen;
-use function number_format;
 
 use const JSON_THROW_ON_ERROR;
 
@@ -101,7 +99,6 @@ final class Forum implements Route
         }
 
         $page = '';
-        $table = '';
 
         $forum = ModelsForum::selectOne($fid);
 
@@ -248,7 +245,7 @@ final class Forum implements Route
 
         $isForumModerator = $this->isForumModerator($modelsForum);
 
-        $rows = array_map(fn($topic) => [
+        $rows = array_map(fn(Topic $topic): array => [
             'author' => $membersById[$topic->author],
             'topic' => $topic,
             'lastPostUser' => $membersById[$topic->lastPostUser] ?? null,
@@ -259,7 +256,7 @@ final class Forum implements Route
 
         return $this->template->render('forum/table', [
             'forum' => $modelsForum,
-            'rows' => $rows
+            'rows' => $rows,
         ]);
     }
 
