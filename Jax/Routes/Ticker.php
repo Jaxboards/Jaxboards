@@ -69,7 +69,9 @@ final class Ticker implements Route
         }
 
         $this->session->addVar('tickid', $first);
-        $page = $this->template->meta('ticker', $ticksHTML);
+        $page = $this->template->render('ticker/ticker', [
+            'ticks' => $ticksHTML,
+        ]);
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
     }
@@ -144,17 +146,14 @@ final class Ticker implements Route
     {
         [$post, $postAuthor, $topic] = $tick;
 
-        return $this->template->meta(
-            'ticker-tick',
-            $post->date ? $this->date->smallDate($post->date, ['autodate' => true]) : '',
-            $this->template->meta(
-                'user-link',
-                $postAuthor->id,
-                $postAuthor->groupID,
-                $postAuthor->displayName,
-            ),
-            $this->router->url('topic', ['id' => $topic->id, 'findpost' => $post->id]),
-            $this->textFormatting->wordfilter($topic->title),
+        return $this->template->render(
+            'ticker/tick',
+            [
+                'date' => $post->date ? $this->date->smallDate($post->date, ['autodate' => true]) : '',
+                'user' => $postAuthor,
+                'topic' => $topic,
+                'post' => $post,
+            ]
         );
     }
 }

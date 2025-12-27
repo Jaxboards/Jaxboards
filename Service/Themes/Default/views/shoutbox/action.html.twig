@@ -1,5 +1,5 @@
 <div class="shout action" title="{{ timestamp }}">
-    ***{%- include 'global/user-link.html.twig' with { user: user } only %}
+    ***{%- include 'global/user-link.html.twig' with { user } only %}
     {{ shout.shout|slice(4)|theWorksInline }}
-    {%- include 'shoutbox/shout-delete.html.twig' with { shout } -%}
+    {%- include 'shoutbox/shout-delete.html.twig' with { shout } only -%}
 </div>

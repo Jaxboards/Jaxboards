@@ -462,16 +462,14 @@ final class Post implements Route
         }
 
         $topic->title = $topicTitle;
-        $topic->subtitle = $this->textFormatting->blockhtml($topicDesc ?? '');
+        $topic->subtitle = $topicDesc ?? '';
         $topic->summary = mb_substr(
             (string) preg_replace(
                 '@\s+@',
                 ' ',
                 $this->textFormatting->wordfilter(
-                    $this->textFormatting->blockhtml(
-                        $this->textFormatting->textOnly(
-                            $this->postData ?? '',
-                        ),
+                    $this->textFormatting->textOnly(
+                        $this->postData ?? '',
                     ),
                 ),
             ),
@@ -621,7 +619,7 @@ final class Post implements Route
             0,
             50,
         );
-        $topic->title = $this->textFormatting->blockhtml($topicTitle ?? '');
+        $topic->title = $topicTitle;
         $topic->views = 0;
         $topic->insert();
 
