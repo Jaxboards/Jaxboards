@@ -92,7 +92,7 @@ final class InboxTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go('/ucp/inbox');
-        $url = $this->container->get(Router::class)->url('ucp', ['what' => 'inbox', 'view' => '1']);
+        $url = $this->container->get(Router::class)->url('inbox', ['view' => '1']);
 
         DOMAssert::assertSelectEquals(".unread a[href^='{$url}']", 'Test Message', 1, $page);
     }
@@ -163,7 +163,7 @@ final class InboxTest extends FeatureTestCase
 
         $page = $this->go('/ucp/inbox?flag=1&tog=1');
 
-        $this->assertRedirect('ucp', ['what' => 'inbox'], $page);
+        $this->assertRedirect('inbox', [], $page);
 
         $message = Message::selectOne(1);
         $this->assertEquals(1, $message->flag);
@@ -177,7 +177,7 @@ final class InboxTest extends FeatureTestCase
 
         $page = $this->go('/ucp/inbox?flag=1&tog=0');
 
-        $this->assertRedirect('ucp', ['what' => 'inbox'], $page);
+        $this->assertRedirect('inbox', [], $page);
 
         $message = Message::selectOne(1);
         $this->assertEquals(0, $message->flag);

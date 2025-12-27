@@ -208,33 +208,23 @@ final readonly class App
         $this->page->append(
             'USERBOX',
             $this->user->isGuest()
-                ? $this->template->meta(
-                    'userbox-logged-out',
-                    $this->router->url('forgotPassword'),
-                    $this->router->url('register'),
-                )
-                : $this->template->meta(
-                    'userbox-logged-in',
-                    $this->template->meta(
-                        'user-link',
-                        $this->user->get()->id,
-                        $this->user->get()->groupID,
-                        $this->user->get()->displayName,
-                    ),
-                    $this->date->smallDate(
-                        $this->user->get()->lastVisit,
-                    ),
-                    $unreadMessages,
-                    $this->router->url('logout'),
-                    $this->router->url('ucp', ['what' => 'inbox']),
-                    $this->router->url('ucp'),
+                ? $this->template->render('global/userbox-logged-out')
+                : $this->template->render(
+                    'global/userbox-logged-in',
+                    [
+                        'user' => $this->user->get(),
+                        'lastVisit' => $this->date->smallDate(
+                            $this->user->get()->lastVisit
+                        ),
+                        'unreadMessages' => $unreadMessages,
+                    ]
                 ),
         );
     }
 
     private function getUnreadMessages(): int
     {
-        if ($this->user->get()->id !== 0) {
+        if (!$this->user->isGuest()) {
             return Message::count(
                 'WHERE `read`=0 AND `to`=?',
                 $this->user->get()->id,
@@ -247,7 +237,7 @@ final readonly class App
     private function renderFooter(int $unreadMessages): void
     {
         if ($unreadMessages !== 0) {
-            $inboxURL = $this->router->url('ucp', ['what' => 'inbox']);
+            $inboxURL = $this->router->url('inbox');
             $plural = ($unreadMessages === 1 ? '' : 's');
             $this->page->append(
                 'FOOTER',

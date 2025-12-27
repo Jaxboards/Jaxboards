@@ -1,14 +1,14 @@
-<form data-ajax-form="resetOnSubmit" action="/login" method="post">
+<form data-ajax-form="resetOnSubmit" action="{{ url('login') }}" method="post">
   <div>
     <label for="user">Username:</label><br>
     <input type="text" title="Username" id="user" name="user">
     <br>
     <label for="pass">Password:</label>
-    <a href="%s" class="forgot">Forgot?</a>
+    <a href="{{ url('forgotPassword') }}" class="forgot">Forgot?</a>
     <br>
     <input type="password" title="Password" id="pass" name="pass">
     <br>
     <input type="submit" value="Login">
-    <a href="%s" class="register">Register</a>
+    <a href="{{ url('forgotPassword') }}" class="register">Register</a>
   </div>
 </form>

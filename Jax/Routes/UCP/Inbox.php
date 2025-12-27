@@ -149,7 +149,7 @@ final readonly class Inbox
                 $udata->id,
             );
 
-            $inboxURL = $this->domainDefinitions->getBoardUrl() . $this->router->url('ucp', ['what' => 'inbox']);
+            $inboxURL = $this->domainDefinitions->getBoardUrl() . $this->router->url('inbox');
 
             // Send em an email!
             if (($udata->emailSettings & 2) !== 0) {
@@ -217,7 +217,6 @@ final readonly class Inbox
             Template::hiddenFormFields(
                 [
                     'submit' => '1',
-                    'what' => 'inbox',
                 ],
             ),
             $mid,
@@ -258,9 +257,8 @@ final readonly class Inbox
         }
 
         $this->router->redirect(
-            'ucp',
+            'inbox',
             [
-                'what' => 'inbox',
                 'page' => $this->request->asString->both('prevpage') ?? '',
             ],
         );
@@ -326,7 +324,7 @@ final readonly class Inbox
         }
 
         if (!$this->request->isJSAccess()) {
-            $this->router->redirect('ucp', ['what' => 'inbox']);
+            $this->router->redirect('inbox');
         }
 
         return null;
@@ -384,7 +382,6 @@ final readonly class Inbox
                 [
                     'messageid' => (string) $message->id,
                     'sender' => (string) $message->from,
-                    'what' => 'inbox',
                 ],
             ),
         );
@@ -407,7 +404,6 @@ final readonly class Inbox
         $pages .= implode(' &middot; ', array_map(function (int $pageNumber) use ($requestPage, $view): string {
             $active = $pageNumber === $requestPage ? ' class="active"' : '';
             $pageURL = $this->router->url('ucp', [
-                'what' => 'inbox',
                 'view' => $view,
                 'page' => $pageNumber,
             ]);
@@ -447,7 +443,7 @@ final readonly class Inbox
                 '<input type="checkbox" '
                     . ($message->flag ? 'checked="checked" ' : '')
                     . 'class="switch flag" onchange="' . $dmessageOnchange . '">',
-                $this->router->url('ucp', ['what' => 'inbox', 'view' => $message->id]),
+                $this->router->url('inbox', ['view' => $message->id]),
                 $message->title,
                 $otherMember->displayName,
                 $this->date->autoDate($message->date),
@@ -455,7 +451,7 @@ final readonly class Inbox
         }
 
         if ($messages === []) {
-            $composeURL = $this->router->url('ucp', ['what' => 'inbox', 'view' => 'compose']);
+            $composeURL = $this->router->url('inbox', ['view' => 'compose']);
             $msg = match ($view) {
                 'sent' => 'No sent messages.',
                 'flagged' => 'No flagged messages.',

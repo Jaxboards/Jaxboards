@@ -299,19 +299,15 @@ final class LogReg implements Route
         session_destroy();
         $this->template->reset(
             'USERBOX',
-            $this->template->meta(
-                'userbox-logged-out',
-                $this->router->url('forgotPassword'),
-                $this->router->url('register'),
+            $this->template->render(
+                'global/userbox-logged-out',
             ),
         );
         $this->page->command(
             'update',
             'userbox',
-            $this->template->meta(
-                'userbox-logged-out',
-                $this->router->url('forgotPassword'),
-                $this->router->url('register'),
+            $this->template->render(
+                'global/userbox-logged-out',
             ),
         );
         $this->page->command('softurl');

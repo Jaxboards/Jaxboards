@@ -96,7 +96,7 @@ final readonly class UserProfile implements Route
             array_keys($links),
         ));
 
-        $privateMessageURL = $this->router->url('ucp', ['what' => 'inbox', 'view' => 'compose', 'mid' => $member->id]);
+        $privateMessageURL = $this->router->url('inbox', ['view' => 'compose', 'mid' => $member->id]);
 
         $contactDetails .= <<<HTML
             <div class="contact im">
@@ -151,8 +151,7 @@ final readonly class UserProfile implements Route
             'id' => $member->id,
             'page' => 'activity',
         ]);
-        $privateMessageURL = $this->router->url('ucp', [
-            'what' => 'inbox',
+        $privateMessageURL = $this->router->url('inbox', [
             'view' => 'compose',
             'mid' => $member->id,
         ]);

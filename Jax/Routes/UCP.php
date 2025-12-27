@@ -139,10 +139,10 @@ final readonly class UCP implements Route
             $this->router->url('ucp', ['what' => 'sounds']),
             $this->router->url('ucp', ['what' => 'board']),
             // inbox links
-            $this->router->url('ucp', ['what' => 'inbox', 'view' => 'compose']),
-            $this->router->url('ucp', ['what' => 'inbox']),
-            $this->router->url('ucp', ['what' => 'inbox', 'view' => 'sent']),
-            $this->router->url('ucp', ['what' => 'inbox', 'view' => 'flagged']),
+            $this->router->url('inbox', ['view' => 'compose']),
+            $this->router->url('inbox'),
+            $this->router->url('inbox', ['view' => 'sent']),
+            $this->router->url('inbox', ['view' => 'flagged']),
             $page,
         );
         $this->page->append('PAGE', $page);

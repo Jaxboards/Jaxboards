@@ -177,11 +177,12 @@ final class Router
             return $path . ($queryParams !== [] ? '?' . http_build_query($queryParams) : '');
         }
 
-        // These are aliases and will be removed soon
+        // These are aliases
         return match ($name) {
-            'shoutbox' => '?module=shoutbox' . ($params !== [] ? '&' . http_build_query($params) : ''),
+            'shoutbox' => '?module=shoutbox',
+            'inbox' => '/ucp/inbox',
             default => '',
-        };
+        } . ($params !== [] ? '&' . http_build_query($params) : '');
     }
 
     /**

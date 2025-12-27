@@ -164,8 +164,7 @@ final class Members implements Route
                     HTML;
             }
 
-            $privateMessageURL = $this->router->url('ucp', [
-                'what' => 'inbox',
+            $privateMessageURL = $this->router->url('inbox', [
                 'view' => 'compose',
                 'mid' => $member->id,
             ]);
