@@ -276,7 +276,7 @@ final class Template
     {
         $this->filesystemLoader = new FilesystemLoader();
         $this->twigEnvironment = new Environment($this->filesystemLoader, [
-            // 'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
+            'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
         ]);
         $this->twigEnvironment->addFunction(new TwigFunction('url', fn(...$args) => $this->container->get(Router::class)->url(...$args)));
         $this->twigEnvironment->addFilter(new TwigFilter('slugify', fn(string $string) => $this->container->get(TextFormatting::class)->slugify($string)));
