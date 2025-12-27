@@ -9,12 +9,12 @@ use Jax\Models\Page as ModelsPage;
 use Jax\Page;
 use Jax\Request;
 
-final class CustomPage
+final readonly class CustomPage
 {
     public function __construct(
-        private readonly BBCode $bbCode,
-        private readonly Page $page,
-        private readonly Request $request,
+        private BBCode $bbCode,
+        private Page $page,
+        private Request $request,
     ) {}
 
     /**
