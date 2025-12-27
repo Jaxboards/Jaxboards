@@ -1,15 +1,17 @@
 <tr id="fid_{{ forum.id }}" class="{% if isRead %}read{% else %}unread{% endif %}">
   <td class="f_icon" rowspan="2">
-    <a id="fid_{{ forum.id }}_icon" href="{{ markReadURL }}">
-        {% if isRead %}
-            {% include [ 'icon-read', 'idx/icon-read.html.twig' ]%}
-        {% else %}
-            {% include [ 'icon-unread', 'idx/icon-unread.html.twig' ]%}
-        {% endif %}
-    </a>
+    {% if isRead %}
+        <a id="fid_{{ forum.id }}_icon">
+            {% include 'idx/icon-read.html.twig' %}
+        </a>
+    {% else %}
+        <a id="fid_{{ forum.id }}_icon" href="{{ url('forum', { id: forum.id, markread: 1 }) }}">
+            {% include 'idx/icon-unread.html.twig' %}
+        </a>
+    {% endif %}
   </td>
   <td class="forum" rowspan="2">
-    <a href="{{ forumURL }}">{{ forum.title }}</a>
+    <a href="{{ url('forum', { id: forum.id, slug: forum.title|slugify }) }}">{{ forum.title }}</a>
     <div class="description">
       {{ forum.subtitle|nl2br }}
     </div>

@@ -150,7 +150,10 @@ final readonly class App
             return;
         }
 
-        $this->router->route();
+        // Redirect to index instead of 404
+        if (!$this->router->route($this->request->asString->both('path') ?? '')) {
+            $this->router->redirect('index');
+        }
     }
 
     private function renderBaseHTML(): void

@@ -231,23 +231,15 @@ final class BoardIndex implements Route
                     ],
                 );
             } else {
-                $markReadURL = $read
-                    ? ''
-                    : $this->router->url('forum', ['id' => $forum->id, 'markread' => 1]);
                 $table .= $this->template->render(
                     'idx/row',
                     [
                         'forum' => $forum,
-                        'forumURL' => $this->router->url('forum', [
-                            'id' => $forum->id,
-                            'slug' => $this->textFormatting->slugify($forum->title),
-                        ]),
                         'lastPostHTML' => $this->formatLastPost(
                             $forum,
                             $lastPostMembers[$forum->lastPostUser] ?? null,
                         ),
                         'isRead' => $read,
-                        'markReadURL' => $markReadURL,
                         'mods' => $forum->showLedBy && $forum->mods ? $this->getMods($forum->mods) : [],
                     ],
                 );

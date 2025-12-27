@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use DI\Container;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 use function array_key_exists;
 use function array_keys;
@@ -116,16 +119,27 @@ final class Template
     private readonly FilesystemLoader $filesystemLoader;
 
     public function __construct(
+        private readonly Container $container,
         private readonly DebugLog $debugLog,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly FileSystem $fileSystem,
     ) {
+        $this->initializeTwig();
+        $this->setThemePath($this->domainDefinitions->getDefaultThemePath());
+    }
 
+    private function initializeTwig(): void
+    {
         $this->filesystemLoader = new FilesystemLoader();
         $this->twigEnvironment = new Environment($this->filesystemLoader, [
             // 'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
         ]);
-        $this->setThemePath($this->domainDefinitions->getDefaultThemePath());
+        $this->twigEnvironment->addFunction(new TwigFunction('url', function (...$args) {
+            return $this->container->get(Router::class)->url(...$args);
+        }));
+        $this->twigEnvironment->addFilter(new TwigFilter('slugify', function (string $string) {
+            return $this->container->get(TextFormatting::class)->slugify($string);
+        }));
     }
 
     /**
