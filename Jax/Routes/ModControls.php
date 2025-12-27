@@ -127,7 +127,7 @@ final readonly class ModControls implements Route
             'modcp/index',
             [
                 'content' => $cppage,
-            ]
+            ],
         );
         $page = $this->template->meta('box', ' id="modcp"', 'Mod CP', $page);
 
