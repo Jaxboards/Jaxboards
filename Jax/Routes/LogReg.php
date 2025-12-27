@@ -162,7 +162,7 @@ final class LogReg implements Route
 
         if ($error !== null) {
             $this->page->command('alert', $error);
-            $this->page->append('PAGE', $this->template->meta('error', $error));
+            $this->page->append('PAGE', $this->template->render('error', ['message' => $error]));
 
             return;
         }
@@ -184,7 +184,7 @@ final class LogReg implements Route
 
         if ($error !== null) {
             $this->page->command('alert', $error);
-            $this->page->append('PAGE', $this->template->meta('error', $error));
+            $this->page->append('PAGE', $this->template->render('error', ['message' => $error]));
 
             return;
         }
@@ -266,7 +266,7 @@ final class LogReg implements Route
             } else {
                 $this->page->append(
                     'PAGE',
-                    $this->template->meta('error', 'Incorrect username/password'),
+                    $this->template->render('error', ['message' => 'Incorrect username/password']),
                 );
                 $this->page->command('error', 'Incorrect username/password');
             }
@@ -309,7 +309,7 @@ final class LogReg implements Route
             ),
         );
         $this->page->command('softurl');
-        $this->page->append('PAGE', $this->template->meta('success', 'Logged out successfully'));
+        $this->page->append('PAGE', $this->template->render('success', ['message' => 'Logged out successfully']));
         if ($this->request->isJSAccess()) {
             return;
         }
@@ -414,7 +414,7 @@ final class LogReg implements Route
 
                 if ($member === null) {
                     $error = "There is no user registered as <strong>{$user}</strong>, sure this is correct?";
-                    $page .= $this->template->meta('error', $error);
+                    $page .= $this->template->render('error', ['message' => $error]);
                 } else {
                     // Generate token.
                     $forgotpasswordtoken

@@ -129,7 +129,11 @@ final readonly class ModControls implements Route
                 'content' => $cppage,
             ],
         );
-        $page = $this->template->meta('box', ' id="modcp"', 'Mod CP', $page);
+        $page = $this->template->render('global/box', [
+            'boxID' => 'modcp',
+            'title' => 'Mod CP',
+            'content' => $page,
+        ]);
 
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
@@ -157,7 +161,7 @@ final readonly class ModControls implements Route
         $member->sig = $this->request->asString->post('signature') ?? '';
         $member->update();
 
-        return $this->template->meta('success', 'Profile information saved.');
+        return $this->template->render('success', ['message' => 'Profile information saved.']);
     }
 
     private function editMember(): string
@@ -365,12 +369,7 @@ final readonly class ModControls implements Route
                 $this->ipAddress->asBinary($ipAddress),
             );
             foreach ($members as $member) {
-                $content[] = $this->template->meta(
-                    'user-link',
-                    $member->id,
-                    $member->groupID,
-                    $member->displayName,
-                );
+                $content[] = $this->template->render('user-link', ['user' => $member]);
             }
 
             $page .= $this->box('Users with this IP:', implode(', ', $content));
@@ -392,12 +391,7 @@ final readonly class ModControls implements Route
 
                 foreach ($shouts as $shout) {
                     $member = $members[$shout->uid] ?? null;
-                    $content .= $member ? $this->template->meta(
-                        'user-link',
-                        $member->id,
-                        $member->groupID,
-                        $member->displayName,
-                    ) : '';
+                    $content .= $member ? $this->template->render('user-link', ['user' => $member]) : '';
                     $content .= ': ' . $shout->shout . '<br>';
                 }
 

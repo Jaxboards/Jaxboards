@@ -13,6 +13,6 @@ Last Post:
 {% endif %}
 <br>
 {% if lastPostUser %}
-    By {% include 'global/user-link.html.twig' with { user: lastPostUser } only -%},
+    By {% include 'user-link.html.twig' with { user: lastPostUser } only -%},
     {{ subforum.lastPostDate|autodate }}
 {% endif %}

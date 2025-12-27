@@ -15,7 +15,7 @@
         <div class="ledby">
             Led by:
             {% for mod in mods %}
-                {%- include 'global/user-link.html.twig' with { user: mod } only -%}
+                {%- include 'user-link.html.twig' with { user: mod } only -%}
                 {%- if not loop.last %}, {% endif -%}
             {% endfor %}
         </div>

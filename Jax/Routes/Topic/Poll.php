@@ -36,11 +36,13 @@ final readonly class Poll
 
     public function render(Topic $topic): string
     {
-        return $this->template->meta(
-            'box',
-            " id='poll'",
-            $topic->pollQuestion,
-            $this->renderPollHTML($topic),
+        return $this->template->render(
+            'global/box',
+            [
+                'boxID' => 'poll',
+                'title' => $topic->pollQuestion,
+                'content' => $this->renderPollHTML($topic),
+            ],
         );
     }
 

@@ -173,13 +173,8 @@ final class Members implements Route
             $page .= $this->template->meta(
                 'members-row',
                 $this->router->url('profile', ['id' => $member->id]),
-                $member->avatar ?: $this->template->meta('default-avatar'),
-                $this->template->meta(
-                    'user-link',
-                    $member->id,
-                    $member->groupID,
-                    $member->displayName,
-                ),
+                $member->avatar ?: $this->template->render('default-avatar'),
+                $this->template->render('user-link', ['user' => $member]),
                 $groups[$member->groupID]->title,
                 $member->id,
                 $member->posts,
@@ -198,11 +193,13 @@ final class Members implements Route
             $page,
         );
         $page = "<div class='pages pages-top'>{$pages}</div><div class='forum-pages-top'>&nbsp;</div>"
-            . $this->template->meta(
-                'box',
-                ' id="memberlist"',
-                'Members',
-                $page,
+            . $this->template->render(
+                'global/box',
+                [
+                    'boxID' => 'memberlist',
+                    'title' => 'Members',
+                    'content' => $page,
+                ],
             )
             . "<div class='pages pages-bottom'>{$pages}</div>"
             . "<div class='clear'></div>";

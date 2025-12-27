@@ -77,18 +77,15 @@ final readonly class Activity
         Member $member,
         ?Member $affectedUser,
     ): string {
-        $user = $this->template->meta(
+        $user = $this->template->render(
             'user-link',
-            $modelsActivity->uid,
-            $member->groupID,
-            $this->user->get()->id === $modelsActivity->uid ? 'You' : $member->displayName,
+            ['user' => [
+                'id' => $modelsActivity->uid,
+                'groupID' => $member->groupID,
+                'displayName' => $this->user->get()->id === $modelsActivity->uid ? 'You' : $member->displayName
+            ]],
         );
-        $otherguy = $affectedUser instanceof Member ? $this->template->meta(
-            'user-link',
-            $affectedUser->id,
-            $affectedUser->groupID,
-            $affectedUser->displayName,
-        ) : '';
+        $otherguy = $affectedUser instanceof Member ? $this->template->render('user-link', ['user' => $affectedUser]) : '';
 
         $date = $modelsActivity->date
             ? $this->date->smallDate($modelsActivity->date)
@@ -118,16 +115,20 @@ final readonly class Activity
                 <a href="{$urls['new_topic']}">{$modelsActivity->arg1}</a>
                 {$date}
                 HTML,
-            'profile_name_change' => $this->template->meta(
+            'profile_name_change' => $this->template->render(
                 'user-link',
-                $modelsActivity->uid,
-                $member->groupID,
-                $modelsActivity->arg1,
-            ) . ' is now known as ' . $this->template->meta(
+                [
+                    'id' => $modelsActivity->uid,
+                    'groupID' => $member->groupID,
+                    'displayName' => $modelsActivity->arg1
+                ]
+            ) . ' is now known as ' . $this->template->render(
                 'user-link',
-                $modelsActivity->uid,
-                $member->groupID,
-                $modelsActivity->arg2,
+                [
+                    'id' => $modelsActivity->uid,
+                    'groupID' => $member->groupID,
+                    'displayName' => $modelsActivity->arg2
+                ]
             ) . ', ' . $date,
             'buddy_add' => $user . ' made friends with ' . $otherguy,
             default => '',

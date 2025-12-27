@@ -144,14 +144,18 @@ final class Page
     public function collapseBox(
         string $title,
         string $contents,
-        ?string $boxId = null,
+        ?string $boxID = null,
     ): string {
-        return $this->template->meta('collapsebox', $boxId ? " id=\"{$boxId}\"" : '', $title, $contents);
+        return $this->template->render('global/collapsebox', [
+            'boxID' => $boxID,
+            'title' => $title,
+            'content' => $contents
+        ]);
     }
 
     public function error(string $error): string
     {
-        return $this->template->meta('error', $error);
+        return $this->template->render('error', ['message' => $error]);
     }
 
     public function loadSkin(): void

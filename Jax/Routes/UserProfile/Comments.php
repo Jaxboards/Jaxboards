@@ -43,7 +43,7 @@ final readonly class Comments
             $tabHTML .= $this->template->meta(
                 'userprofile-comment-form',
                 $this->user->get()->name ?? '',
-                $this->user->get()->avatar ?: $this->template->meta('default-avatar'),
+                $this->user->get()->avatar ?: $this->template->render('default-avatar'),
             );
         }
 
@@ -80,13 +80,8 @@ final readonly class Comments
             $fromMember = $membersById[$comment->from];
             $tabHTML .= $this->template->meta(
                 'userprofile-comment',
-                $this->template->meta(
-                    'user-link',
-                    $fromMember->id,
-                    $fromMember->groupID,
-                    $fromMember->displayName,
-                ),
-                $fromMember->avatar ?: $this->template->meta('default-avatar'),
+                $this->template->render('user-link', ['user' => $fromMember]),
+                $fromMember->avatar ?: $this->template->render('default-avatar'),
                 $this->date->autoDate($comment->date),
                 $this->textFormatting->theWorks($comment->comment),
                 $deleteLink,
@@ -114,7 +109,7 @@ final readonly class Comments
         if ($error !== null) {
             $this->page->command('error', $error);
 
-            return $this->template->meta('error', $error);
+            return $this->template->render('error', ['message' => $error]);
         }
 
         $activity = new Activity();

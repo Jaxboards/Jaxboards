@@ -608,13 +608,8 @@ final class Topic implements Route
                 'topic-post-row',
                 $post->id,
                 $modelsTopic->id,
-                $author ? $this->template->meta(
-                    'user-link',
-                    $author->id,
-                    $author->groupID,
-                    $author->displayName,
-                ) : 'Guest',
-                $author?->avatar ?: $this->template->meta('default-avatar'),
+                $author ? $this->template->render('user-link', ['user' => $author]) : 'Guest',
+                $author?->avatar ?: $this->template->render('default-avatar'),
                 $author?->usertitle,
                 $author?->posts,
                 $this->template->meta(
@@ -638,12 +633,7 @@ final class Topic implements Route
                 $this->router->url('profile', ['id' => $post->author]),
                 $editor ? $this->template->meta(
                     'topic-edit-by',
-                    $this->template->meta(
-                        'user-link',
-                        $editor->id,
-                        $editor->groupID,
-                        $editor->displayName,
-                    ),
+                    $this->template->render('user-link', ['user' => $editor]),
                     $this->date->autoDate($post->editDate),
                 ) : '',
                 $this->user->getGroup()?->canModerate
@@ -758,7 +748,7 @@ final class Topic implements Route
         if ($post === null) {
             $error = "That post doesn't exist!";
             $this->page->command('alert', $error);
-            $this->page->append('PAGE', $this->template->meta('error', $error));
+            $this->page->append('PAGE', $this->template->render('error', ['message' => $error]));
 
             return;
         }

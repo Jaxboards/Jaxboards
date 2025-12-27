@@ -128,13 +128,8 @@ final readonly class ProfileTabs
             $tabHTML .= $this->template->meta(
                 'userprofile-friend',
                 $this->router->url('profile', ['id' => $friend->id]),
-                $friend->avatar ?: $this->template->meta('default-avatar'),
-                $this->template->meta(
-                    'user-link',
-                    $friend->id,
-                    $friend->groupID,
-                    $friend->displayName,
-                ),
+                $friend->avatar ?: $this->template->render('default-avatar'),
+                $this->template->render('user-link', ['user' => $friend]),
             );
         }
 

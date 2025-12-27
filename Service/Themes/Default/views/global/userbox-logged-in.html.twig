@@ -1,5 +1,5 @@
 <div class="welcome">
-    Hi, {% include 'global/user-link.html.twig' with { user } only -%}!
+    Hi, {% include 'user-link.html.twig' with { user } only -%}!
     <a href="{{ url('logout') }}" class="logout">Logout</a>
 </div>
 <div class="lastvisit">Last Visit: {{ lastVisit }}</div>

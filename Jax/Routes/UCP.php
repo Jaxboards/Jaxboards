@@ -115,11 +115,11 @@ final readonly class UCP implements Route
 
         $ucpnotepad = $this->user->get()->ucpnotepad;
 
-        return ($error !== null ? $this->template->meta('error', $error) : '') . $this->template->meta(
+        return ($error !== null ? $this->template->render('error', ['message' => $error]) : '') . $this->template->meta(
             'ucp-index',
             '',
             $this->user->get()->displayName,
-            $this->user->get()->avatar ?: $this->template->meta('default-avatar'),
+            $this->user->get()->avatar ?: $this->template->render('default-avatar'),
             trim($ucpnotepad) !== ''
                 ? $this->textFormatting->blockhtml($ucpnotepad) : 'Personal notes go here.',
         );
@@ -262,7 +262,7 @@ final readonly class UCP implements Route
                     HTML;
             }
 
-            $page .= $this->template->meta('error', $error);
+            $page .= $this->template->render('error', ['message' => $error]);
             $this->page->command('error', $error);
         }
 
@@ -358,7 +358,7 @@ final readonly class UCP implements Route
             }
         }
 
-        $avatarURL = $avatar ?: trim($this->template->meta('default-avatar'));
+        $avatarURL = $avatar ?: trim($this->template->render('default-avatar'));
         $errorDisplay = $error !== null ? $this->page->error($error) : '';
         $avatarInputValue = $this->textFormatting->blockhtml($avatar);
 
@@ -491,7 +491,7 @@ final readonly class UCP implements Route
             if (is_string($updateResult)) {
                 $this->page->command('error', $updateResult);
 
-                return $this->template->meta('error', $updateResult);
+                return $this->template->render('error', ['message' => $updateResult]);
             }
 
             $editProfileURL = $this->router->url('ucp', ['what' => 'profile']);
@@ -622,7 +622,7 @@ final readonly class UCP implements Route
         if ($this->request->both('skin') !== null) {
             $error = $this->saveBoardSettings();
             if ($error) {
-                $page .= $this->template->meta('error', $error);
+                $page .= $this->template->render('error', ['message' => $error]);
             }
         }
 

@@ -8,7 +8,7 @@ Last Post:
 </a><br>
 By
 {% if lastPostUser -%}
-    {%- include 'global/user-link.html.twig' with { user: lastPostUser } only -%}
+    {%- include 'user-link.html.twig' with { user: lastPostUser } only -%}
 {%- else -%}
     None
 {%- endif -%},

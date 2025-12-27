@@ -368,15 +368,10 @@ final readonly class Inbox
         return $this->template->meta(
             'inbox-messageview',
             $message->title,
-            $otherMember !== null ? $this->template->meta(
-                'user-link',
-                $otherMember->id,
-                $otherMember->groupID,
-                $otherMember->name,
-            ) : '',
+            $otherMember !== null ? $this->template->render('user-link', ['user' => $otherMember]) : '',
             $this->date->autoDate($message->date),
             $this->textFormatting->theWorks($message->message),
-            $otherMember?->avatar ?: $this->template->meta('default-avatar'),
+            $otherMember?->avatar ?: $this->template->render('default-avatar'),
             $otherMember?->usertitle,
             Template::hiddenFormFields(
                 [

@@ -165,7 +165,7 @@ final readonly class UserProfile implements Route
                 'content' => $this->template->meta(
                     'userprofile-contact-card',
                     $member->displayName,
-                    $member->avatar ?: $this->template->meta('default-avatar'),
+                    $member->avatar ?: $this->template->render('default-avatar'),
                     $member->usertitle,
                     $member->id,
                     $contactdetails,
@@ -203,7 +203,7 @@ final readonly class UserProfile implements Route
         $page = $this->template->meta(
             'userprofile-full-profile',
             $member->displayName,
-            $member->avatar ?: $this->template->meta('default-avatar'),
+            $member->avatar ?: $this->template->render('default-avatar'),
             $member->usertitle,
             $contactdetails,
             $member->full_name ?: 'N/A',
@@ -229,7 +229,7 @@ final readonly class UserProfile implements Route
 
     private function showProfileError(): void
     {
-        $error = $this->template->meta('error', "Sorry, this user doesn't exist.");
+        $error = $this->template->render('error', ['message' => "Sorry, this user doesn't exist."]);
         $this->page->command('update', 'page', $error);
         $this->page->append('PAGE', $error);
     }

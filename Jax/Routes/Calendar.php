@@ -126,7 +126,7 @@ final readonly class Calendar implements Route
         }
 
         $page = $this->template->meta('calendar', $page);
-        $page = $this->template->meta('box', '', 'Calendar', $page);
+        $page = $this->template->render('global/box', ['title' => 'Calendar', 'content' => $page]);
 
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);

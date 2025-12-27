@@ -72,9 +72,7 @@ final class Post implements Route
         private readonly Template $template,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
-    ) {
-        $this->template->addMeta('post-preview', $this->template->meta('box', '', 'Post Preview', '%s'));
-    }
+    ) {}
 
     public function route($params): void
     {
@@ -173,7 +171,7 @@ final class Post implements Route
         $post = $this->postData ?? '';
         if (trim($post) !== '') {
             $post = $this->textFormatting->theWorks($post);
-            $post = $this->template->meta('post-preview', $post);
+            $post = $this->template->render('post/post-preview', ['post' => $post]);
             $this->postpreview = $post;
         }
 
@@ -283,7 +281,10 @@ final class Post implements Route
                 </div>
             </form>
             HTML;
-        $page .= $this->template->meta('box', '', $forum->title . ' > New Topic', $form);
+        $page .= $this->template->render('global/box', [
+            'title' => $forum->title . ' > New Topic',
+            'content' => $form
+        ]);
 
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
@@ -389,7 +390,10 @@ final class Post implements Route
             </div>
             HTML;
 
-        $page .= $this->template->meta('box', '', $topic->title . ' &gt; Reply', $form);
+        $page .= $this->template->render('global/box', [
+            'title' => $topic->title . ' &gt; Reply',
+            'content' => $form
+        ]);
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
         if (!$topicPerms['upload']) {

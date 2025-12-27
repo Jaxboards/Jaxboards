@@ -1,0 +1,11 @@
+<div class="postrating">
+  <div class="form">
+    Rate: {{ postratingbuttons|raw }}
+    {%if not isAnonymousReactionsEnabled %}
+        <a href="{{ url('topic', { id: post.tid, listrating: post.id }) }}">(List)</a>
+    {% endif %}
+  </div>
+  <div class="showrating">
+    {{ showrating|raw }}
+  </div>
+</div>

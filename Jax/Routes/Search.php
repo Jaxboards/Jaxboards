@@ -373,7 +373,10 @@ final class Search implements Route
             }
         }
 
-        $page = $this->template->meta('box', '', 'Search Results - ' . $pages, $page);
+        $page = $this->template->render('global/box', [
+            'title' => 'Search Results - ' . $pages,
+            'content' => $page
+        ]);
 
         if (
             $this->request->isJSAccess()

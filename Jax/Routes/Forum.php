@@ -227,7 +227,11 @@ final class Forum implements Route
             }
         }
 
-        $page .= $this->template->meta('box', ' id="fid_' . $fid . '_listing"', $forum->title, $table);
+        $page .= $this->template->render('global/box', [
+            'boxID' => "fid_{$fid}_listing",
+            'title' => $forum->title,
+            'content' => $table
+        ]);
         $page .= $this->template->meta('forum-pages-bottom', $forumpages);
         $page .= $this->template->meta('forum-buttons-bottom', $forumbuttons);
 
@@ -283,12 +287,7 @@ final class Forum implements Route
                 // 3
                 $this->textFormatting->wordfilter($topic->subtitle),
                 // 4
-                $this->template->meta(
-                    'user-link',
-                    $author->id,
-                    $author->groupID,
-                    $author->displayName,
-                ),
+                $this->template->render('user-link', ['user' => $author]),
                 // 5
                 $topic->replies,
                 // 6
@@ -298,12 +297,7 @@ final class Forum implements Route
                     ? $this->date->autoDate($topic->lastPostDate)
                     : '',
                 // 8
-                $lastPostUser ? $this->template->meta(
-                    'user-link',
-                    $lastPostUser->id,
-                    $lastPostUser->groupID,
-                    $lastPostUser->displayName,
-                ) : '',
+                $lastPostUser ? $this->template->render('user-link', ['user' => $lastPostUser]) : '',
                 // 9
                 ($topic->pinned !== 0 ? 'pinned' : '') . ' ' . ($topic->locked !== 0 ? 'locked' : ''),
                 // 10

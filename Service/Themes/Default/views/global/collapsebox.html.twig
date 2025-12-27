@@ -1,0 +1,17 @@
+<div class="box collapse-box" {% if boxID %}id="{{ boxID }}"{% endif %}>
+    <div class="title">
+        <div class="x collapse-button">
+            -/+
+        </div>
+        {{ title|raw }}
+    </div>
+    <div class="collapse-content">
+        <div class="content_top">
+        </div>
+        <div class="content">
+            {{ content|raw }}
+        </div>
+        <div class="content_bottom">
+        </div>
+    </div>
+</div>

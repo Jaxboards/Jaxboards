@@ -92,12 +92,7 @@ final readonly class Reactions
             $page .= '<img src="' . $niblets[$index]->img . '"> '
                 . $niblets[$index]->title . '<ul>';
             foreach ($rating as $mid) {
-                $page .= '<li>' . $this->template->meta(
-                    'user-link',
-                    $mid,
-                    $mdata[$mid]->groupID,
-                    $mdata[$mid]->displayName,
-                ) . '</li>';
+                $page .= '<li>' . $this->template->render('user-link', ['user' => $mdata[$mid]]) . '</li>';
             }
 
             $page .= '</ul></div>';
@@ -120,11 +115,7 @@ final readonly class Reactions
         $showrating = '';
 
         foreach ($this->fetchRatingNiblets() as $ratingNiblet) {
-            $nibletHTML = $this->template->meta(
-                'rating-niblet',
-                $ratingNiblet->img,
-                $ratingNiblet->title,
-            );
+            $nibletHTML = $this->template->render('global/rating-niblet', ['ratingNiblet' => $ratingNiblet]);
             $ratePostURL = $this->router->url('topic', [
                 'id' => $post->tid,
                 'ratepost' => $post->id,
@@ -143,22 +134,17 @@ final readonly class Reactions
 
             $num = 'x' . count($prating[$ratingNiblet->id]);
             $postratingbuttons .= $num;
-            $showrating .= $this->template->meta(
-                'rating-niblet',
-                $ratingNiblet->img,
-                $ratingNiblet->title,
-            ) . $num;
+            $showrating .= $this->template->render('global/rating-niblet', ['ratingNiblet' => $ratingNiblet]) . $num;
         }
 
-        $listRatingURL = $this->router->url('topic', ['id' => $post->tid, 'listrating' => $post->id]);
-
-        return $this->template->meta(
-            'rating-wrapper',
-            $postratingbuttons,
-            $this->isAnonymousReactionsEnabled()
-                ? ''
-                : "<a href='{$listRatingURL}'>(List)</a>",
-            $showrating,
+        return $this->template->render(
+            'global/rating-wrapper',
+            [
+                'post' => $post,
+                'postratingbuttons' => $postratingbuttons,
+                'isAnonymousReactionsEnabled' => $this->isAnonymousReactionsEnabled(),
+                'showrating' => $showrating,
+            ]
         );
     }
 

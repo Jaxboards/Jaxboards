@@ -123,7 +123,7 @@ final readonly class BuddyList implements Route
                     $this->router->url('profile', ['id' => $friend->id]),
                     $friend->name,
                     array_key_exists($friend->id, $online) ? 'online' : 'offline',
-                    $friend->avatar ?: $this->template->meta('default-avatar'),
+                    $friend->avatar ?: $this->template->render('default-avatar'),
                     $friend->usertitle,
                 );
             }
@@ -140,7 +140,7 @@ final readonly class BuddyList implements Route
                     $enemy->id,
                     $enemy->name,
                     'blocked',
-                    $enemy->avatar ?: $this->template->meta('default-avatar'),
+                    $enemy->avatar ?: $this->template->render('default-avatar'),
                     $enemy->usertitle,
                 );
             }

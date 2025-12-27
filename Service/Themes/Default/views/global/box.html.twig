@@ -1,11 +1,11 @@
-<div class="box" %1$s>
+<div class="box" {% if boxID %}id="{{ boxID }}"{% endif %}>
   <div class="title">
-    %2$s
+    {{ title|raw }}
   </div>
   <div class="content_top">
   </div>
   <div class="content">
-    %3$s
+    {{ content|raw }}
   </div>
   <div class="content_bottom">
   </div>

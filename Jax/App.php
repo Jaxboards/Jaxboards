@@ -314,7 +314,7 @@ final readonly class App
         $this->template->addVar('groupid', (string) $this->user->get()->groupID);
         $this->template->addVar('userposts', (string) $this->user->get()->posts);
         $this->template->addVar('grouptitle', (string) $this->user->getGroup()?->title);
-        $this->template->addVar('avatar', $this->user->get()->avatar ?: $this->template->meta('default-avatar'));
+        $this->template->addVar('avatar', $this->user->get()->avatar ?: $this->template->render('default-avatar'));
         $this->template->addVar('username', $this->user->get()->displayName);
         $this->template->addVar('userid', (string) $this->user->get()->id ?: '0');
     }

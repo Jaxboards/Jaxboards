@@ -61,7 +61,7 @@
             <div class="stats">
                 Our <strong>{{ stats.members }}</strong> {% if stats.members == 1 %}user has{% else %}users have{% endif %} made
                 <strong>{{ stats.topics }}</strong> topics with <strong>{{ stats.posts }}</strong> posts.
-                Newest Member: {% include 'global/user-link.html.twig' with { user: lastRegisteredMember } only %}
+                Newest Member: {% include 'user-link.html.twig' with { user: lastRegisteredMember } only %}
             </div>
         </div>
         <div class="content_bottom">

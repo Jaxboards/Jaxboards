@@ -105,7 +105,7 @@ final class Shoutbox implements Module
     public function formatShout(Shout $shout, ?Member $member): string
     {
         $avatarURL = $this->config->getSetting('shoutboxava')
-            ? ($member?->avatar ?: $this->template->meta('default-avatar'))
+            ? ($member?->avatar ?: $this->template->render('default-avatar'))
             : null;
 
         $message = $this->textFormatting->theWorksInline($shout->shout);
@@ -157,9 +157,7 @@ final class Shoutbox implements Module
 
         $this->page->append(
             'SHOUTBOX',
-            $this->template->meta(
-                'collapsebox',
-                '',
+            $this->page->collapseBox(
                 $this->template->render(
                     'shoutbox/title',
                 ),
@@ -168,7 +166,7 @@ final class Shoutbox implements Module
                     [
                         'shouts' => $shoutHTML,
                     ],
-                ),
+                )
             ) . <<<HTML
                 <script type='text/javascript'>
                     Object.assign(globalSettings, {
@@ -271,11 +269,12 @@ final class Shoutbox implements Module
             $shoutHTML .= $this->formatShout($shout, $membersById[$shout->uid] ?? null);
         }
 
-        $page = $this->template->meta(
-            'box',
-            '',
-            'Shoutbox' . $pages,
-            '<div class="sbhistory">' . $shoutHTML . '</div>',
+        $page = $this->template->render(
+            'global/box',
+            [
+                'title' => 'Shoutbox' . $pages,
+                'content' => '<div class="sbhistory">' . $shoutHTML . '</div>',
+            ]
         );
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
