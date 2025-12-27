@@ -96,7 +96,7 @@ final class Session
         if ($sid) {
             $params = $botName
                 ? [Database::WHERE_ID_EQUALS, $sid]
-                : ['WHERE `id`=? AND `ip`=?', $sid, $this->ipAddress->asBinary()];
+                : ['WHERE `id`=?', $sid];
 
             $session = ModelsSession::selectOne(...$params);
         }
