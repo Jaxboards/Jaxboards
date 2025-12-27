@@ -29,17 +29,13 @@ use function _\keyBy;
 use function array_filter;
 use function array_flip;
 use function array_key_exists;
-use function array_merge;
 use function array_unique;
 use function count;
 use function explode;
 use function implode;
 use function json_decode;
 use function max;
-use function mb_strlen;
 use function mb_substr;
-use function nl2br;
-use function preg_match;
 
 use const JSON_THROW_ON_ERROR;
 use const SORT_REGULAR;
@@ -164,17 +160,20 @@ final class BoardIndex implements Route
     }
 
     /**
-     * Selects Member records for all forum moderators and stores them
-     * @param Forum[] $forums
+     * Selects Member records for all forum moderators and stores them.
+     *
+     * @param array<Forum> $forums
      */
     private function setModsFromForums(array $forums): void
     {
         $modIDs = [];
         foreach ($forums as $forum) {
-            if (!$forum->showLedBy || !$forum->mods) {
+            if (!$forum->showLedBy) {
                 continue;
             }
-
+            if (!$forum->mods) {
+                continue;
+            }
             foreach (explode(',', $forum->mods) as $modId) {
                 if ($modId === '') {
                     continue;
@@ -188,14 +187,14 @@ final class BoardIndex implements Route
 
         $this->mods = $modIDs === [] ? [] : keyBy(
             Member::selectMany(Database::WHERE_ID_IN, $modIDs),
-            static fn(Member $member) => $member->id
+            static fn(Member $member): int => $member->id,
         );
     }
 
     /**
      * @param string $modids a comma separated list
      *
-     * @return Member[]
+     * @return array<Member>
      */
     private function getMods(string $modids): array
     {
@@ -227,7 +226,7 @@ final class BoardIndex implements Route
                             'id' => $forum->id,
                             'slug' => $this->textFormatting->slugify($forum->title),
                         ]),
-                    ]
+                    ],
                 );
             } else {
                 $markReadURL = $read
