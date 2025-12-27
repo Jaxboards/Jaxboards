@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\Routes;
 
 use Jax\BBCode;
@@ -7,12 +9,12 @@ use Jax\Models\Page as ModelsPage;
 use Jax\Page;
 use Jax\Request;
 
-class CustomPage
+final class CustomPage
 {
     public function __construct(
-        private BBCode $bbCode,
-        private Page $page,
-        private Request $request,
+        private readonly BBCode $bbCode,
+        private readonly Page $page,
+        private readonly Request $request,
     ) {}
 
     /**

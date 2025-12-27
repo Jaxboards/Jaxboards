@@ -131,6 +131,7 @@ final class Router
     {
         if ($this->isBoardOffline() && !str_contains($path, 'login')) {
             $this->container->get(BoardOffline::class)->route([]);
+
             return true;
         }
 
@@ -138,11 +139,7 @@ final class Router
             return true;
         }
 
-        if ($this->container->get(CustomPage::class)->route(trim($path, '/'))) {
-            return true;
-        }
-
-        return false;
+        return (bool) $this->container->get(CustomPage::class)->route(trim($path, '/'));
     }
 
     /**

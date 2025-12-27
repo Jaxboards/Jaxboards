@@ -128,20 +128,6 @@ final class Template
         $this->setThemePath($this->domainDefinitions->getDefaultThemePath());
     }
 
-    private function initializeTwig(): void
-    {
-        $this->filesystemLoader = new FilesystemLoader();
-        $this->twigEnvironment = new Environment($this->filesystemLoader, [
-            // 'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
-        ]);
-        $this->twigEnvironment->addFunction(new TwigFunction('url', function (...$args) {
-            return $this->container->get(Router::class)->url(...$args);
-        }));
-        $this->twigEnvironment->addFilter(new TwigFilter('slugify', function (string $string) {
-            return $this->container->get(TextFormatting::class)->slugify($string);
-        }));
-    }
-
     /**
      * Utility method for generating input[hidden].
      *
@@ -284,6 +270,16 @@ final class Template
     public function has(string $part): false|int
     {
         return preg_match("/<!--{$part}-->/i", $this->template);
+    }
+
+    private function initializeTwig(): void
+    {
+        $this->filesystemLoader = new FilesystemLoader();
+        $this->twigEnvironment = new Environment($this->filesystemLoader, [
+            // 'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
+        ]);
+        $this->twigEnvironment->addFunction(new TwigFunction('url', fn(...$args) => $this->container->get(Router::class)->url(...$args)));
+        $this->twigEnvironment->addFilter(new TwigFilter('slugify', fn(string $string) => $this->container->get(TextFormatting::class)->slugify($string)));
     }
 
     private function checkExtended(string $data, ?string $meta = null): bool
