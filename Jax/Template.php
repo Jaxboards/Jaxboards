@@ -276,7 +276,7 @@ final class Template
     {
         $this->filesystemLoader = new FilesystemLoader();
         $this->twigEnvironment = new Environment($this->filesystemLoader, [
-            // 'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
+            'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
         ]);
 
         array_map(
