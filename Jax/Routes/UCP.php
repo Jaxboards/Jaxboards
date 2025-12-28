@@ -553,7 +553,7 @@ final readonly class UCP implements Route
                 'user' => $this->user->get(),
                 'genderSelect' => $genderselect,
                 'dobSelect' => $dobselect,
-            ]
+            ],
         );
     }
 
