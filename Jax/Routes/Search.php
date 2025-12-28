@@ -309,6 +309,9 @@ final class Search implements Route
         }
 
         while ($postRow = $this->database->arow($result)) {
+            $title = $this->textFormatting->textOnly($postRow['title']);
+            $title = $this->textFormatting->blockHtml($post);
+
             $post = $this->textFormatting->textOnly($postRow['post']);
             $post = $this->textFormatting->blockHtml($post);
             $post = nl2br($post, false);
@@ -320,12 +323,12 @@ final class Search implements Route
                     'titleHighlighted' => preg_replace(
                         '@' . implode('|', $terms) . '@i',
                         $this->template->render('search/highlight', ['searchTerm' => '$0']),
-                        $post,
+                        (string) $title,
                     ),
                     'postHighlighted' => preg_replace(
                         '@' . implode('|', $terms) . '@i',
                         $this->template->render('search/highlight', ['searchTerm' => '$0']),
-                        (string) $postRow['title'],
+                        $post,
                     ),
                 ],
             );
