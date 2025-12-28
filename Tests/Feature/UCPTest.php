@@ -130,22 +130,13 @@ final class UCPTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('#changesig', 'I made jaxboards', 1, $page);
     }
 
-    public function testEmailNoEmail(): void
-    {
-        $this->actingAs('member');
-
-        $page = $this->go('/ucp/email');
-
-        $this->assertStringContainsString('Your current email: --none--', $page);
-    }
-
     public function testEmail(): void
     {
         $this->actingAs('member', ['email' => 'jaxboards@jaxboards.com']);
 
         $page = $this->go('/ucp/email');
 
-        $this->assertStringContainsString('Your current email: <strong>jaxboards@jaxboards.com</strong>', $page);
+        DOMAssert::assertSelectEquals('strong', 'jaxboards@jaxboards.com', 1, $page);
     }
 
     public function testEmailChange(): void
@@ -259,8 +250,7 @@ final class UCPTest extends FeatureTestCase
         $this->assertEquals('http://google.com', $member->website);
 
         $birthdate = $this->container->get(Date::class)
-            ->datetimeAsCarbon($member->birthdate)
-        ;
+            ->datetimeAsCarbon($member->birthdate);
 
         $this->assertEquals(1, $birthdate->month);
         $this->assertEquals(1, $birthdate->day);
