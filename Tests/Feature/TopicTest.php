@@ -187,7 +187,7 @@ final class TopicTest extends FeatureTestCase
 
         // TODO: Test that there are new posts
         $this->assertEquals('onlinelist', $json[0][0]);
-        $this->assertEquals('GoogleBot', $json[0][1][0][0]);
+        $this->assertEquals('GoogleBot', $json[0][1][0]['name']);
     }
 
     public function testQuickReplyWindow(): void

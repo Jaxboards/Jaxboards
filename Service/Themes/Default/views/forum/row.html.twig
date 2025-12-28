@@ -26,7 +26,7 @@
         {% include "user-link.html.twig" with { user: author } %}
     </td>
     <td class="item_2">
-        <a href="{{ url('forum', { id: topic.fid, replies: topic.id }) }}" rel="nofollow">Replies: {{ topic.replies }}</a>
+        <a href="{{ url('forum', { id: topic.fid, replies: topic.id }) }}" rel="nofollow">Replies: {{ topic.replies|number_format }}</a>
         <br>
         Views:&nbsp;{{ topic.views|number_format }}
     </td>
