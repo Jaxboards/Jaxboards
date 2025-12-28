@@ -114,5 +114,3 @@ export default function createSnow() {
     generateSnowCSS(snowflakesCount);
     generateSnow(snowflakesCount);
 }
-
-window.addEventListener('resize', createSnow);

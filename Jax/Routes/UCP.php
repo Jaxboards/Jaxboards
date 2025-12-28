@@ -284,40 +284,16 @@ final readonly class UCP implements Route
                 HTML;
         }
 
-        $email = $this->user->get()->email;
         $emailSettings = $this->user->get()->emailSettings;
-        $notificationsChecked = ($emailSettings & 2) !== 0 ? 'checked' : '';
-        $adminEmailsChecked = ($emailSettings & 1) !== 0 ? 'checked' : '';
-        $changeEmailURL = $this->router->url('ucp', ['what' => 'email', 'change' => '1']);
 
-        return $this->template->meta(
-            'ucp-email-settings',
-            Template::hiddenFormFields(
-                ['submit' => 'true'],
-            ),
-            match (true) {
-                $this->request->both('change') !== null => <<<HTML
-                    <input
-                        type="text"
-                        name="email"
-                        aria-label="Email"
-                        title="Enter your new email address"
-                        value="{$this->user->get()->email}">
-                    HTML,
-                (bool) $email => <<<HTML
-                    <strong>{$email}</strong>
-                    <a href='{$changeEmailURL}'>Change</a>
-                    <input type='hidden' name='email' value='{$email}'>
-                    HTML,
-
-                default => '--none--',
-            },
-            <<<HTML
-                <input type="checkbox" title="Notifications" name="notifications" {$notificationsChecked}>
-                HTML,
-            <<<HTML
-                <input type="checkbox" title="Admin Emails" name="adminemails" {$adminEmailsChecked}>
-                HTML,
+        return $this->template->render(
+            'ucp/email-settings',
+            [
+                'changeEmail' => $this->request->both('changeEmail'),
+                'user' => $this->user->get(),
+                'notificationsEnabled' => ($emailSettings & 2) !== 0,
+                'adminEmailsEnabled' => ($emailSettings & 1) !== 0
+            ]
         );
     }
 

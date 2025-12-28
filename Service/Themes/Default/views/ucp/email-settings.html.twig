@@ -1,0 +1,36 @@
+<form method="post" data-ajax-form="true">
+    <input type="hidden" name="submit" value="1">
+    Your current email:
+    {% if changeEmail %}
+        <input
+            type="text"
+            name="email"
+            aria-label="Email"
+            title="Enter your new email address"
+            value="{{ user.email }}"
+        >
+    {% elseif user.email %}
+        <strong>{{ user.email }}</strong>
+        <a href="{{ url('ucp', { what: 'email', changeEmail: 1 }) }}">Change</a>
+        <input type="hidden" name="email" value="{{ user.email }}">
+    {% endif %}
+
+    <br>
+    <br>
+    <input
+        type="checkbox"
+        title="Notifications"
+        name="notifications"
+        {% if notificationsEnabled %}checked{% endif %}
+    > Receive notifications
+    <br>
+    <input
+        type="checkbox"
+        title="Admin Emails"
+        name="adminemails"
+        {% if adminEmailsEnabled %}checked{% endif %}
+    > Receive email from administrators
+    <br>
+    <br>
+    <input type="submit" name="submit" value="Save">
+</form>
