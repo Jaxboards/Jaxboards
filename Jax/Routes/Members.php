@@ -6,7 +6,6 @@ namespace Jax\Routes;
 
 use Jax\ContactDetails;
 use Jax\Database\Database;
-use Jax\Date;
 use Jax\Interfaces\Route;
 use Jax\Jax;
 use Jax\Models\Group;
@@ -32,7 +31,6 @@ final class Members implements Route
     public function __construct(
         private readonly ContactDetails $contactDetails,
         private readonly Database $database,
-        private readonly Date $date,
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Router $router,
@@ -154,7 +152,7 @@ final class Members implements Route
                 . ">{$fieldLabel}</a>";
         }
 
-        $rows = array_map(fn($member) => [
+        $rows = array_map(fn(Member $member): array => [
             'member' => $member,
             'group' => $groups[$member->groupID],
             'contactDetails' => $this->contactDetails->getContactLinks($member),
@@ -165,7 +163,7 @@ final class Members implements Route
             [
                 'links' => $links,
                 'rows' => $rows,
-            ]
+            ],
         );
         $page = "<div class='pages pages-top'>{$pages}</div><div class='forum-pages-top'>&nbsp;</div>"
             . $this->template->render(
