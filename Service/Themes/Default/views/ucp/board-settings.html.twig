@@ -12,7 +12,7 @@
                     {% if skin.id == user.skinID %}selected{% endif %}
                 >
                     {{- skin.title -}}
-                    {%- if skin.hidden -%} (hidden){%- endif -%}
+                    {%- if skin.hidden%} (hidden){%- endif -%}
                 </option>
             {% endfor %}
         </select>
