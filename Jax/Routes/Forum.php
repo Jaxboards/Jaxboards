@@ -267,7 +267,7 @@ final class Forum implements Route
         }
 
         return $this->template->render('forum/topic-pages', [
-            'pages' => implode(' ', $pageArray)
+            'pages' => implode(' ', $pageArray),
         ]);
     }
 
