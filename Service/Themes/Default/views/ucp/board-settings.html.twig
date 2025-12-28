@@ -1,0 +1,43 @@
+{% if error %}
+    {% include "error.html.twig" with { message: error } %}
+{% endif %}
+<form method="post" data-ajax-form="true">
+    <input type="hidden" name="submit" value="1">
+    Board Skin:
+    {% if skins %}
+        <select name="skin" title="Board Skin">
+            {% for skin in skins %}
+                <option
+                    value="{{ skin.id }}"
+                    {% if skin.id == user.skinID %}selected{% endif %}
+                >
+                    {{- skin.title -}}
+                    {%- if skin.hidden -%} (hidden){%- endif -%}
+                </option>
+            {% endfor %}
+        </select>
+    {% else %}
+        -- No Skins --
+    {% endif %}
+    <br>
+    <br>
+    Use word filter:
+    <input
+        type="checkbox"
+        name="usewordfilter"
+        title="Use Word Filter"
+        {% if user.nowordfilter == 0 %}checked{% endif %}
+    >
+    <br>
+    <br>
+    WYSIWYG Enabled by Default:
+    <input
+        type="checkbox"
+        name="wysiwyg"
+        title="WYSIWYG Enabled"
+        {% if user.wysiwyg > 0 %}checked{% endif %}
+    >
+    <br>
+    <br>
+    <input type="submit" value="Save">
+</form>

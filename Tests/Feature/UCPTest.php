@@ -90,11 +90,11 @@ final class UCPTest extends FeatureTestCase
 
     public function testUCPNotePad(): void
     {
-        $this->actingAs('member');
+        $this->actingAs('member', ['ucpnotepad' => 'pikachu']);
 
         $page = $this->go('/ucp');
 
-        DOMAssert::assertSelectEquals('#notepad', 'Personal notes go here.', 1, $page);
+        DOMAssert::assertSelectEquals('#notepad', 'pikachu', 1, $page);
     }
 
     public function testUCPNotePadSave(): void
@@ -259,8 +259,7 @@ final class UCPTest extends FeatureTestCase
         $this->assertEquals('http://google.com', $member->website);
 
         $birthdate = $this->container->get(Date::class)
-            ->datetimeAsCarbon($member->birthdate)
-        ;
+            ->datetimeAsCarbon($member->birthdate);
 
         $this->assertEquals(1, $birthdate->month);
         $this->assertEquals(1, $birthdate->day);

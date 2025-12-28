@@ -111,16 +111,13 @@ final readonly class UCP implements Route
             }
         }
 
-        $ucpnotepad = $this->user->get()->ucpnotepad;
-
-        return ($error !== null ? $this->template->render('error', ['message' => $error]) : '') . $this->template->meta(
-            'ucp-index',
-            '',
-            $this->user->get()->displayName,
-            $this->user->get()->avatar ?: $this->template->render('default-avatar'),
-            trim($ucpnotepad) !== ''
-                ? $this->textFormatting->blockhtml($ucpnotepad) : 'Personal notes go here.',
-        );
+        return ($error !== null ? $this->template->render('error', ['message' => $error]) : '') .
+            $this->template->render(
+                'ucp/notepad',
+                [
+                    'user' => $this->user->get(),
+                ]
+            );
     }
 
     private function showucp(string $page): void
@@ -530,40 +527,21 @@ final readonly class UCP implements Route
     private function showBoardSettings(): string
     {
         $error = null;
-        $skinId = $this->user->get()->skinID;
-        $page = '';
-        if ($this->request->both('skin') !== null) {
+        if ($this->request->both('submit') !== null) {
             $error = $this->saveBoardSettings();
-            if ($error) {
-                $page .= $this->template->render('error', ['message' => $error]);
-            }
         }
 
         $skins = $this->user->get()->groupID !== 2
             ? Skin::selectMany('WHERE `hidden`!=1 ORDER BY `title` ASC')
             : Skin::selectMany('ORDER BY `title` ASC');
-        $select = '';
-        foreach ($skins as $skin) {
-            $select .= "<option value='" . $skin->id . "' "
-                . ($skinId === $skin->id ? "selected='selected'" : '')
-                . '/>' . ($skin->hidden ? '*' : '') . $skin->title . '</option>';
-        }
 
-        $select = '<select name="skin" title="Board Skin">' . $select . '</select>';
-        if ($skins === []) {
-            $select = '--No Skins--';
-        }
-
-        return $page . $this->template->meta(
-            'ucp-board-settings',
-            '',
-            $select,
-            '<input type="checkbox" name="usewordfilter" title="Use Word Filter"'
-                . ($this->user->get()->nowordfilter !== 0 ? '' : ' checked="checked"')
-                . '>',
-            '<input type="checkbox" name="wysiwyg" title="WYSIWYG Enabled"'
-                . ($this->user->get()->wysiwyg !== 0 ? ' checked="checked"' : '')
-                . '>',
+        return $this->template->render(
+            'ucp/board-settings',
+            [
+                'error' => $error,
+                'skins' => $skins,
+                'user' => $this->user->get(),
+            ]
         );
     }
 }
