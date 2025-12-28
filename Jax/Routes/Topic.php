@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax\Routes;
 
 use Carbon\Carbon;
-use Jax\Config;
 use Jax\Database\Database;
 use Jax\Date;
 use Jax\DomainDefinitions;
@@ -59,7 +58,6 @@ final class Topic implements Route
 
     public function __construct(
         private readonly Badges $badges,
-        private readonly Config $config,
         private readonly Database $database,
         private readonly Date $date,
         private readonly DomainDefinitions $domainDefinitions,
@@ -389,6 +387,7 @@ final class Topic implements Route
 
             if (!array_key_exists($userOnline->uid, $oldcache)) {
                 $list[] = $userOnline;
+
                 continue;
             }
 
