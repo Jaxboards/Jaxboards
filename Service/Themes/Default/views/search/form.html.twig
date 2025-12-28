@@ -5,11 +5,11 @@
     <div class="content_top">
     </div>
     <div class="content">
-        <form method="post" action="/search" data-ajax-form="true">
+        <form method="post" action="{{ url('search') }}" data-ajax-form="true">
             <label for="searchterm">
                 Search Terms:
             </label>
-            <input type="text" id="searchterm" name="searchterm" value="%1$s">
+            <input type="text" id="searchterm" name="searchterm" value="{{ searchTerm }}">
             <input type="submit" value="Search">
             &nbsp; &nbsp;
             <button type="button" onclick="document.querySelector('#searchadvanced').classList.toggle('display-none')">
@@ -29,7 +29,7 @@
                 </tr>
                 <tr>
                     <td>
-                        %2$s
+                        {{ forumSelect|raw }}
                     </td>
                     <td>
                         <label for="datestart">
@@ -55,5 +55,5 @@
     <div class="content_bottom"></div>
 </div>
 <div id="searchresults">
-    %3$s
+    {{ searchResults|raw }}
 </div>

@@ -91,13 +91,13 @@ final class Search implements Route
             return;
         }
 
-        $page = $this->template->meta(
-            'search-form',
-            $this->textFormatting->blockhtml(
-                $this->session->getVar('searcht') ?? '',
-            ),
-            $this->getForumSelection(),
-            $pageContents,
+        $page = $this->template->render(
+            'search/form',
+            [
+                'searchTerm' => $this->session->getVar('searcht') ?? '',
+                'forumSelect' => $this->getForumSelection(),
+                'searchResults' => $pageContents,
+            ]
         );
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
@@ -312,32 +312,22 @@ final class Search implements Route
             $post = $this->textFormatting->textOnly($postRow['post']);
             $post = $this->textFormatting->blockHtml($post);
             $post = nl2br($post, false);
-            $post = preg_replace(
-                '@' . implode('|', $terms) . '@i',
-                $this->template->meta('search-highlight', '$0'),
-                $post,
-            );
-            $title = preg_replace(
-                '@' . implode('|', $terms) . '@i',
-                $this->template->meta('search-highlight', '$0'),
-                (string) $postRow['title'],
-            );
 
-            $topicSlug = $this->textFormatting->slugify($postRow['title']);
-
-            $page .= $this->template->meta(
-                'search-result',
-                $this->router->url('topic', [
-                    'id' => $postRow['tid'],
-                    'slug' => $topicSlug,
-                ]),
-                $title,
-                $this->router->url('topic', [
-                    'id' => $postRow['tid'],
-                    'findpost' => $postRow['id'],
-                    'slug' => $topicSlug,
-                ]),
-                $post,
+            $page .= $this->template->render(
+                'search/result',
+                [
+                    'post' => $postRow,
+                    'titleHighlighted' => preg_replace(
+                        '@' . implode('|', $terms) . '@i',
+                        $this->template->render('search/highlight', ['searchTerm' => '$0']),
+                        $post,
+                    ),
+                    'postHighlighted' => preg_replace(
+                        '@' . implode('|', $terms) . '@i',
+                        $this->template->render('search/highlight', ['searchTerm' => '$0']),
+                        (string) $postRow['title'],
+                    ),
+                ]
             );
         }
 
@@ -355,8 +345,7 @@ final class Search implements Route
             }
 
             if ($omitted !== []) {
-                $error .= '<br><br>'
-                    . 'The following terms were omitted due to length: '
+                $error .= 'The following terms were omitted due to length: '
                     . implode(', ', $omitted);
             }
 

@@ -1,0 +1,10 @@
+<div class="searchresult">
+  <a class="topic" href="{{ url('topic', { id: post.tid, slug:post.title|slugify })}}">
+    {{ titleHighlighted|raw }}
+  </a>
+  <a href="{{ url('topic', { id: post.tid, findpost: post.id, slug: post.title|slugify })}}">
+    (Post)
+  </a>
+  <br>
+  {{ postHighlighted|raw }}
+</div>
