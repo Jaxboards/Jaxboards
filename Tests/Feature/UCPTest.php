@@ -250,7 +250,8 @@ final class UCPTest extends FeatureTestCase
         $this->assertEquals('http://google.com', $member->website);
 
         $birthdate = $this->container->get(Date::class)
-            ->datetimeAsCarbon($member->birthdate);
+            ->datetimeAsCarbon($member->birthdate)
+        ;
 
         $this->assertEquals(1, $birthdate->month);
         $this->assertEquals(1, $birthdate->day);
