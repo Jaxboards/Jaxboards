@@ -59,7 +59,7 @@
                 {% endfor %}
             </div>
             <div class="stats">
-                Our <strong>{{ stats.members }}</strong> {% if stats.members == 1 %}user has{% else %}users have{% endif %} made
+                Our <strong>{{ stats.members|number_format }}</strong> {% if stats.members == 1 %}user has{% else %}users have{% endif %} made
                 <strong>{{ stats.topics|number_format }}</strong> topics with <strong>{{ stats.posts|number_format }}</strong> posts.
                 Newest Member: {% include 'user-link.html.twig' with { user: lastRegisteredMember } only %}
             </div>
