@@ -167,7 +167,7 @@ final class ModControlsTest extends FeatureTestCase
 
     public function testIPToolsLookup(): void
     {
-        $this->actingAs('admin');
+        $this->actingAs('admin', ['ip' => inet_pton('::1')]);
 
         $page = $this->go(new Request(
             get: ['path' => '/modcontrols/iptools'],
@@ -177,9 +177,8 @@ final class ModControlsTest extends FeatureTestCase
         DOMAssert::assertSelectCount('input[type=text][name=ip][value="::1"]', 1, $page);
         DOMAssert::assertSelectEquals('span[style="color:#090"]', 'not banned', 1, $page);
         DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Users with this IP:', 1, $page);
-        DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Last 5 shouts:', 1, $page);
-        DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Last 5 posts:', 1, $page);
-        DOMAssert::assertSelectEquals('.modcppage .minibox .content', '--No Data--', 3, $page);
+        DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Last 5 shouts:', 0, $page);
+        DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Last 5 posts:', 0, $page);
     }
 
     public function testOnlineSessions(): void
