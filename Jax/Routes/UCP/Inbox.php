@@ -62,8 +62,8 @@ final readonly class Inbox
         return match (true) {
             $messageId !== 0 => match ($page) {
                 'Delete' => $this->delete($messageId),
-                'Forward' => $this->compose($messageId, 'fwd'),
-                'Reply' => $this->compose($messageId),
+                'Forward' => $this->compose($messageId, 'forward'),
+                'Reply' => $this->compose($messageId, 'reply'),
                 default => null,
             },
             is_numeric($view) => $this->viewMessage($view),
@@ -186,13 +186,15 @@ final readonly class Inbox
             );
 
             if ($message !== null) {
-                $recipient = $todo === 'fwd'
-                    ? null
-                    : Member::selectOne($message->from);
+                $sender = Member::selectOne($message->from);
 
-                $messageTitle = ($todo === 'fwd' ? 'FWD:' : 'RE:') . $message->title;
+                if ($todo === 'reply') {
+                    $recipient = $sender;
+                }
+
+                $messageTitle = ($todo === 'reply' ? 'RE:' : 'FWD:') . $message->title;
                 $messageBody = PHP_EOL . PHP_EOL . PHP_EOL
-                    . "[quote={$recipient->displayName}]{$message->message}[/quote]";
+                    . "[quote={$sender->displayName}]{$message->message}[/quote]";
             }
         }
 
