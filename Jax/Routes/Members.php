@@ -53,10 +53,10 @@ final class Members implements Route
             return;
         }
 
-        $this->showmemberlist();
+        $this->showMemberList();
     }
 
-    private function showmemberlist(): void
+    private function showMemberList(): void
     {
         $this->page->setBreadCrumbs([
             $this->router->url('members') => 'Members',
@@ -109,7 +109,7 @@ final class Members implements Route
             $this->perpage,
         );
 
-        $nummemberquery = $this->database->special(
+        $numMemberQuery = $this->database->special(
             <<<EOT
                 SELECT COUNT(m.`id`) AS `num_members`
                 FROM %t m
@@ -120,7 +120,7 @@ final class Members implements Route
                 EOT,
             ['members', 'member_groups'],
         );
-        $thisrow = $this->database->arow($nummemberquery);
+        $thisrow = $this->database->arow($numMemberQuery);
         $nummembers = $thisrow['num_members'] ?? 0;
 
         $pageNumbers = $this->jax->pages(
@@ -138,8 +138,6 @@ final class Members implements Route
                 . ($pageNumber - 1 === $this->pageNumber ? ' class="active"' : '') . ">{$pageNumber}</a> ";
         }
 
-
-
         $links = [];
         foreach ($fields as $field => $fieldLabel) {
             $url = $this->router->url(
@@ -156,41 +154,18 @@ final class Members implements Route
                 . ">{$fieldLabel}</a>";
         }
 
-        foreach ($members as $member) {
-            $contactdetails = '';
-            foreach ($this->contactDetails->getContactLinks($member) as $service => [$href]) {
-                $contactdetails .= <<<HTML
-                    <a class="{$service} contact" href="{$href}" title="{$service} contact">&nbsp;</a>
-                    HTML;
-            }
+        $rows = array_map(fn($member) => [
+            'member' => $member,
+            'group' => $groups[$member->groupID],
+            'contactDetails' => $this->contactDetails->getContactLinks($member),
+        ], $members);
 
-            $privateMessageURL = $this->router->url('inbox', [
-                'view' => 'compose',
-                'mid' => $member->id,
-            ]);
-            $contactdetails .= '<a title="PM this member" class="pm contact" '
-                . "href='{$privateMessageURL}'></a>";
-            $page .= $this->template->meta(
-                'members-row',
-                $this->router->url('profile', ['id' => $member->id]),
-                $member->avatar ?: $this->template->render('default-avatar'),
-                $this->template->render('user-link', ['user' => $member]),
-                $groups[$member->groupID]->title,
-                $member->id,
-                $member->posts,
-                $this->date->autoDate($member->joinDate),
-                $contactdetails,
-            );
-        }
-
-        $page = $this->template->meta(
-            'members-table',
-            $links[0],
-            $links[1],
-            $links[2],
-            $links[3],
-            $links[4],
-            $page,
+        $page = $this->template->render(
+            'members/table',
+            [
+                'links' => $links,
+                'rows' => $rows,
+            ]
         );
         $page = "<div class='pages pages-top'>{$pages}</div><div class='forum-pages-top'>&nbsp;</div>"
             . $this->template->render(

@@ -1,0 +1,31 @@
+<tr>
+  <td class="avatar">
+    <a href="{{ url('profile', { id: member.id }) }}">
+        {% include "avatar.html.twig" with { avatar: member.avatar } %}
+    </a>
+  </td>
+  <td>
+    {%- include 'user-link.html.twig' with { user: member } only -%}
+    <br>
+    {{ group.title }}
+  </td>
+  <td>
+    #{{ member.id }}
+  </td>
+  <td>
+    {{ member.posts }}
+  </td>
+  <td>
+    {{ member.joinDate|autodate }}
+  </td>
+  <td>
+    {% for service,contact in contactDetails %}
+        <a class="{{ service }} contact" href="{{ contact[0] }}" title="{{ service }} contact">&nbsp;</a>
+    {% endfor %}
+    <a
+        title="PM this member"
+        class="pm contact"
+        href="{{ url('inbox', { view: 'compose', mid: member.id }) }}"
+    ></a>
+  </td>
+</tr>

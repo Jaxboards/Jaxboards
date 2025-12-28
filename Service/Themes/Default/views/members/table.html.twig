@@ -1,0 +1,24 @@
+<table>
+    <tr>
+        <th>
+        </th>
+        <th>
+            {{ links[0]|raw }} / {{ links[1]|raw }}
+        </th>
+        <th>
+            {{ links[2]|raw }}
+        </th>
+        <th>
+            {{ links[3]|raw }}
+        </th>
+        <th>
+            {{ links[4]|raw }}
+        </th>
+        <th>
+            Contact
+        </th>
+    </tr>
+    {% for row in rows %}
+        {% include 'members/row.html.twig' with row only %}
+    {% endfor %}
+</table>
