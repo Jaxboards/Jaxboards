@@ -547,28 +547,13 @@ final readonly class UCP implements Route
 
         $dobselect .= '</select>';
 
-        return $this->template->meta(
-            'ucp-profile-settings',
-            Template::hiddenFormFields(['submit' => 'true']),
-            $this->user->get()->name,
-            $this->user->get()->displayName,
-            $this->user->get()->full_name,
-            $this->user->get()->usertitle,
-            $this->user->get()->about,
-            $this->user->get()->location,
-            $genderselect,
-            $dobselect,
-            $this->user->get()->contactSkype,
-            $this->user->get()->contactDiscord,
-            $this->user->get()->contactYIM,
-            $this->user->get()->contactMSN,
-            $this->user->get()->contactGoogleChat,
-            $this->user->get()->contactAIM,
-            $this->user->get()->contactYoutube,
-            $this->user->get()->contactSteam,
-            $this->user->get()->contactTwitter,
-            $this->user->get()->contactBlueSky,
-            $this->user->get()->website,
+        return $this->template->render(
+            'ucp/profile-settings',
+            [
+                'user' => $this->user->get(),
+                'genderSelect' => $genderselect,
+                'dobSelect' => $dobselect,
+            ]
         );
     }
 

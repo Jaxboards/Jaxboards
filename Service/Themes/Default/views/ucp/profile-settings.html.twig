@@ -1,0 +1,107 @@
+<form method="post" data-ajax-form="true">
+    <input type="hidden" name="submit" value="true">
+    <h2>Name:</h2>
+    <div>
+        <label for="username">Your username:</label>
+        <input type="text" id="username" value="{{ user.name }}" disabled>
+    </div>
+    <div>
+        <label for="displayName">
+            Display name:
+        </label>
+        <input type="text" name="displayName" title="Display Name" id="displayName" value="{{ user.displayName }}">
+    </div>
+    <div>
+        <label for="full_name">
+            Real name:
+        </label>
+        <input type="text" name="full_name" title="Real Name" id="full_name" value="{{ user.full_name }}">
+    </div>
+    <div>
+        <label for="usertitle">
+            Title:
+        </label>
+        <input type="text" name="usertitle" title="User Title" id="usertitle" value="{{ user.usertitle }}">
+    </div>
+    <h2>About you:</h2>
+    <div class="description">
+        <textarea rows="10" cols="60" name="about" title="About You" id="about" class="bbcode-editor">{{ user.about }}</textarea>
+        <h2>Location</h2>
+        <input type="text" name="location" title="Location" value="{{ user.location }}">
+        <h2>Gender</h2>
+        {{ genderSelect|raw }}
+        <h2>Date of Birth:</h2>
+        {{ dobSelect|raw }}
+        <h2>Contact Details (Optional)</h2>
+        <div id="contact_details">
+            <div class="contact skype">
+                <label for="contactSkype">
+                    Skype:
+                </label>
+                <input type="text" name="contactSkype" id="contactSkype" value="{{ user.contactSkype }}">
+            </div>
+            <div class="contact discord">
+                <label for="contactDiscord">
+                    Discord ID:
+                </label>
+                <input type="text" name="contactDiscord" id="contactDiscord" value="{{ user.contactDiscord }}">
+            </div>
+            <div class="contact yim">
+                <label for="contactYIM">
+                    YIM:
+                </label>
+                <input type="text" name="contactYIM" id="contactYIM" value="{{ user.contactYIM }}">
+            </div>
+            <div class="contact msn">
+                <label for="contactMSN">
+                    MSN:
+                </label>
+                <input type="text" name="contactMSN" id="contactMSN" value="{{ user.contactMSN }}">
+            </div>
+            <div class="contact gtalk">
+                <label for="contactGoogleChat">
+                    Google Chat:
+                </label>
+                <input type="text" name="contactGoogleChat" id="contactGoogleChat" value="{{ user.contactGoogleChat }}">
+            </div>
+            <div class="contact aim">
+                <label for="contactAIM">
+                    AIM:
+                </label>
+                <input type="text" name="contactAIM" id="contactAIM" value="{{ user.contactAIM }}">
+            </div>
+            <div class="contact youtube">
+                <label for="contactYoutube">
+                    YouTube:
+                </label>
+                <input type="text" name="contactYoutube" id="contactYoutube" value="{{ user.contactYoutube }}">
+            </div>
+            <div class="contact steam">
+                <label for="contactSteam">
+                    Steam:
+                </label>
+                <input type="text" name="contactSteam" id="contactSteam" value="{{ user.contactSteam }}">
+            </div>
+            <div class="contact twitter">
+                <label for="contactTwitter">
+                    Twitter:
+                </label>
+                <input type="text" name="contactTwitter" id="contactTwitter" value="{{ user.contactTwitter }}">
+            </div>
+            <div class="contact bluesky">
+                <label for="contactBlueSky">
+                    Bluesky:
+                </label>
+                <input type="text" name="contactBlueSky" id="contactBlueSky" value="{{ user.contactBlueSky }}">
+            </div>
+        </div>
+        <h2>Website</h2>
+        <label for="website">
+            Your website:
+        </label>
+        <input type="text" name="website" id="website" value="{{ user.website }}">
+    </div>
+    <div>
+        <input name="submit" type="submit" value="Save Profile Settings">
+    </div>
+</form>
