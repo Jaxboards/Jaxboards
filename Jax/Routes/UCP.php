@@ -111,12 +111,12 @@ final readonly class UCP implements Route
             }
         }
 
-        return ($error !== null ? $this->template->render('error', ['message' => $error]) : '') .
-            $this->template->render(
+        return ($error !== null ? $this->template->render('error', ['message' => $error]) : '')
+            . $this->template->render(
                 'ucp/notepad',
                 [
                     'user' => $this->user->get(),
-                ]
+                ],
             );
     }
 
@@ -541,7 +541,7 @@ final readonly class UCP implements Route
                 'error' => $error,
                 'skins' => $skins,
                 'user' => $this->user->get(),
-            ]
+            ],
         );
     }
 }
