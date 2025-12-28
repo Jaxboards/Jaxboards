@@ -292,8 +292,8 @@ final readonly class UCP implements Route
                 'changeEmail' => $this->request->both('changeEmail'),
                 'user' => $this->user->get(),
                 'notificationsEnabled' => ($emailSettings & 2) !== 0,
-                'adminEmailsEnabled' => ($emailSettings & 1) !== 0
-            ]
+                'adminEmailsEnabled' => ($emailSettings & 1) !== 0,
+            ],
         );
     }
 
