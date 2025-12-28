@@ -323,7 +323,7 @@ final class Search implements Route
                     'titleHighlighted' => preg_replace(
                         '@' . implode('|', $terms) . '@i',
                         $this->template->render('search/highlight', ['searchTerm' => '$0']),
-                        (string) $title,
+                        $title,
                     ),
                     'postHighlighted' => preg_replace(
                         '@' . implode('|', $terms) . '@i',
