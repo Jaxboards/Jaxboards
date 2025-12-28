@@ -203,7 +203,7 @@ textarea {
     height: 100px;
 }
 
-#ucp label {
+#ucp .profile-settings label {
     display: inline-block;
     width: 120px;
 }

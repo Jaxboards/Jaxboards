@@ -1,0 +1,61 @@
+<h2>Sounds</h2>
+<form data-ajax-form="true" method="post">
+    <input type="hidden" name="submit" value="true">
+    When someone shouts:
+    <br>
+    &nbsp;
+    <input type="checkbox" id="soundShout" name="soundShout" {% if user.soundShout %}checked{% endif %}>
+    <label for="soundShout">play a sound</label>
+    <br>
+    <br>
+    When someone IMs me:
+    <br>
+    &nbsp;
+    <input type="checkbox" id="soundIM" name="soundIM" {% if user.soundIM %}checked{% endif %}>
+    <label for="soundIM">play a sound</label>
+    <br>
+    &nbsp;
+    <input
+        id="dtnotify"
+        onChange="if(!window.Notification) {alert('browser not supported');} else { Notification.requestPermission() }"
+        title="notify_im"
+        type="checkbox"
+    >
+    <label for="dtnotify">display a desktop notification</label>
+    <br>
+    <br>
+    When someone PMs me:
+    <br>
+    &nbsp;
+    <input type="checkbox" id="soundPM" name="soundPM" {% if user.soundPM %}checked{% endif %}>
+    <label for="soundPM">play a sound</label>
+    <br>
+    &nbsp;
+    <input type="checkbox" id="notifyPM" name="notifyPM" {% if user.notifyPM %}checked{% endif %}>
+    <label for="notifyPM">display a notification</label>
+    <br>
+    <br>
+    When someone posts in a topic I've created:
+    <br>
+    &nbsp;
+    <input type="checkbox" id="soundPostInMyTopic" name="soundPostInMyTopic" {% if user.soundPostInMyTopic %}checked{% endif %}>
+    <label for="soundPostInMyTopic">play a sound</label>
+    <br>
+    &nbsp;
+    <input type="checkbox" id="notifyPostInMyTopic" name="notifyPostInMyTopic" {% if user.notifyPostInMyTopic %}checked{% endif %}>
+    <label for="notifyPostInMyTopic">display a notification</label>
+    <br>
+    <br>
+    When someone posts in a topic I'm subscribed to:
+    <br>
+    &nbsp;
+    <input type="checkbox" id="soundPostInSubscribedTopic" name="soundPostInSubscribedTopic" {% if user.soundPostInSubscribedTopic %}checked{% endif %}>
+    <label for="soundPostInSubscribedTopic">play a sound</label>
+    <br>
+    &nbsp;
+    <input type="checkbox" id="notifyPostInSubscribedTopic" name="notifyPostInSubscribedTopic" {% if user.notifyPostInSubscribedTopic %}checked{% endif %}>
+    <label for="notifyPostInSubscribedTopic">display a notification</label>
+    <br>
+    <br>
+    <input type="submit" title="Save" value="Save Changes">
+</form>

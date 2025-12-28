@@ -161,48 +161,35 @@ final readonly class UCP implements Route
             $this->page->command('alert', 'Settings saved successfully.');
         }
 
-        $checkboxes = [
-            Template::hiddenFormFields(
-                ['submit' => 'true'],
-            ),
-        ];
-
-        foreach ($fields as $field) {
-            $checkboxes[] = '<input type="checkbox" title="' . $field . '" name="' . $field . '" '
-                . ($this->user->get()->{$field} !== 0 ? 'checked="checked"' : '') . '/>';
-        }
-
         $this->page->command('script', <<<'JS'
                 if (document.querySelector('#dtnotify') && window.webkitNotifications) {
                     document.querySelector('#dtnotify').checked=(webkitNotifications.checkPermission()==0)
                 }
             JS);
 
-        return $this->template->meta('ucp-sound-settings', ...$checkboxes);
+        return $this->template->render('ucp/sound-settings', [
+            'user' => $this->user->get(),
+        ]);
     }
 
     private function showSigSettings(): string
     {
-        $sig = $this->user->get()->sig;
         $changeSig = $this->request->asString->post('changesig');
         if ($changeSig !== null) {
-            $sig = $this->textFormatting->linkify($changeSig);
-            $this->user->set('sig', $sig);
+            $this->user->set('sig', $this->textFormatting->linkify($changeSig));
         }
 
-        return $this->template->meta(
-            'ucp-sig-settings',
-            '',
-            $sig !== ''
-                ? $this->textFormatting->theWorks($sig) : '( none )',
-            $this->textFormatting->blockhtml($sig),
+        return $this->template->render(
+            'ucp/sig-settings',
+            [
+                'user' => $this->user->get(),
+            ]
         );
     }
 
     private function showPassSettings(): string
     {
         $error = null;
-        $page = '';
 
         $currentPassword = $this->request->asString->post('curpass');
         $newPass1 = $this->request->asString->post('newpass1');
@@ -242,14 +229,12 @@ final readonly class UCP implements Route
                     HTML;
             }
 
-            $page .= $this->template->render('error', ['message' => $error]);
             $this->page->command('error', $error);
         }
 
-        return $page . $this->template->meta(
-            'ucp-pass-settings',
-            Template::hiddenFormFields(['passchange' => 'true']),
-        );
+        return $this->template->render('ucp/pass-settings', [
+            'error' => $error,
+        ]);
     }
 
     private function showEmailSettings(): ?string
