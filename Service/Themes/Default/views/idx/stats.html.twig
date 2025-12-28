@@ -55,7 +55,7 @@
 
                 <br>
                 {% for group in legend %}
-                    <a href='#' class='mgroup{{ group.id }}'>{{ group.title }}</a>
+                    <a href="{{ url('members') }}" class="mgroup{{ group.id }}">{{ group.title }}</a>
                 {% endfor %}
             </div>
             <div class="stats">
