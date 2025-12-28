@@ -29,8 +29,47 @@
         <h2>Location</h2>
         <input type="text" name="location" title="Location" value="{{ user.location }}">
         <h2>Gender</h2>
-        {{ genderSelect|raw }}
+        <select name="gender" title="Your gender" aria-label="Gender">
+            <option>Not Telling</option>
+            {% for gender in ['male', 'female', 'other'] %}
+                <option
+                    value="{{ gender }}"
+                    {% if user.gender == gender %}selected{% endif %}
+                >{{ gender|capitalize }}</option>
+            {% endfor %}
+        </select>
+
         <h2>Date of Birth:</h2>
+        {% set year = "now"|date("Y") %}
+        <select name="dob_month" title="Month">
+            <option value="">--</option>
+            {% for month in 1..12 %}
+                {% set option = month ~ '/1/' ~ year %}
+                <option
+                    value="{{ month }}"
+                    {% if month == birthdate.month %}selected{% endif %}
+                >{{ option|date('F') }}</option>
+            {% endfor %}
+        </select>
+        <select name="dob_day" title="Day">
+            <option value="">--</option>
+            {% for day in 1..31 %}
+                <option
+                    value="{{ day }}"
+                    {% if day == birthdate.day %}selected{% endif %}
+                >{{ day }}</option>
+            {% endfor %}
+        </select>
+        <select name="dob_year" title="Day">
+            <option value="">--</option>
+            {% for yearOption in year..(year-100) %}
+                <option
+                    value="{{ yearOption }}"
+                    {% if yearOption == birthdate.year %}selected{% endif %}
+                >{{ yearOption }}</option>
+            {% endfor %}
+        </select>
+
         {{ dobSelect|raw }}
         <h2>Contact Details (Optional)</h2>
         <div id="contact_details">

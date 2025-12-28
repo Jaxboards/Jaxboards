@@ -488,72 +488,17 @@ final readonly class UCP implements Route
                 HTML;
         }
 
-        $genderselect = '<select name="gender" title="Your gender" aria-label="Gender">';
-        foreach (['', 'male', 'female', 'other'] as $gender) {
-            $genderSelected = $this->user->get()->gender === $gender
-                ? 'selected'
-                : '';
-            $genderDisplay = ucfirst($gender) ?: 'Not telling';
-            $genderselect .= <<<HTML
-                <option value="{$gender}" {$genderSelected}>{$genderDisplay}</option>
-                HTML;
-        }
-
-        $genderselect .= '</select>';
-
-        $dobselect = '<select name="dob_month" title="Month"><option value="">--</option>';
-        $fullMonthNames = [
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-            'July',
-            'August',
-            'September',
-            'October',
-            'November',
-            'December',
-        ];
-
         $birthdate = $this->user->get()->birthdate;
         $birthdate = $birthdate !== null
-            ? $this->date->dateAsCarbon($birthdate)
+            ? $this->date->dateAsCarbon($this->user->get()->birthdate)
             : null;
-
-        foreach ($fullMonthNames as $index => $monthName) {
-            $dobselect .= '<option value="' . ($index + 1) . '"'
-                . ($index + 1 === $birthdate?->month ? ' selected="selected"' : '')
-                . '>' . $monthName . '</option>';
-        }
-
-        $dobselect .= '</select><select name="dob_day" title="Day"><option value="">--</option>';
-        for ($day = 1; $day < 32; ++$day) {
-            $dobselect .= '<option value="' . $day . '"'
-                . ($day === $birthdate?->day ? ' selected="selected"' : '')
-                . '>' . $day . '</option>';
-        }
-
-        $dobselect .= '</select><select name="dob_year" title="Year">'
-            . '<option value="">--</option>';
-
-        $thisyear = (int) gmdate('Y');
-        for ($year = $thisyear; $year > $thisyear - 100; --$year) {
-            $dobselect .= '<option value="' . $year . '"'
-                . ($year === $birthdate?->year ? ' selected="selected"' : '')
-                . '>' . $year . '</option>';
-        }
-
-        $dobselect .= '</select>';
 
         return $this->template->render(
             'ucp/profile-settings',
             [
                 'user' => $this->user->get(),
-                'genderSelect' => $genderselect,
-                'dobSelect' => $dobselect,
-            ],
+                'birthdate' => $birthdate,
+            ]
         );
     }
 
