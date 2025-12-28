@@ -31,7 +31,6 @@ use function count;
 use function filter_var;
 use function gmdate;
 use function implode;
-use function nl2br;
 
 use const FILTER_VALIDATE_IP;
 
