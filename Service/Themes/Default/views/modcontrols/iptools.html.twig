@@ -1,0 +1,83 @@
+<form method='post' data-ajax-form='true'>
+    <label>IP:
+    <input type='text' name='ip' title="Enter IP address" value='{{ ipAddress }}'></label>
+    <input type='submit' value='Submit' title="Search for IP">
+</form>
+
+{% if ipAddress %}
+<h3>Data for {{ ipAddress }}:</h3>
+<div class='minibox'>
+    <div class='title'>Info</div>
+    <div class='content'>
+        <form method='post' data-ajax-form='true'>
+            <input type="hidden" name="ip" value="{{ ipAddress }}">
+            IP ban status:
+            {% if isBanned %}
+                <span style="color:#900">
+                    banned
+                </span>
+                <input type="submit" name="unban"
+                    onclick="this.form.submitButton=this" value="Unban">
+            {% else %}
+                <span style="color:#090">
+                    not banned
+                </span>
+                <input type="submit" name="ban"
+                    onclick="this.form.submitButton=this" value="Ban">
+            {% endif %}
+
+            <br>
+            Location: {{ location }}
+        </form>
+        IP Lookup Services:
+        <ul>
+            <li><a href="https://whois.domaintools.com/{{ ipAddress }}">DomainTools Whois</a></li>
+            <li><a href="https://www.ip2location.com/{{ ipAddress }}">IP2Location Lookup</a></li>
+            <li><a href="https://www.dan.me.uk/torcheck?ip={{ ipAddress }}">IP2Location Lookup</a></li>
+            <li><a href="https://metrics.torproject.org/exonerator.html?ip={{ ipAddress }}&amp;timestamp={{ torDate }}">
+                ExoneraTor Lookup
+            </a></li>
+            <li><a href="https://www.projecthoneypot.org/ip_{{ ipAddress }}">Project Honeypot Lookup</a></li>
+            <li><a href="https://www.stopforumspam.com/ipcheck/{{ ipAddress }}">StopForumSpam Lookup</a></li>
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+{% if usersWithIP %}
+<div class='minibox'>
+    <div class='title'>Users with this IP:</div>
+    <div class='content'>
+        {%- for user in usersWithIP -%}
+            {%- include 'user-link.html.twig' with { user } only -%}
+            {%- if not loop.last %}, {% endif -%}
+        {%- endfor -%}
+    </div>
+</div>
+{% endif %}
+
+{% if shoutResults %}
+<div class='minibox'>
+    <div class='title'>Last 5 shouts:</div>
+    <div class='content'>
+        {%- for shout in shoutResults -%}
+            {%- include 'user-link.html.twig' with { user: shout.user } only -%}
+            : {{ shout.shout|textOnly -}}
+            <br>
+        {%- endfor -%}
+    </div>
+</div>
+{% endif %}
+
+{% if posts %}
+<div class='minibox'>
+    <div class='title'>Last 5 posts:</div>
+    <div class='content'>
+        {% for post in posts %}
+            <div class="post">
+                {{ post.post|textOnly|nl2br }}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

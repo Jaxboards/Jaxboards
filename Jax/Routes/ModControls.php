@@ -124,7 +124,7 @@ final readonly class ModControls implements Route
         }
 
         $page = $this->template->render(
-            'modcp/index',
+            'modcontrols/index',
             [
                 'content' => $cppage,
             ],
@@ -291,8 +291,6 @@ final readonly class ModControls implements Route
 
     private function ipTools(): string
     {
-        $page = '';
-
         $ipAddress = $this->request->asString->both('ip') ?? '';
         if (!filter_var($ipAddress, FILTER_VALIDATE_IP)) {
             $ipAddress = '';
@@ -304,79 +302,25 @@ final readonly class ModControls implements Route
             $this->ipAddress->unBan($ipAddress);
         }
 
-        $form = <<<EOT
-            <form method='post' data-ajax-form='true'>
-                <label>IP:
-                <input type='text' name='ip' title="Enter IP address" value='{$ipAddress}'></label>
-                <input type='submit' value='Submit' title="Search for IP">
-            </form>
-            EOT;
+        $posts = [];
+        $shoutResults = [];
+        $usersWithIP = [];
+        $location = 'Unknown';
+
         if ($ipAddress !== '') {
-            $page .= "<h3>Data for {$ipAddress}:</h3>";
-
-            $hiddenFields = Template::hiddenFormFields(
-                [
-                    'ip' => $ipAddress,
-                ],
-            );
-            $banCode = $this->ipAddress->isBanned($ipAddress) ? <<<'HTML'
-                <span style="color:#900">
-                    banned
-                </span>
-                <input type="submit" name="unban"
-                    onclick="this.form.submitButton=this" value="Unban">
-                HTML : <<<'HTML'
-                <span style="color:#090">
-                    not banned
-                </span>
-                <input type="submit" name="ban"
-                    onclick="this.form.submitButton=this" value="Ban">
-                HTML;
-
             $geo = $this->geoLocate->lookup($ipAddress);
 
-            $location = 'Unknown';
             if ($geo !== null) {
                 $flag = $this->geoLocate->getFlagEmoji($geo->country->isoCode);
                 $location = "{$geo->city->name}, {$geo->country->name} {$flag}";
             }
 
-            $torDate = gmdate('Y-m-d', Carbon::now('UTC')->subDays(2)->getTimestamp());
-            $page .= $this->box(
-                'Info',
-                <<<EOT
-                    <form method='post' data-ajax-form='true'>
-                        {$hiddenFields}
-                        IP ban status: {$banCode}<br>
-                        Location: {$location}
-                    </form>
-                    IP Lookup Services: <ul>
-                        <li><a href="https://whois.domaintools.com/{$ipAddress}">DomainTools Whois</a></li>
-                        <li><a href="https://www.ip2location.com/{$ipAddress}">IP2Location Lookup</a></li>
-                        <li><a href="https://www.dan.me.uk/torcheck?ip={$ipAddress}">IP2Location Lookup</a></li>
-                        <li><a href="https://metrics.torproject.org/exonerator.html?ip={$ipAddress}&timestamp={$torDate}">
-                            ExoneraTor Lookup
-                        </a></li>
-                        <li><a href="https://www.projecthoneypot.org/ip_{$ipAddress}">Project Honeypot Lookup</a></li>
-                        <li><a href="https://www.stopforumspam.com/ipcheck/{$ipAddress}">StopForumSpam Lookup</a></li>
-                    </ul>
-                    EOT,
-            );
-
-            $content = [];
-            $members = Member::selectMany(
+            $usersWithIP = Member::selectMany(
                 'WHERE `ip`=?',
                 $this->ipAddress->asBinary($ipAddress),
             );
-            foreach ($members as $member) {
-                $content[] = $this->template->render('user-link', ['user' => $member]);
-            }
-
-            $page .= $this->box('Users with this IP:', implode(', ', $content));
 
             if ($this->config->getSetting('shoutbox')) {
-                $content = '';
-
                 $shouts = Shout::selectMany(
                     'WHERE `ip`=?
                     ORDER BY `id`
@@ -390,31 +334,28 @@ final readonly class ModControls implements Route
                 );
 
                 foreach ($shouts as $shout) {
-                    $member = $members[$shout->uid] ?? null;
-                    $content .= $member
-                        ? $this->template->render('user-link', ['user' => $member])
-                        : '';
-                    $content .= ': ' . $shout->shout . '<br>';
+                    $shoutResults[] = [
+                        'user' => $members[$shout->uid] ?? null,
+                        'shout' => $shout->shout,
+                    ];
                 }
-
-                $page .= $this->box('Last 5 shouts:', $content);
             }
 
-            $content = '';
             $posts = Post::selectMany(
                 'WHERE `ip`=? ORDER BY `id` DESC LIMIT 5',
                 $this->ipAddress->asBinary($ipAddress),
             );
-            foreach ($posts as $post) {
-                $content .= "<div class='post'>"
-                    . nl2br($this->textFormatting->blockhtml($this->textFormatting->textOnly($post->post)), false)
-                    . '</div>';
-            }
-
-            $page .= $this->box('Last 5 posts:', $content);
         }
 
-        return $form . $page;
+        return $this->template->render('modcontrols/iptools', [
+            'ipAddress' => $ipAddress,
+            'isBanned' => $this->ipAddress->isBanned($ipAddress),
+            'location' => $location,
+            'posts' => $posts,
+            'shoutResults' => $shoutResults,
+            'torDate' => gmdate('Y-m-d', Carbon::now('UTC')->subDays(2)->getTimestamp()),
+            'usersWithIP' => $usersWithIP,
+        ]);
     }
 
     private function showOnlineSessions(): string

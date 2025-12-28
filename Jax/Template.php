@@ -299,6 +299,10 @@ final class Template
                     fn(?string $string) => $this->container->get(TextFormatting::class)->slugify($string),
                 ),
                 new TwigFilter(
+                    'textOnly',
+                    fn(?string $string) => $this->container->get(TextFormatting::class)->textOnly($string),
+                ),
+                new TwigFilter(
                     'theWorks',
                     fn(?string $string) => $this->container->get(TextFormatting::class)->theWorks($string),
                     ['is_safe' => ['html']],

@@ -175,8 +175,12 @@ final readonly class TextFormatting
         return $text;
     }
 
-    public function textOnly(string $text): string
+    public function textOnly(?string $text): string
     {
+        if ((string) $text === '') {
+            return '';
+        }
+
         while (($cleaned = (string) preg_replace('@\[(\w+)[^\]]*\](.*)\[/\1\]@Us', '$2', $text)) !== $text) {
             $text = $cleaned;
         }
