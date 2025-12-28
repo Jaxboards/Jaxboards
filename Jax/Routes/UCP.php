@@ -128,7 +128,7 @@ final readonly class UCP implements Route
     private function showucp(string $page): void
     {
         $page = $this->template->render('ucp/index', [
-            'page' => $page
+            'page' => $page,
         ]);
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
