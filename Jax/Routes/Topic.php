@@ -388,19 +388,7 @@ final class Topic implements Route
             $newcache[] = $userOnline->uid;
 
             if (!array_key_exists($userOnline->uid, $oldcache)) {
-                $list[] = [
-                    $userOnline->uid,
-                    $userOnline->groupID,
-                    $userOnline->status !== 'active'
-                        ? $userOnline->status
-                        : ($userOnline->birthday && ($this->config->getSetting('birthdays') & 1)
-                            ? ' birthday' : ''),
-                    $userOnline->name,
-                    // don't display location, since we know we're in the topic
-                    false,
-                    $userOnline->lastAction,
-                ];
-
+                $list[] = $userOnline;
                 continue;
             }
 
