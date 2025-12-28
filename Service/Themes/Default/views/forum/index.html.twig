@@ -1,0 +1,24 @@
+{{ subforums|raw }}
+
+<div class="pages-top pages">
+  {{ pages|raw }}
+</div>
+
+<div class="forum-buttons-top">
+  {% if forumPerms.start %}
+    <a href="{{ url('post', { fid: forum.id }) }}">New Topic</a>
+  {% endif %}
+</div>
+
+{{ topicListing|raw }}
+
+<div class="pages-bottom pages">
+  {{ pages|raw }}
+</div>
+
+<div class="forum-buttons-top">
+  {% if forumPerms.start %}
+    <a href="{{ url('post', { fid: forum.id }) }}">New Topic</a>
+  {% endif %}
+</div>
+

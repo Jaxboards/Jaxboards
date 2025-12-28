@@ -98,8 +98,6 @@ final class Forum implements Route
             return;
         }
 
-        $page = '';
-
         $forum = ModelsForum::selectOne($fid);
 
         if ($forum === null) {
@@ -131,13 +129,14 @@ final class Forum implements Route
         $this->setBreadCrumbs($forum);
         $this->page->setPageTitle($forum->title);
 
+        // TODO: remove this insane coupling between forums and subforums
         // NOW we can actually start building the page
         // subforums
         // right now, this loop also fixes the number of pages to show in a forum
         // parent forum - subforum topics = total topics
         // I'm fairly sure this is faster than doing
         // `SELECT count(*) FROM topics`... but I haven't benchmarked it.
-        $page .= $this->renderSubforums($forum);
+        $subforums = $this->renderSubforums($forum);
 
         // Generate pages.
         $numpages = (int) ceil($forum->topics / $this->numperpage);
@@ -157,22 +156,6 @@ final class Forum implements Route
                 $this->jax->pages($numpages, $this->pageNumber + 1, 10),
             ));
         }
-
-        $newTopicURL = $this->router->url('post', ['fid' => $fid]);
-        // Buttons.
-        $forumbuttons = '&nbsp;'
-            . ($forumPerms['start'] ? "<a href='{$newTopicURL}'>"
-                . $this->template->meta(
-                    $this->template->metaExists('button-newtopic')
-                        ? 'button-newtopic' : 'forum-button-newtopic',
-                ) . '</a>' : '');
-        $page .= $this->template->meta(
-            'forum-pages-top',
-            $forumpages,
-        ) . $this->template->meta(
-            'forum-buttons-top',
-            $forumbuttons,
-        );
 
         $orderby = match ($forum->orderby & ~1) {
             2 => 'id',
@@ -204,18 +187,22 @@ final class Forum implements Route
             $this->markRead($fid);
         }
 
-        $page .= $this->template->render('global/box', [
-            'boxID' => "fid_{$fid}_listing",
-            'title' => $forum->title,
-            'content' => $this->renderTopicListing($forum, $topics),
+        $index = $this->template->render('forum/index', [
+            'forum' => $forum,
+            'forumPerms' => $forumPerms,
+            'pages' => $forumpages,
+            'subforums' => $subforums,
+            'topicListing' => $this->template->render('global/box', [
+                'boxID' => "fid_{$fid}_listing",
+                'title' => $forum->title,
+                'content' => $this->renderTopicListing($forum, $topics),
+            ]),
         ]);
-        $page .= $this->template->meta('forum-pages-bottom', $forumpages);
-        $page .= $this->template->meta('forum-buttons-bottom', $forumbuttons);
 
         if ($this->request->isJSAccess()) {
-            $this->page->command('update', 'page', $page);
+            $this->page->command('update', 'page', $index);
         } else {
-            $this->page->append('PAGE', $page);
+            $this->page->append('PAGE', $index);
         }
     }
 
@@ -279,7 +266,9 @@ final class Forum implements Route
             $pageArray[] = "<a href='{$pageURL}'>{$pageNumber}</a>";
         }
 
-        return $this->template->meta('forum-topic-pages', implode(' ', $pageArray));
+        return $this->template->render('forum/topic-pages', [
+            'pages' => implode(' ', $pageArray)
+        ]);
     }
 
     private function setBreadCrumbs(ModelsForum $forum): void
