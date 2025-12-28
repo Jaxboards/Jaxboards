@@ -97,7 +97,7 @@ final class Search implements Route
                 'searchTerm' => $this->session->getVar('searcht') ?? '',
                 'forumSelect' => $this->getForumSelection(),
                 'searchResults' => $pageContents,
-            ]
+            ],
         );
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
@@ -327,7 +327,7 @@ final class Search implements Route
                         $this->template->render('search/highlight', ['searchTerm' => '$0']),
                         (string) $postRow['title'],
                     ),
-                ]
+                ],
             );
         }
 
