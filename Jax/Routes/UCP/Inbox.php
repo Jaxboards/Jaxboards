@@ -81,149 +81,133 @@ final readonly class Inbox
         };
     }
 
+    /**
+     * Return string on error, null on success
+     */
+    private function sendMessage(?Member $recipient): ?string
+    {
+        if ($recipient === null) {
+            return 'Invalid user!';
+        }
+
+        $title = $this->request->asString->post('title');
+
+        if (trim($title ?? '') === '') {
+            return 'You must enter a title.';
+        }
+
+        // Put it into the table.
+        $message = new Message();
+        $message->date = $this->database->datetime();
+        $message->deletedRecipient = 0;
+        $message->deletedSender = 0;
+        $message->from = $this->user->get()->id;
+        $message->message = $this->request->asString->post('message') ?? '';
+        $message->read = 0;
+        $message->title = $title;
+        $message->to = $recipient->id;
+        $message->insert();
+
+        // Give them a notification.
+        $cmd = json_encode(
+            [
+                'newmessage',
+                'You have a new message from ' . $this->user->get()->displayName,
+                $message->id,
+            ],
+            JSON_THROW_ON_ERROR,
+        ) . PHP_EOL;
+
+        $this->database->special(
+            <<<'SQL'
+                UPDATE %t
+                SET `runonce`=concat(`runonce`,?)
+                WHERE `uid`=?
+                SQL,
+            ['session'],
+            $cmd,
+            $recipient->id,
+        );
+
+        $inboxURL = $this->domainDefinitions->getBoardUrl() . $this->router->url('inbox');
+
+        // Send em an email!
+        if (($recipient->emailSettings & 2) !== 0) {
+            $fromName = $this->user->get()->displayName;
+            $this->jax->mail(
+                $recipient->email,
+                "PM From {$fromName}",
+                <<<HTML
+                    You are receiving this email because you've
+                    received a message from {$fromName} on {BOARDLINK}<br>
+                    Please go to <a href='{$inboxURL}'>{$inboxURL}</a>
+                    to view your message.
+                    HTML,
+            );
+        }
+
+        return null;
+    }
+
     private function compose(
-        ?int $messageid = null,
+        ?int $messageId = null,
         string $todo = '',
     ): ?string {
         $error = null;
-        $mname = '';
-        $mtitle = '';
-        $mid = 0;
-        if ($this->request->post('submit') !== null) {
-            $mid = (int) $this->request->asString->both('mid');
-            $to = $this->request->asString->both('to');
-            $udata = !$mid && $to
-                ? Member::selectOne('WHERE `displayName`=?', $to)
-                : Member::selectOne($mid);
+        $recipient = null;
 
-            $error = match (true) {
-                !$udata => 'Invalid user!',
-                trim($this->request->asString->both('title') ?? '') === '' => 'You must enter a title.',
-                default => null,
-            };
 
-            if ($error !== null) {
-                $this->page->command('error', $error);
-                $this->page->append('PAGE', $this->page->error($error));
+        $mid = (int) $this->request->asString->both('mid');
+        $to = $this->request->asString->both('to');
 
-                return null;
-            }
-
-            if ($udata === null) {
-                return null;
-            }
-
-            $title = $this->request->asString->post('title');
-
-            // Put it into the table.
-            $message = new Message();
-            $message->date = $this->database->datetime();
-            $message->deletedRecipient = 0;
-            $message->deletedSender = 0;
-            $message->from = $this->user->get()->id;
-            $message->message = $this->request->asString->post('message') ?? '';
-            $message->read = 0;
-            $message->title = $title
-                ? $this->textFormatting->blockhtml($title)
-                : '';
-            $message->to = $udata->id;
-            $message->insert();
-
-            // Give them a notification.
-            $cmd = json_encode(
-                [
-                    'newmessage',
-                    'You have a new message from ' . $this->user->get()->displayName,
-                    $message->id,
-                ],
-                JSON_THROW_ON_ERROR,
-            ) . PHP_EOL;
-            $this->database->special(
-                <<<'SQL'
-                    UPDATE %t
-                    SET `runonce`=concat(`runonce`,?)
-                    WHERE `uid`=?
-                    SQL,
-                ['session'],
-                $cmd,
-                $udata->id,
-            );
-
-            $inboxURL = $this->domainDefinitions->getBoardUrl() . $this->router->url('inbox');
-
-            // Send em an email!
-            if (($udata->emailSettings & 2) !== 0) {
-                $fromName = $this->user->get()->displayName;
-                $this->jax->mail(
-                    $udata->email,
-                    "PM From {$fromName}",
-                    <<<HTML
-                        You are receiving this email because you've
-                        received a message from {$fromName} on {BOARDLINK}<br>
-                        Please go to <a href='{$inboxURL}'>{$inboxURL}</a>
-                        to view your message.
-                        HTML,
-                );
-            }
-
-            return <<<HTML
-                Message successfully delivered.
-                <br><br>
-                <a href='{$inboxURL}'>Back</a>
-                HTML;
+        if ($mid) {
+            $recipient = Member::selectOne($mid);
         }
 
-        if ($this->request->isJSUpdate() && !$messageid) {
+        $sentMessage = $this->request->post('submit') !== null;
+
+        if ($sentMessage) {
+            $recipient ??= $to
+                ? Member::selectOne('WHERE `displayName`=?', $to)
+                : null;
+
+            $error = $this->sendMessage($recipient);
+        }
+
+        if ($this->request->isJSUpdate() && !$messageId) {
             return null;
         }
 
-        $msg = '';
-        if ($messageid) {
+        $messageTitle = '';
+        $messageBody = '';
+        if ($messageId) {
             $message = Message::selectOne(
                 'WHERE (`to`=? OR `from`=?) AND `id`=?',
                 $this->user->get()->id,
                 $this->user->get()->id,
-                $messageid,
+                $messageId,
             );
 
             if ($message !== null) {
-                $mid = $message->from;
-                $member = Member::selectOne($mid);
-                $mname = $member?->displayName;
+                $recipient = $todo === 'fwd'
+                    ? null
+                    : Member::selectOne($message->from);
 
-                $msg = PHP_EOL . PHP_EOL . PHP_EOL
-                    . '[quote=' . $mname . ']' . $message->message . '[/quote]';
-                $mtitle = ($todo === 'fwd' ? 'FWD:' : 'RE:') . $message->title;
-                if ($todo === 'fwd') {
-                    $mid = '';
-                    $mname = '';
-                }
+                $messageTitle = ($todo === 'fwd' ? 'FWD:' : 'RE:') . $message->title;
+                $messageBody = PHP_EOL . PHP_EOL . PHP_EOL
+                    . "[quote={$recipient->displayName}]{$message->message}[/quote]";
             }
         }
 
-        if (is_numeric($this->request->asString->get('mid'))) {
-            $mid = (int) $this->request->asString->both('mid');
-            $member = Member::selectOne($mid);
-            $mname = $member?->displayName;
-
-            if (!$mname) {
-                $mid = 0;
-                $mname = '';
-            }
-        }
-
-        return $this->template->meta(
-            'inbox-composeform',
-            Template::hiddenFormFields(
-                [
-                    'submit' => '1',
-                ],
-            ),
-            $mid,
-            $mname,
-            $mname !== '' ? 'good' : '',
-            $mtitle,
-            htmlspecialchars($msg),
+        return $this->template->render(
+            'inbox/compose',
+            [
+                'error' => $error,
+                'success' => $sentMessage && $error == null,
+                'recipient' => $recipient,
+                'messageTitle' => $messageTitle,
+                'messageBody' => $messageBody,
+            ]
         );
     }
 
@@ -330,7 +314,7 @@ final readonly class Inbox
         return null;
     }
 
-    private function viewMessage(string $messageid): ?string
+    private function viewMessage(string $messageId): ?string
     {
         if (
             $this->request->isJSUpdate()
@@ -342,7 +326,7 @@ final readonly class Inbox
         $message = Message::selectOne(
             'WHERE `id`=?
             ORDER BY `date` DESC',
-            $messageid,
+            $messageId,
         );
 
         if ($message === null) {

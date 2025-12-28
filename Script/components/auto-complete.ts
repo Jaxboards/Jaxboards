@@ -156,6 +156,7 @@ export default class AutoComplete extends Component<HTMLInputElement> {
                     resultsContainer.style.display = 'none';
                     if (this.indicatorElement) {
                         this.indicatorElement.classList.add(VALID_CLASS);
+                        this.indicatorElement.classList.remove(INVALID_CLASS);
                     }
                     this.outputElement.value = `${key}`;
                     this.outputElement.dispatchEvent(new Event('change'));

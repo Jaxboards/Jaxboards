@@ -1,0 +1,38 @@
+{% if error %}
+    {% include "error.html.twig" with { message: error } %}
+{% endif %}
+{% if success %}
+    {% include "success.html.twig" with { message: 'Message successfully delivered.' } %}
+{% endif %}
+
+<div class="composeform">
+    <form method="post" data-ajax-form="true">
+        <input type="hidden" name="submit" value="1">
+        <div>
+            <label for="to">
+                To:
+            </label>
+            <input type="hidden" id="mid" name="mid" value="{{ recipient.id }}">
+            <input type="text" id="to" name="to" title="To Member" value="{{ recipient.displayName }}" autocomplete="off"
+                data-autocomplete-action="searchmembers" data-autocomplete-output="#mid"
+                data-autocomplete-indicator="#validname">
+            <span id="validname" class="{% if recipient %}valid{% endif %}">
+            </span>
+        </div>
+        <div>
+            <label for="title">
+                Title:
+            </label>
+            <input type="text" id="title" name="title" title="Message Title" value="{{ messageTitle }}">
+        </div>
+        <div>
+            <textarea
+                id="message"
+                name="message"
+                title="Message Body"
+                class="bbcode-editor"
+            >{{ messageBody }}</textarea>
+        </div>
+        <input type="submit" value="Send">
+    </form>
+</div>
