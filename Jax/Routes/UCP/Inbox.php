@@ -14,7 +14,6 @@ use Jax\Page;
 use Jax\Request;
 use Jax\Router;
 use Jax\Template;
-use Jax\TextFormatting;
 use Jax\User;
 
 use function array_map;
@@ -42,7 +41,6 @@ final readonly class Inbox
         private Request $request,
         private Router $router,
         private Template $template,
-        private TextFormatting $textFormatting,
         private User $user,
     ) {}
 
@@ -353,7 +351,7 @@ final readonly class Inbox
             [
                 'message' => $message,
                 'otherMember' => $otherMember,
-            ]
+            ],
         );
     }
 
