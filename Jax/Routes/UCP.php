@@ -127,24 +127,9 @@ final readonly class UCP implements Route
 
     private function showucp(string $page): void
     {
-        $page = $this->template->meta(
-            'ucp-wrapper',
-            // Settings links
-            $this->router->url('ucp'),
-            $this->router->url('ucp', ['what' => 'pass']),
-            $this->router->url('ucp', ['what' => 'email']),
-            $this->router->url('ucp', ['what' => 'avatar']),
-            $this->router->url('ucp', ['what' => 'signature']),
-            $this->router->url('ucp', ['what' => 'profile']),
-            $this->router->url('ucp', ['what' => 'sounds']),
-            $this->router->url('ucp', ['what' => 'board']),
-            // inbox links
-            $this->router->url('inbox', ['view' => 'compose']),
-            $this->router->url('inbox'),
-            $this->router->url('inbox', ['view' => 'sent']),
-            $this->router->url('inbox', ['view' => 'flagged']),
-            $page,
-        );
+        $page = $this->template->render('ucp/index', [
+            'page' => $page
+        ]);
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
     }

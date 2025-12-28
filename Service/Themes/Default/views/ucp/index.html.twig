@@ -1,0 +1,30 @@
+<div class="box" id="ucp">
+  <div class="title">UCP</div>
+  <div class="content_top">
+  </div>
+  <div class="content">
+    <div class="leftbar folders">
+      <h2>Settings</h2>
+      <a href="{{ url('ucp')}}">Notepad</a>
+      <a href="{{ url('ucp', { what: 'pass' }) }}">Change Password</a>
+      <a href="{{ url('ucp', { what: 'email' }) }}">Email</a>
+      <a href="{{ url('ucp', { what: 'avatar' }) }}">Avatar</a>
+      <a href="{{ url('ucp', { what: 'signature' }) }}">Signature</a>
+      <a href="{{ url('ucp', { what: 'profile' }) }}">Profile</a>
+      <a href="{{ url('ucp', { what: 'sounds' }) }}">Sounds/Notifications</a>
+      <a href="{{ url('ucp', { what: 'board' }) }}">Board Customization</a>
+
+      <h2>Private Messaging</h2>
+      <a href="{{ url('inbox', { view: 'compose' }) }}" class="icon compose">Compose</a>
+      <a href="{{ url('inbox') }}" class="icon inbox">Inbox</a>
+      <a href="{{ url('inbox', { view: 'sent' }) }}" class="icon sent">Sent</a>
+      <a href="{{ url('inbox', { view: 'flagged' }) }}" class="icon flagged">Flagged</a>
+    </div>
+    <div id="ucppage" class="inbox">
+      {{ page|raw }}
+    </div>
+    <div class="clear">
+    </div>
+  </div>
+  <div class="content_bottom"></div>
+</div>
