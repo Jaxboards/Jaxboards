@@ -19,7 +19,6 @@ use Jax\User;
 
 use function array_map;
 use function ceil;
-use function htmlspecialchars;
 use function implode;
 use function is_array;
 use function is_numeric;
@@ -82,11 +81,11 @@ final readonly class Inbox
     }
 
     /**
-     * Return string on error, null on success
+     * Return string on error, null on success.
      */
-    private function sendMessage(?Member $recipient): ?string
+    private function sendMessage(?Member $member): ?string
     {
-        if ($recipient === null) {
+        if ($member === null) {
             return 'Invalid user!';
         }
 
@@ -105,7 +104,7 @@ final readonly class Inbox
         $message->message = $this->request->asString->post('message') ?? '';
         $message->read = 0;
         $message->title = $title;
-        $message->to = $recipient->id;
+        $message->to = $member->id;
         $message->insert();
 
         // Give them a notification.
@@ -126,16 +125,16 @@ final readonly class Inbox
                 SQL,
             ['session'],
             $cmd,
-            $recipient->id,
+            $member->id,
         );
 
         $inboxURL = $this->domainDefinitions->getBoardUrl() . $this->router->url('inbox');
 
         // Send em an email!
-        if (($recipient->emailSettings & 2) !== 0) {
+        if (($member->emailSettings & 2) !== 0) {
             $fromName = $this->user->get()->displayName;
             $this->jax->mail(
-                $recipient->email,
+                $member->email,
                 "PM From {$fromName}",
                 <<<HTML
                     You are receiving this email because you've
@@ -160,7 +159,7 @@ final readonly class Inbox
         $mid = (int) $this->request->asString->both('mid');
         $to = $this->request->asString->both('to');
 
-        if ($mid) {
+        if ($mid !== 0) {
             $recipient = Member::selectOne($mid);
         }
 
@@ -203,11 +202,11 @@ final readonly class Inbox
             'inbox/compose',
             [
                 'error' => $error,
-                'success' => $sentMessage && $error == null,
+                'success' => $sentMessage && $error === null,
                 'recipient' => $recipient,
                 'messageTitle' => $messageTitle,
                 'messageBody' => $messageBody,
-            ]
+            ],
         );
     }
 
