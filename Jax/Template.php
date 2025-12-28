@@ -290,7 +290,7 @@ final class Template
             $this->twigEnvironment->addFilter(...),
             [
                 new TwigFilter(
-                    'autodate',
+                    'autoDate',
                     fn(?string $string) => $this->container->get(Date::class)->autoDate($string),
                     ['is_safe' => ['html']],
                 ),

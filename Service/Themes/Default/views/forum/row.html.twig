@@ -31,7 +31,7 @@
         Views:&nbsp;{{ topic.views|number_format }}
     </td>
     <td class="last_post">
-        <a href="{{ url('topic', { id: topic.id, getlast: 1, slug: topic.title|slugify }) }}">{{ topic.lastPostDate|autodate }}</a>
+        <a href="{{ url('topic', { id: topic.id, getlast: 1, slug: topic.title|slugify }) }}">{{ topic.lastPostDate|autoDate }}</a>
         {% if lastPostUser %}
         <br>
         By {% include "user-link.html.twig" with { user: lastPostUser } %}

@@ -1,0 +1,28 @@
+<div class="messageview">
+    <div class="messageinfo">
+        <div class="title">
+            {{ message.title }}
+        </div>
+        <div>
+            From:
+            {% if otherMember %}
+                {% include "user-link.html.twig" with { user: otherMember } %}
+            {% endif %}
+        </div>
+        <div>
+            Sent: {{ message.date|autoDate }}
+        </div>
+    </div>
+    <div class="message">
+        {{ message.message|theWorks }}
+    </div>
+    <div class="messagebuttons">
+        <form method="post" data-ajax-form="true">
+            <input type="hidden" name="messageid" value="{{ message.id }}">
+            <input type="hidden" name="sender" value="{{ message.from }}">
+            <input type="submit" name="page" onclick="this.form.submitButton=this;" value="Delete">
+            <input type="submit" onclick="this.form.submitButton=this;" name="page" value="Forward">
+            <input type="submit" onclick="this.form.submitButton=this;" name="page" value="Reply">
+        </form>
+    </div>
+</div>

@@ -14,5 +14,5 @@ Last Post:
 <br>
 {% if lastPostUser %}
     By {% include 'user-link.html.twig' with { user: lastPostUser } only -%},
-    {{ subforum.lastPostDate|autodate }}
+    {{ subforum.lastPostDate|autoDate }}
 {% endif %}

@@ -348,20 +348,12 @@ final readonly class Inbox
             $this->page->command('update', 'num-messages', $this->fetchMessageCount('unread'));
         }
 
-        return $this->template->meta(
-            'inbox-messageview',
-            $message->title,
-            $otherMember !== null ? $this->template->render('user-link', ['user' => $otherMember]) : '',
-            $this->date->autoDate($message->date),
-            $this->textFormatting->theWorks($message->message),
-            $otherMember?->avatar ?: $this->template->render('default-avatar'),
-            $otherMember?->usertitle,
-            Template::hiddenFormFields(
-                [
-                    'messageid' => (string) $message->id,
-                    'sender' => (string) $message->from,
-                ],
-            ),
+        return $this->template->render(
+            'inbox/message-view',
+            [
+                'message' => $message,
+                'otherMember' => $otherMember,
+            ]
         );
     }
 
