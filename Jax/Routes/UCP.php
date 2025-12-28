@@ -22,7 +22,6 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function filter_var;
-use function gmdate;
 use function in_array;
 use function is_string;
 use function mb_strlen;
@@ -31,7 +30,6 @@ use function password_hash;
 use function password_verify;
 use function preg_match;
 use function trim;
-use function ucfirst;
 
 use const FILTER_VALIDATE_EMAIL;
 use const FILTER_VALIDATE_URL;
@@ -498,7 +496,7 @@ final readonly class UCP implements Route
             [
                 'user' => $this->user->get(),
                 'birthdate' => $birthdate,
-            ]
+            ],
         );
     }
 
