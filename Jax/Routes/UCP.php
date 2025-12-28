@@ -183,7 +183,7 @@ final readonly class UCP implements Route
             'ucp/sig-settings',
             [
                 'user' => $this->user->get(),
-            ]
+            ],
         );
     }
 
