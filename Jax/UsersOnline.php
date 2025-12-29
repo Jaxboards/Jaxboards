@@ -30,13 +30,13 @@ final class UsersOnline
         private readonly Config $config,
         private readonly Database $database,
         private readonly Date $date,
+        private readonly Router $router,
         private readonly User $user,
         private readonly ServiceConfig $serviceConfig,
     ) {
         $this->idleTimestamp = Carbon::now('UTC')
             ->subSeconds($this->serviceConfig->getSetting('timetoidle') ?? 300)
-            ->getTimestamp()
-        ;
+            ->getTimestamp();
         $this->fetchUsersOnline();
     }
 
@@ -120,14 +120,17 @@ final class UsersOnline
             $userOnline = new UserOnline();
 
             $userOnline->birthday = $birthday;
-            $userOnline->isBot = (bool) $session->isBot;
             $userOnline->groupID = $member->groupID ?? Groups::Guest->value;
             $userOnline->hide = (bool) $session->hide;
+            $userOnline->isBot = (bool) $session->isBot;
             $userOnline->lastAction = $this->date->datetimeAsTimestamp($session->lastAction);
             $userOnline->lastUpdate = $this->date->datetimeAsTimestamp($session->lastUpdate);
             $userOnline->location = $session->location;
             $userOnline->locationVerbose = $session->locationVerbose;
             $userOnline->name = ($session->hide ? '* ' : '') . $name;
+            $userOnline->profileURL = $session->isBot
+                ? null
+                : $this->router->url('profile', ['id' => $uid]);
             $userOnline->readDate = $this->date->datetimeAsTimestamp($session->readDate);
             $userOnline->status = $session->lastAction < $this->idleTimestamp
                 ? 'idle'
