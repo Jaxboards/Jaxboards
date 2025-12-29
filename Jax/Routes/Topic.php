@@ -237,7 +237,7 @@ final class Topic implements Route
                 'topic' => $modelsTopic,
                 'content' => $this->postsIntoOutput($modelsTopic),
                 'canCreateTopic' => $forumPerms['start'],
-                'canReply' =>  $forumPerms['reply'] && (
+                'canReply' => $forumPerms['reply'] && (
                     !$modelsTopic->locked || $this->user->getGroup()?->canOverrideLockedTopics
                 ),
                 'pages' => $pagelist,
