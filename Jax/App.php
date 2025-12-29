@@ -165,15 +165,6 @@ final readonly class App
             '<script src="' . $this->domainDefinitions->getBoardURL() . '/dist/app.js" defer></script>',
         );
 
-        if (
-            $this->template->meta('favicon') !== ''
-        ) {
-            $this->page->append(
-                'CSS',
-                '<link rel="icon" href="' . $this->template->meta('favicon') . '">',
-            );
-        }
-
         $this->page->append(
             'LOGO',
             $this->template->render(

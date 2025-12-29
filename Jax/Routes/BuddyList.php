@@ -33,39 +33,7 @@ final readonly class BuddyList implements Route
         private Template $template,
         private User $user,
         private UsersOnline $usersOnline,
-    ) {
-        $this->template->addMeta(
-            'buddylist-contacts',
-            <<<'HTML'
-                    <div class="contacts">
-                        <form action="/buddylist" data-ajax-form="true">
-                            <a href="%s" id="status" class="%s">
-                            </a>
-                            <input style="width:100%%;padding-left:20px;" type="text" name="status"
-                                onblur="this.form.requestSubmit()" value="%s"/>
-                            %s
-                    </div>
-                HTML,
-        );
-        $this->template->addMeta(
-            'buddylist-contact',
-            <<<'HTML'
-                    <div
-                        class="contact %3$s">
-                        <a href="%1$s">
-                            <div class="avatar">
-                                <img src="%4$s" alt="Avatar"/>
-                            </div>
-                            <div class="name">
-                                %2$s
-                            </div>
-                            <div class="status">
-                                %5$s
-                            </div>
-                    </div>
-                HTML,
-        );
-    }
+    ) {}
 
     public function route($params): void
     {
@@ -109,59 +77,51 @@ final readonly class BuddyList implements Route
 
         $this->page->command('softurl');
         $contacts = '';
+
+        $online = $this->usersOnline->getUsersOnline();
+
+        $friends = [];
+        $enemies = [];
+
         if (
             $this->user->get()->friends !== ''
         ) {
-            $online = $this->usersOnline->getUsersOnline();
-            $friends = Member::selectMany(
-                'WHERE `id` IN ? ORDER BY `name` ASC',
-                explode(',', $this->user->get()->friends),
+            $friends = array_map(
+                fn(Member $member) => [
+                    'user' => $member,
+                    'class' => array_key_exists($member->id, $online) ? 'online' : 'offline'
+                ],
+                Member::selectMany(
+                    'WHERE `id` IN ? ORDER BY `name` ASC',
+                    explode(',', $this->user->get()->friends),
+                )
             );
-            foreach ($friends as $friend) {
-                $contacts .= $this->template->meta(
-                    'buddylist-contact',
-                    $this->router->url('profile', ['id' => $friend->id]),
-                    $friend->name,
-                    array_key_exists($friend->id, $online) ? 'online' : 'offline',
-                    $friend->avatar ?: $this->template->render('default-avatar'),
-                    $friend->usertitle,
-                );
-            }
         }
 
         if ($this->user->get()->enemies !== '') {
-            $enemies = Member::selectMany(
-                'WHERE `id` IN ? ORDER BY `name` ASC',
-                explode(',', $this->user->get()->enemies),
-            );
-            foreach ($enemies as $enemy) {
-                $contacts .= $this->template->meta(
-                    'buddylist-contact',
-                    $enemy->id,
-                    $enemy->name,
-                    'blocked',
-                    $enemy->avatar ?: $this->template->render('default-avatar'),
-                    $enemy->usertitle,
-                );
-            }
-        }
-
-        if ($contacts === '') {
-            $contacts = $this->template->meta(
-                'error',
-                "You don't have any contacts added to your buddy list!",
+            $enemies = array_map(
+                fn(Member $member) => [
+                    'user' => $member,
+                    'class' => 'blocked'
+                ],
+                Member::selectMany(
+                    'WHERE `id` IN ? ORDER BY `name` ASC',
+                    explode(',', $this->user->get()->enemies),
+                )
             );
         }
 
         $this->page->command(
             'window',
             [
-                'content' => $this->template->meta(
-                    'buddylist-contacts',
-                    $this->router->url('toggleInvisible'),
-                    $this->session->get()->hide !== 0 ? 'invisible' : '',
-                    $this->user->get()->usertitle,
-                    $contacts,
+                'content' => $this->template->render(
+                    'buddylist/contacts',
+                    [
+                        'enemies' => $enemies,
+                        'friends' => $friends,
+                        'isInvisible' => $this->session->get()->hide !== 0,
+                        'user' => $this->user->get(),
+                    ]
                 ),
                 'id' => 'buddylist',
                 'pos' => 'tr 20 20',

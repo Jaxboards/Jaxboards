@@ -243,10 +243,7 @@ final class Page
 
     private function getPageTitle(): string
     {
-        return (
-            ($this->template->meta('title') ?: $this->config->getSetting('boardname'))
-            ?: 'JaxBoards'
-        ) . ($this->pageTitle !== '' ? ' -> ' . $this->pageTitle : '');
+        return ($this->config->getSetting('boardname') ?: 'JaxBoards') . ($this->pageTitle !== '' ? ' -> ' . $this->pageTitle : '');
     }
 
     private function outputJavascriptCommands(): string

@@ -452,18 +452,22 @@ final class LogReg implements Route
                     );
 
                     if (!$mailResult) {
-                        $page .= $this->template->meta(
+                        $page .= $this->template->render(
                             'error',
-                            'There was a problem sending the email. '
-                                . 'Please contact the administrator.',
+                            [
+                                'message' => 'There was a problem sending the email. '
+                                    . 'Please contact the administrator.'
+                            ]
                         );
                     } else {
-                        $page .= $this->template->meta(
+                        $page .= $this->template->render(
                             'success',
-                            'An email has been sent to the email associated '
-                                . 'with this account. Please check your email and '
-                                . 'follow the instructions in order to recover '
-                                . 'your password.',
+                            [
+                                'message' => 'An email has been sent to the email associated '
+                                    . 'with this account. Please check your email and '
+                                    . 'follow the instructions in order to recover '
+                                    . 'your password.'
+                            ]
                         );
                     }
                 }

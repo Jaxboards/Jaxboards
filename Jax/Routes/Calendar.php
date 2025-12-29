@@ -82,8 +82,6 @@ final readonly class Calendar implements Route
             ];
         }
 
-        $page = '';
-        $page .= $this->template->meta('calendar-daynames');
         $weeks = [];
         $days = [
             ['offset' => $offset],

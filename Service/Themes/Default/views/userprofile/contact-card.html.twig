@@ -31,9 +31,9 @@
         {% endif %}
         <br>
         {% if isEnemy %}
-            <a href="{{ url('buddylist', { block: member.id }) }}">Unblock Contact</a>
+            <a href="{{ url('buddylist', { unblock: member.id }) }}">Unblock Contact</a>
         {% else %}
-            <a href="{{ url('buddylist', { unblock: member.id }) }}">Block Contact</a>
+            <a href="{{ url('buddylist', { block: member.id }) }}">Block Contact</a>
         {% endif %}
         <br>
         <br>
