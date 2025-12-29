@@ -456,8 +456,8 @@ final class LogReg implements Route
                             'error',
                             [
                                 'message' => 'There was a problem sending the email. '
-                                    . 'Please contact the administrator.'
-                            ]
+                                    . 'Please contact the administrator.',
+                            ],
                         );
                     } else {
                         $page .= $this->template->render(
@@ -466,8 +466,8 @@ final class LogReg implements Route
                                 'message' => 'An email has been sent to the email associated '
                                     . 'with this account. Please check your email and '
                                     . 'follow the instructions in order to recover '
-                                    . 'your password.'
-                            ]
+                                    . 'your password.',
+                            ],
                         );
                     }
                 }

@@ -10,7 +10,6 @@ use Jax\Models\Activity;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
-use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 use Jax\User;
@@ -18,6 +17,7 @@ use Jax\UsersOnline;
 
 use function array_filter;
 use function array_key_exists;
+use function array_map;
 use function array_search;
 use function explode;
 use function implode;
@@ -28,7 +28,6 @@ final readonly class BuddyList implements Route
     public function __construct(
         private Page $page,
         private Session $session,
-        private Router $router,
         private Request $request,
         private Template $template,
         private User $user,
@@ -76,7 +75,6 @@ final readonly class BuddyList implements Route
         }
 
         $this->page->command('softurl');
-        $contacts = '';
 
         $online = $this->usersOnline->getUsersOnline();
 
@@ -87,27 +85,27 @@ final readonly class BuddyList implements Route
             $this->user->get()->friends !== ''
         ) {
             $friends = array_map(
-                fn(Member $member) => [
+                static fn(Member $member): array => [
                     'user' => $member,
-                    'class' => array_key_exists($member->id, $online) ? 'online' : 'offline'
+                    'class' => array_key_exists($member->id, $online) ? 'online' : 'offline',
                 ],
                 Member::selectMany(
                     'WHERE `id` IN ? ORDER BY `name` ASC',
                     explode(',', $this->user->get()->friends),
-                )
+                ),
             );
         }
 
         if ($this->user->get()->enemies !== '') {
             $enemies = array_map(
-                fn(Member $member) => [
+                static fn(Member $member): array => [
                     'user' => $member,
-                    'class' => 'blocked'
+                    'class' => 'blocked',
                 ],
                 Member::selectMany(
                     'WHERE `id` IN ? ORDER BY `name` ASC',
                     explode(',', $this->user->get()->enemies),
-                )
+                ),
             );
         }
 
@@ -121,7 +119,7 @@ final readonly class BuddyList implements Route
                         'friends' => $friends,
                         'isInvisible' => $this->session->get()->hide !== 0,
                         'user' => $this->user->get(),
-                    ]
+                    ],
                 ),
                 'id' => 'buddylist',
                 'pos' => 'tr 20 20',
