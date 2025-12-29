@@ -179,13 +179,13 @@ final class ProfileTabs
             static fn(Topic $topic): ?int => $topic->fid,
         );
 
-        return implode('', array_map(function (Post $post) use ($topics, $forums) {
+        return implode('', array_map(function (Post $post) use ($topics, $forums): string {
             $topic = $topics[$post->tid];
             $forum = $forums[$topic->fid];
 
             $perms = $this->user->getForumPerms($forum->perms);
             if (!$perms['read']) {
-                return;
+                return '';
             }
 
             return $this->template->render(
