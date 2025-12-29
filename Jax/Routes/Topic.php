@@ -499,98 +499,35 @@ final class Topic implements Route
                 $this->firstPostID = $post->id;
             }
 
-            $postBody = $post->post;
-            $postBody = $this->textFormatting->theWorks($postBody);
-
-            // Post rating content goes here.
-            $postrating = "<div id='reaction_p{$post->id}'>"
-                . $this->reactions->render($post)
-                . '</div>';
-
             $author = $post->author ? $membersById[$post->author] : null;
             $editor = $post->editby ? $membersById[$post->editby] : null;
 
             $authorGroup = $author
                 ? $groups[$author->groupID]
                 : null;
-            $postbuttons
-                // Adds the Edit button
-                = ($this->canEdit($modelsTopic, $post)
-                    ? $this->template->render('topic/button/edit', [
-                        'post' => $post,
-                    ]) : '')
-                // Adds the Quote button
-                . ($forumPerms['reply']
-                    ? $this->template->render('topic/button/quote', [
-                        'post' => $post,
-                    ]) : '')
-                // Adds the Moderate options
-                . ($canModerateTopic
-                    ? $this->template->render('topic/button/moderate', [
-                        'post' => $post,
-                    ]) : '');
 
-            $postEmbeds = '';
-            if ($post->openGraphMetadata) {
-                $openGraphData = json_decode($post->openGraphMetadata, true, flags: JSON_THROW_ON_ERROR);
-                foreach ($openGraphData as $url => $data) {
-                    $postEmbeds .= $this->template->render(
-                        'topic/post-opengraph',
-                        [
-                            'url' => $data['url'] ?? $url,
-                            'site_name' => $data['site_name'] ?? '',
-                            'title' => $data['title'] ?? '',
-                            'description' => $data['description'] ?? '',
-                            'image' => $data['image'] ?: '',
-                        ],
-                    );
-                }
-            }
-
-            $rows .= $this->template->meta(
-                'topic-post-row',
-                $post->id,
-                $modelsTopic->id,
-                $author ? $this->template->render('user-link', ['user' => $author]) : 'Guest',
-                $author?->avatar ?: $this->template->render('default-avatar'),
-                $author?->usertitle,
-                $author?->posts,
-                $this->template->render(
-                    'topic/status-'
-                        . (array_key_exists($post->author, $usersonline) ? 'online' : 'offline'),
-                ),
-                $authorGroup?->title,
-                $post->author,
-                $postbuttons,
-                // ^10
-                $this->date->autoDate($post->date),
-                $this->template->render('topic/button/perma', ['topic' => $modelsTopic, 'post' => $post]),
-                $postBody,
-                $authorGroup->canUseSignatures && $author?->sig
-                    ? $this->textFormatting->theWorks($author->sig)
-                    : '',
-                $this->router->url('profile', ['id' => $post->author]),
-                $editor ? $this->template->render(
-                    'topic/edit-by',
-                    [
-                        'user' => $editor,
-                        'post' => $post,
-                    ],
-                ) : '',
-                $this->user->getGroup()?->canModerate
-                    ? $this->template->render(
-                        'topic/button/mod-ip',
-                        [
-                            'ip' => $this->ipAddress->asHumanReadable($post->ip),
-                        ],
-                    )
-                    : '',
-                $this->template->render('topic/icon-wrapper', ['group' => $authorGroup]),
-                ++$topicPostCounter,
-                $postrating,
-                // ^20
-                $badgesPerAuthor[$author?->id] ?? '',
-                $postEmbeds,
+            $rows .= $this->template->render(
+                'topic/post-row',
+                [
+                    'author' => $author,
+                    'badges' => $badgesPerAuthor[$author?->id] ?? '',
+                    'canEdit' => $this->canEdit($modelsTopic, $post),
+                    'canModerate' => $canModerateTopic,
+                    'canReply' => $forumPerms['reply'],
+                    'canUseSignatures' => $authorGroup->canUseSignatures,
+                    'editor' => $editor,
+                    'group' => $authorGroup,
+                    'ip' => $this->ipAddress->asHumanReadable($post->ip),
+                    'isOnline' => array_key_exists($post->author, $usersonline),
+                    'openGraphData' => $post->openGraphMetadata ? json_decode(
+                        $post->openGraphMetadata,
+                        true,
+                        flags: JSON_THROW_ON_ERROR
+                    ) : null,
+                    'post' => $post,
+                    'postRating' => $this->reactions->render($post),
+                    'topic' => $modelsTopic,
+                ],
             );
             $lastpid = $post->id;
         }

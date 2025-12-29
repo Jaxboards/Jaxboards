@@ -1,0 +1,77 @@
+<tbody class="topic-post-row" id="pid_{{ post.id }}">
+    <tr>
+        <td class="userdata" rowspan="2">
+            <div class="username">
+                {%- include "user-link.html.twig" with { user: author } -%}
+            </div>
+            <div class="avatar">
+                <a href="{{ url('profile', { id: author.id }) }}">
+                    {% include "avatar.html.twig" with { avatar: author.avatar } %}
+                </a>
+            </div>
+            <div class="usertitle">
+                {{ author.usertitle }}
+            </div>
+            {% if group.icon %}
+                <div class="group_icon">
+                    <img src="{{ group.icon }}" alt="group icon" />
+                </div>
+            {% endif %}
+
+            {% if badges %}
+                <div class="badges">{{ badges|raw }}</div>
+            {% endif %}
+
+            <div class="userstats">
+                Posts: {{ author.posts|number_format }}
+                <br>
+                Status: {% if isOnline %}Online!{% else %}Offline{% endif %}
+                <br>
+                Group: {{ group.title }}
+                <br>
+                Member: #{{ author.id }}
+            </div>
+        </td>
+        <td class="post">
+            <div class="posttop">
+                <div class="post_buttons">
+                    {%- if canEdit -%}
+                        {%- include "topic/button/edit.html.twig" with { post } -%}
+                    {%- endif -%}
+                    {%- if canReply -%}
+                    {%- endif -%}
+                    {%- if canModerate -%}
+                        {%- include "topic/button/moderate.html.twig" with { post } -%}
+                        {%- include "topic/button/mod-ip.html.twig" with { ip } -%}
+                    {%- endif -%}
+                </div>
+                <div class="post_info">
+                    {{ post.date|autoDate }}
+                    {% include "topic/button/perma.html.twig" with { topic, post } %}
+                </div>
+            </div>
+            <div class="post_content">
+                {{ post.post|theWorks }}
+                {% if openGraphData %}
+                    {% for url,openGraph in openGraphData %}
+                        {% include "topic/post-opengraph.html.twig" with openGraph %}
+                    {% endfor %}
+                {% endif %}
+                {% if editor %}
+                    {% include "topic/edit-by.html.twig" with { user: editor, post } %}
+                {% endif %}
+            </div>
+            {% if postRating %}
+                <div id="reaction_p{{ post.id }}">{{ postRating|raw }}</div>
+            {% endif %}
+            <div class="signature">
+                {% if canUseSignatures %}
+                    {{ author.sig|theWorks }}
+                {% endif %}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="postbottom"></td>
+    </tr>
+</tbody>
