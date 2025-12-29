@@ -1,3 +1,4 @@
-<a href="/profile/{{ user.id }}" class="user{{ user.id }} mgroup{{ user.groupID }}">
-    {{- user.displayName -}}
-</a>{# #}
+<a
+    href="{{ url('profile', { id: user.id }) }}"
+    class="user{{ user.id }} mgroup{{ user.groupID }} {{ user.class }}"
+>{{- user.displayName -}}</a>{# #}

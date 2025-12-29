@@ -36,8 +36,7 @@ final class UsersOnline
     ) {
         $this->idleTimestamp = Carbon::now('UTC')
             ->subSeconds($this->serviceConfig->getSetting('timetoidle') ?? 300)
-            ->getTimestamp()
-        ;
+            ->getTimestamp();
         $this->fetchUsersOnline();
     }
 
@@ -113,9 +112,6 @@ final class UsersOnline
 
             $uid = $session->isBot ? $session->id : $session->uid;
             $name = ($session->isBot ? $session->id : $member?->displayName);
-            $profileURL = $session->isBot
-                ? null
-                : $this->router->url('profile', ['id' => $uid]);
 
             if (!$name) {
                 continue;
@@ -133,7 +129,6 @@ final class UsersOnline
             $userOnline->locationVerbose = $session->locationVerbose;
             $userOnline->name = ($session->hide ? '* ' : '') . $name;
             $userOnline->readDate = $this->date->datetimeAsTimestamp($session->readDate);
-            $userOnline->profileURL = $profileURL;
             $userOnline->status = $session->lastAction < $this->idleTimestamp
                 ? 'idle'
                 : 'active';

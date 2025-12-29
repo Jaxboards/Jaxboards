@@ -1,0 +1,36 @@
+<div class="box collapse-box" id="topic-users-online">
+    <div class="title">
+        <div class="x collapse-button">
+            -/+
+        </div>
+        Users Viewing This Topic
+    </div>
+    <div class="collapse-content">
+        <div class="content_top">
+        </div>
+        <div class="content">
+            <div id="statusers" class="topicstatusers">
+                {% for user in users %}
+                    {% if user.isBot %}
+                        <a class="user{{ user.uid}}">{{user.name}}</a>
+                    {% else %}
+                        {% include "user-link.html.twig" with {
+                            user: {
+                                id: user.uid,
+                                groupID: user.groupID,
+                                class: (
+                                    user.status == 'idle'
+                                        ? ' idle lastAction' ~ user.lastAction
+                                        : ''
+                                ),
+                                displayName: user.name
+                            }
+                        } %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="content_bottom">
+        </div>
+    </div>
+</div>

@@ -283,35 +283,14 @@ final class Topic implements Route
 
 
         // Make the users online list.
-        $usersonline = '';
-        foreach ($this->usersOnline->getUsersOnline() as $userOnline) {
-            if (!$userOnline->uid) {
-                continue;
-            }
+        $usersInTopic = array_filter(
+            $this->usersOnline->getUsersOnline(),
+            static fn($row) => $row->location === "vt{$modelsTopic->id}"
+        );
 
-            if ($userOnline->location !== "vt{$modelsTopic->id}") {
-                continue;
-            }
-
-            if ($userOnline->isBot) {
-                $usersonline .= '<a class="user' . $userOnline->uid . '">' . $userOnline->name . '</a>';
-
-                continue;
-            }
-
-            $usersonline .= $this->template->meta(
-                'user-link',
-                $userOnline->uid,
-                $userOnline->groupID . (
-                    $userOnline->status === 'idle'
-                    ? " idle lastAction{$userOnline->lastAction}"
-                    : ''
-                ),
-                $userOnline->name,
-            );
-        }
-
-        $page .= $this->template->meta('topic-users-online', $usersonline);
+        $page .= $this->template->render('topic/users-online', [
+            'users' => $usersInTopic,
+        ]);
 
         // Add in other page elements.
         $page = $poll . $this->template->meta(

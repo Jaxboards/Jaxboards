@@ -45,7 +45,7 @@
                 {{ usersOnlineToday|length }} User{% if usersOnlineToday|length != 1 %}s{% endif %} Online Today:
 
                 {% for user in usersOnlineToday %}
-                    <a href="{{ user.profileURL }}"
+                    <a href="{% if not user.isBot %}{{ url('profile', { id: user.uid }) }}{% endif %}"
                     class="user{{ user.uid }} mgroup{{ user.groupID }} {% if user.birthday %}birthday{% endif %}"
                     title="Last online: {{ user.lastOnlineRelative }}"
                     data-use-tooltip="true"
