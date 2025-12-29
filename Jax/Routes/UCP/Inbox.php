@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax\Routes\UCP;
 
 use Jax\Database\Database;
-use Jax\Date;
 use Jax\DomainDefinitions;
 use Jax\Jax;
 use Jax\Models\Member;
@@ -35,7 +34,6 @@ final readonly class Inbox
 
     public function __construct(
         private Database $database,
-        private Date $date,
         private DomainDefinitions $domainDefinitions,
         private Jax $jax,
         private Page $page,
@@ -395,11 +393,11 @@ final readonly class Inbox
 
         $readCounts = countBy(
             $messages,
-            static fn(Message $message) => $message->read ? 'read' : 'unread'
+            static fn(Message $message): string => $message->read !== 0 ? 'read' : 'unread',
         );
-        $rows = array_map(static fn(Message $message) => [
+        $rows = array_map(static fn(Message $message): array => [
             'message' => $message,
-            'otherMember' => $membersById[$getMessageMemberId($message)]
+            'otherMember' => $membersById[$getMessageMemberId($message)],
         ], $messages);
 
         if ($view === 'inbox') {
@@ -411,8 +409,8 @@ final readonly class Inbox
             [
                 'pages' => $pages,
                 'view' => $view,
-                'rows' => $rows
-            ]
-        );;
+                'rows' => $rows,
+            ],
+        );
     }
 }
