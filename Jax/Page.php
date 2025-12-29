@@ -199,7 +199,7 @@ final class Page
         $this->template->load(
             $skinWrapper && $this->fileSystem->getFileInfo($skinWrapper)->isFile()
                 ? $skinWrapper
-                : $this->domainDefinitions->getDefaultThemePath() . '/wrappers.html',
+                : $this->domainDefinitions->getDefaultThemePath() . '/wrapper.html',
         );
     }
 
