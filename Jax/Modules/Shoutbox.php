@@ -44,9 +44,7 @@ final class Shoutbox implements Module
         private readonly TextFormatting $textFormatting,
         private readonly Template $template,
         private readonly User $user,
-    ) {
-        $this->template->loadMeta('shoutbox');
-    }
+    ) {}
 
     public function init(): void
     {

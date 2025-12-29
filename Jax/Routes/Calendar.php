@@ -26,9 +26,7 @@ final readonly class Calendar implements Route
         private Router $router,
         private Session $session,
         private Template $template,
-    ) {
-        $this->template->loadMeta('calendar');
-    }
+    ) {}
 
     public function route($params): void
     {

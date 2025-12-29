@@ -75,9 +75,7 @@ final class Topic implements Route
         private readonly Template $template,
         private readonly User $user,
         private readonly UsersOnline $usersOnline,
-    ) {
-        $this->template->loadMeta('topic');
-    }
+    ) {}
 
     public function route($params): void
     {

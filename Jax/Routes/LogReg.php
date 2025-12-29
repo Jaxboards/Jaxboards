@@ -64,9 +64,7 @@ final class LogReg implements Route
         private readonly Template $template,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
-    ) {
-        $this->template->loadMeta('logreg');
-    }
+    ) {}
 
     public function route($params): void
     {

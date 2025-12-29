@@ -58,9 +58,7 @@ final class Search implements Route
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
-    ) {
-        $this->template->loadMeta('search');
-    }
+    ) {}
 
     public function route($params): void
     {

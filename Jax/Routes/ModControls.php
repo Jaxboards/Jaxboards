@@ -49,9 +49,7 @@ final readonly class ModControls implements Route
         private TextFormatting $textFormatting,
         private Template $template,
         private User $user,
-    ) {
-        $this->template->loadMeta('modcp');
-    }
+    ) {}
 
     public function route($params): void
     {

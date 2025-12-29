@@ -63,9 +63,7 @@ final class BoardIndex implements Route
         private readonly Template $template,
         private readonly User $user,
         private readonly UsersOnline $usersOnline,
-    ) {
-        $this->template->loadMeta('idx');
-    }
+    ) {}
 
     public function route($params): void
     {

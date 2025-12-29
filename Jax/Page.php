@@ -162,8 +162,6 @@ final class Page
     {
         $skinId = $this->user->get()->skinID;
 
-        $this->template->loadMeta('global');
-
         $skin = $this->getSelectedSkin($skinId);
 
         $themePath = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardPath() : '') . '/Themes/' . $skin->title;

@@ -36,9 +36,7 @@ final class Members implements Route
         private readonly Router $router,
         private readonly Template $template,
         private readonly Request $request,
-    ) {
-        $this->template->loadMeta('members');
-    }
+    ) {}
 
     public function route($params): void
     {

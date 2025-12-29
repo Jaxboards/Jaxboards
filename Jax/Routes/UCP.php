@@ -48,9 +48,7 @@ final readonly class UCP implements Route
         private TextFormatting $textFormatting,
         private Template $template,
         private User $user,
-    ) {
-        $this->template->loadMeta('ucp');
-    }
+    ) {}
 
     public function route($params): void
     {

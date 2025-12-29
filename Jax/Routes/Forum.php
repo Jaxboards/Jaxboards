@@ -64,9 +64,7 @@ final class Forum implements Route
         private readonly Template $template,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
-    ) {
-        $this->template->loadMeta('forum');
-    }
+    ) {}
 
     public function route($params): void
     {

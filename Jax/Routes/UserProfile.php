@@ -37,9 +37,7 @@ final readonly class UserProfile implements Route
         private Session $session,
         private Template $template,
         private User $user,
-    ) {
-        $this->template->loadMeta('userprofile');
-    }
+    ) {}
 
     public function route($params): void
     {

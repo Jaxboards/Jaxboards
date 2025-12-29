@@ -29,9 +29,7 @@ final class Ticker implements Route
         private readonly Session $session,
         private readonly Template $template,
         private readonly User $user,
-    ) {
-        $this->template->loadMeta('ticker');
-    }
+    ) {}
 
     public function route($params): void
     {
