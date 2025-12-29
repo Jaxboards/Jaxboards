@@ -84,6 +84,6 @@ final class CalendarTest extends FeatureTestCase
 
         $page = $this->go('/calendar');
 
-        DOMAssert::assertSelectEquals('.birthdays .user1', 'Admin', 1, $page);
+        DOMAssert::assertSelectEquals('.today .birthdays .user1', 'Admin', 1, $page);
     }
 }
