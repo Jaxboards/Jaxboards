@@ -25,9 +25,9 @@
         <br>
         <br>
         {% if isFriend %}
-            <a href="{{ url('buddylist', { add: member.id }) }}">Add Contact</a>
-        {% else %}
             <a href="{{ url('buddylist', { remove: member.id }) }}">Remove Contact</a>
+        {% else %}
+            <a href="{{ url('buddylist', { add: member.id }) }}">Add Contact</a>
         {% endif %}
         <br>
         {% if isEnemy %}
