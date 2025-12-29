@@ -16,7 +16,6 @@ use Jax\Template;
 
 use function explode;
 use function gmdate;
-use function implode;
 
 final readonly class Calendar implements Route
 {
@@ -87,7 +86,7 @@ final readonly class Calendar implements Route
         $page .= $this->template->meta('calendar-daynames');
         $weeks = [];
         $days = [
-            ['offset' => $offset]
+            ['offset' => $offset],
         ];
 
         for ($x = 1; $x <= $daysInMonth; ++$x) {
