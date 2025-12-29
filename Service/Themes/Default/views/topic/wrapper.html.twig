@@ -1,7 +1,12 @@
 <div class="box">
     <div class="title">
         <div class="topic-tools">
-            <a href="{{ url('topic', { id: topic.id, fmt: 'RSS' }) }}">RSS</a>
+            <a
+                href="{{ url('topic', { id: topic.id, fmt: 'RSS' }) }}"
+                class="social rss"
+                title="RSS Feed for this Topic"
+                target="_blank"
+            >RSS</a>
         </div>
         {{- topic.title|wordFilter -}}
         {%- if topic.subtitle %}, {{ topic.subtitle|wordFilter }}{% endif -%}
