@@ -222,62 +222,7 @@ final class Topic implements Route
             ? $this->poll->render($modelsTopic)
             : '';
 
-        // Generate post listing.
-        $page = $this->template->render(
-            'topic/wrapper',
-            [
-                'topic' => $modelsTopic,
-                'content' => $this->postsIntoOutput($modelsTopic),
-            ],
-        );
-
-        // Add buttons.
-        $buttons = [
-            '',
-            '',
-            '',
-        ];
-
         $forumPerms = $this->fetchForumPermissions($modelsTopic, $forum);
-        if ($forumPerms['start']) {
-            $buttons[0] = $this->template->render(
-                'topic/button/newtopic',
-                [
-                    'topic' => $modelsTopic,
-                ],
-            );
-        }
-
-        if (
-            $forumPerms['reply']
-            && (
-                !$modelsTopic->locked
-                || $this->user->getGroup()?->canOverrideLockedTopics
-            )
-        ) {
-            $buttons[1] = $this->template->render(
-                'topic/button/qreply',
-                [
-                    'topic' => $modelsTopic,
-                ],
-            );
-        }
-
-        if (
-            $forumPerms['reply']
-            && (
-                !$modelsTopic->locked
-                || $this->user->getGroup()?->canOverrideLockedTopics
-            )
-        ) {
-            $buttons[2] = $this->template->render(
-                'topic/button/reply',
-                [
-                    'topic' => $modelsTopic,
-                ],
-            );
-        }
-
 
         // Make the users online list.
         $usersInTopic = array_filter(
@@ -285,17 +230,21 @@ final class Topic implements Route
             static fn(UserOnline $userOnline): bool => $userOnline->location === "vt{$modelsTopic->id}",
         );
 
-        $page .= $this->template->render('topic/users-online', [
-            'users' => $usersInTopic,
-        ]);
-
-        // Add in other page elements.
-        $page = $poll
-            . $this->template->render('topic/pages-top', ['pages' => $pagelist])
-            . $this->template->render('topic/buttons-top', ['buttons' => $buttons])
-            . $page
-            . $this->template->render('topic/pages-bottom', ['pages' => $pagelist])
-            . $this->template->render('topic/buttons-bottom', ['buttons' => $buttons]);
+        // Generate post listing.
+        $page = $this->template->render(
+            'topic/index',
+            [
+                'topic' => $modelsTopic,
+                'content' => $this->postsIntoOutput($modelsTopic),
+                'canCreateTopic' => $forumPerms['start'],
+                'canReply' =>  $forumPerms['reply'] && (
+                    !$modelsTopic->locked || $this->user->getGroup()?->canOverrideLockedTopics
+                ),
+                'pages' => $pagelist,
+                'poll' => $poll,
+                'usersInTopic' => $usersInTopic,
+            ],
+        );
 
         // Update view count.
         ++$modelsTopic->views;

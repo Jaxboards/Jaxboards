@@ -1,0 +1,55 @@
+{{ poll|raw }}
+
+<div class="pages-top pages">
+    {{ pages|raw }}
+</div>
+
+<div class="topic-buttons-top">
+    {% if canCreateTopic %}
+        {% include "topic/button/newtopic.html.twig" with { topic } %}
+    {% endif %}
+    {% if canReply %}
+        {% include "topic/button/qreply.html.twig" with { topic } %}
+        {% include "topic/button/reply.html.twig" with { topic } %}
+    {% endif %}
+</div>
+
+<div class="box">
+    <div class="title">
+        <div class="topic-tools">
+            <a
+                href="{{ url('topic', { id: topic.id, fmt: 'RSS' }) }}"
+                class="social rss"
+                title="RSS Feed for this Topic"
+                target="_blank"
+            >RSS</a>
+        </div>
+        {{- topic.title|wordFilter -}}
+        {%- if topic.subtitle %}, {{ topic.subtitle|wordFilter }}{% endif -%}
+    </div>
+    <div class="content_top">
+    </div>
+    <div class="content">
+        <table id="intopic" role="presentation">
+            {{ content|raw }}
+        </table>
+    </div>
+    <div class="content_bottom">
+    </div>
+</div>
+
+{% include "topic/users-online.html.twig" with { users: usersInTopic } %}
+
+<div class="pages-bottom pages">
+  {{ pages|raw }}
+</div>
+
+<div class="topic-buttons-bottom">
+    {% if canCreateTopic %}
+        {% include "topic/button/newtopic.html.twig" with { topic } %}
+    {% endif %}
+    {% if canReply %}
+        {% include "topic/button/qreply.html.twig" with { topic } %}
+        {% include "topic/button/reply.html.twig" with { topic } %}
+    {% endif %}
+</div>
