@@ -23,7 +23,6 @@ use function array_map;
 use function explode;
 use function implode;
 use function in_array;
-use function ucfirst;
 
 final readonly class UserProfile implements Route
 {
@@ -138,7 +137,7 @@ final readonly class UserProfile implements Route
                         'isGuest' => $this->user->isGuest(),
                         'isFriend' => $this->isUserInList($member->id, $this->user->get()->friends),
                         'isEnemy' => $this->isUserInList($member->id, $this->user->get()->enemies),
-                    ]
+                    ],
                 ),
                 'minimizable' => false,
                 'title' => 'Contact Card',
@@ -176,7 +175,7 @@ final readonly class UserProfile implements Route
                 'selectedTab' => $page ?: 'activity',
                 'tabHTML' => $tabHTML,
                 'canModerate' => $this->user->getGroup()?->canModerate,
-            ]
+            ],
         );
 
         $this->page->command('update', 'page', $profile);

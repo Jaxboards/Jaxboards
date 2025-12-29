@@ -5,22 +5,19 @@ declare(strict_types=1);
 namespace Jax\Routes\UserProfile;
 
 use Jax\Database\Database;
-use Jax\Date;
 use Jax\Models\Forum;
 use Jax\Models\Member;
 use Jax\Models\Post;
 use Jax\Models\Topic;
 use Jax\Page;
-use Jax\Router;
 use Jax\Routes\Badges;
 use Jax\Template;
-use Jax\TextFormatting;
 use Jax\User;
 
 use function array_map;
 use function explode;
+use function implode;
 use function in_array;
-use function ucwords;
 
 final class ProfileTabs
 {
@@ -37,19 +34,18 @@ final class ProfileTabs
     ];
 
     public function __construct(
-        private Activity $activity,
-        private Badges $badges,
-        private Comments $comments,
-        private Date $date,
-        private Page $page,
-        private Router $router,
-        private Template $template,
-        private TextFormatting $textFormatting,
-        private User $user,
+        private readonly Activity $activity,
+        private readonly Badges $badges,
+        private readonly Comments $comments,
+        private readonly Page $page,
+        private readonly Template $template,
+        private readonly User $user,
     ) {
-        if ($this->badges->isEnabled()) {
-            $this->tabs[] = 'badges';
+        if (!$this->badges->isEnabled()) {
+            return;
         }
+
+        $this->tabs[] = 'badges';
     }
 
     /**
@@ -88,7 +84,7 @@ final class ProfileTabs
             'userprofile/about',
             [
                 'member' => $member,
-            ]
+            ],
         );
     }
 
@@ -149,7 +145,7 @@ final class ProfileTabs
                 [
                     'post' => $post,
                     'topic' => $topic,
-                ]
+                ],
             );
         }
 
@@ -193,7 +189,7 @@ final class ProfileTabs
                 [
                     'topic' => $topic,
                     'post' => $post,
-                ]
+                ],
             );
         }, $posts));
     }

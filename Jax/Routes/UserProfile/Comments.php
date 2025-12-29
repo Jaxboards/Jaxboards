@@ -5,27 +5,21 @@ declare(strict_types=1);
 namespace Jax\Routes\UserProfile;
 
 use Jax\Database\Database;
-use Jax\Date;
 use Jax\Models\Activity;
 use Jax\Models\Member;
 use Jax\Models\ProfileComment;
 use Jax\Page;
 use Jax\Request;
-use Jax\Router;
 use Jax\Template;
-use Jax\TextFormatting;
 use Jax\User;
 
 final readonly class Comments
 {
     public function __construct(
         private Database $database,
-        private Date $date,
         private Page $page,
         private Request $request,
-        private Router $router,
         private Template $template,
-        private TextFormatting $textFormatting,
         private User $user,
     ) {}
 
@@ -44,7 +38,7 @@ final readonly class Comments
                 'userprofile/comment-form',
                 [
                     'user' => $this->user->get(),
-                ]
+                ],
             );
         }
 
@@ -75,7 +69,7 @@ final readonly class Comments
                     'member' => $member,
                     'comment' => $comment,
                     'fromMember' => $membersById[$comment->from],
-                ]
+                ],
             );
         }
 
