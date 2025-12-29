@@ -3,7 +3,7 @@
     {{ date|raw }}
   </div>
   <a href="{{ url('topic', { id: topic.id, findpost: post.id }) }}" class="tick-title">
-    {{ topic.title|wordfilter }}
+    {{ topic.title|wordFilter }}
   </a>
   <div class="by">
     {%- include 'user-link.html.twig' with { user } only -%}

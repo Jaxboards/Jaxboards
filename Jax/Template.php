@@ -313,8 +313,8 @@ final class Template
                     ['is_safe' => ['html']],
                 ),
                 new TwigFilter(
-                    'wordfilter',
-                    fn(?string $string) => $this->container->get(TextFormatting::class)->wordfilter($string),
+                    'wordFilter',
+                    fn(?string $string) => $this->container->get(TextFormatting::class)->wordFilter($string),
                 ),
             ],
         );

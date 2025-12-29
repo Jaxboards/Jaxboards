@@ -172,8 +172,8 @@ final class Topic implements Route
             $this->markRead($modelsTopic);
         }
 
-        $topicTitle = $this->textFormatting->wordfilter($modelsTopic->title);
-        $topicSubtitle = $this->textFormatting->wordfilter($modelsTopic->subtitle);
+        $topicTitle = $this->textFormatting->wordFilter($modelsTopic->title);
+        $topicSubtitle = $this->textFormatting->wordFilter($modelsTopic->subtitle);
 
         $this->page->setPageTitle($topicTitle);
         $this->session->set('locationVerbose', "In topic '" . $topicTitle . "'");
@@ -193,7 +193,7 @@ final class Topic implements Route
                 $this->router->url('topic', [
                     'id' => $modelsTopic->id,
                     'slug' => $this->textFormatting->slugify($modelsTopic->title),
-                ]) => $topicTitle,
+                ]) => $this->textFormatting->wordFilter($modelsTopic->title),
             ],
         );
 
@@ -224,14 +224,12 @@ final class Topic implements Route
 
         // Generate post listing.
         $page = $this->template->meta('topic-table', $this->postsIntoOutput($modelsTopic));
-        $page = $this->template->meta(
-            'topic-wrapper',
-            $topicTitle
-                . ($topicSubtitle !== '' ? ', ' . $topicSubtitle : ''),
-            $page,
-            '<a href="'
-                . $this->router->url('topic', ['id' => $modelsTopic->id, 'fmt' => 'RSS'])
-                . '" class="social rss" title="RSS Feed for this Topic" target="_blank">RSS</a>',
+        $page = $this->template->render(
+            'topic/wrapper',
+            [
+                'topic' => $modelsTopic,
+                'content' => $page,
+            ]
         );
 
         // Add buttons.
@@ -457,7 +455,7 @@ final class Topic implements Route
                 ),
                 'id' => 'qreply',
                 'resize' => 'textarea',
-                'title' => $this->textFormatting->wordfilter($modelsTopic->title),
+                'title' => $this->textFormatting->wordFilter($modelsTopic->title),
             ],
         );
         $this->page->command('updateqreply', '');
@@ -818,9 +816,9 @@ final class Topic implements Route
         $boardURL = $this->domainDefinitions->getBoardURL();
         $rssFeed = new RSSFeed(
             [
-                'description' => $this->textFormatting->wordfilter($modelsTopic->subtitle),
+                'description' => $this->textFormatting->wordFilter($modelsTopic->subtitle),
                 'link' => $boardURL . $this->router->url('topic', ['id' => $modelsTopic->id]),
-                'title' => $this->textFormatting->wordfilter($modelsTopic->title),
+                'title' => $this->textFormatting->wordFilter($modelsTopic->title),
             ],
         );
         $posts = Post::selectMany(

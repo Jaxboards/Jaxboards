@@ -318,7 +318,7 @@ final class Post implements Route
             return "The forum you're attempting to reply to no longer exists.";
         }
 
-        $topic->title = $this->textFormatting->wordfilter($topic->title);
+        $topic->title = $this->textFormatting->wordFilter($topic->title);
         $topicPerms = $this->user->getForumPerms($forum->perms);
 
         $page .= '<div id="post-preview">' . $this->postpreview . '</div>';
@@ -470,7 +470,7 @@ final class Post implements Route
             (string) preg_replace(
                 '@\s+@',
                 ' ',
-                $this->textFormatting->wordfilter(
+                $this->textFormatting->wordFilter(
                     $this->textFormatting->textOnly(
                         $this->postData ?? '',
                     ),

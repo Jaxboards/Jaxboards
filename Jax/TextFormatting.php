@@ -93,7 +93,7 @@ final readonly class TextFormatting
     /**
      * Handles badword replacements.
      */
-    public function wordfilter(?string $text): string
+    public function wordFilter(?string $text): string
     {
         if ($this->user->get()->nowordfilter !== 0) {
             return (string) $text;
@@ -206,7 +206,7 @@ final readonly class TextFormatting
         $text = $this->bbCode->toHTML($text);
         $text = $this->finishCodeTags($text, $codes);
 
-        return $this->wordfilter($text);
+        return $this->wordFilter($text);
     }
 
     /**
@@ -219,7 +219,7 @@ final readonly class TextFormatting
         $text = $this->emotes($text);
         $text = $this->bbCode->toInlineHTML($text);
 
-        return $this->wordfilter($text);
+        return $this->wordFilter($text);
     }
 
     /**

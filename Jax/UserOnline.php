@@ -27,8 +27,6 @@ final class UserOnline
 
     public string $name;
 
-    public ?string $profileURL = null;
-
     public int $readDate;
 
     public string $status;

@@ -11,7 +11,7 @@
         {% endif %} #}
     </td>
     <td class="topic">
-        <a href="{{ url('topic', { id: topic.id, slug: topic.title|slugify }) }}" title="{{ topic.summary }}" data-use-tooltip="true">{{ topic.title|wordfilter }}</a>
+        <a href="{{ url('topic', { id: topic.id, slug: topic.title|slugify }) }}" title="{{ topic.summary }}" data-use-tooltip="true">{{ topic.title|wordFilter }}</a>
         {% if isForumModerator %}
         <a
             href="{{ url('modcontrols', { do: 'modt', tid: topic.id }) }}"
@@ -20,7 +20,7 @@
         ></a>
         {% endif %}
         <br>
-        {{ topic.subtitle|wordfilter }} {{ pages|raw }}
+        {{ topic.subtitle|wordFilter }} {{ pages|raw }}
     </td>
     <td class="item_1">
         {% include "user-link.html.twig" with { user: author } only %}
