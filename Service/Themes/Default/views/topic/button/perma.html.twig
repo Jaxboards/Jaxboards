@@ -1,0 +1,9 @@
+<a
+    href="{{ url('topic', {
+        id: topic.id,
+        findpost: post.id,
+        pid: post.id,
+        slug: topic.title|slugify
+    } ) ~ '#pid_' ~ post.id }}"
+    onclick="prompt('Link to this post:',this.href);return false"
+>Perma-link</a>

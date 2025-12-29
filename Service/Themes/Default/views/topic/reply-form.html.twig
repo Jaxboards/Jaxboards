@@ -1,9 +1,9 @@
 <div class="topic-reply-form">
-    <form method="post" action="/post" data-ajax-form="true" onsubmit="this.submitButton.disabled=true;">
+    <form method="post" action="{{ url('post') }}" data-ajax-form="true" onsubmit="this.submitButton.disabled=true;">
         <input type="hidden" name="how" value="qreply">
-        <input type="hidden" name="tid" value="%1$s">
+        <input type="hidden" name="tid" value="{{ topic.id }}">
         <div class="replybox">
-            <textarea name="postdata" title="Post Text">%2$s</textarea>
+            <textarea name="postdata" title="Post Text">{{ text }}</textarea>
         </div>
         <div class="submitbutton">
             <input type="submit" name="submit" title="Submit your post" value="Post"

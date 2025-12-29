@@ -223,12 +223,11 @@ final class Topic implements Route
             : '';
 
         // Generate post listing.
-        $page = $this->template->meta('topic-table', $this->postsIntoOutput($modelsTopic));
         $page = $this->template->render(
             'topic/wrapper',
             [
                 'topic' => $modelsTopic,
-                'content' => $page,
+                'content' => $this->postsIntoOutput($modelsTopic),
             ],
         );
 
@@ -241,14 +240,12 @@ final class Topic implements Route
 
         $forumPerms = $this->fetchForumPermissions($modelsTopic, $forum);
         if ($forumPerms['start']) {
-            $newTopicURL = $this->router->url('post', ['fid' => $modelsTopic->fid]);
-            $buttons[0] = "<a href='{$newTopicURL}'>"
-                . $this->template->meta(
-                    $this->template->metaExists('button-newtopic')
-                        ? 'button-newtopic'
-                        : 'topic-button-newtopic',
-                )
-                . '</a>';
+            $buttons[0] = $this->template->render(
+                'topic/button/newtopic',
+                [
+                    'topic' => $modelsTopic,
+                ]
+            );
         }
 
         if (
@@ -258,12 +255,12 @@ final class Topic implements Route
                 || $this->user->getGroup()?->canOverrideLockedTopics
             )
         ) {
-            $quickReplyURL = $this->router->url('topic', ['id' => $modelsTopic->id, 'qreply' => 1]);
-            $buttons[1] = "<a href='{$quickReplyURL}'>" . $this->template->meta(
-                $this->template->metaExists('button-qreply')
-                    ? 'button-qreply'
-                    : 'topic-button-qreply',
-            ) . '</a>';
+            $buttons[1] = $this->template->render(
+                'topic/button/qreply',
+                [
+                    'topic' => $modelsTopic,
+                ]
+            );
         }
 
         if (
@@ -273,12 +270,12 @@ final class Topic implements Route
                 || $this->user->getGroup()?->canOverrideLockedTopics
             )
         ) {
-            $replyURL = $this->router->url('post', ['tid' => $modelsTopic->id]);
-            $buttons[2] = "<a href='{$replyURL}'>" . $this->template->meta(
-                $this->template->metaExists('button-reply')
-                    ? 'button-reply'
-                    : 'topic-button-reply',
-            ) . '</a>';
+            $buttons[2] = $this->template->render(
+                'topic/button/reply',
+                [
+                    'topic' => $modelsTopic,
+                ]
+            );
         }
 
 
@@ -293,19 +290,12 @@ final class Topic implements Route
         ]);
 
         // Add in other page elements.
-        $page = $poll . $this->template->meta(
-            'topic-pages-top',
-            $pagelist,
-        ) . $this->template->meta(
-            'topic-buttons-top',
-            ...$buttons,
-        ) . $page . $this->template->meta(
-            'topic-pages-bottom',
-            $pagelist,
-        ) . $this->template->meta(
-            'topic-buttons-bottom',
-            ...$buttons,
-        );
+        $page = $poll .
+            $this->template->render('topic/pages-top', ['pages' => $pagelist])
+            . $this->template->render('topic/buttons-top', ['buttons' => $buttons])
+            . $page
+            . $this->template->render('topic/pages-bottom', ['pages' => $pagelist])
+            . $this->template->render('topic/buttons-bottom', ['buttons' => $buttons]);
 
         // Update view count.
         ++$modelsTopic->views;
@@ -448,10 +438,12 @@ final class Topic implements Route
         $this->page->command(
             'window',
             [
-                'content' => $this->template->meta(
-                    'topic-reply-form',
-                    $modelsTopic->id,
-                    $this->textFormatting->blockhtml($prefilled),
+                'content' => $this->template->render(
+                    'topic/reply-form',
+                    [
+                        'topic' => $modelsTopic,
+                        'text' => $prefilled,
+                    ]
                 ),
                 'id' => 'qreply',
                 'resize' => 'textarea',
@@ -518,54 +510,40 @@ final class Topic implements Route
             $author = $post->author ? $membersById[$post->author] : null;
             $editor = $post->editby ? $membersById[$post->editby] : null;
 
-            $editURL = $this->router->url('topic', ['id' => $modelsTopic->id, 'edit' => $post->id]);
-            $replyURL = $this->router->url('topic', ['id' => $modelsTopic->id, 'quote' => $post->id]);
-            $modPostURL = $this->router->url('modcontrols', ['do' => 'modp', 'pid' => $post->id]);
-
             $authorGroup = $author
                 ? $groups[$author->groupID]
                 : null;
             $postbuttons
                 // Adds the Edit button
                 = ($this->canEdit($modelsTopic, $post)
-                    ? "<a href='{$editURL}' class='edit'>" . $this->template->meta('topic-edit-button')
-                    . '</a>'
-                    : '')
+                    ? $this->template->render('topic/button/edit', [
+                        'post' => $post,
+                    ]) : '')
                 // Adds the Quote button
                 . ($forumPerms['reply']
-                    ? " <a href='{$replyURL}' onclick='RUN.handleQuoting(this);return false;' "
-                    . "class='quotepost'>" . $this->template->meta('topic-quote-button') . '</a> '
-                    : '')
+                    ? $this->template->render('topic/button/quote', [
+                        'post' => $post,
+                    ]) : '')
                 // Adds the Moderate options
                 . ($canModerateTopic
-                    ? "<a href='{$modPostURL}' class='modpost' onclick='ModControls.togbutton(this)'>"
-                    . $this->template->meta('topic-mod-button') . '</a>'
-                    : '');
-
-            $urls = [
-                'findpost' => $this->router->url('topic', [
-                    'id' => $modelsTopic->id,
-                    'findpost' => $post->id,
-                    'pid' => $post->id,
-                    'slug' => $this->textFormatting->slugify($modelsTopic->title),
-                ]) . '#pid_' . $post->id,
-                'iptools' => $this->router->url('modcontrols', [
-                    'do' => 'iptools',
-                    'ip' => $this->ipAddress->asHumanReadable($post->ip),
-                ]),
-            ];
+                    ? $this->template->render('topic/button/moderate', [
+                        'post' => $post
+                    ]) : '');
 
             $postEmbeds = '';
             if ($post->openGraphMetadata) {
                 $openGraphData = json_decode($post->openGraphMetadata, true, flags: JSON_THROW_ON_ERROR);
                 foreach ($openGraphData as $url => $data) {
-                    $postEmbeds .= $this->template->meta(
-                        'topic-post-opengraph',
-                        $data['url'] ?? $url,
-                        $data['site_name'] ?? '',
-                        $data['title'] ?? '',
-                        $data['description'] ?? '',
-                        $data['image'] ? '<img src="' . $this->textFormatting->blockhtml($data['image']) . '">' : '',
+                    //
+                    $postEmbeds .= $this->template->render(
+                        'topic/post-opengraph',
+                        [
+                            'url' => $data['url'] ?? $url,
+                            'site_name' => $data['site_name'] ?? '',
+                            'title' => $data['title'] ?? '',
+                            'description' => $data['description'] ?? '',
+                            'image' =>  $data['image'] ? $data['image'] : '',
+                        ]
                     );
                 }
             }
@@ -578,8 +556,8 @@ final class Topic implements Route
                 $author?->avatar ?: $this->template->render('default-avatar'),
                 $author?->usertitle,
                 $author?->posts,
-                $this->template->meta(
-                    'topic-status-'
+                $this->template->render(
+                    'topic/status-'
                         . (array_key_exists($post->author, $usersonline) ? 'online' : 'offline'),
                 ),
                 $authorGroup?->title,
@@ -587,31 +565,28 @@ final class Topic implements Route
                 $postbuttons,
                 // ^10
                 $this->date->autoDate($post->date),
-                <<<HTML
-                    <a href="{$urls['findpost']}"
-                        onclick="prompt('Link to this post:',this.href);return false"
-                        >{$this->template->meta('topic-perma-button')}</a>
-                    HTML,
+                $this->template->render('topic/button/perma', ['topic' => $modelsTopic, 'post' => $post]),
                 $postBody,
                 $authorGroup->canUseSignatures && $author?->sig
                     ? $this->textFormatting->theWorks($author->sig)
                     : '',
                 $this->router->url('profile', ['id' => $post->author]),
-                $editor ? $this->template->meta(
-                    'topic-edit-by',
-                    $this->template->render('user-link', ['user' => $editor]),
-                    $this->date->autoDate($post->editDate),
+                $editor ? $this->template->render(
+                    'topic/edit-by',
+                    [
+                        'user' => $editor,
+                        'post' => $post,
+                    ]
                 ) : '',
                 $this->user->getGroup()?->canModerate
-                    ? "<a href='{$urls['iptools']}'>" . $this->template->meta(
-                        'topic-mod-ipbutton',
-                        $this->ipAddress->asHumanReadable($post->ip),
-                    ) . '</a>'
+                    ? $this->template->render(
+                        'topic/button/mod-ip',
+                        [
+                            'ip' => $this->ipAddress->asHumanReadable($post->ip),
+                        ]
+                    )
                     : '',
-                $authorGroup?->icon ? $this->template->meta(
-                    'topic-icon-wrapper',
-                    $authorGroup->icon,
-                ) : '',
+                $this->template->render('topic/icon-wrapper', ['group' => $authorGroup]),
                 ++$topicPostCounter,
                 $postrating,
                 // ^20

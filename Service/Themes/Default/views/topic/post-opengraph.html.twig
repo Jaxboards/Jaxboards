@@ -1,0 +1,9 @@
+<aside class="opengraph">
+    <a href="{{ url }}">
+        <h4>{{ site_name }} - {{ title }}</h4>
+    </a>
+    <p>{{ description }}</p>
+    {% if image %}
+        <a href="{{ url }}"><img src="{{ image }}"></a>
+    {% endif %}
+</aside>
