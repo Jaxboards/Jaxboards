@@ -691,22 +691,18 @@ final class Topic implements Route
             return;
         }
 
-        if ($post->newtopic !== 0) {
-            $form = $this->template->render(
-                'topic/qedit-topic',
-                [
-                    'topic' => $modelsTopic,
-                    'post' => $post,
-                ]
-            );
-        } else {
-            $form = $this->template->render(
-                'topic/qedit-post',
-                [
-                    'post' => $post,
-                ]
-            );
-        }
+        $form = $post->newtopic !== 0 ? $this->template->render(
+            'topic/qedit-topic',
+            [
+                'topic' => $modelsTopic,
+                'post' => $post,
+            ],
+        ) : $this->template->render(
+            'topic/qedit-post',
+            [
+                'post' => $post,
+            ],
+        );
 
         $this->page->command('update', "#pid_{$pid} .post_content", $form);
     }
