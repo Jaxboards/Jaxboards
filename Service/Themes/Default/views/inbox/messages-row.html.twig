@@ -1,0 +1,29 @@
+<tr class="{% if message.read %}read{% else %}unread{% endif %}">
+    <td class="center">
+        <input
+            type="checkbox"
+            class="check"
+            title="PM Checkbox"
+            name="dmessage[]"
+            value="{{ message.id }}"
+        >
+    </td>
+    <td class="center">
+        <input
+            type="checkbox"
+            class="switch flag"
+            data-url="{{ url('inbox', { flag: message.id }) }}"
+            onchange="RUN.stream.location(this.dataset.url + '&amp;tog=' + (this.checked?1:0), 2)"
+            {% if message.flag %}checked{% endif %}
+        >
+    </td>
+    <td>
+        <a href="{{ url('inbox', { view: message.id }) }}">{{ message.title }}</a>
+    </td>
+    <td>
+        {{ otherMember.displayName }}
+    </td>
+    <td>
+        {{ message.date|autoDate }}
+    </td>
+</tr>

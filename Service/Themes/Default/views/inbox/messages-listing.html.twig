@@ -1,0 +1,55 @@
+<form action="/ucp/inbox" method="post" data-ajax-form="true">
+    <div class="pages pages-top">{{ pages|raw }}</div>
+    <div class="forum-buttons-top">&nbsp;</div>
+    <table class="listing">
+        <tr>
+            <th class="center" style="width:5%">
+                <input
+                    type="checkbox"
+                    onChange="document.querySelectorAll('.check').forEach(checkbox => checkbox.checked = this.checked)"
+                    title="Select All Messages"
+                >
+            </th>
+            <th style="width:5%">
+                Flag
+            </th>
+            <th style="width:45%">
+                Title
+            </th>
+            <th style="width:20%">
+                {% if view == 'sent' %}
+                    Recipient
+                {% else %}
+                    Sender
+                {% endif %}
+            </th>
+            <th style="width:25%">
+                Date Sent
+            </th>
+        </tr>
+        {% for row in rows %}
+            {% include "inbox/messages-row.html.twig" with row only %}
+        {% else %}
+            <tr>
+                <td colspan="5">
+                    {% if view == 'sent' %}
+                        No sent messages.
+                    {% elseif view == 'flagged' %}
+                        No flagged messages.
+                    {% else %}
+                        No messages. You could always try
+                        <a href="{{ url('inbox', { view: 'compose' }) }}">sending some</a>
+                        though!
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td>
+            </td>
+            <td colspan="4">
+                <input type="submit" value="Delete Messages" title="Delete Messages">
+            </td>
+        </tr>
+    </table>
+</form>

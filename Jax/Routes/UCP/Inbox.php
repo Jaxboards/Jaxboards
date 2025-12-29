@@ -16,6 +16,7 @@ use Jax\Router;
 use Jax\Template;
 use Jax\User;
 
+use function _\countBy;
 use function array_map;
 use function ceil;
 use function implode;
@@ -359,8 +360,6 @@ final readonly class Inbox
 
     private function viewMessages(string $view = 'inbox'): string
     {
-        $html = '';
-
         $requestPage = max(1, (int) $this->request->asString->both('page'));
         $numMessages = $this->fetchMessageCount($view);
 
@@ -383,7 +382,6 @@ final readonly class Inbox
                 HTML;
         }, $pageNumbers));
 
-        $unread = 0;
         $messages = $this->fetchMessages($view, $requestPage - 1);
 
         $getMessageMemberId = $view === 'sent'
@@ -395,55 +393,26 @@ final readonly class Inbox
             $getMessageMemberId,
         );
 
-        foreach ($messages as $message) {
-            if (!$message->read) {
-                ++$unread;
-            }
-
-            $otherMember = $membersById[$getMessageMemberId($message)];
-
-            $dmessageOnchange = "RUN.stream.location('"
-                . '/ucp/inbox?flag=' . $message->id . "&tog='+" . '
-                (this.checked?1:0), 2)';
-            $html .= $this->template->meta(
-                'inbox-messages-row',
-                $message->read ? 'read' : 'unread',
-                '<input class="check" type="checkbox" title="PM Checkbox" name="dmessage[]" '
-                    . 'value="' . $message->id . '">',
-                '<input type="checkbox" '
-                    . ($message->flag ? 'checked="checked" ' : '')
-                    . 'class="switch flag" onchange="' . $dmessageOnchange . '">',
-                $this->router->url('inbox', ['view' => $message->id]),
-                $message->title,
-                $otherMember->displayName,
-                $this->date->autoDate($message->date),
-            );
-        }
-
-        if ($messages === []) {
-            $composeURL = $this->router->url('inbox', ['view' => 'compose']);
-            $msg = match ($view) {
-                'sent' => 'No sent messages.',
-                'flagged' => 'No flagged messages.',
-                default => <<<HTML
-                    No messages. You could always try <a href="{$composeURL}">sending some</a>, though!
-                    HTML,
-            };
-
-            $html .= '<tr><td colspan="5" class="error">' . $msg . '</td></tr>';
-        }
-
-        $html = $this->template->meta(
-            'inbox-messages-listing',
-            $pages,
-            $view === 'sent' ? 'Recipient' : 'Sender',
-            $html,
+        $readCounts = countBy(
+            $messages,
+            static fn(Message $message) => $message->read ? 'read' : 'unread'
         );
+        $rows = array_map(static fn(Message $message) => [
+            'message' => $message,
+            'otherMember' => $membersById[$getMessageMemberId($message)]
+        ], $messages);
 
         if ($view === 'inbox') {
-            $this->page->command('update', 'num-messages', $unread);
+            $this->page->command('update', 'num-messages', $readCounts['unread'] ?? 0);
         }
 
-        return $html;
+        return $this->template->render(
+            'inbox/messages-listing',
+            [
+                'pages' => $pages,
+                'view' => $view,
+                'rows' => $rows
+            ]
+        );;
     }
 }
