@@ -39,6 +39,7 @@
                         {%- include "topic/button/edit.html.twig" with { post } -%}
                     {%- endif -%}
                     {%- if canReply -%}
+                        {%- include "topic/button/quote.html.twig" with { post } -%}
                     {%- endif -%}
                     {%- if canModerate -%}
                         {%- include "topic/button/moderate.html.twig" with { post } -%}
