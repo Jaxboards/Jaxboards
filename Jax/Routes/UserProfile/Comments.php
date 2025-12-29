@@ -40,10 +40,11 @@ final readonly class Comments
             !$this->user->isGuest()
             && $this->user->getGroup()?->canAddComments
         ) {
-            $tabHTML .= $this->template->meta(
-                'userprofile-comment-form',
-                $this->user->get()->name ?? '',
-                $this->user->get()->avatar ?: $this->template->render('default-avatar'),
+            $tabHTML .= $this->template->render(
+                'userprofile/comment-form',
+                [
+                    'user' => $this->user->get(),
+                ]
             );
         }
 
@@ -64,27 +65,17 @@ final readonly class Comments
         }
 
         foreach ($comments as $comment) {
-            $deleteLink = '';
-            if (
-                $this->user->getGroup()?->canModerate
-                || ($this->user->getGroup()?->canDeleteComments && $comment->from === $this->user->get()->id)
-            ) {
-                $deleteCommentURL = $this->router->url('profile', [
-                    'id' => $member->id,
-                    'page' => 'comments',
-                    'del' => $comment->id,
-                ]);
-                $deleteLink = "<a href='{$deleteCommentURL}' class='delete'>[X]</a>";
-            }
+            $canDelete = $this->user->getGroup()?->canModerate
+                || ($this->user->getGroup()?->canDeleteComments && $comment->from === $this->user->get()->id);
 
-            $fromMember = $membersById[$comment->from];
-            $tabHTML .= $this->template->meta(
-                'userprofile-comment',
-                $this->template->render('user-link', ['user' => $fromMember]),
-                $fromMember->avatar ?: $this->template->render('default-avatar'),
-                $this->date->autoDate($comment->date),
-                $this->textFormatting->theWorks($comment->comment),
-                $deleteLink,
+            $tabHTML .= $this->template->render(
+                'userprofile/comment',
+                [
+                    'canDelete' => $canDelete,
+                    'member' => $member,
+                    'comment' => $comment,
+                    'fromMember' => $membersById[$comment->from],
+                ]
             );
         }
 

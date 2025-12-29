@@ -1,0 +1,12 @@
+<div class="post">
+    <a href="{{ url('topic', { id: post.tid, slug: topic.title|slugify })}}"
+    >{{ topic.title }}</a>
+    <a href="{{ url('topic', { id: post.tid, findpost: post.id, slug: topic.title|slugify }) }}"
+    >(Post)</a>
+
+    <div class="postdate">
+        Posted on: {{ post.date|autoDate }}
+    </div>
+
+    {{ post.post|theWorks }}
+</div>

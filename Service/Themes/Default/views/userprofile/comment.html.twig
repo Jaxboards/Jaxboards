@@ -1,0 +1,20 @@
+<div class="comment">
+    <div class="userdata">
+        <div class="username">
+            {% include "user-link.html.twig" with { user: fromMember } %}
+        </div>
+        <div class="avatar">
+            {% include "avatar.html.twig" with { avatar: fromMember.avatar } %}
+        </div>
+    </div>
+    <div class="date">
+        {{ comment.date|autoDate }}
+    </div>
+    <div class="commenttext">
+        {{ comment.comment|theWorks }}
+        {% if canDelete %}
+            <a href="{{ url('profile', { id: member.id, page: 'comments', del: comment.id }) }}"
+            >[X]</a>
+        {% endif %}
+    </div>
+</div>

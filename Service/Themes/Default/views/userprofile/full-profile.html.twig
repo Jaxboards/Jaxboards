@@ -1,0 +1,84 @@
+<div class="userprofile">
+    <div class="leftbar">
+        <div class="username">
+            {{ member.displayName }}
+            {% if canModerate %}
+                <a class="moderate" href="{{ url('modcontrols', { do: 'emem', mid: member.id }) }}">Edit</a>
+            {% endif %}
+        </div>
+        <div class="avatar">
+            {% include "avatar.html.twig" with { avatar: member.avatar } %}
+        </div>
+        <div class="usertitle">
+            {{ member.usertitle }}
+        </div>
+        <div class="infobox contact">
+            Contact Details:
+            <div class="content">
+                {{ contactdetails|raw }}
+            </div>
+        </div>
+        <div class="infobox personal">
+            Personal info:
+            <div class="content">
+                <div>
+                    Full name: {{ member.full_name|default('N/A') }}
+                </div>
+                <div>
+                    Gender: {{ member.gender|default('N/A') }}
+                </div>
+                <div>
+                    Location: {{ member.location|default('N/A') }}
+                </div>
+                <div>
+                    Birthday:
+                    {% if birthdate %}
+                        {{ birthdate.format('M jS') }}, {{ birthdate.age }} years old!
+                    {% else %}
+                        N?A
+                    {% endif %}
+                </div>
+                <div>
+                    Site:
+                    {% if member.website %}
+                        <a href="{{ member.website }}">{{ member.website }}</a>
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="infobox stats">
+            Stats:
+            <div class="content">
+                <div>
+                    Joined: {{ member.joinDate }}
+                </div>
+                <div>
+                    Last Visit: {{ member.lastVisit }}
+                </div>
+                <div>
+                    Member: #{{ member.id }}
+                </div>
+                <div>
+                    Posts: {{ member.posts|number_format }}
+                </div>
+                <div>
+                    Group: {{ group.title }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="rightbar tabs pftabs">
+        {% for tab in tabs %}
+            <a
+                href="{{ url('profile', { id: member.id, page: tab }) }}"
+                {% if selectedTab == tab %}class="active"{% endif %}
+            >{{ tab|capitalize }}</a>
+        {% endfor %}
+    </nav>
+    <div class="rightbar" id="pfbox">
+        {{ tabHTML|raw }}
+    </div>
+    <div class="clear">
+    </div>

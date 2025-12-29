@@ -192,8 +192,12 @@ final readonly class TextFormatting
      * Does pretty much all of the post formatting.
      * BBCodes, badwords, HTML, everything you could want.
      */
-    public function theWorks(string $text): string
+    public function theWorks(?string $text): string
     {
+        if ($text === null || $text === '') {
+            return '';
+        }
+
         [$text, $codes] = $this->startCodeTags($text);
 
         $text = $this->blockhtml($text);

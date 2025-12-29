@@ -45,7 +45,7 @@ final readonly class UserProfile implements Route
     public function route($params): void
     {
         $userId = (int) $params['id'];
-        $page = (string) ($params['page'] ?? '');
+        $page = $params['page'] ?? '';
 
         // Nothing is live updating on the profile page
         if ($this->request->isJSUpdate()) {
@@ -124,55 +124,21 @@ final readonly class UserProfile implements Route
 
     private function showContactCard(Member $member): void
     {
-        $contactdetails = '';
-
-        foreach ($this->contactDetails->getContactLinks($member) as $type => [$href]) {
-            $contactdetails .= <<<"HTML"
-                <a class="{$type} contact" title="{$type} contact" href="{$href}">&nbsp;</a>
-                HTML;
-        }
-
-        $buddyListURLs = [
-            'add' => $this->router->url('buddylist', ['add' => $member->id]),
-            'block' => $this->router->url('buddylist', ['block' => $member->id]),
-            'remove' => $this->router->url('buddylist', ['remove' => $member->id]),
-            'unblock' => $this->router->url('buddylist', ['unblock' => $member->id]),
-        ];
-
-        $addContactLink = $this->isUserInList($member->id, $this->user->get()->friends)
-            ? "<a href='{$buddyListURLs['remove']}'>Remove Contact</a>"
-            : "<a href='{$buddyListURLs['add']}'>Add Contact</a>";
-
-        $blockLink = $this->isUserInList($member->id, $this->user->get()->enemies)
-            ? "<a href='{$buddyListURLs['unblock']}'>Unblock Contact</a>"
-            : "<a href='{$buddyListURLs['block']}'>Block Contact</a>";
-
-        $viewProfileURL = $this->router->url('profile', [
-            'id' => $member->id,
-            'page' => 'activity',
-        ]);
-        $privateMessageURL = $this->router->url('inbox', [
-            'view' => 'compose',
-            'mid' => $member->id,
-        ]);
-
         $this->page->command('softurl');
         $this->page->command(
             'window',
             [
                 'animate' => false,
                 'className' => 'contact-card',
-                'content' => $this->template->meta(
-                    'userprofile-contact-card',
-                    $member->displayName,
-                    $member->avatar ?: $this->template->render('default-avatar'),
-                    $member->usertitle,
-                    $member->id,
-                    $contactdetails,
-                    $addContactLink,
-                    $blockLink,
-                    $viewProfileURL,
-                    $privateMessageURL,
+                'content' => $this->template->render(
+                    'userprofile/contact-card',
+                    [
+                        'member' => $member,
+                        'contactLinks' => $this->contactDetails->getContactLinks($member),
+                        'isGuest' => $this->user->isGuest(),
+                        'isFriend' => $this->isUserInList($member->id, $this->user->get()->friends),
+                        'isEnemy' => $this->isUserInList($member->id, $this->user->get()->enemies),
+                    ]
                 ),
                 'minimizable' => false,
                 'title' => 'Contact Card',
@@ -182,7 +148,7 @@ final readonly class UserProfile implements Route
 
     private function showFullProfile(string $page, Member $member): void
     {
-        [$tabs, $tabHTML] = $this->profileTabs->render($page, $member);
+        $tabHTML = $this->profileTabs->render($page, $member);
 
         $this->page->setBreadCrumbs(
             [
@@ -199,30 +165,22 @@ final readonly class UserProfile implements Route
             ? $this->date->dateAsCarbon($member->birthdate)
             : null;
 
-        $moderateMemberURL = $this->router->url('modcontrols', ['do' => 'emem', 'mid' => $member->id]);
-        $page = $this->template->meta(
-            'userprofile-full-profile',
-            $member->displayName,
-            $member->avatar ?: $this->template->render('default-avatar'),
-            $member->usertitle,
-            $contactdetails,
-            $member->full_name ?: 'N/A',
-            ucfirst($member->gender) ?: 'N/A',
-            $member->location,
-            $birthdate !== null ? $birthdate->format('M jS') . ", {$birthdate->age} years old!" : 'N/A',
-            $member->website !== '' ? "<a href='{$member->website}'>{$member->website}</a>" : 'N/A',
-            $member->joinDate,
-            $member->lastVisit,
-            $member->id,
-            $member->posts,
-            Group::selectOne($member->groupID)?->title,
-            implode('', $tabs),
-            $tabHTML,
-            $this->user->getGroup()?->canModerate
-                ? "<a class='moderate' href='{$moderateMemberURL}'>Edit</a>" : '',
+        $profile = $this->template->render(
+            'userprofile/full-profile',
+            [
+                'member' => $member,
+                'contactdetails' => $contactdetails,
+                'birthdate' => $birthdate,
+                'group' => Group::selectOne($member->groupID),
+                'tabs' => $this->profileTabs->getTabs(),
+                'selectedTab' => $page ?: 'activity',
+                'tabHTML' => $tabHTML,
+                'canModerate' => $this->user->getGroup()?->canModerate,
+            ]
         );
-        $this->page->command('update', 'page', $page);
-        $this->page->append('PAGE', $page);
+
+        $this->page->command('update', 'page', $profile);
+        $this->page->append('PAGE', $profile);
 
         $this->session->set('locationVerbose', "Viewing {$member->displayName}'s profile");
     }

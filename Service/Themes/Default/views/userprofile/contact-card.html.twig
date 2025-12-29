@@ -1,0 +1,50 @@
+<div class="left">
+    <div class="username">
+        {{ member.displayName }}
+    </div>
+    <div class="avatar">
+        {% include "avatar.html.twig" with { avatar: member.avatar } %}
+    </div>
+    <div class="usertitle">
+        {{ member.usertitle }}
+    </div>
+</div>
+<div class="right">
+    {% if not isGuest %}
+        <button
+            data-window-close="true"
+            onclick="IMWindow('{{ member.id }}',this.innerHTML.match(/IM (.+)/)[1]);"
+            type="button"
+        >
+            IM {{ member.displayName }}
+        </button>
+        <br>
+        <a href="{{ url('inbox', { view: 'compose', mid: member.id }) }}" data-window-close="true">
+            PM {{ member.displayName }}
+        </a>
+        <br>
+        <br>
+        {% if isFriend %}
+            <a href="{{ url('buddylist', { add: member.id }) }}">Add Contact</a>
+        {% else %}
+            <a href="{{ url('buddylist', { remove: member.id }) }}">Remove Contact</a>
+        {% endif %}
+        <br>
+        {% if isEnemy %}
+            <a href="{{ url('buddylist', { block: member.id }) }}">Unblock Contact</a>
+        {% else %}
+            <a href="{{ url('buddylist', { unblock: member.id }) }}">Block Contact</a>
+        {% endif %}
+        <br>
+        <br>
+    {% endif %}
+
+    <a href="{{ url('profile', { id: member.id, page: 'activity' }) }}" data-window-close="true">
+        Full Profile
+    </a>
+    <div class="contact_details">
+        {%- for type,link in contactLinks -%}
+            <a class="{{ type }} contact" title="{{ type }} contact" href="{{ link[0] }}">&nbsp;</a>
+        {%- endfor -%}
+    </div>
+</div>

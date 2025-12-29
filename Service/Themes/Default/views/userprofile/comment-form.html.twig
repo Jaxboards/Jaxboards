@@ -1,0 +1,17 @@
+<div class="comment">
+    <div class="userdata">
+        <div class="username">
+            {{ user.displayName }}
+        </div>
+        <div class="avatar">
+            {% include "avatar.html.twig" with { avatar: user.avatar } %}
+        </div>
+    </div>
+    <div class="commenttext">
+        <form data-ajax-form="resetOnSubmit">
+            <textarea name="comment" title="Type your comment here"></textarea>
+            <br>
+            <input type="submit" value="Comment">
+        </form>
+    </div>
+</div>

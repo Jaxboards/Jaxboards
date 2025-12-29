@@ -22,12 +22,19 @@ use function explode;
 use function in_array;
 use function ucwords;
 
-final readonly class ProfileTabs
+final class ProfileTabs
 {
     /**
      * @var array<string>
      */
-    private array $tabs;
+    private array $tabs = [
+        'about',
+        'activity',
+        'posts',
+        'topics',
+        'comments',
+        'friends',
+    ];
 
     public function __construct(
         private Activity $activity,
@@ -40,26 +47,23 @@ final readonly class ProfileTabs
         private TextFormatting $textFormatting,
         private User $user,
     ) {
-        $tabs = [
-            'about',
-            'activity',
-            'posts',
-            'topics',
-            'comments',
-            'friends',
-        ];
-
         if ($this->badges->isEnabled()) {
-            $tabs[] = 'badges';
+            $this->tabs[] = 'badges';
         }
+    }
 
-        $this->tabs = $tabs;
+    /**
+     * @return array<string>
+     */
+    public function getTabs(): array
+    {
+        return $this->tabs;
     }
 
     /**
      * @return list{list<string>,string}
      */
-    public function render(string $page, Member $member): array
+    public function render(string $page, Member $member): string
     {
         $selectedTab = in_array($page, $this->tabs, true) ? $page : 'activity';
 
@@ -73,31 +77,18 @@ final readonly class ProfileTabs
             default => $this->activity->render($member),
         };
 
-        $tabs = array_map(
-            function (string $tab) use ($selectedTab, $member): string {
-                $active = ($tab === $selectedTab ? ' class="active"' : '');
-                $uppercase = ucwords($tab);
-                $profileId = $member->id;
-                $profileURL = $this->router->url('profile', ['id' => $profileId, 'page' => $tab]);
-
-                return <<<HTML
-                    <a href="{$profileURL}" {$active}>{$uppercase}</a>
-                    HTML;
-            },
-            $this->tabs,
-        );
-
         $this->page->command('update', 'pfbox', $tabHTML);
 
-        return [$tabs, $tabHTML];
+        return $tabHTML;
     }
 
     private function showTabAbout(Member $member): string
     {
-        return $this->template->meta(
-            'userprofile-about',
-            $this->textFormatting->theWorks($member->about),
-            $this->textFormatting->theWorks($member->sig),
+        return $this->template->render(
+            'userprofile/about',
+            [
+                'member' => $member,
+            ]
         );
     }
 
@@ -118,22 +109,9 @@ final readonly class ProfileTabs
 
     private function showTabFriends(Member $member): string
     {
-        $friends = $this->fetchFriends($member);
-        if ($friends === []) {
-            return "I'm pretty lonely, I have no friends. :(";
-        }
-
-        $tabHTML = '';
-        foreach ($friends as $friend) {
-            $tabHTML .= $this->template->meta(
-                'userprofile-friend',
-                $this->router->url('profile', ['id' => $friend->id]),
-                $friend->avatar ?: $this->template->render('default-avatar'),
-                $this->template->render('user-link', ['user' => $friend]),
-            );
-        }
-
-        return "<div class='contacts'>{$tabHTML}<br clear='all'></div>";
+        return $this->template->render('userprofile/friends', [
+            'friends' => $this->fetchFriends($member),
+        ]);
     }
 
     private function showTabTopics(Member $member): string
@@ -166,15 +144,12 @@ final readonly class ProfileTabs
                 continue;
             }
 
-            $tabHTML .= $this->template->meta(
-                'userprofile-topic',
-                $this->router->url('topic', [
-                    'id' => $post->tid,
-                    'slug' => $this->textFormatting->slugify($topic->title),
-                ]),
-                $topic->title,
-                $this->date->autoDate($post->date),
-                $this->textFormatting->theWorks($post->post),
+            $tabHTML .= $this->template->render(
+                'userprofile/topic',
+                [
+                    'post' => $post,
+                    'topic' => $topic,
+                ]
             );
         }
 
@@ -187,8 +162,6 @@ final readonly class ProfileTabs
 
     private function showTabPosts(Member $member): string
     {
-        $tabHTML = '';
-
         $posts = Post::selectMany(
             'WHERE author = ?
             ORDER BY id DESC
@@ -206,32 +179,22 @@ final readonly class ProfileTabs
             static fn(Topic $topic): ?int => $topic->fid,
         );
 
-        foreach ($posts as $post) {
+        return implode('', array_map(function (Post $post) use ($topics, $forums) {
             $topic = $topics[$post->tid];
             $forum = $forums[$topic->fid];
 
             $perms = $this->user->getForumPerms($forum->perms);
             if (!$perms['read']) {
-                continue;
+                return;
             }
 
-            $tabHTML .= $this->template->meta(
-                'userprofile-post',
-                $this->router->url('topic', [
-                    'id' => $post->tid,
-                    'slug' => $this->textFormatting->slugify($topic->title),
-                ]),
-                $topic->title,
-                $this->router->url('topic', [
-                    'id' => $post->tid,
-                    'findpost' => $post->id,
-                    'slug' => $this->textFormatting->slugify($topic->title),
-                ]),
-                $this->date->autoDate($post->date),
-                $this->textFormatting->theWorks($post->post),
+            return $this->template->render(
+                'userprofile/post',
+                [
+                    'topic' => $topic,
+                    'post' => $post,
+                ]
             );
-        }
-
-        return $tabHTML;
+        }, $posts));
     }
 }

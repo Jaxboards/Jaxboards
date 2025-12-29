@@ -1,0 +1,17 @@
+<div class="contacts">
+    {% for friend in friends %}
+        <a href="{{ url('profile', { id: friend.id }) }}" title="Contact">
+            <div class="contact">
+                <div class="avatar">
+                    {% include "avatar.html.twig" with { avatar: friend.avatar } %}
+                </div>
+                <div class="name">
+                    {% include "user-link.html.twig" with { user: friend } only %}
+                </div>
+            </div>
+        </a>
+    {% else %}
+        I'm pretty lonely, I have no friends. :(
+    {% endfor %}
+    <br clear='all'>
+</div>
