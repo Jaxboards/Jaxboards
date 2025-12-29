@@ -173,7 +173,6 @@ final class Topic implements Route
         }
 
         $topicTitle = $this->textFormatting->wordFilter($modelsTopic->title);
-        $this->textFormatting->wordFilter($modelsTopic->subtitle);
 
         $this->page->setPageTitle($topicTitle);
         $this->session->set('locationVerbose', "In topic '" . $topicTitle . "'");
