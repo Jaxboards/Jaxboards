@@ -522,7 +522,7 @@ final class Topic implements Route
                     'openGraphData' => $post->openGraphMetadata ? json_decode(
                         $post->openGraphMetadata,
                         true,
-                        flags: JSON_THROW_ON_ERROR
+                        flags: JSON_THROW_ON_ERROR,
                     ) : null,
                     'post' => $post,
                     'postRating' => $this->reactions->render($post),
