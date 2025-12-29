@@ -13,16 +13,10 @@ use Twig\TwigFunction;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
-use function array_merge;
-use function array_pop;
-use function array_reduce;
 use function array_values;
-use function explode;
 use function in_array;
 use function mb_strtolower;
 use function preg_match;
-use function preg_replace_callback;
-use function str_contains;
 use function str_replace;
 
 /**
@@ -122,9 +116,7 @@ final class Template
             $html = str_replace("<!--{$part}-->", $contents, $html);
         }
 
-        $html = $this->replaceVars($html);
-
-        return $html;
+        return $this->replaceVars($html);
     }
 
     public function setThemePath(string $themePath): void
