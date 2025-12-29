@@ -1,0 +1,21 @@
+<form action="/post" method="post" data-ajax-form="true">
+    <input type="hidden" name="how" value="edit">
+    <input type="hidden" name="tid" value="{{ topic.id }}">
+    <input type="hidden" name="pid" value="{{ post.id }}">
+    <label for="ttitle">Topic Title:</label>
+    <input type="text" id="ttitle" name="ttitle" title="Topic Title" value="{{ topic.title }}">
+    <br>
+    <label for="tdesc">Topic Description:</label>
+    <input type="text" id="tdesc" name="tdesc" title="Topic Description (extra information about your topic)"
+        value="{{ topic.subtitle }}">
+    <br>
+    <textarea
+        id="postdata"
+        name="postdata"
+        title="Post Text"
+        aria-label="Post Text"
+        class="bbcode-editor"
+    >{{ post.post }}</textarea>
+    <br>
+    <input type="submit" name="submit" title="Submit Edit" value="Edit" onclick="this.form.submitButton=this">
+</form>

@@ -675,13 +675,6 @@ final class Topic implements Route
         $this->page->command('softurl');
         $post = Post::selectOne($pid);
 
-        $hiddenfields = Template::hiddenFormFields(
-            [
-                'how' => 'edit',
-                'pid' => (string) $pid,
-            ],
-        );
-
         if (!$this->request->isJSNewLocation()) {
             return;
         }
@@ -699,24 +692,19 @@ final class Topic implements Route
         }
 
         if ($post->newtopic !== 0) {
-            $hiddenfields .= Template::hiddenFormFields(
+            $form = $this->template->render(
+                'topic/qedit-topic',
                 [
-                    'tid' => (string) $post->tid,
-                ],
-            );
-            $form = $this->template->meta(
-                'topic-qedit-topic',
-                $hiddenfields,
-                $this->textFormatting->wordfilter($modelsTopic->title),
-                $this->textFormatting->wordfilter($modelsTopic->subtitle),
-                $this->textFormatting->blockhtml($post->post),
+                    'topic' => $modelsTopic,
+                    'post' => $post,
+                ]
             );
         } else {
-            $form = $this->template->meta(
-                'topic-qedit-post',
-                $hiddenfields,
-                $this->textFormatting->blockhtml($post->post),
-                $pid,
+            $form = $this->template->render(
+                'topic/qedit-post',
+                [
+                    'post' => $post,
+                ]
             );
         }
 

@@ -1,0 +1,12 @@
+<form action="/post" method="post" data-ajax-form="true">
+    <input type="hidden" name="how" value="edit">
+    <input type="hidden" name="pid" value="{{ post.id }}">
+    <textarea
+        id="postdata{{ post.id }}"
+        name="postdata"
+        title="Post Text"
+        class="bbcode-editor"
+    >{{ post.post }}</textarea>
+    <br>
+    <input type="submit" name="submit" title="Submit Edit" value="Edit" onclick="this.form.submitButton=this">
+</form>
