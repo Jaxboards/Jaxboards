@@ -1,0 +1,55 @@
+<table class="calendar">
+    <tr>
+        <th scope="col">
+            {% if monthOffset >= -11 %}
+                <a href="{{ url('calendar', { month: monthOffset-1 }) }}">&lt;</a>
+            {% endif %}
+        </th>
+        <th colspan="5" class="month" scope="col">
+            {{ monthName }} {{ year }}
+        </th>
+        <th scope="col">
+            {% if monthOffset <= 11 %}
+                <a href="{{ url('calendar', { month: monthOffset+1 }) }}">&gt;</a>
+            {% endif %}
+        </th>
+    </tr>
+    <tr>
+        <th scope="col">Sun</th>
+        <th scope="col">Mon</th>
+        <th scope="col">Tue</th>
+        <th scope="col">Wed</th>
+        <th scope="col">Thu</th>
+        <th scope="col">Fri</th>
+        <th scope="col">Sat</th>
+    </tr>
+
+    {% for week in weeks %}
+        <tr>
+            {% for day in week %}
+                {% if day.offset %}
+                    <td colspan="{{ day.offset }}"></td>
+                {% else %}
+                    <td class="{{ day.class }}">
+                        <div>
+                            {{ day.day }}
+                            {% if day.birthdays %}
+                                <div class="birthdays">
+                                    {%- for birthday in day.birthdays -%}
+                                        <a
+                                            href="{{ url('profile', { id: birthday.member.id }) }}"
+                                            class="user{{ birthday.member.id }} mgroup{{ birthday.member.groupID }}"
+                                            title="{{ birthday.age }} years old!"
+                                            data-use-tooltip="true"
+                                        >{{ birthday.member.displayName }}</a>
+                                        {%- if not loop.last %}, {% endif -%}
+                                    {%- endfor -%}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>

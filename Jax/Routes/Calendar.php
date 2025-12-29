@@ -46,7 +46,6 @@ final readonly class Calendar implements Route
             return;
         }
 
-        $page = '';
         $today = gmdate('n j Y');
         [
             $offset,
@@ -78,54 +77,40 @@ final readonly class Calendar implements Route
             }
 
             $birthday = $this->date->dateAsCarbon($member->birthdate);
-            $profileURL = $this->router->url('profile', ['id' => $member->id]);
-            $birthdays[$birthday?->day][] = <<<HTML
-                    <a
-                        href="{$profileURL}"
-                        class="user{$member->id} mgroup{$member->groupID}"
-                        title="{$birthday->age} years old!"
-                        data-use-tooltip="true">{$member->displayName}</a>
-                HTML;
+            $birthdays[$birthday?->day][] = [
+                'member' => $member,
+                'age' => $birthday->age,
+            ];
         }
 
-        $prevMonthURL = $this->router->url('calendar', ['month' => $monthOffset - 1]);
-        $nextMonthURL = $this->router->url('calendar', ['month' => $monthOffset + 1]);
-
-        $page .= $this->template->meta(
-            'calendar-heading',
-            $monthName,
-            $year,
-            $monthOffset >= -11 ? "<a href='{$prevMonthURL}'>&lt;</a>" : '',
-            $monthOffset <= 11 ? "<a href='{$nextMonthURL}'>&gt;</a>" : '',
-        );
+        $page = '';
         $page .= $this->template->meta('calendar-daynames');
-        $week = '';
-        for ($x = 1; $x <= $daysInMonth; ++$x) {
-            if ($x === 1 && $offset) {
-                $week .= $this->template->meta(
-                    'calendar-padding',
-                    $offset,
-                );
-            }
+        $weeks = [];
+        $days = [
+            ['offset' => $offset]
+        ];
 
-            $week .= $this->template->meta(
-                'calendar-day',
-                $month . ' ' . $x . ' ' . $year === $today ? 'today' : '',
-                $x,
-                empty($birthdays[$x]) ? '' : $this->template->meta(
-                    'calendar-birthdays',
-                    implode(',', $birthdays[$x]),
-                ),
-            );
-            if (0 !== ($x + $offset) % 7 && !($x === $daysInMonth && $week)) {
+        for ($x = 1; $x <= $daysInMonth; ++$x) {
+            $days[] = [
+                'class' => $month . ' ' . $x . ' ' . $year === $today ? 'today' : '',
+                'day' => $x,
+                'birthdays' => $birthdays[$x] ?? [],
+            ];
+
+            if (0 !== ($x + $offset) % 7 && $x !== $daysInMonth) {
                 continue;
             }
 
-            $page .= $this->template->meta('calendar-week', $week);
-            $week = '';
+            $weeks[] = $days;
+            $days = [];
         }
 
-        $page = $this->template->meta('calendar', $page);
+        $page = $this->template->render('calendar/calendar', [
+            'monthName' => $monthName,
+            'monthOffset' => $monthOffset,
+            'weeks' => $weeks,
+            'year' => $year,
+        ]);
         $page = $this->template->render('global/box', ['title' => 'Calendar', 'content' => $page]);
 
         $this->page->append('PAGE', $page);
