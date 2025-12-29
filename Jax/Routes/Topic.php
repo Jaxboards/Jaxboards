@@ -27,9 +27,11 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use Jax\UserOnline;
 use Jax\UsersOnline;
 
 use function _\keyBy;
+use function array_filter;
 use function array_flip;
 use function array_key_exists;
 use function array_map;
@@ -285,7 +287,7 @@ final class Topic implements Route
         // Make the users online list.
         $usersInTopic = array_filter(
             $this->usersOnline->getUsersOnline(),
-            static fn($row) => $row->location === "vt{$modelsTopic->id}"
+            static fn(UserOnline $userOnline): bool => $userOnline->location === "vt{$modelsTopic->id}",
         );
 
         $page .= $this->template->render('topic/users-online', [

@@ -30,13 +30,13 @@ final class UsersOnline
         private readonly Config $config,
         private readonly Database $database,
         private readonly Date $date,
-        private readonly Router $router,
         private readonly User $user,
         private readonly ServiceConfig $serviceConfig,
     ) {
         $this->idleTimestamp = Carbon::now('UTC')
             ->subSeconds($this->serviceConfig->getSetting('timetoidle') ?? 300)
-            ->getTimestamp();
+            ->getTimestamp()
+        ;
         $this->fetchUsersOnline();
     }
 
