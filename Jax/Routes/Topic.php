@@ -244,7 +244,7 @@ final class Topic implements Route
                 'topic/button/newtopic',
                 [
                     'topic' => $modelsTopic,
-                ]
+                ],
             );
         }
 
@@ -259,7 +259,7 @@ final class Topic implements Route
                 'topic/button/qreply',
                 [
                     'topic' => $modelsTopic,
-                ]
+                ],
             );
         }
 
@@ -274,7 +274,7 @@ final class Topic implements Route
                 'topic/button/reply',
                 [
                     'topic' => $modelsTopic,
-                ]
+                ],
             );
         }
 
@@ -290,8 +290,8 @@ final class Topic implements Route
         ]);
 
         // Add in other page elements.
-        $page = $poll .
-            $this->template->render('topic/pages-top', ['pages' => $pagelist])
+        $page = $poll
+            . $this->template->render('topic/pages-top', ['pages' => $pagelist])
             . $this->template->render('topic/buttons-top', ['buttons' => $buttons])
             . $page
             . $this->template->render('topic/pages-bottom', ['pages' => $pagelist])
@@ -443,7 +443,7 @@ final class Topic implements Route
                     [
                         'topic' => $modelsTopic,
                         'text' => $prefilled,
-                    ]
+                    ],
                 ),
                 'id' => 'qreply',
                 'resize' => 'textarea',
@@ -527,14 +527,13 @@ final class Topic implements Route
                 // Adds the Moderate options
                 . ($canModerateTopic
                     ? $this->template->render('topic/button/moderate', [
-                        'post' => $post
+                        'post' => $post,
                     ]) : '');
 
             $postEmbeds = '';
             if ($post->openGraphMetadata) {
                 $openGraphData = json_decode($post->openGraphMetadata, true, flags: JSON_THROW_ON_ERROR);
                 foreach ($openGraphData as $url => $data) {
-                    //
                     $postEmbeds .= $this->template->render(
                         'topic/post-opengraph',
                         [
@@ -542,8 +541,8 @@ final class Topic implements Route
                             'site_name' => $data['site_name'] ?? '',
                             'title' => $data['title'] ?? '',
                             'description' => $data['description'] ?? '',
-                            'image' =>  $data['image'] ? $data['image'] : '',
-                        ]
+                            'image' => $data['image'] ?: '',
+                        ],
                     );
                 }
             }
@@ -576,14 +575,14 @@ final class Topic implements Route
                     [
                         'user' => $editor,
                         'post' => $post,
-                    ]
+                    ],
                 ) : '',
                 $this->user->getGroup()?->canModerate
                     ? $this->template->render(
                         'topic/button/mod-ip',
                         [
                             'ip' => $this->ipAddress->asHumanReadable($post->ip),
-                        ]
+                        ],
                     )
                     : '',
                 $this->template->render('topic/icon-wrapper', ['group' => $authorGroup]),
