@@ -1,4 +1,4 @@
-<form action="/post" method="post" data-ajax-form="true">
+<form action="{{ url('post') }}" method="post" data-ajax-form="true">
     <input type="hidden" name="how" value="edit">
     <input type="hidden" name="pid" value="{{ post.id }}">
     <textarea
