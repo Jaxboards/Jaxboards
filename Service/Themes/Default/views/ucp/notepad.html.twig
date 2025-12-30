@@ -1,7 +1,7 @@
 <form method="post" data-ajax-form="true">
     <div class="username">{{ user.displayName }}</div>
     <div class="avatar">
-        {% include "avatar.html.twig" with { avatar } %}
+        {% include "avatar.html.twig" with { avatar: user.avatar } %}
     </div>
     <textarea
         id="notepad"
