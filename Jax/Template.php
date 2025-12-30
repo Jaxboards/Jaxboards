@@ -10,10 +10,10 @@ use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
+use function array_filter;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
-use function array_unshift;
 use function array_values;
 use function in_array;
 use function mb_strtolower;
@@ -123,14 +123,14 @@ final class Template
         $paths = array_filter(
             [
                 $this->fileSystem->pathJoin($themePath, 'views'),
-                $this->fileSystem->pathJoin($this->domainDefinitions->getDefaultThemePath(), 'views')
+                $this->fileSystem->pathJoin($this->domainDefinitions->getDefaultThemePath(), 'views'),
             ],
-            fn($dir) => $this->fileSystem->getFileInfo($dir)->isDir()
+            fn(string $dir): bool => $this->fileSystem->getFileInfo($dir)->isDir(),
         );
 
         $paths = array_map(
-            fn($dir) => $this->fileSystem->pathFromRoot($dir),
-            $paths
+            $this->fileSystem->pathFromRoot(...),
+            $paths,
         );
 
         $this->filesystemLoader->setPaths($paths);
