@@ -22,7 +22,9 @@ use function ini_get;
 use function readfile;
 use function sys_get_temp_dir;
 use function tempnam;
+use function unlink;
 
+use const GLOB_BRACE;
 use const PHP_EOL;
 
 final readonly class Tools
@@ -126,6 +128,7 @@ final readonly class Tools
 
         $zipArchive = new ZipArchive();
         $zipArchive->open($tempFile, ZipArchive::OVERWRITE);
+
         $globStarStarIsNotSupportedWTF = implode(',', [
             '',
             '/*',
