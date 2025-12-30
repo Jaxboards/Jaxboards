@@ -125,9 +125,10 @@ final class Template
 
         $paths = [$this->fileSystem->pathFromRoot($this->domainDefinitions->getDefaultThemePath(), 'views')];
 
-        $themeViews = $this->fileSystem->pathFromRoot($this->themePath, 'views');
+        $themeViews = $this->fileSystem->pathJoin($themePath, 'views');
         if ($this->fileSystem->getFileInfo($themeViews)->isDir()) {
-            $paths[] = $themeViews;
+            // Custom skin needs higher priority
+            array_unshift($paths, $themeViews);
         }
 
         $this->filesystemLoader->setPaths($paths);
