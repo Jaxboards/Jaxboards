@@ -5,13 +5,13 @@
 </div>
 
 <div class="topic-buttons-top">
-    {% if canCreateTopic %}
-        {% include "topic/button/newtopic.html.twig" with { topic } %}
-    {% endif %}
-    {% if canReply %}
-        {% include "topic/button/qreply.html.twig" with { topic } %}
-        {% include "topic/button/reply.html.twig" with { topic } %}
-    {% endif %}
+    {%- if canCreateTopic -%}
+        {%- include "topic/button/newtopic.html.twig" with { topic } -%}
+    {%- endif -%}
+    {%- if canReply -%}
+        {%- include "topic/button/qreply.html.twig" with { topic } -%}
+        {%- include "topic/button/reply.html.twig" with { topic } -%}
+    {%- endif -%}
 </div>
 
 <div class="box">
@@ -45,11 +45,11 @@
 </div>
 
 <div class="topic-buttons-bottom">
-    {% if canCreateTopic %}
-        {% include "topic/button/newtopic.html.twig" with { topic } %}
-    {% endif %}
-    {% if canReply %}
-        {% include "topic/button/qreply.html.twig" with { topic } %}
-        {% include "topic/button/reply.html.twig" with { topic } %}
-    {% endif %}
+    {%- if canCreateTopic -%}
+        {%- include "topic/button/newtopic.html.twig" with { topic } -%}
+    {%- endif -%}
+    {%- if canReply -%}
+        {%- include "topic/button/qreply.html.twig" with { topic } -%}
+        {%- include "topic/button/reply.html.twig" with { topic } -%}
+    {%- endif -%}
 </div>
