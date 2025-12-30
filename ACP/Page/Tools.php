@@ -126,18 +126,22 @@ final readonly class Tools
 
         $zipArchive = new ZipArchive();
         $zipArchive->open($tempFile, ZipArchive::OVERWRITE);
-        // I tried glob star star and it just doesn't work in some environments
-        // Being explicit does, so I'll just do that I guess?
-        $zipArchive->addGlob($boardPath . '/Themes/*/*', 0, ['remove_path' => $boardPath]);
-        $zipArchive->addGlob($boardPath . '/Uploads/*', 0, ['remove_path' => $boardPath]);
-        $zipArchive->addGlob($boardPath . '/Wrappers/*', 0, ['remove_path' => $boardPath]);
-        $zipArchive->addGlob($boardPath . '/bannedips.txt', 0, ['remove_path' => $boardPath]);
-        $zipArchive->addGlob($boardPath . '/config.php', 0, ['remove_path' => $boardPath]);
+        $globStarStarIsNotSupportedWTF = implode(',', [
+            '',
+            '/*',
+            '/*/*',
+            '/*/*/*',
+            '/*/*/*/*',
+            '/*/*/*/*/*',
+            '/*/*/*/*/*/*',
+        ]);
+
+        $zipArchive->addGlob($boardPath . "{{$globStarStarIsNotSupportedWTF}}/*.*", GLOB_BRACE, ['remove_path' => $boardPath]);
         $zipArchive->addFromString('backup.sql', $fileContents);
         $zipArchive->close();
 
         readfile($tempFile);
-        $this->fileSystem->unlink($tempFile);
+        unlink($tempFile);
     }
 
     private function outputTextFile(string $fileContents): void
