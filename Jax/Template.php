@@ -12,9 +12,7 @@ use Twig\TwigFunction;
 
 use function array_filter;
 use function array_key_exists;
-use function array_keys;
 use function array_map;
-use function array_values;
 use function in_array;
 use function mb_strtolower;
 use function preg_match;
