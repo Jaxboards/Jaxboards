@@ -50,8 +50,7 @@ final readonly class TextFormatting
 
     public function blockhtml(string $text): string
     {
-        // Fix for template conditionals.
-        return str_replace('{if', '&#123;if', htmlspecialchars($text, ENT_QUOTES));
+        return htmlspecialchars($text, ENT_QUOTES);
     }
 
     public function emotes(string $text): string
