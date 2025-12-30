@@ -16,7 +16,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
 
     container: HTMLDivElement;
 
-    htmlMode = false;
+    htmlMode = true;
 
     editbar?: HTMLDivElement;
 
@@ -71,9 +71,8 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         const { iframe, element } = this;
 
         iframe.className = 'editorframe';
-        // 1 for html editing mode, 0 for textarea mode
-        this.htmlMode =
-            Browser.mobile || Browser.n3ds ? false : globalSettings.wysiwyg;
+
+        this.htmlMode = globalSettings.wysiwyg;
 
         this.doc?.addEventListener('input', () => {
             // keep textarea updated with BBCode in real time
