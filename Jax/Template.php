@@ -36,13 +36,6 @@ final class Template
 
     private string $template;
 
-    /**
-     * Stores page variables, like <%ismod%>.
-     *
-     * @var array<string,string>
-     */
-    private array $vars = [];
-
     private readonly Environment $twigEnvironment;
 
     private readonly FilesystemLoader $filesystemLoader;
@@ -69,11 +62,6 @@ final class Template
         }
 
         return $html;
-    }
-
-    public function addVar(string $varName, string $value): void
-    {
-        $this->vars['<%' . $varName . '%>'] = $value;
     }
 
     public function append(string $part, string $content): void
@@ -115,7 +103,7 @@ final class Template
             $html = str_replace("<!--{$part}-->", $contents, $html);
         }
 
-        return $this->replaceVars($html);
+        return $html;
     }
 
     public function setThemePath(string $themePath): void
@@ -187,10 +175,5 @@ final class Template
                 ),
             ],
         );
-    }
-
-    private function replaceVars(string $string): string
-    {
-        return str_replace(array_keys($this->vars), array_values($this->vars), $string);
     }
 }

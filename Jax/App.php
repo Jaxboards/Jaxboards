@@ -279,11 +279,6 @@ final readonly class App
 
     private function setPageVars(): void
     {
-        $this->template->addVar('ismod', $this->user->getGroup()?->canModerate ? 'true' : 'false');
-        $this->template->addVar('isadmin', $this->user->getGroup()?->canAccessACP ? 'true' : 'false');
-        $this->template->addVar('isguest', $this->user->isGuest() ? 'true' : 'false');
-        $this->template->addVar('boardname', $this->config->getSetting('boardname'));
-
         $globalSettings = $this->user->isGuest() ? [] : [
             'canIM' => $this->user->getGroup()?->canIM,
             'groupID' => $this->user->get()->groupID,
@@ -297,16 +292,5 @@ final readonly class App
             'SCRIPT',
             '<script>window.globalSettings=' . json_encode($globalSettings, JSON_FORCE_OBJECT) . '</script>',
         );
-
-        if ($this->user->isGuest()) {
-            return;
-        }
-
-        $this->template->addVar('groupid', (string) $this->user->get()->groupID);
-        $this->template->addVar('userposts', (string) $this->user->get()->posts);
-        $this->template->addVar('grouptitle', (string) $this->user->getGroup()?->title);
-        $this->template->addVar('avatar', $this->user->get()->avatar ?: $this->template->render('default-avatar'));
-        $this->template->addVar('username', $this->user->get()->displayName);
-        $this->template->addVar('userid', (string) $this->user->get()->id ?: '0');
     }
 }
