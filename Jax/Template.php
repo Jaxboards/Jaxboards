@@ -120,13 +120,18 @@ final class Template
 
     public function setThemePath(string $themePath): void
     {
-        $paths = [$this->fileSystem->pathFromRoot($this->domainDefinitions->getDefaultThemePath(), 'views')];
+        $paths = array_filter(
+            [
+                $this->fileSystem->pathJoin($themePath, 'views'),
+                $this->fileSystem->pathJoin($this->domainDefinitions->getDefaultThemePath(), 'views')
+            ],
+            fn($dir) => $this->fileSystem->getFileInfo($dir)->isDir()
+        );
 
-        $themeViews = $this->fileSystem->pathJoin($themePath, 'views');
-        if ($this->fileSystem->getFileInfo($themeViews)->isDir()) {
-            // Custom skin needs higher priority
-            array_unshift($paths, $themeViews);
-        }
+        $paths = array_map(
+            fn($dir) => $this->fileSystem->pathFromRoot($dir),
+            $paths
+        );
 
         $this->filesystemLoader->setPaths($paths);
     }
