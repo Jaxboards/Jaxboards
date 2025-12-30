@@ -13,6 +13,7 @@ use Twig\TwigFunction;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
+use function array_unshift;
 use function array_values;
 use function in_array;
 use function mb_strtolower;
@@ -34,8 +35,6 @@ final class Template
     private array $parts = [];
 
     private string $template;
-
-    private string $themePath;
 
     /**
      * Stores page variables, like <%ismod%>.
@@ -121,8 +120,6 @@ final class Template
 
     public function setThemePath(string $themePath): void
     {
-        $this->themePath = $themePath;
-
         $paths = [$this->fileSystem->pathFromRoot($this->domainDefinitions->getDefaultThemePath(), 'views')];
 
         $themeViews = $this->fileSystem->pathJoin($themePath, 'views');
