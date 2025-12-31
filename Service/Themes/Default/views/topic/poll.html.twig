@@ -1,14 +1,19 @@
 {% if voted %}
     <table>
+        <tr><th>Choice</th><th>Votes</th><th>Percent</th></tr>
         {% for index,choice in choices %}
             {% set percentOfVotes=(numVotes[index] / totalVotes * 100)|round(2) %}
             <tr>
                 <td>{{ choice }}</td>
                 <td class="numvotes">
-                    {{ numVotes[index] }} votes ({{ percentOfVotes }}%)
+                    {{ numVotes[index] }}
                 </td>
                 <td style="width:200px">
-                    <div class="bar" style="width:{{ percentOfVotes }}%;"></div>
+                    <div
+                        class="bar"
+                        style="width:{{ percentOfVotes }}%;"
+                        aria-label="{{ percentOfVotes }}% of users voted for {{ choice }}"
+                    >{% if percentOfVotes %}{{ percentOfVotes }}%{% endif %}</div>
                 </td>
             </tr>
         {% endfor %}
@@ -21,11 +26,17 @@
         <input type="hidden" name="votepoll" value="1">
         {% for index,choice in choices %}
             <div class='choice'>
-                {% if type == 'multi' %}
-                    <input type="checkbox" name="choice[]" value="{{ index }}" id="poll_{{ index }}">
-                {% else %}
-                    <input type="radio" name="choice" value="{{ index }}" id="poll_{{ index }}">
-                {% endif %}
+                <input
+                    {% if type == 'multi' %}
+                        type="checkbox"
+                        name="choice[]"
+                    {% else %}
+                        type="radio"
+                        name="choice"
+                    {% endif %}
+                    value="{{ index }}"
+                    id="poll_{{ index }}"
+                >
                 <label for='poll_{{ index }}'>{{ choice }}</label>
             </div>
         {% endfor %}
