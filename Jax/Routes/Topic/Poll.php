@@ -136,36 +136,24 @@ final readonly class Poll
         }
 
         $usersVoted = [];
-        $voted = false;
-        $totalVotes = 0;
-
-        // Accomplish three things at once:
-        // * Determine if the user has voted.
-        // * Count up the number of votes.
-        // * Parse the result set.
         $numVotes = [];
+
         foreach ($this->parsePollResults($topic->pollResults) as $optionIndex => $voters) {
-            $totalVotes += ($numVotes[$optionIndex] = count($voters));
-            if (
-                !$this->user->isGuest()
-                && in_array($this->user->get()->id, $voters, true)
-            ) {
-                $voted = true;
-            }
+            $numVotes[$optionIndex] = count($voters);
 
             foreach ($voters as $voter) {
                 $usersVoted[$voter] = 1;
             }
         }
 
-        $usersVoted = count($usersVoted);
+        $voted = !$this->user->isGuest() && $usersVoted[$this->user->get()->id] == 1;
 
         return $this->template->render('topic/poll', [
             'choices' => $choices,
             'numVotes' => $numVotes,
-            'totalVotes' => $totalVotes,
+            'totalVotes' => array_sum($numVotes),
+            'totalVoters' => count($usersVoted),
             'type' => $type,
-            'usersVoted' => $usersVoted,
             'voted' => $voted,
         ]);
     }
