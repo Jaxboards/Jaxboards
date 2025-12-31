@@ -369,7 +369,7 @@ final readonly class ModControls implements Route
         $rows = [];
         foreach ($groupedSessions as $userAgent => $sessions) {
             $ips = array_filter(
-                array_map(fn(ModelsSession $session): string => $this->ipAddress->asHumanReadable($session->ip), $sessions),
+                array_map(fn(ModelsSession $modelsSession): string => $this->ipAddress->asHumanReadable($modelsSession->ip), $sessions),
                 static fn(string $ip): bool => $ip !== '',
             );
             $ipsWithFlags = array_map(function (string $ip): array {
