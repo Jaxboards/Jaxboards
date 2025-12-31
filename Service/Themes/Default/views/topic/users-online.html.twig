@@ -12,7 +12,7 @@
             <div id="statusers" class="topicstatusers">
                 {% for user in users %}
                     {% if user.isBot %}
-                        <a class="user{{ user.uid}}">{{user.name}}</a>
+                        <a class="user{{ user.uid }}">{{user.name}}</a>
                     {% else %}
                         {% include "user-link.html.twig" with {
                             user: {

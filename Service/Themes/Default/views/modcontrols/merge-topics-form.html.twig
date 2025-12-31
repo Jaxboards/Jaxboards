@@ -1,0 +1,9 @@
+<form method="post" action="/modcontrols" data-ajax-form="true" style="padding:10px;">
+    <input type="hidden" name="dot" value="merge">
+    Which topic should the topics be merged into?<br>
+
+    {% for topic in topics %}
+        <input type="radio" name="ot" value="{{ topic.id }}"> {{ topic.title }}<br >
+    {% endfor %}
+    <input type="submit" value="Merge">
+</form>

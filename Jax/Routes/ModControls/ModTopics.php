@@ -34,6 +34,7 @@ final readonly class ModTopics
         private Request $request,
         private Router $router,
         private Session $session,
+        private Template $template,
         private User $user,
     ) {}
 
@@ -181,101 +182,95 @@ final readonly class ModTopics
     {
         $page = '';
         $topicIds = $this->getModTids();
-        $otherTopic = (int) $this->request->asString->post('ot');
-        if (
-            in_array($otherTopic, $topicIds)
-        ) {
-            // Move the posts and set all posts to normal (newtopic=0).
-            $this->database->update(
-                'posts',
-                [
-                    'newtopic' => '0',
-                    'tid' => $otherTopic,
-                ],
-                'WHERE `tid` IN ?',
-                $this->getModTids(),
-            );
 
-            // Make the first post in the topic have newtopic=1.
-            // Get the op.
-            $result = $this->database->select(
-                'MIN(`id`) `minId`',
-                'posts',
-                'WHERE `tid`=?',
-                $otherTopic,
-            );
-            $firstPost = $this->database->arow($result);
-            $op = $firstPost ? (int) $firstPost['minId'] : 0;
-            $this->database->disposeresult($result);
-
-            if ($op !== 0) {
-                $this->database->update(
-                    'posts',
-                    [
-                        'newtopic' => 1,
-                    ],
-                    Database::WHERE_ID_EQUALS,
-                    $op,
-                );
-
-                // Also fix op.
-                $this->database->update(
-                    'topics',
-                    [
-                        'op' => $op,
-                    ],
-                    Database::WHERE_ID_EQUALS,
-                    $otherTopic,
-                );
-            }
-
-            unset($topicIds[array_search($otherTopic, $topicIds, true)]);
-            if ($topicIds !== []) {
-                $this->database->delete(
-                    'topics',
-                    Database::WHERE_ID_IN,
-                    $topicIds,
-                );
-            }
-
-            $this->cancel();
-            $this->router->redirect('topic', ['id' => $otherTopic]);
-
+        if ($topicIds === []) {
             return;
         }
 
-        $page .= '<form method="post" action="/modcontrols" data-ajax-form="true" '
-            . 'style="padding:10px;">'
-            . 'Which topic should the topics be merged into?<br>';
-        $page .= Template::hiddenFormFields(
-            [
-                'dot' => 'merge',
-            ],
-        );
-
-        if ($this->session->getVar('modtids')) {
-            $topics = keyBy(
-                Topic::selectMany(
-                    Database::WHERE_ID_IN,
-                    $this->getModTids(),
-                ),
-                static fn($topic) => $topic->id,
-            );
-
-            foreach ($topicIds as $topicId) {
-                if (!array_key_exists($topicId, $topics)) {
-                    continue;
-                }
-
-                $page .= '<input type="radio" name="ot" value="' . $topicId . '"> '
-                    . $topics[$topicId]->title . '<br>';
-            }
+        $otherTopic = (int) $this->request->asString->post('ot');
+        if (
+            $otherTopic !== 0 && in_array($otherTopic, $topicIds)
+        ) {
+            $this->mergeTopicsSubmit($otherTopic);
+            return;
         }
 
-        $page .= '<input type="submit" value="Merge"></form>';
+        $topics = Topic::selectMany(
+            Database::WHERE_ID_IN,
+            $topicIds,
+        );
+
+        $page = $this->template->render('modcontrols/merge-topics-form', [
+            'topics' => $topics,
+        ]);
+
         $page = $this->page->collapseBox('Merging Topics', $page);
+
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
+    }
+
+    private function mergeTopicsSubmit(int $otherTopic): void
+    {
+        $topicIds = $this->getModTids();
+
+        // Move the posts and set all posts to normal (newtopic=0).
+        $this->database->update(
+            'posts',
+            [
+                'newtopic' => '0',
+                'tid' => $otherTopic,
+            ],
+            'WHERE `tid` IN ?',
+            $topicIds,
+        );
+
+        // Make the first post in the topic have newtopic=1.
+        // Get the op.
+        $result = $this->database->select(
+            'MIN(`id`) `minId`',
+            'posts',
+            'WHERE `tid`=?',
+            $otherTopic,
+        );
+        $firstPost = $this->database->arow($result);
+        $op = $firstPost ? (int) $firstPost['minId'] : 0;
+        $this->database->disposeresult($result);
+
+        if ($op !== 0) {
+            $this->database->update(
+                'posts',
+                [
+                    'newtopic' => 1,
+                ],
+                Database::WHERE_ID_EQUALS,
+                $op,
+            );
+
+            // Also fix op.
+            $this->database->update(
+                'topics',
+                [
+                    'op' => $op,
+                ],
+                Database::WHERE_ID_EQUALS,
+                $otherTopic,
+            );
+        }
+
+        unset($topicIds[array_search($otherTopic, $topicIds, true)]);
+        if ($topicIds !== []) {
+            $this->database->delete(
+                'topics',
+                Database::WHERE_ID_IN,
+                $topicIds,
+            );
+        }
+
+        $this->cancel();
+        $this->router->redirect('topic', ['id' => $otherTopic]);
+
+        return;
     }
 
     private function moveTo(): void
