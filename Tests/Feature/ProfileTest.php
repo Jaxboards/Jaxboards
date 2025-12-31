@@ -154,6 +154,30 @@ final class ProfileTest extends FeatureTestCase
         $page = $this->go('/profile/1/activity');
 
         DOMAssert::assertSelectRegExp(
+            '.buddy_add',
+            '/Admin.*made friends with.*Admin/',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectRegExp(
+            '.profile_name_change',
+            '/Prince.*is now known as.*Admin/',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectRegExp(
+            '.new_post',
+            '/Admin.*posted in topic.*Post/',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectRegExp(
+            '.new_topic',
+            '/Admin.*created new topic.*Topic/',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectRegExp(
             '.profile_comment',
             '/Admin.*commented on.*Admin/',
             1,
