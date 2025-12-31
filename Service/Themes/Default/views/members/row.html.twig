@@ -20,7 +20,7 @@
   </td>
   <td>
     {% for service,contact in contactDetails %}
-        <a class="{{ service }} contact" href="{{ contact[0] }}" title="{{ service }} contact">&nbsp;</a>
+        <a class="{{ service }} contact" href="{{ contact.href }}" title="{{ service }} contact">&nbsp;</a>
     {% endfor %}
     <a
         title="PM this member"

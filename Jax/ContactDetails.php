@@ -34,7 +34,7 @@ final class ContactDetails
      * Given a user's profile, returns an associative array formatted as:
      * 'twitter' => ['https://twitter.com/jax', 'jax']
      *
-     * @return array<string,array{string,string}>
+     * @return array<string, object{href:string,username:string}>
      */
     public function getContactLinks(Member $member): array
     {
@@ -46,9 +46,9 @@ final class ContactDetails
 
         return array_reduce($contactFields, static function (array $links, $field) use ($contactFieldPrefix, $member): array {
             $type = mb_strtolower(mb_substr($field, mb_strlen($contactFieldPrefix)));
-            $value = $member->{$field};
-            $href = sprintf(self::CONTACT_URLS[$type], $value);
-            $links[$type] = [$href, $value];
+            $username = $member->{$field};
+            $href = sprintf(self::CONTACT_URLS[$type], $username);
+            $links[$type] = (object) ['href' => $href, 'username' => $username];
 
             return $links;
         }, []);

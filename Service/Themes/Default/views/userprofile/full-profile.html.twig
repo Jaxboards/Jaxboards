@@ -15,7 +15,20 @@
         <div class="infobox contact">
             Contact Details:
             <div class="content">
-                {{ contactdetails|raw }}
+                {% for service,link in contactLinks %}
+                    <div class="contact {{ service }}"><a href="{{ link.href }}">{{ link.username }}</a></div>
+                {% endfor %}
+                <div class="contact im">
+                    <a href="javascript:void(0)"
+                        onclick="new IMWindow({{ member.id }},'{{ member.displayName }}')"
+                        >IM</a>
+                </div>
+                <div class="contact pm">
+                    <a href="{{ url('inbox', { view: 'compose', mid: member.id }) }}">PM</a>
+                </div>
+                {% if canModerate %}
+                    <div>IP: <a href="{{ url('modcontrols', { do: 'iptools', ip: ipAddress }) }}">{{ ipAddress }}</a></div>
+                {% endif %}
             </div>
         </div>
         <div class="infobox personal">

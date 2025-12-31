@@ -77,48 +77,6 @@ final readonly class UserProfile implements Route
         );
     }
 
-    private function renderContactDetails(Member $member): string
-    {
-        $contactDetails = '';
-
-        $links = $this->contactDetails->getContactLinks($member);
-        $contactDetails = implode('', array_map(
-            static function (string $service) use ($links): string {
-                [$href, $value] = $links[$service];
-
-                return <<<HTML
-                    <div class="contact {$service}"><a href="{$href}">{$value}</a></div>
-                    HTML;
-            },
-            array_keys($links),
-        ));
-
-        $privateMessageURL = $this->router->url('inbox', ['view' => 'compose', 'mid' => $member->id]);
-
-        $contactDetails .= <<<HTML
-            <div class="contact im">
-                <a href="javascript:void(0)"
-                    onclick="new IMWindow({$member->id},'{$member->displayName}')"
-                    >IM</a>
-            </div>
-            <div class="contact pm">
-                <a href="{$privateMessageURL}">PM</a>
-            </div>
-            HTML;
-
-        if ($this->user->getGroup()?->canModerate) {
-            $ipReadable = $member->ip !== ''
-                ? $this->ipAddress->asHumanReadable($member->ip)
-                : '';
-            $modControlsIPURL = $this->router->url('modcontrols', ['do' => 'iptools', 'ip' => $ipReadable]);
-            $contactDetails .= <<<HTML
-                    <div>IP: <a href="{$modControlsIPURL}">{$ipReadable}</a></div>
-                HTML;
-        }
-
-        return $contactDetails;
-    }
-
     private function showContactCard(Member $member): void
     {
         $this->page->command('softurl');
@@ -156,8 +114,6 @@ final readonly class UserProfile implements Route
             ],
         );
 
-        $contactdetails = $this->renderContactDetails($member);
-
         $birthdate = $member->birthdate !== null
             ? $this->date->dateAsCarbon($member->birthdate)
             : null;
@@ -165,14 +121,17 @@ final readonly class UserProfile implements Route
         $profile = $this->template->render(
             'userprofile/full-profile',
             [
-                'member' => $member,
-                'contactdetails' => $contactdetails,
                 'birthdate' => $birthdate,
+                'canModerate' => $this->user->getGroup()?->canModerate,
+                'contactLinks' => $this->contactDetails->getContactLinks($member),
                 'group' => Group::selectOne($member->groupID),
-                'tabs' => $this->profileTabs->getTabs(),
+                'ipAddress' => $member->ip !== ''
+                    ? $this->ipAddress->asHumanReadable($member->ip)
+                    : '',
+                'member' => $member,
                 'selectedTab' => $page ?: 'activity',
                 'tabHTML' => $tabHTML,
-                'canModerate' => $this->user->getGroup()?->canModerate,
+                'tabs' => $this->profileTabs->getTabs(),
             ],
         );
 
