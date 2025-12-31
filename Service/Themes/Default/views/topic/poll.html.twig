@@ -1,0 +1,36 @@
+{% if voted %}
+    <table>
+        {% for index,choice in choices %}
+            {% set percentOfVotes=(numVotes[index] / totalVotes * 100)|round(2) %}
+            <tr>
+                <td>{{ choice }}</td>
+                <td class="numvotes">
+                    {{ numVotes[index] }} votes ({{ percentOfVotes }}%)
+                </td>
+                <td style="width:200px">
+                    <div class="bar" style="width:{{ percentOfVotes }}%;"></div>
+                </td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="3" class="totalvotes">Total Votes: {{ usersVoted }}</td>
+        </tr>
+    </table>
+{% else %}
+    <form method='post' data-ajax-form='true'>
+        <input type="hidden" name="votepoll" value="1">
+        {% for index,choice in choices %}
+            <div class='choice'>
+                {% if type == 'multi' %}
+                    <input type="checkbox" name="choice[]" value="{{ index }}" id="poll_{{ index }}">
+                {% else %}
+                    <input type="radio" name="choice" value="{{ index }}" id="poll_{{ index }}">
+                {% endif %}
+                <label for='poll_{{ index }}'>{{ choice }}</label>
+            </div>
+        {% endfor %}
+        <div class='buttons'>
+            <input type='submit' value='Vote'>
+        </div>
+    </form>
+{% endif %}

@@ -137,20 +137,17 @@ final readonly class Poll
             $choices = [];
         }
 
-        $results = $topic->pollResults;
-
-        $usersvoted = [];
+        $usersVoted = [];
         $voted = false;
-
-        $totalvotes = 0;
+        $totalVotes = 0;
 
         // Accomplish three things at once:
         // * Determine if the user has voted.
         // * Count up the number of votes.
         // * Parse the result set.
-        $numvotes = [];
-        foreach ($this->parsePollResults($results) as $optionIndex => $voters) {
-            $totalvotes += ($numvotes[$optionIndex] = count($voters));
+        $numVotes = [];
+        foreach ($this->parsePollResults($topic->pollResults) as $optionIndex => $voters) {
+            $totalVotes += ($numVotes[$optionIndex] = count($voters));
             if (
                 !$this->user->isGuest()
                 && in_array($this->user->get()->id, $voters, true)
@@ -159,72 +156,20 @@ final readonly class Poll
             }
 
             foreach ($voters as $voter) {
-                $usersvoted[$voter] = 1;
+                $usersVoted[$voter] = 1;
             }
         }
 
-        $usersvoted = count($usersvoted);
+        $usersVoted = count($usersVoted);
 
-        if ($voted) {
-            $resultRows = implode('', array_map(
-                static function (int $index, string $choice) use ($numvotes, $totalvotes): string {
-                    $percentOfVotes = round($numvotes[$index] / $totalvotes * 100, 2);
-
-                    return <<<HTML
-                        <tr>
-                            <td>{$choice}</td>
-                            <td class='numvotes'>
-                                {$numvotes[$index]} votes ({$percentOfVotes}%)
-                            </td>
-                            <td style='width:200px'>
-                                <div class='bar' style='width:{$percentOfVotes}%;'></div>
-                            </td>
-                        </tr>
-                        HTML;
-                },
-                array_keys($choices),
-                $choices,
-            ));
-
-            return <<<HTML
-                <table>
-                    {$resultRows}
-                    <tr>
-                        <td colspan='3' class='totalvotes'>Total Votes: {$usersvoted}</td>
-                    </tr>
-                </table>
-                HTML;
-        }
-
-        $hiddenFields = Template::hiddenFormFields(
-            [
-                'votepoll' => '1',
-            ],
-        );
-
-        $choicesHTML = '';
-        foreach ($choices as $index => $value) {
-            $input = $type === 'multi'
-                ? "<input type='checkbox' name='choice[]' value='{$index}' id='poll_{$index}'>"
-                : "<input type='radio' name='choice' value='{$index}' id='poll_{$index}'> ";
-
-            $choicesHTML .= <<<HTML
-                <div class='choice'>
-                    {$input}
-                    <label for='poll_{$index}'>{$value}</label>
-                </div>
-                HTML;
-        }
-
-        return <<<HTML
-            <form method='post' action='?' data-ajax-form='true'>
-                {$hiddenFields}
-                {$choicesHTML}
-                <div class='buttons'>
-                    <input type='submit' value='Vote'>
-                </div>
-            </form>
-            HTML;
+        return $this->template->render('topic/poll', [
+            'choices' => $choices,
+            'numVotes' => $numVotes,
+            'totalVotes' => $totalVotes,
+            'type' => $type,
+            'usersVoted' => $usersVoted,
+            'voted' => $voted,
+        ]);
     }
 
     /**
