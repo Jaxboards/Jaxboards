@@ -153,6 +153,9 @@ final class Router
      */
     public function url(string $name, array $params = []): string
     {
+        // make sure query param order is consistent
+        ksort($params);
+
         if (array_key_exists($name, $this->urls)) {
             $foundParams = [];
 
