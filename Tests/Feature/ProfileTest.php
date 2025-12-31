@@ -155,7 +155,7 @@ final class ProfileTest extends FeatureTestCase
 
         DOMAssert::assertSelectRegExp(
             '.profile_comment',
-            '/You.*commented on.*Admin/',
+            '/Admin.*commented on.*Admin/',
             1,
             $page,
         );

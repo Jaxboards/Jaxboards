@@ -8,10 +8,10 @@
 {% endif %}
 
 {% for row in rows %}
-    <div class="activity {{ activity.type }}">
-        {% set activity=row.activity %}
-        {% set affectedUser=row.affectedUser %}
+    {% set activity=row.activity %}
+    {% set affectedUser=row.affectedUser %}
 
+    <div class="activity {{ activity.type }}">
         {% if activity.type == 'profile_comment' %}
             {% include "user-link.html.twig" with { user } only %}
             commented on
