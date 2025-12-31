@@ -14,7 +14,6 @@ use Jax\Router;
 use Jax\RSSFeed;
 use Jax\Template;
 use Jax\TextFormatting;
-use Jax\User;
 
 use function array_map;
 
@@ -30,7 +29,6 @@ final readonly class Activity
         private Router $router,
         private TextFormatting $textFormatting,
         private Template $template,
-        private User $user,
     ) {}
 
     public function render(Member $member): string
