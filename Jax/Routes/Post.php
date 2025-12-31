@@ -214,7 +214,7 @@ final class Post implements Route
             <label class="addpoll" for="pollType">
                 Add a Poll
             </label>
-            <select name="pollType" title="Add a poll"
+            <select name="pollType" id="pollType" title="Add a poll"
                 onchange="document.querySelector('#polloptions').style.display=this.value?'block':'none'">
             <option value="">No</option>
             <option value="single">Yes, single-choice</option>
