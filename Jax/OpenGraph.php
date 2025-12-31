@@ -17,6 +17,7 @@ use function libxml_clear_errors;
 use function libxml_use_internal_errors;
 use function mb_encode_numericentity;
 use function mb_substr;
+use function str_replace;
 use function str_starts_with;
 
 use const FILTER_NULL_ON_FAILURE;
