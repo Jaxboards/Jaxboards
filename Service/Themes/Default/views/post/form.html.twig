@@ -1,0 +1,34 @@
+<div class="postform">
+    <form method="post" action="/post" data-ajax-form="true"
+        onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;"
+        enctype="multipart/form-data"
+        >
+        <input type="hidden" name="how" value="fullpost">
+        {% if pid %}
+            <input type="hidden" name="pid" value="{{ pid }}">
+        {% endif %}
+        {% if tid %}
+            <input type="hidden" name="tid" value="{{ tid }}">
+        {% endif %}
+
+        <textarea
+            name="postdata" id="post" title="Type your post here" class="bbcode-editor"
+            >{{ post }}</textarea>
+        <br>
+        {% if topicPerms.upload %}
+            <div id="attachfiles">
+                Add Files
+                <input type="file" name="Filedata" title="Browse for file">
+            </div>
+        {% endif %}
+        <div class="buttons">
+            <input type="submit" name="submit"  id="submitbutton"
+                value="Post" title="Submit your post"
+                onclick="this.form.submitButton=this"
+                >
+            <input type="submit" name="submit" value="Preview"
+                title="See a preview of your post"
+                onclick="this.form.submitButton=this">
+        </div>
+    </form>
+</div>

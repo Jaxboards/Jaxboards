@@ -171,7 +171,7 @@ final class Post implements Route
         $post = $this->postData ?? '';
         if (trim($post) !== '') {
             $post = $this->textFormatting->theWorks($post);
-            $post = $this->template->render('post/post-preview', ['post' => $post]);
+            $post = $this->template->render('post/preview', ['post' => $post]);
             $this->postpreview = $post;
         }
 
@@ -323,19 +323,6 @@ final class Post implements Route
 
         $page .= '<div id="post-preview">' . $this->postpreview . '</div>';
         $postData = $this->textFormatting->blockhtml($this->postData ?? '');
-        $varsarray = [
-            'how' => 'fullpost',
-        ];
-        if ($this->pid !== 0) {
-            $varsarray['pid'] = $this->pid;
-        } else {
-            $varsarray['tid'] = $tid;
-        }
-
-        $vars = '';
-        foreach ($varsarray as $k => $v) {
-            $vars .= '<input type="hidden" name="' . $k . '" value="' . $v . '">';
-        }
 
         if ($this->session->getVar('multiquote')) {
             $postData = '';
@@ -358,37 +345,12 @@ final class Post implements Route
             $this->session->deleteVar('multiquote');
         }
 
-        $uploadForm = $topicPerms['upload'] ? <<<'HTML'
-            <div id="attachfiles">
-                Add Files
-                <input type="file" name="Filedata" title="Browse for file">
-            </div>
-            HTML : '';
-
-        $form = <<<HTML
-            <div class="postform">
-                <form method="post" action="/post" data-ajax-form="true"
-                    onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;"
-                    enctype="multipart/form-data"
-                    >
-                    {$vars}
-                    <textarea
-                        name="postdata" id="post" title="Type your post here" class="bbcode-editor"
-                        >{$postData}</textarea>
-                    <br>
-                    {$uploadForm}
-                    <div class="buttons">
-                        <input type="submit" name="submit"  id="submitbutton"
-                            value="Post" title="Submit your post"
-                            onclick="this.form.submitButton=this"
-                           >
-                        <input type="submit" name="submit" value="Preview"
-                            title="See a preview of your post"
-                            onclick="this.form.submitButton=this"/>
-                    </div>
-                </form>
-            </div>
-            HTML;
+        $form = $this->template->render('post/form', [
+            'topicPerms' => $topicPerms,
+            'post' => $postData,
+            'pid' => $this->pid,
+            'tid' => $tid,
+        ]);
 
         $page .= $this->template->render('global/box', [
             'title' => $topic->title . ' &gt; Reply',
