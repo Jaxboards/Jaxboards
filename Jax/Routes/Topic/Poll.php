@@ -146,7 +146,7 @@ final readonly class Poll
             }
         }
 
-        $voted = !$this->user->isGuest() && $usersVoted[$this->user->get()->id] === 1;
+        $voted = !$this->user->isGuest() && array_key_exists($this->user->get()->id, $usersVoted);
 
         return $this->template->render('topic/poll', [
             'choices' => $choices,
