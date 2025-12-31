@@ -5,9 +5,7 @@
             {% set percentOfVotes=(numVotes[index] / totalVotes * 100)|round(2) %}
             <tr>
                 <td>{{ choice }}</td>
-                <td class="numvotes">
-                    {{ numVotes[index] }}
-                </td>
+                <td class="numvotes">{{ numVotes[index] }} vote{% if numVotes[index]!=1 %}s{% endif %}</td>
                 <td style="width:200px">
                     <div
                         class="bar"

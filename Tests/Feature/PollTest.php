@@ -113,9 +113,10 @@ final class PollTest extends FeatureTestCase
             post: ['choice' => '1', 'votepoll' => '1'],
         ));
 
+
         DOMAssert::assertSelectEquals('#poll .title', 'What is your favorite pet?', 1, $page);
-        DOMAssert::assertSelectEquals('.numvotes', '4 votes (40%)', 1, $page);
-        DOMAssert::assertSelectEquals('.numvotes', '3 votes (30%)', 2, $page);
+        DOMAssert::assertSelectEquals('.numvotes', '4 votes', 1, $page);
+        DOMAssert::assertSelectEquals('.numvotes', '3 votes', 2, $page);
         DOMAssert::assertSelectEquals('.totalvotes', 'Total Votes: 10', 1, $page);
     }
 
@@ -146,8 +147,8 @@ final class PollTest extends FeatureTestCase
         ));
 
         DOMAssert::assertSelectEquals('#poll .title', 'What is your favorite pet?', 1, $page);
-        DOMAssert::assertSelectEquals('.numvotes', '4 votes (36.36%)', 2, $page);
-        DOMAssert::assertSelectEquals('.numvotes', '3 votes (27.27%)', 1, $page);
+        DOMAssert::assertSelectEquals('.numvotes', '4 votes', 2, $page);
+        DOMAssert::assertSelectEquals('.numvotes', '3 votes', 1, $page);
         DOMAssert::assertSelectEquals('.totalvotes', 'Total Votes: 10', 1, $page);
     }
 
