@@ -14,9 +14,7 @@ use Jax\Session;
 use Jax\Template;
 use Jax\User;
 
-use function _\keyBy;
 use function array_diff;
-use function array_key_exists;
 use function array_map;
 use function array_search;
 use function array_unique;
@@ -192,6 +190,7 @@ final readonly class ModTopics
             $otherTopic !== 0 && in_array($otherTopic, $topicIds)
         ) {
             $this->mergeTopicsSubmit($otherTopic);
+
             return;
         }
 
@@ -269,8 +268,6 @@ final readonly class ModTopics
 
         $this->cancel();
         $this->router->redirect('topic', ['id' => $otherTopic]);
-
-        return;
     }
 
     private function moveTo(): void
