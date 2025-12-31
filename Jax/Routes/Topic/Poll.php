@@ -13,10 +13,10 @@ use Jax\User;
 use function array_filter;
 use function array_key_exists;
 use function array_map;
+use function array_sum;
 use function count;
 use function explode;
 use function implode;
-use function in_array;
 use function is_array;
 use function is_numeric;
 use function json_decode;
@@ -146,7 +146,7 @@ final readonly class Poll
             }
         }
 
-        $voted = !$this->user->isGuest() && $usersVoted[$this->user->get()->id] == 1;
+        $voted = !$this->user->isGuest() && $usersVoted[$this->user->get()->id] === 1;
 
         return $this->template->render('topic/poll', [
             'choices' => $choices,
