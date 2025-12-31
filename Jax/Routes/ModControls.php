@@ -25,6 +25,7 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function _\groupBy;
+use function array_filter;
 use function array_map;
 use function arsort;
 use function count;
@@ -368,10 +369,10 @@ final readonly class ModControls implements Route
         $rows = [];
         foreach ($groupedSessions as $userAgent => $sessions) {
             $ips = array_filter(
-                array_map(fn($session) => $this->ipAddress->asHumanReadable($session->ip), $sessions),
-                fn($ip) => $ip !== ''
+                array_map(fn(ModelsSession $session): string => $this->ipAddress->asHumanReadable($session->ip), $sessions),
+                static fn(string $ip): bool => $ip !== '',
             );
-            $ipsWithFlags = array_map(function (string $ip) {
+            $ipsWithFlags = array_map(function (string $ip): array {
                 $geo = $this->geoLocate->lookup($ip);
                 $flag = $geo instanceof City
                     ? $this->geoLocate->getFlagEmoji($geo->country->isoCode)
@@ -392,7 +393,7 @@ final readonly class ModControls implements Route
             'Most Active User Agents',
             $this->template->render('modcontrols/online-sessions', [
                 'rows' => $rows,
-            ])
+            ]),
         );
     }
 
