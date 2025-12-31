@@ -1,9 +1,9 @@
 <div class="idxtools">
-    <a href="{{ markReadURL }}">
+    <a href="{{ url('index', { markread: 1 }) }}">
         Mark Everything Read
     </a>
     |
-    <a href="{{ staffURL }}">
+    <a href="{{ url('members', { filter: 'staff', sortby: 'g_title' }) }}">
         View Staff
     </a>
 </div>

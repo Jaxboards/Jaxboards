@@ -34,8 +34,8 @@
                     {%- endif -%}
                 {%- endfor -%}
                 {%- if guestCount -%}
-                    {%- if modURL -%}
-                        <a href="{{ modURL }}">{{ guestCount }} guest{% if guestCount>0 %}s{% endif %}</a>
+                    {%- if canModerate -%}
+                        <a href="{{ url('modcontrols', { do: 'onlineSessions' }) }}">{{ guestCount }} guest{% if guestCount>0 %}s{% endif %}</a>
                     {%- else -%}
                         {{ guestCount }} guest{% if guestCount>1 %}s{% endif %}
                     {%- endif -%}

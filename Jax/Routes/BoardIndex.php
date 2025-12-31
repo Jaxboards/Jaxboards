@@ -58,7 +58,6 @@ final class BoardIndex implements Route
         private readonly Date $date,
         private readonly Page $page,
         private readonly Request $request,
-        private readonly Router $router,
         private readonly Session $session,
         private readonly Template $template,
         private readonly User $user,
@@ -139,13 +138,7 @@ final class BoardIndex implements Route
             );
         }
 
-        $page .= $this->template->render(
-            'idx/tools',
-            [
-                'markReadURL' => $this->router->url('index', ['markread' => '1']),
-                'staffURL' => $this->router->url('members', ['filter' => 'staff', 'sortby' => 'g_title']),
-            ],
-        );
+        $page .= $this->template->render('idx/tools');
 
         $page .= $this->getBoardStats();
 
@@ -260,9 +253,7 @@ final class BoardIndex implements Route
                 'usersOnlineCount' => $usersOnlineCount,
                 'usersOnlineToday' => $this->usersOnline->getUsersOnlineToday(),
                 'guestCount' => $this->usersOnline->getGuestCount(),
-                'modURL' => $this->user->getGroup()?->canModerate !== 0
-                    ? $this->router->url('modcontrols', ['do' => 'onlineSessions'])
-                    : null,
+                'canModerate' => $this->user->getGroup()?->canModerate,
                 'stats' => $stats,
                 'lastRegisteredMember' => $lastRegisteredMember,
                 'legend' => $legendGroups,
