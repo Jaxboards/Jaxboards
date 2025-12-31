@@ -210,77 +210,15 @@ final class Post implements Route
 
         $forumPerms = $this->user->getForumPerms($forum->perms);
 
-        $pollForm = $forumPerms['poll'] ? <<<'HTML'
-            <label class="addpoll" for="pollType">
-                Add a Poll
-            </label>
-            <select name="pollType" id="pollType" title="Add a poll"
-                onchange="document.querySelector('#polloptions').style.display=this.value?'block':'none'">
-            <option value="">No</option>
-            <option value="single">Yes, single-choice</option>
-            <option value="multi">Yes, multi-choice</option></select>
-            <br>
-            <div id="polloptions" style="display:none">
-                <label for="pollq">Poll Question:</label>
-                <input type="text" id="pollq" name="pollq" title="Poll Question"/><br>
-                <label for="pollc">Poll Choices:</label> (one per line)
-                <textarea id="pollc" name="pollchoices" title="Poll Choices"></textarea>
-            </div>
-            HTML : '';
-
-        $uploadButton = $forumPerms['upload']
-            ? ''
-            : <<<'HTML'
-                <div id="attachfiles" class="addfile">
-                    Add Files <input type="file" name="Filedata" title="Browse for file">
-                </div>
-                HTML;
-
-        $submitLabel = $isEditing ? 'Edit Topic' : 'Post New Topic';
-        $form = <<<HTML
-            <form method="post" action="/post" data-ajax-form="true"
-                            onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;">
-            <div class="topicform">
-                <input type="hidden" name="how" value="{$how}">
-                <input type="hidden" name="fid" value="{$fid}">
-                <input type="hidden" name="tid" value="{$tid}">
-                <label for="ttitle">Topic title:</label>
-                <input type="text" name="ttitle" id="ttitle" title="Topic Title" value="{$topic->title}">
-                <br>
-                <label for="tdesc">Description:</label>
-                <input
-                    id="tdesc"
-                    name="tdesc"
-                    title="Topic Description (extra information about your topic)"
-                    type="text"
-                    value="{$topic->subtitle}"
-                   >
-                <br>
-                <textarea
-                    name="postdata"
-                    id="postdata"
-                    title="Type your post here"
-                    class="bbcode-editor"
-                    >{$this->textFormatting->blockhtml($postData ?? '')}</textarea>
-                <br><div class="postoptions">
-                    {$pollForm}
-                    {$uploadButton}
-                    <div class="buttons">
-                        <input type="submit" name="submit"
-                            value="{$submitLabel}"
-                            title="Submit your post"
-                            onclick="this.form.submitButton=this;"
-                            id="submitbutton">
-                        <input
-                            type="submit"
-                            name="submit"
-                            value="Preview"
-                            title="See a preview of your post"
-                            onclick="this.form.submitButton=this">
-                        </div>
-                </div>
-            </form>
-            HTML;
+        $form = $this->template->render('post/new-topic-form', [
+            'fid' => $fid,
+            'forumPerms' => $forumPerms,
+            'how' => $how,
+            'isEditing' => $isEditing,
+            'post' => $postData,
+            'tid' => $tid,
+            'topic' => $topic,
+        ]);
         $page .= $this->template->render('global/box', [
             'title' => $forum->title . ' > New Topic',
             'content' => $form,
