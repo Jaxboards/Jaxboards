@@ -1,0 +1,16 @@
+<table class="onlinesessions">
+    <tr><th>User Agent</th><th>Count</th><th>IPs</th></tr>
+    {% for userAgent, row in rows %}
+        <tr>
+            <td>{{ userAgent }}</td>
+            <td>{{ row.ipsWithFlags|length }}</td>
+            <td>
+                {%- for ipWithFlag in row.ipsWithFlags -%}
+                    <a href="{{ url('modcontrols', { do: 'iptools', ip: ipWithFlag.ip }) }}">
+                        {{- ipWithFlag.ip }}&nbsp;{{ ipWithFlag.flag -}}
+                    </a>
+                {%- endfor -%}
+            </td>
+        </tr>
+    {% endfor %}
+</table>

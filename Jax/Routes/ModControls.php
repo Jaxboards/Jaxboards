@@ -365,43 +365,34 @@ final readonly class ModControls implements Route
         $groupedSessions = groupBy($allSessions, static fn(ModelsSession $modelsSession): string => $modelsSession->useragent);
         arsort($groupedSessions);
 
-        $rows = '';
+        $rows = [];
         foreach ($groupedSessions as $userAgent => $sessions) {
-            $count = count($sessions);
-
-            $ips = implode('<br>', array_map(function (ModelsSession $modelsSession): string {
-                $ip = $this->ipAddress->asHumanReadable($modelsSession->ip);
-
-                if ($ip === '') {
-                    return '';
-                }
-
+            $ips = array_filter(
+                array_map(fn($session) => $this->ipAddress->asHumanReadable($session->ip), $sessions),
+                fn($ip) => $ip !== ''
+            );
+            $ipsWithFlags = array_map(function (string $ip) {
                 $geo = $this->geoLocate->lookup($ip);
                 $flag = $geo instanceof City
                     ? $this->geoLocate->getFlagEmoji($geo->country->isoCode)
                     : null;
 
-                $ipToolsURL = $this->router->url('modcontrols', [
-                    'do' => 'iptools',
+                return [
                     'ip' => $ip,
-                ]);
+                    'flag' => $flag,
+                ];
+            }, $ips);
 
-                return "<a href=\"{$ipToolsURL}\">{$ip} {$flag}</a>";
-            }, $sessions));
-
-            $rows .= <<<HTML
-                <tr><td>{$userAgent}</td><td>{$count}</td><td>{$ips}</td></tr>
-                HTML;
+            $rows[$userAgent] = [
+                'ipsWithFlags' => $ipsWithFlags,
+            ];
         }
 
         return $this->box(
             'Most Active User Agents',
-            <<<HTML
-                <table class="onlinesessions">
-                    <tr><th>User Agent</th><th>Count</th><th>IPs</th></tr>
-                    {$rows}
-                </table>
-                HTML,
+            $this->template->render('modcontrols/online-sessions', [
+                'rows' => $rows,
+            ])
         );
     }
 
