@@ -1,0 +1,54 @@
+{% if rows %}
+    <a
+        href="{{ url('profile', { id: user.id, page: 'activity', fmt: 'RSS' } ) }}"
+        target="_blank"
+        class="social"
+        style="float:right"
+    >RSS</a>
+{% endif %}
+
+{% for row in rows %}
+    <div class="activity {{ activity.type }}">
+        {% set activity=row.activity %}
+        {% set affectedUser=row.affectedUser %}
+
+        {% if activity.type == 'profile_comment' %}
+            {% include "user-link.html.twig" with { user } only %}
+            commented on
+            {% include "user-link.html.twig" with { user: affectedUser } only %}'s profile
+        {% elseif activity.type == 'new_post' %}
+            {% include "user-link.html.twig" with { user } only %}
+            posted in topic
+            <a href="{{ url('topic', {
+                id: activity.tid,
+                slug: activity.arg1|slugify,
+                findpost: activity.pid,
+            }) }}">{{ activity.arg1 }}</a>
+        {% elseif activity.type == 'new_topic' %}
+            {% include "user-link.html.twig" with { user } only %}
+            created new topic
+            <a href="{{ url('topic', {
+                id: activity.tid,
+                slug: activity.arg1|slugify,
+            }) }}">{{ activity.arg1 }}</a>
+        {% elseif activity.type == 'profile_name_change' %}
+            {% include "user-link.html.twig" with { user: {
+                id: user.id,
+                groupId: user.groupID,
+                displayName: activity.arg1
+            }} only %}
+            is now known as
+            {% include "user-link.html.twig" with { user: {
+                id: user.id,
+                groupId: user.groupID,
+                displayName: activity.arg2
+            }} only %}
+        {% elseif activity.type == 'buddy_add' %}
+            {% include "user-link.html.twig" with { user } only %}
+            made friends with
+            {% include "user-link.html.twig" with { user: affectedUser } only %}
+        {% endif %}
+    </div>
+{% else %}
+    This user has yet to do anything noteworthy!
+{% endfor %}

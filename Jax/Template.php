@@ -144,9 +144,15 @@ final class Template
         array_map(
             $this->twigEnvironment->addFilter(...),
             [
+                // TODO: combine date helpers
                 new TwigFilter(
                     'autoDate',
                     fn(?string $string) => $this->container->get(Date::class)->autoDate($string),
+                    ['is_safe' => ['html']],
+                ),
+                new TwigFilter(
+                    'smallDate',
+                    fn(?string $string) => $string ? $this->container->get(Date::class)->smallDate($string) : '',
                     ['is_safe' => ['html']],
                 ),
                 new TwigFilter(

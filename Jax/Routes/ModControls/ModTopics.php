@@ -190,7 +190,6 @@ final readonly class ModTopics
             $otherTopic !== 0 && in_array($otherTopic, $topicIds)
         ) {
             $this->mergeTopicsSubmit($otherTopic);
-
             return;
         }
 

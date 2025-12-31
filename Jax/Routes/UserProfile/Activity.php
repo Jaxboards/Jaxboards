@@ -55,88 +55,21 @@ final readonly class Activity
                 'title' => $member->displayName . "'s recent activity",
             ],
         );
-        foreach ($this->fetchActivities($member->id) as [$activity, $affectedUser]) {
-            $parsed = $this->parseActivityRSS($activity, $member, $affectedUser);
+        foreach ($this->fetchActivities($member->id) as $entry) {
+            $parsed = $this->parseActivityRSS($entry->activity, $member, $entry->affectedUser);
             $rssFeed->additem(
                 [
                     'description' => $parsed['text'],
-                    'guid' => $activity->id,
+                    'guid' => $entry->activity->id,
                     'link' => $this->domainDefinitions->getBoardUrl()
                         . $this->textFormatting->blockhtml($parsed['link']),
-                    'pubDate' => $this->date->datetimeAsCarbon($activity->date)?->format('r') ?? '',
+                    'pubDate' => $this->date->datetimeAsCarbon($entry->activity->date)?->format('r') ?? '',
                     'title' => $parsed['text'],
                 ],
             );
         }
 
         $this->page->earlyFlush($rssFeed->publish());
-    }
-
-    private function parseActivity(
-        ModelsActivity $modelsActivity,
-        Member $member,
-        ?Member $affectedUser,
-    ): string {
-        $user = $this->template->render(
-            'user-link',
-            ['user' => [
-                'id' => $modelsActivity->uid,
-                'groupID' => $member->groupID,
-                'displayName' => $this->user->get()->id === $modelsActivity->uid ? 'You' : $member->displayName,
-            ]],
-        );
-        $otherguy = $affectedUser instanceof Member
-            ? $this->template->render('user-link', ['user' => $affectedUser])
-            : '';
-
-        $date = $modelsActivity->date
-            ? $this->date->smallDate($modelsActivity->date)
-            : '';
-
-        $urls = [
-            'new_post' => $this->router->url('topic', [
-                'id' => $modelsActivity->tid,
-                'slug' => $this->textFormatting->slugify($modelsActivity->arg1),
-                'findpost' => $modelsActivity->pid,
-            ]),
-            'new_topic' => $this->router->url('topic', [
-                'id' => $modelsActivity->tid,
-                'slug' => $this->textFormatting->slugify($modelsActivity->arg1),
-            ]),
-        ];
-
-        $text = match ($modelsActivity->type) {
-            'profile_comment' => "{$user}  commented on  {$otherguy}'s profile",
-            'new_post' => <<<HTML
-                {$user} posted in topic
-                <a href="{$urls['new_post']}">{$modelsActivity->arg1}</a>
-                {$date}
-                HTML,
-            'new_topic' => <<<HTML
-                {$user} created new topic
-                <a href="{$urls['new_topic']}">{$modelsActivity->arg1}</a>
-                {$date}
-                HTML,
-            'profile_name_change' => $this->template->render(
-                'user-link',
-                [
-                    'id' => $modelsActivity->uid,
-                    'groupID' => $member->groupID,
-                    'displayName' => $modelsActivity->arg1,
-                ],
-            ) . ' is now known as ' . $this->template->render(
-                'user-link',
-                [
-                    'id' => $modelsActivity->uid,
-                    'groupID' => $member->groupID,
-                    'displayName' => $modelsActivity->arg2,
-                ],
-            ) . ', ' . $date,
-            'buddy_add' => $user . ' made friends with ' . $otherguy,
-            default => '',
-        };
-
-        return "<div class=\"activity {$modelsActivity->type}\">{$text}</div>";
     }
 
     /**
@@ -185,24 +118,14 @@ final readonly class Activity
 
     private function renderActivitiesPage(Member $member): string
     {
-        $tabHTML = '';
-
-        foreach ($this->fetchActivities($member->id) as [$activity, $affectedUser]) {
-            $tabHTML .= $this->parseActivity($activity, $member, $affectedUser);
-        }
-
-        $rssButtonURL = $this->router->url('profile', ['id' => $member->id, 'page' => 'activity', 'fmt' => 'RSS']);
-
-        return $tabHTML !== ''
-            ? <<<HTML
-                <a href="{$rssButtonURL}" target="_blank" class="social" style='float:right'
-                >RSS</a>{$tabHTML}
-                HTML
-            : 'This user has yet to do anything noteworthy!';
+        return $this->template->render('userprofile/activities', [
+            'user' => $member,
+            'rows' => $this->fetchActivities($member->id),
+        ]);
     }
 
     /**
-     * @return array<array{ModelsActivity,?Member}>
+     * @return array<object{activity:ModelsActivity,affectedUser:?Member}>
      */
     private function fetchActivities(int $profileId): array
     {
@@ -222,9 +145,9 @@ final readonly class Activity
         );
 
         return array_map(
-            static fn(ModelsActivity $modelsActivity): array => [
-                $modelsActivity,
-                $members[$modelsActivity->affectedUser] ?? null,
+            static fn(ModelsActivity $modelsActivity): object => (object) [
+                'activity' => $modelsActivity,
+                'affectedUser' => $members[$modelsActivity->affectedUser] ?? null,
             ],
             $activities,
         );
