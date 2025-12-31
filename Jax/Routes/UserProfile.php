@@ -18,10 +18,8 @@ use Jax\Session;
 use Jax\Template;
 use Jax\User;
 
-use function array_keys;
 use function array_map;
 use function explode;
-use function implode;
 use function in_array;
 
 final readonly class UserProfile implements Route
