@@ -19,9 +19,9 @@
                     <div class="contact {{ service }}"><a href="{{ link.href }}">{{ link.username }}</a></div>
                 {% endfor %}
                 <div class="contact im">
-                    <a href="javascript:void(0)"
+                    <button
                         onclick="new IMWindow({{ member.id }},'{{ member.displayName }}')"
-                        >IM</a>
+                        >IM</button>
                 </div>
                 <div class="contact pm">
                     <a href="{{ url('inbox', { view: 'compose', mid: member.id }) }}">PM</a>

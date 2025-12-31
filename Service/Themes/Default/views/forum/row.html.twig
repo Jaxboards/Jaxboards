@@ -13,11 +13,12 @@
     <td class="topic">
         <a href="{{ url('topic', { id: topic.id, slug: topic.title|slugify }) }}" title="{{ topic.summary }}" data-use-tooltip="true">{{ topic.title|wordFilter }}</a>
         {% if isForumModerator %}
-        <a
-            href="{{ url('modcontrols', { do: 'modt', tid: topic.id }) }}"
-            class="moderate"
-            onclick="ModControls.togbutton(this)"
-        ></a>
+            <a
+                href="{{ url('modcontrols', { do: 'modt', tid: topic.id }) }}"
+                class="moderate"
+                onclick="ModControls.togbutton(this)"
+                title="Moderate this topic"
+            ></a>
         {% endif %}
         <br>
         {{ topic.subtitle|wordFilter }} {{ pages|raw }}

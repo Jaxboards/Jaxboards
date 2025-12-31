@@ -77,7 +77,7 @@ final readonly class OpenGraph
                     continue;
                 }
 
-                $metaValues[mb_substr((string) $property, 3)] = $metumTag->getAttribute('content');
+                $metaValues[str_replace(':', '__', mb_substr($property ?? '', 3))] = $metumTag->getAttribute('content');
             }
 
             libxml_clear_errors();
