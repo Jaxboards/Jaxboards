@@ -16,7 +16,6 @@ use Jax\Models\Member;
 use Jax\Models\Stats;
 use Jax\Page;
 use Jax\Request;
-use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 use Jax\User;
