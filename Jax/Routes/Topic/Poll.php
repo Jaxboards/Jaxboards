@@ -12,7 +12,6 @@ use Jax\User;
 
 use function array_filter;
 use function array_key_exists;
-use function array_keys;
 use function array_map;
 use function count;
 use function explode;
@@ -21,7 +20,6 @@ use function in_array;
 use function is_array;
 use function is_numeric;
 use function json_decode;
-use function round;
 
 use const JSON_THROW_ON_ERROR;
 
