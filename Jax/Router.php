@@ -34,6 +34,7 @@ use function array_key_exists;
 use function header;
 use function http_build_query;
 use function in_array;
+use function ksort;
 use function preg_match;
 use function preg_replace;
 use function preg_replace_callback;
