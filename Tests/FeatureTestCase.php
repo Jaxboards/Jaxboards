@@ -108,6 +108,14 @@ abstract class FeatureTestCase extends TestCase
                     $member->groupID = Groups::Member->value;
 
                     break;
+
+                case 'banned':
+                    $member->id = 4;
+                    $member->name = 'Banned';
+                    $member->displayName = 'Banned';
+                    $member->groupID = Groups::Banned->value;
+
+                    break;
             }
 
             foreach ($memberOverrides as $property => $value) {

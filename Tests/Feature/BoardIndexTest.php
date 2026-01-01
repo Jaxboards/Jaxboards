@@ -123,4 +123,32 @@ final class BoardIndexTest extends FeatureTestCase
 
         DOMAssert::assertSelectCount('#debug', 1, $page);
     }
+
+    public function testViewForumIndexAsBannedGroup(): void
+    {
+        $this->actingAs('banned');
+
+        $page = $this->go('/');
+
+        DOMAssert::assertSelectRegExp('.error', "/You don't have permission to view the board./", 1, $page);
+    }
+
+
+    public function testViewForumIndexAsBannedIP(): void
+    {
+        // This test is a little weird.
+        // We have to set the request up (to mock out the IP) before anything else gets initialized
+        $request = new Request(
+            get: ['path' => '/'],
+            server: ['REMOTE_ADDR' => '1.2.3.4'],
+        );
+        $this->container->set(Request::class, $request);
+
+        $this->actingAs('guest');
+        $this->container->get(IPAddress::class)->ban('1.2.3.4');
+
+        $page = $this->go($request);
+
+        DOMAssert::assertSelectRegExp('.error', "/You don't have permission to view the board./", 1, $page);
+    }
 }

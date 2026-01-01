@@ -90,8 +90,7 @@ final class UserTest extends UnitTestCase
                 'disposeresult',
                 'select',
             ])
-            ->getMock()
-        ;
+            ->getMock();
 
         $database->expects(self::never())
             ->method('select')
@@ -148,8 +147,7 @@ final class UserTest extends UnitTestCase
                 'disposeresult',
                 'select',
             ])
-            ->getMock()
-        ;
+            ->getMock();
 
         $database->expects(self::never())
             ->method('select')
@@ -188,7 +186,6 @@ final class UserTest extends UnitTestCase
 
     public function testGetForumPermissionAsBanned(): void
     {
-        // banned? where are these defined? these should be constants or an enum
         $database = self::getMockBuilder(Database::class)
             ->disableOriginalConstructor()
             ->onlyMethods([
@@ -196,8 +193,7 @@ final class UserTest extends UnitTestCase
                 'disposeresult',
                 'select',
             ])
-            ->getMock()
-        ;
+            ->getMock();
 
         $database->expects(self::never())
             ->method('select')
