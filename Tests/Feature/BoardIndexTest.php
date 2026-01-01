@@ -133,7 +133,6 @@ final class BoardIndexTest extends FeatureTestCase
         DOMAssert::assertSelectRegExp('.error', "/You don't have permission to view the board./", 1, $page);
     }
 
-
     public function testViewForumIndexAsBannedIP(): void
     {
         // This test is a little weird.

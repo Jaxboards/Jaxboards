@@ -90,7 +90,8 @@ final class UserTest extends UnitTestCase
                 'disposeresult',
                 'select',
             ])
-            ->getMock();
+            ->getMock()
+        ;
 
         $database->expects(self::never())
             ->method('select')
@@ -147,7 +148,8 @@ final class UserTest extends UnitTestCase
                 'disposeresult',
                 'select',
             ])
-            ->getMock();
+            ->getMock()
+        ;
 
         $database->expects(self::never())
             ->method('select')
@@ -193,7 +195,8 @@ final class UserTest extends UnitTestCase
                 'disposeresult',
                 'select',
             ])
-            ->getMock();
+            ->getMock()
+        ;
 
         $database->expects(self::never())
             ->method('select')
