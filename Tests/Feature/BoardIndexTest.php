@@ -29,6 +29,7 @@ use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
 use Jax\Routes\BoardIndex;
+use Jax\Routes\BoardOffline;
 use Jax\ServiceConfig;
 use Jax\Session;
 use Jax\Template;
@@ -48,6 +49,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(FileSystem::class)]
 #[CoversClass(BBCode::class)]
 #[CoversClass(BotDetector::class)]
+#[CoversClass(BoardOffline::class)]
 #[CoversClass(Column::class)]
 #[CoversClass(Config::class)]
 #[CoversClass(Database::class)]
