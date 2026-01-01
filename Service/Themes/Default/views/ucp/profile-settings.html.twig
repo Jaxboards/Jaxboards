@@ -23,124 +23,127 @@
         </label>
         <input type="text" name="usertitle" title="User Title" id="usertitle" value="{{ user.usertitle }}">
     </div>
-    <h2>About you:</h2>
-    <div class="description">
-        <textarea rows="10" cols="60" name="about" title="About You" id="about" class="bbcode-editor">{{ user.about }}</textarea>
-        <h2>Location</h2>
-        <input type="text" name="location" title="Location" value="{{ user.location }}">
-        <h2>Gender</h2>
-        <select name="gender" title="Your gender" aria-label="Gender">
-            <option>Not Telling</option>
-            {% for gender in ['male', 'female', 'other'] %}
-                <option
-                    value="{{ gender }}"
-                    {% if user.gender == gender %}selected{% endif %}
-                >{{ gender|capitalize }}</option>
-            {% endfor %}
-        </select>
 
-        <h2>Date of Birth:</h2>
-        {% set year = "now"|date("Y") %}
-        <select name="dob_month" title="Month">
-            <option value="">--</option>
-            {% for month in 1..12 %}
-                {% set option = month ~ '/1/' ~ year %}
-                <option
-                    value="{{ month }}"
-                    {% if month == birthdate.month %}selected{% endif %}
-                >{{ option|date('F') }}</option>
-            {% endfor %}
-        </select>
-        <select name="dob_day" title="Day">
-            <option value="">--</option>
-            {% for day in 1..31 %}
-                <option
-                    value="{{ day }}"
-                    {% if day == birthdate.day %}selected{% endif %}
-                >{{ day }}</option>
-            {% endfor %}
-        </select>
-        <select name="dob_year" title="Day">
-            <option value="">--</option>
-            {% for yearOption in year..(year-100) %}
-                <option
-                    value="{{ yearOption }}"
-                    {% if yearOption == birthdate.year %}selected{% endif %}
-                >{{ yearOption }}</option>
-            {% endfor %}
-        </select>
+    <h2><label for="about">About you:</label></h2>
+    <textarea rows="10" cols="60" name="about" id="about" title="About You" class="bbcode-editor">{{ user.about }}</textarea>
 
-        {{ dobSelect|raw }}
-        <h2>Contact Details (Optional)</h2>
-        <div id="contact_details">
-            <div class="contact skype">
-                <label for="contactSkype">
-                    Skype:
-                </label>
-                <input type="text" name="contactSkype" id="contactSkype" value="{{ user.contactSkype }}">
-            </div>
-            <div class="contact discord">
-                <label for="contactDiscord">
-                    Discord ID:
-                </label>
-                <input type="text" name="contactDiscord" id="contactDiscord" value="{{ user.contactDiscord }}">
-            </div>
-            <div class="contact yim">
-                <label for="contactYIM">
-                    YIM:
-                </label>
-                <input type="text" name="contactYIM" id="contactYIM" value="{{ user.contactYIM }}">
-            </div>
-            <div class="contact msn">
-                <label for="contactMSN">
-                    MSN:
-                </label>
-                <input type="text" name="contactMSN" id="contactMSN" value="{{ user.contactMSN }}">
-            </div>
-            <div class="contact gtalk">
-                <label for="contactGoogleChat">
-                    Google Chat:
-                </label>
-                <input type="text" name="contactGoogleChat" id="contactGoogleChat" value="{{ user.contactGoogleChat }}">
-            </div>
-            <div class="contact aim">
-                <label for="contactAIM">
-                    AIM:
-                </label>
-                <input type="text" name="contactAIM" id="contactAIM" value="{{ user.contactAIM }}">
-            </div>
-            <div class="contact youtube">
-                <label for="contactYoutube">
-                    YouTube:
-                </label>
-                <input type="text" name="contactYoutube" id="contactYoutube" value="{{ user.contactYoutube }}">
-            </div>
-            <div class="contact steam">
-                <label for="contactSteam">
-                    Steam:
-                </label>
-                <input type="text" name="contactSteam" id="contactSteam" value="{{ user.contactSteam }}">
-            </div>
-            <div class="contact twitter">
-                <label for="contactTwitter">
-                    Twitter:
-                </label>
-                <input type="text" name="contactTwitter" id="contactTwitter" value="{{ user.contactTwitter }}">
-            </div>
-            <div class="contact bluesky">
-                <label for="contactBlueSky">
-                    Bluesky:
-                </label>
-                <input type="text" name="contactBlueSky" id="contactBlueSky" value="{{ user.contactBlueSky }}">
-            </div>
-        </div>
-        <h2>Website</h2>
-        <label for="website">
-            Your website:
+    <h2><label for="location">Location</label></h2>
+    <input type="text" name="location" id="location" title="Location" value="{{ user.location }}">
+
+    <h2><label for="gender">Gender</label></h2>
+    <select name="gender" id="gender" title="Your gender">
+        <option>Not Telling</option>
+        {% for gender in ['male', 'female', 'other'] %}
+            <option
+                value="{{ gender }}"
+                {% if user.gender == gender %}selected{% endif %}
+            >{{ gender|capitalize }}</option>
+        {% endfor %}
+    </select>
+
+    <h2><label for="dob_month">Birthday</label></h2>
+    {% set year = "now"|date("Y") %}
+    <select name="dob_month" id="dob_month" title="Month">
+        <option value="">--</option>
+        {% for month in 1..12 %}
+            {% set option = month ~ '/1/' ~ year %}
+            <option
+                value="{{ month }}"
+                {% if month == birthdate.month %}selected{% endif %}
+            >{{ option|date('F') }}</option>
+        {% endfor %}
+    </select>
+    <select name="dob_day" title="Day">
+        <option value="">--</option>
+        {% for day in 1..31 %}
+            <option
+                value="{{ day }}"
+                {% if day == birthdate.day %}selected{% endif %}
+            >{{ day }}</option>
+        {% endfor %}
+    </select>
+    <select name="dob_year" title="Day">
+        <option value="">--</option>
+        {% for yearOption in year..(year-100) %}
+            <option
+                value="{{ yearOption }}"
+                {% if yearOption == birthdate.year %}selected{% endif %}
+            >{{ yearOption }}</option>
+        {% endfor %}
+    </select>
+
+    {{ dobSelect|raw }}
+    <h2>Contact Details (Optional)</h2>
+    <div id="contact_details">
+    <div class="contact skype">
+        <label for="contactSkype">
+            Skype:
         </label>
-        <input type="text" name="website" id="website" value="{{ user.website }}">
+        <input type="text" name="contactSkype" id="contactSkype" value="{{ user.contactSkype }}">
     </div>
-    <div>
-        <input name="submit" type="submit" value="Save Profile Settings">
+    <div class="contact discord">
+        <label for="contactDiscord">
+            Discord ID:
+        </label>
+        <input type="text" name="contactDiscord" id="contactDiscord" value="{{ user.contactDiscord }}">
     </div>
+    <div class="contact yim">
+        <label for="contactYIM">
+            YIM:
+        </label>
+        <input type="text" name="contactYIM" id="contactYIM" value="{{ user.contactYIM }}">
+    </div>
+    <div class="contact msn">
+        <label for="contactMSN">
+            MSN:
+        </label>
+        <input type="text" name="contactMSN" id="contactMSN" value="{{ user.contactMSN }}">
+    </div>
+    <div class="contact gtalk">
+        <label for="contactGoogleChat">
+            Google Chat:
+        </label>
+        <input type="text" name="contactGoogleChat" id="contactGoogleChat" value="{{ user.contactGoogleChat }}">
+    </div>
+    <div class="contact aim">
+        <label for="contactAIM">
+            AIM:
+        </label>
+        <input type="text" name="contactAIM" id="contactAIM" value="{{ user.contactAIM }}">
+    </div>
+    <div class="contact youtube">
+        <label for="contactYoutube">
+            YouTube:
+        </label>
+        <input type="text" name="contactYoutube" id="contactYoutube" value="{{ user.contactYoutube }}">
+    </div>
+    <div class="contact steam">
+        <label for="contactSteam">
+            Steam:
+        </label>
+        <input type="text" name="contactSteam" id="contactSteam" value="{{ user.contactSteam }}">
+    </div>
+    <div class="contact twitter">
+        <label for="contactTwitter">
+            Twitter:
+        </label>
+        <input type="text" name="contactTwitter" id="contactTwitter" value="{{ user.contactTwitter }}">
+    </div>
+    <div class="contact bluesky">
+        <label for="contactBlueSky">
+            Bluesky:
+        </label>
+        <input type="text" name="contactBlueSky" id="contactBlueSky" value="{{ user.contactBlueSky }}">
+    </div>
+
+    <h2>Website</h2>
+    <label for="website">
+        Your website:
+    </label>
+
+    <input type="text" name="website" id="website" value="{{ user.website }}">
+    <br>
+    <br>
+
+    <input name="submit" type="submit" value="Save Profile Settings">
 </form>
