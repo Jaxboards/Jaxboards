@@ -66,7 +66,6 @@ final class BBCode
     public function __construct(
         private readonly DomainDefinitions $domainDefinitions,
         private readonly FileSystem $fileSystem,
-        private readonly Router $router,
         private readonly Template $template,
     ) {}
 
