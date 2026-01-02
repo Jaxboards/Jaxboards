@@ -2,7 +2,7 @@
     <a href="{{ url }}">
         <h4>{{ site_name }} - {{ title }}</h4>
     </a>
-    <p>{{ description }}</p>
+    <p>{{ description|nl2br }}</p>
     {% if image %}
         <a href="{{ url }}"><img src="{{ image }}" alt="{{ image__alt }}"></a>
     {% endif %}
