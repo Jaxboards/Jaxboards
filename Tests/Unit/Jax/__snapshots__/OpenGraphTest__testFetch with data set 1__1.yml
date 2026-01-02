@@ -1,0 +1,20 @@
+image: 'https://opengraph.githubassets.com/9e42864e715305b7fb43886e68810c7fa1ad5b45a971b6de80b1605b1983951b/Jaxboards/Jaxboards/releases/tag/3.0'
+image__alt: |-
+    What's Changed
+                New bots added to BotDetector (thanks @VinnyVideo )
+                OpenGraph post embeddings (link unrolling) for posts
+                Guest session view for moderators in ModCP
+                GeoIP information is back, modera...
+image__width: '1200'
+image__height: '600'
+site_name: GitHub
+type: object
+title: 'Release 3.0 · Jaxboards/Jaxboards'
+url: 'https://github.com/Jaxboards/Jaxboards/releases/tag/3.0'
+description: |-
+    What's Changed
+
+                New bots added to BotDetector (thanks @VinnyVideo )
+                OpenGraph post embeddings (link unrolling) for posts
+                Guest session view for moderators in ModCP
+                GeoIP information is back, modera...

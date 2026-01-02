@@ -83,6 +83,11 @@ final readonly class OpenGraph
 
             libxml_clear_errors();
 
+            // Use fetch URL for malformed or missing og:url
+            if (!array_key_exists('url', $metaValues) || $this->filterHTTPURL($metaValues['url']) === null) {
+                $metaValues['url'] = $url;
+            }
+
             return $metaValues;
         } catch (Exception) {
             return [];
