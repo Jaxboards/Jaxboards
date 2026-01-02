@@ -9,6 +9,7 @@ use DOMDocument;
 use Exception;
 
 use function array_filter;
+use function array_key_exists;
 use function array_slice;
 use function class_exists;
 use function filter_var;
@@ -84,7 +85,10 @@ final readonly class OpenGraph
             libxml_clear_errors();
 
             // Use fetch URL for malformed or missing og:url
-            if (!array_key_exists('url', $metaValues) || $this->filterHTTPURL($metaValues['url']) === null) {
+            if (
+                !array_key_exists('url', $metaValues)
+                || $this->filterHTTPURL($metaValues['url']) === null
+            ) {
                 $metaValues['url'] = $url;
             }
 
