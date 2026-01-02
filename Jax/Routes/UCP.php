@@ -290,6 +290,7 @@ final readonly class UCP implements Route
         }
 
         $this->user->set('avatar', $newAvatar);
+
         return null;
     }
 
