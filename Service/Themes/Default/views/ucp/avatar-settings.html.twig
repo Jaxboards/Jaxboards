@@ -1,0 +1,14 @@
+Your avatar:
+<br>
+<span class="avatar">
+    {% include "avatar.html.twig" with { avatar: user.avatar }  %}
+</span>
+<br><br>
+<form data-ajax-form="true" method="post">
+    {% if error %}
+        {% include "error.html.twig" with { message: error } %}
+    {% endif %}
+
+    <input type="text" name="changedava" title="Your avatar" value="{{ user.avatar }}">
+    <input type="submit" value="Edit">
+</form>

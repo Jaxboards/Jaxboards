@@ -280,36 +280,31 @@ final readonly class UCP implements Route
         );
     }
 
+    private function saveAvatarSettings(string $newAvatar): ?string
+    {
+        if (
+            $newAvatar
+            && !filter_var($newAvatar, FILTER_VALIDATE_URL)
+        ) {
+            return 'Please enter a valid image URL.';
+        }
+
+        $this->user->set('avatar', $newAvatar);
+        return null;
+    }
+
     private function showAvatarSettings(): string
     {
         $error = null;
-        $avatar = $this->user->get()->avatar;
         $changedAvatar = $this->request->asString->post('changedava');
         if ($changedAvatar !== null) {
-            if (
-                $changedAvatar
-                && !filter_var($changedAvatar, FILTER_VALIDATE_URL)
-            ) {
-                $error = 'Please enter a valid image URL.';
-            } else {
-                $avatar = $changedAvatar;
-                $this->user->set('avatar', $avatar);
-            }
+            $error = $this->saveAvatarSettings($changedAvatar);
         }
 
-        $avatarURL = $avatar ?: trim($this->template->render('default-avatar'));
-        $errorDisplay = $error !== null ? $this->page->error($error) : '';
-        $avatarInputValue = $this->textFormatting->blockhtml($avatar);
-
-        return <<<HTML
-            Your avatar: <span class="avatar"><img src="{$avatarURL}" alt="Your avatar"></span>
-            <br><br>
-            <form data-ajax-form="true" method="post">
-                {$errorDisplay}
-                <input type="text" name="changedava" title="Your avatar" value="{$avatarInputValue}">
-                <input type="submit" value="Edit">
-            </form>
-            HTML;
+        return $this->template->render('ucp/avatar-settings', [
+            'error' => $error,
+            'user' => $this->user->get(),
+        ]);
     }
 
     /**
