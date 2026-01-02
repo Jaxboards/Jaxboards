@@ -1,4 +1,5 @@
 title: 'Dick Van Dyke is turning 100. Here’s what he’s been up to lately'
+description: description
 type: website
 url: 'https://ogp.me/'
 image: 'https://ogp.me/logo.png'
@@ -6,4 +7,3 @@ image__type: image/png
 image__width: '300'
 image__height: '300'
 image__alt: 'The Open Graph logo'
-description: description
