@@ -1,0 +1,7 @@
+{% for categoryHTML in categories %}
+    {{ categoryHTML|raw }}
+{% endfor %}
+
+{% include "idx/tools.html.twig" %}
+
+{{ boardStats|raw }}

@@ -65,18 +65,19 @@ final class BoardIndex implements Route
 
     public function route($params): void
     {
-        if ($this->request->both('markread') !== null) {
-            $this->page->command('softurl');
-            $this->session->set('forumsread', '{}');
-            $this->session->set('topicsread', '{}');
-            $this->session->set('readDate', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
-        }
+        match (true) {
+            $this->request->both('markread') !== null => $this->markEverythingRead(),
+            $this->request->isJSUpdate() => $this->update(),
+            default => $this->viewBoardIndex(),
+        };
+    }
 
-        if ($this->request->isJSUpdate()) {
-            $this->update();
-        } else {
-            $this->viewBoardIndex();
-        }
+    private function markEverythingRead(): void
+    {
+        $this->page->command('softurl');
+        $this->session->set('forumsread', '{}');
+        $this->session->set('topicsread', '{}');
+        $this->session->set('readDate', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
     }
 
     /**
@@ -84,7 +85,7 @@ final class BoardIndex implements Route
      *
      * @return array<Forum>
      */
-    private function fetchIDXForums(): array
+    private function fetchIndexForums(): array
     {
         $forums = Forum::selectMany(<<<'SQL'
                 WHERE `path` = ""
@@ -113,33 +114,45 @@ final class BoardIndex implements Route
     private function viewBoardIndex(): void
     {
         $this->session->set('locationVerbose', 'Viewing board index');
-        $page = '';
 
-        $forums = $this->fetchIDXForums();
+        $forums = $this->fetchIndexForums();
         $lastPostMembers = $this->fetchLastPostMembers($forums);
         $forumsByCatID = groupBy($forums, static fn(Forum $forum): ?int => $forum->category);
 
         $this->setModsFromForums($forums);
 
         $categories = Category::selectMany('ORDER BY `order`,`title` ASC');
+        $categoryHTML = [];
         foreach ($categories as $category) {
             if (!array_key_exists($category->id, $forumsByCatID)) {
                 continue;
             }
 
-            $page .= $this->page->collapseBox(
+            $categoryHTML[] = $this->page->collapseBox(
                 $category->title,
-                $this->buildTable(
-                    $forumsByCatID[$category->id],
-                    $lastPostMembers,
-                ),
+                $this->template->render('idx/table', [
+                    'rows' => array_map(
+                        fn(Forum $forum): array => [
+                            'forum' => $forum,
+                            'lastPostHTML' => $this->formatLastPost(
+                                $forum,
+                                $lastPostMembers[$forum->lastPostUser] ?? null,
+                            ),
+                            'isRead' => $this->isForumRead($forum),
+                            'mods' => $this->getMods($forum->mods),
+                        ],
+                        $forumsByCatID[$category->id],
+                    ),
+                ]),
                 'cat_' . $category->id,
             );
         }
 
-        $page .= $this->template->render('idx/tools');
-
-        $page .= $this->getBoardStats();
+        $page = $this->template->render('idx/index', [
+            'categories' => $categoryHTML,
+            'forumsByCatID' => $forumsByCatID,
+            'boardStats' => $this->getBoardStats(),
+        ]);
 
         if ($this->request->isJSNewLocation()) {
             $this->page->command('update', 'page', $page);
@@ -194,28 +207,6 @@ final class BoardIndex implements Route
         }
 
         return $returnedMods;
-    }
-
-    /**
-     * @param array<Forum>  $forums
-     * @param array<Member> $lastPostMembers
-     */
-    private function buildTable(array $forums, array $lastPostMembers): string
-    {
-        return $this->template->render('idx/table', [
-            'rows' => array_map(
-                fn(Forum $forum): array => [
-                    'forum' => $forum,
-                    'lastPostHTML' => $this->formatLastPost(
-                        $forum,
-                        $lastPostMembers[$forum->lastPostUser] ?? null,
-                    ),
-                    'isRead' => $this->isForumRead($forum),
-                    'mods' => $this->getMods($forum->mods),
-                ],
-                $forums,
-            ),
-        ]);
     }
 
     private function update(): void
@@ -307,7 +298,7 @@ final class BoardIndex implements Route
     private function updateLastPosts(): void
     {
         $unreadForums = array_filter(
-            $this->fetchIDXForums(),
+            $this->fetchIndexForums(),
             fn(Forum $forum): bool => !$this->isForumRead($forum),
         );
 
