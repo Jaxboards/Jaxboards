@@ -28,11 +28,13 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function array_filter;
+use function array_key_exists;
 use function count;
 use function explode;
 use function filesize;
 use function hash_file;
 use function in_array;
+use function json_decode;
 use function json_encode;
 use function mb_strlen;
 use function mb_substr;
@@ -326,9 +328,8 @@ final class Post implements Route
         };
     }
 
-    private function updatePost(
-        ModelsPost $modelsPost,
-    ) {
+    private function updatePost(ModelsPost $modelsPost): void
+    {
         $modelsPost->editby = $this->user->get()->id;
         $modelsPost->editDate = $this->database->datetime();
         $modelsPost->update();
@@ -400,13 +401,14 @@ final class Post implements Route
             $openGraphMetadata = json_decode(
                 $post->openGraphMetadata,
                 true,
-                flags: JSON_THROW_ON_ERROR
+                flags: JSON_THROW_ON_ERROR,
             );
             if (array_key_exists($removeEmbed, $openGraphMetadata)) {
                 unset($openGraphMetadata[$removeEmbed]);
                 $post->openGraphMetadata = json_encode($openGraphMetadata, JSON_THROW_ON_ERROR);
                 $this->updatePost($post);
             }
+
             return null;
         }
 
