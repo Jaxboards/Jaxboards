@@ -156,15 +156,9 @@ final class BoardIndex implements Route
     private function setModsFromForums(array $forums): void
     {
         $modIDs = [];
-        foreach ($forums as $forum) {
-            if (!$forum->showLedBy) {
-                continue;
-            }
+        $forumsWithMods = array_filter($forums, fn($forum) => $forum->showLedBy && $forum->mods !== '');
 
-            if (!$forum->mods) {
-                continue;
-            }
-
+        foreach ($forumsWithMods as $forum) {
             foreach (explode(',', $forum->mods) as $modId) {
                 if ($modId === '') {
                     continue;
@@ -242,20 +236,23 @@ final class BoardIndex implements Route
             : null;
 
         $usersOnline = $this->usersOnline->getUsersOnline();
-        $usersOnlineCount = count(array_filter($usersOnline, static fn(UserOnline $userOnline): bool => !$userOnline->isBot));
+        $usersOnlineCount = count(array_filter(
+            $usersOnline,
+            static fn(UserOnline $userOnline): bool => !$userOnline->isBot
+        ));
         $legendGroups = Group::selectMany('WHERE `legend`=1 ORDER BY `title`');
 
         return $this->template->render(
             'idx/stats',
             [
+                'canModerate' => $this->user->getGroup()?->canModerate,
+                'guestCount' => $this->usersOnline->getGuestCount(),
+                'lastRegisteredMember' => $lastRegisteredMember,
+                'legend' => $legendGroups,
+                'stats' => $stats,
                 'usersOnline' => $usersOnline,
                 'usersOnlineCount' => $usersOnlineCount,
                 'usersOnlineToday' => $this->usersOnline->getUsersOnlineToday(),
-                'guestCount' => $this->usersOnline->getGuestCount(),
-                'canModerate' => $this->user->getGroup()?->canModerate,
-                'stats' => $stats,
-                'lastRegisteredMember' => $lastRegisteredMember,
-                'legend' => $legendGroups,
             ],
         );
     }
@@ -317,26 +314,27 @@ final class BoardIndex implements Route
         $lastPostMembers = $this->fetchLastPostMembers($unreadForums);
 
         foreach ($unreadForums as $unreadForum) {
-            $this->page->command('addclass', '#fid_' . $unreadForum->id, 'unread');
+            $forumSelector = "#fid_{$unreadForum->id}";
+            $this->page->command('addclass', $forumSelector, 'unread');
             $this->page->command(
                 'update',
-                '#fid_' . $unreadForum->id . '_icon',
+                "{$forumSelector}_icon",
                 $this->template->render('idx/icon-unread', ['forum' => $unreadForum]),
             );
             $this->page->command(
                 'update',
-                '#fid_' . $unreadForum->id . '_lastpost',
+                "{$forumSelector}_lastpost",
                 $this->formatLastPost($unreadForum, $lastPostMembers[$unreadForum->lastPostUser] ?? null),
                 '1',
             );
             $this->page->command(
                 'update',
-                '#fid_' . $unreadForum->id . '_topics',
+                "{$forumSelector}_topics",
                 $this->template->render('idx/topics-count', ['count' => $unreadForum->topics]),
             );
             $this->page->command(
                 'update',
-                '#fid_' . $unreadForum->id . '_replies',
+                "{$forumSelector}_replies",
                 $this->template->render('idx/replies-count', ['count' => $unreadForum->posts]),
             );
         }
