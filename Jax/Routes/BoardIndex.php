@@ -156,10 +156,10 @@ final class BoardIndex implements Route
     private function setModsFromForums(array $forums): void
     {
         $modIDs = [];
-        $forumsWithMods = array_filter($forums, fn($forum) => $forum->showLedBy && $forum->mods !== '');
+        $forumsWithMods = array_filter($forums, static fn(Forum $forum): bool => $forum->showLedBy && $forum->mods !== '');
 
-        foreach ($forumsWithMods as $forum) {
-            foreach (explode(',', $forum->mods) as $modId) {
+        foreach ($forumsWithMods as $forumWithMod) {
+            foreach (explode(',', $forumWithMod->mods) as $modId) {
                 if ($modId === '') {
                     continue;
                 }
@@ -238,7 +238,7 @@ final class BoardIndex implements Route
         $usersOnline = $this->usersOnline->getUsersOnline();
         $usersOnlineCount = count(array_filter(
             $usersOnline,
-            static fn(UserOnline $userOnline): bool => !$userOnline->isBot
+            static fn(UserOnline $userOnline): bool => !$userOnline->isBot,
         ));
         $legendGroups = Group::selectMany('WHERE `legend`=1 ORDER BY `title`');
 
