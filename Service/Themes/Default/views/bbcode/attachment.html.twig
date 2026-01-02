@@ -1,0 +1,14 @@
+{%- if isImage -%}
+    <a href="{{ attachmentURL }}" target="_blank">
+        <img src="{{ attachmentURL }}" alt="attachment" class="bbcodeimg">
+    </a>
+{%- else -%}
+    <div class="attachment">
+        <a
+            href='{{ url('download', { id: file.id, name: file.name }) }}'
+            class='name'
+            target="_blank"
+        >{{ file.name }}</a>
+        Downloads: {{ file.downloads }}
+    </div>
+{%- endif -%}

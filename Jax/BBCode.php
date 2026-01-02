@@ -67,6 +67,7 @@ final class BBCode
         private readonly DomainDefinitions $domainDefinitions,
         private readonly FileSystem $fileSystem,
         private readonly Router $router,
+        private readonly Template $template,
     ) {}
 
     /**
@@ -179,31 +180,11 @@ final class BBCode
 
         $ext = $this->fileSystem->getFileInfo($file->name)->getExtension();
 
-        if (
-            !in_array($ext, Jax::IMAGE_EXTENSIONS, true)
-        ) {
-            $ext = null;
-        }
-
-        if ($ext !== null) {
-            $attachmentURL = $this->domainDefinitions->getBoardPathUrl() . '/Uploads/' . $file->hash . '.' . $ext;
-
-            return "<a href='{$attachmentURL}'>"
-                . "<img src='{$attachmentURL}' alt='attachment' class='bbcodeimg'>"
-                . '</a>';
-        }
-
-        $downloadURL = $this->router->url('download', [
-            'id' => $file->id,
-            'name' => $file->name,
+        return $this->template->render('bbcode/attachment', [
+            'attachmentURL' => $this->domainDefinitions->getBoardPathUrl() . '/Uploads/' . $file->hash . '.' . $ext,
+            'file' => $file,
+            'isImage' => in_array($ext, Jax::IMAGE_EXTENSIONS, true),
         ]);
-
-        return <<<ATTACHMENT_HTML
-            <div class="attachment">
-                <a href='{$downloadURL}' class='name'>{$file->name}</a>
-                Downloads: {$file->downloads}
-            </div>
-            ATTACHMENT_HTML;
     }
 
     /**
@@ -291,42 +272,11 @@ final class BBCode
 
     private function youtubeEmbedHTML(
         string $link,
-        string $embedUrl,
+        string $embedURL,
     ): string {
-        $allow = 'accelerometer; autoplay; clipboard-write; encrypted-media;'
-            . ' gyroscope; picture-in-picture; web-share';
-
-        // do NOT replace this with <<<HTML, sonarqube thinks it's an HTML tag and it's bitten me twice
-        return <<<DOC
-            <div class="media youtube">
-                <div class="summary">
-                    Watch Youtube Video:
-                    <a href="{$link}">
-                        {$link}
-                    </a>
-                </div>
-                <div class="open">
-                    <a href="{$link}" class="popout">
-                        Popout
-                    </a>
-                    &middot;
-                    <a href="{$link}" class="inline">
-                        Inline
-                    </a>
-                </div>
-                <div class="movie" style="display:none">
-                    <iframe
-                        allow="{$allow}"
-                        allowfullscreen="allowfullscreen"
-                        frameborder="0"
-                        height="315"
-                        referrerpolicy="strict-origin-when-cross-origin"
-                        src="{$embedUrl}"
-                        title="YouTube video player"
-                        width="560"
-                        ></iframe>
-                </div>
-            </div>
-            DOC;
+        return $this->template->render('bbcode/youtube-embed', [
+            'link' => $link,
+            'embedURL' => $embedURL,
+        ]);
     }
 }

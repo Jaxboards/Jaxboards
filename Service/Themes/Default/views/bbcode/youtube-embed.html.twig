@@ -1,0 +1,32 @@
+<div class="media youtube">
+    <div class="summary">
+        Watch Youtube Video:
+        <a href="{{ link }}">
+            {{ link }}
+        </a>
+    </div>
+    <div class="open">
+        <a href="{{ link }}" class="popout">
+            Popout
+        </a>
+        &middot;
+        <a href="{{ link }}" class="inline">
+            Inline
+        </a>
+    </div>
+    <div class="movie" style="display:none">
+        <iframe allow="accelerometer;
+            autoplay;
+            clipboard-write;
+            encrypted-media;
+            gyroscope;
+            picture-in-picture;
+            web-share"
+            allowfullscreen="allowfullscreen"
+            frameborder="0"
+            height="315"
+            referrerpolicy="strict-origin-when-cross-origin"
+            src="{{ embedURL }}" title="YouTube video player"
+            width="560"></iframe>
+    </div>
+</div>
