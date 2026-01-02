@@ -22,6 +22,7 @@ use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
 use Jax\ServiceConfig;
+use Jax\Template;
 use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
@@ -49,6 +50,7 @@ use function DI\autowire;
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
 #[CoversClass(Model::class)]
+#[CoversClass(Template::class)]
 #[CoversClass(TextRules::class)]
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]

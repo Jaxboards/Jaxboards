@@ -14,6 +14,7 @@ use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
 use Jax\ServiceConfig;
+use Jax\Template;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Small;
@@ -36,6 +37,7 @@ use const PHP_EOL;
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(ServiceConfig::class)]
+#[CoversClass(Template::class)]
 #[Small]
 final class BBCodeTest extends UnitTestCase
 {
