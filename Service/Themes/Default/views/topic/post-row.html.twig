@@ -55,7 +55,7 @@
                 {{ post.post|theWorks }}
                 {% if openGraphData %}
                     {% for url,openGraph in openGraphData %}
-                        {% include "topic/post-opengraph.html.twig" with openGraph %}
+                        {% include "topic/post-opengraph.html.twig" with {...openGraph, canEdit, post, source: url } %}
                     {% endfor %}
                 {% endif %}
                 {% if editor %}

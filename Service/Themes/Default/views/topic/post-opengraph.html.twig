@@ -1,4 +1,7 @@
 <aside class="opengraph">
+    {% if canEdit %}
+        <a href="{{ url('post', { how: 'edit', pid: post.id, removeEmbed: source }) }}" title="Remove this embed">[X]</a>
+    {% endif %}
     <a href="{{ url }}" target="_blank">
         <h4>{{ site_name }} - {{ title }}</h4>
     </a>

@@ -328,26 +328,17 @@ final class Post implements Route
 
     private function updatePost(
         ModelsPost $modelsPost,
-        ?string $postData,
-    ): ?string {
-        $error = $this->validatePost($postData);
-        if ($error) {
-            return $error;
-        }
-
+    ) {
         $modelsPost->editby = $this->user->get()->id;
         $modelsPost->editDate = $this->database->datetime();
-        $modelsPost->post = $this->postData ?? '';
         $modelsPost->update();
 
         $this->page->command(
             'update',
             "#pid_{$modelsPost->id} .post_content",
-            $this->textFormatting->theWorks($this->postData ?? ''),
+            $this->textFormatting->theWorks($modelsPost->post ?? ''),
         );
         $this->page->command('softurl');
-
-        return null;
     }
 
     private function updateTopic(Topic $topic): ?string
@@ -404,10 +395,32 @@ final class Post implements Route
             return "You don't have permission to edit that post!";
         }
 
+        $removeEmbed = $this->request->both('removeEmbed');
+        if ($removeEmbed !== null) {
+            $openGraphMetadata = json_decode(
+                $post->openGraphMetadata,
+                true,
+                flags: JSON_THROW_ON_ERROR
+            );
+            if (array_key_exists($removeEmbed, $openGraphMetadata)) {
+                unset($openGraphMetadata[$removeEmbed]);
+                $post->openGraphMetadata = json_encode($openGraphMetadata, JSON_THROW_ON_ERROR);
+                $this->updatePost($post);
+            }
+            return null;
+        }
+
         if ($this->request->post('submit') !== null) {
             // Update topic when editing topic
-            $error = $this->updatePost($post, $postData);
-            if (!$error && $isTopicPost) {
+            $error = $this->validatePost($postData);
+            if ($error !== null) {
+                return $error;
+            }
+
+            $post->post = $postData;
+            $this->updatePost($post);
+
+            if ($isTopicPost) {
                 $error = $this->updateTopic($topic);
             }
 
