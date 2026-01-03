@@ -401,8 +401,7 @@ final class Post implements Route
     private function createTopic(): null
     {
         $topicInput = $this->createTopic->getInput();
-        $error ??= $this->createTopic->validateInput($topicInput);
-        $error ??= $this->validatePost($this->postData);
+        $error = $this->createTopic->validateInput($topicInput) ?? $this->validatePost($this->postData);
 
         if ($error) {
             // Handle error here so we can still show topic form
