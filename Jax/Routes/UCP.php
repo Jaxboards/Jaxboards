@@ -392,7 +392,7 @@ final readonly class UCP implements Route
                 return "Invalid characters in {$fieldLabel}";
             }
 
-            $data[$field] = $data[$field] ?? '';
+            $data[$field] ??= '';
             $length = $field === 'displayName'
                 ? 30
                 : ($field === 'location' ? 100 : 50);
