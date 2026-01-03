@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\Routes\Post;
 
 use Jax\Database\Database;
@@ -13,7 +15,18 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-class CreateTopic
+use function array_filter;
+use function count;
+use function json_encode;
+use function mb_strlen;
+use function mb_substr;
+use function preg_replace;
+use function preg_split;
+use function trim;
+
+use const JSON_THROW_ON_ERROR;
+
+final class CreateTopic
 {
     public function __construct(
         private readonly Database $database,
@@ -25,7 +38,7 @@ class CreateTopic
         private readonly User $user,
     ) {}
 
-    public function getInput()
+    public function getInput(): array
     {
         $input = [
             'fid' => (int) $this->request->both('fid'),
@@ -57,8 +70,8 @@ class CreateTopic
         $error = match (true) {
             !$forum => "The forum you're trying to post in does not exist.",
             !$forumPerms['start'] => "You don't have permission to post a new topic in that forum.",
-            !$input['topicTitle'] || trim($input['topicTitle']) === '' => "You didn't specify a topic title!",
-            mb_strlen($input['topicTitle']) > 255 => 'Topic title must not exceed 255 characters',
+            !$input['topicTitle'] || trim((string) $input['topicTitle']) === '' => "You didn't specify a topic title!",
+            mb_strlen((string) $input['topicTitle']) > 255 => 'Topic title must not exceed 255 characters',
             mb_strlen($input['topicDescription'] ?? '') > 255 => 'Topic description must not exceed 255 characters',
             default => null,
         };
@@ -112,8 +125,10 @@ class CreateTopic
         return $topic;
     }
 
-    public function showTopicForm(?Topic $topic = null, ?Post $post = null): null
-    {
+    public function showTopicForm(
+        ?Topic $topic = null,
+        ?Post $post = null,
+    ): null {
         $postData = $this->request->asString->post('postdata') ?? $post?->post;
         $tid = $topic->id ?? '';
         $fid = $topic->fid ?? (int) $this->request->asString->both('fid');
