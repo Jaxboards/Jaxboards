@@ -106,7 +106,7 @@ final class Post implements Route
             $submit === 'Preview' || $submit === 'Full Reply' => $this->previewPost(),
             (bool) $this->pid && $this->how === 'edit' => $this->editPost(),
             $this->how === 'newtopic' => $this->createTopic(),
-            $this->postData !== null => $this->submitPost($this->tid),
+            $this->postData !== null => $this->createPost($this->tid),
             (bool) $this->fid => $this->createTopic->showTopicForm(),
             (bool) $this->tid => $this->showPostForm(),
             default => $this->router->redirect('index'),
@@ -414,14 +414,13 @@ final class Post implements Route
         }
 
         $topic = $this->createTopic->createTopic($topicInput);
-        $this->submitPost($topic->id, true);
+        $this->createPost($topic->id, true);
 
         return null;
     }
 
-    private function submitPost(int $tid, bool $newtopic = false): ?string
+    private function createPost(int $tid, bool $newtopic = false): ?string
     {
-        $this->session->act();
         $postData = $this->postData;
         $postDate = $this->database->datetime();
         $uid = $this->user->get()->id;

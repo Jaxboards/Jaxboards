@@ -82,8 +82,6 @@ final readonly class PrivateMessage implements Module
 
     public function message(int $uid, string $instantMessage): void
     {
-        $this->session->act();
-
         if ($this->user->isGuest()) {
             $this->page->command('error', 'You must be logged in to instant message!');
 

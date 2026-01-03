@@ -299,7 +299,6 @@ final class Shoutbox implements Module
 
     public function addShout(string $shoutBody): void
     {
-        $this->session->act();
         $shoutBody = $this->textFormatting->linkify($shoutBody);
 
         $error = match (true) {
