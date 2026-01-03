@@ -1,0 +1,22 @@
+<div class="badges">
+    <section class="badge">
+        <div class="badge-image"><img src="{{ badge.imagePath }}" title="{{ badge.badgeTitle }}"></div>
+        <div class="badge-title">{{ badge.badgeTitle }}</div>
+        <div class="description">{{ badge.description }}</div>
+    </section>
+    <table class="badges" style="width:100%">
+        <tr><th>User</th><th>Reason</th><th>Award Date</th></tr>
+        {% for badgeAssociation in badgeAssociations %}
+            {% set member = membersWithBadges[badgeAssociation.user] %}
+            <tr>
+                <td>
+                    <a href="{{ url('profile', { id: member.id }) }}"
+                        class="user{{ member.id }} mgroup{{ member.groupID }}"
+                        >{{ member.name }}</a>
+                </td>
+                <td class="reason">{{ badgeAssociation.reason }}</td>
+                <td class="award-date">{{ badgeAssociation.awardDate|autoDate }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>

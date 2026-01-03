@@ -120,44 +120,13 @@ final readonly class Badges implements Route
             static fn(BadgeAssociation $badgeAssociation): int => $badgeAssociation->user,
         );
 
-
-        $badgesTable = '';
-        foreach ($badgeAssociations as $badgeAssociation) {
-            $member = $membersWithBadges[$badgeAssociation->user];
-            $profileURL = $this->router->url('profile', ['id' => $member->id]);
-
-            $badgesTable .= <<<HTML
-                <tr>
-                    <td>
-                        <a href="{$profileURL}"
-                            class="user{$member->id} mgroup{$member->groupID}"
-                            >{$member->name}</a>
-                    </td>
-                    <td class="reason">{$badgeAssociation->reason}</td>
-                    <td class="award-date">{$this->date->autodate($badgeAssociation->awardDate)}</td>
-                </tr>
-                HTML;
-        }
-
-        $badgesHTML = <<<HTML
-            <table class="badges" style="width:100%">
-                <tr><th>User</th><th>Reason</th><th>Award Date</th></tr>
-                {$badgesTable}
-            </table>
-            HTML;
-
         $page = $this->page->collapseBox(
             "Badge: {$badge->badgeTitle}",
-            <<<HTML
-                <div class="badges">
-                    <section class="badge">
-                        <div class="badge-image"><img src="{$badge->imagePath}" title="{$badge->badgeTitle}"></div>
-                        <div class="badge-title">{$badge->badgeTitle}</div>
-                        <div class="description">{$badge->description}</div>
-                    </section>
-                    {$badgesHTML}
-                </div>
-                HTML,
+            $this->template->render('badges/recipients', [
+                'badge' => $badge,
+                'badgeAssociations' => $badgeAssociations,
+                'membersWithBadges' => $membersWithBadges,
+            ])
         );
 
         $this->page->setPageTitle("Viewing Recipients of {$badge->badgeTitle} badge");
