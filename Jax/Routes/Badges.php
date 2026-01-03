@@ -14,7 +14,6 @@ use Jax\Page;
 use Jax\Request;
 use Jax\Router;
 use Jax\Template;
-use Jax\TextFormatting;
 
 use function array_key_exists;
 
@@ -93,7 +92,7 @@ final readonly class Badges implements Route
         }
 
         return $this->template->render('badges/profile-tab', [
-            'rows' => $badgesPerMember[$member->id]
+            'rows' => $badgesPerMember[$member->id],
         ]);
     }
 
