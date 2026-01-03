@@ -26,16 +26,16 @@ use function trim;
 
 use const JSON_THROW_ON_ERROR;
 
-final class CreateTopic
+final readonly class CreateTopic
 {
     public function __construct(
-        private readonly Database $database,
-        private readonly Page $page,
-        private readonly Request $request,
-        private readonly Router $router,
-        private readonly Template $template,
-        private readonly TextFormatting $textFormatting,
-        private readonly User $user,
+        private Database $database,
+        private Page $page,
+        private Request $request,
+        private Router $router,
+        private Template $template,
+        private TextFormatting $textFormatting,
+        private User $user,
     ) {}
 
     public function getInput(): array
