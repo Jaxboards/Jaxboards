@@ -1,0 +1,19 @@
+<div class="badges">
+    {% for row in rows %}
+        {% set badge = row.badge %}
+        {% set badgeAssociation = row.badgeAssociation %}
+        <section class="badge">
+            <div class="badge-image">
+                <a href="{{ url('badges', { badgeId: badge.id }) }}" title="View all users with this badge">
+                    <img src='{{ badge.imagePath }}' title='{{ badge.badgeTitle }}'>
+                </a>
+            </div>
+            <h3 class="badge-title">
+                {{ badge.badgeTitle }}
+            </h3>
+            <div class="description">{{ badge.description }}</div>
+            <div class="reason">For: {{ badgeAssociation.reason }}</div>
+            <div class="award-date">{{ badgeAssociation.awardDate|autoDate }}</div>
+        </section>
+    {% endfor %}
+</div>

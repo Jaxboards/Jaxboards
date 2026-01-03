@@ -308,10 +308,8 @@ final class Search implements Route
 
         while ($postRow = $this->database->arow($result)) {
             $title = $this->textFormatting->textOnly($postRow['title']);
-            $title = $this->textFormatting->blockHtml($title);
-
             $post = $this->textFormatting->textOnly($postRow['post']);
-            $post = $this->textFormatting->blockHtml($post);
+
             $post = nl2br($post, false);
 
             $page .= $this->template->render(

@@ -13,6 +13,7 @@ use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\Router;
+use Jax\Template;
 use Jax\TextFormatting;
 
 use function array_key_exists;
@@ -25,7 +26,7 @@ final readonly class Badges implements Route
         private Page $page,
         private Request $request,
         private Router $router,
-        private TextFormatting $textFormatting,
+        private Template $template,
     ) {}
 
     public function isEnabled(): bool
@@ -68,9 +69,6 @@ final readonly class Badges implements Route
 
             $badge = $badges[$badgeAssociation->badge];
 
-            $badge->imagePath = $this->textFormatting->blockhtml($badge->imagePath);
-            $badge->description = $this->textFormatting->blockhtml($badge->description);
-
             $badgesPerUser[$badgeAssociation->user][] = (object) [
                 'badge' => $badge,
                 'badgeAssociation' => $badgeAssociation,
@@ -94,27 +92,9 @@ final readonly class Badges implements Route
             return 'No badges yet!';
         }
 
-        $badgesHTML = '<div class="badges">';
-        foreach ($badgesPerMember[$member->id] as $badgeTuple) {
-            $badgeURL = $this->router->url('badges', ['badgeId' => $badgeTuple->badge->id]);
-            $badgesHTML .= <<<HTML
-                <section class="badge">
-                    <div class="badge-image">
-                        <a href="{$badgeURL}" title="View all users with this badge">
-                            <img src='{$badgeTuple->badge->imagePath}' title='{$badgeTuple->badge->badgeTitle}'>
-                        </a>
-                    </div>
-                    <h3 class="badge-title">
-                        {$badgeTuple->badge->badgeTitle}
-                    </h3>
-                    <div class="description">{$badgeTuple->badge->description}</div>
-                    <div class="reason">For: {$badgeTuple->badgeAssociation->reason}</div>
-                    <div class="award-date">{$this->date->autodate($badgeTuple->badgeAssociation->awardDate)}</div>
-                </section>
-                HTML;
-        }
-
-        return $badgesHTML . '</table>';
+        return $this->template->render('badges/profile-tab', [
+            'rows' => $badgesPerMember[$member->id]
+        ]);
     }
 
     public function renderBadgeRecipients(int $badgeId): void
