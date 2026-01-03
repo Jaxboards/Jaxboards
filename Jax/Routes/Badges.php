@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax\Routes;
 
 use Jax\Config;
-use Jax\Date;
 use Jax\Interfaces\Route;
 use Jax\Models\Badge;
 use Jax\Models\BadgeAssociation;
@@ -21,7 +20,6 @@ final readonly class Badges implements Route
 {
     public function __construct(
         private Config $config,
-        private Date $date,
         private Page $page,
         private Request $request,
         private Router $router,
@@ -126,7 +124,7 @@ final readonly class Badges implements Route
                 'badge' => $badge,
                 'badgeAssociations' => $badgeAssociations,
                 'membersWithBadges' => $membersWithBadges,
-            ])
+            ]),
         );
 
         $this->page->setPageTitle("Viewing Recipients of {$badge->badgeTitle} badge");
