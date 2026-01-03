@@ -41,7 +41,7 @@ function getDBVersion(Database $database): int
 }
 
 $migrations = array_reduce(
-    $fileSystem->glob('Tools/migrations/**/*.php') ?: [],
+    $fileSystem->glob('Tools/Migrations/**/*.php') ?: [],
     static function ($migrations, string $path) use ($fileSystem) {
         preg_match('/V(\d+)/', $path, $match);
         $fileInfo = $fileSystem->getFileInfo($path);
