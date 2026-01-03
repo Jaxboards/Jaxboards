@@ -22,14 +22,13 @@ use Jax\OpenGraph;
 use Jax\Page;
 use Jax\Request;
 use Jax\Router;
+use Jax\Routes\Post\CreateTopic;
 use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function array_filter;
 use function array_key_exists;
-use function count;
 use function explode;
 use function filesize;
 use function hash_file;
@@ -40,7 +39,6 @@ use function mb_strlen;
 use function mb_substr;
 use function move_uploaded_file;
 use function preg_replace;
-use function preg_split;
 use function trim;
 
 use const JSON_THROW_ON_ERROR;
@@ -61,6 +59,7 @@ final class Post implements Route
     private ?string $how = null;
 
     public function __construct(
+        private readonly CreateTopic $createTopic,
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly FileSystem $fileSystem,
@@ -108,7 +107,7 @@ final class Post implements Route
             (bool) $this->pid && $this->how === 'edit' => $this->editPost(),
             $this->how === 'newtopic' => $this->createTopic(),
             $this->postData !== null => $this->submitPost($this->tid),
-            (bool) $this->fid => $this->showTopicForm(),
+            (bool) $this->fid => $this->createTopic->showTopicForm(),
             (bool) $this->tid => $this->showPostForm(),
             default => $this->router->redirect('index'),
         };
@@ -172,7 +171,6 @@ final class Post implements Route
     {
         $post = $this->postData ?? '';
         if (trim($post) !== '') {
-            $post = $this->textFormatting->theWorks($post);
             $post = $this->template->render('post/preview', ['post' => $post]);
             $this->postpreview = $post;
         }
@@ -182,56 +180,6 @@ final class Post implements Route
         }
 
         $this->page->command('update', 'post-preview', $post);
-
-        return null;
-    }
-
-    private function showTopicForm(?Topic $topic = null): null
-    {
-        $postData = $this->postData;
-        $page = '<div id="post-preview">' . $this->postpreview . '</div>';
-        $tid = $topic->id ?? '';
-        $fid = $topic->fid ?? $this->fid;
-        $how = $this->how ?? 'newtopic';
-
-        $isEditing = (bool) $topic;
-
-        $forum = Forum::selectOne($fid);
-
-        if ($forum === null) {
-            $this->router->redirect('index');
-
-            return null;
-        }
-
-        if ($topic === null) {
-            $topic = new Topic();
-            $topic->subtitle = $this->request->asString->post('tdesc') ?? '';
-            $topic->title = $this->request->asString->post('ttitle') ?? '';
-        }
-
-        $forumPerms = $this->user->getForumPerms($forum->perms);
-
-        $form = $this->template->render('post/new-topic-form', [
-            'fid' => $fid,
-            'forumPerms' => $forumPerms,
-            'how' => $how,
-            'isEditing' => $isEditing,
-            'post' => $postData,
-            'tid' => $tid,
-            'topic' => $topic,
-        ]);
-        $page .= $this->template->render('global/box', [
-            'title' => $forum->title . ' > New Topic',
-            'content' => $form,
-        ]);
-
-        $this->page->append('PAGE', $page);
-        $this->page->command('update', 'page', $page);
-
-        if ($forumPerms['upload']) {
-            $this->page->command('attachfiles');
-        }
 
         return null;
     }
@@ -440,7 +388,7 @@ final class Post implements Route
         }
 
         if ($isTopicPost) {
-            $this->showTopicForm($topic);
+            $this->createTopic->showTopicForm($topic, $post);
 
             return null;
         }
@@ -452,88 +400,21 @@ final class Post implements Route
 
     private function createTopic(): null
     {
-        $fid = $this->fid;
-        $uid = $this->user->get()->id;
-        $postDate = $this->database->datetime();
-
-        $inputPollChoices = $this->request->asString->post('pollchoices');
-        $topicTitle = $this->request->asString->post('ttitle');
-        $topicDescription = $this->request->asString->post('tdesc');
-        $subTitle = $this->request->asString->post('subtitle');
-        $pollQuestion = $this->request->asString->post('pollq');
-        $pollChoices = $inputPollChoices !== null ? array_filter(
-            preg_split("@[\r\n]+@", $inputPollChoices) ?: [],
-            static fn(string $line): bool => trim($line) !== '',
-        ) : [];
-        $pollType = $this->request->asString->post('pollType');
-
-        $forum = Forum::selectOne($fid);
-
-        $forumPerms = $forum !== null
-            ? $this->user->getForumPerms($forum->perms)
-            : [];
-
-        // New topic input validation
-        $error = match (true) {
-            !$forum => "The forum you're trying to post in does not exist.",
-            !$forumPerms['start'] => "You don't have permission to post a new topic in that forum.",
-            !$topicTitle || trim($topicTitle) === '' => "You didn't specify a topic title!",
-            mb_strlen($topicTitle) > 255 => 'Topic title must not exceed 255 characters',
-            mb_strlen($subTitle ?? '') > 255 => 'Subtitle must not exceed 255 characters',
-            default => null,
-        };
-
-        // Post validation
+        $topicInput = $this->createTopic->getInput();
+        $error ??= $this->createTopic->validateInput($topicInput);
         $error ??= $this->validatePost($this->postData);
 
-        // Poll input validation
-        $error ??= match (true) {
-            !$pollType => null,
-            $pollQuestion === null || trim($pollQuestion) === '' => "You didn't specify a poll question!",
-            count($pollChoices) > 10 => 'Poll choices must not exceed 10.',
-            $pollChoices === [] => "You didn't provide any poll choices!",
-            $forum && !$forumPerms['poll'] => "You don't have permission to post a poll in that forum",
-            default => null,
-        };
-
-        if ($error !== null) {
+        if ($error) {
             // Handle error here so we can still show topic form
             $this->page->append('PAGE', $this->page->error($error));
             $this->page->command('error', $error);
             $this->page->command('enable', 'submitbutton');
-            $this->showTopicForm();
+            $this->createTopic->showTopicForm();
 
             return null;
         }
 
-        $topic = new Topic();
-        $topic->author = $uid;
-        $topic->date = $postDate;
-        $topic->fid = $fid;
-        $topic->lastPostDate = $postDate;
-        $topic->lastPostUser = $uid;
-        $topic->pollChoices = $pollChoices !== []
-            ? (json_encode($pollChoices, JSON_THROW_ON_ERROR))
-            : '';
-        $topic->pollQuestion = $pollQuestion ?: '';
-        $topic->pollType = $pollType ?? '';
-        $topic->replies = 0;
-        $topic->subtitle = $topicDescription ?? '';
-        $topic->summary = mb_substr(
-            (string) preg_replace(
-                '@\s+@',
-                ' ',
-                $this->textFormatting->textOnly(
-                    $this->postData ?? '',
-                ),
-            ),
-            0,
-            50,
-        );
-        $topic->title = $topicTitle;
-        $topic->views = 0;
-        $topic->insert();
-
+        $topic = $this->createTopic->createTopic($topicInput);
         $this->submitPost($topic->id, true);
 
         return null;

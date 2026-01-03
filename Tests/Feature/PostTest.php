@@ -32,6 +32,7 @@ use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
 use Jax\Routes\Post;
+use Jax\Routes\Post\CreateTopic;
 use Jax\ServiceConfig;
 use Jax\Session;
 use Jax\Template;
@@ -66,6 +67,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(OpenGraph::class)]
 #[CoversClass(Page::class)]
 #[CoversClass(Post::class)]
+#[CoversClass(CreateTopic::class)]
 #[CoversClass(PrivateMessage::class)]
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]

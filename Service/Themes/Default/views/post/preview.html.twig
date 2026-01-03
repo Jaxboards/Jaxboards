@@ -1,1 +1,3 @@
-{% include 'global/box.html.twig' with { title: 'Post Preview', content: post } %}
+{% if post %}
+{% include 'global/box.html.twig' with { title: 'Post Preview', content: post|theWorks } %}
+{% endif %}
