@@ -165,25 +165,25 @@ export function bbcodeToHTML(bbcode: string) {
         .replaceAll(/\[s\]([^]*?)\[\/s\]/gi, '<s>$1</s>')
         .replaceAll(/\[img\]([^'"[]+)\[\/img\]/gi, '<img src="$1">')
         .replaceAll(
-            /\[color=([^\]]+)\](.*?)\[\/color\]/gi,
+            /\[color=([^\]]+)\]([^]*?)\[\/color\]/gi,
             '<span style="color:$1">$2</span>',
         )
         .replaceAll(
-            /\[size=([^\]]+)\](.*?)\[\/size\]/gi,
+            /\[size=([^\]]+)\]([^]*?)\[\/size\]/gi,
             '<span style="font-size:$1">$2</span>',
         )
         .replaceAll(
-            /\[font=['"]?([^\]]+?)['"]?\](.*?)\[\/font\]/gi,
+            /\[font=['"]?([^\]]+?)['"]?\]([^]*?)\[\/font\]/gi,
             '<span style="font-family:$1">$2</span>',
         )
-        .replaceAll(/\[url=([^\]]+)\](.*?)\[\/url\]/gi, '<a href="$1">$2</a>')
+        .replaceAll(/\[url=([^\]]+)\]([^]*?)\[\/url\]/gi, '<a href="$1">$2</a>')
         .replaceAll(
-            /\[bgcolor=([^\]]+)\](.*?)\[\/bgcolor\]/gi,
+            /\[bgcolor=([^\]]+)\]([^]*?)\[\/bgcolor\]/gi,
             '<span style="background-color:$1">$2</span>',
         )
-        .replaceAll(/\[h(\d)\](.*?)\[\/h\1\]/g, '<h$1>$2</h$1>')
+        .replaceAll(/\[h(\d)\]([^]*?)\[\/h\1\]/g, '<h$1>$2</h$1>')
         .replaceAll(
-            /\[align=(left|right|center)\](.*?)\[\/align\]/g,
+            /\[align=(left|right|center)\]([^]*?)\[\/align\]/g,
             '<div style="text-align:$1">$2</div>',
         )
         .replaceAll(
