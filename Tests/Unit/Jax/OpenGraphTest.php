@@ -91,14 +91,14 @@ final class OpenGraphTest extends UnitTestCase
             [
 
                 'https://bibbyteam.com/',
-                <<<HTML
+                <<<'HTML'
                     <html>
                     	<head>
                     		<!-- Specifically testing a website with no og: tags -->
                     	</head>
                     </html>
                     HTML,
-            ]
+            ],
         ];
     }
 }
