@@ -169,6 +169,10 @@ export function bbcodeToHTML(bbcode: string) {
             /\[size=([^\]]+)\](.*?)\[\/size\]/gi,
             '<span style="font-size:$1">$2</span>',
         )
+        .replaceAll(
+            /\[font=([^\]]+)\](.*?)\[\/font\]/gi,
+            '<span style="font-family:$1">$2</span>',
+        )
         .replaceAll(/\[url=([^\]]+)\](.*?)\[\/url\]/gi, '<a href="$1">$2</a>')
         .replaceAll(
             /\[bgcolor=([^\]]+)\](.*?)\[\/bgcolor\]/gi,
