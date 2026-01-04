@@ -87,7 +87,7 @@ final class SearchTest extends FeatureTestCase
         $page = $this->go('/search');
 
         DOMAssert::assertSelectCount('input[name=searchterm]', 1, $page);
-        DOMAssert::assertSelectEquals('select[name=fids] option[value=1]', 'Forum', 1, $page);
+        DOMAssert::assertSelectEquals('select[name="fids[]"] option[value=1]', 'Forum', 1, $page);
         DOMAssert::assertSelectCount('input[name=datestart]', 1, $page);
         DOMAssert::assertSelectCount('input[name=dateend]', 1, $page);
         DOMAssert::assertSelectCount('input[name=mid]', 1, $page);
