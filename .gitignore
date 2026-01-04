@@ -1,16 +1,19 @@
-# Cache files
+# OS Files
 .DS_Store
+Thumbs.db
+Desktop.ini
+
+# Test Reports
+/coverage
+
+
+# Cache files
 /.php-cs-fixer.cache
 /.phpunit.result.cache
 /.cache
-Thumbs.db
 
 # Config files
 /config.php
-Desktop.ini
-crossdomain.xml
-/phpunit.xml
-# Boards data
 boards
 
 # Log files
