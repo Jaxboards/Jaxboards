@@ -78,7 +78,7 @@ const styleToBBCode: Record<
     },
 
     'font-family': (fontFace, inner) =>
-        `[font=${fontFace.replaceAll(/^['"]|['"]$/g, '')}]${inner}[/font]`,
+        `[font=${fontFace.replaceAll(/['"]/g, '')}]${inner}[/font]`,
 
     'font-style': (fontStyle, inner) => `[i]${inner}[/i]`,
 
