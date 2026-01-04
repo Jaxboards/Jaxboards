@@ -7,12 +7,9 @@
     <table class="badges" style="width:100%">
         <tr><th>User</th><th>Reason</th><th>Award Date</th></tr>
         {% for badgeAssociation in badgeAssociations %}
-            {% set member = membersWithBadges[badgeAssociation.user] %}
             <tr>
                 <td>
-                    <a href="{{ url('profile', { id: member.id }) }}"
-                        class="user{{ member.id }} mgroup{{ member.groupID }}"
-                        >{{ member.name }}</a>
+                    {% include "user-link.html.twig" with { user: membersWithBadges[badgeAssociation.user] } %}
                 </td>
                 <td class="reason">{{ badgeAssociation.reason }}</td>
                 <td class="award-date">{{ badgeAssociation.awardDate|autoDate }}</td>
