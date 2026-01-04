@@ -30,6 +30,8 @@ final class Shoutbox implements Module
 {
     private int $shoutlimit;
 
+    private bool $avatarsEnabled = false;
+
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
@@ -44,7 +46,10 @@ final class Shoutbox implements Module
         private readonly TextFormatting $textFormatting,
         private readonly Template $template,
         private readonly User $user,
-    ) {}
+    ) {
+        $this->avatarsEnabled = (bool) $this->config->getSetting('shoutboxava');
+        $this->shoutlimit = (int) ($this->config->getSetting('shoutbox_num') ?? 5);
+    }
 
     public function init(): void
     {
@@ -56,62 +61,37 @@ final class Shoutbox implements Module
             return;
         }
 
-        $this->shoutlimit = (int) ($this->config->getSetting('shoutbox_num') ?? 5);
         $shoutboxDelete = (int) $this->request->both('shoutbox_delete');
         $shoutboxShout = trim($this->request->asString->post('shoutbox_shout') ?? '');
 
         if ($shoutboxShout !== '') {
             $this->addShout($shoutboxShout);
-        }
+        };
 
-        if ($shoutboxDelete !== 0) {
-            $this->deleteShout($shoutboxDelete);
-        } elseif (
-            $this->request->both('module') === 'shoutbox'
-        ) {
-            $this->showAllShouts();
-        }
-
-        if (!$this->request->isJSAccess()) {
-            $this->displayShoutbox();
-        } else {
-            $this->updateShoutbox();
-        }
+        match (true) {
+            $shoutboxDelete !== 0 => $this->deleteShout($shoutboxDelete),
+            $this->request->both('module') === 'shoutbox' => $this->showAllShouts(),
+            $this->request->isJSAccess() => $this->updateShoutbox(),
+            default => $this->displayShoutbox(),
+        };
     }
 
     public function canDelete(Shout $shout): bool
     {
-        $candelete = (bool) $this->user->getGroup()?->canDeleteShouts;
+        $canDeleteAllShouts = (bool) $this->user->getGroup()?->canDeleteShouts;
+        $canDeleteOwnShouts = $this->user->getGroup()?->canDeleteOwnShouts;
+        $isOwnShout = $shout->uid === $this->user->get()->id;
 
-        if ($candelete) {
-            return $candelete;
-        }
-
-        if (!$this->user->getGroup()?->canDeleteOwnShouts) {
-            return $candelete;
-        }
-
-        if (
-            $shout->uid === $this->user->get()->id
-        ) {
-            return true;
-        }
-
-        return $candelete;
+        return $canDeleteAllShouts || ($canDeleteOwnShouts && $isOwnShout);
     }
 
     public function formatShout(Shout $shout, ?Member $member): string
     {
-        $avatarURL = $this->config->getSetting('shoutboxava')
-            ? ($member?->avatar ?: $this->template->render('default-avatar'))
-            : null;
-
-        $message = $this->textFormatting->theWorksInline($shout->shout);
-        if (mb_substr($message, 0, 4) === '/me ') {
+        if (str_starts_with($shout->shout, '/me ')) {
             return $this->template->render(
                 'shoutbox/action',
                 [
-                    'avatarURL' => $avatarURL,
+                    'avatarsEnabled' => $this->avatarsEnabled,
                     'canDelete' => $this->canDelete($shout),
                     'shout' => $shout,
                     'timestamp' => $this->date->datetimeAsTimestamp($shout->date),
@@ -123,7 +103,7 @@ final class Shoutbox implements Module
         return $this->template->render(
             'shoutbox/shout',
             [
-                'avatarURL' => $avatarURL,
+                'avatarsEnabled' => $this->avatarsEnabled,
                 'canDelete' => $this->canDelete($shout),
                 'shout' => $shout,
                 'timestamp' => $this->date->datetimeAsTimestamp($shout->date),
@@ -221,11 +201,7 @@ final class Shoutbox implements Module
             --$pageNumber;
         }
 
-        $numShouts = Shout::count();
-
-        if ($numShouts > 1000) {
-            $numShouts = 1000;
-        }
+        $numShouts = min(Shout::count(), 1_000);
 
         if ($numShouts > $perpage) {
             $pages .= " &middot; Pages: <span class='pages'>";

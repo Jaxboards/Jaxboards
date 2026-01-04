@@ -1,6 +1,6 @@
 <div class="shout" data-timestamp="{{ timestamp }}">
-    {%- if avatarURL -%}
-        <img src="{{ avatarURL }}" class="avatar" alt="avatar">
+    {%- if avatarsEnabled -%}
+        {% include "avatar.html.twig" with { avatar: user.avatar } %}
     {%- endif -%}
     {%- include 'user-link.html.twig' with { user: user } only -%}
     : {{ shout.shout|theWorksInline }}
