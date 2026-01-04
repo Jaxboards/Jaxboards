@@ -23,12 +23,13 @@ use Jax\User;
 
 use function ceil;
 use function mb_strlen;
-use function mb_substr;
+use function min;
+use function str_starts_with;
 use function trim;
 
 final class Shoutbox implements Module
 {
-    private int $shoutlimit;
+    private readonly int $shoutlimit;
 
     private bool $avatarsEnabled = false;
 
@@ -66,7 +67,7 @@ final class Shoutbox implements Module
 
         if ($shoutboxShout !== '') {
             $this->addShout($shoutboxShout);
-        };
+        }
 
         match (true) {
             $shoutboxDelete !== 0 => $this->deleteShout($shoutboxDelete),
