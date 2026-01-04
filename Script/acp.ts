@@ -53,36 +53,16 @@ function dropdownMenu(e: MouseEvent) {
 }
 
 async function submitForm(form: HTMLFormWithSubmit) {
-    const postBody = new URLSearchParams();
-    const elements = Array.from(form.elements);
-    const submit = form.submitButton;
-    elements.forEach((element) => {
-        if (element instanceof HTMLInputElement) {
-            if (
-                ['checkbox', 'radio'].includes(element.type) &&
-                !element.checked
-            ) {
-                return;
-            }
-            if (element.type === 'submit') {
-                return;
-            }
-        }
+    const formData = new FormData(form, form.submitButton);
 
-        if (
-            element instanceof HTMLInputElement ||
-            element instanceof HTMLTextAreaElement
-        ) {
-            postBody.append(element.name, element.value);
-        }
-    });
+    // Filter out input[type=file]
+    const withoutFiles = Array.from(formData.entries()).filter(
+        (tuple): tuple is [string, string] => typeof tuple[1] === 'string',
+    );
 
-    if (submit) {
-        postBody.append(submit.name, submit.value);
-    }
     await fetch(document.location.search, {
         method: 'POST',
-        body: postBody,
+        body: new URLSearchParams(withoutFiles),
         headers: {
             'X-JSACCESS': `1`,
             'Content-Type': 'application/x-www-form-urlencoded',
