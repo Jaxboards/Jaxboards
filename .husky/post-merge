@@ -1,0 +1,2 @@
+# Rebuild autoloader on pull to keep it up-to-date
+composer dumpautoload
