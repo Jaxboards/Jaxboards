@@ -32,6 +32,7 @@ final readonly class TextFormatting
     public function __construct(
         private BBCode $bbCode,
         public TextRules $rules,
+        private Template $template,
         private Request $request,
         private User $user,
     ) {}
@@ -259,6 +260,9 @@ final readonly class TextFormatting
     {
         [, $space, $emoteText] = $match;
 
-        return "{$space}<img src='{$this->rules->getEmotes()[$emoteText]}' alt='{$this->blockhtml($emoteText)}'>";
+        return $space . $this->template->render('bbcode/emote', [
+            'image' => $this->rules->getEmotes()[$emoteText],
+            'text' => $emoteText
+        ]);
     }
 }

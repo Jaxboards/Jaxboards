@@ -210,7 +210,7 @@ final class Post implements Route
         $topicPerms = $this->user->getForumPerms($forum->perms);
 
         $page .= '<div id="post-preview">' . $this->postpreview . '</div>';
-        $postData = $this->textFormatting->blockhtml($this->postData ?? '');
+        $postData = $this->postData;
 
         if ($this->session->getVar('multiquote')) {
             $postData = '';

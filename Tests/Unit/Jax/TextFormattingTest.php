@@ -94,7 +94,7 @@ final class TextFormattingTest extends UnitTestCase
         $this->assertEquals(
             <<<'HTML'
                 <div class="bbcode code ">hello</div><br>
-                <img src='/emoticons/keshaemotes/smile.gif' alt=':)'><br>
+                <img src="/emoticons/keshaemotes/smile.gif" data-emoji=":)" alt=":)"><br>
                 world
                 HTML,
             $result,

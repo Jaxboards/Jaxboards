@@ -207,61 +207,9 @@ final readonly class ModControls implements Route
             return $this->page->error('You do not have permission to edit this profile.');
         }
 
-        $hiddenFormFields = Template::hiddenFormFields(
-            [
-                'mid' => (string) $member->id,
-                'submit' => 'save',
-            ],
-        );
-        $fieldRows = implode(
-            '',
-            array_map(
-                static function (array $field): string {
-                    [$label, $name, $value, $type] = $field;
-                    $input = $type === 'textarea'
-                        ? <<<HTML
-                                <textarea name="{$name}" id="m_{$name}">{$value}</textarea>
-                            HTML
-                        : <<<HTML
-                                <input type="text" id="m_{$name}" name="{$name}" value="{$value}">
-                            HTML;
-
-                    return <<<HTML
-                        <tr>
-                            <td><label for="m_{$name}">{$label}</label></td>
-                            <td>{$input}</td>
-                        </tr>
-                        HTML;
-                },
-                [
-                    ['Display Name', 'displayName', $member->displayName, 'text'],
-                    ['Avatar', 'avatar', $member->avatar, 'text'],
-                    ['Full Name', 'full_name', $member->full_name, 'text'],
-                    [
-                        'About',
-                        'about',
-                        $this->textFormatting->blockhtml($member->about),
-                        'textarea',
-                    ],
-                    [
-                        'Signature',
-                        'signature',
-                        $this->textFormatting->blockhtml($member->sig),
-                        'textarea',
-                    ],
-                ],
-            ),
-        );
-
-        return $page . <<<HTML
-            <form method="post" data-ajax-form="true">
-                {$hiddenFormFields}
-                <table>
-                    {$fieldRows}
-                </table>
-                <input type="submit" value="Save">
-            </form>
-            HTML;
+        return $page . $this->template->render('modcontrols/edit-member', [
+            'member' => $member,
+        ]);
     }
 
     private function selectMemberToEdit(): string

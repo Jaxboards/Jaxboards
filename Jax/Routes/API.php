@@ -8,6 +8,7 @@ use Jax\Interfaces\Route;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
+use Jax\Template;
 use Jax\TextFormatting;
 
 use function array_keys;
@@ -25,6 +26,7 @@ final readonly class API implements Route
         private Page $page,
         private Request $request,
         private TextFormatting $textFormatting,
+        private Template $template,
     ) {}
 
     public function route(array $params): void
@@ -61,8 +63,10 @@ final readonly class API implements Route
     {
         $rules = $this->textFormatting->rules->getEmotes();
         foreach ($rules as $text => $image) {
-            $safeText = $this->textFormatting->blockhtml($text);
-            $rules[$text] = "<img src=\"{$image}\" data-emoji=\"{$safeText}\" alt=\"{$safeText}\">";
+            $rules[$text] = $this->template->render('bbcode/emote', [
+                'image' => $image,
+                'text' => $text,
+            ]);
         }
 
         return json_encode([array_keys($rules), array_values($rules)], JSON_THROW_ON_ERROR);

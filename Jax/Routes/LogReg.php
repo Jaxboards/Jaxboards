@@ -166,8 +166,6 @@ final class LogReg implements Route
         }
 
         // Are they attempting to use an existing username/display name?
-        $dispname = $this->textFormatting->blockhtml($dispname);
-        $name = $this->textFormatting->blockhtml($name);
         $member = Member::selectOne(
             'WHERE `name`=? OR `displayName`=?',
             $name,
