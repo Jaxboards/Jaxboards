@@ -1,27 +1,26 @@
 <form method="post" data-ajax-form="true">
     <input type="hidden" name="mid" value="{{ member.id }}">
     <input type="hidden" name="submit" value="save">
-    <table>
-        <tr>
-            <td><label for="m_displayName">Display Name</label></td>
-            <td><input type="text" id="m_displayName" name="displayName" value="{{ member.displayName }}"></td>
-        </tr>
-        <tr>
-            <td><label for="m_avatar">Avatar</label></td>
-            <td><input type="text" id="m_avatar" name="avatar" value="{{ member.avatar }}"></td>
-        </tr>
-        <tr>
-            <td><label for="m_full_name">Full Name</label></td>
-            <td><input type="text" id="m_full_name" name="full_name" value="{{ member.full_name }}"></td>
-        </tr>
-        <tr>
-            <td><label for="m_about">About</label></td>
-            <td><textarea name="about" id="m_about">{{ member.about }}</textarea></td>
-        </tr>
-        <tr>
-            <td><label for="m_signature">Signature</label></td>
-            <td><textarea name="signature" id="m_signature">{{ member.sig }}</textarea></td>
-        </tr>
-    </table>
+
+    <label for="m_displayName">Display Name</label>
+    <input type="text" id="m_displayName" name="displayName" value="{{ member.displayName }}">
+    <br>
+
+    <label for="m_avatar">Avatar</label>
+    <input type="text" id="m_avatar" name="avatar" value="{{ member.avatar }}">
+    <br>
+
+    <label for="m_full_name">Full Name</label>
+    <input type="text" id="m_full_name" name="full_name" value="{{ member.full_name }}">
+    <br>
+
+    <label for="m_about">About</label><br>
+    <textarea name="about" id="m_about">{{ member.about }}</textarea>
+    <br>
+
+    <label for="m_signature">Signature</label><br>
+    <textarea name="signature" id="m_signature">{{ member.sig }}</textarea>
+    <br>
+
     <input type="submit" value="Save">
 </form>
