@@ -46,7 +46,7 @@
         "phpstan": "composer-runner -- run-script --no-interaction phpstan",
         "phpstan-report": "composer-runner -- run-script --no-interaction phpstan-report",
         "postinstall": "composer-runner -- install",
-        "prettier": "prettier --write --single-quote \"**/*.{htm{,l},{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}\"",
+        "prettier": "prettier --write --single-quote \"**/*.{htm{,l},{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,graphql}\"",
         "psalm": "composer-runner -- run-script --no-interaction psalm",
         "psalm-report": "composer-runner -- run-script --no-interaction psalm-report",
         "rector": "composer-runner -- run-script --no-interaction rector",
