@@ -3,9 +3,6 @@
 Thumbs.db
 Desktop.ini
 
-# Test Reports
-/coverage
-
 
 # Cache files
 /.php-cs-fixer.cache
@@ -19,10 +16,8 @@ boards
 # Log files
 *.log
 
-# Scan Results
-/clover.xml
+# Linters
 eslint-report.json
-/junit.xml
 parallel-lint-report-sonarqube.json
 parallel-lint-report.json
 phpcs-report-sonarqube.json
@@ -32,6 +27,11 @@ phpmd-report.json
 phpstan-report.json
 psalm-report.json
 stylelint-report.json
+
+# Test Reports
+/coverage
+/clover.xml
+/junit.xml
 
 # Vendor files
 node_modules
