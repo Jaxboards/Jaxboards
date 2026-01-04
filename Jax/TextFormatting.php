@@ -262,7 +262,7 @@ final readonly class TextFormatting
 
         return $space . $this->template->render('bbcode/emote', [
             'image' => $this->rules->getEmotes()[$emoteText],
-            'text' => $emoteText
+            'text' => $emoteText,
         ]);
     }
 }

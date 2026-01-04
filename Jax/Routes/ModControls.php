@@ -21,7 +21,6 @@ use Jax\Routes\ModControls\ModPosts;
 use Jax\Routes\ModControls\ModTopics;
 use Jax\Session;
 use Jax\Template;
-use Jax\TextFormatting;
 use Jax\User;
 
 use function _\groupBy;
@@ -31,7 +30,6 @@ use function arsort;
 use function count;
 use function filter_var;
 use function gmdate;
-use function implode;
 
 use const FILTER_VALIDATE_IP;
 
@@ -47,7 +45,6 @@ final readonly class ModControls implements Route
         private Request $request,
         private Router $router,
         private Session $session,
-        private TextFormatting $textFormatting,
         private Template $template,
         private User $user,
     ) {}
