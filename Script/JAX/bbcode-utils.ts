@@ -77,6 +77,9 @@ const styleToBBCode: Record<
         return `[color=${colorAttribute}]${inner}[/color]`;
     },
 
+    'font-family': (fontFace, inner) =>
+        `[font=${fontFace.replaceAll(/^['"]|['"]$/g, '')}]${inner}[/font]`,
+
     'font-style': (fontStyle, inner) => `[i]${inner}[/i]`,
 
     'font-size': (size, inner) => `[size=${size}]${inner}[/size]`,
@@ -170,7 +173,7 @@ export function bbcodeToHTML(bbcode: string) {
             '<span style="font-size:$1">$2</span>',
         )
         .replaceAll(
-            /\[font=([^\]]+)\](.*?)\[\/font\]/gi,
+            /\[font=['"]?([^\]]+?)['"]?\](.*?)\[\/font\]/gi,
             '<span style="font-family:$1">$2</span>',
         )
         .replaceAll(/\[url=([^\]]+)\](.*?)\[\/url\]/gi, '<a href="$1">$2</a>')
