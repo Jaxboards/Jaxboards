@@ -51,7 +51,7 @@ final readonly class FileManager
                         ? $this->page->success('File deleted')
                         : $this->page->error(
                             "Error deleting file, maybe it's already been "
-                            . 'deleted? Removed from DB',
+                                . 'deleted? Removed from DB',
                         );
                 }
 
@@ -84,7 +84,7 @@ final readonly class FileManager
 
         $posts = Post::selectMany(
             "WHERE MATCH (`post`) AGAINST ('attachment') "
-            . "AND post LIKE '%[attachment]%'",
+                . "AND post LIKE '%[attachment]%'",
         );
         $linkedIn = [];
 
@@ -95,7 +95,7 @@ final readonly class FileManager
                 $matches,
             );
             foreach ($matches[1] as $attachmentId) {
-                $linkedIn[(int) $attachmentId][] = $this->page->parseTemplate(
+                $linkedIn[(int) $attachmentId][] = $this->page->render(
                     'tools/attachment-link.html',
                     [
                         'post_id' => $post->id,
@@ -121,7 +121,7 @@ final readonly class FileManager
                     "{$file->hash}.{$ext}",
                 ) : "../download?id={$file->id}";
 
-            $table .= $this->page->parseTemplate(
+            $table .= $this->page->render(
                 'tools/file-manager-row.html',
                 [
                     'downloads' => $file->downloads,
@@ -136,7 +136,7 @@ final readonly class FileManager
             );
         }
 
-        $page .= $table !== '' ? $this->page->parseTemplate(
+        $page .= $table !== '' ? $this->page->render(
             'tools/file-manager.html',
             [
                 'content' => $table,

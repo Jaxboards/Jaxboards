@@ -88,7 +88,7 @@ final readonly class Settings
         // This is silly, but we need the whole page to be a form
         $this->page->append('content', '<form method="post">');
 
-        $this->page->addContentBox('Board Name/Logo', $status . $this->page->parseTemplate(
+        $this->page->addContentBox('Board Name/Logo', $status . $this->page->render(
             'settings/boardname.html',
             [
                 'board_name' => $this->config->getSetting('boardname'),
@@ -96,7 +96,7 @@ final readonly class Settings
             ],
         ));
 
-        $this->page->addContentBox('Board Online/Offline', $this->page->parseTemplate(
+        $this->page->addContentBox('Board Online/Offline', $this->page->render(
             'settings/boardname-board-offline.html',
             [
                 'board_offline_checked' => $this->page->checked(!$this->config->getSetting('boardoffline')),
@@ -106,14 +106,14 @@ final readonly class Settings
             ],
         ));
 
-        $this->page->addContentBox('Birthdays', $this->page->parseTemplate(
+        $this->page->addContentBox('Birthdays', $this->page->render(
             'settings/birthday.html',
             [
                 'checked' => $this->page->checked($this->config->getSetting('birthdays') !== 0),
             ],
         ));
 
-        $this->page->addContentBox('HCaptcha Setup', $this->page->parseTemplate(
+        $this->page->addContentBox('HCaptcha Setup', $this->page->render(
             'settings/hcaptcha.html',
             [
                 'hcaptcha_secret' => $this->config->getSetting('hcaptcha_secret'),
@@ -157,7 +157,7 @@ final readonly class Settings
         $pages = ModelsPage::selectMany();
         $table = '';
         foreach ($pages as $pageRecord) {
-            $table .= $this->page->parseTemplate(
+            $table .= $this->page->render(
                 'settings/pages-row.html',
                 [
                     'act' => $pageRecord->act,
@@ -166,7 +166,7 @@ final readonly class Settings
         }
 
         if ($table !== '') {
-            $page .= $this->page->parseTemplate(
+            $page .= $this->page->render(
                 'settings/pages.html',
                 [
                     'content' => $table,
@@ -180,7 +180,7 @@ final readonly class Settings
                 'do' => 'pages',
             ],
         );
-        $page .= $this->page->parseTemplate(
+        $page .= $this->page->render(
             'settings/pages-new.html',
             [
                 'hidden_fields' => $hiddenFields,
@@ -215,7 +215,7 @@ final readonly class Settings
             );
         }
 
-        $page .= $this->page->parseTemplate(
+        $page .= $this->page->render(
             'settings/pages-edit.html',
             [
                 'content' => $this->textFormatting->blockhtml($pageRecord->page),
@@ -256,7 +256,7 @@ final readonly class Settings
             $page .= $this->saveShoutboxSettings();
         }
 
-        $page .= $this->page->parseTemplate(
+        $page .= $this->page->render(
             'settings/shoutbox.html',
             [
                 'shoutbox_avatar_checked' => $this->page->checked((bool) $this->config->getSetting('shoutboxava')),
@@ -366,7 +366,7 @@ final readonly class Settings
 
         $badgesList = '';
         foreach ($badges as $badge) {
-            $badgesList .= $this->page->parseTemplate(
+            $badgesList .= $this->page->render(
                 'settings/badges-row.html',
                 [
                     'badgeId' => $badge->id,
@@ -401,14 +401,14 @@ final readonly class Settings
             $this->page->addContentBox('Save Data', $saveDataResult);
         }
 
-        $this->page->addContentBox('Badges', $this->page->parseTemplate(
+        $this->page->addContentBox('Badges', $this->page->render(
             'settings/badges-enable.html',
             [
                 'badges_enabled' => $this->config->getSetting('badgesEnabled') ? ' checked' : '',
             ],
         ));
 
-        $this->page->addContentBox('Manage Badges', $this->page->parseTemplate(
+        $this->page->addContentBox('Manage Badges', $this->page->render(
             'settings/badges-list.html',
             [
                 'badges' => $badgesList,
@@ -419,7 +419,7 @@ final readonly class Settings
             return;
         }
 
-        $this->page->addContentBox('Grant Badges', $this->page->parseTemplate(
+        $this->page->addContentBox('Grant Badges', $this->page->render(
             'settings/badges-grant.html',
             [
                 'options' => $badgeOptions,

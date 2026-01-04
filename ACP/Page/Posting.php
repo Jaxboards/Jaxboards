@@ -85,19 +85,19 @@ final readonly class Posting
         }
 
         if ($badWords === []) {
-            $table = $this->page->parseTemplate(
+            $table = $this->page->render(
                 'posting/word-filter-empty.html',
-            ) . $this->page->parseTemplate(
+            ) . $this->page->render(
                 'posting/word-filter-submit-row.html',
             );
         } else {
-            $table = $this->page->parseTemplate(
+            $table = $this->page->render(
                 'posting/word-filter-heading.html',
-            ) . $this->page->parseTemplate(
+            ) . $this->page->render(
                 'posting/word-filter-submit-row.html',
             );
             foreach (array_reverse($badWords, true) as $textRule) {
-                $table .= $this->page->parseTemplate(
+                $table .= $this->page->render(
                     'posting/word-filter-row.html',
                     [
                         'filter' => $textRule->needle,
@@ -108,7 +108,7 @@ final readonly class Posting
             }
         }
 
-        $page .= $this->page->parseTemplate(
+        $page .= $this->page->render(
             'posting/word-filter.html',
             [
                 'content' => $table,
@@ -170,23 +170,23 @@ final readonly class Posting
         }
 
         if ($emoticons === []) {
-            $table = $this->page->parseTemplate(
+            $table = $this->page->render(
                 'posting/emoticon-heading.html',
-            ) . $this->page->parseTemplate(
+            ) . $this->page->render(
                 'posting/emoticon-submit-row.html',
-            ) . $this->page->parseTemplate(
+            ) . $this->page->render(
                 'posting/emoticon-empty-row.html',
             );
         } else {
-            $table = $this->page->parseTemplate(
+            $table = $this->page->render(
                 'posting/emoticon-heading.html',
-            ) . $this->page->parseTemplate(
+            ) . $this->page->render(
                 'posting/emoticon-submit-row.html',
             );
             $emoticons = array_reverse($emoticons, true);
 
             foreach ($emoticons as $emoticon) {
-                $table .= $this->page->parseTemplate(
+                $table .= $this->page->render(
                     'posting/emoticon-row.html',
                     [
                         'emoticon' => $emoticon->needle,
@@ -197,7 +197,7 @@ final readonly class Posting
             }
         }
 
-        $page .= $this->page->parseTemplate(
+        $page .= $this->page->render(
             'posting/emoticons.html',
             [
                 'content' => $table,
@@ -209,7 +209,7 @@ final readonly class Posting
         $emotepack = $this->config->getSetting('emotepack');
         $emoticonPackOptions = '';
         foreach ($basesets as $packId => $packName) {
-            $emoticonPackOptions .= $this->page->parseTemplate(
+            $emoticonPackOptions .= $this->page->render(
                 'select-option.html',
                 [
                     'label' => $packName,
@@ -222,7 +222,7 @@ final readonly class Posting
 
         $emoticonRows = '';
         foreach ($this->textFormatting->rules->getEmotePack($emotepack) as $emoticon => $smileyFile) {
-            $emoticonRows .= $this->page->parseTemplate(
+            $emoticonRows .= $this->page->render(
                 'posting/emoticon-packs-row.html',
                 [
                     'emoticon' => $emoticon,
@@ -232,7 +232,7 @@ final readonly class Posting
         }
 
 
-        $page = $this->page->parseTemplate(
+        $page = $this->page->render(
             'posting/emoticon-packs.html',
             [
                 'emoticon_packs' => $emoticonPackOptions,
@@ -285,24 +285,24 @@ final readonly class Posting
 
         $reactionsettings = $this->config->getSetting('reactions');
 
-        $page2 .= $this->page->parseTemplate(
+        $page2 .= $this->page->render(
             'posting/post-rating-settings.html',
             [
                 'ratings_anonymous' => $this->page->checked(($reactionsettings & 2) !== 0),
                 'ratings_enabled' => $this->page->checked(($reactionsettings & 1) !== 0),
             ],
         );
-        $table = $this->page->parseTemplate(
+        $table = $this->page->render(
             'posting/post-rating-heading.html',
         );
         if ($niblets === []) {
-            $table .= $this->page->parseTemplate(
+            $table .= $this->page->render(
                 'posting/post-rating-empty-row.html',
             );
         } else {
             krsort($niblets);
             foreach ($niblets as $niblet) {
-                $table .= $this->page->parseTemplate(
+                $table .= $this->page->render(
                     'posting/post-rating-row.html',
                     [
                         'id' => $niblet->id,
@@ -313,7 +313,7 @@ final readonly class Posting
             }
         }
 
-        $page .= $this->page->parseTemplate(
+        $page .= $this->page->render(
             'posting/post-rating.html',
             [
                 'content' => $table,

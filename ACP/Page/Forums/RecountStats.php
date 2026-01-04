@@ -33,7 +33,7 @@ final readonly class RecountStats
     {
         $this->page->addContentBox(
             'Board Statistics',
-            $this->page->parseTemplate(
+            $this->page->render(
                 'stats/show-stats.html',
             ),
         );

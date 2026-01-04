@@ -307,7 +307,7 @@ final readonly class Themes
         foreach ($skins as $skin) {
             $wrapperOptions = '';
             foreach ($wrappers as $wrapper) {
-                $wrapperOptions .= $this->page->parseTemplate(
+                $wrapperOptions .= $this->page->render(
                     'select-option.html',
                     [
                         'label' => $wrapper,
@@ -318,15 +318,15 @@ final readonly class Themes
                 );
             }
 
-            $skinsHTML .= $this->page->parseTemplate(
+            $skinsHTML .= $this->page->render(
                 'themes/show-skin-index-css-row.html',
                 [
                     'custom' => $skin->custom
-                        ? $this->page->parseTemplate(
+                        ? $this->page->render(
                             'themes/show-skin-index-css-row-custom.html',
                         ) : '',
                     'default_checked' => $this->page->checked($skin->default === 1),
-                    'default_option' => $skin->custom ? '' : $this->page->parseTemplate(
+                    'default_option' => $skin->custom ? '' : $this->page->render(
                         'select-option.html',
                         [
                             'label' => 'Skin Default',
@@ -334,7 +334,7 @@ final readonly class Themes
                             'value' => '',
                         ],
                     ),
-                    'delete' => $skin->custom ? $this->page->parseTemplate(
+                    'delete' => $skin->custom ? $this->page->render(
                         'themes/show-skin-index-css-row-delete.html',
                         [
                             'id' => $skin->id,
@@ -350,7 +350,7 @@ final readonly class Themes
             $usedwrappers[] = $skin->wrapper;
         }
 
-        $skinsHTML = $this->page->parseTemplate(
+        $skinsHTML = $this->page->render(
             'themes/show-skin-index-css.html',
             [
                 'content' => $skinsHTML,
@@ -364,11 +364,11 @@ final readonly class Themes
 
         $wrap = '';
         foreach ($wrappers as $wrapper) {
-            $wrap .= $this->page->parseTemplate(
+            $wrap .= $this->page->render(
                 'themes/show-skin-index-wrapper-row.html',
                 [
                     'delete' => in_array($wrapper, $usedwrappers) ? 'In use'
-                        : $this->page->parseTemplate(
+                        : $this->page->render(
                             'themes/show-skin-index-wrapper-row-delete.html',
                             [
                                 'title' => $wrapper,
@@ -379,7 +379,7 @@ final readonly class Themes
             );
         }
 
-        $wrap = $this->page->parseTemplate(
+        $wrap = $this->page->render(
             'themes/show-skin-index-wrapper.html',
             [
                 'content' => $wrap,
@@ -411,7 +411,7 @@ final readonly class Themes
 
         $this->page->addContentBox(
             ($skin->custom !== 0 ? 'Editing' : 'Viewing') . ' Skin: ' . $skin->title,
-            $this->page->parseTemplate(
+            $this->page->render(
                 'themes/edit-css.html',
                 [
                     'content' => $this->textFormatting->blockhtml(
@@ -422,7 +422,7 @@ final readonly class Themes
                             ) . "/{$skin->title}/css.css",
                         ) ?: '',
                     ),
-                    'save' => $skin->custom !== 0 ? $this->page->parseTemplate(
+                    'save' => $skin->custom !== 0 ? $this->page->render(
                         'save-changes.html',
                     ) : '',
                 ],
@@ -456,7 +456,7 @@ final readonly class Themes
 
         $this->page->addContentBox(
             "Editing Wrapper: {$wrapper}",
-            $saved . $this->page->parseTemplate(
+            $saved . $this->page->render(
                 'themes/edit-wrapper.html',
                 [
                     'content' => $this->textFormatting->blockhtml(
@@ -529,7 +529,7 @@ final readonly class Themes
 
         $wrapperOptions = '';
         foreach ($this->getWrappers() as $wrapper) {
-            $wrapperOptions .= $this->page->parseTemplate(
+            $wrapperOptions .= $this->page->render(
                 'select-option.html',
                 [
                     'label' => $wrapper,
@@ -539,7 +539,7 @@ final readonly class Themes
             );
         }
 
-        $page .= $this->page->parseTemplate(
+        $page .= $this->page->render(
             'themes/create-skin.html',
             [
                 'wrapper_options' => $wrapperOptions,

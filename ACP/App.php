@@ -82,7 +82,7 @@ final class App
     {
         $url = "?act={$title}";
 
-        $this->nav['links'] .= $this->page->parseTemplate(
+        $this->nav['links'] .= $this->page->render(
             'nav-link.html',
             [
                 'class' => mb_strtolower($title),
@@ -93,7 +93,7 @@ final class App
 
         $dropdownLinks = '';
         foreach ($menu as $do => $menuTitle) {
-            $dropdownLinks .= $this->page->parseTemplate(
+            $dropdownLinks .= $this->page->render(
                 'nav-dropdown-link.html',
                 [
                     'title' => $menuTitle,
@@ -102,7 +102,7 @@ final class App
             );
         }
 
-        $this->nav['dropdowns'] .= $this->page->parseTemplate(
+        $this->nav['dropdowns'] .= $this->page->render(
             'nav-dropdown.html',
             [
                 'dropdown_id' => 'menu_' . mb_strtolower($title),
@@ -187,7 +187,7 @@ final class App
 
         $this->page->append(
             'nav',
-            $this->page->parseTemplate('nav.html', $this->nav),
+            $this->page->render('nav.html', $this->nav),
         );
     }
 }

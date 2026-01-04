@@ -59,7 +59,7 @@ final class Page
         $content = '';
         $act = $this->request->asString->get('act') ?? '';
         foreach ($links as $do => $title) {
-            $content .= $this->parseTemplate(
+            $content .= $this->render(
                 'sidebar-list-link.html',
                 [
                     'title' => $title,
@@ -68,10 +68,10 @@ final class Page
             );
         }
 
-        $this->parts['sidebar'] = $this->parseTemplate(
+        $this->parts['sidebar'] = $this->render(
             'sidebar.html',
             [
-                'content' => $this->parseTemplate(
+                'content' => $this->render(
                     'sidebar-list.html',
                     [
                         'content' => $content,
@@ -83,7 +83,7 @@ final class Page
 
     public function addContentBox(string $title, string $content): void
     {
-        $this->append('content', $this->parseTemplate(
+        $this->append('content', $this->render(
             'content-box.html',
             [
                 'content' => $content,
@@ -102,7 +102,7 @@ final class Page
         $data['themes_css_url'] = $boardURL . '/ACP/css/themes.css';
         $data['admin_js_url'] = $boardURL . '/dist/acp.js';
 
-        echo $this->parseTemplate(
+        echo $this->render(
             'admin.html',
             $data,
         );
@@ -110,7 +110,7 @@ final class Page
 
     public function error(string $content): string
     {
-        return $this->parseTemplate(
+        return $this->render(
             'error.html',
             [
                 'content' => $content,
@@ -120,7 +120,7 @@ final class Page
 
     public function success(string $content): string
     {
-        return $this->parseTemplate(
+        return $this->render(
             'success.html',
             [
                 'content' => $content,
@@ -144,7 +144,7 @@ final class Page
      *
      * @return string returns the template with the data replaced
      */
-    public function parseTemplate(
+    public function render(
         string $templateFile,
         array $data = [],
     ): string {

@@ -209,7 +209,7 @@ final class Groups
         $widthPercent = 1 / $numgroups * 100;
         $groupHeadings = '';
         foreach ($groups as $groupId => $group) {
-            $groupHeadings .= $this->page->parseTemplate(
+            $groupHeadings .= $this->page->render(
                 'groups/show-permissions-group-heading.html',
                 [
                     'id' => $groupId,
@@ -273,7 +273,7 @@ final class Groups
         ];
         $permissionsTable = '';
         foreach ($permissionsChart as $category => $permissions) {
-            $permissionsTable .= $this->page->parseTemplate(
+            $permissionsTable .= $this->page->render(
                 'groups/show-permissions-breaker-row.html',
                 [
                     'column_count' => 1 + $numgroups,
@@ -284,7 +284,7 @@ final class Groups
             foreach ($permissions as $field => $title) {
                 $groupColumns = '';
                 foreach ($groups as $groupId => $group) {
-                    $groupColumns .= $this->page->parseTemplate(
+                    $groupColumns .= $this->page->render(
                         'groups/show-permissions-permission-row-group-column.html',
                         [
                             'checked' => $this->page->checked((bool) $group->{$field}),
@@ -294,7 +294,7 @@ final class Groups
                     );
                 }
 
-                $permissionsTable .= $this->page->parseTemplate(
+                $permissionsTable .= $this->page->render(
                     'groups/show-permissions-permission-row.html',
                     [
                         'group_columns' => $groupColumns,
@@ -304,7 +304,7 @@ final class Groups
             }
         }
 
-        $page .= $this->page->parseTemplate(
+        $page .= $this->page->render(
             'groups/show-permissions.html',
             [
                 'group_headings' => $groupHeadings,
@@ -371,7 +371,7 @@ final class Groups
             $group = Group::selectOne($gid);
         }
 
-        $page .= $this->page->parseTemplate(
+        $page .= $this->page->render(
             'groups/create.html',
             [
                 'icon_url' => $group !== null ? $this->textFormatting->blockhtml($group->icon) : '',
@@ -409,7 +409,7 @@ final class Groups
         $found = false;
         foreach ($groups as $group) {
             $found = true;
-            $page .= $this->page->parseTemplate(
+            $page .= $this->page->render(
                 'groups/delete.html',
                 [
                     'id' => $group->id,

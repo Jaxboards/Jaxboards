@@ -64,7 +64,7 @@ final readonly class Login
             }
         }
 
-        echo $this->page->parseTemplate(
+        echo $this->page->render(
             'login.html',
             $pageElements,
         );

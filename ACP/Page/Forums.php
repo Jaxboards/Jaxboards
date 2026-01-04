@@ -151,7 +151,7 @@ final readonly class Forums
         foreach ($this->fetchAllGroups() as $group) {
             $groupPerms = $perms[$group->id] ?? null;
 
-            $permsTable .= $this->page->parseTemplate(
+            $permsTable .= $this->page->render(
                 'forums/create-forum-permissions-row.html',
                 [
                     'global' => $this->checkbox($group->id, 'global', $groupPerms === null),
@@ -213,7 +213,7 @@ final readonly class Forums
 
             if ($forum->mods) {
                 $modCount = count(explode(',', $forum->mods));
-                $mods = $this->page->parseTemplate(
+                $mods = $this->page->render(
                     'forums/order-forums-tree-item-mods.html',
                     [
                         'content' => 'moderator' . ($modCount === 1 ? '' : 's'),
@@ -224,7 +224,7 @@ final readonly class Forums
                 $mods = '';
             }
 
-            $html .= $this->page->parseTemplate(
+            $html .= $this->page->render(
                 'forums/order-forums-tree-item.html',
                 [
                     'class' => implode(' ', [
@@ -240,13 +240,13 @@ final readonly class Forums
                     'mods' => $mods,
                     'title' => $forum->title,
                     'trashcan' => $forum->trashcan
-                        ? $this->page->parseTemplate('forums/order-forums-tree-item-trashcan.html')
+                        ? $this->page->render('forums/order-forums-tree-item-trashcan.html')
                         : '',
                 ],
             );
         }
 
-        return $this->page->parseTemplate(
+        return $this->page->render(
             'forums/order-forums-tree.html',
             [
                 'class' => '',
@@ -288,7 +288,7 @@ final readonly class Forums
 
         $treeHTML = '';
         foreach ($categories as $categoryId => $category) {
-            $treeHTML .= $this->page->parseTemplate(
+            $treeHTML .= $this->page->render(
                 'forums/order-forums-tree-item.html',
                 [
                     'class' => 'parentlock',
@@ -307,7 +307,7 @@ final readonly class Forums
             );
         }
 
-        $page .= $this->page->parseTemplate(
+        $page .= $this->page->render(
             'forums/order-forums-tree.html',
             [
                 'class' => 'tree',
@@ -315,7 +315,7 @@ final readonly class Forums
             ],
         );
 
-        $page .= $this->page->parseTemplate(
+        $page .= $this->page->render(
             'forums/order-forums.html',
         );
         $this->page->addContentBox('Forums', $page);
@@ -401,7 +401,7 @@ final readonly class Forums
 
         $subforumOptions = '';
         foreach ($subforumOptionsArray as $value => $label) {
-            $subforumOptions .= $this->page->parseTemplate(
+            $subforumOptions .= $this->page->render(
                 'select-option.html',
                 [
                     'label' => $label,
@@ -421,7 +421,7 @@ final readonly class Forums
         ];
         $orderByOptions = '';
         foreach ($orderByOptionsArray as $value => $label) {
-            $orderByOptions .= $this->page->parseTemplate(
+            $orderByOptions .= $this->page->render(
                 'select-option.html',
                 [
                     'label' => $label,
@@ -433,7 +433,7 @@ final readonly class Forums
         }
 
 
-        $page .= $this->page->parseTemplate(
+        $page .= $this->page->render(
             'forums/create-forum.html',
             [
                 'description' => $forum ? $this->textFormatting->blockhtml($forum->subtitle) : '',
@@ -453,7 +453,7 @@ final readonly class Forums
             );
             $modList = '';
             foreach ($members as $member) {
-                $modList .= $this->page->parseTemplate(
+                $modList .= $this->page->render(
                     'forums/create-forum-moderators-mod.html',
                     [
                         'delete_link' => '?act=Forums&do=edit&edit=' . $fid . '&rmod=' . $member->id,
@@ -465,7 +465,7 @@ final readonly class Forums
             $modList = 'No forum-specific moderators added!';
         }
 
-        $moderators = $this->page->parseTemplate(
+        $moderators = $this->page->render(
             'forums/create-forum-moderators.html',
             [
                 'mod_list' => $modList,
@@ -473,7 +473,7 @@ final readonly class Forums
             ],
         );
 
-        $forumperms = $this->page->parseTemplate(
+        $forumperms = $this->page->render(
             'forums/create-forum-permissions.html',
             [
                 'content' => $this->printForumPermsTable($forum),
@@ -639,7 +639,7 @@ final readonly class Forums
             $this->page->addContentBox(
                 'Forum Deletion',
                 $this->page->success(
-                    $this->page->parseTemplate(
+                    $this->page->render(
                         'forums/delete-forum-deleted.html',
                         [
                             'content' => $page,
@@ -654,7 +654,7 @@ final readonly class Forums
         $forumOptions = '';
         $forums = $this->fetchAllForums();
         foreach ($forums as $forum) {
-            $forumOptions .= $this->page->parseTemplate(
+            $forumOptions .= $this->page->render(
                 'select-option.html',
                 [
                     'label' => $forum->title,
@@ -675,7 +675,7 @@ final readonly class Forums
 
         $this->page->addContentBox(
             'Deleting Forum: ' . $forums[$forumId]->title,
-            $this->page->parseTemplate(
+            $this->page->render(
                 'forums/delete-forum.html',
                 [
                     'forum_options' => $forumOptions,
@@ -719,7 +719,7 @@ final readonly class Forums
 
         $this->page->addContentBox(
             ($category->id !== 0 ? 'Edit' : 'Create') . ' Category',
-            $page . $this->page->parseTemplate(
+            $page . $this->page->render(
                 'forums/create-category.html',
                 [
                     'id' => (string) $category->id,
@@ -773,7 +773,7 @@ final readonly class Forums
         } else {
             $categoryOptions = '';
             foreach ($categories as $categoryId => $category) {
-                $categoryOptions .= $this->page->parseTemplate(
+                $categoryOptions .= $this->page->render(
                     'select-option.html',
                     [
                         'label' => $category->title,
@@ -783,7 +783,7 @@ final readonly class Forums
                 );
             }
 
-            $page .= $this->page->parseTemplate(
+            $page .= $this->page->render(
                 'forums/delete-category.html',
                 [
                     'category_options' => $categoryOptions,
@@ -866,7 +866,7 @@ final readonly class Forums
         string $name,
         bool|int $checked,
     ): string {
-        return $this->page->parseTemplate(
+        return $this->page->render(
             'forums/create-forum-permissions-row-checkbox.html',
             [
                 'checked' => $this->page->checked((bool) $checked),

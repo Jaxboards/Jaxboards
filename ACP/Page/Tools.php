@@ -62,7 +62,7 @@ final readonly class Tools
 
         $this->page->addContentBox(
             'Backup Forum',
-            $this->page->parseTemplate(
+            $this->page->render(
                 'tools/backup.html',
             ),
         );

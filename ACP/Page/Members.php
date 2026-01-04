@@ -74,7 +74,7 @@ final readonly class Members
 
         $rows = '';
         foreach ($members as $member) {
-            $rows .= $this->page->parseTemplate(
+            $rows .= $this->page->render(
                 'members/show-main-row.html',
                 [
                     'avatar_url' => $member->avatar ?: self::DEFAULT_AVATAR,
@@ -87,7 +87,7 @@ final readonly class Members
 
         $this->page->addContentBox(
             'Member List',
-            $this->page->parseTemplate(
+            $this->page->render(
                 'members/show-main.html',
                 [
                     'rows' => $rows,
@@ -117,7 +117,7 @@ final readonly class Members
             $numMembers = count($members);
             if ($numMembers > 1) {
                 foreach ($members as $member) {
-                    $page .= $this->page->parseTemplate(
+                    $page .= $this->page->render(
                         'members/edit-select-option.html',
                         [
                             'avatar_url' => $member->avatar ?: self::DEFAULT_AVATAR,
@@ -177,13 +177,13 @@ final readonly class Members
                 $page .= $this->inputText('YouTube:', 'contactYoutube', $member->contactYoutube);
                 $page .= $this->heading('System-Generated Variables');
                 $page .= $this->inputText('Post Count:', 'posts', (string) $member->posts);
-                $page = $this->page->parseTemplate(
+                $page = $this->page->render(
                     'members/edit-form.html',
                     ['content' => $page],
                 );
             }
         } else {
-            $page = $this->page->parseTemplate('members/edit.html');
+            $page = $this->page->render('members/edit.html');
         }
 
         $this->page->addContentBox(
@@ -311,7 +311,7 @@ final readonly class Members
                 : $this->page->success('Member registered.');
         }
 
-        $page .= $this->page->parseTemplate('members/pre-register.html');
+        $page .= $this->page->render('members/pre-register.html');
         $this->page->addContentBox('Pre-Register', $page);
     }
 
@@ -320,7 +320,7 @@ final readonly class Members
         $page = '';
         $groups = Group::selectMany('ORDER BY `title` DESC');
         foreach ($groups as $group) {
-            $page .= $this->page->parseTemplate(
+            $page .= $this->page->render(
                 'select-option.html',
                 [
                     'label' => $group->title,
@@ -330,7 +330,7 @@ final readonly class Members
             );
         }
 
-        return $this->page->parseTemplate(
+        return $this->page->render(
             'members/get-groups.html',
             [
                 'content' => $page,
@@ -486,7 +486,7 @@ final readonly class Members
 
         $this->page->addContentBox(
             'Account Merge',
-            $mergeResult . $this->page->parseTemplate(
+            $mergeResult . $this->page->render(
                 'members/merge.html',
             ),
         );
@@ -561,7 +561,7 @@ final readonly class Members
         $this->page->addContentBox(
             'Delete Account',
             $page
-                . $this->page->parseTemplate(
+                . $this->page->render(
                     'members/delete.html',
                 ),
         );
@@ -582,7 +582,7 @@ final readonly class Members
 
         $this->page->addContentBox(
             'IP Bans',
-            $this->page->parseTemplate(
+            $this->page->render(
                 'members/ip-bans.html',
                 [
                     'content' => htmlspecialchars($data),
@@ -634,7 +634,7 @@ final readonly class Members
         $this->page->addContentBox(
             'Mass Message',
             $page
-                . $this->page->parseTemplate(
+                . $this->page->render(
                     'members/mass-message.html',
                 ),
         );
@@ -650,7 +650,7 @@ final readonly class Members
             );
         }
 
-        $page = $this->page->parseTemplate(
+        $page = $this->page->render(
             'members/validation.html',
             [
                 'checked' => $this->page->checked((bool) $this->config->getSetting('membervalidation')),
@@ -674,7 +674,7 @@ final readonly class Members
         $members = Member::selectMany('WHERE `groupID`=5');
         $page = '';
         foreach ($members as $member) {
-            $page .= $this->page->parseTemplate(
+            $page .= $this->page->render(
                 'members/validation-list-row.html',
                 [
                     'email_address' => $member->email,
@@ -686,7 +686,7 @@ final readonly class Members
             );
         }
 
-        $page = $page !== '' ? $this->page->parseTemplate(
+        $page = $page !== '' ? $this->page->render(
             'members/validation-list.html',
             [
                 'content' => $page,
@@ -700,7 +700,7 @@ final readonly class Members
         string $name,
         string $value,
     ): string {
-        return $this->page->parseTemplate(
+        return $this->page->render(
             'members/edit-form-field-text.html',
             [
                 'label' => $label,
@@ -715,7 +715,7 @@ final readonly class Members
         string $name,
         string $value,
     ): string {
-        return $this->page->parseTemplate(
+        return $this->page->render(
             'members/edit-form-field-textarea.html',
             [
                 'label' => $label,
@@ -727,7 +727,7 @@ final readonly class Members
 
     private function heading(string $value): string
     {
-        return $this->page->parseTemplate(
+        return $this->page->render(
             'members/edit-heading.html',
             [
                 'value' => $value,
