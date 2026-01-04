@@ -78,6 +78,7 @@ jobs:
               shell: bash
             - run: npm run-script ci-lint
             - run: composer run-script test
+            - run: npm test
             - name: SonarQube Scan
               if: ${{ !cancelled() }}
               uses: SonarSource/sonarqube-scan-action@v6
