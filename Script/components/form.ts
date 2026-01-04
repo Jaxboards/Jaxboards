@@ -28,48 +28,17 @@ export default class Form extends Component<HTMLFormWithSubmit> {
 
     submitForm() {
         const { element, resetOnSubmit } = this;
-        const postBody = new URLSearchParams();
         const { submitButton } = element;
 
-        const inputFields = ['input', 'select', 'button', 'textarea'] as const;
+        const formData = new FormData(element, submitButton);
 
-        inputFields
-            .flatMap((tagName) => Array.from(element.querySelectorAll(tagName)))
-            .forEach((inputField) => {
-                if (!inputField.name || inputField.type === 'submit') {
-                    return;
-                }
+        // Filter out input[type=file]
+        const withoutFiles = Array.from(formData.entries()).filter(
+            (tuple): tuple is [string, string] => typeof tuple[1] === 'string',
+        );
 
-                if (
-                    inputField instanceof HTMLSelectElement &&
-                    inputField.type === 'select-multiple'
-                ) {
-                    Array.from(inputField.options)
-                        .filter((option) => option.selected)
-                        .forEach((option) => {
-                            postBody.append(
-                                `${inputField.name}[]`,
-                                option.value,
-                            );
-                        });
-                    return;
-                }
-
-                if (
-                    inputField instanceof HTMLInputElement &&
-                    ['checkbox', 'radio'].includes(inputField.type) &&
-                    !inputField.checked
-                ) {
-                    return;
-                }
-                postBody.append(inputField.name, inputField.value);
-            });
-
-        if (submitButton) {
-            postBody.append(submitButton.name, submitButton.value);
-        }
         void RUN.stream.load(element.action || globalThis.location.toString(), {
-            body: postBody,
+            body: new URLSearchParams(withoutFiles),
         });
         if (resetOnSubmit) {
             element.reset();

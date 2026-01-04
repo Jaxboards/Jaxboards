@@ -136,7 +136,7 @@ final class Search implements Route
             $options .= "<option value='{$forumId}'>{$text}</option>";
         }
 
-        return '<select size="15" title="List of forums" multiple="multiple" name="fids">' . $options . '</select>';
+        return '<select size="15" title="List of forums" multiple="multiple" name="fids[]">' . $options . '</select>';
     }
 
     private function dosearch(): void
