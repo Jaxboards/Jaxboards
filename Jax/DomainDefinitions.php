@@ -31,7 +31,7 @@ final class DomainDefinitions
         $scheme = $request->server('REQUEST_SCHEME') ?? 'https';
 
         // Build the url.
-        $boardURL = '//' . $host;
+        $boardURL = $scheme . '://' . $host;
         if (
             !($port === '443' && $scheme === 'https')
             && !($port === '80' && $scheme === 'http')

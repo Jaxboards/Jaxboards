@@ -685,14 +685,15 @@ final class Topic implements Route
         $authors = $this->fetchMembersById(array_map(static fn(Post $post): int => $post->author, $posts));
 
         foreach ($posts as $post) {
+            $link = $boardURL . $this->router->url('topic', [
+                'id' => $modelsTopic->id,
+                'findpost' => $post->id,
+            ]);
             $rssFeed->additem(
                 [
                     'description' => $this->textFormatting->blockhtml($this->textFormatting->theWorks($post->post)),
-                    'guid' => $post->id,
-                    'link' => $boardURL . $this->router->url('topic', [
-                        'id' => $modelsTopic->id,
-                        'findpost' => $post->id,
-                    ]),
+                    'guid' => $link,
+                    'link' => $link,
                     'pubDate' => gmdate('r', $this->date->datetimeAsTimestamp($post->date)),
                     'title' => $authors[$post->author]->displayName . ':',
                 ],

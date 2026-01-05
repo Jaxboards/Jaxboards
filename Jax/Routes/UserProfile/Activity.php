@@ -55,12 +55,13 @@ final readonly class Activity
         );
         foreach ($this->fetchActivities($member->id) as $entry) {
             $parsed = $this->parseActivityRSS($entry->activity, $member, $entry->affectedUser);
+            $link = $this->domainDefinitions->getBoardUrl()
+                . $this->textFormatting->blockhtml($parsed['link']);
             $rssFeed->additem(
                 [
                     'description' => $parsed['text'],
-                    'guid' => $entry->activity->id,
-                    'link' => $this->domainDefinitions->getBoardUrl()
-                        . $this->textFormatting->blockhtml($parsed['link']),
+                    'guid' => $link,
+                    'link' => $link,
                     'pubDate' => $this->date->datetimeAsCarbon($entry->activity->date)?->format('r') ?? '',
                     'title' => $parsed['text'],
                 ],
