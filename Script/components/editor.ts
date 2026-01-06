@@ -19,6 +19,7 @@ const webSafeFonts: Record<string, string[]> = {
         'Calibri',
         'Candara',
         'Century Gothic',
+        'Comic Sans MS', // Not technically web safe but can't not have it
         'Franklin Gothic Medium',
         'Futura',
         'Geneva',
