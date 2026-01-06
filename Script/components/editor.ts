@@ -9,6 +9,60 @@ import { replaceSelection } from '../JAX/selection';
 const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
 const isURL = (text: string) => URL_REGEX.test(text);
 
+const webSafeFonts: Record<string, string[]> = {
+    'Sans Serif': [
+        'Arial',
+        'Arial Black',
+        'Arial Narrow',
+        'Arial Rounded MT Bold',
+        'Avant Garde',
+        'Calibri',
+        'Candara',
+        'Century Gothic',
+        'Franklin Gothic Medium',
+        'Futura',
+        'Geneva',
+        'Gill Sans',
+        'Helvetica',
+        'Impact',
+        'Lucida Grande',
+        'Optima',
+        'Segoe UI',
+        'Tahoma',
+        'Trebuchet MS',
+        'Verdana',
+    ],
+    Serif: [
+        'Big Caslon',
+        'Bodoni MT',
+        'Book Antiqua',
+        'Calisto MT',
+        'Cambria',
+        'Didot',
+        'Garamond',
+        'Georgia',
+        'Goudy Old Style',
+        'Hoefler Text',
+        'Lucida Bright',
+        'Palatino',
+        'Perpetua',
+        'Rockwell',
+        'Rockwell Extra Bold',
+        'Baskerville',
+        'Times New Roman',
+    ],
+    Monospaced: [
+        'Consolas',
+        'Courier New',
+        'Lucida Console',
+        'Lucida Sans Typewriter',
+        'Monaco',
+        'Andale Mono',
+    ],
+    Fantasy: ['Copperplate', 'Papyrus'],
+    Script: ['Brush Script MT'],
+};
+
 export default class Editor extends Component<HTMLTextAreaElement> {
     iframe: HTMLIFrameElement;
 
@@ -43,14 +97,6 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         // Attach Event Listeners
         this.iframe.addEventListener('load', () => this.iframeLoaded(), {
             once: true,
-        });
-        this.container.addEventListener('click', (evt) => {
-            if (
-                evt.target instanceof HTMLElement &&
-                evt.target.matches('.editbar a')
-            ) {
-                this.editbarCommand(evt, evt.target.className);
-            }
         });
 
         // Update DOM
@@ -93,7 +139,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
 
         this.doc.designMode = 'on';
 
-        this.editbar = Editor.buildEditBar();
+        this.editbar = this.buildEditBar();
 
         iframe.style.height = `${element.clientHeight}px`;
 
@@ -107,10 +153,11 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         }, 100);
     }
 
-    static buildEditBar(): HTMLDivElement {
+    buildEditBar(): HTMLDivElement {
         const editbar = document.createElement('div');
         editbar.className = 'editbar';
         editbar.innerHTML = [
+            `<select class="fontface"><option>Default Font</option></select>`,
             `<a class="bold" title="Bold"></a>`,
             `<a class="italic" title="Italic"></a>`,
             `<a class="underline" title="Underline"></a>`,
@@ -133,10 +180,38 @@ export default class Editor extends Component<HTMLTextAreaElement> {
             `<a class="c_switcheditmode" title="Switch editor mode"></a>`,
         ].join('');
 
+        editbar.addEventListener('click', (evt) => {
+            if (
+                evt.target instanceof HTMLElement &&
+                evt.target.matches('.editbar a')
+            ) {
+                this.editbarCommand(evt, evt.target.className);
+            }
+        });
+
+        const fontFace =
+            editbar.querySelector<HTMLSelectElement>('select.fontface');
+        if (fontFace) {
+            fontFace.addEventListener('input', (evt) => {
+                this.editbarCommand(
+                    evt as MouseEvent,
+                    'fontname',
+                    fontFace.value,
+                );
+            });
+            for (const group of Object.keys(webSafeFonts)) {
+                const options = webSafeFonts[group].map(
+                    (font: string) =>
+                        `<option style="font-family: ${font}">${font}</option>`,
+                );
+                fontFace.innerHTML += `<optgroup label="${group}">${options}</optgroup>`;
+            }
+        }
+
         return editbar;
     }
 
-    editbarCommand(event: MouseEvent, cmd: string) {
+    editbarCommand(event: MouseEvent, cmd: string, cmdValue?: string) {
         event.preventDefault();
 
         switch (cmd) {
@@ -151,7 +226,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
                 this.switchMode(!this.htmlMode);
                 break;
             default:
-                this.cmd(cmd);
+                this.cmd(cmd, cmdValue);
                 break;
         }
     }
@@ -344,6 +419,9 @@ export default class Editor extends Component<HTMLTextAreaElement> {
                 break;
             case 'forecolor':
                 bbcode = `[color=${arg1}]${selection}[/color]`;
+                break;
+            case 'fontname':
+                bbcode = `[font=${arg1}]${selection}[/font]`;
                 break;
             case 'c_code':
                 realCommand = 'inserthtml';

@@ -27,6 +27,11 @@ body {
     background-position-y: -24px;
 }
 
+.editbar .fontface {
+    vertical-align: top;
+    height: 24px;
+}
+
 .editbar .bold {
     width: 32px;
 }
