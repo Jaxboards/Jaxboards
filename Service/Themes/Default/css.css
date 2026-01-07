@@ -1371,6 +1371,7 @@ textarea {
 /* stylelint-disable-next-line selector-class-pattern */
 #intopic .post_buttons {
     flex: 1;
+    flex-wrap: wrap;
     display: flex;
     gap: 5px;
     font-size: smaller;
