@@ -170,7 +170,7 @@ final class Page
         // Custom theme found but files not there, also fallback to default
         if (!$this->fileSystem->getFileInfo($themePath)->isDir()) {
             $themePath = $this->domainDefinitions->getDefaultThemePath();
-            $themeUrl = $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default/';
+            $themeUrl = $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default';
         }
 
         $this->template->setThemePath($themePath);
@@ -227,14 +227,6 @@ final class Page
 
         // Couldn't find custom skin, get the default
         $skin ??= Skin::selectOne('WHERE `default`=? LIMIT 1', 1);
-
-        // We've exhausted all other ways of finding the right skin
-        // Fallback to default
-        if ($skin === null) {
-            $skin = new Skin();
-            $skin->title = 'Default';
-            $skin->wrapper = '';
-        }
 
         return $skin;
     }
