@@ -925,6 +925,9 @@ textarea {
     margin: 20px 40px;
     align-self: center;
 }
+#logo img {
+    max-width: initial; /* don't let logo shrink */
+}
 
 /* UserBox */
 #userbox {
