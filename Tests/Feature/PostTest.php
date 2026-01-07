@@ -31,6 +31,7 @@ use Jax\Page;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
+use Jax\Routes\API;
 use Jax\Routes\Post;
 use Jax\Routes\Post\CreateTopic;
 use Jax\ServiceConfig;
@@ -47,6 +48,7 @@ use Tests\FeatureTestCase;
  * @internal
  */
 #[CoversClass(App::class)]
+#[CoversClass(API::class)]
 #[CoversClass(BBCode::class)]
 #[CoversClass(BotDetector::class)]
 #[CoversClass(Column::class)]

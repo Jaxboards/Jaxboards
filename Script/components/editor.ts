@@ -158,7 +158,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         const editbar = document.createElement('div');
         editbar.className = 'editbar';
         editbar.innerHTML = [
-            `<select class="fontface"><option>Default Font</option></select>`,
+            `<select class="fontface"><option value="">Default Font</option></select>`,
             `<a class="bold" title="Bold"></a>`,
             `<a class="italic" title="Italic"></a>`,
             `<a class="underline" title="Underline"></a>`,

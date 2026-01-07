@@ -5,14 +5,10 @@ declare(strict_types=1);
 namespace Jax\Routes;
 
 use Jax\Database\Database;
-use Jax\DomainDefinitions;
-use Jax\FileSystem;
 use Jax\Hooks;
 use Jax\Interfaces\Route;
 use Jax\IPAddress;
-use Jax\Jax;
 use Jax\Models\Activity;
-use Jax\Models\File;
 use Jax\Models\Forum;
 use Jax\Models\Member;
 use Jax\Models\Post as ModelsPost;
@@ -30,14 +26,11 @@ use Jax\User;
 
 use function array_key_exists;
 use function explode;
-use function filesize;
-use function hash_file;
 use function in_array;
 use function json_decode;
 use function json_encode;
 use function mb_strlen;
 use function mb_substr;
-use function move_uploaded_file;
 use function preg_replace;
 use function trim;
 
@@ -59,10 +52,9 @@ final class Post implements Route
     private ?string $how = null;
 
     public function __construct(
+        private readonly API $api,
         private readonly CreateTopic $createTopic,
         private readonly Database $database,
-        private readonly DomainDefinitions $domainDefinitions,
-        private readonly FileSystem $fileSystem,
         private readonly Hooks $hooks,
         private readonly IPAddress $ipAddress,
         private readonly OpenGraph $openGraph,
@@ -82,7 +74,6 @@ final class Post implements Route
         $this->pid = (int) $this->request->asString->both('pid');
         $this->how = $this->request->asString->both('how');
         $submit = $this->request->asString->post('submit');
-        $fileData = $this->request->file('Filedata');
         $postData = $this->request->asString->post('postdata');
 
         // Nothing updates on this page
@@ -97,9 +88,11 @@ final class Post implements Route
             $this->postData = $postData;
         }
 
-        if ($fileData !== null && $this->user->getGroup()?->canAttach) {
-            $attachmentId = $this->upload($fileData);
-            $this->postData .= "\n\n[attachment]{$attachmentId}[/attachment]";
+        if ($this->request->file('Filedata') !== null) {
+            $attachmentId = $this->api->upload();
+            if ($attachmentId !== '') {
+                $this->postData .= "\n\n[attachment]{$attachmentId}[/attachment]";
+            }
         }
 
         $error = match (true) {
@@ -118,53 +111,6 @@ final class Post implements Route
 
             return;
         }
-    }
-
-    /**
-     * 1) Compute a hash of the file to use as the filename on the server
-     * 2) If it's an image, keep the extension so we can show it. Otherwise remove it.
-     * 3) If the file has already been uploaded (based on hash) then don't replace it.
-     *
-     * @param array<string,mixed> $fileobj
-     *
-     * @return string file ID
-     */
-    private function upload(array $fileobj): string
-    {
-        $uid = $this->user->get()->id;
-
-        $size = (int) filesize($fileobj['tmp_name']);
-        $hash = hash_file('sha1', $fileobj['tmp_name']) ?: 'hash_error';
-        $uploadPath = $this->domainDefinitions->getBoardPath() . '/Uploads/';
-
-        $ext = $this->fileSystem->getFileInfo($fileobj['name'])->getExtension();
-
-        $imageExtension = in_array($ext, Jax::IMAGE_EXTENSIONS, true)
-            ? ".{$ext}"
-            : null;
-
-        $filePath = $uploadPath . $hash . $imageExtension;
-
-        if (!$this->fileSystem->getFileInfo($filePath)->isFile()) {
-            move_uploaded_file($fileobj['tmp_name'], $filePath);
-
-            $file = new File();
-            $file->hash = $hash;
-            $file->ip = $this->ipAddress->asBinary() ?? '';
-            $file->name = $fileobj['name'];
-            $file->size = $size;
-            $file->uid = $uid;
-            $file->insert();
-
-            return (string) $file->id;
-        }
-
-        $fileRecord = File::selectOne('WHERE `hash`=?', $hash);
-        if ($fileRecord === null) {
-            return '';
-        }
-
-        return (string) $fileRecord->id;
     }
 
     private function previewPost(): null

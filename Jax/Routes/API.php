@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Jax\DomainDefinitions;
+use Jax\FileSystem;
 use Jax\Interfaces\Route;
+use Jax\IPAddress;
+use Jax\Jax;
+use Jax\Models\File;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\Template;
 use Jax\TextFormatting;
+use Jax\User;
 
 use function array_keys;
 use function array_values;
@@ -23,10 +29,14 @@ use const JSON_THROW_ON_ERROR;
 final readonly class API implements Route
 {
     public function __construct(
+        private DomainDefinitions $domainDefinitions,
+        private FileSystem $fileSystem,
+        private IPAddress $ipAddress,
         private Page $page,
         private Request $request,
         private TextFormatting $textFormatting,
         private Template $template,
+        private User $user,
     ) {}
 
     public function route(array $params): void
@@ -35,6 +45,7 @@ final readonly class API implements Route
             match ($params['method']) {
                 'searchmembers' => $this->searchMembers(),
                 'emotes' => $this->emotes(),
+                'upload' => $this->upload(),
                 default => '',
             },
         );
@@ -70,5 +81,56 @@ final readonly class API implements Route
         }
 
         return json_encode([array_keys($rules), array_values($rules)], JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * 1) Compute a hash of the file to use as the filename on the server
+     * 2) If it's an image, keep the extension so we can show it. Otherwise remove it.
+     * 3) If the file has already been uploaded (based on hash) then don't replace it.
+     *
+     * @return string file ID
+     */
+    public function upload(): string
+    {
+        $fileobj = $this->request->file('Filedata');
+
+        if ($fileobj === null || !$this->user->getGroup()?->canAttach) {
+            return '';
+        }
+
+        $uid = $this->user->get()->id;
+
+        $size = (int) filesize($fileobj['tmp_name']);
+        $hash = hash_file('sha1', $fileobj['tmp_name']) ?: 'hash_error';
+        $uploadPath = $this->domainDefinitions->getBoardPath() . '/Uploads/';
+
+        $ext = $this->fileSystem->getFileInfo($fileobj['name'])->getExtension();
+
+        $imageExtension = in_array($ext, Jax::IMAGE_EXTENSIONS, true)
+            ? ".{$ext}"
+            : null;
+
+        $filePath = $uploadPath . $hash . $imageExtension;
+
+        if (!$this->fileSystem->getFileInfo($filePath)->isFile()) {
+            move_uploaded_file($fileobj['tmp_name'], $filePath);
+
+            $file = new File();
+            $file->hash = $hash;
+            $file->ip = $this->ipAddress->asBinary() ?? '';
+            $file->name = $fileobj['name'];
+            $file->size = $size;
+            $file->uid = $uid;
+            $file->insert();
+
+            return (string) $file->id;
+        }
+
+        $fileRecord = File::selectOne('WHERE `hash`=?', $hash);
+        if ($fileRecord === null) {
+            return '';
+        }
+
+        return (string) $fileRecord->id;
     }
 }
