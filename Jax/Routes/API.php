@@ -19,8 +19,12 @@ use Jax\User;
 
 use function array_keys;
 use function array_values;
+use function filesize;
+use function hash_file;
 use function htmlspecialchars;
+use function in_array;
 use function json_encode;
+use function move_uploaded_file;
 use function str_replace;
 
 use const ENT_QUOTES;
@@ -49,38 +53,6 @@ final readonly class API implements Route
                 default => '',
             },
         );
-    }
-
-    private function searchMembers(): string
-    {
-        $members = Member::selectMany(
-            'WHERE `displayName` LIKE ? ORDER BY `displayName` LIMIT 10',
-            htmlspecialchars(
-                str_replace('_', '\_', $this->request->asString->get('term') ?? ''),
-                ENT_QUOTES,
-            ) . '%',
-        );
-
-        $list = [[], []];
-        foreach ($members as $member) {
-            $list[0][] = $member->id;
-            $list[1][] = $member->displayName;
-        }
-
-        return json_encode($list, JSON_THROW_ON_ERROR);
-    }
-
-    private function emotes(): string
-    {
-        $rules = $this->textFormatting->rules->getEmotes();
-        foreach ($rules as $text => $image) {
-            $rules[$text] = $this->template->render('bbcode/emote', [
-                'image' => $image,
-                'text' => $text,
-            ]);
-        }
-
-        return json_encode([array_keys($rules), array_values($rules)], JSON_THROW_ON_ERROR);
     }
 
     /**
@@ -132,5 +104,37 @@ final readonly class API implements Route
         }
 
         return (string) $fileRecord->id;
+    }
+
+    private function searchMembers(): string
+    {
+        $members = Member::selectMany(
+            'WHERE `displayName` LIKE ? ORDER BY `displayName` LIMIT 10',
+            htmlspecialchars(
+                str_replace('_', '\_', $this->request->asString->get('term') ?? ''),
+                ENT_QUOTES,
+            ) . '%',
+        );
+
+        $list = [[], []];
+        foreach ($members as $member) {
+            $list[0][] = $member->id;
+            $list[1][] = $member->displayName;
+        }
+
+        return json_encode($list, JSON_THROW_ON_ERROR);
+    }
+
+    private function emotes(): string
+    {
+        $rules = $this->textFormatting->rules->getEmotes();
+        foreach ($rules as $text => $image) {
+            $rules[$text] = $this->template->render('bbcode/emote', [
+                'image' => $image,
+                'text' => $text,
+            ]);
+        }
+
+        return json_encode([array_keys($rules), array_values($rules)], JSON_THROW_ON_ERROR);
     }
 }
