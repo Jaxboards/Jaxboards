@@ -15,7 +15,7 @@ body {
 
 img {
     border: 0;
-    max-width: 680px;
+    max-width: 100%;
 }
 
 a:active,
@@ -55,12 +55,6 @@ textarea {
 
 .center {
     text-align: center;
-}
-
-/* Avatars */
-.avatar img {
-    max-width: 150px;
-    max-height: 150px;
 }
 
 /* All windows */
