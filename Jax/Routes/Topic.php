@@ -392,7 +392,7 @@ final class Topic implements Route
                     ],
                 ),
                 'id' => 'qreply',
-                'resize' => 'textarea',
+                'resize' => '.replybox',
                 'title' => $this->textFormatting->wordFilter($modelsTopic->title),
             ],
         );
