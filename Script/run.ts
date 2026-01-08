@@ -69,9 +69,12 @@ onDOMReady(() => {
     globalThis.addEventListener('focus', () => {
         RUN.setWindowActive();
     });
+});
+onDOMReady(function featureDetectionClasses() {
     if (!supportsEmoji()) {
         document.documentElement.classList.add('no-emoji');
     }
+    document.documentElement.classList.add('js-enabled');
 });
 
 export default RUN;

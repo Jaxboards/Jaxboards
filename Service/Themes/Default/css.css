@@ -1683,6 +1683,10 @@ textarea {
 .postform .buttons {
     text-align: center;
 }
+/* Hide normal file input in favor of WYSIWYG attachments */
+.js-enabled #attachfiles {
+    display: none;
+}
 
 /* Search */
 #searchresults .content {
