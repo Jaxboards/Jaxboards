@@ -192,9 +192,6 @@ final class Post implements Route
         ]);
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
-        if (!$topicPerms['upload']) {
-            $this->page->command('attachfiles');
-        }
 
         return null;
     }

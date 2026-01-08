@@ -284,12 +284,6 @@ export default {
     playsound(name: string, url: string) {
         Sound.loadAndPlay(name, url);
     },
-    attachfiles() {
-        const el = document.querySelector('#attachfiles');
-        el?.addEventListener('click', () => {
-            alert('Attaching files is under construction');
-        });
-    },
     listrating(postId: number, html: string) {
         let prdiv = document.querySelector<HTMLDivElement>(
             `#postrating_${postId}`,

@@ -170,10 +170,6 @@ final readonly class CreateTopic
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
 
-        if ($forumPerms['upload']) {
-            $this->page->command('attachfiles');
-        }
-
         return null;
     }
 }

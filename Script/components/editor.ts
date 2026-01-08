@@ -126,6 +126,19 @@ export default class Editor extends Component<HTMLTextAreaElement> {
             this.element.value = htmlToBBCode(this.doc.body);
         });
 
+        this.doc?.addEventListener('drop', (e) => {
+            if (!e.dataTransfer?.files.length) {
+                return;
+            }
+            this.upload(e.dataTransfer.files[0]);
+        });
+        this.doc?.addEventListener('dragleave', (e) => {
+            this.getAttachmentStatus().remove();
+        });
+        this.doc?.addEventListener('dragover', () => {
+            this.getAttachmentStatus();
+        });
+
         if (!this.doc) {
             return;
         }
@@ -152,6 +165,79 @@ export default class Editor extends Component<HTMLTextAreaElement> {
             this.setSource(bbcodeToHTML(element.value));
             this.switchMode(this.htmlMode);
         }, 100);
+    }
+
+    getAttachmentStatus(): HTMLDivElement {
+        let attachment =
+            this.doc?.querySelector<HTMLDivElement>('#attachmentStatus');
+        if (attachment) {
+            return attachment;
+        }
+
+        attachment = document.createElement('div');
+        Object.assign(attachment, {
+            id: 'attachmentStatus',
+            innerHTML: 'Drop file here',
+            contentEditable: 'false',
+        });
+        Object.assign(attachment.style, {
+            position: 'fixed',
+            padding: '20px',
+            top: '50%',
+            left: '50%',
+            translate: '-50% -50%',
+            border: '2px dashed #ccc',
+        });
+        this.doc?.body.appendChild(attachment);
+        return attachment;
+    }
+
+    upload(file: File) {
+        const formData = new FormData();
+        formData.append('Filedata', file);
+
+        const xhr = new XMLHttpRequest();
+
+        this.getAttachmentStatus().innerHTML =
+            'Uploading: <progress id="attachmentProgress"></div>';
+        const progressBar =
+            this.getAttachmentStatus().querySelector<HTMLProgressElement>(
+                '#attachmentProgress',
+            );
+
+        // 1. Attach the progress event listener to the xhr.upload object
+        xhr.upload.addEventListener('progress', (event) => {
+            if (progressBar && event.lengthComputable) {
+                // Calculate the percentage
+                const percentComplete = Math.round(
+                    (event.loaded / event.total) * 100,
+                );
+
+                // Update the UI
+                progressBar.value = event.loaded;
+                progressBar.max = event.total;
+                progressBar.textContent = `${percentComplete}%`;
+            }
+        });
+
+        // 2. Handle completion
+        xhr.addEventListener('load', () => {
+            this.window?.focus();
+            this.getAttachmentStatus().remove();
+            this.cmd(
+                'inserthtml',
+                `[attachment]${xhr.responseText}[/attachment]`,
+            );
+        });
+
+        // 3. Handle errors (optional)
+        xhr.upload.addEventListener('error', () => {
+            this.getAttachmentStatus().remove();
+        });
+
+        // 4. Open and send the request (POST method and a server URL needed)
+        xhr.open('POST', '/api/upload', true);
+        xhr.send(formData);
     }
 
     buildEditBar(): HTMLDivElement {
