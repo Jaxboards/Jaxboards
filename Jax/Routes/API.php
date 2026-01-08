@@ -67,7 +67,7 @@ final readonly class API implements Route
         $fileobj = $this->request->file('Filedata');
 
         if ($fileobj === null || !$this->user->getGroup()?->canAttach) {
-            return '';
+            return 'You do not have permission to attach files';
         }
 
         $uid = $this->user->get()->id;
@@ -100,7 +100,7 @@ final readonly class API implements Route
 
         $fileRecord = File::selectOne('WHERE `hash`=?', $hash);
         if ($fileRecord === null) {
-            return '';
+            return 'Error inserting file record';
         }
 
         return (string) $fileRecord->id;

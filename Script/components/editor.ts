@@ -224,6 +224,13 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         xhr.addEventListener('load', () => {
             this.window?.focus();
             this.getAttachmentStatus().remove();
+
+            const response = xhr.responseText;
+            if (/\D/.test(response)) {
+                alert('Error: ' + response);
+                return;
+            }
+
             this.cmd(
                 'inserthtml',
                 `[attachment]${xhr.responseText}[/attachment]`,
