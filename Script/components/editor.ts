@@ -126,13 +126,13 @@ export default class Editor extends Component<HTMLTextAreaElement> {
             this.element.value = htmlToBBCode(this.doc.body);
         });
 
-        this.doc?.addEventListener('drop', (e) => {
-            if (!e.dataTransfer?.files.length) {
+        this.doc?.addEventListener('drop', (event) => {
+            if (!event.dataTransfer?.files.length) {
                 return;
             }
-            this.upload(e.dataTransfer.files[0]);
+            this.upload(event.dataTransfer.files[0]);
         });
-        this.doc?.addEventListener('dragleave', (e) => {
+        this.doc?.addEventListener('dragleave', () => {
             this.getAttachmentStatus().remove();
         });
         this.doc?.addEventListener('dragover', () => {
