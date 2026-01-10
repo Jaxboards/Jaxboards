@@ -1785,8 +1785,6 @@ textarea {
 
 .calendar .birthdays {
     font-size: smaller;
-    position: absolute;
-    bottom: 0;
 }
 
 .calendar .birthdays::before {
