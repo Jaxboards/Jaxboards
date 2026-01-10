@@ -211,25 +211,7 @@ final readonly class ModControls implements Route
 
     private function selectMemberToEdit(): string
     {
-        $hiddenFormFields = Template::hiddenFormFields(
-            [
-                'submit' => 'showform',
-            ],
-        );
-
-        return <<<HTML
-            <form method="post" data-ajax-form="true">
-                {$hiddenFormFields}
-                Member name:
-                <input type="text" title="Enter member name" name="mname"
-                    data-autocomplete-action="searchmembers"
-                    data-autocomplete-output="#mid"
-                    data-autocomplete-indicator="#validname">
-                <span id="validname"></span>
-                <input type="hidden" name="mid" id="mid" onchange="this.form.onsubmit();">
-                <input type="submit" type="View member details" value="Go">
-            </form>
-            HTML;
+        return $this->template->render('modcontrols/edit-member');
     }
 
     private function ipTools(): string
