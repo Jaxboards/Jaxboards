@@ -1448,6 +1448,10 @@ textarea {
     font-size: 1.2rem;
 }
 
+#intopic .opengraph .remove {
+    float: right;
+}
+
 /* stylelint-disable-next-line selector-class-pattern */
 .postrating_list {
     position: absolute;
