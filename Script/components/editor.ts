@@ -122,6 +122,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         this.htmlMode = globalSettings.wysiwyg;
 
         this.doc?.addEventListener('input', () => {
+            if (!this.doc) return;
             // keep textarea updated with BBCode in real time
             this.element.value = htmlToBBCode(this.doc.body);
         });
