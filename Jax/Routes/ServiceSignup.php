@@ -16,7 +16,6 @@ use Jax\ServiceConfig;
 use Jax\Template;
 
 use function filter_var;
-use function gmdate;
 use function header;
 use function mb_strlen;
 use function mb_strtolower;
@@ -66,8 +65,8 @@ final readonly class ServiceSignup
             'signup',
             [
                 'error' => $error,
-                'domain' => $this->serviceConfig->getSetting('domain')
-            ]
+                'domain' => $this->serviceConfig->getSetting('domain'),
+            ],
         );
     }
 
