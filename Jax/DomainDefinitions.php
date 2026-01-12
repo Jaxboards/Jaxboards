@@ -92,7 +92,7 @@ final class DomainDefinitions
 
             preg_match("/(.*)\\.{$domainMatch}/i", $host, $matches);
 
-            if ($matches[1] !== '') {
+            if ($matches && $matches[1] !== '') {
                 $prefix = $matches[1];
                 $this->serviceConfig->override([
                     'prefix' => $prefix,
