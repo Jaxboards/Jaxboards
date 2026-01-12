@@ -23,6 +23,7 @@ use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Routes\ServiceInstall;
 use Jax\ServiceConfig;
+use Jax\Template;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -59,6 +60,7 @@ use function password_verify;
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(ServiceConfig::class)]
+#[CoversClass(Template::class)]
 final class ServiceInstallTest extends TestCase
 {
     private MockObject&FileSystem $fileSystemMock;
@@ -74,10 +76,11 @@ final class ServiceInstallTest extends TestCase
         $this->fileSystemMock = $this->createMock(FileSystem::class);
         $fileSystemMock = $this->fileSystemMock;
 
-        // Pass through the models glob
-        $fileSystemMock->method('glob')
-            ->willReturnCallback($originalFileSystem->glob(...))
-        ;
+        $allowList = ['glob', 'pathJoin', 'pathFromRoot'];
+        foreach ($allowList as $method) {
+            $fileSystemMock->method($method)
+                ->willReturnCallback($originalFileSystem->{$method}(...));
+        }
 
         $this->mockedFiles = [];
         $fileSystemMock->method('getFileInfo')
