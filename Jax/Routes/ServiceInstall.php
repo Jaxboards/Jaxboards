@@ -108,7 +108,7 @@ final readonly class ServiceInstall
 
         return $this->template->render('install', [
             'errors' => $errors,
-            'fields' => self::FIELDS
+            'fields' => self::FIELDS,
         ]);
     }
 

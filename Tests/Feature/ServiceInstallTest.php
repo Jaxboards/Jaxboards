@@ -79,7 +79,8 @@ final class ServiceInstallTest extends TestCase
         $allowList = ['glob', 'pathJoin', 'pathFromRoot'];
         foreach ($allowList as $method) {
             $fileSystemMock->method($method)
-                ->willReturnCallback($originalFileSystem->{$method}(...));
+                ->willReturnCallback($originalFileSystem->{$method}(...))
+            ;
         }
 
         $this->mockedFiles = [];
