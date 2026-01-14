@@ -155,7 +155,7 @@ final class User
 
     public function isModerator(): bool
     {
-        return (bool) $this->getGroup()->canModerate;
+        return (bool) $this->getGroup()?->canModerate;
     }
 
     public function isModeratorOfTopic(Topic $modelsTopic): bool
