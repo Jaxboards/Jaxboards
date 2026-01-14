@@ -21,7 +21,7 @@
         <a href="{{ url('inbox', { view: message.id }) }}">{{ message.title }}</a>
     </td>
     <td>
-        {{ otherMember.displayName }}
+        {% include "user-link.html.twig" with { user: otherMember } only %}
     </td>
     <td>
         {{ message.date|autoDate }}
