@@ -6,6 +6,7 @@ namespace Jax;
 
 use DI\Container;
 use Jax\Models\Message;
+use Jax\Models\Report;
 
 use function gmdate;
 use function header;
@@ -220,18 +221,20 @@ final readonly class App
     private function renderFooter(int $unreadMessages): void
     {
         if ($unreadMessages !== 0) {
-            $inboxURL = $this->router->url('inbox');
-            $plural = ($unreadMessages === 1 ? '' : 's');
             $this->page->append(
                 'FOOTER',
-                <<<HTML
-                    <a href="{$inboxURL}">
-                        <div id="notification" class="newmessage" onclick="this.style.display='none'">
-                            You have {$unreadMessages} new message{$plural}
-                        </div>
-                    </a>
-                    HTML,
+                $this->template->render('notifications/unread-messages', ['unreadMessages' => $unreadMessages])
             );
+        }
+
+        if ($this->user->isModerator()) {
+            $reportCount = Report::count("WHERE `acknowledger` IS NULL");
+            if ($reportCount !== 0) {
+                $this->page->append(
+                    'FOOTER',
+                    $this->template->render('notifications/post-reports', ['reportCount' => $reportCount]),
+                );
+            }
         }
 
         $version = json_decode(

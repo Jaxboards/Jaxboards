@@ -120,7 +120,7 @@ final readonly class UserProfile implements Route
             'userprofile/full-profile',
             [
                 'birthdate' => $birthdate,
-                'canModerate' => $this->user->getGroup()?->canModerate,
+                'canModerate' => $this->user->isModerator(),
                 'contactLinks' => $this->contactDetails->getContactLinks($member),
                 'group' => Group::selectOne($member->groupID),
                 'ipAddress' => $member->ip !== ''

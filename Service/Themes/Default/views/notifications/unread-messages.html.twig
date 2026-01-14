@@ -1,0 +1,5 @@
+<a href="{{ url('inbox') }}">
+    <div id="notification" class="newmessage" onclick="this.style.display='none'">
+        You have {{ unreadMessages }} new message{% if unreadMessages > 1 %}s{% endif %}
+    </div>
+</a>

@@ -426,7 +426,7 @@ final class Forum implements Route
 
     private function isForumModerator(ModelsForum $modelsForum): bool
     {
-        return $this->user->getGroup()?->canModerate
+        return $this->user->isModerator()
             || in_array((string) $this->user->get()->id, explode(',', $modelsForum->mods), true);
     }
 

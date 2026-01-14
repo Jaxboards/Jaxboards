@@ -52,7 +52,7 @@ final readonly class ModControls implements Route
     public function route($params): void
     {
         if (
-            !$this->user->getGroup()?->canModerate
+            !$this->user->isModerator()
             && !$this->user->get()->mod
         ) {
             $this->router->redirect('index');
@@ -114,7 +114,7 @@ final readonly class ModControls implements Route
     private function showModCP(
         string $cppage = 'Choose an option on the left.',
     ): void {
-        if (!$this->user->getGroup()?->canModerate) {
+        if (!$this->user->isModerator()) {
             return;
         }
 

@@ -63,7 +63,7 @@ final readonly class ModTopics
             return;
         }
 
-        if (!$this->user->getGroup()?->canModerate) {
+        if (!$this->user->isModerator()) {
             $forum = Forum::selectOne($topic->fid);
 
             if (!$forum || $forum->mods === '') {

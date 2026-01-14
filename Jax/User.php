@@ -153,9 +153,14 @@ final class User
         return $this->member->groupID === Groups::Guest->value;
     }
 
+    public function isModerator(): bool
+    {
+        return (bool) $this->getGroup()->canModerate;
+    }
+
     public function isModeratorOfTopic(Topic $modelsTopic): bool
     {
-        if ($this->getGroup()?->canModerate) {
+        if ($this->isModerator()) {
             return true;
         }
 

@@ -1,0 +1,5 @@
+<a href="{{ url('modcontrols', { do: 'reports' }) }}">
+    <div id="notification" class="newmessage" onclick="this.style.display='none'">
+        You have {{ reportCount }} post{% if reportCount > 1 %}s{% endif %} to review.
+    </div>
+</a>
