@@ -7,11 +7,13 @@ namespace Jax\Routes;
 use Carbon\Carbon;
 use GeoIp2\Model\City;
 use Jax\Config;
+use Jax\Database\Database;
 use Jax\GeoLocate;
 use Jax\Interfaces\Route;
 use Jax\IPAddress;
 use Jax\Models\Member;
 use Jax\Models\Post;
+use Jax\Models\Report;
 use Jax\Models\Session as ModelsSession;
 use Jax\Models\Shout;
 use Jax\Page;
@@ -37,6 +39,7 @@ final readonly class ModControls implements Route
 {
     public function __construct(
         private Config $config,
+        private Database $database,
         private GeoLocate $geoLocate,
         private IPAddress $ipAddress,
         private ModTopics $modTopics,
@@ -90,6 +93,7 @@ final readonly class ModControls implements Route
             }),
             'iptools' => $this->showModCP($this->ipTools()),
             'onlineSessions' => $this->showModCP($this->showOnlineSessions()),
+            'reports' => $this->showModCP($this->showReports()),
             default => $dot === null && $dop === null ? $this->showModCP() : null,
         };
     }
@@ -322,6 +326,42 @@ final readonly class ModControls implements Route
                 'rows' => $rows,
             ]),
         );
+    }
+
+    private function showReport(int $reportId): string
+    {
+        $report = Report::selectOne($reportId);
+        $post = Post::selectOne($report->pid);
+
+        if ($report->acknowledger === null) {
+            $report->acknowledger = $this->user->get()->id;
+            $report->acknowledgedDate = $this->database->datetime();
+            $report->update();
+        }
+
+        $this->router->redirect('topic', ['id' => $post->tid, 'findpost' => $post->id], "#pid_{$post->id}");
+
+        return '';
+    }
+
+    private function showReports(): string
+    {
+        $reportId = (int) $this->request->both('reportId');
+        if ($reportId !== 0) {
+            $this->showReport($reportId);
+        }
+
+        $reports = Report::selectMany('ORDER BY reportDate DESC LIMIT 100');
+        $posts = Post::joinedOn($reports, fn(Report $report) => $report->pid);
+        $reporters = Member::joinedOn($reports, fn(Report $report) => $report->reporter);
+
+        $rows = array_map(fn(Report $report) => [
+            'report' => $report,
+            'post' => $posts[$report->pid],
+            'reporter' => $reporters[$report->reporter],
+        ], $reports);
+
+        return $this->template->render('modcontrols/post-reports', ['rows' => $rows]);
     }
 
     private function box(string $title, string $content): string

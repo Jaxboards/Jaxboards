@@ -116,6 +116,7 @@ final class Router
         }
 
         if ($this->request->isJSAccess()) {
+            $this->page->command('softurl');
             $this->page->command('location', $newLocation);
 
             return;
