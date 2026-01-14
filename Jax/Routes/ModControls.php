@@ -354,11 +354,13 @@ final readonly class ModControls implements Route
         $reports = Report::selectMany('ORDER BY reportDate DESC LIMIT 100');
         $posts = Post::joinedOn($reports, static fn(Report $report): int => $report->pid);
         $reporters = Member::joinedOn($reports, static fn(Report $report): int => $report->reporter);
+        $acknowledgers = Member::joinedOn($reports, static fn(Report $report): int => $report->acknowledger);
 
         $rows = array_map(static fn(Report $report): array => [
             'report' => $report,
             'post' => $posts[$report->pid],
             'reporter' => $reporters[$report->reporter],
+            'acknowledger' => $acknowledgers[$report->acknowledger],
         ], $reports);
 
         return $this->template->render('modcontrols/post-reports', ['rows' => $rows]);

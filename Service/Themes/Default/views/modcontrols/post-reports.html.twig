@@ -4,7 +4,7 @@
             <th>Post</th>
             <th>Reason</th>
             <th>Reporter</th>
-            <th>Date</th>
+            <th>Acknowledger</th>
         </tr>
         {% for row in rows %}
             <tr {% if not row.report.acknowledger %}class="unread"{% endif %}>
@@ -14,9 +14,17 @@
                     </a>
                 </td>
                 <td>{{ row.report.reason }}</td>
-                <td>{% include "user-link.html.twig" with { user: row.reporter } %}</td>
-                <td>{{ row.report.reportDate|autoDate }}</td>
+                <td>
+                    {% include "user-link.html.twig" with { user: row.reporter } %}<br>
+                    {{ row.report.reportDate|autoDate }}
+                </td>
+                <td>
+                    {% include "user-link.html.twig" with { user: row.acknowledger } %}<br>
+                    {{ row.report.acknowledgedDate|autoDate }}
+                </td>
             </tr>
+        {% else %}
+            <tr><td colspan="4">No reports to display.</td></tr>
         {% endfor %}
     </table>
 </div>
