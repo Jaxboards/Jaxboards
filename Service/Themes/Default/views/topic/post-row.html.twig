@@ -41,12 +41,12 @@
                     {%- if canReply -%}
                         {%- include "topic/button/quote.html.twig" with { post } -%}
                     {%- endif -%}
+                    {%- if canReport -%}
+                        {%- include "topic/button/report.html.twig" with { post } -%}
+                    {%- endif -%}
                     {%- if canModerate -%}
                         {%- include "topic/button/moderate.html.twig" with { post } -%}
                         {%- include "topic/button/mod-ip.html.twig" with { ip } -%}
-                    {%- endif -%}
-                    {%- if canReport -%}
-                        <a href="{{ url('report', { pid: post.id }) }}">Report</a>
                     {%- endif -%}
                 </div>
                 <div class="post_info">
