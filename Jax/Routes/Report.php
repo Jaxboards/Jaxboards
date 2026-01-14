@@ -16,7 +16,7 @@ use Jax\User;
 use function array_key_exists;
 use function mb_substr;
 
-final class Report implements Route
+final readonly class Report implements Route
 {
     public const REPORT_REASONS = [
         'spam' => 'Spam',
@@ -27,11 +27,11 @@ final class Report implements Route
     ];
 
     public function __construct(
-        private readonly Database $database,
-        private readonly Request $request,
-        private readonly Page $page,
-        private readonly Template $template,
-        private readonly User $user,
+        private Database $database,
+        private Request $request,
+        private Page $page,
+        private Template $template,
+        private User $user,
     ) {}
 
     public function route(array $params): void
