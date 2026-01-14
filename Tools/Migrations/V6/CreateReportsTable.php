@@ -10,6 +10,8 @@ final class CreateReportsTable
 {
     public function execute(Database $database): void
     {
+        // drop old reports table if it is still there
+        $database->special('DROP TABLE IF EXISTS %t', ['reports']);
         $database->special(
             <<<'SQL'
                     CREATE TABLE %t (
