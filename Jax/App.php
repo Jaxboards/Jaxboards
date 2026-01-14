@@ -223,12 +223,12 @@ final readonly class App
         if ($unreadMessages !== 0) {
             $this->page->append(
                 'FOOTER',
-                $this->template->render('notifications/unread-messages', ['unreadMessages' => $unreadMessages])
+                $this->template->render('notifications/unread-messages', ['unreadMessages' => $unreadMessages]),
             );
         }
 
         if ($this->user->isModerator()) {
-            $reportCount = Report::count("WHERE `acknowledger` IS NULL");
+            $reportCount = Report::count('WHERE `acknowledger` IS NULL');
             if ($reportCount !== 0) {
                 $this->page->append(
                     'FOOTER',
