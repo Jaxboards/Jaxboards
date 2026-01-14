@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Tools\Migrations\V6;
 
 use Jax\Database\Database;
-use Jax\Database\Utils;
-use Jax\Models\Report;
-use Rector\Exception\NotImplementedYetException;
 
 final class CreateReportsTable
 {

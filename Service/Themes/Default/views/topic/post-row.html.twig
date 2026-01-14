@@ -45,6 +45,9 @@
                         {%- include "topic/button/moderate.html.twig" with { post } -%}
                         {%- include "topic/button/mod-ip.html.twig" with { ip } -%}
                     {%- endif -%}
+                    {%- if canReport -%}
+                        <a href="{{ url('report', { pid: post.id }) }}">Report</a>
+                    {%- endif -%}
                 </div>
                 <div class="post_info">
                     {{ post.date|autoDate }}

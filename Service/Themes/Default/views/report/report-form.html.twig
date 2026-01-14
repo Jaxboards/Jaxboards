@@ -1,0 +1,23 @@
+<form action="{{ url('report', { pid: post.id }) }}" data-ajax-form="true" style="padding: 5px">
+    {% for value,label in reasons %}
+        <input
+            type="radio"
+            name="reason"
+            id="{{ value }}"
+            value="{{ value }}"
+            onclick="this.form.submit.removeAttribute('disabled')"
+        >
+        <label for="{{ value }}">{{ label }}</label>
+        <br>
+    {% endfor %}
+
+    <br>
+    <label for="notes">Additional Notes (optional)</label>
+    <br>
+    <textarea id="notes" style="width: 300px"></textarea>
+    <br>
+    <br>
+
+    <button type="submit" name="submit" disabled>Report Post</button>
+
+</form>

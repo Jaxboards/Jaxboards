@@ -459,6 +459,7 @@ final class Topic implements Route
                     'badges' => $badgesPerAuthor[$author?->id] ?? '',
                     'canEdit' => $this->canEdit($modelsTopic, $post),
                     'canModerate' => $canModerateTopic,
+                    'canReport' => !$this->user->isGuest(),
                     'canReply' => $forumPerms['reply'],
                     'canUseSignatures' => $authorGroup->canUseSignatures,
                     'editor' => $editor,

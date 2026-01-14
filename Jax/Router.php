@@ -22,6 +22,7 @@ use Jax\Routes\Members;
 use Jax\Routes\ModControls;
 use Jax\Routes\Post;
 use Jax\Routes\Rainbow;
+use Jax\Routes\Report;
 use Jax\Routes\Search;
 use Jax\Routes\Solitaire;
 use Jax\Routes\Tardis;
@@ -83,6 +84,7 @@ final class Router
         $this->get('post', '/post', Post::class);
         $this->get('profile', '/profile/{id}/{page}', UserProfile::class);
         $this->get('rainbow', '/rainbow', Rainbow::class);
+        $this->get('report', '/report', Report::class);
         $this->get('search', '/search', Search::class);
         $this->get('solitaire', '/solitaire', Solitaire::class);
         $this->get('tardis', '/tardis', Tardis::class);
