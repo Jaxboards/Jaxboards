@@ -6,6 +6,7 @@ namespace Jax\Models;
 
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
+use Jax\Attributes\Key;
 use Jax\Attributes\PrimaryKey;
 use Jax\Database\Model;
 
@@ -32,6 +33,7 @@ final class Report extends Model
     public int $reporter = 0;
 
     #[Column(name: 'reportDate', type: 'datetime')]
+    #[Key()]
     public string $reportDate = '';
 
     #[Column(name: 'acknowledger', type: 'int', nullable: true, unsigned: true)]
