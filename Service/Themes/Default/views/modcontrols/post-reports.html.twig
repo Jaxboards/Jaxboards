@@ -12,6 +12,11 @@
                     <a href="{{ url('modcontrols', { do: 'reports', reportId: row.report.id }) }}">
                         {{- row.post.post|textOnly|slice(0,100) -}}
                     </a>
+                    {% if row.report.note %}
+                        <br><br>
+                        --<br>
+                        REPORTER NOTE: {{ row.report.note }}
+                    {% endif %}
                 </td>
                 <td>{{ row.report.reason }}</td>
                 <td>
