@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\Routes;
 
 use Jax\Database\Database;
@@ -11,16 +13,11 @@ use Jax\Request;
 use Jax\Template;
 use Jax\User;
 
-class Report implements Route
-{
-    public function __construct(
-        private Database $database,
-        private Request $request,
-        private Page $page,
-        private Template $template,
-        private User $user,
-    ) {}
+use function array_key_exists;
+use function mb_substr;
 
+final class Report implements Route
+{
     public const REPORT_REASONS = [
         'spam' => 'Spam',
         'trolling' => 'Flaming/Trolling',
@@ -29,6 +26,14 @@ class Report implements Route
         'needs_to_pin' => 'Topic needs to be pinned',
     ];
 
+    public function __construct(
+        private readonly Database $database,
+        private readonly Request $request,
+        private readonly Page $page,
+        private readonly Template $template,
+        private readonly User $user,
+    ) {}
+
     public function route(array $params): void
     {
         $pid = (int) $this->request->both('pid');
@@ -36,6 +41,7 @@ class Report implements Route
 
         if ($this->user->isGuest()) {
             $this->page->command('error', 'You must be logged in to report posts');
+
             return;
         }
 
@@ -45,26 +51,28 @@ class Report implements Route
         };
     }
 
-    private function reportPost(int $pid, string $reason)
+    private function reportPost(int $pid, string $reason): void
     {
         $report = new ModelsReport();
         $report->pid = $pid;
         $report->reporter = $this->user->get()->id;
         $report->reason = $reason;
-        $report->note = mb_substr($this->request->asString->post('note'), 0, 100);
+        $report->note = mb_substr((string) $this->request->asString->post('note'), 0, 100);
         $report->reportDate = $this->database->datetime();
         $report->insert();
 
         $this->page->command('closewindow', "#report{$pid}");
 
-        if (!$report->id) {
+        if ($report->id === 0) {
             $this->page->command('error', 'There was an error submitting your report');
+
             return;
         }
+
         $this->page->command('alert', 'Thank you for your report');
     }
 
-    private function reportPostForm($pid)
+    private function reportPostForm(int $pid): void
     {
         $post = Post::selectOne($pid);
 
@@ -78,8 +86,8 @@ class Report implements Route
             'id' => "report{$post->id}",
             'content' => $this->template->render('report/report-form', [
                 'post' => $post,
-                'reasons' => self::REPORT_REASONS
-            ])
+                'reasons' => self::REPORT_REASONS,
+            ]),
         ]);
     }
 }

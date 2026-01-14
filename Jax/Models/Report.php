@@ -22,10 +22,10 @@ final class Report extends Model
     #[ForeignKey(table: 'posts', field: 'id', onDelete: 'cascade')]
     public int $pid = 0;
 
-    #[Column(name: 'reason', type: 'string', length: 25, default: 'other')]
+    #[Column(name: 'reason', type: 'string', default: 'other', length: 25)]
     public string $reason = '';
 
-    #[Column(name: 'note', type: 'string', length: 100, default: '')]
+    #[Column(name: 'note', type: 'string', default: '', length: 100)]
     public string $note = '';
 
     #[Column(name: 'reporter', type: 'int', nullable: false, unsigned: true)]
