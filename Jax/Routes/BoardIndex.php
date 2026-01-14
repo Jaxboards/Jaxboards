@@ -236,7 +236,7 @@ final class BoardIndex implements Route
         return $this->template->render(
             'idx/stats',
             [
-                'canModerate' => $this->user->getGroup()?->canModerate,
+                'canModerate' => $this->user->isModerator(),
                 'guestCount' => $this->usersOnline->getGuestCount(),
                 'lastRegisteredMember' => $lastRegisteredMember,
                 'legend' => $legendGroups,

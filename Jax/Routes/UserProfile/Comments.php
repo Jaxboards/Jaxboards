@@ -59,7 +59,7 @@ final readonly class Comments
         }
 
         foreach ($comments as $comment) {
-            $canDelete = $this->user->getGroup()?->canModerate
+            $canDelete = $this->user->isModerator()
                 || ($this->user->getGroup()?->canDeleteComments && $comment->from === $this->user->get()->id);
 
             $tabHTML .= $this->template->render(
@@ -122,7 +122,7 @@ final readonly class Comments
         }
 
         // Moderators can delete any comment
-        if ($this->user->getGroup()?->canModerate) {
+        if ($this->user->isModerator()) {
             $this->database->delete(
                 'profile_comments',
                 Database::WHERE_ID_EQUALS,

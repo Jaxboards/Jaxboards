@@ -1,0 +1,22 @@
+<div class="inbox">
+    <table class="listing">
+        <tr>
+            <th>Post</th>
+            <th>Reason</th>
+            <th>Reporter</th>
+            <th>Date</th>
+        </tr>
+        {% for row in rows %}
+            <tr {% if not row.report.acknowledger %}class="unread"{% endif %}>
+                <td>
+                    <a href="{{ url('modcontrols', { do: 'reports', reportId: row.report.id }) }}">
+                        {{- row.post.post|textOnly|slice(0,100) -}}
+                    </a>
+                </td>
+                <td>{{ row.report.reason }}</td>
+                <td>{% include "user-link.html.twig" with { user: row.reporter } %}</td>
+                <td>{{ row.report.reportDate|autoDate }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
