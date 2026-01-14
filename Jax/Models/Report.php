@@ -32,7 +32,7 @@ final class Report extends Model
     public int $reporter = 0;
 
     #[Column(name: 'reportDate', type: 'datetime')]
-    public string $date = '';
+    public string $reportDate = '';
 
     #[Column(name: 'acknowledger', type: 'int', nullable: true, unsigned: true)]
     #[ForeignKey(table: 'members', field: 'id', onDelete: 'cascade')]
