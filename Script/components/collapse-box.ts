@@ -77,6 +77,7 @@ export default class CollapseBox extends Component<HTMLDivElement> {
             if (!this.fullHeight) return;
 
             style.height = `${this.fullHeight}px`;
+            this.element.classList.remove('collapsed');
             setTimeout(() => {
                 style.removeProperty('height');
                 style.removeProperty('overflow');
@@ -86,6 +87,7 @@ export default class CollapseBox extends Component<HTMLDivElement> {
                 collapseContent.clientHeight || collapseContent.offsetHeight;
             style.height = `${this.fullHeight}px`;
             style.overflow = 'hidden';
+            this.element.classList.add('collapsed');
             requestAnimationFrame(() => {
                 style.height = '0px';
             });
