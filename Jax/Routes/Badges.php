@@ -125,6 +125,7 @@ final readonly class Badges implements Route
                 'badgeAssociations' => $badgeAssociations,
                 'membersWithBadges' => $membersWithBadges,
             ]),
+            'badges_' . $badge->id
         );
 
         $this->page->setPageTitle("Viewing Recipients of {$badge->badgeTitle} badge");

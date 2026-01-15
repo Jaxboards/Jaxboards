@@ -144,7 +144,7 @@ final class Page
     public function collapseBox(
         string $title,
         string $contents,
-        ?string $boxID = null,
+        string $boxID,
     ): string {
         return $this->template->render('global/collapsebox', [
             'boxID' => $boxID,

@@ -203,7 +203,7 @@ final readonly class ModTopics
             'topics' => $topics,
         ]);
 
-        $page = $this->page->collapseBox('Merging Topics', $page);
+        $page = $this->page->collapseBox('Merging Topics', $page, 'modtopics');
 
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);

@@ -146,6 +146,7 @@ final class Shoutbox implements Module
                         'shouts' => $shoutHTML,
                     ],
                 ),
+                'shoutbox'
             ) . <<<HTML
                 <script type='text/javascript'>
                     Object.assign(globalSettings, {

@@ -267,6 +267,7 @@ final readonly class App
             $this->page->collapseBox(
                 'Debug',
                 $debug,
+                'debug'
             ) . "<div id='pagegen' style='text-align: center'>{$pagegen}</div>",
         );
     }

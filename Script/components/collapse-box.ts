@@ -24,18 +24,46 @@ export default class CollapseBox extends Component<HTMLDivElement> {
             });
         }
 
+        // Toggle initial state
+        this.toggle();
+
         this.element.addEventListener('click', (event) => {
             if (
                 event.target instanceof HTMLElement &&
                 event.target.matches('.collapse-button')
             ) {
+                this.isOpen = !this.isOpen;
                 this.toggle();
             }
         });
     }
 
+    get boxID() {
+        return this.element.getAttribute('id') || '';
+    }
+
     get collapseContent() {
         return this.element.querySelector<HTMLDivElement>('.collapse-content');
+    }
+
+    get isOpen() {
+        return !(globalThis.sessionStorage.getItem('collapsed') ?? '')
+            .split(',')
+            .includes(this.boxID);
+    }
+
+    set isOpen(isOpen: boolean) {
+        let list = (globalThis.sessionStorage.getItem('collapsed') ?? '')
+            ?.split(',')
+            .filter(Boolean);
+
+        if (isOpen) {
+            list = list.filter((item) => item !== this.boxID);
+        } else {
+            list?.push(this.boxID);
+        }
+
+        globalThis.sessionStorage.setItem('collapsed', list.join(',') ?? '');
     }
 
     toggle() {
@@ -45,7 +73,9 @@ export default class CollapseBox extends Component<HTMLDivElement> {
 
         const { style } = collapseContent;
 
-        if (style.height === '0px') {
+        if (this.isOpen) {
+            if (!this.fullHeight) return;
+
             style.height = `${this.fullHeight}px`;
             setTimeout(() => {
                 style.removeProperty('height');
