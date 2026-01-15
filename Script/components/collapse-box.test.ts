@@ -2,7 +2,7 @@ import CollapseBox from './collapse-box';
 
 test('collapse box', function () {
     document.body.innerHTML = `
-        <div class="collapse-box">
+        <div class="collapse-box" id="test-box">
             <button class="collapse-button">
             <div class="collapse-content">
             Hello world
