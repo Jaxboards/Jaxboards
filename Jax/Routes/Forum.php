@@ -336,7 +336,7 @@ final class Forum implements Route
             $this->template->render('forum/subforum-table', [
                 'rows' => $rows,
             ]),
-            'subforums_' . $forum->id
+            'subforums_' . $forum->id,
         );
     }
 
