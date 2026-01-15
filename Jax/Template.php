@@ -90,7 +90,7 @@ final class Template
 
     public function out(): string
     {
-        $header = ['CSS', 'SCRIPT', 'TITLE'];
+        $header = ['CSS', 'SCRIPT', 'TITLE', 'DEBUG'];
 
         $html = $this->template;
         foreach ($this->parts as $part => $contents) {
