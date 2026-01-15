@@ -54,13 +54,13 @@ export default class CollapseBox extends Component<HTMLDivElement> {
 
     set isOpen(isOpen: boolean) {
         let list = (globalThis.sessionStorage.getItem('collapsed') ?? '')
-            ?.split(',')
+            .split(',')
             .filter(Boolean);
 
         if (isOpen) {
             list = list.filter((item) => item !== this.boxID);
         } else {
-            list?.push(this.boxID);
+            list.push(this.boxID);
         }
 
         globalThis.sessionStorage.setItem('collapsed', list.join(',') ?? '');
