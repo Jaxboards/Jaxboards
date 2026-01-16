@@ -299,8 +299,8 @@ final class BoardIndex implements Route
     {
         $unreadForums = array_filter(
             $this->fetchIndexForums(),
-            fn(Forum $forum): bool => !$this->isForumRead($forum) &&
-                $this->date->datetimeAsTimestamp($forum->lastPostDate) > $this->date->datetimeAsTimestamp($this->session->get()->lastUpdate),
+            fn(Forum $forum): bool => !$this->isForumRead($forum)
+                && $this->date->datetimeAsTimestamp($forum->lastPostDate) > $this->date->datetimeAsTimestamp($this->session->get()->lastUpdate),
         );
 
         $lastPostMembers = $this->fetchLastPostMembers($unreadForums);
