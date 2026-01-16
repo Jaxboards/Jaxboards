@@ -1,7 +1,7 @@
 /* global RUN, globalSettings */
 
 import { addIdleClock } from '../components/idle-clock';
-import Animation from '../JAX/animation';
+import Animation, { dehighlight } from '../JAX/animation';
 import { getCoordinates } from '../JAX/el';
 import gracefulDegrade from '../JAX/graceful-degrade';
 import { messageReceived } from '../JAX/instant-messaging-window';
@@ -80,7 +80,7 @@ export default {
         if (!el) return;
         el.innerHTML = html;
         if (shouldHighlight) {
-            new Animation(el).dehighlight().play();
+            dehighlight(el);
         }
         gracefulDegrade(el);
     },
@@ -132,7 +132,7 @@ export default {
         while (shouts.length > globalSettings.shoutLimit - 1) {
             shouts.pop()?.remove();
         }
-        new Animation(div).dehighlight().play();
+        dehighlight(div);
         if (globalSettings.soundShout) {
             Sound.play('sbblip');
         }

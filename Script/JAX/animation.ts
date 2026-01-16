@@ -1,5 +1,4 @@
 import Color from './color';
-import { getComputedStyle } from './el';
 
 type LineupEntry = (
     el: Element,
@@ -8,7 +7,7 @@ type LineupEntry = (
  * This class was written before CSS animations existed.
  * It should be replaced.
  */
-class Animation {
+export default class Animation {
     private readonly el: HTMLElement;
 
     private readonly delay: number;
@@ -100,22 +99,6 @@ class Animation {
         return this;
     }
 
-    dehighlight(): this {
-        this.el.style.backgroundColor = '';
-        const bg = getComputedStyle(this.el).backgroundColor;
-        this.el.classList.add('highlight');
-        let bg2 = getComputedStyle(this.el).backgroundColor;
-
-        if (bg2 === bg) bg2 = 'FF0'; // yellow
-        this.el.classList.add('highlight');
-
-        if (!bg2 || !bg) return this;
-
-        return this.add('backgroundColor', bg2, bg).andThen(() => {
-            this.el.style.backgroundColor = bg;
-        });
-    }
-
     andThen(
         what: string | ((el: HTMLElement) => undefined),
         from = undefined,
@@ -133,4 +116,17 @@ class Animation {
     }
 }
 
-export default Animation;
+export function dehighlight(el: HTMLElement) {
+    el.style.backgroundColor = '#FF0';
+
+    // This is needed to force a repaint
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    el.offsetHeight;
+
+    el.style.transition = 'background-color 1s';
+    el.style.backgroundColor = '';
+
+    setTimeout(() => {
+        el.style.transition = '';
+    }, 1000);
+}
