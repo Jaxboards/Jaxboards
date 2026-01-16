@@ -1,53 +1,45 @@
 class Color {
     private rgb?: number[];
 
-    constructor(_colorToParse: string | number[]) {
-        let colorToParse = _colorToParse;
-        // RGB
-        if (typeof colorToParse === 'object') {
-            this.rgb = colorToParse;
+    constructor(colorToParse: string) {
+        const rgbMatch = /^rgb\((\d+),\s?(\d+),\s?(\d+)\)/i.exec(colorToParse);
+        const hexMatch = /#?([\da-fA-F]+)/.exec(colorToParse);
+
+        if (rgbMatch) {
+            this.rgb = [
+                Number.parseFloat(rgbMatch[1]),
+                Number.parseFloat(rgbMatch[2]),
+                Number.parseFloat(rgbMatch[3]),
+            ];
             return;
         }
 
-        if (typeof colorToParse === 'string') {
-            const rgbMatch = /^rgb\((\d+),\s?(\d+),\s?(\d+)\)/i.exec(
-                colorToParse,
-            );
-            const hexMatch = /#?[^\da-fA-F]/.exec(colorToParse);
-            if (rgbMatch) {
-                this.rgb = [
-                    Number.parseFloat(rgbMatch[1]),
-                    Number.parseFloat(rgbMatch[2]),
-                    Number.parseFloat(rgbMatch[3]),
-                ];
+        if (hexMatch) {
+            let hexCode = hexMatch[1];
+
+            // FFF -> FFFFFF
+            if (hexCode.length === 3) {
+                hexCode =
+                    hexCode.charAt(0) +
+                    hexCode.charAt(0) +
+                    hexCode.charAt(1) +
+                    hexCode.charAt(1) +
+                    hexCode.charAt(2) +
+                    hexCode.charAt(2);
+            }
+
+            // Invalid hex
+            if (hexCode.length !== 6) {
+                this.rgb = [0, 0, 0];
                 return;
             }
 
-            if (hexMatch) {
-                if (colorToParse.startsWith('#')) {
-                    colorToParse = colorToParse.slice(1);
-                }
-                if (colorToParse.length === 3) {
-                    colorToParse =
-                        colorToParse.charAt(0) +
-                        colorToParse.charAt(0) +
-                        colorToParse.charAt(1) +
-                        colorToParse.charAt(1) +
-                        colorToParse.charAt(2) +
-                        colorToParse.charAt(2);
-                }
-                if (colorToParse.length !== 6) {
-                    this.rgb = [0, 0, 0];
-                    return;
-                }
-
-                this.rgb = [];
-                for (let x = 0; x < 3; x += 1) {
-                    this.rgb[x] = Number.parseInt(
-                        colorToParse.slice(x * 2, (x + 1) * 2),
-                        16,
-                    );
-                }
+            this.rgb = [];
+            for (let x = 0; x < 3; x += 1) {
+                this.rgb[x] = Number.parseInt(
+                    hexCode.slice(x * 2, (x + 1) * 2),
+                    16,
+                );
             }
         }
     }
@@ -68,9 +60,10 @@ class Color {
     }
 
     toHex() {
-        return this.rgb
-            ?.map((dec) => dec.toString(16).padStart(2, '0'))
-            .join('');
+        return (
+            '#' +
+            this.rgb?.map((dec) => dec.toString(16).padStart(2, '0')).join('')
+        );
     }
 }
 
