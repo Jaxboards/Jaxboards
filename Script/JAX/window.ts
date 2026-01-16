@@ -1,4 +1,4 @@
-import Animation from './animation';
+import { animate } from './animation';
 import Drag, { DragSession } from './drag';
 import { getHighestZIndex } from './el';
 import { onImagesLoaded } from './util';
@@ -217,7 +217,7 @@ class Window {
         }
     }
 
-    setPosition(pos: string, animate = false) {
+    setPosition(pos: string, shouldAnimate = true) {
         const container = this.windowContainer;
         if (!container) return;
         let x = 0;
@@ -250,10 +250,14 @@ class Window {
         if (x < 0) x = 0;
         if (y < 0) y = 0;
         container.style.left = `${x}px`;
-        if (this.animate || animate) {
-            new Animation(container, 10)
-                .add('top', `${y - 100}px`, `${y}px`)
-                .play();
+        if (this.animate || shouldAnimate) {
+            animate(
+                container,
+                { top: `${y - 100}px` },
+                { top: `${y}px` },
+                300,
+                'ease-out',
+            );
         } else container.style.top = `${y}px`;
         this.pos = pos;
     }

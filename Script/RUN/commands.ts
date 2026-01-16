@@ -1,7 +1,7 @@
 /* global RUN, globalSettings */
 
 import { addIdleClock } from '../components/idle-clock';
-import Animation, { dehighlight } from '../JAX/animation';
+import { animate, dehighlight } from '../JAX/animation';
 import { getCoordinates } from '../JAX/el';
 import gracefulDegrade from '../JAX/graceful-degrade';
 import { messageReceived } from '../JAX/instant-messaging-window';
@@ -291,12 +291,12 @@ export default {
         let c;
         if (prdiv) {
             if (prdiv.style.display !== 'none') {
-                new Animation(prdiv)
-                    .add('height', '200px', '0px')
-                    .andThen((el) => {
-                        el.style.display = 'none';
-                    })
-                    .play();
+                animate(
+                    prdiv,
+                    { height: '200px' },
+                    { height: '0px' },
+                    300,
+                ).then((el) => (el.style.display = 'none'));
                 return;
             }
             prdiv.style.display = 'block';
@@ -316,6 +316,6 @@ export default {
             document.querySelector<HTMLDivElement>('#page')?.appendChild(prdiv);
         }
         prdiv.innerHTML = html;
-        new Animation(prdiv).add('height', '0px', '200px').play();
+        animate(prdiv, { height: '0px' }, { height: '200px' }, 300);
     },
 };
