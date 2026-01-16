@@ -81,7 +81,7 @@ final readonly class UserProfile implements Route
         $this->page->command(
             'window',
             [
-                'animate' => false,
+                'animate' => true,
                 'className' => 'contact-card',
                 'content' => $this->template->render(
                     'userprofile/contact-card',
