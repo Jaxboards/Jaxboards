@@ -50,7 +50,8 @@ final readonly class WebHooks implements Module
             return;
         }
 
-        $topicURL = $this->domainDefinitions->getBoardURL()
+        $boardURL = $this->domainDefinitions->getBoardURL();
+        $topicURL = $boardURL
             . $this->router->url('topic', [
                 'id' => $topic->id,
                 'findpost' => $post->id,
@@ -58,8 +59,10 @@ final readonly class WebHooks implements Module
 
         $postContent = $this->textFormatting->textOnly($post->post);
 
+        $user = $this->user->get();
         $this->sendJSON($discord, json_encode([
-            'username' => $this->user->get()->displayName,
+            'username' => $user->displayName,
+            'avatar_url' => $user->avatar ?? $boardURL . '/Service/Themes/Default/avatars/default.gif',
             'content' => <<<MARKDOWN
                 [{$topic->title}](<{$topicURL}>)
 
