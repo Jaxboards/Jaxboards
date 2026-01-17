@@ -1,0 +1,18 @@
+{% if success %}
+    <div class="success">{{ success }}</div>
+{% endif %}
+{% if error %}
+    <div class="error">{{ error }}</div>
+{% endif %}
+
+<p>Webhooks are a way for jaxboards to integrate with other applications.</p>
+
+<form method="post">
+    {% for service,url in webhooks%}
+        <label>{{ service|capitalize }} URL:</label>
+        <input type="text" name="webhooks[{{ service }}]" value="{{ url }}">
+        <br>
+    {% endfor %}
+    <br>
+    <button type="submit">Save</button>
+</form>
