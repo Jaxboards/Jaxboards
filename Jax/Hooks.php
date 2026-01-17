@@ -29,7 +29,7 @@ final class Hooks
     /**
      * Dispatches an event to all listeners.
      */
-    public function dispatch(string $hookName, mixed $payload = null): void
+    public function dispatch(string $hookName, ...$payload): void
     {
         if (!array_key_exists($hookName, $this->hooks)) {
             return;
@@ -37,7 +37,7 @@ final class Hooks
 
         array_map(
             static function (callable $callable) use ($payload): void {
-                $callable($payload);
+                $callable(...$payload);
             },
             $this->hooks[$hookName],
         );
