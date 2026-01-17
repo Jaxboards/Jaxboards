@@ -59,10 +59,10 @@ final readonly class WebHooks implements Module
 
         $postContent = $this->textFormatting->textOnly($post->post);
 
-        $user = $this->user->get();
+        $member = $this->user->get();
         $this->sendJSON($discord, json_encode([
-            'username' => $user->displayName,
-            'avatar_url' => $user->avatar ?? $boardURL . '/Service/Themes/Default/avatars/default.gif',
+            'username' => $member->displayName,
+            'avatar_url' => $member->avatar ?? $boardURL . '/Service/Themes/Default/avatars/default.gif',
             'content' => <<<MARKDOWN
                 [{$topic->title}](<{$topicURL}>)
 
