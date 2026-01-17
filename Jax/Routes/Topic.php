@@ -659,6 +659,7 @@ final class Topic implements Route
                 'pid' => $postId,
                 'slug' => $this->textFormatting->slugify($modelsTopic->title),
             ],
+            "#pid_" . $post->id
         );
     }
 
