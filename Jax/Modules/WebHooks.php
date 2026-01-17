@@ -26,15 +26,15 @@ use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
 use const CURLOPT_URL;
 
-final class WebHooks implements Module
+final readonly class WebHooks implements Module
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly DomainDefinitions $domainDefinitions,
-        private readonly Hooks $hooks,
-        private readonly Router $router,
-        private readonly TextFormatting $textFormatting,
-        private readonly User $user,
+        private Config $config,
+        private DomainDefinitions $domainDefinitions,
+        private Hooks $hooks,
+        private Router $router,
+        private TextFormatting $textFormatting,
+        private User $user,
     ) {}
 
     public function init(): void
