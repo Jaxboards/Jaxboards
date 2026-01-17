@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\Hooks;
+use Jax\Modules\WebHooks;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -70,6 +72,8 @@ use const PASSWORD_DEFAULT;
 #[CoversClass(Model::class)]
 #[CoversClass(PrivateMessage::class)]
 #[CoversClass(Shoutbox::class)]
+#[CoversClass(Hooks::class)]
+#[CoversClass(WebHooks::class)]
 #[CoversClass(Page::class)]
 #[CoversClass(TextRules::class)]
 #[CoversClass(Inbox::class)]
@@ -250,8 +254,7 @@ final class UCPTest extends FeatureTestCase
         $this->assertEquals('http://google.com', $member->website);
 
         $birthdate = $this->container->get(Date::class)
-            ->datetimeAsCarbon($member->birthdate)
-        ;
+            ->datetimeAsCarbon($member->birthdate);
 
         $this->assertEquals(1, $birthdate->month);
         $this->assertEquals(1, $birthdate->day);

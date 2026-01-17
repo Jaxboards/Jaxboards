@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\Hooks;
+use Jax\Modules\WebHooks;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -63,6 +65,8 @@ use Tests\FeatureTestCase;
 #[CoversClass(Model::class)]
 #[CoversClass(PrivateMessage::class)]
 #[CoversClass(Shoutbox::class)]
+#[CoversClass(Hooks::class)]
+#[CoversClass(WebHooks::class)]
 #[CoversClass(Page::class)]
 #[CoversClass(TextRules::class)]
 #[CoversClass(UCP::class)]

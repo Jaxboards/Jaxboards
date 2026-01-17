@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\Modules\WebHooks;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -72,6 +73,8 @@ use function DI\autowire;
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(Session::class)]
 #[CoversClass(Shoutbox::class)]
+#[CoversClass(Hooks::class)]
+#[CoversClass(WebHooks::class)]
 #[CoversClass(SQLite::class)]
 #[CoversClass(Template::class)]
 #[CoversClass(TextFormatting::class)]

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\Hooks;
+use Jax\Modules\WebHooks;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -72,6 +74,8 @@ use function json_decode;
 #[CoversClass(Date::class)]
 #[CoversClass(PrivateMessage::class)]
 #[CoversClass(Shoutbox::class)]
+#[CoversClass(Hooks::class)]
+#[CoversClass(WebHooks::class)]
 final class APITest extends FeatureTestCase
 {
     protected function setUp(): void
