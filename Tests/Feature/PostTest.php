@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Jax\Modules\WebHooks;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -27,6 +26,7 @@ use Jax\Models\Post as ModelsPost;
 use Jax\Models\Topic;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
+use Jax\Modules\WebHooks;
 use Jax\OpenGraph;
 use Jax\Page;
 use Jax\Request;

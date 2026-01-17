@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Jax\Hooks;
-use Jax\Modules\WebHooks;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -21,6 +19,7 @@ use Jax\Date;
 use Jax\DebugLog;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
+use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Models\Member;
@@ -28,6 +27,7 @@ use Jax\Models\Stats;
 use Jax\Models\Token;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
+use Jax\Modules\WebHooks;
 use Jax\Page;
 use Jax\Request;
 use Jax\RequestStringGetter;
