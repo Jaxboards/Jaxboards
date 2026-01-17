@@ -61,7 +61,7 @@ final readonly class WebHooks implements Module
         $this->sendJSON($discord, json_encode([
             'username' => $this->user->get()->displayName,
             'content' => <<<MARKDOWN
-                [{$topic->title}]({$topicURL})
+                [{$topic->title}](<{$topicURL}>)
 
                 {$postContent}
                 MARKDOWN,
