@@ -16,6 +16,7 @@ use Jax\Template;
 use Jax\TextFormatting;
 
 use function _\keyBy;
+use function array_merge;
 use function filter_var;
 use function is_string;
 use function mb_strlen;
@@ -438,13 +439,13 @@ final readonly class Settings
         $webhooksPost = $this->request->post('webhooks');
         if ($webhooksPost) {
             $this->config->write([
-                'webhooks' => $webhooksPost
+                'webhooks' => $webhooksPost,
             ]);
             $success = 'Settings saved.';
-        };
+        }
 
         $webhooks = array_merge([
-            'discord' => ''
+            'discord' => '',
         ], $this->config->get()['webhooks'] ?? []);
         $this->page->addContentBox('Webhooks', $this->page->render(
             'settings/webhooks.html',
