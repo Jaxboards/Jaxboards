@@ -41,12 +41,14 @@ final readonly class Settings
             'pages' => 'Custom Pages',
             'shoutbox' => 'Shoutbox',
             'badges' => 'Badges',
+            'webhooks' => 'Webhooks',
         ]);
 
         match ($this->request->both('do')) {
             'pages' => $this->pages(),
             'shoutbox' => $this->shoutbox(),
             'badges' => $this->badges(),
+            'webhooks' => $this->webhooks(),
             default => $this->global(),
         };
     }
@@ -424,6 +426,32 @@ final readonly class Settings
             [
                 'options' => $badgeOptions,
                 'grantedBadges' => $grantedBadgesRows,
+            ],
+        ));
+    }
+
+    private function webhooks(): void
+    {
+        $error = null;
+        $success = null;
+
+        $webhooksPost = $this->request->post('webhooks');
+        if ($webhooksPost) {
+            $this->config->write([
+                'webhooks' => $webhooksPost
+            ]);
+            $success = 'Settings saved.';
+        };
+
+        $webhooks = array_merge([
+            'discord' => ''
+        ], $this->config->get()['webhooks'] ?? []);
+        $this->page->addContentBox('Webhooks', $this->page->render(
+            'settings/webhooks.html',
+            [
+                'error' => $error,
+                'success' => $success,
+                'webhooks' => $webhooks,
             ],
         ));
     }

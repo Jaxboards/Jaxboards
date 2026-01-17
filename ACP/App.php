@@ -130,6 +130,7 @@ final class App
                 'pages' => 'Custom Pages',
                 'shoutbox' => 'Shoutbox',
                 'badges' => 'Badges',
+                'webhooks' => 'Webhooks',
             ],
         );
         $this->addNavMenu(

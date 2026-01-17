@@ -410,7 +410,7 @@ final class Post implements Route
         $post->openGraphMetadata = json_encode($this->openGraph->fetchFromBBCode($postData), JSON_THROW_ON_ERROR);
         $post->insert();
 
-        $this->hooks->dispatch('post', $post);
+        $this->hooks->dispatch('post', $post, $topic);
 
         // Set op.
         if ($newtopic) {
