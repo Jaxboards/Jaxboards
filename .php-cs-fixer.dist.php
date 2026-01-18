@@ -167,15 +167,6 @@ return (new Config())
         //
         // @see https://cs.symfony.com/doc/rules/cast_notation/modernize_types_casting.html
         'modernize_types_casting' => true,
-        // All new expressions with a further call must (not) be wrapped in
-        // parentheses.
-        //
-        // Enforce parenthesis for backwards compatible code for now
-        //
-        // @see https://cs.symfony.com/doc/rules/operator/new_expression_parentheses.html
-        'new_expression_parentheses' => [
-            'use_parentheses' => true,
-        ],
         // Replace accidental usage of homoglyphs (non ascii characters) in
         // names.
         //
