@@ -136,7 +136,7 @@
   <rule ref="SlevomatCodingStandard.Classes.ModernClassNameReference"/>
   <rule ref="SlevomatCodingStandard.Classes.RequireAbstractOrFinal"/>
   <rule ref="SlevomatCodingStandard.Classes.RequireConstructorPropertyPromotion"/>
-  <rule ref="SlevomatCodingStandard.Classes.RequireMultiLineMethodSignature">
+  <rule ref="SlevomatCodingStandard.Classes.RequireMultiLineMethodSignature" phpcs-only="true">
     <properties>
       <property name="minLineLength" value="80"/>
       <property name="withParametersWithAttributes" value="true"/>
