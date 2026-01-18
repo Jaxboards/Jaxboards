@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Override;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -86,6 +87,7 @@ use function json_decode;
 #[CoversClass(UsersOnline::class)]
 final class PrivateMessageTest extends FeatureTestCase
 {
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jax;
 
+use Override;
 use DI\Container;
 use Jax\Config;
 use Jax\Constants\Groups;
@@ -89,6 +90,7 @@ final class JaxTest extends UnitTestCase
 
     // phpcs:enable SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder
 
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

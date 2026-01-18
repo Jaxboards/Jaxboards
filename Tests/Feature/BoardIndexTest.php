@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Override;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -86,6 +87,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(UserOnline::class)]
 final class BoardIndexTest extends FeatureTestCase
 {
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

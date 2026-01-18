@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Override;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -95,6 +96,7 @@ use const JSON_THROW_ON_ERROR;
 #[CoversClass(UsersOnline::class)]
 final class ReactionsTest extends FeatureTestCase
 {
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -104,7 +104,7 @@ if (!is_array($data['results']['errors'] ?? null)) {
 $rules = array_reduce(
     $data['results']['errors'],
     static function (array $rules, array $error): array {
-        if (array_key_exists($error['normalizeMessage'], $rules)) {
+        if (array_key_exists((string) $error['normalizeMessage'], $rules)) {
             return $rules;
         }
 

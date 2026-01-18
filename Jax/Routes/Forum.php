@@ -415,7 +415,7 @@ final class Forum implements Route
                 true,
                 flags: JSON_THROW_ON_ERROR,
             );
-            if ($topic->fid && array_key_exists($topic->fid, $forumsRead)) {
+            if ($topic->fid && array_key_exists((string) $topic->fid, $forumsRead)) {
                 $forumReadTime = $forumsRead[$topic->fid];
             }
         }

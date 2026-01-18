@@ -206,7 +206,7 @@ $rules = array_reduce(
     static fn(array $rules, array $file): array => array_reduce(
         $file['messages'],
         static function (array $rules, array $message): array {
-            if (array_key_exists($message['source'], $rules)) {
+            if (array_key_exists((string) $message['source'], $rules)) {
                 return $rules;
             }
 

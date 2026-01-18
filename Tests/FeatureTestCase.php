@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use Override;
 use Jax\App;
 use Jax\Constants\Groups;
 use Jax\Database\Database;
@@ -32,6 +33,7 @@ use const PASSWORD_DEFAULT;
 #[CoversNothing]
 abstract class FeatureTestCase extends TestCase
 {
+    #[Override]
     protected function setUp(): void
     {
         session_id('paratest-' . getenv('TEST_TOKEN'));
@@ -69,7 +71,7 @@ abstract class FeatureTestCase extends TestCase
             $name,
             $params,
         ) ?? $name;
-        static::assertStringContainsString("Location: {$location}", $page);
+        self::assertStringContainsString("Location: {$location}", $page);
     }
 
     /**

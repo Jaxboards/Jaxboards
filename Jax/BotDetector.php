@@ -9,7 +9,7 @@ use function str_contains;
 
 final readonly class BotDetector
 {
-    public const BOTS = [
+    public const array BOTS = [
         'AhrefsBot' => 'Ahrefs',
         'AliyunSecBot' => 'AliyunSecBot',
         'Amazonbot' => 'Amazon',

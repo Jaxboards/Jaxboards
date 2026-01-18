@@ -16,7 +16,7 @@ use function str_starts_with;
 
 final class ContactDetails
 {
-    private const CONTACT_URLS = [
+    private const array CONTACT_URLS = [
         'aim' => 'aim:goaim?screenname=%s',
         'bluesky' => 'https://bsky.app/profile/%s.bsky.social',
         'discord' => 'discord://-/users/%s',

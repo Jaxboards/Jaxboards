@@ -26,7 +26,7 @@ use function str_replace;
 
 final readonly class Utils implements Adapter
 {
-    public const ADAPTERS = [
+    public const array ADAPTERS = [
         'mysql' => MySQL::class,
         'sqliteMemory' => SQLite::class,
     ];

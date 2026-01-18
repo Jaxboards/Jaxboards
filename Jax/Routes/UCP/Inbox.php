@@ -30,7 +30,7 @@ use const PHP_EOL;
 
 final readonly class Inbox
 {
-    public const MESSAGES_PER_PAGE = 10;
+    public const int MESSAGES_PER_PAGE = 10;
 
     public function __construct(
         private Database $database,

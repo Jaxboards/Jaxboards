@@ -29,7 +29,7 @@ use const PHP_URL_HOST;
 
 final readonly class ServiceInstall
 {
-    public const FIELDS = [
+    public const array FIELDS = [
         'admin_username' => [
             'name' => 'Admin Username',
             'placeholder' => 'admin',

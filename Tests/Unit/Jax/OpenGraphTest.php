@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jax;
 
+use Override;
 use Jax\BBCode;
 use Jax\FileSystem;
 use Jax\OpenGraph;
@@ -22,6 +23,7 @@ final class OpenGraphTest extends UnitTestCase
 {
     use MatchesSnapshots;
 
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

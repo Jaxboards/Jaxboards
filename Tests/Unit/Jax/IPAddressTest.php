@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jax;
 
+use Override;
 use Jax\Config;
 use Jax\Database\Database;
 use Jax\Database\Model;
@@ -31,8 +32,9 @@ use Tests\UnitTestCase;
 #[CoversClass(IPAddress::class)]
 final class IPAddressTest extends UnitTestCase
 {
-    public const TESTIP = '192.168.1.1';
+    public const string TESTIP = '192.168.1.1';
 
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

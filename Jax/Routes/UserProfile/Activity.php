@@ -19,7 +19,7 @@ use function array_map;
 
 final readonly class Activity
 {
-    private const ACTIVITY_LIMIT = 30;
+    private const int ACTIVITY_LIMIT = 30;
 
     public function __construct(
         private Date $date,
