@@ -63,6 +63,7 @@
   </rule>
   <rule ref="Squiz.Commenting.PostStatementComment" />
   <rule ref="Squiz.Commenting.BlockComment">
+    <exclude name="Squiz.Commenting.BlockComment.HasEmptyLineBefore" />
     <exclude name="Squiz.Commenting.BlockComment.InvalidEndChar" />
     <exclude name="Squiz.Commenting.BlockComment.LastLineIndent" />
     <exclude name="Squiz.Commenting.BlockComment.NotCapital" />
