@@ -51,7 +51,7 @@ final readonly class Posting
         /** @var array<string,TextRule> $badWords */
         $badWords = Lodash::keyBy(
             TextRule::selectMany("WHERE `type`='badword'"),
-            static fn($textRule) => $textRule->needle,
+            static fn($textRule): string => $textRule->needle,
         );
 
         // Delete.
@@ -141,7 +141,7 @@ final readonly class Posting
         /** @var array<TextRule> $emoticons */
         $emoticons = Lodash::keyBy(
             TextRule::selectMany("WHERE `type`='emote'"),
-            static fn($textRule) => $textRule->needle,
+            static fn($textRule): string => $textRule->needle,
         );
 
         // Insert emoticon.
@@ -249,7 +249,7 @@ final readonly class Posting
         $page2 = '';
         $niblets = Lodash::keyBy(
             RatingNiblet::selectMany('ORDER BY `id` DESC'),
-            static fn($niblet) => $niblet->id,
+            static fn($niblet): int => $niblet->id,
         );
 
         // Delete.

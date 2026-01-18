@@ -50,7 +50,7 @@ final readonly class Reactions
 
         return $ratingNiblets = Lodash::keyBy(
             RatingNiblet::selectMany(),
-            static fn($niblet) => $niblet->id,
+            static fn($niblet): int => $niblet->id,
         );
     }
 
@@ -81,7 +81,7 @@ final readonly class Reactions
 
         $mdata = Lodash::keyBy(
             Member::selectMany(Database::WHERE_ID_IN, $members),
-            static fn($member) => $member->id,
+            static fn($member): int => $member->id,
         );
 
         unset($members);

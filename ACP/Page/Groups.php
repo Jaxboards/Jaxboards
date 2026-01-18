@@ -161,7 +161,7 @@ final class Groups
             ...($groupIds ? [$groupIds] : []),
         );
 
-        return Lodash::keyBy($groups, static fn($group) => $group->id);
+        return Lodash::keyBy($groups, static fn($group): int => $group->id);
     }
 
     private function showPerms(): void

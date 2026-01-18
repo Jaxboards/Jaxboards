@@ -280,7 +280,7 @@ final readonly class Forums
         $forums = $this->fetchAllForums();
         $forumsByCategory = array_map(
             static fn(array $forums): ForumTree => new ForumTree($forums),
-            Lodash::groupBy($forums, static fn($forum) => $forum->category),
+            Lodash::groupBy($forums, static fn($forum): ?int => $forum->category),
         );
 
         $categories = $this->fetchAllCategories();
@@ -800,7 +800,7 @@ final readonly class Forums
     {
         $categories = Category::selectMany('ORDER BY `order`,`id` ASC');
 
-        return Lodash::keyBy($categories, static fn($category) => $category->id);
+        return Lodash::keyBy($categories, static fn($category): int => $category->id);
     }
 
     /**
@@ -810,7 +810,7 @@ final readonly class Forums
     {
         $forums = Forum::selectMany('ORDER BY `order`,`title`');
 
-        return Lodash::keyBy($forums, static fn($forum) => $forum->id);
+        return Lodash::keyBy($forums, static fn($forum): int => $forum->id);
     }
 
     /**
@@ -818,7 +818,7 @@ final readonly class Forums
      */
     private function fetchAllGroups(): array
     {
-        return Lodash::keyBy(Group::selectMany(), static fn($group) => $group->id);
+        return Lodash::keyBy(Group::selectMany(), static fn($group): int => $group->id);
     }
 
     /*
