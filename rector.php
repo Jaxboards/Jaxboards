@@ -15,23 +15,6 @@ use Rector\CodingStyle\Rector\Catch_\CatchExceptionNameMatchingTypeRector;
 use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
 use Rector\Config\RectorConfig;
 use Rector\Php70\Rector\FunctionLike\ExceptionHandlerTypehintRector;
-use Rector\Php83\Rector\BooleanAnd\JsonValidateRector;
-use Rector\Php84\Rector\Class_\DeprecatedAnnotationToDeprecatedAttributeRector;
-use Rector\Php84\Rector\Foreach_\ForeachToArrayAllRector;
-use Rector\Php84\Rector\Foreach_\ForeachToArrayAnyRector;
-use Rector\Php84\Rector\Foreach_\ForeachToArrayFindKeyRector;
-use Rector\Php84\Rector\Foreach_\ForeachToArrayFindRector;
-use Rector\Php84\Rector\FuncCall\AddEscapeArgumentRector;
-use Rector\Php84\Rector\Param\ExplicitNullableParamTypeRector;
-use Rector\Php85\Rector\ArrayDimFetch\ArrayFirstLastRector;
-use Rector\Php85\Rector\Class_\SleepToSerializeRector;
-use Rector\Php85\Rector\Class_\WakeupToUnserializeRector;
-use Rector\Php85\Rector\ClassMethod\NullDebugInfoReturnRector;
-use Rector\Php85\Rector\FuncCall\ArrayKeyExistsNullToEmptyStringRector;
-use Rector\Php85\Rector\FuncCall\ChrArgModuloRector;
-use Rector\Php85\Rector\FuncCall\OrdSingleByteRector;
-use Rector\Php85\Rector\ShellExec\ShellExecFunctionCallOverBackticksRector;
-use Rector\Php85\Rector\Switch_\ColonAfterSwitchCaseRector;
 use Rector\Removing\Rector\FuncCall\RemoveFuncCallRector;
 use Rector\Renaming\Rector\FuncCall\RenameFunctionRector;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
@@ -238,30 +221,6 @@ return RectorConfig::configure()
         symfonyConfigs: false,
     )
     ->withRootFiles()
-    ->withRules([
-        // PHP 8.4 rules that are safe to enable whenever
-        AddEscapeArgumentRector::class,
-        ExplicitNullableParamTypeRector::class,
-        // PHP 8.5 rules that are safe to enable whenever
-        ArrayKeyExistsNullToEmptyStringRector::class,
-        ChrArgModuloRector::class,
-        ColonAfterSwitchCaseRector::class,
-        NullDebugInfoReturnRector::class,
-        OrdSingleByteRector::class,
-        ShellExecFunctionCallOverBackticksRector::class,
-        SleepToSerializeRector::class,
-        WakeupToUnserializeRector::class,
-        // PHP 8.3 rules that are safe to enable due to polyfills
-        JsonValidateRector::class,
-        // PHP 8.4 rules that are safe to enable due to polyfills
-        ForeachToArrayAllRector::class,
-        ForeachToArrayAnyRector::class,
-        ForeachToArrayFindKeyRector::class,
-        ForeachToArrayFindRector::class,
-        DeprecatedAnnotationToDeprecatedAttributeRector::class,
-        // PHP 8.5 rules that are safe to enable due to polyfills
-        ArrayFirstLastRector::class,
-    ])
     ->withSkip([
         // disable ! and empty rules which make the code noisy due to the
         // automated handling of it
