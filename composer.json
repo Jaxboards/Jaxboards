@@ -44,6 +44,13 @@
   },
   "require": {
     "composer": "2.9.3",
+    "ext-mbstring": "*",
+    "ext-openssl": "*",
+    "ext-zip": "*",
+    "lib-curl": "*",
+    "lib-curl-openssl": "*",
+    "lib-openssl": "*",
+    "lib-zip-libzip": "*",
     "php": "8.2.12",
     "php-di/php-di": "^7.1",
     "symfony/polyfill-php83": "^1.33",
