@@ -49,6 +49,11 @@ final readonly class OpenGraph
         try {
             $contents = $this->fileSystem->getContents($url);
 
+            // Don't attempt to parse an empty document
+            if ($contents === '') {
+                return [];
+            }
+
             $metaValues = [];
 
             libxml_use_internal_errors(true);
@@ -64,7 +69,9 @@ final readonly class OpenGraph
                 $doc = new DOMDocument();
 
                 // This incantation prevents loadHTML from assuming ISO-8859-1
-                $doc->loadHTML(mb_encode_numericentity($contents, [0x80, 0x10FFFF, 0, ~0], 'UTF-8'));
+                $contents = mb_encode_numericentity($contents, [0x80, 0x10FFFF, 0, ~0], 'UTF-8');
+
+                $doc->loadHTML($contents);
 
                 $metaTags = $doc->getElementsByTagName('meta');
             }

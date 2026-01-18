@@ -99,6 +99,10 @@ final class OpenGraphTest extends UnitTestCase
                     </html>
                     HTML,
             ],
+            [
+                'https://bibbyteam.com/',
+                ''
+            ],
         ];
     }
 }
