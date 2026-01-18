@@ -136,7 +136,7 @@ final class BoardIndex implements Route
                             'forum' => $forum,
                             'lastPostHTML' => $this->formatLastPost(
                                 $forum,
-                                $lastPostMembers[$forum->lastPostUser] ?? null,
+                                $forum->lastPostUser ? $lastPostMembers[$forum->lastPostUser] : null,
                             ),
                             'isRead' => $this->isForumRead($forum),
                             'mods' => $this->getMods($forum->mods),

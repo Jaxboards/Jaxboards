@@ -326,7 +326,7 @@ final class Forum implements Route
 
             $rows[] = [
                 'subforum' => $subforum,
-                'lastPostUser' => $lastPostUsers[$subforum->lastPostUser] ?? null,
+                'lastPostUser' => $subforum->lastPostUser ? $lastPostUsers[$subforum->lastPostUser] : null,
                 'isRead' => $this->isForumRead($subforum),
             ];
         }
