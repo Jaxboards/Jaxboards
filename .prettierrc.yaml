@@ -1,2 +1,6 @@
+overrides:
+  - files: "*.php"
+    options:
+      singleQuote: true
 plugins:
   - "@prettier/plugin-php"
