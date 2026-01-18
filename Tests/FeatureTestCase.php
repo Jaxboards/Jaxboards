@@ -80,49 +80,10 @@ abstract class FeatureTestCase extends TestCase
         array $memberOverrides = [],
         array $sessionOverrides = [],
     ): void {
-        $database = $this->container->get(Database::class);
+        $members = $this->insertMembers($memberOverrides);
 
         if (! $member instanceof Member) {
-            $memberName = $member;
-            $member = new Member();
-            $member->joinDate = $database->datetime();
-            $member->lastVisit = $database->datetime();
-
-            switch ($memberName) {
-                case 'admin':
-                    $member->id = 1;
-                    $member->name = 'Admin';
-                    $member->displayName = 'Admin';
-                    $member->sig = 'I like tacos';
-                    $member->pass = password_hash('password', PASSWORD_DEFAULT);
-                    $member->birthdate = $database->date();
-                    $member->groupID = Groups::Admin->value;
-
-                    break;
-
-                case 'member':
-                default:
-                    $member->id = 2;
-                    $member->name = 'Member';
-                    $member->displayName = 'Member';
-                    $member->groupID = Groups::Member->value;
-
-                    break;
-
-                case 'banned':
-                    $member->id = 4;
-                    $member->name = 'Banned';
-                    $member->displayName = 'Banned';
-                    $member->groupID = Groups::Banned->value;
-
-                    break;
-            }
-
-            foreach ($memberOverrides as $property => $value) {
-                $member->{$property} = $value;
-            }
-
-            $member->insert();
+            $member = $members[$member];
         }
 
         $this->container->set(
@@ -132,7 +93,7 @@ abstract class FeatureTestCase extends TestCase
 
         $this->container->set(
             JaxSession::class,
-            autowire()->constructorParameter('session', ['uid' => $member->id, ...$sessionOverrides]),
+            autowire()->constructorParameter('session', ['uid' => $member->id ?? null, ...$sessionOverrides]),
         );
     }
 
@@ -140,5 +101,55 @@ abstract class FeatureTestCase extends TestCase
     {
         $databaseUtils = $this->container->get(DatabaseUtils::class);
         $databaseUtils->install();
+    }
+
+    /**
+     * @param array<mixed> $memberOverrides
+     * @return array<Member>
+     */
+    private function insertMembers(array $memberOverrides = []): array
+    {
+        $database = $this->container->get(Database::class);
+
+        $admin = new Member();
+        $admin->id = 1;
+        $admin->name = 'Admin';
+        $admin->displayName = 'Admin';
+        $admin->sig = 'I like tacos';
+        $admin->pass = password_hash('password', PASSWORD_DEFAULT);
+        $admin->birthdate = $database->date();
+        $admin->groupID = Groups::Admin->value;
+
+        $member = new Member();
+        $member->id = 2;
+        $member->name = 'Member';
+        $member->displayName = 'Member';
+        $member->groupID = Groups::Member->value;
+
+        $banned = new Member();
+        $banned->id = 4;
+        $banned->name = 'Banned';
+        $banned->displayName = 'Banned';
+        $banned->groupID = Groups::Banned->value;
+
+        $members = [
+            'admin' => $admin,
+            'banned' => $banned,
+            'member' => $member,
+        ];
+
+        // override properties and insert the models
+        foreach ($members as $member) {
+            $member->joinDate = $database->datetime();
+            $member->lastVisit = $database->datetime();
+            foreach ($memberOverrides as $property => $value) {
+                $member->{$property} = $value;
+            }
+            $member->insert();
+        }
+
+        $members['guest'] = null;
+
+        return $members;
     }
 }

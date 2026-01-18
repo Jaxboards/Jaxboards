@@ -97,6 +97,8 @@ final class ShoutboxTest extends FeatureTestCase
 
     public function testUnauthShout(): void
     {
+        $this->actingAs('guest');
+
         $page = $this->go(new Request(
             post: ['shoutbox_shout' => 'test'],
         ));
