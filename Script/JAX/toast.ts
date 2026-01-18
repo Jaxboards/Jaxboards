@@ -66,6 +66,4 @@ class Toast {
     }
 }
 
-window.Toast = new Toast();
-
 export default new Toast();
