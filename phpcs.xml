@@ -8,8 +8,25 @@
   <!-- ignore vendor files -->
   <exclude-pattern>./vendor</exclude-pattern>
   <exclude-pattern>./node_modules</exclude-pattern>
+  <!-- PHP Version -->
+  <!-- Reference https://github.com/squizlabs/PHP_CodeSniffer/wiki/Configuration-Options#setting-the-php-version -->
+  <config name="php_version" value="80230"/>
+  <!-- Make sure this works with PHP 8.2+ -->
+  <config name="testVersion" value="8.2-" />
+  <!-- Use UTF-8 encoding -->
+  <config name="encoding" value="utf-8"/>
+  <!-- Return error codes on exit if there are errros -->
+  <config name="ignore_errors_on_exit" value="0"/>
+  <config name="ignore_warnings_on_exit" value="0"/>
+  <!-- We don't care about non-fixable errors when running phpcbf -->
+  <config name="ignore_non_auto_fixable_on_exit" phpcbf-only="true" value="1"/>
+  <!-- Set tab width to PSR-12 standard -->
+  <!-- Reference https://github.com/squizlabs/PHP_CodeSniffer/wiki/Configuration-Options#setting-the-default-tab-width -->
+  <config name="tab_width" value="4"/>
   <!-- show colors -->
   <arg name="colors" />
+  <!-- Output with rule names -->
+  <arg value="s"/>
   <!-- only check php files -->
   <arg name="extensions" value="php" />
   <!-- Follow PSR coding style guides -->
@@ -288,9 +305,6 @@
       <property name="ignoreSpacesInComment" value="true"/>
     </properties>
   </rule>
-
-  <!-- Make sure this works with PHP 8.2+ -->
-  <config name="testVersion" value="8.2-" />
 
   <!-- Ban some functions -->
   <rule ref="Generic.PHP.ForbiddenFunctions">
