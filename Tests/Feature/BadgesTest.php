@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Jax\Lodash;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -23,6 +22,7 @@ use Jax\FileSystem;
 use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Lodash;
 use Jax\Models\Badge;
 use Jax\Models\BadgeAssociation;
 use Jax\Modules\PrivateMessage;

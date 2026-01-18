@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_key_exists;
+
 /**
- * An implementation of some of my favorite lodash functions
+ * An implementation of some of my favorite lodash functions.
  */
-class Lodash
+final class Lodash
 {
     /**
-     * @param array<mixed> $data
+     * @param array<mixed>                 $data
      * @param callable(mixed $data):string $iteratee
      *
      * @return array<int>
@@ -33,7 +35,8 @@ class Lodash
 
     /**
      * @template T
-     * @param array<T> $data
+     *
+     * @param array<T>                     $data
      * @param callable(mixed $data):string $iteratee
      *
      * @return array<array<T>>
@@ -56,7 +59,8 @@ class Lodash
 
     /**
      * @template T
-     * @param array<T> $data
+     *
+     * @param array<T>                     $data
      * @param callable(mixed $data):string $iteratee
      *
      * @return array<T>
