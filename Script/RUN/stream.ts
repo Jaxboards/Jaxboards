@@ -1,3 +1,4 @@
+import toast from '../JAX/toast';
 import Commands from './commands';
 
 const UPDATE_INTERVAL = 5000;
@@ -65,6 +66,10 @@ export default class Stream {
         if (request.ok) {
             const json = (await request.json()) as [unknown[]];
             this.handleRequestData(url, json, requestType);
+        } else {
+            toast.error(
+                'An unrecoverable error has occurred.<br>Please try again later.',
+            );
         }
     }
 

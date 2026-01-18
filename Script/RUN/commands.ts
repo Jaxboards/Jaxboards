@@ -5,6 +5,7 @@ import { animate, dehighlight } from '../JAX/animation';
 import { getCoordinates } from '../JAX/el';
 import gracefulDegrade from '../JAX/graceful-degrade';
 import { messageReceived } from '../JAX/instant-messaging-window';
+import toast from '../JAX/toast';
 import openTooltip from '../JAX/tooltip';
 import { onImagesLoaded } from '../JAX/util';
 import Window from '../JAX/window';
@@ -41,10 +42,10 @@ export default {
         (0, eval)(script);
     },
     error(message: string) {
-        alert(message);
+        toast.error(message);
     },
     alert(message: string) {
-        alert([message]);
+        toast.alert(message);
     },
     reload(timeout = 0) {
         setTimeout(() => globalThis.location.reload(), timeout);

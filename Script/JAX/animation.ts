@@ -11,7 +11,7 @@ export async function animate<T extends HTMLElement>(
     el: T,
     from: Partial<CSSStyleDeclaration>,
     to: Partial<CSSStyleDeclaration>,
-    durationMS = 1000,
+    durationMS = 600,
     timingFunction = 'linear',
 ): Promise<T> {
     Object.assign(el.style, from);
@@ -36,5 +36,10 @@ export async function animate<T extends HTMLElement>(
  * @param el the element
  */
 export function dehighlight(el: HTMLElement) {
-    return animate(el, { backgroundColor: '#FF0' }, { backgroundColor: '' });
+    return animate(
+        el,
+        { backgroundColor: '#FF0' },
+        { backgroundColor: '' },
+        1000,
+    );
 }

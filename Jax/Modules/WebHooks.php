@@ -60,7 +60,7 @@ final readonly class WebHooks implements Module
         $postContent = $this->textFormatting->textOnly($post->post);
 
         $member = $this->user->get();
-        $this->sendJSON($discord, json_encode([
+        $this->sendJSON($discord, [
             'username' => $member->displayName,
             'avatar_url' => $member->avatar ?? $boardURL . '/Service/Themes/Default/avatars/default.gif',
             'content' => <<<MARKDOWN
@@ -68,11 +68,15 @@ final readonly class WebHooks implements Module
 
                 {$postContent}
                 MARKDOWN,
-        ]));
+        ]);
     }
 
-    private function sendJSON(string $url, string $json): void
+    /**
+     * @param array<mixed> $payload
+     */
+    private function sendJSON(string $url, array $payload): void
     {
+        $payload = json_encode($payload, JSON_THROW_ON_ERROR);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Content-Length: ' . mb_strlen($json)]);
