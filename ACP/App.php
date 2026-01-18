@@ -162,6 +162,9 @@ final class App
             'viewErrorLog' => 'View Error Log',
         ]);
 
-        $this->page->append('nav', $this->page->render('nav.html', $this->nav));
+        $this->page->append(
+            'nav',
+            $this->page->render('nav.html', $this->nav),
+        );
     }
 }

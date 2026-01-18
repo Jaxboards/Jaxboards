@@ -153,8 +153,10 @@ final readonly class Inbox
         return null;
     }
 
-    private function compose(?int $messageId = null, string $todo = ''): ?string
-    {
+    private function compose(
+        ?int $messageId = null,
+        string $todo = '',
+    ): ?string {
         $error = null;
         $recipient = null;
 
@@ -317,7 +319,10 @@ final readonly class Inbox
 
     private function viewMessage(string $messageId): ?string
     {
-        if ($this->request->isJSUpdate() && !$this->request->isJSDirectLink()) {
+        if (
+            $this->request->isJSUpdate()
+            && !$this->request->isJSDirectLink()
+        ) {
             return null;
         }
 

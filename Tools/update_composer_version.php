@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 // Update our composer version to the latest available.
 declare(strict_types=1);
 
@@ -54,7 +55,10 @@ ksort($composerData['config']['platform']);
 $composerData['require-dev']['composer'] = $version;
 ksort($composerData['require-dev']);
 
-file_put_contents(COMPOSER_FILE, json_encode($composerData, JSON_PRETTY_PRINT));
+file_put_contents(
+    COMPOSER_FILE,
+    json_encode($composerData, JSON_PRETTY_PRINT),
+);
 
 define('PACKAGE_FILE', dirname(__DIR__) . '/package.json');
 
@@ -78,4 +82,3 @@ $packageData['engines']['composer'] = $version;
 ksort($packageData['engines']);
 
 file_put_contents(PACKAGE_FILE, json_encode($packageData, JSON_PRETTY_PRINT));
-

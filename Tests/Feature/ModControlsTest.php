@@ -480,7 +480,11 @@ final class ModControlsTest extends FeatureTestCase
 
         $this->assertContainsEquals(['modcontrols_clearbox'], $json);
 
-        $this->assertEquals(Post::selectOne($pid)->tid, $tid, 'Post was moved');
+        $this->assertEquals(
+            Post::selectOne($pid)->tid,
+            $tid,
+            'Post was moved',
+        );
     }
 
     public function testMoveTopics(): void

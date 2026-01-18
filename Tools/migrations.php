@@ -77,7 +77,7 @@ foreach ($migrations as $version => $migration) {
         echo error("Error updating to V{$version}: {$e->getMessage()}") .
             PHP_EOL;
 
-        exit();
+        exit;
     }
 
     // Update DB version

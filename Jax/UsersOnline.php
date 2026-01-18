@@ -62,7 +62,9 @@ final class UsersOnline
             $this->database->datetime(
                 Carbon::now('UTC')
                     ->subSeconds(
-                        $this->serviceConfig->getSetting('timetologout') ?? 900,
+                        $this->serviceConfig->getSetting(
+                            'timetologout',
+                        ) ?? 900,
                     )
                     ->getTimestamp(),
             ),

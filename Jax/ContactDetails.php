@@ -49,7 +49,10 @@ final class ContactDetails
 
         return array_reduce(
             $contactFields,
-            static function (array $links, $field) use (
+            static function (
+                array $links,
+                $field,
+            ) use (
                 $contactFieldPrefix,
                 $member,
             ): array {

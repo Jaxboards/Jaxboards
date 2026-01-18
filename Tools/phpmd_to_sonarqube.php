@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 declare(strict_types=1);
 
 // phpcs:disable Generic.Files.LineLength.TooLong,PSR12.Files.FileHeader.IncorrectOrder,Squiz.Commenting.InlineComment.DocBlock,Squiz.Commenting.BlockComment.WrongStart
@@ -60,7 +61,10 @@ if (file_exists($sonarQubeReport) && !is_writable($sonarQubeReport)) {
     exit(1);
 }
 
-if (!file_exists($sonarQubeReport) && !is_writable(dirname($sonarQubeReport))) {
+if (
+    !file_exists($sonarQubeReport)
+    && !is_writable(dirname($sonarQubeReport))
+) {
     fwrite(STDERR, 'SonarQube report file directory is not writable');
 
     exit(1);
@@ -269,4 +273,3 @@ file_put_contents(
     ),
     LOCK_EX,
 );
-

@@ -118,7 +118,10 @@ final readonly class ModTopics
 
         $trashcan = $trashcan->id ?? false;
 
-        $topics = Topic::selectMany(Database::WHERE_ID_IN, $this->getModTids());
+        $topics = Topic::selectMany(
+            Database::WHERE_ID_IN,
+            $this->getModTids(),
+        );
         $delete = [];
         foreach ($topics as $topic) {
             if ($topic->fid && !in_array($topic->fid, $forumIds)) {
@@ -241,7 +244,11 @@ final readonly class ModTopics
 
         unset($topicIds[array_search($otherTopic, $topicIds, true)]);
         if ($topicIds !== []) {
-            $this->database->delete('topics', Database::WHERE_ID_IN, $topicIds);
+            $this->database->delete(
+                'topics',
+                Database::WHERE_ID_IN,
+                $topicIds,
+            );
         }
 
         $this->cancel();
@@ -256,7 +263,10 @@ final readonly class ModTopics
             return;
         }
 
-        $topics = Topic::selectMany(Database::WHERE_ID_IN, $this->getModTids());
+        $topics = Topic::selectMany(
+            Database::WHERE_ID_IN,
+            $this->getModTids(),
+        );
         $fids = array_unique(
             array_map(
                 static fn(Topic $topic): int => (int) $topic->fid,

@@ -58,7 +58,7 @@ final readonly class Download implements Route
             );
             echo $this->fileSystem->getContents($filePath);
 
-            exit();
+            exit;
         }
     }
 }

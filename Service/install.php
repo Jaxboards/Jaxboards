@@ -5,7 +5,7 @@ declare(strict_types=1);
 use DI\Container;
 use Jax\Routes\ServiceInstall;
 
-/**
+/*
  * Service install file, for installing a new JaxBoards service.
  *
  * PHP Version 5.3.7

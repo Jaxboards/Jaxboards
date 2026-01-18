@@ -137,7 +137,10 @@ final class ServiceSignupTest extends FeatureTestCase
         $database->setPrefix('');
 
         $directoryEntry = Directory::selectOne(1);
-        $this->assertEquals('email@email.com', $directoryEntry->registrarEmail);
+        $this->assertEquals(
+            'email@email.com',
+            $directoryEntry->registrarEmail,
+        );
         $this->assertEquals('boardname', $directoryEntry->boardname);
     }
 }

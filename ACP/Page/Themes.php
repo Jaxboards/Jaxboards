@@ -137,7 +137,10 @@ final readonly class Themes
         $validWrappers = $this->getWrappers();
 
         foreach ($wrappers as $skinId => $wrapperName) {
-            if ($wrapperName && !in_array($wrapperName, $validWrappers, true)) {
+            if (
+                $wrapperName
+                && !in_array($wrapperName, $validWrappers, true)
+            ) {
                 continue;
             }
 
@@ -181,7 +184,12 @@ final readonly class Themes
                 return 'Invalid from skin name';
             }
 
-            if (!$this->isValidFilename($newName) || mb_strlen($newName) > 50) {
+            if (
+                !$this->isValidFilename($newName)
+                || mb_strlen(
+                $newName,
+                ) > 50
+            ) {
                 return 'Skin name must consist of letters, numbers, spaces, and underscore, and be under 50 characters long.';
             }
 
@@ -296,8 +304,12 @@ final readonly class Themes
             is_string($deleteWrapper) => $this->deleteWrapper($deleteWrapper),
             is_string($newWrapper) && $newWrapper !== ''
                 => $this->createWrapper($newWrapper),
-            is_array($updateWrappers) => $this->updateWrappers($updateWrappers),
-            is_array($renameWrappers) => $this->renameWrappers($renameWrappers),
+            is_array($updateWrappers) => $this->updateWrappers(
+                $updateWrappers,
+            ),
+            is_array($renameWrappers) => $this->renameWrappers(
+                $renameWrappers,
+            ),
             default => null,
         };
 
@@ -497,7 +509,10 @@ final readonly class Themes
                 ->getFileInfo($this->themesPath . $skinName)
                 ->isDir()
                 => 'A skin with that name already exists.',
-            !in_array($wrapperName, $this->getWrappers()) => 'Invalid wrapper.',
+            !in_array(
+                $wrapperName,
+                $this->getWrappers(),
+            ) => 'Invalid wrapper.',
             default => null,
         };
 
@@ -579,7 +594,10 @@ final readonly class Themes
             return;
         }
 
-        $skindir = $this->fileSystem->pathJoin($this->themesPath, $skin->title);
+        $skindir = $this->fileSystem->pathJoin(
+            $this->themesPath,
+            $skin->title,
+        );
         if ($this->fileSystem->getFileInfo($skindir)->isDir()) {
             $this->fileSystem->removeDirectory($skindir);
         }
