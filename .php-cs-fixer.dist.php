@@ -18,20 +18,11 @@ return (new Config())
     ->setParallelConfig(ParallelConfigFactory::detect())
     ->setRules([
         // # Rulesets
+        // Default (risky) rule set. Applies newest PER-CS and optimizations for
+        // PHP and PHPUnit, based on project’s composer.json file.
         //
-        // Rules to improve code for PHP 8.4 compatibility.
-        //
-        // @see https://cs.symfony.com/doc/ruleSets/PHP84Migration.html
-        '@PHP8x4Migration' => true,
-        // Rules to improve code for PHP 7.4 compatibility.
-        //
-        // @see https://cs.symfony.com/doc/ruleSets/PHP74MigrationRisky.html
-        '@PHP7x4Migration:risky' => true,
-        // Alias for the latest revision of PER-CS risky rules. Use it if you
-        // always want to be in sync with newest PER-CS standard.
-        //
-        // @see https://cs.symfony.com/doc/ruleSets/PER-CSRisky.html
-        '@PER-CS:risky' => true,
+        // @see https://cs.symfony.com/doc/ruleSets/AutoRisky.html
+        '@auto:risky' => true,
         // Rules that follow the official
         // [Symfony Coding Standards](https://symfony.com/doc/current/contributing/code/standards.html).
         //
@@ -42,14 +33,14 @@ return (new Config())
         //
         // @see https://cs.symfony.com/doc/ruleSets/PhpCsFixer.html
         '@PhpCsFixer' => true,
-        // PER Coding style https://www.php-fig.org/per/coding-style/
-        // Alias for the latest revision of PER-CS rules.
+        // Default rule set. Applies newest PER-CS and optimizations for PHP,
+        // based on project’s composer.json file.
         //
         // Run this after the PhpCsFixer and Symfony rules to make sure these
         // take priority
         //
-        // @see https://cs.symfony.com/doc/ruleSets/PER-CS.html
-        '@PER-CS' => true,
+        // @see https://cs.symfony.com/doc/ruleSets/Auto.html
+        '@auto' => true,
         // # Individual Rules
         //
         // Each line of multi-line DocComments must have an asterisk [PSR-5] and
@@ -176,6 +167,15 @@ return (new Config())
         //
         // @see https://cs.symfony.com/doc/rules/cast_notation/modernize_types_casting.html
         'modernize_types_casting' => true,
+        // All new expressions with a further call must (not) be wrapped in
+        // parentheses.
+        //
+        // Enforce parenthesis for backwards compatible code for now
+        //
+        // @see https://cs.symfony.com/doc/rules/operator/new_expression_parentheses.html
+        'new_expression_parentheses' => [
+            'use_parentheses' => true,
+        ],
         // Replace accidental usage of homoglyphs (non ascii characters) in
         // names.
         //

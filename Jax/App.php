@@ -137,7 +137,9 @@ final readonly class App
 
         foreach ($modules as $module) {
             $fileInfo = $this->fileSystem->getFileInfo((string) $module);
-            $moduleName = $fileInfo->getBasename('.' . $fileInfo->getExtension());
+            $moduleName = $fileInfo->getBasename(
+                '.' . $fileInfo->getExtension(),
+            );
 
             $module = $this->container->get('Jax\Modules\\' . $moduleName);
 
@@ -152,7 +154,11 @@ final readonly class App
         }
 
         // Redirect to index instead of 404
-        if ($this->router->route($this->request->asString->both('path') ?? '')) {
+        if (
+            $this->router->route(
+                $this->request->asString->both('path') ?? '',
+            )
+        ) {
             return;
         }
 
@@ -223,7 +229,10 @@ final readonly class App
         if ($unreadMessages !== 0) {
             $this->page->append(
                 'FOOTER',
-                $this->template->render('notifications/unread-messages', ['unreadMessages' => $unreadMessages]),
+                $this->template->render(
+                    'notifications/unread-messages',
+                    ['unreadMessages' => $unreadMessages],
+                ),
             );
         }
 
@@ -232,7 +241,10 @@ final readonly class App
             if ($reportCount !== 0) {
                 $this->page->append(
                     'FOOTER',
-                    $this->template->render('notifications/post-reports', ['reportCount' => $reportCount]),
+                    $this->template->render(
+                        'notifications/post-reports',
+                        ['reportCount' => $reportCount],
+                    ),
                 );
             }
         }
@@ -276,7 +288,9 @@ final readonly class App
     {
         $this->page->setBreadCrumbs(
             [
-                $this->router->url('index') => ($this->config->getSetting('boardname') ?: 'Home'),
+                $this->router->url('index') => ($this->config->getSetting(
+                    'boardname',
+                ) ?: 'Home'),
             ],
         );
     }
@@ -294,7 +308,10 @@ final readonly class App
 
         $this->page->append(
             'SCRIPT',
-            '<script>window.globalSettings=' . json_encode($globalSettings, JSON_FORCE_OBJECT) . '</script>',
+            '<script>window.globalSettings=' . json_encode(
+                $globalSettings,
+                JSON_FORCE_OBJECT,
+            ) . '</script>',
         );
     }
 }

@@ -92,7 +92,10 @@ final readonly class Reactions
             $page .= '<img src="' . $niblets[$index]->img . '"> '
                 . $niblets[$index]->title . '<ul>';
             foreach ($rating as $mid) {
-                $page .= '<li>' . $this->template->render('user-link', ['user' => $mdata[$mid]]) . '</li>';
+                $page .= '<li>' . $this->template->render(
+                    'user-link',
+                    ['user' => $mdata[$mid]],
+                ) . '</li>';
             }
 
             $page .= '</ul></div>';
@@ -115,7 +118,10 @@ final readonly class Reactions
         $showrating = '';
 
         foreach ($this->fetchRatingNiblets() as $ratingNiblet) {
-            $nibletHTML = $this->template->render('global/rating-niblet', ['ratingNiblet' => $ratingNiblet]);
+            $nibletHTML = $this->template->render(
+                'global/rating-niblet',
+                ['ratingNiblet' => $ratingNiblet],
+            );
             $ratePostURL = $this->router->url('topic', [
                 'id' => $post->tid,
                 'ratepost' => $post->id,
@@ -134,7 +140,10 @@ final readonly class Reactions
 
             $num = 'x' . count($prating[$ratingNiblet->id]);
             $postratingbuttons .= $num;
-            $showrating .= $this->template->render('global/rating-niblet', ['ratingNiblet' => $ratingNiblet]) . $num;
+            $showrating .= $this->template->render(
+                'global/rating-niblet',
+                ['ratingNiblet' => $ratingNiblet],
+            ) . $num;
         }
 
         return $this->template->render(
@@ -178,16 +187,26 @@ final readonly class Reactions
         $unrate = in_array($this->user->get()->id, $ratings[$nibletid], true);
         // Unrate
         if ($unrate) {
-            $ratings[$nibletid] = array_diff($ratings[$nibletid], [$this->user->get()->id]);
+            $ratings[$nibletid] = array_diff(
+                $ratings[$nibletid],
+                [$this->user->get()->id],
+            );
         } else {
             // Rate
             $ratings[$nibletid][] = $this->user->get()->id;
         }
 
-        $post->rating = json_encode($ratings, JSON_THROW_ON_ERROR) ?: $post->rating;
+        $post->rating = json_encode(
+            $ratings,
+            JSON_THROW_ON_ERROR,
+        ) ?: $post->rating;
         $post->update();
 
-        $this->page->command('update', "#reaction_p{$post->id}", $this->render($post));
+        $this->page->command(
+            'update',
+            "#reaction_p{$post->id}",
+            $this->render($post),
+        );
     }
 
     private function getRatingSetting(): int

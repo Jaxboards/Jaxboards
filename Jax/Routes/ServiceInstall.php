@@ -244,7 +244,9 @@ final readonly class ServiceInstall
                     [
                         'boardname' => $board,
                         'date' => $this->database->datetime(),
-                        'referral' => $this->request->asString->both('r') ?? '',
+                        'referral' => $this->request->asString->both(
+                            'r',
+                        ) ?? '',
                         'registrarEmail' => $adminEmail,
                         'registrarIP' => $this->ipAddress->asBinary(),
                     ],
@@ -269,7 +271,10 @@ final readonly class ServiceInstall
             );
             $member->insert();
 
-            $this->fileSystem->copyDirectory('Service/blueprint', 'boards/' . $board);
+            $this->fileSystem->copyDirectory(
+                'Service/blueprint',
+                'boards/' . $board,
+            );
         }
 
         if ($serviceMode) {

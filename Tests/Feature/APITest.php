@@ -91,7 +91,7 @@ final class APITest extends FeatureTestCase
 
         $page = $this->go('/api/searchmembers?term=admin');
 
-        $this->assertEquals([[1], ['Admin']], json_decode($page, true));
+        self::assertEquals([[1], ['Admin']], json_decode($page, true));
     }
 
     public function testEmotes(): void
@@ -100,6 +100,6 @@ final class APITest extends FeatureTestCase
 
         $page = $this->go('/api/emotes');
 
-        $this->assertContains(':)', json_decode($page, true)[0]);
+        self::assertContains(':)', json_decode($page, true)[0]);
     }
 }

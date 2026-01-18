@@ -77,7 +77,10 @@ final class UserTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=', true);
+        $this->encodedForumFlags = base64_decode(
+            'AAEAPgADABgABAAYAAUAGAAGAD8=',
+            true,
+        );
     }
 
     public function testGetForumPermissionAsAdmin(): void
@@ -93,15 +96,15 @@ final class UserTest extends UnitTestCase
             ->getMock()
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('select')
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('arow')
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('disposeresult')
         ;
 
@@ -151,15 +154,15 @@ final class UserTest extends UnitTestCase
             ->getMock()
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('select')
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('arow')
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('disposeresult')
         ;
 
@@ -198,15 +201,15 @@ final class UserTest extends UnitTestCase
             ->getMock()
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('select')
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('arow')
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('disposeresult')
         ;
 

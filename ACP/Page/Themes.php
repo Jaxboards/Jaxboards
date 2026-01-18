@@ -105,16 +105,23 @@ final readonly class Themes
         $newWrapperFileInfo = $this->fileSystem->getFileInfo($newWrapperPath);
 
         return match (true) {
-            !$this->isValidFilename($wrapper) => 'Wrapper name must consist of letters, '
+            !$this->isValidFilename(
+                $wrapper,
+            ) => 'Wrapper name must consist of letters, '
                 . 'numbers, spaces, and underscore.',
-            mb_strlen($wrapper) > 50 => 'Wrapper name must be less than 50 characters.',
+            mb_strlen(
+                $wrapper,
+            ) > 50 => 'Wrapper name must be less than 50 characters.',
             $newWrapperFileInfo->isFile() => 'That wrapper already exists.',
             !$newWrapperFileInfo->isWritable() => 'Wrapper is not writable.',
 
             $this->fileSystem->putContents(
                 $newWrapperPath,
                 $this->fileSystem->getContents(
-                    $this->fileSystem->pathJoin($this->domainDefinitions->getDefaultThemePath(), 'wrappers.html'),
+                    $this->fileSystem->pathJoin(
+                        $this->domainDefinitions->getDefaultThemePath(),
+                        'wrappers.html',
+                    ),
                 ),
             ) === false => 'Wrapper could not be created.',
             default => null,
@@ -171,7 +178,9 @@ final readonly class Themes
 
             if (
                 !$this->isValidFilename($oldName)
-                || !$this->fileSystem->getFileInfo($this->themesPath . $oldName)->isDir()
+                || !$this->fileSystem->getFileInfo(
+                    $this->themesPath . $oldName,
+                )->isDir()
             ) {
                 return 'Invalid from skin name';
             }
@@ -183,7 +192,11 @@ final readonly class Themes
                 return 'Skin name must consist of letters, numbers, spaces, and underscore, and be under 50 characters long.';
             }
 
-            if ($this->fileSystem->getFileInfo($this->themesPath . $newName)->isDir()) {
+            if (
+                $this->fileSystem->getFileInfo(
+                    $this->themesPath . $newName,
+                )->isDir()
+            ) {
                 return 'That skin name is already being used.';
             }
 
@@ -220,7 +233,11 @@ final readonly class Themes
                 continue;
             }
 
-            if (!$this->fileSystem->getFileInfo($this->pathToWrapper($wrapperName))->isFile()) {
+            if (
+                !$this->fileSystem->getFileInfo(
+                    $this->pathToWrapper($wrapperName),
+                )->isFile()
+            ) {
                 continue;
             }
 
@@ -232,7 +249,11 @@ final readonly class Themes
                     under 50 characters long.';
             }
 
-            if ($this->fileSystem->getFileInfo($this->pathToWrapper($wrapperNewName))->isFile()) {
+            if (
+                $this->fileSystem->getFileInfo(
+                    $this->pathToWrapper($wrapperNewName),
+                )->isFile()
+            ) {
                 return "That wrapper name ({$wrapperNewName}) is already being used.";
             }
 
@@ -283,9 +304,17 @@ final readonly class Themes
 
         $wrapperError = match (true) {
             is_string($deleteWrapper) => $this->deleteWrapper($deleteWrapper),
-            is_string($newWrapper) && $newWrapper !== '' => $this->createWrapper($newWrapper),
-            is_array($updateWrappers) => $this->updateWrappers($updateWrappers),
-            is_array($renameWrappers) => $this->renameWrappers($renameWrappers),
+            is_string(
+                $newWrapper,
+            ) && $newWrapper !== '' => $this->createWrapper(
+                $newWrapper,
+            ),
+            is_array($updateWrappers) => $this->updateWrappers(
+                $updateWrappers,
+            ),
+            is_array($renameWrappers) => $this->renameWrappers(
+                $renameWrappers,
+            ),
             default => null,
         };
 
@@ -325,7 +354,9 @@ final readonly class Themes
                         ? $this->page->render(
                             'themes/show-skin-index-css-row-custom.html',
                         ) : '',
-                    'default_checked' => $this->page->checked($skin->default === 1),
+                    'default_checked' => $this->page->checked(
+                        $skin->default === 1,
+                    ),
                     'default_option' => $skin->custom ? '' : $this->page->render(
                         'select-option.html',
                         [
@@ -340,7 +371,9 @@ final readonly class Themes
                             'id' => $skin->id,
                         ],
                     ) : '',
-                    'hidden_checked' => $this->page->checked($skin->hidden === 1),
+                    'hidden_checked' => $this->page->checked(
+                        $skin->hidden === 1,
+                    ),
                     'id' => $skin->id,
                     'title' => $skin->title,
                     'view_or_edit' => $skin->custom ? 'Edit' : 'View',
@@ -359,7 +392,9 @@ final readonly class Themes
 
         $this->page->addContentBox(
             'Themes',
-            ($skinError !== null ? $this->page->error($skinError) : '') . $skinsHTML,
+            ($skinError !== null ? $this->page->error(
+                $skinError,
+            ) : '') . $skinsHTML,
         );
 
         $wrap = '';
@@ -387,7 +422,9 @@ final readonly class Themes
         );
         $this->page->addContentBox(
             'Wrappers',
-            ($wrapperError !== null ? $this->page->error($wrapperError) : '') . $wrap,
+            ($wrapperError !== null ? $this->page->error(
+                $wrapperError,
+            ) : '') . $wrap,
         );
     }
 
@@ -449,7 +486,10 @@ final readonly class Themes
         $wrapperContents = $this->request->post('newwrapper');
         $saved = match (true) {
             !is_string($wrapperContents) => '',
-            default => $this->fileSystem->putContents($wrapperPath, $wrapperContents)
+            default => $this->fileSystem->putContents(
+                $wrapperPath,
+                $wrapperContents,
+            )
                 ? $this->page->success('Wrapper saved successfully.')
                 : $this->page->error('Error saving wrapper.'),
         };
@@ -473,10 +513,19 @@ final readonly class Themes
         $wrapperName = $this->request->asString->post('wrapper');
         $error = match (true) {
             !$skinName => 'No skin name supplied!',
-            !$this->isValidFilename($skinName) => 'Skinname must only consist of letters, numbers, and spaces.',
-            mb_strlen($skinName) > 50 => 'Skin name must be less than 50 characters.',
-            $this->fileSystem->getFileInfo($this->themesPath . $skinName)->isDir() => 'A skin with that name already exists.',
-            !in_array($wrapperName, $this->getWrappers()) => 'Invalid wrapper.',
+            !$this->isValidFilename(
+                $skinName,
+            ) => 'Skinname must only consist of letters, numbers, and spaces.',
+            mb_strlen(
+                $skinName,
+            ) > 50 => 'Skin name must be less than 50 characters.',
+            $this->fileSystem->getFileInfo(
+                $this->themesPath . $skinName,
+            )->isDir() => 'A skin with that name already exists.',
+            !in_array(
+                $wrapperName,
+                $this->getWrappers(),
+            ) => 'Invalid wrapper.',
             default => null,
         };
 
@@ -484,11 +533,17 @@ final readonly class Themes
             return $error;
         }
 
-        $newThemePath = $this->fileSystem->pathJoin($this->themesPath, $skinName);
+        $newThemePath = $this->fileSystem->pathJoin(
+            $this->themesPath,
+            $skinName,
+        );
 
         $this->fileSystem->mkdir($newThemePath, 0o777, true);
         $this->fileSystem->copy(
-            $this->fileSystem->pathjoin($this->domainDefinitions->getDefaultThemePath(), 'css.css'),
+            $this->fileSystem->pathjoin(
+                $this->domainDefinitions->getDefaultThemePath(),
+                'css.css',
+            ),
             $this->fileSystem->pathjoin($newThemePath, 'css.css'),
         );
 
@@ -558,7 +613,10 @@ final readonly class Themes
             return;
         }
 
-        $skindir = $this->fileSystem->pathJoin($this->themesPath, $skin->title);
+        $skindir = $this->fileSystem->pathJoin(
+            $this->themesPath,
+            $skin->title,
+        );
         if ($this->fileSystem->getFileInfo($skindir)->isDir()) {
             $this->fileSystem->removeDirectory($skindir);
         }
@@ -581,7 +639,10 @@ final readonly class Themes
 
     private function pathToWrapper(string $wrapperName): string
     {
-        return $this->fileSystem->pathJoin($this->wrappersPath, $wrapperName . '.html');
+        return $this->fileSystem->pathJoin(
+            $this->wrappersPath,
+            $wrapperName . '.html',
+        );
     }
 
     /**

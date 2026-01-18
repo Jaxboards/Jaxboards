@@ -13,7 +13,13 @@ final class Message extends Model
 {
     public const TABLE = 'messages';
 
-    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
+    #[Column(
+        name: 'id',
+        type: 'int',
+        nullable: false,
+        autoIncrement: true,
+        unsigned: true,
+    )]
     #[PrimaryKey]
     public int $id = 0;
 

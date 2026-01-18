@@ -65,7 +65,9 @@ final class BoardIndex implements Route
     public function route($params): void
     {
         match (true) {
-            $this->request->both('markread') !== null => $this->markEverythingRead(),
+            $this->request->both(
+                'markread',
+            ) !== null => $this->markEverythingRead(),
             $this->request->isJSUpdate() => $this->update(),
             default => $this->viewBoardIndex(),
         };
@@ -76,7 +78,10 @@ final class BoardIndex implements Route
         $this->page->command('softurl');
         $this->session->set('forumsread', '{}');
         $this->session->set('topicsread', '{}');
-        $this->session->set('readDate', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
+        $this->session->set(
+            'readDate',
+            $this->database->datetime(Carbon::now('UTC')->getTimestamp()),
+        );
     }
 
     /**
@@ -93,7 +98,9 @@ final class BoardIndex implements Route
 
         return array_filter(
             $forums,
-            fn(Forum $forum): bool => !$forum->perms || $this->user->getForumPerms($forum->perms)['view'],
+            fn(Forum $forum): bool => !$forum->perms || $this->user->getForumPerms(
+                $forum->perms,
+            )['view'],
         );
     }
 
@@ -116,7 +123,10 @@ final class BoardIndex implements Route
 
         $forums = $this->fetchIndexForums();
         $lastPostMembers = $this->fetchLastPostMembers($forums);
-        $forumsByCatID = Lodash::groupBy($forums, static fn(Forum $forum): ?int => $forum->category);
+        $forumsByCatID = Lodash::groupBy(
+            $forums,
+            static fn(Forum $forum): ?int => $forum->category,
+        );
 
         $this->setModsFromForums($forums);
 
@@ -168,7 +178,10 @@ final class BoardIndex implements Route
     private function setModsFromForums(array $forums): void
     {
         $modIDs = [];
-        $forumsWithMods = array_filter($forums, static fn(Forum $forum): bool => $forum->showLedBy && $forum->mods !== '');
+        $forumsWithMods = array_filter(
+            $forums,
+            static fn(Forum $forum): bool => $forum->showLedBy && $forum->mods !== '',
+        );
 
         foreach ($forumsWithMods as $forumWithMod) {
             foreach (explode(',', $forumWithMod->mods) as $modId) {
@@ -254,15 +267,21 @@ final class BoardIndex implements Route
         if (
             $this->session->get()->usersOnlineCache !== ''
         ) {
-            $oldcache = array_flip(explode(',', $this->session->get()->usersOnlineCache));
+            $oldcache = array_flip(
+                explode(',', $this->session->get()->usersOnlineCache),
+            );
         }
 
         $useronlinecache = '';
         foreach ($this->usersOnline->getUsersOnline() as $userOnline) {
             $lastUpdateTS = $this->session->get()->lastUpdate !== null
-                ? $this->date->datetimeAsTimestamp($this->session->get()->lastUpdate)
+                ? $this->date->datetimeAsTimestamp(
+                    $this->session->get()->lastUpdate,
+                )
                 : 0;
-            $lastActionIdle = $lastUpdateTS - ($this->config->getSetting('timetoidle') ?? 300) - 30;
+            $lastActionIdle = $lastUpdateTS - ($this->config->getSetting(
+                'timetoidle',
+            ) ?? 300) - 30;
             if (!$userOnline->uid && !$userOnline->isBot) {
                 continue;
             }
@@ -283,10 +302,16 @@ final class BoardIndex implements Route
         }
 
         if ($oldcache !== null && $oldcache !== []) {
-            $this->page->command('setoffline', implode(',', array_flip($oldcache)));
+            $this->page->command(
+                'setoffline',
+                implode(',', array_flip($oldcache)),
+            );
         }
 
-        $this->session->set('usersOnlineCache', mb_substr($useronlinecache, 0, -1));
+        $this->session->set(
+            'usersOnlineCache',
+            mb_substr($useronlinecache, 0, -1),
+        );
         if ($list === []) {
             return;
         }
@@ -299,7 +324,11 @@ final class BoardIndex implements Route
         $unreadForums = array_filter(
             $this->fetchIndexForums(),
             fn(Forum $forum): bool => !$this->isForumRead($forum)
-                && $this->date->datetimeAsTimestamp($forum->lastPostDate) > $this->date->datetimeAsTimestamp($this->session->get()->lastUpdate),
+                && $this->date->datetimeAsTimestamp(
+                    $forum->lastPostDate,
+                ) > $this->date->datetimeAsTimestamp(
+                    $this->session->get()->lastUpdate,
+                ),
         );
 
         $lastPostMembers = $this->fetchLastPostMembers($unreadForums);
@@ -310,23 +339,35 @@ final class BoardIndex implements Route
             $this->page->command(
                 'update',
                 "{$forumSelector}_icon",
-                $this->template->render('idx/icon-unread', ['forum' => $unreadForum]),
+                $this->template->render(
+                    'idx/icon-unread',
+                    ['forum' => $unreadForum],
+                ),
             );
             $this->page->command(
                 'update',
                 "{$forumSelector}_lastpost",
-                $this->formatLastPost($unreadForum, $lastPostMembers[$unreadForum->lastPostUser] ?? null),
+                $this->formatLastPost(
+                    $unreadForum,
+                    $lastPostMembers[$unreadForum->lastPostUser] ?? null,
+                ),
                 '1',
             );
             $this->page->command(
                 'update',
                 "{$forumSelector}_topics",
-                $this->template->render('idx/topics-count', ['count' => $unreadForum->topics]),
+                $this->template->render(
+                    'idx/topics-count',
+                    ['count' => $unreadForum->topics],
+                ),
             );
             $this->page->command(
                 'update',
                 "{$forumSelector}_replies",
-                $this->template->render('idx/replies-count', ['count' => $unreadForum->posts]),
+                $this->template->render(
+                    'idx/replies-count',
+                    ['count' => $unreadForum->posts],
+                ),
             );
         }
     }
@@ -345,7 +386,11 @@ final class BoardIndex implements Route
     private function isForumRead(Forum $forum): bool
     {
         if ($this->forumsread === null) {
-            $this->forumsread = json_decode($this->session->get()->forumsread, true, flags: JSON_THROW_ON_ERROR);
+            $this->forumsread = json_decode(
+                $this->session->get()->forumsread,
+                true,
+                flags: JSON_THROW_ON_ERROR,
+            );
         }
 
         if (!array_key_exists($forum->id, $this->forumsread)) {

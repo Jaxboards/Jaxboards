@@ -2,12 +2,15 @@
 
 # Some defaults for every file
 [*]
+# prettier defaults
+# https://prettier.io/docs/configuration#editorconfig
 charset = utf-8
 end_of_line = lf
+indent_size = 2
 indent_style = space
 insert_final_newline = true
+max_line_length = 80
 trim_trailing_whitespace = true
-indent_size = 4
 
 # PHP makes use of 4 space indentation
 [*.php]

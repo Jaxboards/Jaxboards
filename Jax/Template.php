@@ -95,7 +95,9 @@ final class Template
         $html = $this->template;
         foreach ($this->parts as $part => $contents) {
             if (!in_array($part, $header, true)) {
-                $contents = '<div id="' . mb_strtolower($part) . '">' . $contents . '</div>';
+                $contents = '<div id="' . mb_strtolower(
+                    $part,
+                ) . '">' . $contents . '</div>';
             }
 
             $html = str_replace("<!--{$part}-->", $contents, $html);
@@ -109,9 +111,14 @@ final class Template
         $paths = array_filter(
             [
                 $this->fileSystem->pathJoin($themePath, 'views'),
-                $this->fileSystem->pathJoin($this->domainDefinitions->getDefaultThemePath(), 'views'),
+                $this->fileSystem->pathJoin(
+                    $this->domainDefinitions->getDefaultThemePath(),
+                    'views',
+                ),
             ],
-            fn(string $dir): bool => $this->fileSystem->getFileInfo($dir)->isDir(),
+            fn(string $dir): bool => $this->fileSystem->getFileInfo(
+                $dir,
+            )->isDir(),
         );
 
         $paths = array_map(
@@ -137,7 +144,12 @@ final class Template
         array_map(
             $this->twigEnvironment->addFunction(...),
             [
-                new TwigFunction('url', fn(...$args) => $this->container->get(Router::class)->url(...$args)),
+                new TwigFunction(
+                    'url',
+                    fn(...$args) => $this->container->get(Router::class)->url(
+                        ...$args,
+                    ),
+                ),
             ],
         );
 
@@ -147,35 +159,63 @@ final class Template
                 // TODO: combine date helpers
                 new TwigFilter(
                     'autoDate',
-                    fn(?string $string) => $this->container->get(Date::class)->autoDate($string),
+                    fn(?string $string) => $this->container->get(
+                        Date::class,
+                    )->autoDate(
+                        $string,
+                    ),
                     ['is_safe' => ['html']],
                 ),
                 new TwigFilter(
                     'smallDate',
-                    fn(?string $string) => $string ? $this->container->get(Date::class)->smallDate($string) : '',
+                    fn(?string $string) => $string ? $this->container->get(
+                        Date::class,
+                    )->smallDate(
+                        $string,
+                    ) : '',
                     ['is_safe' => ['html']],
                 ),
                 new TwigFilter(
                     'slugify',
-                    fn(?string $string) => $this->container->get(TextFormatting::class)->slugify($string),
+                    fn(?string $string) => $this->container->get(
+                        TextFormatting::class,
+                    )->slugify(
+                        $string,
+                    ),
                 ),
                 new TwigFilter(
                     'textOnly',
-                    fn(?string $string) => $this->container->get(TextFormatting::class)->textOnly($string),
+                    fn(?string $string) => $this->container->get(
+                        TextFormatting::class,
+                    )->textOnly(
+                        $string,
+                    ),
                 ),
                 new TwigFilter(
                     'theWorks',
-                    fn(?string $string) => $this->container->get(TextFormatting::class)->theWorks($string),
+                    fn(?string $string) => $this->container->get(
+                        TextFormatting::class,
+                    )->theWorks(
+                        $string,
+                    ),
                     ['is_safe' => ['html']],
                 ),
                 new TwigFilter(
                     'theWorksInline',
-                    fn(?string $string) => $this->container->get(TextFormatting::class)->theWorksInline($string),
+                    fn(?string $string) => $this->container->get(
+                        TextFormatting::class,
+                    )->theWorksInline(
+                        $string,
+                    ),
                     ['is_safe' => ['html']],
                 ),
                 new TwigFilter(
                     'wordFilter',
-                    fn(?string $string) => $this->container->get(TextFormatting::class)->wordFilter($string),
+                    fn(?string $string) => $this->container->get(
+                        TextFormatting::class,
+                    )->wordFilter(
+                        $string,
+                    ),
                 ),
             ],
         );

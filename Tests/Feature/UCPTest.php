@@ -133,7 +133,12 @@ final class UCPTest extends FeatureTestCase
             post: ['changesig' => 'I made jaxboards'],
         ));
 
-        DOMAssert::assertSelectEquals('#changesig', 'I made jaxboards', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '#changesig',
+            'I made jaxboards',
+            1,
+            $page,
+        );
     }
 
     public function testEmail(): void
@@ -142,7 +147,12 @@ final class UCPTest extends FeatureTestCase
 
         $page = $this->go('/ucp/email');
 
-        DOMAssert::assertSelectEquals('strong', 'jaxboards@jaxboards.com', 1, $page);
+        DOMAssert::assertSelectEquals(
+            'strong',
+            'jaxboards@jaxboards.com',
+            1,
+            $page,
+        );
     }
 
     public function testEmailChange(): void
@@ -154,9 +164,12 @@ final class UCPTest extends FeatureTestCase
             post: ['email' => 'jaxboards@jaxboards.com', 'submit' => 'true'],
         ));
 
-        $this->assertStringContainsString('Email settings updated.', $page);
+        self::assertStringContainsString('Email settings updated.', $page);
 
-        $this->assertEquals('jaxboards@jaxboards.com', Member::selectOne(2)->email);
+        self::assertEquals(
+            'jaxboards@jaxboards.com',
+            Member::selectOne(2)->email,
+        );
     }
 
     public function testChangePassword(): void
@@ -175,8 +188,10 @@ final class UCPTest extends FeatureTestCase
             ],
         ));
 
-        $this->assertStringContainsString('Password changed.', $page);
-        $this->assertTrue(password_verify('newpass', Member::selectOne(2)->pass));
+        self::assertStringContainsString('Password changed.', $page);
+        self::assertTrue(
+            password_verify('newpass', Member::selectOne(2)->pass),
+        );
     }
 
     public function testChangePasswordIncorrectCurrentPassword(): void
@@ -195,8 +210,15 @@ final class UCPTest extends FeatureTestCase
             ],
         ));
 
-        DOMAssert::assertSelectEquals('.error', 'The password you entered is incorrect.', 1, $page);
-        $this->assertFalse(password_verify('newpass', Member::selectOne(2)->pass));
+        DOMAssert::assertSelectEquals(
+            '.error',
+            'The password you entered is incorrect.',
+            1,
+            $page,
+        );
+        self::assertFalse(
+            password_verify('newpass', Member::selectOne(2)->pass),
+        );
     }
 
     public function testProfileForm(): void
@@ -214,11 +236,23 @@ final class UCPTest extends FeatureTestCase
                     'dob_day',
                     'dob_year',
                     'gender',
-                ], true) => DOMAssert::assertSelectCount("select[name={$field}]", 1, $page),
+                ], true) => DOMAssert::assertSelectCount(
+                    "select[name={$field}]",
+                    1,
+                    $page,
+                ),
 
-                $field === 'about' => DOMAssert::assertSelectCount("textarea[name={$field}]", 1, $page),
+                $field === 'about' => DOMAssert::assertSelectCount(
+                    "textarea[name={$field}]",
+                    1,
+                    $page,
+                ),
 
-                default => DOMAssert::assertSelectCount("input[name={$field}]", 1, $page),
+                default => DOMAssert::assertSelectCount(
+                    "input[name={$field}]",
+                    1,
+                    $page,
+                ),
             };
         }
     }
@@ -234,33 +268,36 @@ final class UCPTest extends FeatureTestCase
             post: $formData,
         ));
 
-        $this->assertStringContainsString('Profile successfully updated.', $page);
+        self::assertStringContainsString(
+            'Profile successfully updated.',
+            $page,
+        );
 
         $member = Member::selectOne(2);
-        $this->assertEquals('DisplayName', $member->displayName);
-        $this->assertEquals('Full Name', $member->full_name);
-        $this->assertEquals('User Title', $member->usertitle);
-        $this->assertEquals('About me', $member->about);
-        $this->assertEquals('Location', $member->location);
-        $this->assertEquals('male', $member->gender);
-        $this->assertEquals('Skype', $member->contactSkype);
-        $this->assertEquals('Discord', $member->contactDiscord);
-        $this->assertEquals('YIM', $member->contactYIM);
-        $this->assertEquals('MSN', $member->contactMSN);
-        $this->assertEquals('GoogleChat', $member->contactGoogleChat);
-        $this->assertEquals('AIM', $member->contactAIM);
-        $this->assertEquals('Youtube', $member->contactYoutube);
-        $this->assertEquals('Steam', $member->contactSteam);
-        $this->assertEquals('Twitter', $member->contactTwitter);
-        $this->assertEquals('BlueSky', $member->contactBlueSky);
-        $this->assertEquals('http://google.com', $member->website);
+        self::assertEquals('DisplayName', $member->displayName);
+        self::assertEquals('Full Name', $member->full_name);
+        self::assertEquals('User Title', $member->usertitle);
+        self::assertEquals('About me', $member->about);
+        self::assertEquals('Location', $member->location);
+        self::assertEquals('male', $member->gender);
+        self::assertEquals('Skype', $member->contactSkype);
+        self::assertEquals('Discord', $member->contactDiscord);
+        self::assertEquals('YIM', $member->contactYIM);
+        self::assertEquals('MSN', $member->contactMSN);
+        self::assertEquals('GoogleChat', $member->contactGoogleChat);
+        self::assertEquals('AIM', $member->contactAIM);
+        self::assertEquals('Youtube', $member->contactYoutube);
+        self::assertEquals('Steam', $member->contactSteam);
+        self::assertEquals('Twitter', $member->contactTwitter);
+        self::assertEquals('BlueSky', $member->contactBlueSky);
+        self::assertEquals('http://google.com', $member->website);
 
         $date = $this->container->get(Date::class);
         $birthdate = $date->datetimeAsCarbon($member->birthdate);
 
-        $this->assertEquals(1, $birthdate->month);
-        $this->assertEquals(1, $birthdate->day);
-        $this->assertEquals(2_000, $birthdate->year);
+        self::assertEquals(1, $birthdate->month);
+        self::assertEquals(1, $birthdate->day);
+        self::assertEquals(2_000, $birthdate->year);
     }
 
     public function testAvatarSettings(): void
@@ -269,7 +306,11 @@ final class UCPTest extends FeatureTestCase
 
         $page = $this->go('/ucp/avatar');
 
-        DOMAssert::assertSelectCount('.avatar img[src="/Service/Themes/Default/avatars/default.gif"]', 1, $page);
+        DOMAssert::assertSelectCount(
+            '.avatar img[src="/Service/Themes/Default/avatars/default.gif"]',
+            1,
+            $page,
+        );
     }
 
     public function testAvatarSettingsSave(): void
@@ -281,7 +322,11 @@ final class UCPTest extends FeatureTestCase
             post: ['changedava' => 'http://jaxboards.com'],
         ));
 
-        DOMAssert::assertSelectCount('.avatar img[src="http://jaxboards.com"]', 1, $page);
+        DOMAssert::assertSelectCount(
+            '.avatar img[src="http://jaxboards.com"]',
+            1,
+            $page,
+        );
     }
 
     public function testSoundSettings(): void
@@ -290,7 +335,11 @@ final class UCPTest extends FeatureTestCase
 
         $page = $this->go('/ucp/sounds');
 
-        DOMAssert::assertSelectCount('input[name=soundShout][checked]', 1, $page);
+        DOMAssert::assertSelectCount(
+            'input[name=soundShout][checked]',
+            1,
+            $page,
+        );
     }
 
     public function testSoundSettingsSave(): void
@@ -305,7 +354,11 @@ final class UCPTest extends FeatureTestCase
             ],
         ));
 
-        DOMAssert::assertSelectCount('input[name=soundShout][checked]', 0, $page);
+        DOMAssert::assertSelectCount(
+            'input[name=soundShout][checked]',
+            0,
+            $page,
+        );
     }
 
     public function testBoardCustomization(): void
@@ -315,7 +368,11 @@ final class UCPTest extends FeatureTestCase
         $page = $this->go('/ucp/board');
 
         DOMAssert::assertSelectCount('select[name=skin]', 1, $page);
-        DOMAssert::assertSelectCount('input[name=usewordfilter][checked]', 1, $page);
+        DOMAssert::assertSelectCount(
+            'input[name=usewordfilter][checked]',
+            1,
+            $page,
+        );
         DOMAssert::assertSelectCount('input[name=wysiwyg][checked]', 1, $page);
     }
 
@@ -333,7 +390,11 @@ final class UCPTest extends FeatureTestCase
         ));
 
         DOMAssert::assertSelectCount('select[name=skin]', 1, $page);
-        DOMAssert::assertSelectCount('input[name=usewordfilter][checked]', 0, $page);
+        DOMAssert::assertSelectCount(
+            'input[name=usewordfilter][checked]',
+            0,
+            $page,
+        );
         DOMAssert::assertSelectCount('input[name=wysiwyg][checked]', 0, $page);
     }
 

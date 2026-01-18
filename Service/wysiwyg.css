@@ -1,205 +1,205 @@
 html,
 body {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .editorframe {
-    width: 100%;
-    background: #fff;
-    border: 1px solid #000;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #000;
 }
 
 .editbar {
-    display: block;
-    text-align: left;
-    overflow: hidden;
+  display: block;
+  text-align: left;
+  overflow: hidden;
 }
 
 .editbar a {
-    background: url('wysiwygbar.png');
-    height: 24px;
-    display: inline-block;
-    cursor: pointer;
+  background: url("wysiwygbar.png");
+  height: 24px;
+  display: inline-block;
+  cursor: pointer;
 }
 
 .editbar a:hover {
-    background-position-y: -24px;
+  background-position-y: -24px;
 }
 
 .editbar .fontface {
-    vertical-align: top;
-    height: 24px;
+  vertical-align: top;
+  height: 24px;
 }
 
 .editbar .bold {
-    width: 32px;
+  width: 32px;
 }
 
 .editbar .italic {
-    width: 33px;
-    background-position: -32px 0;
+  width: 33px;
+  background-position: -32px 0;
 }
 
 .editbar .underline {
-    width: 35px;
-    background-position: -65px 0;
+  width: 35px;
+  background-position: -65px 0;
 }
 
 .editbar .strikethrough {
-    width: 30px;
-    background-position: -100px 0;
+  width: 30px;
+  background-position: -100px 0;
 }
 
 .editbar .forecolor {
-    width: 31px;
-    background-position: -130px 0;
+  width: 31px;
+  background-position: -130px 0;
 }
 
 .editbar .backcolor {
-    width: 32px;
-    background-position: -161px 0;
+  width: 32px;
+  background-position: -161px 0;
 }
 
 .editbar .insertimage {
-    width: 29px;
-    background-position: -193px 0;
+  width: 29px;
+  background-position: -193px 0;
 }
 
 .editbar .createlink {
-    width: 28px;
-    background-position: -222px 0;
+  width: 28px;
+  background-position: -222px 0;
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_email {
-    width: 27px;
-    background-position: -250px 0;
+  width: 27px;
+  background-position: -250px 0;
 }
 
 .editbar .justifyleft {
-    width: 26px;
-    background-position: -277px 0;
+  width: 26px;
+  background-position: -277px 0;
 }
 
 .editbar .justifycenter {
-    width: 27px;
-    background-position: -303px 0;
+  width: 27px;
+  background-position: -303px 0;
 }
 
 .editbar .justifyright {
-    width: 26px;
-    background-position: -330px 0;
+  width: 26px;
+  background-position: -330px 0;
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_youtube {
-    width: 28px;
-    background-position: -356px 0;
+  width: 28px;
+  background-position: -356px 0;
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_code {
-    width: 26px;
-    background-position: -384px 0;
+  width: 26px;
+  background-position: -384px 0;
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_quote {
-    width: 25px;
-    background-position: -410px 0;
+  width: 25px;
+  background-position: -410px 0;
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_spoiler {
-    width: 29px;
-    background-position: -435px 0;
+  width: 29px;
+  background-position: -435px 0;
 }
 
 .editbar .insertorderedlist {
-    width: 28px;
-    background-position: -464px 0;
+  width: 28px;
+  background-position: -464px 0;
 }
 
 .editbar .insertunorderedlist {
-    width: 28px;
-    background-position: -492px 0;
+  width: 28px;
+  background-position: -492px 0;
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_smileys {
-    width: 29px;
-    background-position: -520px 0;
+  width: 29px;
+  background-position: -520px 0;
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_switcheditmode {
-    width: 29px;
-    background-position: -549px 0;
+  width: 29px;
+  background-position: -549px 0;
 }
 
 .emotewin {
-    height: 200px;
-    width: 150px;
-    overflow-x: auto;
-    background: #eef;
-    border: 1px solid #000;
+  height: 200px;
+  width: 150px;
+  overflow-x: auto;
+  background: #eef;
+  border: 1px solid #000;
 }
 /* stylelint-disable no-descending-specificity */
 .emotewin a {
-    border-bottom: 1px solid #ccf;
-    display: block;
-    text-decoration: none;
-    padding: 10px;
+  border-bottom: 1px solid #ccf;
+  display: block;
+  text-decoration: none;
+  padding: 10px;
 }
 
 .emotewin a:hover {
-    background: #ccf;
+  background: #ccf;
 }
 /* stylelint-enable no-descending-specificity */
 
 .emotewin a img {
-    border: 0;
-    margin-right: 10px;
+  border: 0;
+  margin-right: 10px;
 }
 
 /* datepicker */
 
 #datepicker {
-    position: absolute;
-    width: 200px;
-    border: 1px solid #000;
-    background: #fff;
+  position: absolute;
+  width: 200px;
+  border: 1px solid #000;
+  background: #fff;
 }
 
 #datepicker td {
-    vertical-align: middle;
-    text-align: center;
+  vertical-align: middle;
+  text-align: center;
 }
 
 #datepicker .control {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 #datepicker .year {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 #datepicker .month {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 #datepicker .weekdays td {
-    width: 50px;
-    font-weight: bold;
-    font-size: smaller;
+  width: 50px;
+  font-weight: bold;
+  font-size: smaller;
 }
 
 #datepicker .day:hover {
-    background: #eee;
-    cursor: pointer;
+  background: #eee;
+  cursor: pointer;
 }
 
 #datepicker .day.selected {
-    background: #ccc;
+  background: #ccc;
 }

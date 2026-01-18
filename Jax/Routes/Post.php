@@ -82,9 +82,14 @@ final class Post implements Route
         }
 
         if ($postData !== null) {
-            [$postData, $codes] = $this->textFormatting->startCodeTags($postData);
+            [$postData, $codes] = $this->textFormatting->startCodeTags(
+                $postData,
+            );
             $postData = $this->textFormatting->linkify($postData);
-            $postData = $this->textFormatting->finishCodeTagsBB($postData, $codes);
+            $postData = $this->textFormatting->finishCodeTagsBB(
+                $postData,
+                $codes,
+            );
             $this->postData = $postData;
         }
 
@@ -213,8 +218,12 @@ final class Post implements Route
     private function validatePost(?string $postData): ?string
     {
         return match (true) {
-            $postData !== null && trim($postData) === '' => "You didn't supply a post!",
-            $this->postData && mb_strlen($this->postData) > 65_535 => 'Post must not exceed 65,535 characters.',
+            $postData !== null && trim(
+                $postData,
+            ) === '' => "You didn't supply a post!",
+            $this->postData && mb_strlen(
+                $this->postData,
+            ) > 65_535 => 'Post must not exceed 65,535 characters.',
             default => null,
         };
     }
@@ -239,7 +248,9 @@ final class Post implements Route
         $topicDesc = $this->request->asString->post('tdesc');
 
         $error = match (true) {
-            $topicTitle === null || trim($topicTitle) === '' => 'You must supply a topic title!',
+            $topicTitle === null || trim(
+                $topicTitle,
+            ) === '' => 'You must supply a topic title!',
             default => null,
         };
 
@@ -296,7 +307,10 @@ final class Post implements Route
             );
             if (array_key_exists($removeEmbed, $openGraphMetadata)) {
                 unset($openGraphMetadata[$removeEmbed]);
-                $post->openGraphMetadata = json_encode($openGraphMetadata, JSON_THROW_ON_ERROR);
+                $post->openGraphMetadata = json_encode(
+                    $openGraphMetadata,
+                    JSON_THROW_ON_ERROR,
+                );
                 $this->updatePost($post);
             }
 
@@ -321,7 +335,10 @@ final class Post implements Route
                 return $error;
             }
 
-            $this->router->redirect('topic', ['id' => $post->tid, 'findpost' => $pid]);
+            $this->router->redirect(
+                'topic',
+                ['id' => $post->tid, 'findpost' => $pid],
+            );
 
             return null;
         }
@@ -344,7 +361,11 @@ final class Post implements Route
     private function createTopic(): null
     {
         $topicInput = $this->createTopic->getInput();
-        $error = $this->createTopic->validateInput($topicInput) ?? $this->validatePost($this->postData);
+        $error = $this->createTopic->validateInput(
+            $topicInput,
+        ) ?? $this->validatePost(
+            $this->postData,
+        );
 
         if ($error) {
             // Handle error here so we can still show topic form
@@ -407,7 +428,10 @@ final class Post implements Route
         $post->newtopic = $newtopic ? 1 : 0;
         $post->post = $postData ?? '';
         $post->tid = $tid;
-        $post->openGraphMetadata = json_encode($this->openGraph->fetchFromBBCode($postData), JSON_THROW_ON_ERROR);
+        $post->openGraphMetadata = json_encode(
+            $this->openGraph->fetchFromBBCode($postData),
+            JSON_THROW_ON_ERROR,
+        );
         $post->insert();
 
         $this->hooks->dispatch('post', $post, $topic);

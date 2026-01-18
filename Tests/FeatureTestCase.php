@@ -65,8 +65,11 @@ abstract class FeatureTestCase extends TestCase
         array $params = [],
         ?string $page = null,
     ): void {
-        $location = $this->container->get(Router::class)->url($name, $params) ?? $name;
-        $this->assertStringContainsString("Location: {$location}", $page);
+        $location = $this->container->get(Router::class)->url(
+            $name,
+            $params,
+        ) ?? $name;
+        static::assertStringContainsString("Location: {$location}", $page);
     }
 
     /**
@@ -93,7 +96,10 @@ abstract class FeatureTestCase extends TestCase
 
         $this->container->set(
             JaxSession::class,
-            autowire()->constructorParameter('session', ['uid' => $member->id ?? null, ...$sessionOverrides]),
+            autowire()->constructorParameter(
+                'session',
+                ['uid' => $member->id ?? null, ...$sessionOverrides],
+            ),
         );
     }
 

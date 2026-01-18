@@ -26,7 +26,11 @@ final class DomainDefinitions
     ) {
 
         // Figure out url.
-        $host = $request->server('SERVER_NAME') ?? (string) $this->serviceConfig->getSetting('domain');
+        $host = $request->server(
+            'SERVER_NAME',
+        ) ?? (string) $this->serviceConfig->getSetting(
+            'domain',
+        );
         $port = $request->server('SERVER_PORT') ?? '443';
         $scheme = $request->server('REQUEST_SCHEME') ?? 'https';
 
@@ -76,7 +80,10 @@ final class DomainDefinitions
 
     public function getBoardPathUrl(): string
     {
-        return $this->boardURL . '/' . $this->fileSystem->pathJoin('boards', $this->prefix);
+        return $this->boardURL . '/' . $this->fileSystem->pathJoin(
+            'boards',
+            $this->prefix,
+        );
     }
 
     /**
@@ -88,7 +95,11 @@ final class DomainDefinitions
     private function getPrefix(string $host): ?string
     {
         if ($this->serviceConfig->getSetting('service')) {
-            $domainMatch = str_replace('.', '\.', $this->serviceConfig->getSetting('domain'));
+            $domainMatch = str_replace(
+                '.',
+                '\.',
+                $this->serviceConfig->getSetting('domain'),
+            );
 
             preg_match("/(.*)\\.{$domainMatch}/i", $host, $matches);
 

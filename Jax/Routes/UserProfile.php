@@ -51,8 +51,13 @@ final readonly class UserProfile implements Route
 
         match (true) {
             !$profile => $this->showProfileError(),
-            $this->didComeFromForum() && $page === '' => $this->showContactCard($profile),
-            (bool) $this->user->getGroup()?->canViewFullProfile => $this->showFullProfile($page, $profile),
+            $this->didComeFromForum() && $page === '' => $this->showContactCard(
+                $profile,
+            ),
+            (bool) $this->user->getGroup()?->canViewFullProfile => $this->showFullProfile(
+                $page,
+                $profile,
+            ),
             default => $this->router->redirect('index'),
         };
     }
@@ -87,10 +92,18 @@ final readonly class UserProfile implements Route
                     'userprofile/contact-card',
                     [
                         'member' => $member,
-                        'contactLinks' => $this->contactDetails->getContactLinks($member),
+                        'contactLinks' => $this->contactDetails->getContactLinks(
+                            $member,
+                        ),
                         'isGuest' => $this->user->isGuest(),
-                        'isFriend' => $this->isUserInList($member->id, $this->user->get()->friends),
-                        'isEnemy' => $this->isUserInList($member->id, $this->user->get()->enemies),
+                        'isFriend' => $this->isUserInList(
+                            $member->id,
+                            $this->user->get()->friends,
+                        ),
+                        'isEnemy' => $this->isUserInList(
+                            $member->id,
+                            $this->user->get()->enemies,
+                        ),
                     ],
                 ),
                 'minimizable' => false,
@@ -121,7 +134,9 @@ final readonly class UserProfile implements Route
             [
                 'birthdate' => $birthdate,
                 'canModerate' => $this->user->isModerator(),
-                'contactLinks' => $this->contactDetails->getContactLinks($member),
+                'contactLinks' => $this->contactDetails->getContactLinks(
+                    $member,
+                ),
                 'group' => Group::selectOne($member->groupID),
                 'ipAddress' => $member->ip !== ''
                     ? $this->ipAddress->asHumanReadable($member->ip)
@@ -136,12 +151,18 @@ final readonly class UserProfile implements Route
         $this->page->command('update', 'page', $profile);
         $this->page->append('PAGE', $profile);
 
-        $this->session->set('locationVerbose', "Viewing {$member->displayName}'s profile");
+        $this->session->set(
+            'locationVerbose',
+            "Viewing {$member->displayName}'s profile",
+        );
     }
 
     private function showProfileError(): void
     {
-        $error = $this->template->render('error', ['message' => "Sorry, this user doesn't exist."]);
+        $error = $this->template->render(
+            'error',
+            ['message' => "Sorry, this user doesn't exist."],
+        );
         $this->page->command('update', 'page', $error);
         $this->page->append('PAGE', $error);
     }

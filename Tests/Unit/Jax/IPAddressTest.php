@@ -42,7 +42,7 @@ final class IPAddressTest extends UnitTestCase
     {
         $ipAddress = $this->getIPAddress();
 
-        $this->assertEquals(
+        self::assertEquals(
             self::TESTIP,
             $ipAddress->asHumanReadable($ipAddress->asBinary()),
         );
@@ -54,11 +54,11 @@ final class IPAddressTest extends UnitTestCase
 
         $ipAddress->ban(self::TESTIP);
 
-        $this->assertTrue($ipAddress->isBanned());
+        self::assertTrue($ipAddress->isBanned());
 
         $ipAddress->unBan(self::TESTIP);
 
-        $this->assertFalse($ipAddress->isBanned());
+        self::assertFalse($ipAddress->isBanned());
     }
 
     #[DataProvider('localHostDataProvider')]
@@ -68,7 +68,7 @@ final class IPAddressTest extends UnitTestCase
     ): void {
         $ipAddress = $this->getIPAddress($ipHumanReadable);
 
-        $this->assertEquals($isLocalHost, $ipAddress->isLocalHost());
+        self::assertEquals($isLocalHost, $ipAddress->isLocalHost());
     }
 
     /**

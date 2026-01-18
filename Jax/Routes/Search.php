@@ -112,11 +112,15 @@ final class Search implements Route
             $this->fids,
         );
 
-        $titles = array_reduce($forums, static function (array $titles, Forum $forum): array {
-            $titles[$forum->id] = $forum->title;
+        $titles = array_reduce(
+            $forums,
+            static function (array $titles, Forum $forum): array {
+                $titles[$forum->id] = $forum->title;
 
-            return $titles;
-        }, []);
+                return $titles;
+            },
+            [],
+        );
         $forumTree = new ForumTree($forums);
 
         return $this->getForumSelect($forumTree, $titles);
@@ -146,7 +150,11 @@ final class Search implements Route
             return;
         }
 
-        $searchTerm = $this->request->asString->both('searchterm') ?: (string) $this->session->getVar('searcht');
+        $searchTerm = $this->request->asString->both(
+            'searchterm',
+        ) ?: (string) $this->session->getVar(
+            'searcht',
+        );
 
         $ids = '';
 
@@ -158,18 +166,25 @@ final class Search implements Route
             $this->getSearchableForums();
             $fidsInput = $this->request->both('fids');
             $fids = is_array($fidsInput)
-                ? array_filter($fidsInput, fn($fid): bool => in_array((int) $fid, $this->fids, true))
+                ? array_filter(
+                    $fidsInput,
+                    fn($fid): bool => in_array((int) $fid, $this->fids, true),
+                )
                 : $this->fids;
 
             $datestart = null;
             if ($this->request->asString->both('datestart')) {
-                $datestart = Carbon::parse($this->request->asString->both('datestart'))->getTimestamp();
+                $datestart = Carbon::parse(
+                    $this->request->asString->both('datestart'),
+                )->getTimestamp();
             }
 
 
             $dateend = null;
             if ($this->request->asString->both('dateend')) {
-                $dateend = Carbon::parse($this->request->asString->both('dateend'))->getTimestamp();
+                $dateend = Carbon::parse(
+                    $this->request->asString->both('dateend'),
+                )->getTimestamp();
             }
 
             $authorId = (int) $this->request->asString->both('mid');
@@ -208,8 +223,14 @@ final class Search implements Route
                 $topicValues[] = $this->database->datetime($datestart);
             }
 
-            $postWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $postParams));
-            $topicWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $topicParams));
+            $postWhere = implode(
+                ' ',
+                array_map(static fn($q): string => "AND {$q}", $postParams),
+            );
+            $topicWhere = implode(
+                ' ',
+                array_map(static fn($q): string => "AND {$q}", $topicParams),
+            );
 
             $sanitizedSearchTerm = $searchTerm;
 
@@ -318,12 +339,18 @@ final class Search implements Route
                     'post' => $postRow,
                     'titleHighlighted' => preg_replace(
                         '@' . implode('|', $terms) . '@i',
-                        $this->template->render('search/highlight', ['searchTerm' => '$0']),
+                        $this->template->render(
+                            'search/highlight',
+                            ['searchTerm' => '$0'],
+                        ),
                         $title,
                     ),
                     'postHighlighted' => preg_replace(
                         '@' . implode('|', $terms) . '@i',
-                        $this->template->render('search/highlight', ['searchTerm' => '$0']),
+                        $this->template->render(
+                            'search/highlight',
+                            ['searchTerm' => '$0'],
+                        ),
                         $post,
                     ),
                 ],
@@ -356,7 +383,10 @@ final class Search implements Route
                 10,
             );
             foreach ($resultsArray as $resultArray) {
-                $searchURL = $this->router->url('search', ['page' => $resultArray]);
+                $searchURL = $this->router->url(
+                    'search',
+                    ['page' => $resultArray],
+                );
                 $pages .= "<a href='{$searchURL}'>{$resultArray}</a> ";
             }
         }

@@ -128,7 +128,9 @@ final readonly class Badges implements Route
             'badges_' . $badge->id,
         );
 
-        $this->page->setPageTitle("Viewing Recipients of {$badge->badgeTitle} badge");
+        $this->page->setPageTitle(
+            "Viewing Recipients of {$badge->badgeTitle} badge",
+        );
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
     }

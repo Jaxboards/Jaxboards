@@ -48,8 +48,12 @@ final class Shoutbox implements Module
         private readonly Template $template,
         private readonly User $user,
     ) {
-        $this->avatarsEnabled = (bool) $this->config->getSetting('shoutboxava');
-        $this->shoutlimit = (int) ($this->config->getSetting('shoutbox_num') ?? 5);
+        $this->avatarsEnabled = (bool) $this->config->getSetting(
+            'shoutboxava',
+        );
+        $this->shoutlimit = (int) ($this->config->getSetting(
+            'shoutbox_num',
+        ) ?? 5);
     }
 
     public function init(): void
@@ -63,7 +67,9 @@ final class Shoutbox implements Module
         }
 
         $shoutboxDelete = (int) $this->request->both('shoutbox_delete');
-        $shoutboxShout = trim($this->request->asString->post('shoutbox_shout') ?? '');
+        $shoutboxShout = trim(
+            $this->request->asString->post('shoutbox_shout') ?? '',
+        );
 
         if ($shoutboxShout !== '') {
             $this->addShout($shoutboxShout);
@@ -71,7 +77,9 @@ final class Shoutbox implements Module
 
         match (true) {
             $shoutboxDelete !== 0 => $this->deleteShout($shoutboxDelete),
-            $this->request->both('module') === 'shoutbox' => $this->showAllShouts(),
+            $this->request->both(
+                'module',
+            ) === 'shoutbox' => $this->showAllShouts(),
             $this->request->isJSAccess() => $this->updateShoutbox(),
             default => $this->displayShoutbox(),
         };
@@ -95,7 +103,9 @@ final class Shoutbox implements Module
                     'avatarsEnabled' => $this->avatarsEnabled,
                     'canDelete' => $this->canDelete($shout),
                     'shout' => $shout,
-                    'timestamp' => $this->date->datetimeAsTimestamp($shout->date),
+                    'timestamp' => $this->date->datetimeAsTimestamp(
+                        $shout->date,
+                    ),
                     'user' => $member,
                 ],
             );
@@ -127,7 +137,10 @@ final class Shoutbox implements Module
 
         $shoutHTML = '';
         foreach ($shouts as $shout) {
-            $shoutHTML .= $this->formatShout($shout, $members[$shout->uid] ?? null);
+            $shoutHTML .= $this->formatShout(
+                $shout,
+                $members[$shout->uid] ?? null,
+            );
         }
 
         $this->session->addVar('sb_id', $shouts[0]->id ?? 0);
@@ -181,7 +194,10 @@ final class Shoutbox implements Module
         );
 
         foreach ($shouts as $shout) {
-            $this->page->command('addshout', $this->formatShout($shout, $members[$shout->uid]));
+            $this->page->command(
+                'addshout',
+                $this->formatShout($shout, $members[$shout->uid]),
+            );
             $last = (int) $shout->id;
         }
 
@@ -242,7 +258,10 @@ final class Shoutbox implements Module
 
         $shoutHTML = '';
         foreach ($shouts as $shout) {
-            $shoutHTML .= $this->formatShout($shout, $membersById[$shout->uid] ?? null);
+            $shoutHTML .= $this->formatShout(
+                $shout,
+                $membersById[$shout->uid] ?? null,
+            );
         }
 
         $page = $this->template->render(
@@ -259,7 +278,9 @@ final class Shoutbox implements Module
     public function deleteShout(int $delete): void
     {
         $shout = Shout::selectOne($delete);
-        $candelete = !$this->user->isGuest() && $shout !== null && $this->canDelete($shout);
+        $candelete = !$this->user->isGuest() && $shout !== null && $this->canDelete(
+            $shout,
+        );
 
         if (!$candelete) {
             $this->router->redirect('index');
@@ -282,7 +303,9 @@ final class Shoutbox implements Module
         $error = match (true) {
             $this->user->isGuest() => 'You must be logged in to shout!',
             !$this->user->getGroup()?->canShout => 'You do not have permission to shout!',
-            mb_strlen($shoutBody) > 300 => 'Shout must be less than 300 characters.',
+            mb_strlen(
+                $shoutBody,
+            ) > 300 => 'Shout must be less than 300 characters.',
             default => null,
         };
 

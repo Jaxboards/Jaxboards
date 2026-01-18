@@ -40,7 +40,7 @@ final class UtilsTest extends UnitTestCase
             ['id' => 2, 'name' => 'Alice', 'age' => 25],
         ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             "INSERT INTO `test_table` (`id`, `name`, `age`) VALUES (1, 'O''Reilly', 30), (2, 'Alice', 25);",
             $query,
         );

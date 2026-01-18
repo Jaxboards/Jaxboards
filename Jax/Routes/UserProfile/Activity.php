@@ -49,12 +49,19 @@ final readonly class Activity
         $rssFeed = new RSSFeed(
             [
                 'description' => $member->usertitle,
-                'link' => $boardURL . $this->router->url('profile', ['id' => $member->id]),
+                'link' => $boardURL . $this->router->url(
+                    'profile',
+                    ['id' => $member->id],
+                ),
                 'title' => $member->displayName . "'s recent activity",
             ],
         );
         foreach ($this->fetchActivities($member->id) as $entry) {
-            $parsed = $this->parseActivityRSS($entry->activity, $member, $entry->affectedUser);
+            $parsed = $this->parseActivityRSS(
+                $entry->activity,
+                $member,
+                $entry->affectedUser,
+            );
             $link = $this->domainDefinitions->getBoardUrl()
                 . $this->textFormatting->blockhtml($parsed['link']);
             $rssFeed->additem(
@@ -62,7 +69,11 @@ final readonly class Activity
                     'description' => $parsed['text'],
                     'guid' => $link,
                     'link' => $link,
-                    'pubDate' => $this->date->datetimeAsCarbon($entry->activity->date)?->format('r') ?? '',
+                    'pubDate' => $this->date->datetimeAsCarbon(
+                        $entry->activity->date,
+                    )?->format(
+                        'r',
+                    ) ?? '',
                     'title' => $parsed['text'],
                 ],
             );

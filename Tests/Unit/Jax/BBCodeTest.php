@@ -48,13 +48,13 @@ final class BBCodeTest extends UnitTestCase
         parent::setUp();
 
         // Router is used for URL generation, we don't care to test that here
-        $this->container->set(Router::class, $this->createStub(Router::class));
+        $this->container->set(Router::class, self::createStub(Router::class));
         $this->bbCode = $this->container->get(BBCode::class);
     }
 
     public function testGetURLS(): void
     {
-        $this->assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             [
                 'http://cnn.com',
                 'http://twitch.com',
@@ -73,7 +73,7 @@ final class BBCodeTest extends UnitTestCase
     public function testToHTML(string $input, string $output): void
     {
         if (str_starts_with($output, '/')) {
-            $this->assertMatchesRegularExpression(
+            self::assertMatchesRegularExpression(
                 $output,
                 $this->bbCode->toHTML($input),
             );
@@ -81,7 +81,7 @@ final class BBCodeTest extends UnitTestCase
             return;
         }
 
-        $this->assertEquals(
+        self::assertEquals(
             $output,
             $this->bbCode->toHTML($input),
         );

@@ -148,11 +148,21 @@ final class LogReg implements Route
                 . ' administrator.',
             !$name || !$dispname => 'Name and display name required.',
             $pass1 !== $pass2 => 'The passwords do not match.',
-            mb_strlen($dispname) > 30 || mb_strlen($name) > 30 => 'Display name and username must be under 30 characters.',
+            mb_strlen($dispname) > 30 || mb_strlen(
+                $name,
+            ) > 30 => 'Display name and username must be under 30 characters.',
             ($badNameChars && preg_match($badNameChars, $name))
-                || $this->textFormatting->blockhtml($name) !== $name => 'Invalid characters in username!',
-            $badNameChars && preg_match($badNameChars, $dispname) => 'Invalid characters in display name!',
-            !filter_var($email, FILTER_VALIDATE_EMAIL) => "That isn't a valid email!",
+                || $this->textFormatting->blockhtml(
+                    $name,
+                ) !== $name => 'Invalid characters in username!',
+            $badNameChars && preg_match(
+                $badNameChars,
+                $dispname,
+            ) => 'Invalid characters in display name!',
+            !filter_var(
+                $email,
+                FILTER_VALIDATE_EMAIL,
+            ) => "That isn't a valid email!",
             $this->ipAddress->isBanned() => 'You have been banned from registering on this board.',
             !$this->didPassCaptcha() => 'You did not pass the captcha. Are you a bot?',
             default => null,
@@ -160,7 +170,10 @@ final class LogReg implements Route
 
         if ($error !== null) {
             $this->page->command('error', $error);
-            $this->page->append('PAGE', $this->template->render('error', ['message' => $error]));
+            $this->page->append(
+                'PAGE',
+                $this->template->render('error', ['message' => $error]),
+            );
 
             return;
         }
@@ -180,7 +193,10 @@ final class LogReg implements Route
 
         if ($error !== null) {
             $this->page->command('error', $error);
-            $this->page->append('PAGE', $this->template->render('error', ['message' => $error]));
+            $this->page->append(
+                'PAGE',
+                $this->template->render('error', ['message' => $error]),
+            );
 
             return;
         }
@@ -232,11 +248,16 @@ final class LogReg implements Route
                     $this->page->command('closewindow', '#loginform');
                 }
 
-                $this->session->setPHPSessionValue('uid', $this->user->get()->id);
+                $this->session->setPHPSessionValue(
+                    'uid',
+                    $this->user->get()->id,
+                );
                 $loginToken = base64_encode(openssl_random_pseudo_bytes(128));
 
                 $token = new Token();
-                $token->expires = $this->database->datetime(Carbon::now('UTC')->addMonth()->getTimestamp());
+                $token->expires = $this->database->datetime(
+                    Carbon::now('UTC')->addMonth()->getTimestamp(),
+                );
                 $token->token = $loginToken;
                 $token->type = 'login';
                 $token->uid = $this->user->get()->id;
@@ -261,7 +282,10 @@ final class LogReg implements Route
             } else {
                 $this->page->append(
                     'PAGE',
-                    $this->template->render('error', ['message' => 'Incorrect username/password']),
+                    $this->template->render(
+                        'error',
+                        ['message' => 'Incorrect username/password'],
+                    ),
                 );
                 $this->page->command('error', 'Incorrect username/password');
             }
@@ -269,7 +293,10 @@ final class LogReg implements Route
             $this->session->erase('location');
         }
 
-        $this->page->append('PAGE', $this->template->render('logreg/login-form'));
+        $this->page->append(
+            'PAGE',
+            $this->template->render('logreg/login-form'),
+        );
     }
 
     private function logout(): void
@@ -304,7 +331,13 @@ final class LogReg implements Route
             ),
         );
         $this->page->command('softurl');
-        $this->page->append('PAGE', $this->template->render('success', ['message' => 'Logged out successfully']));
+        $this->page->append(
+            'PAGE',
+            $this->template->render(
+                'success',
+                ['message' => 'Logged out successfully'],
+            ),
+        );
         if ($this->request->isJSAccess()) {
             return;
         }
@@ -318,7 +351,10 @@ final class LogReg implements Route
 
         $this->session->applyChanges();
 
-        $this->page->command('setstatus', $this->session->get()->hide !== 0 ? 'invisible' : 'online');
+        $this->page->command(
+            'setstatus',
+            $this->session->get()->hide !== 0 ? 'invisible' : 'online',
+        );
         $this->page->command('softurl');
     }
 
@@ -409,23 +445,31 @@ final class LogReg implements Route
 
                 if ($member === null) {
                     $error = "There is no user registered as <strong>{$user}</strong>, sure this is correct?";
-                    $page .= $this->template->render('error', ['message' => $error]);
+                    $page .= $this->template->render(
+                        'error',
+                        ['message' => $error],
+                    );
                 } else {
                     // Generate token.
                     $forgotpasswordtoken
                         = base64_encode(openssl_random_pseudo_bytes(128));
 
                     $token = new Token();
-                    $token->expires = $this->database->datetime(Carbon::now('UTC')->getTimestamp() + 3600 * 24);
+                    $token->expires = $this->database->datetime(
+                        Carbon::now('UTC')->getTimestamp() + 3600 * 24,
+                    );
                     $token->token = $forgotpasswordtoken;
                     $token->type = 'forgotpassword';
                     $token->uid = $member->id;
                     $token->insert();
 
-                    $link = $this->domainDefinitions->getBoardURL() . $this->router->url('forgotPassword', [
-                        'uid' => $member->id,
-                        'tokenId' => rawurlencode($forgotpasswordtoken),
-                    ]);
+                    $link = $this->domainDefinitions->getBoardURL() . $this->router->url(
+                        'forgotPassword',
+                        [
+                            'uid' => $member->id,
+                            'tokenId' => rawurlencode($forgotpasswordtoken),
+                        ],
+                    );
                     $mailResult = $this->jax->mail(
                         $member->email,
                         'Recover Your Password!',

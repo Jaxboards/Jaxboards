@@ -63,7 +63,9 @@ final readonly class Posting
 
         // Insert.
         if ($this->request->post('submit') !== null) {
-            $badword = $this->textFormatting->blockhtml($this->request->asString->post('badword') ?? '');
+            $badword = $this->textFormatting->blockhtml(
+                $this->request->asString->post('badword') ?? '',
+            );
             $replacement = $this->request->asString->post('replacement');
             if (!$badword || !$replacement) {
                 $page .= $this->page->error('All fields required.');
@@ -101,8 +103,12 @@ final readonly class Posting
                     'posting/word-filter-row.html',
                     [
                         'filter' => $textRule->needle,
-                        'filter_url_encoded' => rawurlencode((string) $textRule->needle),
-                        'result_code' => $this->textFormatting->blockhtml($textRule->replacement),
+                        'filter_url_encoded' => rawurlencode(
+                            (string) $textRule->needle,
+                        ),
+                        'result_code' => $this->textFormatting->blockhtml(
+                            $textRule->replacement,
+                        ),
                     ],
                 );
             }
@@ -147,12 +153,16 @@ final readonly class Posting
         // Insert emoticon.
         if ($this->request->post('submit') !== null) {
             $emoticonInput = $this->request->asString->post('emoticon');
-            $emoticonNoHTML = $this->textFormatting->blockhtml($emoticonInput ?? '');
+            $emoticonNoHTML = $this->textFormatting->blockhtml(
+                $emoticonInput ?? '',
+            );
             $imageInput = $this->request->asString->post('image');
             if (!$emoticonInput || !$imageInput) {
                 $page .= $this->page->error('All fields required.');
             } elseif (array_key_exists($emoticonNoHTML, $emoticons)) {
-                $page .= $this->page->error('That emoticon is already being used.');
+                $page .= $this->page->error(
+                    'That emoticon is already being used.',
+                );
             } else {
                 $textRule = new TextRule();
                 $textRule->enabled = 1;
@@ -190,7 +200,9 @@ final readonly class Posting
                     'posting/emoticon-row.html',
                     [
                         'emoticon' => $emoticon->needle,
-                        'emoticon_url_encoded' => rawurlencode((string) $emoticon->needle),
+                        'emoticon_url_encoded' => rawurlencode(
+                            (string) $emoticon->needle,
+                        ),
                         'smiley_url' => $emoticon->replacement,
                     ],
                 );
@@ -221,7 +233,11 @@ final readonly class Posting
         }
 
         $emoticonRows = '';
-        foreach ($this->textFormatting->rules->getEmotePack($emotepack) as $emoticon => $smileyFile) {
+        foreach (
+            $this->textFormatting->rules->getEmotePack(
+                $emotepack,
+            ) as $emoticon => $smileyFile
+        ) {
             $emoticonRows .= $this->page->render(
                 'posting/emoticon-packs-row.html',
                 [
@@ -277,7 +293,9 @@ final readonly class Posting
 
         if ($this->request->post('rsubmit') !== null) {
             $this->config->write([
-                'reactions' => ($this->request->post('renabled') !== null ? 1 : 0)
+                'reactions' => ($this->request->post(
+                    'renabled',
+                ) !== null ? 1 : 0)
                     + ($this->request->post('ranon') !== null ? 2 : 0),
             ]);
             $page2 .= $this->page->success('Settings saved!');
@@ -288,8 +306,12 @@ final readonly class Posting
         $page2 .= $this->page->render(
             'posting/post-rating-settings.html',
             [
-                'ratings_anonymous' => $this->page->checked(($reactionsettings & 2) !== 0),
-                'ratings_enabled' => $this->page->checked(($reactionsettings & 1) !== 0),
+                'ratings_anonymous' => $this->page->checked(
+                    ($reactionsettings & 2) !== 0,
+                ),
+                'ratings_enabled' => $this->page->checked(
+                    ($reactionsettings & 1) !== 0,
+                ),
             ],
         );
         $table = $this->page->render(
@@ -306,8 +328,12 @@ final readonly class Posting
                     'posting/post-rating-row.html',
                     [
                         'id' => $niblet->id,
-                        'image_url' => $this->textFormatting->blockhtml($niblet->img),
-                        'title' => $this->textFormatting->blockhtml($niblet->title),
+                        'image_url' => $this->textFormatting->blockhtml(
+                            $niblet->img,
+                        ),
+                        'title' => $this->textFormatting->blockhtml(
+                            $niblet->title,
+                        ),
                     ],
                 );
             }

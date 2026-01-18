@@ -195,7 +195,9 @@ final class Page
             ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin->wrapper . '.html'
             : '';
         $this->template->load(
-            $skinWrapper && $this->fileSystem->getFileInfo($skinWrapper)->isFile()
+            $skinWrapper && $this->fileSystem->getFileInfo(
+                $skinWrapper,
+            )->isFile()
                 ? $skinWrapper
                 : $this->domainDefinitions->getDefaultThemePath() . '/wrapper.html',
         );
@@ -233,7 +235,9 @@ final class Page
 
     private function getPageTitle(): string
     {
-        return ($this->config->getSetting('boardname') ?: 'JaxBoards') . ($this->pageTitle !== '' ? ' -> ' . $this->pageTitle : '');
+        return ($this->config->getSetting(
+            'boardname',
+        ) ?: 'JaxBoards') . ($this->pageTitle !== '' ? ' -> ' . $this->pageTitle : '');
     }
 
     private function outputJavascriptCommands(): string

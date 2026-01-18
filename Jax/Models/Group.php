@@ -12,7 +12,13 @@ final class Group extends Model
 {
     public const TABLE = 'member_groups';
 
-    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
+    #[Column(
+        name: 'id',
+        type: 'int',
+        nullable: false,
+        autoIncrement: true,
+        unsigned: true,
+    )]
     #[PrimaryKey]
     public int $id = 0;
 
@@ -43,13 +49,25 @@ final class Group extends Model
     #[Column(name: 'canViewOfflineBoard', type: 'bool')]
     public int $canViewOfflineBoard = 0;
 
-    #[Column(name: 'floodControl', type: 'int', default: 0, nullable: false, unsigned: true)]
+    #[Column(
+        name: 'floodControl',
+        type: 'int',
+        default: 0,
+        nullable: false,
+        unsigned: true,
+    )]
     public int $floodControl = 0;
 
     #[Column(name: 'canOverrideLockedTopics', type: 'bool')]
     public int $canOverrideLockedTopics = 0;
 
-    #[Column(name: 'icon', type: 'string', default: '', length: 255, nullable: false)]
+    #[Column(
+        name: 'icon',
+        type: 'string',
+        default: '',
+        length: 255,
+        nullable: false,
+    )]
     public string $icon = '';
 
     #[Column(name: 'canShout', type: 'bool')]

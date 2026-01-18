@@ -30,13 +30,13 @@ final class OpenGraphTest extends UnitTestCase
     #[DataProvider('fetchDataProvider')]
     public function testFetch(string $url, string $htmlInput): void
     {
-        $fileSystemStub = $this->createStub(FileSystem::class);
+        $fileSystemStub = self::createStub(FileSystem::class);
         $fileSystemStub->method('getContents')
             ->willReturn($htmlInput)
         ;
 
         $this->container->set(FileSystem::class, $fileSystemStub);
-        $this->container->set(BBCode::class, $this->createStub(BBCode::class));
+        $this->container->set(BBCode::class, self::createStub(BBCode::class));
 
         $openGraph = $this->container->get(OpenGraph::class);
 

@@ -53,6 +53,10 @@ final readonly class Tardis implements Route
                 })()
             JS);
         $this->page->command('softurl');
-        $this->page->command('playsound', 'drwho', $this->domainDefinitions->getSoundsUrl() . '/doctorwhotheme.mp3');
+        $this->page->command(
+            'playsound',
+            'drwho',
+            $this->domainDefinitions->getSoundsUrl() . '/doctorwhotheme.mp3',
+        );
     }
 }

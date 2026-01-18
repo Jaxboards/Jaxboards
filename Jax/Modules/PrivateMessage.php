@@ -83,7 +83,10 @@ final readonly class PrivateMessage implements Module
     public function message(int $uid, string $instantMessage): void
     {
         if ($this->user->isGuest()) {
-            $this->page->command('error', 'You must be logged in to instant message!');
+            $this->page->command(
+                'error',
+                'You must be logged in to instant message!',
+            );
 
             return;
         }
@@ -139,7 +142,9 @@ final readonly class PrivateMessage implements Module
             ['session'],
             json_encode($cmd) . PHP_EOL,
             $uid,
-            $this->database->datetime(Carbon::now()->subSeconds(10)->getTimestamp()),
+            $this->database->datetime(
+                Carbon::now()->subSeconds(10)->getTimestamp(),
+            ),
         );
 
         return $this->database->affectedRows($result) !== 0;

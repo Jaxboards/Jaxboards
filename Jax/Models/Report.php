@@ -14,7 +14,13 @@ final class Report extends Model
 {
     public const TABLE = 'reports';
 
-    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
+    #[Column(
+        name: 'id',
+        type: 'int',
+        nullable: false,
+        autoIncrement: true,
+        unsigned: true,
+    )]
     #[PrimaryKey]
     public int $id = 0;
 
@@ -36,7 +42,12 @@ final class Report extends Model
     #[Key()]
     public string $reportDate = '';
 
-    #[Column(name: 'acknowledger', type: 'int', nullable: true, unsigned: true)]
+    #[Column(
+        name: 'acknowledger',
+        type: 'int',
+        nullable: true,
+        unsigned: true,
+    )]
     #[ForeignKey(table: 'members', field: 'id', onDelete: 'cascade')]
     public ?int $acknowledger = null;
 

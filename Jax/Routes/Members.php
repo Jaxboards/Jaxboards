@@ -71,7 +71,10 @@ final class Members implements Route
         $sorthow = $this->request->asString->both('how') === 'DESC'
             ? 'DESC' : 'ASC';
         $sortByInput = $this->request->asString->both('sortby');
-        $sortby = $sortByInput !== null && array_key_exists($sortByInput, $fields)
+        $sortby = $sortByInput !== null && array_key_exists(
+            $sortByInput,
+            $fields,
+        )
             ? $sortByInput
             : 'displayName';
 
@@ -153,7 +156,9 @@ final class Members implements Route
         $rows = array_map(fn(Member $member): array => [
             'member' => $member,
             'group' => $groups[$member->groupID],
-            'contactDetails' => $this->contactDetails->getContactLinks($member),
+            'contactDetails' => $this->contactDetails->getContactLinks(
+                $member,
+            ),
         ], $members);
 
         $page = $this->template->render(

@@ -87,7 +87,10 @@ final readonly class ModPosts
 
         $shouldClear = match ($doAct) {
             'move' => $this->page->command('modcontrols_move', 1),
-            'moveto' => $this->movePostsTo($pids, (int) $this->request->post('id')),
+            'moveto' => $this->movePostsTo(
+                $pids,
+                (int) $this->request->post('id'),
+            ),
             'delete' => $this->deletePosts($pids),
             default => null,
         };
@@ -173,7 +176,13 @@ final readonly class ModPosts
         array_map(Forum::fixLastPost(...), $fids);
 
         // Remove them from the page.
-        array_map(fn(int $postId) => $this->page->command('removeel', '#pid_' . $postId), $pids);
+        array_map(
+            fn(int $postId) => $this->page->command(
+                'removeel',
+                '#pid_' . $postId,
+            ),
+            $pids,
+        );
 
         return true;
     }
@@ -187,7 +196,10 @@ final readonly class ModPosts
     {
         $modPids = (string) $this->session->getVar('modpids');
         $intPids = $modPids !== ''
-            ? array_map(static fn($pid): int => (int) $pid, explode(',', $modPids))
+            ? array_map(
+                static fn($pid): int => (int) $pid,
+                explode(',', $modPids),
+            )
             : [];
         sort($intPids);
 
@@ -205,7 +217,10 @@ final readonly class ModPosts
             : null;
 
         return $forum?->mods
-            ? array_map(static fn($mid): int => (int) $mid, explode(',', $forum->mods))
+            ? array_map(
+                static fn($mid): int => (int) $mid,
+                explode(',', $forum->mods),
+            )
             : [];
     }
 

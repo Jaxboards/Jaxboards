@@ -175,22 +175,25 @@ final class ProfileTabs
             static fn(Topic $topic): ?int => $topic->fid,
         );
 
-        return implode('', array_map(function (Post $post) use ($topics, $forums): string {
-            $topic = $topics[$post->tid];
-            $forum = $forums[$topic->fid];
+        return implode(
+            '',
+            array_map(function (Post $post) use ($topics, $forums): string {
+                $topic = $topics[$post->tid];
+                $forum = $forums[$topic->fid];
 
-            $perms = $this->user->getForumPerms($forum->perms);
-            if (!$perms['read']) {
-                return '';
-            }
+                $perms = $this->user->getForumPerms($forum->perms);
+                if (!$perms['read']) {
+                    return '';
+                }
 
-            return $this->template->render(
-                'userprofile/post',
-                [
-                    'topic' => $topic,
-                    'post' => $post,
-                ],
-            );
-        }, $posts));
+                return $this->template->render(
+                    'userprofile/post',
+                    [
+                        'topic' => $topic,
+                        'post' => $post,
+                    ],
+                );
+            }, $posts),
+        );
     }
 }

@@ -84,11 +84,17 @@ final readonly class ModControls implements Route
         }
 
         match ($params['do'] ?? $this->request->both('do')) {
-            'modp' => $this->modPosts->addPost((int) $this->request->both('pid')),
-            'modt' => $this->modTopics->addTopic((int) $this->request->both('tid')),
+            'modp' => $this->modPosts->addPost(
+                (int) $this->request->both('pid'),
+            ),
+            'modt' => $this->modTopics->addTopic(
+                (int) $this->request->both('tid'),
+            ),
             'emem' => $this->showModCP(match (true) {
                 $this->request->post('submit') === 'showform'
-                    || $this->request->both('mid') !== null => $this->editMember(),
+                    || $this->request->both(
+                        'mid',
+                    ) !== null => $this->editMember(),
                 default => $this->selectMemberToEdit(),
             }),
             'iptools' => $this->showModCP($this->ipTools()),
@@ -160,7 +166,10 @@ final readonly class ModControls implements Route
         $member->sig = $this->request->asString->post('signature') ?? '';
         $member->update();
 
-        return $this->template->render('success', ['message' => 'Profile information saved.']);
+        return $this->template->render(
+            'success',
+            ['message' => 'Profile information saved.'],
+        );
     }
 
     private function editMember(): string
@@ -196,7 +205,9 @@ final readonly class ModControls implements Route
         }
 
         if (!$member) {
-            return $this->page->error('No members found that matched the criteria.');
+            return $this->page->error(
+                'No members found that matched the criteria.',
+            );
         }
 
         if (
@@ -205,7 +216,9 @@ final readonly class ModControls implements Route
             && ($this->user->get()->id !== 1
                 && $member->id !== $this->user->get()->id)
         ) {
-            return $this->page->error('You do not have permission to edit this profile.');
+            return $this->page->error(
+                'You do not have permission to edit this profile.',
+            );
         }
 
         return $page . $this->template->render('modcontrols/edit-member', [
@@ -282,7 +295,10 @@ final readonly class ModControls implements Route
             'location' => $location,
             'posts' => $posts,
             'shoutResults' => $shoutResults,
-            'torDate' => gmdate('Y-m-d', Carbon::now('UTC')->subDays(2)->getTimestamp()),
+            'torDate' => gmdate(
+                'Y-m-d',
+                Carbon::now('UTC')->subDays(2)->getTimestamp(),
+            ),
             'usersWithIP' => $usersWithIP,
         ]);
     }
@@ -293,14 +309,22 @@ final readonly class ModControls implements Route
             'ORDER BY lastUpdate LIMIT 100',
         );
 
-        /** @var array<string,ModelsSession[]> */
-        $groupedSessions = Lodash::groupBy($allSessions, static fn(ModelsSession $modelsSession): string => $modelsSession->useragent);
+        /** @var array<string,array<ModelsSession>> */
+        $groupedSessions = Lodash::groupBy(
+            $allSessions,
+            static fn(ModelsSession $modelsSession): string => $modelsSession->useragent,
+        );
         arsort($groupedSessions);
 
         $rows = [];
         foreach ($groupedSessions as $userAgent => $sessions) {
             $ips = array_filter(
-                array_map(fn(ModelsSession $modelsSession): string => $this->ipAddress->asHumanReadable($modelsSession->ip), $sessions),
+                array_map(
+                    fn(ModelsSession $modelsSession): string => $this->ipAddress->asHumanReadable(
+                        $modelsSession->ip,
+                    ),
+                    $sessions,
+                ),
                 static fn(string $ip): bool => $ip !== '',
             );
             $ipsWithFlags = array_map(function (string $ip): array {
@@ -339,7 +363,11 @@ final readonly class ModControls implements Route
             $report->update();
         }
 
-        $this->router->redirect('topic', ['id' => $post->tid, 'findpost' => $post->id], "#pid_{$post->id}");
+        $this->router->redirect(
+            'topic',
+            ['id' => $post->tid, 'findpost' => $post->id],
+            "#pid_{$post->id}",
+        );
 
         return '';
     }
@@ -352,9 +380,18 @@ final readonly class ModControls implements Route
         }
 
         $reports = Report::selectMany('ORDER BY reportDate DESC LIMIT 100');
-        $posts = Post::joinedOn($reports, static fn(Report $report): int => $report->pid);
-        $reporters = Member::joinedOn($reports, static fn(Report $report): int => $report->reporter);
-        $acknowledgers = Member::joinedOn($reports, static fn(Report $report): ?int => $report->acknowledger);
+        $posts = Post::joinedOn(
+            $reports,
+            static fn(Report $report): int => $report->pid,
+        );
+        $reporters = Member::joinedOn(
+            $reports,
+            static fn(Report $report): int => $report->reporter,
+        );
+        $acknowledgers = Member::joinedOn(
+            $reports,
+            static fn(Report $report): ?int => $report->acknowledger,
+        );
 
         $rows = array_map(static fn(Report $report): array => [
             'report' => $report,
@@ -363,7 +400,10 @@ final readonly class ModControls implements Route
             'acknowledger' => $acknowledgers[$report->acknowledger] ?? null,
         ], $reports);
 
-        return $this->template->render('modcontrols/post-reports', ['rows' => $rows]);
+        return $this->template->render(
+            'modcontrols/post-reports',
+            ['rows' => $rows],
+        );
     }
 
     private function box(string $title, string $content): string

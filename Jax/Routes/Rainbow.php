@@ -92,6 +92,10 @@ final readonly class Rainbow implements Route
                 );
             }
         })()");
-        $this->page->command('playsound', 'always', $this->domainDefinitions->getSoundsUrl() . '/always.mp3');
+        $this->page->command(
+            'playsound',
+            'always',
+            $this->domainDefinitions->getSoundsUrl() . '/always.mp3',
+        );
     }
 }

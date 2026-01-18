@@ -125,7 +125,9 @@ final readonly class Inbox
             $member->id,
         );
 
-        $inboxURL = $this->domainDefinitions->getBoardUrl() . $this->router->url('inbox');
+        $inboxURL = $this->domainDefinitions->getBoardUrl() . $this->router->url(
+            'inbox',
+        );
 
         // Send em an email!
         if (($member->emailSettings & 2) !== 0) {
@@ -338,13 +340,19 @@ final readonly class Inbox
             return "You don't have permission to view this message.";
         }
 
-        $otherMember = Member::selectOne($userIsRecipient ? $message->from : $message->to);
+        $otherMember = Member::selectOne(
+            $userIsRecipient ? $message->from : $message->to,
+        );
 
         if (!$message->read && $userIsRecipient) {
             $message->read = 1;
             $message->update();
 
-            $this->page->command('update', 'num-messages', $this->fetchMessageCount('unread'));
+            $this->page->command(
+                'update',
+                'num-messages',
+                $this->fetchMessageCount('unread'),
+            );
         }
 
         return $this->template->render(
@@ -368,17 +376,23 @@ final readonly class Inbox
             10,
         );
 
-        $pages .= implode(' &middot; ', array_map(function (int $pageNumber) use ($requestPage, $view): string {
-            $active = $pageNumber === $requestPage ? ' class="active"' : '';
-            $pageURL = $this->router->url('ucp', [
-                'view' => $view,
-                'page' => $pageNumber,
-            ]);
+        $pages .= implode(
+            ' &middot; ',
+            array_map(
+                function (int $pageNumber) use ($requestPage, $view): string {
+                    $active = $pageNumber === $requestPage ? ' class="active"' : '';
+                    $pageURL = $this->router->url('ucp', [
+                        'view' => $view,
+                        'page' => $pageNumber,
+                    ]);
 
-            return <<<HTML
-                <a href="{$pageURL}" {$active}>{$pageNumber}</a>
-                HTML;
-        }, $pageNumbers));
+                    return <<<HTML
+                        <a href="{$pageURL}" {$active}>{$pageNumber}</a>
+                        HTML;
+                },
+                $pageNumbers,
+            ),
+        );
 
         $messages = $this->fetchMessages($view, $requestPage - 1);
 
@@ -401,7 +415,11 @@ final readonly class Inbox
         ], $messages);
 
         if ($view === 'inbox') {
-            $this->page->command('update', 'num-messages', $readCounts['unread'] ?? 0);
+            $this->page->command(
+                'update',
+                'num-messages',
+                $readCounts['unread'] ?? 0,
+            );
         }
 
         return $this->template->render(

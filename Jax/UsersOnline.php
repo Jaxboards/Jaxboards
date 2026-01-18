@@ -60,10 +60,17 @@ final class UsersOnline
     {
         $sessions = Session::selectMany(
             'WHERE lastUpdate>=? ORDER BY lastAction',
-            $this->database->datetime(Carbon::now('UTC')->subSeconds($this->serviceConfig->getSetting('timetologout') ?? 900)->getTimestamp()),
+            $this->database->datetime(
+                Carbon::now('UTC')->subSeconds(
+                    $this->serviceConfig->getSetting('timetologout') ?? 900,
+                )->getTimestamp(),
+            ),
         );
 
-        $userSessions = array_filter($sessions, static fn(Session $session): bool => (bool) $session->uid);
+        $userSessions = array_filter(
+            $sessions,
+            static fn(Session $session): bool => (bool) $session->uid,
+        );
         $guestCount = count($sessions) - count($userSessions);
 
         $this->guestCount = $guestCount;
@@ -81,7 +88,9 @@ final class UsersOnline
         );
 
         return array_map(function (UserOnline $userOnline): UserOnline {
-            $userOnline->lastOnlineRelative = $this->date->relativeTime($userOnline->getLastOnline());
+            $userOnline->lastOnlineRelative = $this->date->relativeTime(
+                $userOnline->getLastOnline(),
+            );
 
             return $userOnline;
         }, $this->sessionsToUsersOnline($sessions));
@@ -94,7 +103,10 @@ final class UsersOnline
      */
     private function sessionsToUsersOnline(array $sessions): array
     {
-        $members = Member::joinedOn($sessions, static fn(Session $session): ?int => $session->uid);
+        $members = Member::joinedOn(
+            $sessions,
+            static fn(Session $session): ?int => $session->uid,
+        );
 
         $today = gmdate('n j');
 
@@ -109,7 +121,9 @@ final class UsersOnline
             $birthday = !$session->isBot
                 && $member?->birthdate
                 && $this->config->getSetting('birthdays')
-                && $this->date->dateAsCarbon($member->birthdate)?->format('n j') === $today;
+                && $this->date->dateAsCarbon($member->birthdate)?->format(
+                    'n j',
+                ) === $today;
 
             $uid = $session->isBot ? $session->id : $session->uid;
             $name = ($session->isBot ? $session->id : $member?->displayName);
@@ -124,15 +138,21 @@ final class UsersOnline
             $userOnline->groupID = $member->groupID ?? Groups::Guest->value;
             $userOnline->hide = (bool) $session->hide;
             $userOnline->isBot = (bool) $session->isBot;
-            $userOnline->lastAction = $this->date->datetimeAsTimestamp($session->lastAction);
-            $userOnline->lastUpdate = $this->date->datetimeAsTimestamp($session->lastUpdate);
+            $userOnline->lastAction = $this->date->datetimeAsTimestamp(
+                $session->lastAction,
+            );
+            $userOnline->lastUpdate = $this->date->datetimeAsTimestamp(
+                $session->lastUpdate,
+            );
             $userOnline->location = $session->location;
             $userOnline->locationVerbose = $session->locationVerbose;
             $userOnline->name = ($session->hide ? '* ' : '') . $name;
             $userOnline->profileURL = $session->isBot
                 ? null
                 : $this->router->url('profile', ['id' => $uid]);
-            $userOnline->readDate = $this->date->datetimeAsTimestamp($session->readDate);
+            $userOnline->readDate = $this->date->datetimeAsTimestamp(
+                $session->readDate,
+            );
             $userOnline->status = $session->lastAction < $this->idleTimestamp
                 ? 'idle'
                 : 'active';

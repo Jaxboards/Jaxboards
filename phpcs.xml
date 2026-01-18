@@ -8,8 +8,25 @@
   <!-- ignore vendor files -->
   <exclude-pattern>./vendor</exclude-pattern>
   <exclude-pattern>./node_modules</exclude-pattern>
+  <!-- PHP Version -->
+  <!-- Reference https://github.com/squizlabs/PHP_CodeSniffer/wiki/Configuration-Options#setting-the-php-version -->
+  <config name="php_version" value="80230"/>
+  <!-- Make sure this works with PHP 8.2+ -->
+  <config name="testVersion" value="8.2-" />
+  <!-- Use UTF-8 encoding -->
+  <config name="encoding" value="utf-8"/>
+  <!-- Return error codes on exit if there are errros -->
+  <config name="ignore_errors_on_exit" value="0"/>
+  <config name="ignore_warnings_on_exit" value="0"/>
+  <!-- We don't care about non-fixable errors when running phpcbf -->
+  <config name="ignore_non_auto_fixable_on_exit" phpcbf-only="true" value="1"/>
+  <!-- Set tab width to PSR-12 standard -->
+  <!-- Reference https://github.com/squizlabs/PHP_CodeSniffer/wiki/Configuration-Options#setting-the-default-tab-width -->
+  <config name="tab_width" value="4"/>
   <!-- show colors -->
   <arg name="colors" />
+  <!-- Output with rule names -->
+  <arg value="s"/>
   <!-- only check php files -->
   <arg name="extensions" value="php" />
   <!-- Follow PSR coding style guides -->
@@ -40,14 +57,16 @@
   </rule>
   <!-- Here's some comment rules we can follow -->
   <rule ref="Squiz.Commenting.InlineComment">
-    <exclude name="Squiz.Commenting.InlineComment.NotCapital" />
+    <exclude name="Squiz.Commenting.InlineComment.DocBlock" />
     <exclude name="Squiz.Commenting.InlineComment.InvalidEndChar" />
+    <exclude name="Squiz.Commenting.InlineComment.NotCapital" />
   </rule>
   <rule ref="Squiz.Commenting.PostStatementComment" />
   <rule ref="Squiz.Commenting.BlockComment">
     <exclude name="Squiz.Commenting.BlockComment.InvalidEndChar" />
     <exclude name="Squiz.Commenting.BlockComment.LastLineIndent" />
     <exclude name="Squiz.Commenting.BlockComment.NotCapital" />
+    <exclude name="Squiz.Commenting.BlockComment.WrongStart" />
   </rule>
   <rule ref="SlevomatCodingStandard.Arrays.ArrayAccess"/>
   <rule ref="SlevomatCodingStandard.Arrays.DisallowImplicitArrayCreation"/>
@@ -117,9 +136,11 @@
   <rule ref="SlevomatCodingStandard.Classes.ModernClassNameReference"/>
   <rule ref="SlevomatCodingStandard.Classes.RequireAbstractOrFinal"/>
   <rule ref="SlevomatCodingStandard.Classes.RequireConstructorPropertyPromotion"/>
-  <rule ref="SlevomatCodingStandard.Classes.RequireMultiLineMethodSignature">
+  <rule ref="SlevomatCodingStandard.Classes.RequireMultiLineMethodSignature" phpcs-only="true">
     <properties>
       <property name="minLineLength" value="80"/>
+      <property name="withParametersWithAttributes" value="true"/>
+      <property name="withPromotedProperties" value="true"/>
     </properties>
   </rule>
   <rule ref="SlevomatCodingStandard.Classes.RequireSelfReference"/>
@@ -178,7 +199,8 @@
       <property name="booleanOperatorOnPreviousLine" value="false"/>
     </properties>
   </rule>
-  <rule ref="SlevomatCodingStandard.ControlStructures.RequireMultiLineTernaryOperator">
+  <!-- disabled from auto-formatting due to a bug in the sniff code -->
+  <rule ref="SlevomatCodingStandard.ControlStructures.RequireMultiLineTernaryOperator" phpcs-only="true">
     <properties>
       <property name="lineLengthLimit" value="80"/>
     </properties>
@@ -204,7 +226,7 @@
     <exclude-pattern>./Tests/</exclude-pattern>
   </rule>
   <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
-  	<properties>
+    <properties>
       <property name="rootNamespaces" type="array">
         <element key="ACP" value="ACP"/>
         <element key="emoticons" value="emoticons"/>
@@ -224,19 +246,24 @@
   </rule>
 
   <rule ref="SlevomatCodingStandard.Functions.RequireArrowFunction"/>
-  <!-- disable this rule which unfortunately crashes PHP_CodeSniffer -->
-  <!--rule ref="SlevomatCodingStandard.Functions.RequireMultiLineCall">
+  <rule ref="SlevomatCodingStandard.Functions.RequireMultiLineCall">
     <properties>
       <property name="minLineLength" value="80"/>
     </properties>
-  </rule-->
+  </rule>
   <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInCall"/>
   <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInClosureUse"/>
   <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInDeclaration"/>
   <rule ref="SlevomatCodingStandard.Functions.StaticClosure"/>
   <rule ref="SlevomatCodingStandard.Functions.StrictCall"/>
   <rule ref="SlevomatCodingStandard.Functions.UnusedInheritedVariablePassedToClosure"/>
-  <rule ref="SlevomatCodingStandard.Functions.UnusedParameter"/>
+  <rule ref="SlevomatCodingStandard.Functions.UnusedParameter">
+    <properties>
+      <property name="allowedParameterPatterns" type="array">
+        <element value="/^_/"/>
+      </property>
+    </properties>
+  </rule>
   <rule ref="SlevomatCodingStandard.Functions.UselessParameterDefaultValue"/>
   <rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses"/>
   <rule ref="SlevomatCodingStandard.Namespaces.DisallowGroupUse"/>
@@ -263,7 +290,13 @@
   <rule ref="SlevomatCodingStandard.PHP.OptimizedFunctionsWithoutUnpacking"/>
   <rule ref="SlevomatCodingStandard.PHP.ShortList"/>
   <rule ref="SlevomatCodingStandard.PHP.TypeCast"/>
-  <rule ref="SlevomatCodingStandard.PHP.UselessParentheses" phpcs-only="true"/>
+  <rule ref="SlevomatCodingStandard.PHP.UselessParentheses" phpcs-only="true">
+    <properties>
+      <property name="ignoreComplexTernaryConditions" value="true"/>
+      <property name="enableCheckAroundNew" value="false"/>
+    </properties>
+    <type>warning</type>
+  </rule>
   <rule ref="SlevomatCodingStandard.PHP.UselessSemicolon"/>
   <rule ref="SlevomatCodingStandard.Strings.DisallowVariableParsing">
     <properties>
@@ -288,10 +321,6 @@
       <property name="ignoreSpacesInComment" value="true"/>
     </properties>
   </rule>
-
-  <!-- Make sure this works with PHP 8.2+ -->
-  <config name="testVersion" value="8.2-" />
-  <rule ref="PHPCompatibility" />
 
   <!-- Ban some functions -->
   <rule ref="Generic.PHP.ForbiddenFunctions">
