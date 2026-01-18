@@ -12,6 +12,7 @@ jobs:
             # Give the default GITHUB_TOKEN write permission to commit and push the
             # added or changed files to the repository.
             contents: write
+        if: github.event.pull_request.draft == false
         steps:
             - uses: awalsh128/cache-apt-pkgs-action@v1
               with:
