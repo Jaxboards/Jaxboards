@@ -50,10 +50,10 @@ jobs:
                   jq ".version = \"$VERSION\"" package.json > /tmp/package.json && \
                   mv /tmp/package.json package.json
               shell: bash
+            - run: composer run-script --no-interaction rector
             - run: npm run-script prettier
             - run: npm run-script eslint-fix
             - run: npm run-script stylelint-fix
-            - run: composer run-script --no-interaction rector
             - run: |
                   set +e; \
                   composer run-script --no-interaction phpcbf; \
