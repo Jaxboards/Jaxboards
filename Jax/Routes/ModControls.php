@@ -304,7 +304,7 @@ final readonly class ModControls implements Route
             'ORDER BY lastUpdate LIMIT 100',
         );
 
-        // @var array<string,ModelsSession[]>
+        /** @var array<string,ModelsSession[]> */
         $groupedSessions = Lodash::groupBy(
             $allSessions,
             static fn(
@@ -330,9 +330,7 @@ final readonly class ModControls implements Route
                 $geo = $this->geoLocate->lookup($ip);
                 $flag =
                     $geo instanceof City
-                        ? $this->geoLocate->getFlagEmoji(
-                            $geo->country->isoCode,
-                        )
+                        ? $this->geoLocate->getFlagEmoji($geo->country->isoCode)
                         : null;
 
                 return [

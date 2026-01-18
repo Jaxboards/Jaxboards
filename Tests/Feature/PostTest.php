@@ -165,10 +165,7 @@ final class PostTest extends FeatureTestCase
             return $postHookPostArg;
         }
 
-        $this->container->get(Hooks::class)->addListener(
-            'post',
-            hookStub(...),
-        );
+        $this->container->get(Hooks::class)->addListener('post', hookStub(...));
 
         $page = $this->go(
             new Request(
@@ -272,11 +269,7 @@ final class PostTest extends FeatureTestCase
         $this->assertEquals('updated description', $topic->subtitle);
         $this->assertEquals('updated post', $post->post);
 
-        $this->assertRedirect(
-            'topic',
-            ['id' => '1', 'findpost' => '1'],
-            $page,
-        );
+        $this->assertRedirect('topic', ['id' => '1', 'findpost' => '1'], $page);
     }
 
     public function testAdminEditOtherPost(): void

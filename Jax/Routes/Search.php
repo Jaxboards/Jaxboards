@@ -126,10 +126,8 @@ final class Search implements Route
     /**
      * @param array<string> $titles
      */
-    private function getForumSelect(
-        ForumTree $forumTree,
-        array $titles,
-    ): string {
+    private function getForumSelect(ForumTree $forumTree, array $titles): string
+    {
         $options = '';
         $generator = $forumTree->getIterator();
         foreach ($generator as $depth => $forumId) {
@@ -386,10 +384,7 @@ final class Search implements Route
             'content' => $page,
         ]);
 
-        if (
-            $this->request->isJSAccess()
-            && !$this->request->isJSDirectLink()
-        ) {
+        if ($this->request->isJSAccess() && !$this->request->isJSDirectLink()) {
             $this->page->command('update', 'searchresults', $page);
         } else {
             $this->form($page);

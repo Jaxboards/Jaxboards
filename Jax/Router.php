@@ -110,10 +110,7 @@ final class Router
         ?string $hash = null,
     ): void {
         $newLocation =
-            ($this->url(
-                $newLocation,
-                $params,
-            ) ?: $newLocation) . ($hash ?? '');
+            ($this->url($newLocation, $params) ?: $newLocation) . ($hash ?? '');
 
         if (!$this->request->hasCookies() && $newLocation[0] === '/') {
             $newLocation .= '&sessid=' . $this->session->get()->id;

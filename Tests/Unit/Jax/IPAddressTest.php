@@ -33,14 +33,6 @@ final class IPAddressTest extends UnitTestCase
 {
     public const TESTIP = '192.168.1.1';
 
-    /**
-     * @return array<array{string,bool}>
-     */
-    public static function localHostDataProvider(): array
-    {
-        return [['127.0.0.1', true], ['::1', true], [self::TESTIP, false]];
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -77,6 +69,14 @@ final class IPAddressTest extends UnitTestCase
         $ipAddress = $this->getIPAddress($ipHumanReadable);
 
         $this->assertEquals($isLocalHost, $ipAddress->isLocalHost());
+    }
+
+    /**
+     * @return array<array{string,bool}>
+     */
+    public static function localHostDataProvider(): array
+    {
+        return [['127.0.0.1', true], ['::1', true], [self::TESTIP, false]];
     }
 
     private function getIPAddress(string $ipAddress = self::TESTIP): IPAddress

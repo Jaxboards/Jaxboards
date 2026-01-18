@@ -187,11 +187,7 @@ final readonly class Members
                     'website',
                     $member->website,
                 );
-                $page .= $this->inputText(
-                    'Avatar:',
-                    'avatar',
-                    $member->avatar,
-                );
+                $page .= $this->inputText('Avatar:', 'avatar', $member->avatar);
                 $page .= $this->textArea('About:', 'about', $member->about);
                 $page .= $this->textArea('Signature:', 'sig', $member->sig);
                 $page .= $this->inputText('Email:', 'email', $member->email);
@@ -582,11 +578,7 @@ final readonly class Members
                     $memberId,
                 );
                 // Posts.
-                $this->database->delete(
-                    'posts',
-                    'WHERE `author`=?',
-                    $memberId,
-                );
+                $this->database->delete('posts', 'WHERE `author`=?', $memberId);
                 // Profile comments.
                 $this->database->delete(
                     'profile_comments',
@@ -729,9 +721,7 @@ final readonly class Members
     {
         if ($this->request->post('submit1') !== null) {
             $this->config->write([
-                'membervalidation' => $this->request->asString->post(
-                    'v_enable',
-                )
+                'membervalidation' => $this->request->asString->post('v_enable')
                     ? 1
                     : 0,
             ]);

@@ -121,12 +121,7 @@ final class ProfileTest extends FeatureTestCase
         $page = $this->go('/profile/1');
 
         // Breadcrumbs
-        DOMAssert::assertSelectEquals(
-            '#path li a',
-            'Example Forums',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('#path li a', 'Example Forums', 1, $page);
         DOMAssert::assertSelectEquals(
             '#path li a',
             "Admin's profile",
@@ -362,10 +357,7 @@ final class ProfileTest extends FeatureTestCase
             static fn($cmd): bool => $cmd[0] === 'window',
         );
         $this->assertEquals('Contact Card', $window[1]['title']);
-        $this->assertStringContainsString(
-            'Add Contact',
-            $window[1]['content'],
-        );
+        $this->assertStringContainsString('Add Contact', $window[1]['content']);
     }
 
     private function insertActivities(): void

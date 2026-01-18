@@ -263,10 +263,7 @@ final readonly class TextFormatting
 
             $stringURL =
                 $parts['path'] .
-                (array_key_exists(
-                    'query',
-                    $parts,
-                ) ? "?{$parts['query']}" : '');
+                (array_key_exists('query', $parts) ? "?{$parts['query']}" : '');
         }
 
         $inner ??= $stringURL;

@@ -42,12 +42,7 @@ final class Forum extends Model
     #[Column(name: 'lastPostDate', type: 'datetime', default: null)]
     public ?string $lastPostDate = null;
 
-    #[Column(
-        name: 'lastPostTopic',
-        type: 'int',
-        default: null,
-        unsigned: true,
-    )]
+    #[Column(name: 'lastPostTopic', type: 'int', default: null, unsigned: true)]
     #[ForeignKey(table: 'topics', field: 'id', onDelete: 'null')]
     public ?int $lastPostTopic = null;
 

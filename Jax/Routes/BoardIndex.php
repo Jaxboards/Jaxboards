@@ -403,9 +403,7 @@ final class BoardIndex implements Route
                 $this->date->datetimeAsTimestamp(
                     $this->session->get()->readDate,
                 ),
-                $this->date->datetimeAsTimestamp(
-                    $this->user->get()->lastVisit,
-                ),
+                $this->date->datetimeAsTimestamp($this->user->get()->lastVisit),
             );
     }
 }

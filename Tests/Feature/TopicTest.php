@@ -109,12 +109,7 @@ final class TopicTest extends FeatureTestCase
         $page = $this->go('/topic/1');
 
         // Breadcrumbs
-        DOMAssert::assertSelectEquals(
-            '#path li a',
-            'Example Forums',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('#path li a', 'Example Forums', 1, $page);
         DOMAssert::assertSelectEquals('#path li a', 'Category', 1, $page);
         DOMAssert::assertSelectEquals('#path li a', 'Forum', 2, $page);
         DOMAssert::assertSelectEquals(

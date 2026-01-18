@@ -75,9 +75,7 @@ final readonly class Utils implements Adapter
     {
         $prefix = $this->database->getPrefix();
         $this->database->setPrefix('');
-        $this->installTablesFromModels(
-            $this->getModels('Jax/Models/Service/'),
-        );
+        $this->installTablesFromModels($this->getModels('Jax/Models/Service/'));
         $this->database->setPrefix($prefix);
     }
 
@@ -101,11 +99,7 @@ final readonly class Utils implements Adapter
         foreach ($tableData as $rowIndex => $row) {
             foreach ($row as $columnName => $value) {
                 if (is_string($value) && !mb_check_encoding($value, 'UTF-8')) {
-                    $value = mb_convert_encoding(
-                        $value,
-                        'UTF-8',
-                        'ISO-8859-1',
-                    );
+                    $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1');
                 }
 
                 if ($rowIndex === 0) {

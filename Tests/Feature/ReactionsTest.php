@@ -111,11 +111,7 @@ final class ReactionsTest extends FeatureTestCase
             ->get(Router::class)
             ->url('topic', ['id' => '1', 'ratepost' => '1', 'niblet' => '1']);
 
-        DOMAssert::assertSelectCount(
-            ".postrating a[href^='{$url}']",
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectCount(".postrating a[href^='{$url}']", 1, $page);
         DOMAssert::assertSelectCount(
             '.postrating img[src="image"][title="title"]',
             1,

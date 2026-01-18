@@ -109,12 +109,12 @@ final readonly class Tools
         if (class_exists(ZipArchive::class, false)) {
             $this->outputZipFile(implode(PHP_EOL, $sqlFileLines));
 
-            exit;
+            exit();
         }
 
         $this->outputTextFile(implode(PHP_EOL, $sqlFileLines));
 
-        exit;
+        exit();
     }
 
     private function outputZipFile(string $fileContents): void

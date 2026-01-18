@@ -44,12 +44,7 @@ final class Report extends Model
     #[Key]
     public string $reportDate = '';
 
-    #[Column(
-        name: 'acknowledger',
-        type: 'int',
-        nullable: true,
-        unsigned: true,
-    )]
+    #[Column(name: 'acknowledger', type: 'int', nullable: true, unsigned: true)]
     #[ForeignKey(table: 'members', field: 'id', onDelete: 'cascade')]
     public ?int $acknowledger = null;
 

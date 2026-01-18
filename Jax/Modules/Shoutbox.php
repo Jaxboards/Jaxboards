@@ -48,9 +48,7 @@ final class Shoutbox implements Module
         private readonly Template $template,
         private readonly User $user,
     ) {
-        $this->avatarsEnabled = (bool) $this->config->getSetting(
-            'shoutboxava',
-        );
+        $this->avatarsEnabled = (bool) $this->config->getSetting('shoutboxava');
         $this->shoutlimit =
             (int) ($this->config->getSetting('shoutbox_num') ?? 5);
     }

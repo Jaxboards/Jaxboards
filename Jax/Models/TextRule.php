@@ -30,12 +30,7 @@ final class TextRule extends Model
     #[Column(name: 'needle', type: 'string', length: 50, nullable: false)]
     public string $needle = '';
 
-    #[Column(
-        name: 'replacement',
-        type: 'string',
-        length: 500,
-        nullable: false,
-    )]
+    #[Column(name: 'replacement', type: 'string', length: 500, nullable: false)]
     public string $replacement = '';
 
     #[Column(name: 'enabled', type: 'bool', default: true)]
