@@ -40,9 +40,7 @@ use Rector\TypeDeclaration\Rector\While_\WhileNullableToInstanceofRector;
 
 return RectorConfig::configure()
     ->withAttributesSets()
-    ->withBootstrapFiles([
-        __DIR__ . '/Tools/phpstan-bootstrap.php',
-    ])
+    ->withBootstrapFiles([__DIR__ . '/Tools/phpstan-bootstrap.php'])
     ->withCache(
         cacheDirectory: '/tmp/rector',
         // ensure file system caching is used instead of in-memory
@@ -54,9 +52,7 @@ return RectorConfig::configure()
         phpunit: false,
         symfony: false,
     )
-    ->withConfiguredRule(RemoveFuncCallRector::class, [
-        'var_dump',
-    ])
+    ->withConfiguredRule(RemoveFuncCallRector::class, ['var_dump'])
     ->withConfiguredRule(RenameFunctionRector::class, [
         'chop' => 'rtrim',
         'chr' => 'mb_chr',
@@ -217,9 +213,7 @@ return RectorConfig::configure()
         importShortClasses: true,
         removeUnusedImports: true,
     )
-    ->withPaths([
-        __DIR__,
-    ])
+    ->withPaths([__DIR__])
     ->withPhpSets()
     ->withPreparedSets(
         deadCode: true,
@@ -284,5 +278,4 @@ return RectorConfig::configure()
         // no need to touch vendor files
         __DIR__ . '/vendor',
         __DIR__ . '/node_modules',
-    ])
-;
+    ]);

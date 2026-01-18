@@ -54,7 +54,9 @@ final readonly class Utils implements Adapter
 
         foreach ($this->fileSystem->glob("{$directory}/*.php") as $model) {
             $fileInfo = $this->fileSystem->getFileInfo($model);
-            $models[] = str_replace('/', '\\', $directory) . $fileInfo->getBasename('.php');
+            $models[] =
+                str_replace('/', '\\', $directory) .
+                $fileInfo->getBasename('.php');
         }
 
         return $models;
@@ -96,10 +98,7 @@ final readonly class Utils implements Adapter
 
         foreach ($tableData as $rowIndex => $row) {
             foreach ($row as $columnName => $value) {
-                if (
-                    is_string($value)
-                    && !mb_check_encoding($value, 'UTF-8')
-                ) {
+                if (is_string($value) && !mb_check_encoding($value, 'UTF-8')) {
                     $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1');
                 }
 
@@ -111,14 +110,22 @@ final readonly class Utils implements Adapter
             }
         }
 
-        $values = implode(', ', array_map(
-            static fn($strRow): string => "({$strRow})",
-            array_map(static fn(array $row): string => implode(', ', $row), $rows),
-        ));
+        $values = implode(
+            ', ',
+            array_map(
+                static fn($strRow): string => "({$strRow})",
+                array_map(
+                    static fn(array $row): string => implode(', ', $row),
+                    $rows,
+                ),
+            ),
+        );
 
-        return "INSERT INTO `{$tableName}`"
-            . ' (' . implode(', ', $columnNames) . ')'
-            . " VALUES {$values};";
+        return "INSERT INTO `{$tableName}`" .
+            ' (' .
+            implode(', ', $columnNames) .
+            ')' .
+            " VALUES {$values};";
     }
 
     /**
@@ -130,7 +137,9 @@ final readonly class Utils implements Adapter
 
         foreach ($models as $modelClass) {
             $model = new $modelClass();
-            $queries[] = 'DROP TABLE IF EXISTS ' . $this->database->ftable($model::TABLE);
+            $queries[] =
+                'DROP TABLE IF EXISTS ' .
+                $this->database->ftable($model::TABLE);
             $queries[] = $this->adapter->createTableQueryFromModel($model);
         }
 
@@ -334,11 +343,11 @@ final readonly class Utils implements Adapter
         $post->id = 1;
         $post->author = 1;
         $post->post = <<<'POST'
-            Now, it's only a matter of time before you have everything set up.
-            You'll find everything you need to get started in the ACP (link at the top).
+        Now, it's only a matter of time before you have everything set up.
+        You'll find everything you need to get started in the ACP (link at the top).
 
-            Enjoy your forum!
-            POST;
+        Enjoy your forum!
+        POST;
         $post->tid = 1;
         $post->newtopic = 1;
         $post->date = $this->database->datetime();

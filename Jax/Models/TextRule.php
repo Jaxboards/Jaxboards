@@ -12,7 +12,15 @@ final class TextRule extends Model
 {
     public const TABLE = 'textrules';
 
-    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
+    #[
+        Column(
+            name: 'id',
+            type: 'int',
+            nullable: false,
+            autoIncrement: true,
+            unsigned: true,
+        ),
+    ]
     #[PrimaryKey]
     public int $id = 0;
 

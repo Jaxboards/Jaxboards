@@ -40,14 +40,14 @@ final class RSSFeed
         header('Content-type: application/rss+xml');
 
         return <<<EOT
-            <?xml version="1.0" encoding="UTF-8" ?>
-            <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-                <channel>
-                    <atom:link href="{$this->feed['link']}&amp;fmt=RSS" rel="self" type="application/rss+xml" />
-                    {$xmlFeed}
-                </channel>
-            </rss>
-            EOT;
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+            <channel>
+                <atom:link href="{$this->feed['link']}&amp;fmt=RSS" rel="self" type="application/rss+xml" />
+                {$xmlFeed}
+            </channel>
+        </rss>
+        EOT;
     }
 
     /**
@@ -58,8 +58,9 @@ final class RSSFeed
         $xml = '';
 
         foreach ($feed as $property => $value) {
-            $attributes = ($property === 'content' ? ' type="html"' : '');
-            $xml .= PHP_EOL . "<{$property}{$attributes}>{$value}</{$property}>";
+            $attributes = $property === 'content' ? ' type="html"' : '';
+            $xml .=
+                PHP_EOL . "<{$property}{$attributes}>{$value}</{$property}>";
         }
 
         return $xml;

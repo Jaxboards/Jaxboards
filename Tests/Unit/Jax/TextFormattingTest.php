@@ -85,18 +85,20 @@ final class TextFormattingTest extends UnitTestCase
     {
         $result = $this->textFormatting->theWorks(
             <<<'TEXT'
-                [code]hello[/code]
-                :)
-                world
-                TEXT,
+            [code]hello[/code]
+            :)
+            world
+            TEXT
+            ,
         );
 
         $this->assertEquals(
             <<<'HTML'
-                <div class="bbcode code ">hello</div><br>
-                <img src="/emoticons/keshaemotes/smile.gif" data-emoji=":)" alt=":)"><br>
-                world
-                HTML,
+            <div class="bbcode code ">hello</div><br>
+            <img src="/emoticons/keshaemotes/smile.gif" data-emoji=":)" alt=":)"><br>
+            world
+            HTML
+            ,
             $result,
         );
     }
@@ -113,7 +115,9 @@ final class TextFormattingTest extends UnitTestCase
         );
         $this->assertEquals(
             '[url=/topic/3?findpost=33&pid=33]Post #33[/url]',
-            $this->textFormatting->linkify('http://jaxboards.com/topic/3?findpost=33&pid=33'),
+            $this->textFormatting->linkify(
+                'http://jaxboards.com/topic/3?findpost=33&pid=33',
+            ),
         );
     }
 }

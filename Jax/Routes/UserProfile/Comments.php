@@ -31,15 +31,12 @@ final readonly class Comments
         $tabHTML .= $this->handleCommentCreation($member);
 
         if (
-            !$this->user->isGuest()
-            && $this->user->getGroup()?->canAddComments
+            !$this->user->isGuest() &&
+            $this->user->getGroup()?->canAddComments
         ) {
-            $tabHTML .= $this->template->render(
-                'userprofile/comment-form',
-                [
-                    'user' => $this->user->get(),
-                ],
-            );
+            $tabHTML .= $this->template->render('userprofile/comment-form', [
+                'user' => $this->user->get(),
+            ]);
         }
 
         $comments = ProfileComment::selectMany(
@@ -51,7 +48,9 @@ final readonly class Comments
 
         $membersById = Member::joinedOn(
             $comments,
-            static fn(ProfileComment $profileComment): int => $profileComment->from,
+            static fn(
+                ProfileComment $profileComment,
+            ): int => $profileComment->from,
         );
 
         if ($comments === []) {
@@ -59,18 +58,17 @@ final readonly class Comments
         }
 
         foreach ($comments as $comment) {
-            $canDelete = $this->user->isModerator()
-                || ($this->user->getGroup()?->canDeleteComments && $comment->from === $this->user->get()->id);
+            $canDelete =
+                $this->user->isModerator() ||
+                ($this->user->getGroup()?->canDeleteComments &&
+                    $comment->from === $this->user->get()->id);
 
-            $tabHTML .= $this->template->render(
-                'userprofile/comment',
-                [
-                    'canDelete' => $canDelete,
-                    'member' => $member,
-                    'comment' => $comment,
-                    'fromMember' => $membersById[$comment->from],
-                ],
-            );
+            $tabHTML .= $this->template->render('userprofile/comment', [
+                'canDelete' => $canDelete,
+                'member' => $member,
+                'comment' => $comment,
+                'fromMember' => $membersById[$comment->from],
+            ]);
         }
 
         return $tabHTML;
@@ -85,8 +83,8 @@ final readonly class Comments
 
         $error = null;
         if (
-            $this->user->isGuest()
-            || !$this->user->getGroup()?->canAddComments
+            $this->user->isGuest() ||
+            !$this->user->getGroup()?->canAddComments
         ) {
             $error = 'No permission to add comments!';
         }

@@ -49,21 +49,24 @@ final class Shoutbox implements Module
         private readonly User $user,
     ) {
         $this->avatarsEnabled = (bool) $this->config->getSetting('shoutboxava');
-        $this->shoutlimit = (int) ($this->config->getSetting('shoutbox_num') ?? 5);
+        $this->shoutlimit =
+            (int) ($this->config->getSetting('shoutbox_num') ?? 5);
     }
 
     public function init(): void
     {
         if (
-            !$this->template->has('shoutbox')
-            || !$this->config->getSetting('shoutbox')
-            || !$this->user->getGroup()?->canViewShoutbox
+            !$this->template->has('shoutbox') ||
+            !$this->config->getSetting('shoutbox') ||
+            !$this->user->getGroup()?->canViewShoutbox
         ) {
             return;
         }
 
         $shoutboxDelete = (int) $this->request->both('shoutbox_delete');
-        $shoutboxShout = trim($this->request->asString->post('shoutbox_shout') ?? '');
+        $shoutboxShout = trim(
+            $this->request->asString->post('shoutbox_shout') ?? '',
+        );
 
         if ($shoutboxShout !== '') {
             $this->addShout($shoutboxShout);
@@ -71,7 +74,8 @@ final class Shoutbox implements Module
 
         match (true) {
             $shoutboxDelete !== 0 => $this->deleteShout($shoutboxDelete),
-            $this->request->both('module') === 'shoutbox' => $this->showAllShouts(),
+            $this->request->both('module') === 'shoutbox'
+                => $this->showAllShouts(),
             $this->request->isJSAccess() => $this->updateShoutbox(),
             default => $this->displayShoutbox(),
         };
@@ -89,28 +93,22 @@ final class Shoutbox implements Module
     public function formatShout(Shout $shout, ?Member $member): string
     {
         if (str_starts_with($shout->shout, '/me ')) {
-            return $this->template->render(
-                'shoutbox/action',
-                [
-                    'avatarsEnabled' => $this->avatarsEnabled,
-                    'canDelete' => $this->canDelete($shout),
-                    'shout' => $shout,
-                    'timestamp' => $this->date->datetimeAsTimestamp($shout->date),
-                    'user' => $member,
-                ],
-            );
-        }
-
-        return $this->template->render(
-            'shoutbox/shout',
-            [
+            return $this->template->render('shoutbox/action', [
                 'avatarsEnabled' => $this->avatarsEnabled,
                 'canDelete' => $this->canDelete($shout),
                 'shout' => $shout,
                 'timestamp' => $this->date->datetimeAsTimestamp($shout->date),
                 'user' => $member,
-            ],
-        );
+            ]);
+        }
+
+        return $this->template->render('shoutbox/shout', [
+            'avatarsEnabled' => $this->avatarsEnabled,
+            'canDelete' => $this->canDelete($shout),
+            'shout' => $shout,
+            'timestamp' => $this->date->datetimeAsTimestamp($shout->date),
+            'user' => $member,
+        ]);
     }
 
     public function displayShoutbox(): void
@@ -127,7 +125,10 @@ final class Shoutbox implements Module
 
         $shoutHTML = '';
         foreach ($shouts as $shout) {
-            $shoutHTML .= $this->formatShout($shout, $members[$shout->uid] ?? null);
+            $shoutHTML .= $this->formatShout(
+                $shout,
+                $members[$shout->uid] ?? null,
+            );
         }
 
         $this->session->addVar('sb_id', $shouts[0]->id ?? 0);
@@ -137,17 +138,13 @@ final class Shoutbox implements Module
         $this->page->append(
             'SHOUTBOX',
             $this->page->collapseBox(
-                $this->template->render(
-                    'shoutbox/title',
-                ),
-                $this->template->render(
-                    'shoutbox/shoutbox',
-                    [
-                        'shouts' => $shoutHTML,
-                    ],
-                ),
+                $this->template->render('shoutbox/title'),
+                $this->template->render('shoutbox/shoutbox', [
+                    'shouts' => $shoutHTML,
+                ]),
                 'shoutbox',
-            ) . <<<HTML
+            ) .
+                <<<HTML
                 <script type='text/javascript'>
                     Object.assign(globalSettings, {
                         shoutLimit: {$this->shoutlimit},
@@ -181,7 +178,10 @@ final class Shoutbox implements Module
         );
 
         foreach ($shouts as $shout) {
-            $this->page->command('addshout', $this->formatShout($shout, $members[$shout->uid]));
+            $this->page->command(
+                'addshout',
+                $this->formatShout($shout, $members[$shout->uid]),
+            );
             $last = (int) $shout->id;
         }
 
@@ -213,10 +213,14 @@ final class Shoutbox implements Module
                 10,
             );
             foreach ($pageArray as $v) {
-                $pages .= '<a href="?module=shoutbox&page='
-                    . $v . '"'
-                    . ($v === ($pageNumber + 1) ? ' class="active"' : '')
-                    . '>' . $v . '</a> ';
+                $pages .=
+                    '<a href="?module=shoutbox&page=' .
+                    $v .
+                    '"' .
+                    ($v === $pageNumber + 1 ? ' class="active"' : '') .
+                    '>' .
+                    $v .
+                    '</a> ';
             }
 
             $pages .= '</span>';
@@ -242,16 +246,16 @@ final class Shoutbox implements Module
 
         $shoutHTML = '';
         foreach ($shouts as $shout) {
-            $shoutHTML .= $this->formatShout($shout, $membersById[$shout->uid] ?? null);
+            $shoutHTML .= $this->formatShout(
+                $shout,
+                $membersById[$shout->uid] ?? null,
+            );
         }
 
-        $page = $this->template->render(
-            'global/box',
-            [
-                'title' => 'Shoutbox' . $pages,
-                'content' => '<div class="sbhistory">' . $shoutHTML . '</div>',
-            ],
-        );
+        $page = $this->template->render('global/box', [
+            'title' => 'Shoutbox' . $pages,
+            'content' => '<div class="sbhistory">' . $shoutHTML . '</div>',
+        ]);
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
     }
@@ -259,7 +263,10 @@ final class Shoutbox implements Module
     public function deleteShout(int $delete): void
     {
         $shout = Shout::selectOne($delete);
-        $candelete = !$this->user->isGuest() && $shout !== null && $this->canDelete($shout);
+        $candelete =
+            !$this->user->isGuest() &&
+            $shout !== null &&
+            $this->canDelete($shout);
 
         if (!$candelete) {
             $this->router->redirect('index');
@@ -268,11 +275,7 @@ final class Shoutbox implements Module
         }
 
         $this->page->command('softurl');
-        $this->database->delete(
-            'shouts',
-            Database::WHERE_ID_EQUALS,
-            $delete,
-        );
+        $this->database->delete('shouts', Database::WHERE_ID_EQUALS, $delete);
     }
 
     public function addShout(string $shoutBody): void
@@ -281,8 +284,10 @@ final class Shoutbox implements Module
 
         $error = match (true) {
             $this->user->isGuest() => 'You must be logged in to shout!',
-            !$this->user->getGroup()?->canShout => 'You do not have permission to shout!',
-            mb_strlen($shoutBody) > 300 => 'Shout must be less than 300 characters.',
+            !$this->user->getGroup()?->canShout
+                => 'You do not have permission to shout!',
+            mb_strlen($shoutBody) > 300
+                => 'Shout must be less than 300 characters.',
             default => null,
         };
 

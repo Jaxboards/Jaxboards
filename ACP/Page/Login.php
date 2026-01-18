@@ -41,13 +41,16 @@ final readonly class Login
             $password = $this->request->asString->post('pass');
 
             $member = Member::selectOne('WHERE `name`=?', $user);
-            $user = $member !== null
-                ? $this->user->login($member->id, $password)
-                : null;
+            $user =
+                $member !== null
+                    ? $this->user->login($member->id, $password)
+                    : null;
 
             $error = match (true) {
-                $user === null => 'The username/password supplied was incorrect',
-                !$this->user->getGroup()?->canAccessACP => 'You are not authorized to log in to the ACP',
+                $user === null
+                    => 'The username/password supplied was incorrect',
+                !$this->user->getGroup()?->canAccessACP
+                    => 'You are not authorized to log in to the ACP',
                 default => null,
             };
 
@@ -64,9 +67,6 @@ final readonly class Login
             }
         }
 
-        echo $this->page->render(
-            'login.html',
-            $pageElements,
-        );
+        echo $this->page->render('login.html', $pageElements);
     }
 }

@@ -112,7 +112,12 @@ final class TopicTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('#path li a', 'Example Forums', 1, $page);
         DOMAssert::assertSelectEquals('#path li a', 'Category', 1, $page);
         DOMAssert::assertSelectEquals('#path li a', 'Forum', 2, $page);
-        DOMAssert::assertSelectEquals('#path li a', 'Welcome to Jaxboards!', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '#path li a',
+            'Welcome to Jaxboards!',
+            1,
+            $page,
+        );
 
         DOMAssert::assertSelectRegExp(
             '#page .box .title',
@@ -122,15 +127,45 @@ final class TopicTest extends FeatureTestCase
         );
 
         DOMAssert::assertSelectEquals('#pid_1 .username', 'Admin', 1, $page);
-        DOMAssert::assertSelectEquals('#pid_1 .signature', 'I like tacos', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '#pid_1 .signature',
+            'I like tacos',
+            1,
+            $page,
+        );
 
-        DOMAssert::assertSelectRegExp('#pid_1 .post_content', '/only a matter of time/', 1, $page);
+        DOMAssert::assertSelectRegExp(
+            '#pid_1 .post_content',
+            '/only a matter of time/',
+            1,
+            $page,
+        );
 
-        DOMAssert::assertSelectRegExp('#pid_1 .userstats', '/Status: Online!/', 1, $page);
-        DOMAssert::assertSelectRegExp('#pid_1 .userstats', '/Group: Admin/', 1, $page);
-        DOMAssert::assertSelectRegExp('#pid_1 .userstats', '/Member: #1/', 1, $page);
+        DOMAssert::assertSelectRegExp(
+            '#pid_1 .userstats',
+            '/Status: Online!/',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectRegExp(
+            '#pid_1 .userstats',
+            '/Group: Admin/',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectRegExp(
+            '#pid_1 .userstats',
+            '/Member: #1/',
+            1,
+            $page,
+        );
 
-        DOMAssert::assertSelectEquals('#statusers .userGoogleBot', 'GoogleBot', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '#statusers .userGoogleBot',
+            'GoogleBot',
+            1,
+            $page,
+        );
     }
 
     public function testOpenGraphEmbed(): void
@@ -143,36 +178,45 @@ final class TopicTest extends FeatureTestCase
         $post->post = 'hello';
         $post->tid = 1;
         $post->openGraphMetadata = <<<'JSON'
-            {
-                "https:\/\/www.youtube.com\/watch?v=qjqPT89KaCc": {
-                    "site_name":"YouTube",
-                    "url":"https:\/\/www.youtube.com\/watch?v=qjqPT89KaCc",
-                    "title":"Uber Freight Dropped my Mainframe... Let's Fix it!",
-                    "image":"https:\/\/i.ytimg.com\/vi\/qjqPT89KaCc\/hqdefault.jpg",
-                    "image:width":"480",
-                    "image:height":"360",
-                    "description":"Dave chronicles the destruction and restoration of a rare PDP-11\/44 system.",
-                    "type":"video.other",
-                    "video:url":"https:\/\/www.youtube.com\/embed\/qjqPT89KaCc",
-                    "video:secure_url":"https:\/\/www.youtube.com\/embed\/qjqPT89KaCc",
-                    "video:type":"text\/html",
-                    "video:width":"1280",
-                    "video:height":"720"
-                }
+        {
+            "https:\/\/www.youtube.com\/watch?v=qjqPT89KaCc": {
+                "site_name":"YouTube",
+                "url":"https:\/\/www.youtube.com\/watch?v=qjqPT89KaCc",
+                "title":"Uber Freight Dropped my Mainframe... Let's Fix it!",
+                "image":"https:\/\/i.ytimg.com\/vi\/qjqPT89KaCc\/hqdefault.jpg",
+                "image:width":"480",
+                "image:height":"360",
+                "description":"Dave chronicles the destruction and restoration of a rare PDP-11\/44 system.",
+                "type":"video.other",
+                "video:url":"https:\/\/www.youtube.com\/embed\/qjqPT89KaCc",
+                "video:secure_url":"https:\/\/www.youtube.com\/embed\/qjqPT89KaCc",
+                "video:type":"text\/html",
+                "video:width":"1280",
+                "video:height":"720"
             }
-            JSON;
+        }
+        JSON;
         $post->insert();
 
         $page = $this->go('/topic/1');
 
-        DOMAssert::assertSelectCount('.opengraph a[href="https://www.youtube.com/watch?v=qjqPT89KaCc"]', 2, $page);
+        DOMAssert::assertSelectCount(
+            '.opengraph a[href="https://www.youtube.com/watch?v=qjqPT89KaCc"]',
+            2,
+            $page,
+        );
         DOMAssert::assertSelectEquals(
             '.opengraph h4',
             "YouTube - Uber Freight Dropped my Mainframe... Let's Fix it!",
             1,
             $page,
         );
-        DOMAssert::assertSelectRegExp('.opengraph p', '/chronicles the destruction and restoration/', 1, $page);
+        DOMAssert::assertSelectRegExp(
+            '.opengraph p',
+            '/chronicles the destruction and restoration/',
+            1,
+            $page,
+        );
         DOMAssert::assertSelectCount(
             '.opengraph img[src="https://i.ytimg.com/vi/qjqPT89KaCc/hqdefault.jpg"]',
             1,
@@ -184,10 +228,12 @@ final class TopicTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            get: ['path' => 'topic/1'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::UPDATING->value],
-        ));
+        $page = $this->go(
+            new Request(
+                get: ['path' => 'topic/1'],
+                server: ['HTTP_X_JSACCESS' => JSAccess::UPDATING->value],
+            ),
+        );
 
         $json = json_decode($page, true);
 
@@ -200,15 +246,20 @@ final class TopicTest extends FeatureTestCase
     {
         $this->actingAs('admin', sessionOverrides: ['multiquote' => 1]);
 
-        $page = $this->go(new Request(
-            get: ['path' => 'topic/1', 'qreply' => '1'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(
+            new Request(
+                get: ['path' => 'topic/1', 'qreply' => '1'],
+                server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+            ),
+        );
 
         $json = json_decode($page, true);
 
         $this->assertContainsEquals(['softurl'], $json);
-        $window = array_find($json, static fn($item): bool => $item[0] === 'window');
+        $window = array_find(
+            $json,
+            static fn($item): bool => $item[0] === 'window',
+        );
 
         DOMAssert::assertSelectRegExp(
             '.topic-reply-form textarea[name="postdata"]',
@@ -224,8 +275,18 @@ final class TopicTest extends FeatureTestCase
 
         $page = $this->go('/topic/1?fmt=RSS');
 
-        DOMAssert::assertSelectEquals('title', 'Welcome to Jaxboards!', 1, $page);
-        DOMAssert::assertSelectRegExp('item description', '/only a matter of time/', 1, $page);
+        DOMAssert::assertSelectEquals(
+            'title',
+            'Welcome to Jaxboards!',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectRegExp(
+            'item description',
+            '/only a matter of time/',
+            1,
+            $page,
+        );
     }
 
     private function insertBotViewingTopic(): void

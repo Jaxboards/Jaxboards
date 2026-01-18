@@ -35,11 +35,8 @@ final class Hooks
             return;
         }
 
-        array_map(
-            static function (callable $callable) use ($payload): void {
-                $callable(...$payload);
-            },
-            $this->hooks[$hookName],
-        );
+        array_map(static function (callable $callable) use ($payload): void {
+            $callable(...$payload);
+        }, $this->hooks[$hookName]);
     }
 }

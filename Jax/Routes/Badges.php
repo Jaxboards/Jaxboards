@@ -55,7 +55,9 @@ final readonly class Badges implements Route
 
         $badges = Badge::joinedOn(
             $badgeAssociations,
-            static fn(BadgeAssociation $badgeAssociation): int => $badgeAssociation->badge,
+            static fn(
+                BadgeAssociation $badgeAssociation,
+            ): int => $badgeAssociation->badge,
         );
 
         $badgesPerUser = [];
@@ -115,7 +117,9 @@ final readonly class Badges implements Route
 
         $membersWithBadges = Member::joinedOn(
             $badgeAssociations,
-            static fn(BadgeAssociation $badgeAssociation): int => $badgeAssociation->user,
+            static fn(
+                BadgeAssociation $badgeAssociation,
+            ): int => $badgeAssociation->user,
         );
 
         $page = $this->page->collapseBox(
@@ -128,7 +132,9 @@ final readonly class Badges implements Route
             'badges_' . $badge->id,
         );
 
-        $this->page->setPageTitle("Viewing Recipients of {$badge->badgeTitle} badge");
+        $this->page->setPageTitle(
+            "Viewing Recipients of {$badge->badgeTitle} badge",
+        );
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
     }

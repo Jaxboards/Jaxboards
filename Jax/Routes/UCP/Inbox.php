@@ -52,10 +52,12 @@ final readonly class Inbox
         $dmessage = $this->request->post('dmessage');
 
         if (is_array($dmessage)) {
-            $this->deleteMessages(array_map(
-                static fn($messageId): int => (int) $messageId,
-                $dmessage,
-            ));
+            $this->deleteMessages(
+                array_map(
+                    static fn($messageId): int => (int) $messageId,
+                    $dmessage,
+                ),
+            );
         }
 
         return match (true) {
@@ -105,27 +107,32 @@ final readonly class Inbox
         $message->insert();
 
         // Give them a notification.
-        $cmd = json_encode(
-            [
-                'newmessage',
-                'You have a new message from ' . $this->user->get()->displayName,
-                $message->id,
-            ],
-            JSON_THROW_ON_ERROR,
-        ) . PHP_EOL;
+        $cmd =
+            json_encode(
+                [
+                    'newmessage',
+                    'You have a new message from ' .
+                    $this->user->get()->displayName,
+                    $message->id,
+                ],
+                JSON_THROW_ON_ERROR,
+            ) . PHP_EOL;
 
         $this->database->special(
             <<<'SQL'
-                UPDATE %t
-                SET `runonce`=concat(`runonce`,?)
-                WHERE `uid`=?
-                SQL,
+            UPDATE %t
+            SET `runonce`=concat(`runonce`,?)
+            WHERE `uid`=?
+            SQL
+            ,
             ['session'],
             $cmd,
             $member->id,
         );
 
-        $inboxURL = $this->domainDefinitions->getBoardUrl() . $this->router->url('inbox');
+        $inboxURL =
+            $this->domainDefinitions->getBoardUrl() .
+            $this->router->url('inbox');
 
         // Send em an email!
         if (($member->emailSettings & 2) !== 0) {
@@ -134,24 +141,22 @@ final readonly class Inbox
                 $member->email,
                 "PM From {$fromName}",
                 <<<HTML
-                    You are receiving this email because you've
-                    received a message from {$fromName} on {BOARDLINK}<br>
-                    Please go to <a href='{$inboxURL}'>{$inboxURL}</a>
-                    to view your message.
-                    HTML,
+                You are receiving this email because you've
+                received a message from {$fromName} on {BOARDLINK}<br>
+                Please go to <a href='{$inboxURL}'>{$inboxURL}</a>
+                to view your message.
+                HTML
+                ,
             );
         }
 
         return null;
     }
 
-    private function compose(
-        ?int $messageId = null,
-        string $todo = '',
-    ): ?string {
+    private function compose(?int $messageId = null, string $todo = ''): ?string
+    {
         $error = null;
         $recipient = null;
-
 
         $mid = (int) $this->request->asString->both('mid');
         $to = $this->request->asString->both('to');
@@ -191,22 +196,23 @@ final readonly class Inbox
                     $recipient = $sender;
                 }
 
-                $messageTitle = ($todo === 'reply' ? 'RE:' : 'FWD:') . $message->title;
-                $messageBody = PHP_EOL . PHP_EOL . PHP_EOL
-                    . "[quote={$sender->displayName}]{$message->message}[/quote]";
+                $messageTitle =
+                    ($todo === 'reply' ? 'RE:' : 'FWD:') . $message->title;
+                $messageBody =
+                    PHP_EOL .
+                    PHP_EOL .
+                    PHP_EOL .
+                    "[quote={$sender->displayName}]{$message->message}[/quote]";
             }
         }
 
-        return $this->template->render(
-            'inbox/compose',
-            [
-                'error' => $error,
-                'success' => $sentMessage && $error === null,
-                'recipient' => $recipient,
-                'messageTitle' => $messageTitle,
-                'messageBody' => $messageBody,
-            ],
-        );
+        return $this->template->render('inbox/compose', [
+            'error' => $error,
+            'success' => $sentMessage && $error === null,
+            'recipient' => $recipient,
+            'messageTitle' => $messageTitle,
+            'messageBody' => $messageBody,
+        ]);
     }
 
     private function delete(int $messageId, bool $relocate = true): void
@@ -238,12 +244,9 @@ final readonly class Inbox
             return;
         }
 
-        $this->router->redirect(
-            'inbox',
-            [
-                'page' => $this->request->asString->both('prevpage') ?? '',
-            ],
-        );
+        $this->router->redirect('inbox', [
+            'page' => $this->request->asString->both('prevpage') ?? '',
+        ]);
     }
 
     /**
@@ -314,10 +317,7 @@ final readonly class Inbox
 
     private function viewMessage(string $messageId): ?string
     {
-        if (
-            $this->request->isJSUpdate()
-            && !$this->request->isJSDirectLink()
-        ) {
+        if ($this->request->isJSUpdate() && !$this->request->isJSDirectLink()) {
             return null;
         }
 
@@ -338,22 +338,25 @@ final readonly class Inbox
             return "You don't have permission to view this message.";
         }
 
-        $otherMember = Member::selectOne($userIsRecipient ? $message->from : $message->to);
+        $otherMember = Member::selectOne(
+            $userIsRecipient ? $message->from : $message->to,
+        );
 
         if (!$message->read && $userIsRecipient) {
             $message->read = 1;
             $message->update();
 
-            $this->page->command('update', 'num-messages', $this->fetchMessageCount('unread'));
+            $this->page->command(
+                'update',
+                'num-messages',
+                $this->fetchMessageCount('unread'),
+            );
         }
 
-        return $this->template->render(
-            'inbox/message-view',
-            [
-                'message' => $message,
-                'otherMember' => $otherMember,
-            ],
-        );
+        return $this->template->render('inbox/message-view', [
+            'message' => $message,
+            'otherMember' => $otherMember,
+        ]);
     }
 
     private function viewMessages(string $view = 'inbox'): string
@@ -368,49 +371,59 @@ final readonly class Inbox
             10,
         );
 
-        $pages .= implode(' &middot; ', array_map(function (int $pageNumber) use ($requestPage, $view): string {
-            $active = $pageNumber === $requestPage ? ' class="active"' : '';
-            $pageURL = $this->router->url('ucp', [
-                'view' => $view,
-                'page' => $pageNumber,
-            ]);
+        $pages .= implode(
+            ' &middot; ',
+            array_map(function (int $pageNumber) use (
+                $requestPage,
+                $view,
+            ): string {
+                $active = $pageNumber === $requestPage ? ' class="active"' : '';
+                $pageURL = $this->router->url('ucp', [
+                    'view' => $view,
+                    'page' => $pageNumber,
+                ]);
 
-            return <<<HTML
+                return <<<HTML
                 <a href="{$pageURL}" {$active}>{$pageNumber}</a>
                 HTML;
-        }, $pageNumbers));
+            }, $pageNumbers),
+        );
 
         $messages = $this->fetchMessages($view, $requestPage - 1);
 
-        $getMessageMemberId = $view === 'sent'
-            ? static fn(Message $message): ?int => $message->to
-            : static fn(Message $message): ?int => $message->from;
+        $getMessageMemberId =
+            $view === 'sent'
+                ? static fn(Message $message): ?int => $message->to
+                : static fn(Message $message): ?int => $message->from;
 
-        $membersById = Member::joinedOn(
-            $messages,
-            $getMessageMemberId,
-        );
+        $membersById = Member::joinedOn($messages, $getMessageMemberId);
 
         $readCounts = Lodash::countBy(
             $messages,
-            static fn(Message $message): string => $message->read !== 0 ? 'read' : 'unread',
+            static fn(Message $message): string => $message->read !== 0
+                ? 'read'
+                : 'unread',
         );
-        $rows = array_map(static fn(Message $message): array => [
-            'message' => $message,
-            'otherMember' => $membersById[$getMessageMemberId($message)],
-        ], $messages);
+        $rows = array_map(
+            static fn(Message $message): array => [
+                'message' => $message,
+                'otherMember' => $membersById[$getMessageMemberId($message)],
+            ],
+            $messages,
+        );
 
         if ($view === 'inbox') {
-            $this->page->command('update', 'num-messages', $readCounts['unread'] ?? 0);
+            $this->page->command(
+                'update',
+                'num-messages',
+                $readCounts['unread'] ?? 0,
+            );
         }
 
-        return $this->template->render(
-            'inbox/messages-listing',
-            [
-                'pages' => $pages,
-                'view' => $view,
-                'rows' => $rows,
-            ],
-        );
+        return $this->template->render('inbox/messages-listing', [
+            'pages' => $pages,
+            'view' => $view,
+            'rows' => $rows,
+        ]);
     }
 }

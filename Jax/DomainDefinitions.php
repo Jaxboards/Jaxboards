@@ -24,19 +24,20 @@ final class DomainDefinitions
         private readonly ServiceConfig $serviceConfig,
         Request $request,
     ) {
-
         // Figure out url.
-        $host = $request->server('SERVER_NAME') ?? (string) $this->serviceConfig->getSetting('domain');
+        $host =
+            $request->server('SERVER_NAME') ??
+            (string) $this->serviceConfig->getSetting('domain');
         $port = $request->server('SERVER_PORT') ?? '443';
         $scheme = $request->server('REQUEST_SCHEME') ?? 'https';
 
         // Build the url.
         $boardURL = $scheme . '://' . $host;
         if (
-            !($port === '443' && $scheme === 'https')
-            && !($port === '80' && $scheme === 'http')
+            !($port === '443' && $scheme === 'https') &&
+            !($port === '80' && $scheme === 'http')
         ) {
-            $boardURL .= ($port !== '' && $port !== '0' ? ':' . $port : '');
+            $boardURL .= $port !== '' && $port !== '0' ? ':' . $port : '';
         }
 
         $this->boardURL = $boardURL;
@@ -76,7 +77,9 @@ final class DomainDefinitions
 
     public function getBoardPathUrl(): string
     {
-        return $this->boardURL . '/' . $this->fileSystem->pathJoin('boards', $this->prefix);
+        return $this->boardURL .
+            '/' .
+            $this->fileSystem->pathJoin('boards', $this->prefix);
     }
 
     /**
@@ -88,7 +91,11 @@ final class DomainDefinitions
     private function getPrefix(string $host): ?string
     {
         if ($this->serviceConfig->getSetting('service')) {
-            $domainMatch = str_replace('.', '\.', $this->serviceConfig->getSetting('domain'));
+            $domainMatch = str_replace(
+                '.',
+                '\.',
+                $this->serviceConfig->getSetting('domain'),
+            );
 
             preg_match("/(.*)\\.{$domainMatch}/i", $host, $matches);
 

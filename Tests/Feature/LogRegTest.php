@@ -91,7 +91,12 @@ final class LogRegTest extends FeatureTestCase
     {
         $page = $this->go('/register');
 
-        DOMAssert::assertSelectEquals('.box.register', 'Registration', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '.box.register',
+            'Registration',
+            1,
+            $page,
+        );
         DOMAssert::assertSelectCount('input[name=name]', 1, $page);
         DOMAssert::assertSelectCount('input[name=display_name]', 1, $page);
         DOMAssert::assertSelectCount('input[name=pass1]', 1, $page);
@@ -101,17 +106,19 @@ final class LogRegTest extends FeatureTestCase
 
     public function testRegistration(): void
     {
-        $page = $this->go(new Request(
-            get: ['path' => 'register'],
-            post: [
-                'register' => 'true',
-                'name' => 'Sean',
-                'display_name' => 'Sean',
-                'pass1' => 'password',
-                'pass2' => 'password',
-                'email' => 'test@test.com',
-            ],
-        ));
+        $page = $this->go(
+            new Request(
+                get: ['path' => 'register'],
+                post: [
+                    'register' => 'true',
+                    'name' => 'Sean',
+                    'display_name' => 'Sean',
+                    'pass1' => 'password',
+                    'pass2' => 'password',
+                    'email' => 'test@test.com',
+                ],
+            ),
+        );
 
         $this->assertRedirect('index', [], $page);
         $this->assertEquals('Sean', Member::selectOne(1)->displayName);
@@ -124,7 +131,12 @@ final class LogRegTest extends FeatureTestCase
 
         $page = $this->go('/logout');
 
-        DOMAssert::assertSelectEquals('.success', 'Logged out successfully', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '.success',
+            'Logged out successfully',
+            1,
+            $page,
+        );
         DOMAssert::assertSelectEquals('.box.login', 'Login', 1, $page);
     }
 
@@ -144,13 +156,15 @@ final class LogRegTest extends FeatureTestCase
         // This just ensures the admin model is inserted
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            get: ['path' => '/login'],
-            post: [
-                'user' => 'Admin',
-                'pass' => 'password',
-            ],
-        ));
+        $page = $this->go(
+            new Request(
+                get: ['path' => '/login'],
+                post: [
+                    'user' => 'Admin',
+                    'pass' => 'password',
+                ],
+            ),
+        );
 
         $this->assertRedirect('index', [], $page);
 
@@ -169,7 +183,12 @@ final class LogRegTest extends FeatureTestCase
 
         $page = $this->go('/forgotPassword');
 
-        DOMAssert::assertSelectEquals('.box.login', 'Forgot Password', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '.box.login',
+            'Forgot Password',
+            1,
+            $page,
+        );
         DOMAssert::assertSelectCount('input[name=user]', 1, $page);
     }
 }

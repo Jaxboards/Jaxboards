@@ -63,9 +63,10 @@ final readonly class Reactions
         $this->page->command('softurl');
         $post = Post::selectOne($pid);
 
-        $ratings = $post !== null && $post->rating !== ''
-            ? json_decode($post->rating, true, flags: JSON_THROW_ON_ERROR)
-            : [];
+        $ratings =
+            $post !== null && $post->rating !== ''
+                ? json_decode($post->rating, true, flags: JSON_THROW_ON_ERROR)
+                : [];
 
         if ($ratings === []) {
             return;
@@ -89,10 +90,19 @@ final readonly class Reactions
         $page = '';
         foreach ($ratings as $index => $rating) {
             $page .= '<div class="column">';
-            $page .= '<img src="' . $niblets[$index]->img . '"> '
-                . $niblets[$index]->title . '<ul>';
+            $page .=
+                '<img src="' .
+                $niblets[$index]->img .
+                '"> ' .
+                $niblets[$index]->title .
+                '<ul>';
             foreach ($rating as $mid) {
-                $page .= '<li>' . $this->template->render('user-link', ['user' => $mdata[$mid]]) . '</li>';
+                $page .=
+                    '<li>' .
+                    $this->template->render('user-link', [
+                        'user' => $mdata[$mid],
+                    ]) .
+                    '</li>';
             }
 
             $page .= '</ul></div>';
@@ -108,22 +118,25 @@ final readonly class Reactions
             return '';
         }
 
-        $prating = $post->rating !== ''
-            ? json_decode($post->rating, true, flags: JSON_THROW_ON_ERROR)
-            : [];
+        $prating =
+            $post->rating !== ''
+                ? json_decode($post->rating, true, flags: JSON_THROW_ON_ERROR)
+                : [];
         $postratingbuttons = '';
         $showrating = '';
 
         foreach ($this->fetchRatingNiblets() as $ratingNiblet) {
-            $nibletHTML = $this->template->render('global/rating-niblet', ['ratingNiblet' => $ratingNiblet]);
+            $nibletHTML = $this->template->render('global/rating-niblet', [
+                'ratingNiblet' => $ratingNiblet,
+            ]);
             $ratePostURL = $this->router->url('topic', [
                 'id' => $post->tid,
                 'ratepost' => $post->id,
                 'niblet' => $ratingNiblet->id,
             ]);
             $postratingbuttons .= <<<HTML
-                <a href="{$ratePostURL}">{$nibletHTML}</a>
-                HTML;
+            <a href="{$ratePostURL}">{$nibletHTML}</a>
+            HTML;
             if (!array_key_exists($ratingNiblet->id, $prating)) {
                 continue;
             }
@@ -134,18 +147,18 @@ final readonly class Reactions
 
             $num = 'x' . count($prating[$ratingNiblet->id]);
             $postratingbuttons .= $num;
-            $showrating .= $this->template->render('global/rating-niblet', ['ratingNiblet' => $ratingNiblet]) . $num;
+            $showrating .=
+                $this->template->render('global/rating-niblet', [
+                    'ratingNiblet' => $ratingNiblet,
+                ]) . $num;
         }
 
-        return $this->template->render(
-            'global/rating-wrapper',
-            [
-                'post' => $post,
-                'postratingbuttons' => $postratingbuttons,
-                'isAnonymousReactionsEnabled' => $this->isAnonymousReactionsEnabled(),
-                'showrating' => $showrating,
-            ],
-        );
+        return $this->template->render('global/rating-wrapper', [
+            'post' => $post,
+            'postratingbuttons' => $postratingbuttons,
+            'isAnonymousReactionsEnabled' => $this->isAnonymousReactionsEnabled(),
+            'showrating' => $showrating,
+        ]);
     }
 
     public function toggleReaction(int $postid, int $nibletid): void
@@ -158,18 +171,19 @@ final readonly class Reactions
         $ratings = [];
 
         if (
-            !$post
-            || !array_key_exists($nibletid, $niblets)
-            || $this->user->isGuest()
+            !$post ||
+            !array_key_exists($nibletid, $niblets) ||
+            $this->user->isGuest()
         ) {
             $this->page->command('error', 'Invalid parameters');
 
             return;
         }
 
-        $ratings = $post->rating !== '' && $post->rating !== '0'
-            ? json_decode($post->rating, true, flags: JSON_THROW_ON_ERROR)
-            : [];
+        $ratings =
+            $post->rating !== '' && $post->rating !== '0'
+                ? json_decode($post->rating, true, flags: JSON_THROW_ON_ERROR)
+                : [];
 
         if (!array_key_exists($nibletid, $ratings)) {
             $ratings[$nibletid] = [];
@@ -178,16 +192,23 @@ final readonly class Reactions
         $unrate = in_array($this->user->get()->id, $ratings[$nibletid], true);
         // Unrate
         if ($unrate) {
-            $ratings[$nibletid] = array_diff($ratings[$nibletid], [$this->user->get()->id]);
+            $ratings[$nibletid] = array_diff($ratings[$nibletid], [
+                $this->user->get()->id,
+            ]);
         } else {
             // Rate
             $ratings[$nibletid][] = $this->user->get()->id;
         }
 
-        $post->rating = json_encode($ratings, JSON_THROW_ON_ERROR) ?: $post->rating;
+        $post->rating =
+            json_encode($ratings, JSON_THROW_ON_ERROR) ?: $post->rating;
         $post->update();
 
-        $this->page->command('update', "#reaction_p{$post->id}", $this->render($post));
+        $this->page->command(
+            'update',
+            "#reaction_p{$post->id}",
+            $this->render($post),
+        );
     }
 
     private function getRatingSetting(): int

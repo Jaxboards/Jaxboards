@@ -109,7 +109,8 @@ final class Router
         array $params = [],
         ?string $hash = null,
     ): void {
-        $newLocation = ($this->url($newLocation, $params) ?: $newLocation) . ($hash ?? '');
+        $newLocation =
+            ($this->url($newLocation, $params) ?: $newLocation) . ($hash ?? '');
 
         if (!$this->request->hasCookies() && $newLocation[0] === '/') {
             $newLocation .= '&sessid=' . $this->session->get()->id;
@@ -123,7 +124,10 @@ final class Router
         }
 
         header("Location: {$newLocation}");
-        $this->page->append('PAGE', "Should've redirected to Location: {$newLocation}");
+        $this->page->append(
+            'PAGE',
+            "Should've redirected to Location: {$newLocation}",
+        );
     }
 
     /**
@@ -143,7 +147,9 @@ final class Router
             return true;
         }
 
-        return (bool) $this->container->get(CustomPage::class)->route(trim($path, '/'));
+        return (bool) $this->container
+            ->get(CustomPage::class)
+            ->route(trim($path, '/'));
     }
 
     /**
@@ -181,7 +187,10 @@ final class Router
             // Anything not a path param gets added on as a query parameter
             $queryParams = $this->without($params, $foundParams);
 
-            return $path . ($queryParams !== [] ? '?' . http_build_query($queryParams) : '');
+            return $path .
+                ($queryParams !== []
+                    ? '?' . http_build_query($queryParams)
+                    : '');
         }
 
         // These are aliases
@@ -202,7 +211,10 @@ final class Router
         $this->urls[$name] = $path;
 
         // Replaces {param} with a name-captured subgroup (?<param>.*) and makes a full regex
-        $regexedPath = '@^' . preg_replace('/\/\{(\w+)\}/', '(?:\/(?<$1>[^/]+))?', $path) . '$@';
+        $regexedPath =
+            '@^' .
+            preg_replace('/\/\{(\w+)\}/', '(?:\/(?<$1>[^/]+))?', $path) .
+            '$@';
         $this->paths[$regexedPath] = $classString;
     }
 
@@ -232,8 +244,8 @@ final class Router
             return true;
         }
 
-        return $this->config->getSetting('boardoffline')
-            && !$this->user->getGroup()->canViewOfflineBoard;
+        return $this->config->getSetting('boardoffline') &&
+            !$this->user->getGroup()->canViewOfflineBoard;
     }
 
     /**

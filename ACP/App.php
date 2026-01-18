@@ -53,7 +53,10 @@ final class App
         }
 
         $this->page->append('username', $this->user->get()->displayName);
-        $this->page->append('title', $this->config->getSetting('boardname') . ' - ACP');
+        $this->page->append(
+            'title',
+            $this->config->getSetting('boardname') . ' - ACP',
+        );
 
         $this->renderNav();
 
@@ -65,7 +68,10 @@ final class App
         }
 
         if ($this->ipAddress->isLocalHost()) {
-            $this->page->addContentBox('Debug', implode('<br>', $this->debugLog->getLog()));
+            $this->page->addContentBox(
+                'Debug',
+                implode('<br>', $this->debugLog->getLog()),
+            );
         }
 
         $this->page->out();
@@ -82,33 +88,24 @@ final class App
     {
         $url = "?act={$title}";
 
-        $this->nav['links'] .= $this->page->render(
-            'nav-link.html',
-            [
-                'class' => mb_strtolower($title),
-                'page' => $url,
-                'title' => $title,
-            ],
-        );
+        $this->nav['links'] .= $this->page->render('nav-link.html', [
+            'class' => mb_strtolower($title),
+            'page' => $url,
+            'title' => $title,
+        ]);
 
         $dropdownLinks = '';
         foreach ($menu as $do => $menuTitle) {
-            $dropdownLinks .= $this->page->render(
-                'nav-dropdown-link.html',
-                [
-                    'title' => $menuTitle,
-                    'url' => "{$url}&do={$do}",
-                ],
-            );
+            $dropdownLinks .= $this->page->render('nav-dropdown-link.html', [
+                'title' => $menuTitle,
+                'url' => "{$url}&do={$do}",
+            ]);
         }
 
-        $this->nav['dropdowns'] .= $this->page->render(
-            'nav-dropdown.html',
-            [
-                'dropdown_id' => 'menu_' . mb_strtolower($title),
-                'dropdown_links' => $dropdownLinks,
-            ],
-        );
+        $this->nav['dropdowns'] .= $this->page->render('nav-dropdown.html', [
+            'dropdown_id' => 'menu_' . mb_strtolower($title),
+            'dropdown_links' => $dropdownLinks,
+        ]);
     }
 
     private function hasACPAccess(): bool
@@ -123,72 +120,48 @@ final class App
 
     private function renderNav(): void
     {
-        $this->addNavMenu(
-            'Settings',
-            [
-                'global' => 'Global Settings',
-                'pages' => 'Custom Pages',
-                'shoutbox' => 'Shoutbox',
-                'badges' => 'Badges',
-                'webhooks' => 'Webhooks',
-            ],
-        );
-        $this->addNavMenu(
-            'Members',
-            [
-                'delete' => 'Delete Account',
-                'edit' => 'Edit',
-                'ipbans' => 'IP Bans',
-                'massmessage' => 'Mass Message',
-                'merge' => 'Account Merge',
-                'prereg' => 'Pre-Register',
-                'validation' => 'Validation',
-            ],
-        );
-        $this->addNavMenu(
-            'Groups',
-            [
-                'create' => 'Create Group',
-                'delete' => 'Delete Groups',
-                'perms' => 'Edit Permissions',
-            ],
-        );
-        $this->addNavMenu(
-            'Themes',
-            [
-                'create' => 'Create Skin',
-                'manage' => 'Manage Skin(s)',
-            ],
-        );
-        $this->addNavMenu(
-            'Posting',
-            [
-                'emoticons' => 'Emoticons',
-                'postRating' => 'Post Rating',
-                'wordfilter' => 'Word Filter',
-            ],
-        );
-        $this->addNavMenu(
-            'Forums',
-            [
-                'create' => 'Create Forum',
-                'createc' => 'Create Category',
-                'order' => 'Manage',
-                'recountstats' => 'Recount Statistics',
-            ],
-        );
-        $this->addNavMenu(
-            'Tools',
-            [
-                'backup' => 'Backup Forum',
-                'files' => 'File Manager',
-                'viewErrorLog' => 'View Error Log',
-            ],
-        );
+        $this->addNavMenu('Settings', [
+            'global' => 'Global Settings',
+            'pages' => 'Custom Pages',
+            'shoutbox' => 'Shoutbox',
+            'badges' => 'Badges',
+            'webhooks' => 'Webhooks',
+        ]);
+        $this->addNavMenu('Members', [
+            'delete' => 'Delete Account',
+            'edit' => 'Edit',
+            'ipbans' => 'IP Bans',
+            'massmessage' => 'Mass Message',
+            'merge' => 'Account Merge',
+            'prereg' => 'Pre-Register',
+            'validation' => 'Validation',
+        ]);
+        $this->addNavMenu('Groups', [
+            'create' => 'Create Group',
+            'delete' => 'Delete Groups',
+            'perms' => 'Edit Permissions',
+        ]);
+        $this->addNavMenu('Themes', [
+            'create' => 'Create Skin',
+            'manage' => 'Manage Skin(s)',
+        ]);
+        $this->addNavMenu('Posting', [
+            'emoticons' => 'Emoticons',
+            'postRating' => 'Post Rating',
+            'wordfilter' => 'Word Filter',
+        ]);
+        $this->addNavMenu('Forums', [
+            'create' => 'Create Forum',
+            'createc' => 'Create Category',
+            'order' => 'Manage',
+            'recountstats' => 'Recount Statistics',
+        ]);
+        $this->addNavMenu('Tools', [
+            'backup' => 'Backup Forum',
+            'files' => 'File Manager',
+            'viewErrorLog' => 'View Error Log',
+        ]);
 
-        $this->page->append(
-            'nav',
-            $this->page->render('nav.html', $this->nav),
-        );
+        $this->page->append('nav', $this->page->render('nav.html', $this->nav));
     }
 }

@@ -59,37 +59,28 @@ final class Page
         $content = '';
         $act = $this->request->asString->get('act') ?? '';
         foreach ($links as $do => $title) {
-            $content .= $this->render(
-                'sidebar-list-link.html',
-                [
-                    'title' => $title,
-                    'url' => "?act={$act}&do={$do}",
-                ],
-            );
+            $content .= $this->render('sidebar-list-link.html', [
+                'title' => $title,
+                'url' => "?act={$act}&do={$do}",
+            ]);
         }
 
-        $this->parts['sidebar'] = $this->render(
-            'sidebar.html',
-            [
-                'content' => $this->render(
-                    'sidebar-list.html',
-                    [
-                        'content' => $content,
-                    ],
-                ),
-            ],
-        );
+        $this->parts['sidebar'] = $this->render('sidebar.html', [
+            'content' => $this->render('sidebar-list.html', [
+                'content' => $content,
+            ]),
+        ]);
     }
 
     public function addContentBox(string $title, string $content): void
     {
-        $this->append('content', $this->render(
-            'content-box.html',
-            [
+        $this->append(
+            'content',
+            $this->render('content-box.html', [
                 'content' => $content,
                 'title' => $title,
-            ],
-        ));
+            ]),
+        );
     }
 
     public function out(): void
@@ -98,34 +89,26 @@ final class Page
 
         $boardURL = $this->domainDefinitions->getBoardURL();
         $data['css_url'] = $boardURL . '/ACP/css/css.css';
-        $data['bbcode_css_url'] = $boardURL . '/Service/Themes/Default/bbcode.css';
+        $data['bbcode_css_url'] =
+            $boardURL . '/Service/Themes/Default/bbcode.css';
         $data['themes_css_url'] = $boardURL . '/ACP/css/themes.css';
         $data['admin_js_url'] = $boardURL . '/dist/acp.js';
 
-        echo $this->render(
-            'admin.html',
-            $data,
-        );
+        echo $this->render('admin.html', $data);
     }
 
     public function error(string $content): string
     {
-        return $this->render(
-            'error.html',
-            [
-                'content' => $content,
-            ],
-        );
+        return $this->render('error.html', [
+            'content' => $content,
+        ]);
     }
 
     public function success(string $content): string
     {
-        return $this->render(
-            'success.html',
-            [
-                'content' => $content,
-            ],
-        );
+        return $this->render('success.html', [
+            'content' => $content,
+        ]);
     }
 
     /**
@@ -144,11 +127,8 @@ final class Page
      *
      * @return string returns the template with the data replaced
      */
-    public function render(
-        string $templateFile,
-        array $data = [],
-    ): string {
-
+    public function render(string $templateFile, array $data = []): string
+    {
         // Add .html extension if needed
         $fileInfo = $this->fileSystem->getFileInfo($templateFile);
         if ($fileInfo->getExtension() !== 'html') {
@@ -164,7 +144,9 @@ final class Page
 
     private function initializeTwig(): void
     {
-        $this->filesystemLoader = new FilesystemLoader($this->fileSystem->pathFromRoot('ACP/views/'));
+        $this->filesystemLoader = new FilesystemLoader(
+            $this->fileSystem->pathFromRoot('ACP/views/'),
+        );
         $this->twigEnvironment = new Environment($this->filesystemLoader, [
             'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
             // TODO: autoescaping should be turned on, but we previously did it manually

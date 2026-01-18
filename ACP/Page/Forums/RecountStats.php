@@ -24,7 +24,8 @@ final readonly class RecountStats
     public function render(): void
     {
         match (true) {
-            $this->request->both('execute') !== null => $this->recountStatistics(),
+            $this->request->both('execute') !== null
+                => $this->recountStatistics(),
             default => $this->showStats(),
         };
     }
@@ -33,9 +34,7 @@ final readonly class RecountStats
     {
         $this->page->addContentBox(
             'Board Statistics',
-            $this->page->render(
-                'stats/show-stats.html',
-            ),
+            $this->page->render('stats/show-stats.html'),
         );
     }
 
@@ -49,14 +48,15 @@ final readonly class RecountStats
 
         $result = $this->database->special(
             <<<'SQL'
-                SELECT
-                    p.`id` AS `id`,
-                    p.`author` AS `author`,
-                    p.`tid` AS `tid`,
-                    t.`fid` AS `fid`
-                FROM %t p
-                LEFT JOIN %t t ON p.`tid`=t.`id`
-                SQL,
+            SELECT
+                p.`id` AS `id`,
+                p.`author` AS `author`,
+                p.`tid` AS `tid`,
+                t.`fid` AS `fid`
+            FROM %t p
+            LEFT JOIN %t t ON p.`tid`=t.`id`
+            SQL
+            ,
             ['posts', 'topics'],
         );
         $stat = [
@@ -108,8 +108,10 @@ final readonly class RecountStats
             }
 
             foreach (explode(' ', $forum->path) as $fid) {
-                $stat['forum_topics'][$fid] += $stat['forum_topics'][$forum->id] ?? 0;
-                $stat['forum_posts'][$fid] += $stat['forum_posts'][$forum->id] ?? 0;
+                $stat['forum_topics'][$fid] +=
+                    $stat['forum_topics'][$forum->id] ?? 0;
+                $stat['forum_posts'][$fid] +=
+                    $stat['forum_posts'][$forum->id] ?? 0;
             }
         }
 
@@ -156,14 +158,11 @@ final readonly class RecountStats
         $this->database->disposeresult($result);
 
         // Update global board stats.
-        $this->database->update(
-            'stats',
-            [
-                'members' => $stat['members'],
-                'posts' => $stat['posts'],
-                'topics' => $stat['topics'],
-            ],
-        );
+        $this->database->update('stats', [
+            'members' => $stat['members'],
+            'posts' => $stat['posts'],
+            'topics' => $stat['topics'],
+        ]);
 
         $this->page->addContentBox(
             'Board Statistics',

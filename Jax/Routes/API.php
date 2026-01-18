@@ -111,7 +111,11 @@ final readonly class API implements Route
         $members = Member::selectMany(
             'WHERE `displayName` LIKE ? ORDER BY `displayName` LIMIT 10',
             htmlspecialchars(
-                str_replace('_', '\_', $this->request->asString->get('term') ?? ''),
+                str_replace(
+                    '_',
+                    '\_',
+                    $this->request->asString->get('term') ?? '',
+                ),
                 ENT_QUOTES,
             ) . '%',
         );
@@ -135,6 +139,9 @@ final readonly class API implements Route
             ]);
         }
 
-        return json_encode([array_keys($rules), array_values($rules)], JSON_THROW_ON_ERROR);
+        return json_encode(
+            [array_keys($rules), array_values($rules)],
+            JSON_THROW_ON_ERROR,
+        );
     }
 }

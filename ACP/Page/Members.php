@@ -70,29 +70,26 @@ final readonly class Members
     private function showMain(): void
     {
         $members = Member::selectMany('ORDER BY `displayName` ASC');
-        $groups = Group::joinedOn($members, static fn(Member $member): int => $member->groupID);
+        $groups = Group::joinedOn(
+            $members,
+            static fn(Member $member): int => $member->groupID,
+        );
 
         $rows = '';
         foreach ($members as $member) {
-            $rows .= $this->page->render(
-                'members/show-main-row.html',
-                [
-                    'avatar_url' => $member->avatar ?: self::DEFAULT_AVATAR,
-                    'group_title' => $groups[$member->groupID]->title,
-                    'id' => $member->id,
-                    'title' => $member->displayName,
-                ],
-            );
+            $rows .= $this->page->render('members/show-main-row.html', [
+                'avatar_url' => $member->avatar ?: self::DEFAULT_AVATAR,
+                'group_title' => $groups[$member->groupID]->title,
+                'id' => $member->id,
+                'title' => $member->displayName,
+            ]);
         }
 
         $this->page->addContentBox(
             'Member List',
-            $this->page->render(
-                'members/show-main.html',
-                [
-                    'rows' => $rows,
-                ],
-            ),
+            $this->page->render('members/show-main.html', [
+                'rows' => $rows,
+            ]),
         );
     }
 
@@ -109,9 +106,15 @@ final readonly class Members
                     $page = $this->updateMember($member);
                 }
 
-                $members = Member::selectMany(Database::WHERE_ID_EQUALS, $memberId);
+                $members = Member::selectMany(
+                    Database::WHERE_ID_EQUALS,
+                    $memberId,
+                );
             } else {
-                $members = Member::selectMany('WHERE `displayName` LIKE ?', $name . '%');
+                $members = Member::selectMany(
+                    'WHERE `displayName` LIKE ?',
+                    $name . '%',
+                );
             }
 
             $numMembers = count($members);
@@ -120,7 +123,8 @@ final readonly class Members
                     $page .= $this->page->render(
                         'members/edit-select-option.html',
                         [
-                            'avatar_url' => $member->avatar ?: self::DEFAULT_AVATAR,
+                            'avatar_url' =>
+                                $member->avatar ?: self::DEFAULT_AVATAR,
                             'id' => $member->id,
                             'title' => $member->displayName,
                         ],
@@ -143,44 +147,115 @@ final readonly class Members
 
             $member = $members[0];
             if (
-                $member->groupID === Groups::Admin->value
-                && $this->user->get()->id !== 1
-                && $this->user->get()->id !== $member->id
+                $member->groupID === Groups::Admin->value &&
+                $this->user->get()->id !== 1 &&
+                $this->user->get()->id !== $member->id
             ) {
-                $page = $this->page->error('You do not have permission to edit this profile. ');
+                $page = $this->page->error(
+                    'You do not have permission to edit this profile. ',
+                );
             } else {
-                $page .= Template::hiddenFormFields(['mid' => (string) $member->id]);
-                $page .= $this->inputText('Display Name:', 'displayName', $member->displayName);
+                $page .= Template::hiddenFormFields([
+                    'mid' => (string) $member->id,
+                ]);
+                $page .= $this->inputText(
+                    'Display Name:',
+                    'displayName',
+                    $member->displayName,
+                );
                 $page .= $this->inputText('Username:', 'name', $member->name);
-                $page .= $this->inputText('Real Name:', 'full_name', $member->full_name);
+                $page .= $this->inputText(
+                    'Real Name:',
+                    'full_name',
+                    $member->full_name,
+                );
                 $page .= $this->inputText('Password:', 'password', '');
                 $page .= $this->getGroups($member->groupID);
                 $page .= $this->heading('Profile Fields');
-                $page .= $this->inputText('User Title:', 'usertitle', $member->usertitle);
-                $page .= $this->inputText('Location:', 'location', $member->location);
-                $page .= $this->inputText('Website:', 'website', $member->website);
+                $page .= $this->inputText(
+                    'User Title:',
+                    'usertitle',
+                    $member->usertitle,
+                );
+                $page .= $this->inputText(
+                    'Location:',
+                    'location',
+                    $member->location,
+                );
+                $page .= $this->inputText(
+                    'Website:',
+                    'website',
+                    $member->website,
+                );
                 $page .= $this->inputText('Avatar:', 'avatar', $member->avatar);
                 $page .= $this->textArea('About:', 'about', $member->about);
                 $page .= $this->textArea('Signature:', 'sig', $member->sig);
                 $page .= $this->inputText('Email:', 'email', $member->email);
-                $page .= $this->textArea('UCP Notepad:', 'ucpnotepad', $member->ucpnotepad);
-                $page .= $this->heading('Contact Details');
-                $page .= $this->inputText('AIM:', 'contactAIM', $member->contactAIM);
-                $page .= $this->inputText('Bluesky:', 'contactBlueSky', $member->contactBlueSky);
-                $page .= $this->inputText('Discord:', 'contactDiscord', $member->contactDiscord);
-                $page .= $this->inputText('Google Chat:', 'contactGoogleChat', $member->contactGoogleChat);
-                $page .= $this->inputText('MSN:', 'contactMSN', $member->contactMSN);
-                $page .= $this->inputText('Skype:', 'contactSkype', $member->contactSkype);
-                $page .= $this->inputText('Steam:', 'contactSteam', $member->contactSteam);
-                $page .= $this->inputText('Twitter:', 'contactTwitter', $member->contactTwitter);
-                $page .= $this->inputText('YIM:', 'contactYIM', $member->contactYIM);
-                $page .= $this->inputText('YouTube:', 'contactYoutube', $member->contactYoutube);
-                $page .= $this->heading('System-Generated Variables');
-                $page .= $this->inputText('Post Count:', 'posts', (string) $member->posts);
-                $page = $this->page->render(
-                    'members/edit-form.html',
-                    ['content' => $page],
+                $page .= $this->textArea(
+                    'UCP Notepad:',
+                    'ucpnotepad',
+                    $member->ucpnotepad,
                 );
+                $page .= $this->heading('Contact Details');
+                $page .= $this->inputText(
+                    'AIM:',
+                    'contactAIM',
+                    $member->contactAIM,
+                );
+                $page .= $this->inputText(
+                    'Bluesky:',
+                    'contactBlueSky',
+                    $member->contactBlueSky,
+                );
+                $page .= $this->inputText(
+                    'Discord:',
+                    'contactDiscord',
+                    $member->contactDiscord,
+                );
+                $page .= $this->inputText(
+                    'Google Chat:',
+                    'contactGoogleChat',
+                    $member->contactGoogleChat,
+                );
+                $page .= $this->inputText(
+                    'MSN:',
+                    'contactMSN',
+                    $member->contactMSN,
+                );
+                $page .= $this->inputText(
+                    'Skype:',
+                    'contactSkype',
+                    $member->contactSkype,
+                );
+                $page .= $this->inputText(
+                    'Steam:',
+                    'contactSteam',
+                    $member->contactSteam,
+                );
+                $page .= $this->inputText(
+                    'Twitter:',
+                    'contactTwitter',
+                    $member->contactTwitter,
+                );
+                $page .= $this->inputText(
+                    'YIM:',
+                    'contactYIM',
+                    $member->contactYIM,
+                );
+                $page .= $this->inputText(
+                    'YouTube:',
+                    'contactYoutube',
+                    $member->contactYoutube,
+                );
+                $page .= $this->heading('System-Generated Variables');
+                $page .= $this->inputText(
+                    'Post Count:',
+                    'posts',
+                    (string) $member->posts,
+                );
+                $page = $this->page->render('members/edit-form.html', [
+                    'content' => $page,
+                ]);
             }
         } else {
             $page = $this->page->render('members/edit.html');
@@ -188,7 +263,8 @@ final readonly class Members
 
         $this->page->addContentBox(
             $member?->name
-                ? 'Editing ' . $member->name . "'s details" : 'Edit Member',
+                ? 'Editing ' . $member->name . "'s details"
+                : 'Edit Member',
             $page,
         );
     }
@@ -205,10 +281,7 @@ final readonly class Members
         }
 
         if ($password) {
-            $member->pass = password_hash(
-                $password,
-                PASSWORD_DEFAULT,
-            );
+            $member->pass = password_hash($password, PASSWORD_DEFAULT);
         }
 
         $stringFields = [
@@ -277,8 +350,9 @@ final readonly class Members
             $displayName,
         );
         if ($member !== null) {
-            return 'That ' . ($member->name === $username
-                ? 'username' : 'display name') . ' is already taken';
+            return 'That ' .
+                ($member->name === $username ? 'username' : 'display name') .
+                ' is already taken';
         }
 
         $member = new Member();
@@ -286,10 +360,7 @@ final readonly class Members
         $member->groupID = 1;
         $member->lastVisit = $this->database->datetime();
         $member->name = $username;
-        $member->pass = password_hash(
-            $password,
-            PASSWORD_DEFAULT,
-        );
+        $member->pass = password_hash($password, PASSWORD_DEFAULT);
 
         $result = $member->insert();
 
@@ -320,22 +391,17 @@ final readonly class Members
         $page = '';
         $groups = Group::selectMany('ORDER BY `title` DESC');
         foreach ($groups as $group) {
-            $page .= $this->page->render(
-                'select-option.html',
-                [
-                    'label' => $group->title,
-                    'selected' => $groupId === $group->id ? ' selected="selected"' : '',
-                    'value' => $group->id,
-                ],
-            );
+            $page .= $this->page->render('select-option.html', [
+                'label' => $group->title,
+                'selected' =>
+                    $groupId === $group->id ? ' selected="selected"' : '',
+                'value' => $group->id,
+            ]);
         }
 
-        return $this->page->render(
-            'members/get-groups.html',
-            [
-                'content' => $page,
-            ],
-        );
+        return $this->page->render('members/get-groups.html', [
+            'content' => $page,
+        ]);
     }
 
     private function mergeMembers(int $mid1, int $mid2): ?string
@@ -457,10 +523,11 @@ final readonly class Members
         // Update stats.
         $this->database->special(
             <<<'SQL'
-                UPDATE %t
-                SET `members` = `members` - 1,
-                    `last_register` = (SELECT MAX(`id`) FROM %t)
-                SQL,
+            UPDATE %t
+            SET `members` = `members` - 1,
+                `last_register` = (SELECT MAX(`id`) FROM %t)
+            SQL
+            ,
             ['stats', 'members'],
         );
 
@@ -486,9 +553,7 @@ final readonly class Members
 
         $this->page->addContentBox(
             'Account Merge',
-            $mergeResult . $this->page->render(
-                'members/merge.html',
-            ),
+            $mergeResult . $this->page->render('members/merge.html'),
         );
     }
 
@@ -507,14 +572,30 @@ final readonly class Members
             } else {
                 // PMs.
                 $this->database->delete('messages', 'WHERE `to`=?', $memberId);
-                $this->database->delete('messages', 'WHERE `from`=?', $memberId);
+                $this->database->delete(
+                    'messages',
+                    'WHERE `from`=?',
+                    $memberId,
+                );
                 // Posts.
                 $this->database->delete('posts', 'WHERE `author`=?', $memberId);
                 // Profile comments.
-                $this->database->delete('profile_comments', 'WHERE `to`=?', $memberId);
-                $this->database->delete('profile_comments', 'WHERE `from`=?', $memberId);
+                $this->database->delete(
+                    'profile_comments',
+                    'WHERE `to`=?',
+                    $memberId,
+                );
+                $this->database->delete(
+                    'profile_comments',
+                    'WHERE `from`=?',
+                    $memberId,
+                );
                 // Topics.
-                $this->database->delete('topics', 'WHERE `author`=?', $memberId);
+                $this->database->delete(
+                    'topics',
+                    'WHERE `author`=?',
+                    $memberId,
+                );
 
                 // Forums.
                 $this->database->update(
@@ -535,7 +616,11 @@ final readonly class Members
                 $this->database->delete('session', 'WHERE `uid`=?', $memberId);
 
                 // Delete the account.
-                $this->database->delete('members', Database::WHERE_ID_EQUALS, $memberId);
+                $this->database->delete(
+                    'members',
+                    Database::WHERE_ID_EQUALS,
+                    $memberId,
+                );
 
                 array_map(
                     static fn(Forum $forum) => Forum::fixLastPost($forum->id),
@@ -545,49 +630,42 @@ final readonly class Members
                 // Update stats.
                 $this->database->special(
                     <<<'SQL'
-                        UPDATE %t
-                        SET `members` = `members` - 1,
-                            `last_register` = (SELECT MAX(`id`) FROM %t)
-                        SQL,
+                    UPDATE %t
+                    SET `members` = `members` - 1,
+                        `last_register` = (SELECT MAX(`id`) FROM %t)
+                    SQL
+                    ,
                     ['stats', 'members'],
                 );
                 $page .= $this->page->success(
-                    'Successfully deleted the member account. '
-                        . 'Board Stat Recount suggested.',
+                    'Successfully deleted the member account. ' .
+                        'Board Stat Recount suggested.',
                 );
             }
         }
 
         $this->page->addContentBox(
             'Delete Account',
-            $page
-                . $this->page->render(
-                    'members/delete.html',
-                ),
+            $page . $this->page->render('members/delete.html'),
         );
     }
 
     private function ipBans(): void
     {
         $ipBans = $this->request->asString->post('ipbans');
-        $bannedIpsPath = $this->domainDefinitions->getBoardPath() . '/bannedips.txt';
+        $bannedIpsPath =
+            $this->domainDefinitions->getBoardPath() . '/bannedips.txt';
         if ($ipBans !== null) {
-            $this->fileSystem->putContents(
-                $bannedIpsPath,
-                $ipBans,
-            );
+            $this->fileSystem->putContents($bannedIpsPath, $ipBans);
         }
 
         $data = $this->fileSystem->getContents($bannedIpsPath) ?: '';
 
         $this->page->addContentBox(
             'IP Bans',
-            $this->page->render(
-                'members/ip-bans.html',
-                [
-                    'content' => htmlspecialchars($data),
-                ],
-            ),
+            $this->page->render('members/ip-bans.html', [
+                'content' => htmlspecialchars($data),
+            ]),
         );
     }
 
@@ -620,7 +698,9 @@ final readonly class Members
 
         $messageCount = count($members);
 
-        return $this->page->success("Successfully delivered {$messageCount} messages");
+        return $this->page->success(
+            "Successfully delivered {$messageCount} messages",
+        );
     }
 
     private function massMessage(): void
@@ -633,29 +713,25 @@ final readonly class Members
 
         $this->page->addContentBox(
             'Mass Message',
-            $page
-                . $this->page->render(
-                    'members/mass-message.html',
-                ),
+            $page . $this->page->render('members/mass-message.html'),
         );
     }
 
     private function validation(): void
     {
         if ($this->request->post('submit1') !== null) {
-            $this->config->write(
-                [
-                    'membervalidation' => $this->request->asString->post('v_enable') ? 1 : 0,
-                ],
-            );
+            $this->config->write([
+                'membervalidation' => $this->request->asString->post('v_enable')
+                    ? 1
+                    : 0,
+            ]);
         }
 
-        $page = $this->page->render(
-            'members/validation.html',
-            [
-                'checked' => $this->page->checked((bool) $this->config->getSetting('membervalidation')),
-            ],
-        );
+        $page = $this->page->render('members/validation.html', [
+            'checked' => $this->page->checked(
+                (bool) $this->config->getSetting('membervalidation'),
+            ),
+        ]);
         $this->page->addContentBox('Enable Member Validation', $page);
 
         $memberId = (int) $this->request->post('mid');
@@ -674,24 +750,21 @@ final readonly class Members
         $members = Member::selectMany('WHERE `groupID`=5');
         $page = '';
         foreach ($members as $member) {
-            $page .= $this->page->render(
-                'members/validation-list-row.html',
-                [
-                    'email_address' => $member->email,
-                    'id' => $member->id,
-                    'ip_address' => $this->ipAddress->asHumanReadable($member->ip),
-                    'joinDate' => $member->joinDate ?? '',
-                    'title' => $member->displayName,
-                ],
-            );
+            $page .= $this->page->render('members/validation-list-row.html', [
+                'email_address' => $member->email,
+                'id' => $member->id,
+                'ip_address' => $this->ipAddress->asHumanReadable($member->ip),
+                'joinDate' => $member->joinDate ?? '',
+                'title' => $member->displayName,
+            ]);
         }
 
-        $page = $page !== '' ? $this->page->render(
-            'members/validation-list.html',
-            [
-                'content' => $page,
-            ],
-        ) : 'There are currently no members awaiting validation.';
+        $page =
+            $page !== ''
+                ? $this->page->render('members/validation-list.html', [
+                    'content' => $page,
+                ])
+                : 'There are currently no members awaiting validation.';
         $this->page->addContentBox('Members Awaiting Validation', $page);
     }
 
@@ -700,14 +773,11 @@ final readonly class Members
         string $name,
         string $value,
     ): string {
-        return $this->page->render(
-            'members/edit-form-field-text.html',
-            [
-                'label' => $label,
-                'title' => $name,
-                'value' => $value,
-            ],
-        );
+        return $this->page->render('members/edit-form-field-text.html', [
+            'label' => $label,
+            'title' => $name,
+            'value' => $value,
+        ]);
     }
 
     private function textArea(
@@ -715,23 +785,17 @@ final readonly class Members
         string $name,
         string $value,
     ): string {
-        return $this->page->render(
-            'members/edit-form-field-textarea.html',
-            [
-                'label' => $label,
-                'title' => $name,
-                'value' => $value,
-            ],
-        );
+        return $this->page->render('members/edit-form-field-textarea.html', [
+            'label' => $label,
+            'title' => $name,
+            'value' => $value,
+        ]);
     }
 
     private function heading(string $value): string
     {
-        return $this->page->render(
-            'members/edit-heading.html',
-            [
-                'value' => $value,
-            ],
-        );
+        return $this->page->render('members/edit-heading.html', [
+            'value' => $value,
+        ]);
     }
 }

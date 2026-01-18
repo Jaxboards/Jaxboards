@@ -48,9 +48,7 @@ abstract class FeatureTestCase extends TestCase
             $parsed = parse_url($request);
             parse_str($parsed['query'] ?? '', $getParameters);
             $getParameters['path'] = ltrim($parsed['path'] ?? '', '/');
-            $request = new Request(
-                get: $getParameters,
-            );
+            $request = new Request(get: $getParameters);
         }
 
         if ($request instanceof Request) {
@@ -65,7 +63,8 @@ abstract class FeatureTestCase extends TestCase
         array $params = [],
         ?string $page = null,
     ): void {
-        $location = $this->container->get(Router::class)->url($name, $params) ?? $name;
+        $location =
+            $this->container->get(Router::class)->url($name, $params) ?? $name;
         $this->assertStringContainsString("Location: {$location}", $page);
     }
 
@@ -82,7 +81,7 @@ abstract class FeatureTestCase extends TestCase
     ): void {
         $members = $this->insertMembers($memberOverrides);
 
-        if (! $member instanceof Member) {
+        if (!$member instanceof Member) {
             $member = $members[$member];
         }
 
@@ -93,7 +92,10 @@ abstract class FeatureTestCase extends TestCase
 
         $this->container->set(
             JaxSession::class,
-            autowire()->constructorParameter('session', ['uid' => $member->id ?? null, ...$sessionOverrides]),
+            autowire()->constructorParameter('session', [
+                'uid' => $member->id ?? null,
+                ...$sessionOverrides,
+            ]),
         );
     }
 

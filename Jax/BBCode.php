@@ -36,19 +36,27 @@ final class BBCode
      */
     private array $inlineBBCodes = [
         'text' => [
-            '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi' => '<span style="background:$2">$3</span>',
+            '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi' =>
+                '<span style="background:$2">$3</span>',
             '@\[b\](.*)\[/b\]@Usi' => '<strong>$1</strong>',
-            '@\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[/color\]@Usi' => '<span style="color:$1">$2</span>',
-            '@\[font=([\s\w]+)](.*)\[/font\]@Usi' => '<span style="font-family:$1">$2</span>',
+            '@\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[/color\]@Usi' =>
+                '<span style="color:$1">$2</span>',
+            '@\[font=([\s\w]+)](.*)\[/font\]@Usi' =>
+                '<span style="font-family:$1">$2</span>',
             '@\[i\](.*)\[/i\]@Usi' => '<em>$1</em>',
-            '@\[s\](.*)\[/s\]@Usi' => '<span style="text-decoration:line-through">$1</span>',
-            '@\[u\](.*)\[/u\]@Usi' => '<span style="text-decoration:underline">$1</span>',
-            '@\[spoiler\](.*)\[/spoiler\]@Usi' => '<span class="spoilertext">$1</span>',
+            '@\[s\](.*)\[/s\]@Usi' =>
+                '<span style="text-decoration:line-through">$1</span>',
+            '@\[u\](.*)\[/u\]@Usi' =>
+                '<span style="text-decoration:underline">$1</span>',
+            '@\[spoiler\](.*)\[/spoiler\]@Usi' =>
+                '<span class="spoilertext">$1</span>',
         ],
         // Consider adding nofollow if admin approval of new accounts is not enabled
         'urls' => [
-            '@\[url\](?P<url>(?:[?/]|https?|ftp|mailto:).*)\[/url\]@Ui' => '<a href="$1">$1</a>',
-            '@\[url=(?P<url>(?:[?/]|https?|ftp|mailto:)[^\]]+)\](.+?)\[/url\]@i' => '<a href="$1">$2</a>',
+            '@\[url\](?P<url>(?:[?/]|https?|ftp|mailto:).*)\[/url\]@Ui' =>
+                '<a href="$1">$1</a>',
+            '@\[url=(?P<url>(?:[?/]|https?|ftp|mailto:)[^\]]+)\](.+?)\[/url\]@i' =>
+                '<a href="$1">$2</a>',
         ],
     ];
 
@@ -56,11 +64,13 @@ final class BBCode
      * @var array<string,string>
      */
     private array $blockBBCodes = [
-        '@\[align=(center|left|right)\](.*)\[/align\]@Usi' => '<p style="text-align:$1">$2</p>',
+        '@\[align=(center|left|right)\](.*)\[/align\]@Usi' =>
+            '<p style="text-align:$1">$2</p>',
         '@\[h([1-5])\](.*)\[/h\1\]@Usi' => '<h$1>$2</h$1>',
         '@\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[/img\]@Ui' => <<<'HTML'
-            <img src="$2" title="$1" alt="$1" class="bbcodeimg">
-            HTML,
+        <img src="$2" title="$1" alt="$1" class="bbcodeimg">
+        HTML
+    ,
     ];
 
     public function __construct(
@@ -129,7 +139,10 @@ final class BBCode
 
     public function toInlineHTML(string $text): string
     {
-        return $this->replaceWithRules($text, array_merge(...array_values($this->inlineBBCodes)));
+        return $this->replaceWithRules(
+            $text,
+            array_merge(...array_values($this->inlineBBCodes)),
+        );
     }
 
     /**
@@ -138,7 +151,11 @@ final class BBCode
     private function replaceWithRules(string $text, array $rules): string
     {
         for ($nestLimit = 0; $nestLimit < 10; ++$nestLimit) {
-            $tmp = preg_replace(array_keys($rules), array_values($rules), $text);
+            $tmp = preg_replace(
+                array_keys($rules),
+                array_values($rules),
+                $text,
+            );
             if ($tmp === $text || !is_string($tmp)) {
                 break;
             }
@@ -180,7 +197,12 @@ final class BBCode
         $ext = $this->fileSystem->getFileInfo($file->name)->getExtension();
 
         return $this->template->render('bbcode/attachment', [
-            'attachmentURL' => $this->domainDefinitions->getBoardPathUrl() . '/Uploads/' . $file->hash . '.' . $ext,
+            'attachmentURL' =>
+                $this->domainDefinitions->getBoardPathUrl() .
+                '/Uploads/' .
+                $file->hash .
+                '.' .
+                $ext,
             'file' => $file,
             'isImage' => in_array($ext, Jax::IMAGE_EXTENSIONS, true),
         ]);
@@ -210,9 +232,8 @@ final class BBCode
      */
     private function bbcodeQuoteCallback(array $match): string
     {
-        $quotee = $match[1] !== ''
-            ? "<div class='quotee'>{$match[1]}</div>"
-            : '';
+        $quotee =
+            $match[1] !== '' ? "<div class='quotee'>{$match[1]}</div>" : '';
 
         return "<div class='quote'>{$quotee}{$match[2]}</div>";
     }
@@ -232,7 +253,6 @@ final class BBCode
      */
     private function bbcodeVideoCallback(array $match): string
     {
-
         if (str_contains($match[1], 'youtube.com')) {
             preg_match('@v=([\w-]+)@', $match[1], $youtubeMatches);
             $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
@@ -261,18 +281,24 @@ final class BBCode
         // This HTML construction could be prettier, but
         // SonarQube requires the LI tags to be surrounded by OL and UL
         $html = $tag === 'ol' ? '<ol>' : '<ul>';
-        $html .= implode('', array_map(
-            static fn(string $item): string => '<li>' . trim($item) . '</li>',
-            array_filter($items, static fn(string $line): bool => (bool) trim($line)),
-        ));
+        $html .= implode(
+            '',
+            array_map(
+                static fn(string $item): string => '<li>' .
+                    trim($item) .
+                    '</li>',
+                array_filter(
+                    $items,
+                    static fn(string $line): bool => (bool) trim($line),
+                ),
+            ),
+        );
 
         return $html . ($tag === 'ol' ? '</ol>' : '</ul>');
     }
 
-    private function youtubeEmbedHTML(
-        string $link,
-        string $embedURL,
-    ): string {
+    private function youtubeEmbedHTML(string $link, string $embedURL): string
+    {
         return $this->template->render('bbcode/youtube-embed', [
             'link' => $link,
             'embedURL' => $embedURL,

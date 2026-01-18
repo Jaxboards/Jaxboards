@@ -40,18 +40,27 @@ final readonly class FileManager
             if ($file !== null) {
                 $fileInfo = $this->fileSystem->getFileInfo($file->name);
                 $ext = mb_strtolower($fileInfo->getExtension());
-                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'], true)) {
+                if (
+                    in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'], true)
+                ) {
                     $file->hash .= '.' . $ext;
                 }
 
-                $uploadFilePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash;
+                $uploadFilePath =
+                    $this->domainDefinitions->getBoardPath() .
+                    '/Uploads/' .
+                    $file->hash;
 
-                if ($this->fileSystem->getFileInfo($uploadFilePath)->isWritable()) {
+                if (
+                    $this->fileSystem
+                        ->getFileInfo($uploadFilePath)
+                        ->isWritable()
+                ) {
                     $page .= $this->fileSystem->unlink($uploadFilePath)
                         ? $this->page->success('File deleted')
                         : $this->page->error(
-                            "Error deleting file, maybe it's already been "
-                                . 'deleted? Removed from DB',
+                            "Error deleting file, maybe it's already been " .
+                                'deleted? Removed from DB',
                         );
                 }
 
@@ -83,8 +92,8 @@ final readonly class FileManager
         }
 
         $posts = Post::selectMany(
-            "WHERE MATCH (`post`) AGAINST ('attachment') "
-                . "AND post LIKE '%[attachment]%'",
+            "WHERE MATCH (`post`) AGAINST ('attachment') " .
+                "AND post LIKE '%[attachment]%'",
         );
         $linkedIn = [];
 
@@ -116,32 +125,34 @@ final readonly class FileManager
         foreach ($files as $file) {
             $ext = $this->fileSystem->getFileInfo($file->name)->getExtension();
             $fileURL = in_array($ext, Jax::IMAGE_EXTENSIONS, true)
-                ? $this->domainDefinitions->getBoardPathUrl() . $this->fileSystem->pathJoin(
-                    '/Uploads',
-                    "{$file->hash}.{$ext}",
-                ) : "../download?id={$file->id}";
+                ? $this->domainDefinitions->getBoardPathUrl() .
+                    $this->fileSystem->pathJoin(
+                        '/Uploads',
+                        "{$file->hash}.{$ext}",
+                    )
+                : "../download?id={$file->id}";
 
-            $table .= $this->page->render(
-                'tools/file-manager-row.html',
-                [
-                    'downloads' => $file->downloads,
-                    'filesize' => $this->fileSystem->fileSizeHumanReadable($file->size),
-                    'id' => $file->id,
-                    'linked_in' => array_key_exists($file->id, $linkedIn)
-                        ? implode(', ', $linkedIn[$file->id]) : 'Not linked!',
-                    'title' => "<a href='{$fileURL}'>{$file->name}</a>",
-                    'username' => $members[$file->uid]->displayName,
-                    'user_id' => $file->uid,
-                ],
-            );
+            $table .= $this->page->render('tools/file-manager-row.html', [
+                'downloads' => $file->downloads,
+                'filesize' => $this->fileSystem->fileSizeHumanReadable(
+                    $file->size,
+                ),
+                'id' => $file->id,
+                'linked_in' => array_key_exists($file->id, $linkedIn)
+                    ? implode(', ', $linkedIn[$file->id])
+                    : 'Not linked!',
+                'title' => "<a href='{$fileURL}'>{$file->name}</a>",
+                'username' => $members[$file->uid]->displayName,
+                'user_id' => $file->uid,
+            ]);
         }
 
-        $page .= $table !== '' ? $this->page->render(
-            'tools/file-manager.html',
-            [
-                'content' => $table,
-            ],
-        ) : $this->page->error('No files to show.');
+        $page .=
+            $table !== ''
+                ? $this->page->render('tools/file-manager.html', [
+                    'content' => $table,
+                ])
+                : $this->page->error('No files to show.');
         $this->page->addContentBox('File Manager', $page);
     }
 }

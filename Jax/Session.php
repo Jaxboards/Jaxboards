@@ -66,7 +66,9 @@ final class Session
 
     public function loginWithToken(): ?int
     {
-        $this->fetchSessionData(session_id() ?? $this->request->get('sessid') ?? null);
+        $this->fetchSessionData(
+            session_id() ?? ($this->request->get('sessid') ?? null),
+        );
 
         if ($this->modelsSession->isBot !== 0) {
             return null;
@@ -105,11 +107,13 @@ final class Session
             $this->modelsSession = $session;
             // This str_starts_with can be removed after a time.
             // Only exists to replace serialize with json_encode
-            $this->vars = (
-                str_starts_with($session->vars, '{')
-                ? json_decode($session->vars, true, flags: JSON_THROW_ON_ERROR)
-                : unserialize($session->vars)
-            ) ?: [];
+            $this->vars = str_starts_with($session->vars, '{')
+                ? json_decode(
+                    $session->vars,
+                    true,
+                    flags: JSON_THROW_ON_ERROR,
+                )
+                : (unserialize($session->vars) ?: []);
 
             return;
         }
@@ -127,7 +131,7 @@ final class Session
      */
     public function getPHPSessionValue(string $field): mixed
     {
-        return $this->session[$field] ?? $_SESSION[$field] ?? null;
+        return $this->session[$field] ?? ($_SESSION[$field] ?? null);
     }
 
     /**
@@ -149,8 +153,8 @@ final class Session
     public function addVar(string $varName, mixed $value): void
     {
         if (
-            array_key_exists($varName, $this->vars)
-            && $this->vars[$varName] === $value
+            array_key_exists($varName, $this->vars) &&
+            $this->vars[$varName] === $value
         ) {
             return;
         }
@@ -171,12 +175,16 @@ final class Session
 
     public function getVar(string $varName): mixed
     {
-        return $this->vars[$varName] ?? $this->getPHPSessionValue($varName) ?? null;
+        return $this->vars[$varName] ??
+            ($this->getPHPSessionValue($varName) ?? null);
     }
 
     public function act(?string $location = null): void
     {
-        $this->set('lastAction', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
+        $this->set(
+            'lastAction',
+            $this->database->datetime(Carbon::now('UTC')->getTimestamp()),
+        );
         if (!$location) {
             return;
         }
@@ -191,7 +199,9 @@ final class Session
 
     public function clean(?int $uid): bool
     {
-        $timeago = Carbon::now('UTC')->subSeconds($this->config->getSetting('timetologout') ?? 900)->getTimestamp();
+        $timeago = Carbon::now('UTC')
+            ->subSeconds($this->config->getSetting('timetologout') ?? 900)
+            ->getTimestamp();
         if (!is_numeric($uid) || $uid < 1) {
             $uid = null;
         } else {
@@ -245,9 +255,10 @@ final class Session
         $this->database->delete(
             'session',
             <<<'SQL'
-                WHERE `lastUpdate`<?
-                    OR (`uid` IS NULL AND `lastUpdate`<?)
-                SQL,
+            WHERE `lastUpdate`<?
+                OR (`uid` IS NULL AND `lastUpdate`<?)
+            SQL
+            ,
             $this->database->datetime($yesterday),
             $this->database->datetime($timeago),
         );
@@ -267,9 +278,7 @@ final class Session
             $changedData['topicsread'] = '{}';
         }
 
-        if (
-            $this->modelsSession->lastAction === null
-        ) {
+        if ($this->modelsSession->lastAction === null) {
             $changedData['lastAction'] = $this->database->datetime();
         }
 

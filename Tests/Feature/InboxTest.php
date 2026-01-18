@@ -98,9 +98,16 @@ final class InboxTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go('/ucp/inbox');
-        $url = $this->container->get(Router::class)->url('inbox', ['view' => '1']);
+        $url = $this->container
+            ->get(Router::class)
+            ->url('inbox', ['view' => '1']);
 
-        DOMAssert::assertSelectEquals(".unread a[href^='{$url}']", 'Test Message', 1, $page);
+        DOMAssert::assertSelectEquals(
+            ".unread a[href^='{$url}']",
+            'Test Message',
+            1,
+            $page,
+        );
     }
 
     public function testInboxViewMessage(): void
@@ -111,7 +118,12 @@ final class InboxTest extends FeatureTestCase
 
         $page = $this->go('/ucp/inbox?view=1');
 
-        DOMAssert::assertSelectEquals('.message', 'This is a test message.', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '.message',
+            'This is a test message.',
+            1,
+            $page,
+        );
     }
 
     public function testInboxReplyMessage(): void
@@ -122,7 +134,12 @@ final class InboxTest extends FeatureTestCase
 
         $page = $this->go('/ucp/inbox?page=Reply&messageid=1');
 
-        DOMAssert::assertSelectRegExp('#message', '/\[quote=Admin\]This is a test message.\[\/quote\]/', 1, $page);
+        DOMAssert::assertSelectRegExp(
+            '#message',
+            '/\[quote=Admin\]This is a test message.\[\/quote\]/',
+            1,
+            $page,
+        );
     }
 
     public function testInboxDeleteMessage(): void
@@ -131,10 +148,12 @@ final class InboxTest extends FeatureTestCase
 
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            get: ['path' => '/ucp/inbox'],
-            post: ['dmessage' => ['1']],
-        ));
+        $page = $this->go(
+            new Request(
+                get: ['path' => '/ucp/inbox'],
+                post: ['dmessage' => ['1']],
+            ),
+        );
 
         $this->assertStringContainsString('No messages.', $page);
     }
@@ -143,17 +162,24 @@ final class InboxTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            get: ['path' => '/ucp/inbox', 'view' => 'compose'],
-            post: [
-                'submit' => '1',
-                'mid' => '1',
-                'title' => 'Hello there',
-                'message' => 'How have you been?',
-            ],
-        ));
+        $page = $this->go(
+            new Request(
+                get: ['path' => '/ucp/inbox', 'view' => 'compose'],
+                post: [
+                    'submit' => '1',
+                    'mid' => '1',
+                    'title' => 'Hello there',
+                    'message' => 'How have you been?',
+                ],
+            ),
+        );
 
-        DOMAssert::assertSelectEquals('#ucppage', 'Message successfully delivered.', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '#ucppage',
+            'Message successfully delivered.',
+            1,
+            $page,
+        );
         $message = Message::selectOne(1);
         $this->assertEquals('Hello there', $message->title);
         $this->assertEquals('How have you been?', $message->message);

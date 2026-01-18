@@ -1,6 +1,5 @@
 #!/usr/bin/env php
 <?php
-
 declare(strict_types=1);
 
 // Fetch the composer version for use in our pre-commit hook.
@@ -20,3 +19,4 @@ $packageData = json_decode(
     JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
 );
 echo $packageData['engines']['composer'] ?? null;
+

@@ -17,7 +17,14 @@ use const PHP_EOL;
 
 final readonly class Jax
 {
-    public const FORUM_PERMS_ORDER = ['upload', 'reply', 'start', 'read', 'view', 'poll'];
+    public const FORUM_PERMS_ORDER = [
+        'upload',
+        'reply',
+        'start',
+        'read',
+        'view',
+        'poll',
+    ];
 
     public const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
 
@@ -59,7 +66,8 @@ final readonly class Jax
             $parsedPerms[$groupId] = array_reduce(
                 array_keys(self::FORUM_PERMS_ORDER),
                 static function (array $perms, int $key) use ($flag): array {
-                    $perms[self::FORUM_PERMS_ORDER[$key]] = (bool) ($flag & (1 << $key));
+                    $perms[self::FORUM_PERMS_ORDER[$key]] =
+                        (bool) ($flag & (1 << $key));
 
                     return $perms;
                 },
@@ -97,7 +105,7 @@ final readonly class Jax
             $start = 2;
         }
 
-        for ($x = 0; $x < $tofill && ($start + $x) < $numpages; ++$x) {
+        for ($x = 0; $x < $tofill && $start + $x < $numpages; ++$x) {
             $pages[] = $x + $start;
         }
 
@@ -123,9 +131,13 @@ final readonly class Jax
                 [$boardname, $boardurl, $boardlink],
                 $message,
             ),
-            'MIME-Version: 1.0' . PHP_EOL
-                . 'Content-type:text/html;charset=iso-8859-1' . PHP_EOL
-                . 'From: ' . $this->config->getSetting('mail_from') . PHP_EOL,
+            'MIME-Version: 1.0' .
+                PHP_EOL .
+                'Content-type:text/html;charset=iso-8859-1' .
+                PHP_EOL .
+                'From: ' .
+                $this->config->getSetting('mail_from') .
+                PHP_EOL,
         );
     }
 }

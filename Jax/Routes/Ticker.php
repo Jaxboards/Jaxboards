@@ -34,8 +34,8 @@ final class Ticker implements Route
     public function route($params): void
     {
         if (
-            $this->request->isJSNewLocation()
-            || !$this->request->isJSAccess()
+            $this->request->isJSNewLocation() ||
+            !$this->request->isJSAccess()
         ) {
             $this->index();
 
@@ -110,11 +110,7 @@ final class Ticker implements Route
                 continue;
             }
 
-            $ticks[] = [
-                $post,
-                $members[$post->author],
-                $topic,
-            ];
+            $ticks[] = [$post, $members[$post->author], $topic];
         }
 
         return $ticks;
@@ -142,14 +138,13 @@ final class Ticker implements Route
     {
         [$post, $postAuthor, $topic] = $tick;
 
-        return $this->template->render(
-            'ticker/tick',
-            [
-                'date' => $post->date ? $this->date->smallDate($post->date, ['autodate' => true]) : '',
-                'user' => $postAuthor,
-                'topic' => $topic,
-                'post' => $post,
-            ],
-        );
+        return $this->template->render('ticker/tick', [
+            'date' => $post->date
+                ? $this->date->smallDate($post->date, ['autodate' => true])
+                : '',
+            'user' => $postAuthor,
+            'topic' => $topic,
+            'post' => $post,
+        ]);
     }
 }

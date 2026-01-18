@@ -24,7 +24,10 @@ final class Config
      */
     public function get(): array
     {
-        return array_merge($this->serviceConfig->get(), $this->getBoardConfig());
+        return array_merge(
+            $this->serviceConfig->get(),
+            $this->getBoardConfig(),
+        );
     }
 
     /**
@@ -38,10 +41,15 @@ final class Config
 
         $this->boardConfig = [];
 
-        $boardConfigPath = $this->fileSystem->pathJoin($this->domainDefinitions->getBoardPath(), '/config.php');
+        $boardConfigPath = $this->fileSystem->pathJoin(
+            $this->domainDefinitions->getBoardPath(),
+            '/config.php',
+        );
 
         if ($this->fileSystem->getFileInfo($boardConfigPath)->isFile()) {
-            $this->boardConfig = require_once $this->fileSystem->pathFromRoot($boardConfigPath);
+            $this->boardConfig = require_once $this->fileSystem->pathFromRoot(
+                $boardConfigPath,
+            );
         }
 
         return $this->boardConfig;
@@ -72,6 +80,9 @@ final class Config
     {
         $this->boardConfig = array_merge($this->boardConfig ?? [], $data);
 
-        $this->fileSystem->putContents($this->domainDefinitions->getBoardPath() . '/config.php', $this->serviceConfig->configFileContents($this->boardConfig));
+        $this->fileSystem->putContents(
+            $this->domainDefinitions->getBoardPath() . '/config.php',
+            $this->serviceConfig->configFileContents($this->boardConfig),
+        );
     }
 }

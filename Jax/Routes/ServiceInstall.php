@@ -146,20 +146,13 @@ final readonly class ServiceInstall
         // it could be a form field one day (so the user can choose the driver)
         $sqlDriver = $this->request->asString->post('sql_driver');
 
-        if (
-            $domain !== null
-            && !parse_url($domain, PHP_URL_HOST)
-        ) {
+        if ($domain !== null && !parse_url($domain, PHP_URL_HOST)) {
             if (preg_match('@[^\w\-.]@', $domain)) {
                 $errors[] = 'Invalid domain';
             } else {
                 // Looks like we have a proper hostname,
                 // just remove the leading www. if it exists.
-                $domain = (string) preg_replace(
-                    '/^www./',
-                    '',
-                    $domain,
-                );
+                $domain = (string) preg_replace('/^www./', '', $domain);
             }
         } else {
             // Remove www if it exists, also only grab host if url is entered.
@@ -181,12 +174,14 @@ final readonly class ServiceInstall
         if (mb_strlen((string) $adminUsername) > 50) {
             $errors[] = 'Admin username is too long';
         } elseif (preg_match('@\W@', (string) $adminUsername)) {
-            $errors[] = 'Admin username needs to consist of letters,'
-                . 'numbers, and underscore only';
+            $errors[] =
+                'Admin username needs to consist of letters,' .
+                'numbers, and underscore only';
         }
 
         if (!$sqlHost || !$sqlUsername || !$sqlPassword || !$sqlDB) {
-            $errors[] = 'SQL host, username, password, database fields required';
+            $errors[] =
+                'SQL host, username, password, database fields required';
         } else {
             $this->database->connect(
                 host: $sqlHost,
@@ -202,20 +197,18 @@ final readonly class ServiceInstall
         }
 
         // Update with our settings.
-        $this->serviceConfig->writeServiceConfig(
-            [
-                'boardname' => 'Jaxboards',
-                'domain' => $domain,
-                'mail_from' => "{$adminUsername} <{$adminEmail}>",
-                'sql_db' => $sqlDB,
-                'sql_host' => $sqlHost,
-                'sql_username' => $sqlUsername,
-                'sql_password' => $sqlPassword,
-                'service' => $serviceMode,
-                'prefix' => $serviceMode ? '' : 'jaxboards',
-                'sql_prefix' => $serviceMode ? '' : 'jaxboards_',
-            ],
-        );
+        $this->serviceConfig->writeServiceConfig([
+            'boardname' => 'Jaxboards',
+            'domain' => $domain,
+            'mail_from' => "{$adminUsername} <{$adminEmail}>",
+            'sql_db' => $sqlDB,
+            'sql_host' => $sqlHost,
+            'sql_username' => $sqlUsername,
+            'sql_password' => $sqlPassword,
+            'service' => $serviceMode,
+            'prefix' => $serviceMode ? '' : 'jaxboards',
+            'sql_prefix' => $serviceMode ? '' : 'jaxboards_',
+        ]);
 
         if ($serviceMode) {
             $this->databaseUtils->installServiceTables();
@@ -239,16 +232,13 @@ final readonly class ServiceInstall
             if ($serviceMode) {
                 $this->database->setPrefix('');
                 // Add board to directory.
-                $this->database->insert(
-                    'directory',
-                    [
-                        'boardname' => $board,
-                        'date' => $this->database->datetime(),
-                        'referral' => $this->request->asString->both('r') ?? '',
-                        'registrarEmail' => $adminEmail,
-                        'registrarIP' => $this->ipAddress->asBinary(),
-                    ],
-                );
+                $this->database->insert('directory', [
+                    'boardname' => $board,
+                    'date' => $this->database->datetime(),
+                    'referral' => $this->request->asString->both('r') ?? '',
+                    'registrarEmail' => $adminEmail,
+                    'registrarIP' => $this->ipAddress->asBinary(),
+                ]);
                 $this->database->setPrefix($boardPrefix);
             }
 
@@ -269,7 +259,10 @@ final readonly class ServiceInstall
             );
             $member->insert();
 
-            $this->fileSystem->copyDirectory('Service/blueprint', 'boards/' . $board);
+            $this->fileSystem->copyDirectory(
+                'Service/blueprint',
+                'boards/' . $board,
+            );
         }
 
         if ($serviceMode) {

@@ -18,7 +18,9 @@ final readonly class Rainbow implements Route
     public function route($params): void
     {
         $this->page->command('softurl');
-        $this->page->command('script', "(function() {
+        $this->page->command(
+            'script',
+            "(function() {
             let i = 0;
 
             document.body.style.background = `radial-gradient(
@@ -91,7 +93,12 @@ final readonly class Rainbow implements Route
                     1000/60
                 );
             }
-        })()");
-        $this->page->command('playsound', 'always', $this->domainDefinitions->getSoundsUrl() . '/always.mp3');
+        })()",
+        );
+        $this->page->command(
+            'playsound',
+            'always',
+            $this->domainDefinitions->getSoundsUrl() . '/always.mp3',
+        );
     }
 }

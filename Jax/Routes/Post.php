@@ -82,9 +82,14 @@ final class Post implements Route
         }
 
         if ($postData !== null) {
-            [$postData, $codes] = $this->textFormatting->startCodeTags($postData);
+            [$postData, $codes] = $this->textFormatting->startCodeTags(
+                $postData,
+            );
             $postData = $this->textFormatting->linkify($postData);
-            $postData = $this->textFormatting->finishCodeTagsBB($postData, $codes);
+            $postData = $this->textFormatting->finishCodeTagsBB(
+                $postData,
+                $codes,
+            );
             $this->postData = $postData;
         }
 
@@ -96,7 +101,8 @@ final class Post implements Route
         }
 
         $error = match (true) {
-            $submit === 'Preview' || $submit === 'Full Reply' => $this->previewPost(),
+            $submit === 'Preview' || $submit === 'Full Reply'
+                => $this->previewPost(),
             (bool) $this->pid && $this->how === 'edit' => $this->editPost(),
             $this->how === 'newtopic' => $this->createTopic(),
             $this->postData !== null => $this->createPost($this->tid),
@@ -173,7 +179,8 @@ final class Post implements Route
 
             foreach ($posts as $post) {
                 $authorName = $membersById[$post->author]->name ?? '';
-                $postData .= "[quote={$authorName}]{$post->post}[/quote]" . PHP_EOL;
+                $postData .=
+                    "[quote={$authorName}]{$post->post}[/quote]" . PHP_EOL;
             }
 
             $this->session->deleteVar('multiquote');
@@ -199,10 +206,11 @@ final class Post implements Route
     private function canEdit(Topic $topic, ModelsPost $modelsPost): bool
     {
         if (
-            $modelsPost->author
-            && ($modelsPost->newtopic !== 0 ? $this->user->getGroup()?->canEditTopics
-                : $this->user->getGroup()?->canEditPosts)
-            && $modelsPost->author === $this->user->get()->id
+            $modelsPost->author &&
+            ($modelsPost->newtopic !== 0
+                ? $this->user->getGroup()?->canEditTopics
+                : $this->user->getGroup()?->canEditPosts) &&
+            $modelsPost->author === $this->user->get()->id
         ) {
             return true;
         }
@@ -213,8 +221,10 @@ final class Post implements Route
     private function validatePost(?string $postData): ?string
     {
         return match (true) {
-            $postData !== null && trim($postData) === '' => "You didn't supply a post!",
-            $this->postData && mb_strlen($this->postData) > 65_535 => 'Post must not exceed 65,535 characters.',
+            $postData !== null && trim($postData) === ''
+                => "You didn't supply a post!",
+            $this->postData && mb_strlen($this->postData) > 65_535
+                => 'Post must not exceed 65,535 characters.',
             default => null,
         };
     }
@@ -239,7 +249,8 @@ final class Post implements Route
         $topicDesc = $this->request->asString->post('tdesc');
 
         $error = match (true) {
-            $topicTitle === null || trim($topicTitle) === '' => 'You must supply a topic title!',
+            $topicTitle === null || trim($topicTitle) === ''
+                => 'You must supply a topic title!',
             default => null,
         };
 
@@ -254,9 +265,7 @@ final class Post implements Route
                 '@\s+@',
                 ' ',
                 $this->textFormatting->wordFilter(
-                    $this->textFormatting->textOnly(
-                        $this->postData ?? '',
-                    ),
+                    $this->textFormatting->textOnly($this->postData ?? ''),
                 ),
             ),
             0,
@@ -273,9 +282,7 @@ final class Post implements Route
         $postData = $this->postData;
 
         $post = ModelsPost::selectOne($pid);
-        $topic = $post !== null
-            ? Topic::selectOne($post->tid)
-            : null;
+        $topic = $post !== null ? Topic::selectOne($post->tid) : null;
 
         $isTopicPost = $topic && $post && $topic->op === $post->id;
 
@@ -296,7 +303,10 @@ final class Post implements Route
             );
             if (array_key_exists($removeEmbed, $openGraphMetadata)) {
                 unset($openGraphMetadata[$removeEmbed]);
-                $post->openGraphMetadata = json_encode($openGraphMetadata, JSON_THROW_ON_ERROR);
+                $post->openGraphMetadata = json_encode(
+                    $openGraphMetadata,
+                    JSON_THROW_ON_ERROR,
+                );
                 $this->updatePost($post);
             }
 
@@ -321,7 +331,10 @@ final class Post implements Route
                 return $error;
             }
 
-            $this->router->redirect('topic', ['id' => $post->tid, 'findpost' => $pid]);
+            $this->router->redirect('topic', [
+                'id' => $post->tid,
+                'findpost' => $pid,
+            ]);
 
             return null;
         }
@@ -344,7 +357,9 @@ final class Post implements Route
     private function createTopic(): null
     {
         $topicInput = $this->createTopic->getInput();
-        $error = $this->createTopic->validateInput($topicInput) ?? $this->validatePost($this->postData);
+        $error =
+            $this->createTopic->validateInput($topicInput) ??
+            $this->validatePost($this->postData);
 
         if ($error) {
             // Handle error here so we can still show topic form
@@ -382,9 +397,7 @@ final class Post implements Route
         }
 
         $topic = Topic::selectOne($tid);
-        $forum = $topic !== null
-            ? Forum::selectOne($topic->fid)
-            : null;
+        $forum = $topic !== null ? Forum::selectOne($topic->fid) : null;
 
         if ($topic === null || $forum === null) {
             return "The topic you're trying to reply to does not exist.";
@@ -393,8 +406,9 @@ final class Post implements Route
         $forumPerms = $this->user->getForumPerms($forum->perms);
 
         if (
-            ($this->how !== 'newtopic' && !$forumPerms['reply'])
-            || ($topic->locked && !$this->user->getGroup()?->canOverrideLockedTopics)
+            ($this->how !== 'newtopic' && !$forumPerms['reply']) ||
+            ($topic->locked &&
+                !$this->user->getGroup()?->canOverrideLockedTopics)
         ) {
             return "You don't have permission to post here.";
         }
@@ -407,7 +421,10 @@ final class Post implements Route
         $post->newtopic = $newtopic ? 1 : 0;
         $post->post = $postData ?? '';
         $post->tid = $tid;
-        $post->openGraphMetadata = json_encode($this->openGraph->fetchFromBBCode($postData), JSON_THROW_ON_ERROR);
+        $post->openGraphMetadata = json_encode(
+            $this->openGraph->fetchFromBBCode($postData),
+            JSON_THROW_ON_ERROR,
+        );
         $post->insert();
 
         $this->hooks->dispatch('post', $post, $topic);
@@ -437,9 +454,7 @@ final class Post implements Route
         }
 
         // Do some magic to update the tree all the way up (for subforums).
-        $path = trim($forum->path) !== ''
-            ? explode(' ', $forum->path)
-            : [];
+        $path = trim($forum->path) !== '' ? explode(' ', $forum->path) : [];
         if (!in_array($topic->fid, $path)) {
             $path[] = $topic->fid;
         }
@@ -447,15 +462,16 @@ final class Post implements Route
         if ($newtopic) {
             $this->database->special(
                 <<<'SQL'
-                    UPDATE %t
-                    SET
-                        `lastPostUser`=?,
-                        `lastPostTopic`=?,
-                        `lastPostTopicTitle`=?,
-                        `lastPostDate`=?,
-                        `topics`=`topics`+1
-                    WHERE `id` IN ?
-                    SQL,
+                UPDATE %t
+                SET
+                    `lastPostUser`=?,
+                    `lastPostTopic`=?,
+                    `lastPostTopicTitle`=?,
+                    `lastPostDate`=?,
+                    `topics`=`topics`+1
+                WHERE `id` IN ?
+                SQL
+                ,
                 ['forums'],
                 $uid,
                 $tid,
@@ -466,15 +482,16 @@ final class Post implements Route
         } else {
             $this->database->special(
                 <<<'SQL'
-                    UPDATE %t
-                    SET
-                        `lastPostUser`=?,
-                        `lastPostTopic`=?,
-                        `lastPostTopicTitle`=?,
-                        `lastPostDate`=?,
-                        `posts`=`posts`+1
-                    WHERE `id` IN ?
-                    SQL,
+                UPDATE %t
+                SET
+                    `lastPostUser`=?,
+                    `lastPostTopic`=?,
+                    `lastPostTopicTitle`=?,
+                    `lastPostDate`=?,
+                    `posts`=`posts`+1
+                WHERE `id` IN ?
+                SQL
+                ,
                 ['forums'],
                 $uid,
                 $tid,
