@@ -70,7 +70,11 @@ final readonly class OpenGraph
                 $doc = new DOMDocument();
 
                 // This incantation prevents loadHTML from assuming ISO-8859-1
-                $contents = mb_encode_numericentity($contents, [0x80, 0x10FFFF, 0, ~0], 'UTF-8');
+                $contents = mb_encode_numericentity(
+                    $contents,
+                    [0x80, 0x10FFFF, 0, ~0],
+                    'UTF-8',
+                );
 
                 $doc->loadHTML($contents);
 
@@ -87,7 +91,13 @@ final readonly class OpenGraph
                     continue;
                 }
 
-                $metaValues[str_replace(':', '__', mb_substr($property ?? '', 3))] = $metumTag->getAttribute('content');
+                $metaValues[str_replace(
+                    ':',
+                    '__',
+                    mb_substr($property ?? '', 3),
+                )] = $metumTag->getAttribute(
+                    'content',
+                );
             }
 
             libxml_clear_errors();
@@ -114,7 +124,10 @@ final readonly class OpenGraph
     {
         $openGraphData = [];
 
-        $urls = array_filter($this->bbCode->getURLs($text), $this->filterHTTPURL(...));
+        $urls = array_filter(
+            $this->bbCode->getURLs($text),
+            $this->filterHTTPURL(...),
+        );
 
         // Limit # of embeddings to prevent abuse
         $urls = array_slice($urls, 0, 3);

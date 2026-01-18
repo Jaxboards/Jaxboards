@@ -37,8 +37,17 @@ final readonly class BoardOffline implements Route
                         "You don't have permission to view the board. "
                             . 'If you have an account that has permission, '
                             . 'please log in.'
-                            . ($this->config->getSetting('boardoffline') && $this->config->getSetting('offlinetext')
-                                ? '<br><br>Note:<br>' . nl2br((string) $this->config->getSetting('offlinetext'), false)
+                            . ($this->config->getSetting(
+                                'boardoffline',
+                            ) && $this->config->getSetting(
+                                'offlinetext',
+                            )
+                                ? '<br><br>Note:<br>' . nl2br(
+                                    (string) $this->config->getSetting(
+                                        'offlinetext',
+                                    ),
+                                    false,
+                                )
                                 : ''),
                     ),
                 ],

@@ -61,7 +61,10 @@ final readonly class Calendar implements Route
         $year = (int) $year;
         $month = (int) $month;
 
-        $this->session->set('locationVerbose', 'Checking out the calendar for ' . $monthName . ' ' . $year);
+        $this->session->set(
+            'locationVerbose',
+            'Checking out the calendar for ' . $monthName . ' ' . $year,
+        );
         $members = Member::selectMany(
             'WHERE MONTH(`birthdate`)=? AND YEAR(`birthdate`)<=?',
             $month,
@@ -106,7 +109,10 @@ final readonly class Calendar implements Route
             'weeks' => $weeks,
             'year' => $year,
         ]);
-        $page = $this->template->render('global/box', ['title' => 'Calendar', 'content' => $page]);
+        $page = $this->template->render(
+            'global/box',
+            ['title' => 'Calendar', 'content' => $page],
+        );
 
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);

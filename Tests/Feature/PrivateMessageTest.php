@@ -102,7 +102,10 @@ final class PrivateMessageTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        $command = array_find($json, static fn($cmd): bool => $cmd[0] === 'im');
+        $command = array_find(
+            $json,
+            static fn($cmd): bool => $cmd[0] === 'im',
+        );
         $this->assertEquals(1, $command[1]);
         $this->assertEquals('Admin', $command[2]);
         $this->assertEquals('test', $command[3]);

@@ -14,7 +14,13 @@ final class File extends Model
 {
     public const TABLE = 'files';
 
-    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
+    #[Column(
+        name: 'id',
+        type: 'int',
+        nullable: false,
+        autoIncrement: true,
+        unsigned: true,
+    )]
     #[PrimaryKey]
     public int $id = 0;
 
@@ -29,13 +35,31 @@ final class File extends Model
     #[ForeignKey(table: 'members', field: 'id', onDelete: 'null')]
     public int $uid = 0;
 
-    #[Column(name: 'size', type: 'int', default: 0, nullable: false, unsigned: true)]
+    #[Column(
+        name: 'size',
+        type: 'int',
+        default: 0,
+        nullable: false,
+        unsigned: true,
+    )]
     public int $size = 0;
 
-    #[Column(name: 'downloads', type: 'int', default: 0, nullable: false, unsigned: true)]
+    #[Column(
+        name: 'downloads',
+        type: 'int',
+        default: 0,
+        nullable: false,
+        unsigned: true,
+    )]
     public int $downloads = 0;
 
-    #[Column(name: 'ip', type: 'binary', default: '', length: 16, nullable: false)]
+    #[Column(
+        name: 'ip',
+        type: 'binary',
+        default: '',
+        length: 16,
+        nullable: false,
+    )]
     #[Key]
     public string $ip = '';
 }

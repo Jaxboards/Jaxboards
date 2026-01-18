@@ -85,14 +85,16 @@ final class ServiceInstallTest extends TestCase
 
         $this->mockedFiles = [];
         $fileSystemMock->method('getFileInfo')
-            ->willReturnCallback(function (string $filename) use ($originalFileSystem): SplFileInfo {
-                if (array_key_exists($filename, $this->mockedFiles)) {
-                    return $this->mockedFiles[$filename];
-                }
+            ->willReturnCallback(
+                function (string $filename) use ($originalFileSystem): SplFileInfo {
+                    if (array_key_exists($filename, $this->mockedFiles)) {
+                        return $this->mockedFiles[$filename];
+                    }
 
-                // Pass through all others
+                    // Pass through all others
                 return $originalFileSystem->getFileInfo($filename);
-            })
+                },
+            )
         ;
 
         // Stub out FileSystem
@@ -110,7 +112,10 @@ final class ServiceInstallTest extends TestCase
 
         $page = $this->goServiceInstall();
 
-        $this->assertStringContainsString('Detected config.php at root.', $page);
+        $this->assertStringContainsString(
+            'Detected config.php at root.',
+            $page,
+        );
     }
 
     public function testInstallerFormNotInstalled(): void
@@ -169,7 +174,10 @@ final class ServiceInstallTest extends TestCase
         $this->assertEquals(false, $serviceConfig['service']);
         $this->assertEquals('Jaxboards', $serviceConfig['boardname']);
         $this->assertEquals('domain.com', $serviceConfig['domain']);
-        $this->assertEquals('Sean <admin_email@jaxboards.com>', $serviceConfig['mail_from']);
+        $this->assertEquals(
+            'Sean <admin_email@jaxboards.com>',
+            $serviceConfig['mail_from'],
+        );
         $this->assertEquals('jaxboards', $serviceConfig['prefix']);
         $this->assertEquals('sql_db', $serviceConfig['sql_db']);
         $this->assertEquals('sql_host', $serviceConfig['sql_host']);
@@ -233,7 +241,10 @@ final class ServiceInstallTest extends TestCase
         $this->assertEquals(true, $serviceConfig['service']);
         $this->assertEquals('Jaxboards', $serviceConfig['boardname']);
         $this->assertEquals('domain.com', $serviceConfig['domain']);
-        $this->assertEquals('Sean <admin_email@jaxboards.com>', $serviceConfig['mail_from']);
+        $this->assertEquals(
+            'Sean <admin_email@jaxboards.com>',
+            $serviceConfig['mail_from'],
+        );
         $this->assertEquals('', $serviceConfig['prefix']);
         $this->assertEquals('sql_db', $serviceConfig['sql_db']);
         $this->assertEquals('sql_host', $serviceConfig['sql_host']);
@@ -252,7 +263,10 @@ final class ServiceInstallTest extends TestCase
 
         $this->container->get(Database::class)->setPrefix('');
         $directory = Directory::selectOne(1);
-        $this->assertEquals('admin_email@jaxboards.com', $directory->registrarEmail);
+        $this->assertEquals(
+            'admin_email@jaxboards.com',
+            $directory->registrarEmail,
+        );
         $this->assertEquals('support', $directory->boardname);
 
         $this->assertStringContainsString('Redirecting', $page);

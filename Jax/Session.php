@@ -66,7 +66,9 @@ final class Session
 
     public function loginWithToken(): ?int
     {
-        $this->fetchSessionData(session_id() ?? $this->request->get('sessid') ?? null);
+        $this->fetchSessionData(
+            session_id() ?? $this->request->get('sessid') ?? null,
+        );
 
         if ($this->modelsSession->isBot !== 0) {
             return null;
@@ -171,12 +173,17 @@ final class Session
 
     public function getVar(string $varName): mixed
     {
-        return $this->vars[$varName] ?? $this->getPHPSessionValue($varName) ?? null;
+        return $this->vars[$varName] ?? $this->getPHPSessionValue(
+            $varName,
+        ) ?? null;
     }
 
     public function act(?string $location = null): void
     {
-        $this->set('lastAction', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
+        $this->set(
+            'lastAction',
+            $this->database->datetime(Carbon::now('UTC')->getTimestamp()),
+        );
         if (!$location) {
             return;
         }
@@ -191,7 +198,9 @@ final class Session
 
     public function clean(?int $uid): bool
     {
-        $timeago = Carbon::now('UTC')->subSeconds($this->config->getSetting('timetologout') ?? 900)->getTimestamp();
+        $timeago = Carbon::now('UTC')->subSeconds(
+            $this->config->getSetting('timetologout') ?? 900,
+        )->getTimestamp();
         if (!is_numeric($uid) || $uid < 1) {
             $uid = null;
         } else {

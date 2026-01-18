@@ -146,7 +146,9 @@ final class Forum implements Route
                     $pageURL = $this->router->url('forum', [
                         'id' => $forum->id,
                         'page' => $pageNumber,
-                        'slug' => $this->textFormatting->slugify($forum->title),
+                        'slug' => $this->textFormatting->slugify(
+                            $forum->title,
+                        ),
                     ]);
 
                     return "<a href='{$pageURL}' {$activeClass}>{$pageNumber}</a> ";
@@ -255,7 +257,13 @@ final class Forum implements Route
         }
 
         $pageArray = [];
-        foreach ($this->jax->pages((int) ceil(($topic->replies + 1) / 10), 1, 10) as $pageNumber) {
+        foreach (
+            $this->jax->pages(
+            (int) ceil(($topic->replies + 1) / 10),
+            1,
+            10,
+            ) as $pageNumber
+) {
             $pageURL = $this->router->url('topic', [
                 'id' => $topic->id,
                 'page' => $pageNumber,
@@ -274,12 +282,18 @@ final class Forum implements Route
         // Start building the nav path.
         $category = Category::selectOne($forum->category);
         $breadCrumbs = $category !== null
-            ? [$this->router->url('category', ['id' => $forum->category]) => $category->title]
+            ? [$this->router->url(
+                'category',
+                ['id' => $forum->category],
+            ) => $category->title]
             : [];
 
         // Subforum breadcrumbs
         if ($forum->path !== '') {
-            $path = array_map(static fn($fid): int => (int) $fid, explode(' ', $forum->path));
+            $path = array_map(
+                static fn($fid): int => (int) $fid,
+                explode(' ', $forum->path),
+            );
             $forums = ModelsForum::selectMany(Database::WHERE_ID_IN, $path);
             // This has to be two steps because WHERE ID IN(1,2,3)
             // does not select records in the same order
@@ -293,11 +307,17 @@ final class Forum implements Route
                 [],
             );
             foreach ($path as $pathId) {
-                $breadCrumbs[$this->router->url('forum', ['id' => $pathId])] = $forumTitles[$pathId];
+                $breadCrumbs[$this->router->url(
+                    'forum',
+                    ['id' => $pathId],
+                )] = $forumTitles[$pathId];
             }
         }
 
-        $breadCrumbs[$this->router->url('forum', ['id' => $forum->id])] = $forum->title;
+        $breadCrumbs[$this->router->url(
+            'forum',
+            ['id' => $forum->id],
+        )] = $forum->title;
         $this->page->setBreadCrumbs($breadCrumbs);
     }
 
@@ -381,12 +401,20 @@ final class Forum implements Route
     private function isTopicRead(Topic $topic): bool
     {
         if ($this->topicsRead === []) {
-            $this->topicsRead = json_decode($this->session->get()->topicsread, true, flags: JSON_THROW_ON_ERROR);
+            $this->topicsRead = json_decode(
+                $this->session->get()->topicsread,
+                true,
+                flags: JSON_THROW_ON_ERROR,
+            );
         }
 
         $forumReadTime = 0;
         if ($this->forumsRead === null) {
-            $forumsRead = json_decode($this->session->get()->forumsread, true, flags: JSON_THROW_ON_ERROR);
+            $forumsRead = json_decode(
+                $this->session->get()->forumsread,
+                true,
+                flags: JSON_THROW_ON_ERROR,
+            );
             if ($topic->fid && array_key_exists($topic->fid, $forumsRead)) {
                 $forumReadTime = $forumsRead[$topic->fid];
             }
@@ -401,7 +429,10 @@ final class Forum implements Route
         );
 
         return $timestamp <= (
-            (max($this->topicsRead[$topic->id], $forumReadTime) ?: $this->session->get()->readDate)
+            (max(
+                $this->topicsRead[$topic->id],
+                $forumReadTime,
+            ) ?: $this->session->get()->readDate)
             ?: $this->user->get()->lastVisit
         );
     }
@@ -414,13 +445,21 @@ final class Forum implements Route
 
 
         if ($this->forumsRead === null) {
-            $this->forumsRead = json_decode($this->session->get()->forumsread, true, flags: JSON_THROW_ON_ERROR);
+            $this->forumsRead = json_decode(
+                $this->session->get()->forumsread,
+                true,
+                flags: JSON_THROW_ON_ERROR,
+            );
         }
 
 
-        return $this->date->datetimeAsTimestamp($modelsForum->lastPostDate) <= (
+        return $this->date->datetimeAsTimestamp(
+            $modelsForum->lastPostDate,
+        ) <= (
             $this->forumsRead[$modelsForum->id] ?? null
-            ?: $this->date->datetimeAsTimestamp($this->session->get()->readDate)
+            ?: $this->date->datetimeAsTimestamp(
+                $this->session->get()->readDate,
+            )
             ?: $this->date->datetimeAsTimestamp($this->user->get()->lastVisit)
         );
     }
@@ -431,14 +470,25 @@ final class Forum implements Route
             return true;
         }
 
-        return in_array((string) $this->user->get()->id, explode(',', $modelsForum->mods), true);
+        return in_array(
+            (string) $this->user->get()->id,
+            explode(',', $modelsForum->mods),
+            true,
+        );
     }
 
     private function markRead(int $id): void
     {
-        $forumsread = json_decode($this->session->get()->forumsread, true, flags: JSON_THROW_ON_ERROR);
+        $forumsread = json_decode(
+            $this->session->get()->forumsread,
+            true,
+            flags: JSON_THROW_ON_ERROR,
+        );
         $forumsread[$id] = Carbon::now('UTC')->getTimestamp();
-        $this->session->set('forumsread', json_encode($forumsread, JSON_THROW_ON_ERROR));
+        $this->session->set(
+            'forumsread',
+            json_encode($forumsread, JSON_THROW_ON_ERROR),
+        );
     }
 
     private function markForumAsRead(int $id): void

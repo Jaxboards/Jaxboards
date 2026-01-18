@@ -113,7 +113,9 @@ final class TextFormattingTest extends UnitTestCase
         );
         $this->assertEquals(
             '[url=/topic/3?findpost=33&pid=33]Post #33[/url]',
-            $this->textFormatting->linkify('http://jaxboards.com/topic/3?findpost=33&pid=33'),
+            $this->textFormatting->linkify(
+                'http://jaxboards.com/topic/3?findpost=33&pid=33',
+            ),
         );
     }
 }

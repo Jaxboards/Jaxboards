@@ -23,6 +23,22 @@ final class FileSystemTest extends UnitTestCase
 {
     private FileSystem $fileSystem;
 
+    /**
+     * @return array<array{int, string}>
+     */
+    public static function fileSizeHumanReadableDataProvider(): array
+    {
+        return [
+            [5, '5B'],
+            [1 << 10, '1KB'],
+            [3 << 9, '1.5KB'],
+            [1 << 20, '1MB'],
+            [1 << 30, '1GB'],
+            [1 << 40, '1TB'],
+            [1 << 50, '1EB'],
+        ];
+    }
+
     protected function setUp(): void
     {
         $this->fileSystem = new FileSystem(sys_get_temp_dir());
@@ -33,7 +49,9 @@ final class FileSystemTest extends UnitTestCase
     {
         // mkdir
         $this->fileSystem->mkdir('jaxboards/deep', recursive: true);
-        $this->assertTrue($this->fileSystem->getFileInfo('jaxboards/deep')->isDir());
+        $this->assertTrue(
+            $this->fileSystem->getFileInfo('jaxboards/deep')->isDir(),
+        );
 
         // putContents
         $this->fileSystem->putContents(
@@ -52,15 +70,24 @@ final class FileSystemTest extends UnitTestCase
 
         // rename
         $this->fileSystem->rename('jaxboards/test', 'jaxboards/renamed');
-        $this->assertTrue($this->fileSystem->getFileInfo('jaxboards/renamed')->isFile());
+        $this->assertTrue(
+            $this->fileSystem->getFileInfo('jaxboards/renamed')->isFile(),
+        );
 
         // Create test file again so we have multiple files
-        $this->fileSystem->putContents('jaxboards/test', implode("\n", range(1, 5)));
+        $this->fileSystem->putContents(
+            'jaxboards/test',
+            implode("\n", range(1, 5)),
+        );
 
         // copyDirectory
         $this->fileSystem->copyDirectory('jaxboards', 'jaxboards2');
-        $this->assertTrue($this->fileSystem->getFileInfo('jaxboards2/renamed')->isFile());
-        $this->assertTrue($this->fileSystem->getFileInfo('jaxboards2/test')->isFile());
+        $this->assertTrue(
+            $this->fileSystem->getFileInfo('jaxboards2/renamed')->isFile(),
+        );
+        $this->assertTrue(
+            $this->fileSystem->getFileInfo('jaxboards2/test')->isFile(),
+        );
 
         // glob
         $this->assertEqualsCanonicalizing(
@@ -77,9 +104,15 @@ final class FileSystemTest extends UnitTestCase
         // Cleanup and assert on the way out
         $this->fileSystem->removeDirectory('jaxboards');
         $this->fileSystem->removeDirectory('jaxboards2');
-        $this->assertFalse($this->fileSystem->getFileInfo('jaxboards/test')->isFile());
-        $this->assertFalse($this->fileSystem->getFileInfo('jaxboards/renamed')->isFile());
-        $this->assertFalse($this->fileSystem->getFileInfo('jaxboards2')->isDir());
+        $this->assertFalse(
+            $this->fileSystem->getFileInfo('jaxboards/test')->isFile(),
+        );
+        $this->assertFalse(
+            $this->fileSystem->getFileInfo('jaxboards/renamed')->isFile(),
+        );
+        $this->assertFalse(
+            $this->fileSystem->getFileInfo('jaxboards2')->isDir(),
+        );
     }
 
     #[DataProvider('fileSizeHumanReadableDataProvider')]
@@ -87,22 +120,9 @@ final class FileSystemTest extends UnitTestCase
         int $fileSize,
         string $readable,
     ): void {
-        $this->assertEquals($readable, $this->fileSystem->fileSizeHumanReadable($fileSize));
-    }
-
-    /**
-     * @return array<array{int, string}>
-     */
-    public static function fileSizeHumanReadableDataProvider(): array
-    {
-        return [
-            [5, '5B'],
-            [1 << 10, '1KB'],
-            [3 << 9, '1.5KB'],
-            [1 << 20, '1MB'],
-            [1 << 30, '1GB'],
-            [1 << 40, '1TB'],
-            [1 << 50, '1EB'],
-        ];
+        $this->assertEquals(
+            $readable,
+            $this->fileSystem->fileSizeHumanReadable($fileSize),
+        );
     }
 }

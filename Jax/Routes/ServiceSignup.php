@@ -73,7 +73,11 @@ final readonly class ServiceSignup
     private function signup(): string
     {
         if ($this->request->post('post') !== null) {
-            header('Location: https://test.' . $this->serviceConfig->getSetting('domain'));
+            header(
+                'Location: https://test.' . $this->serviceConfig->getSetting(
+                    'domain',
+                ),
+            );
         }
 
         $username = $this->request->asString->post('username');
@@ -121,7 +125,9 @@ final readonly class ServiceSignup
         $directoryCount = Directory::count(
             'WHERE `registrarIP`=? AND `date`>?',
             $this->ipAddress->asBinary(),
-            $this->database->datetime(Carbon::now('UTC')->subWeeks(1)->getTimestamp()),
+            $this->database->datetime(
+                Carbon::now('UTC')->subWeeks(1)->getTimestamp(),
+            ),
         );
 
         if ($directoryCount > 3) {
@@ -156,9 +162,14 @@ final readonly class ServiceSignup
         $member->pass = password_hash($password, PASSWORD_DEFAULT);
         $member->insert();
 
-        $this->fileSystem->copyDirectory('Service/blueprint', 'boards/' . $boardURLLowercase);
+        $this->fileSystem->copyDirectory(
+            'Service/blueprint',
+            'boards/' . $boardURLLowercase,
+        );
 
-        $redirect = 'https://' . $boardURL . '.' . $this->serviceConfig->getSetting('domain');
+        $redirect = 'https://' . $boardURL . '.' . $this->serviceConfig->getSetting(
+            'domain',
+        );
         header("Location: {$redirect}");
 
         return "Error redirecting you to Location: {$redirect}";

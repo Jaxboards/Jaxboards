@@ -145,7 +145,10 @@ final class Ticker implements Route
         return $this->template->render(
             'ticker/tick',
             [
-                'date' => $post->date ? $this->date->smallDate($post->date, ['autodate' => true]) : '',
+                'date' => $post->date ? $this->date->smallDate(
+                    $post->date,
+                    ['autodate' => true],
+                ) : '',
                 'user' => $postAuthor,
                 'topic' => $topic,
                 'post' => $post,

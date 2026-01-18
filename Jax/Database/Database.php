@@ -198,7 +198,9 @@ final class Database
 
         $keysPrepared = $this->buildUpdate($keyValuePairs);
         $values = array_values($keyValuePairs);
-        $query = 'UPDATE ' . $this->ftable($table) . ' SET ' . $keysPrepared . ' ' . $whereFormat;
+        $query = 'UPDATE ' . $this->ftable(
+            $table,
+        ) . ' SET ' . $keysPrepared . ' ' . $whereFormat;
 
         return $this->query($query, ...$values, ...$whereParams);
     }
@@ -282,7 +284,11 @@ final class Database
 
         if ($args !== []) {
             foreach ($outArgs as $index => $value) {
-                $pdoStmt->bindValue($index + 1, $value, $this->queryTypeForPDOValue($value));
+                $pdoStmt->bindValue(
+                    $index + 1,
+                    $value,
+                    $this->queryTypeForPDOValue($value),
+                );
             }
         }
 

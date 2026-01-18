@@ -54,7 +54,13 @@ final readonly class Utils implements Adapter
 
         foreach ($this->fileSystem->glob("{$directory}/*.php") as $model) {
             $fileInfo = $this->fileSystem->getFileInfo($model);
-            $models[] = str_replace('/', '\\', $directory) . $fileInfo->getBasename('.php');
+            $models[] = str_replace(
+                '/',
+                '\\',
+                $directory,
+            ) . $fileInfo->getBasename(
+                '.php',
+            );
         }
 
         return $models;
@@ -73,7 +79,9 @@ final readonly class Utils implements Adapter
     {
         $prefix = $this->database->getPrefix();
         $this->database->setPrefix('');
-        $this->installTablesFromModels($this->getModels('Jax/Models/Service/'));
+        $this->installTablesFromModels(
+            $this->getModels('Jax/Models/Service/'),
+        );
         $this->database->setPrefix($prefix);
     }
 
@@ -100,7 +108,11 @@ final readonly class Utils implements Adapter
                     is_string($value)
                     && !mb_check_encoding($value, 'UTF-8')
                 ) {
-                    $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1');
+                    $value = mb_convert_encoding(
+                        $value,
+                        'UTF-8',
+                        'ISO-8859-1',
+                    );
                 }
 
                 if ($rowIndex === 0) {
@@ -113,7 +125,10 @@ final readonly class Utils implements Adapter
 
         $values = implode(', ', array_map(
             static fn($strRow): string => "({$strRow})",
-            array_map(static fn(array $row): string => implode(', ', $row), $rows),
+            array_map(
+                static fn(array $row): string => implode(', ', $row),
+                $rows,
+            ),
         ));
 
         return "INSERT INTO `{$tableName}`"
@@ -130,7 +145,9 @@ final readonly class Utils implements Adapter
 
         foreach ($models as $modelClass) {
             $model = new $modelClass();
-            $queries[] = 'DROP TABLE IF EXISTS ' . $this->database->ftable($model::TABLE);
+            $queries[] = 'DROP TABLE IF EXISTS ' . $this->database->ftable(
+                $model::TABLE,
+            );
             $queries[] = $this->adapter->createTableQueryFromModel($model);
         }
 

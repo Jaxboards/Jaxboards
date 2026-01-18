@@ -109,7 +109,12 @@ final class ModControlsTest extends FeatureTestCase
 
         $page = $this->go('/modcontrols');
 
-        DOMAssert::assertSelectEquals('.modcppage', 'Choose an option on the left.', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '.modcppage',
+            'Choose an option on the left.',
+            1,
+            $page,
+        );
     }
 
     public function testModCPIndexMember(): void
@@ -140,7 +145,11 @@ final class ModControlsTest extends FeatureTestCase
             post: ['mid' => '1', 'submit' => 'showform'],
         ));
 
-        DOMAssert::assertSelectCount('input[name=displayName][value=Admin]', 1, $page);
+        DOMAssert::assertSelectCount(
+            'input[name=displayName][value=Admin]',
+            1,
+            $page,
+        );
     }
 
     public function testEditMemberMemberProvidedSave(): void
@@ -157,9 +166,23 @@ final class ModControlsTest extends FeatureTestCase
             ],
         ));
 
-        DOMAssert::assertSelectEquals('.success', 'Profile information saved.', 1, $page);
-        DOMAssert::assertSelectCount('input[name=displayName][value="New Name"]', 1, $page);
-        DOMAssert::assertSelectEquals('textarea[name=signature]', 'New signature', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '.success',
+            'Profile information saved.',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectCount(
+            'input[name=displayName][value="New Name"]',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectEquals(
+            'textarea[name=signature]',
+            'New signature',
+            1,
+            $page,
+        );
     }
 
     public function testIPTools(): void
@@ -180,11 +203,35 @@ final class ModControlsTest extends FeatureTestCase
             post: ['ip' => '::1'],
         ));
 
-        DOMAssert::assertSelectCount('input[type=text][name=ip][value="::1"]', 1, $page);
-        DOMAssert::assertSelectEquals('span[style="color:#090"]', 'not banned', 1, $page);
-        DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Users with this IP:', 1, $page);
-        DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Last 5 shouts:', 0, $page);
-        DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Last 5 posts:', 0, $page);
+        DOMAssert::assertSelectCount(
+            'input[type=text][name=ip][value="::1"]',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectEquals(
+            'span[style="color:#090"]',
+            'not banned',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectEquals(
+            '.modcppage .minibox .title',
+            'Users with this IP:',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectEquals(
+            '.modcppage .minibox .title',
+            'Last 5 shouts:',
+            0,
+            $page,
+        );
+        DOMAssert::assertSelectEquals(
+            '.modcppage .minibox .title',
+            'Last 5 posts:',
+            0,
+            $page,
+        );
     }
 
     public function testOnlineSessions(): void
@@ -200,8 +247,18 @@ final class ModControlsTest extends FeatureTestCase
             get: ['path' => '/modcontrols/onlineSessions'],
         ));
 
-        DOMAssert::assertSelectEquals('.onlinesessions td', 'Firefox', 1, $page);
-        DOMAssert::assertSelectRegExp('.onlinesessions td', '/64.233.160.0/', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '.onlinesessions td',
+            'Firefox',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectRegExp(
+            '.onlinesessions td',
+            '/64.233.160.0/',
+            1,
+            $page,
+        );
     }
 
     public function testAddOriginalPostToModerate(): void
@@ -218,7 +275,10 @@ final class ModControlsTest extends FeatureTestCase
 
         $this->assertContainsEquals(['softurl'], $json);
         $this->assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
-        $this->assertEquals(json_encode(['modtids' => '1']), $sessionData->vars);
+        $this->assertEquals(
+            json_encode(['modtids' => '1']),
+            $sessionData->vars,
+        );
     }
 
     public function testAddPostReplyToModerate(): void
@@ -237,7 +297,10 @@ final class ModControlsTest extends FeatureTestCase
 
         $this->assertContainsEquals(['softurl'], $json);
         $this->assertContainsEquals(['modcontrols_postsync', $pid, ''], $json);
-        $this->assertEquals(json_encode(['modpids' => $pid]), $sessionData->vars);
+        $this->assertEquals(
+            json_encode(['modpids' => $pid]),
+            $sessionData->vars,
+        );
     }
 
     public function testAddTopicToModerate(): void
@@ -254,7 +317,10 @@ final class ModControlsTest extends FeatureTestCase
 
         $this->assertContainsEquals(['softurl'], $json);
         $this->assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
-        $this->assertEquals(json_encode(['modtids' => '1']), $sessionData->vars);
+        $this->assertEquals(
+            json_encode(['modtids' => '1']),
+            $sessionData->vars,
+        );
     }
 
     public function testDeletePostsWithTrashcan(): void
@@ -278,13 +344,25 @@ final class ModControlsTest extends FeatureTestCase
 
         $this->assertContainsEquals(['removeel', '#pid_2'], $json);
         $this->assertContainsEquals(['modcontrols_clearbox'], $json);
-        $this->assertContainsEquals(['location', '/topic/2'], $json, 'Mod redirected to trashcan topic');
+        $this->assertContainsEquals(
+            ['location', '/topic/2'],
+            $json,
+            'Mod redirected to trashcan topic',
+        );
 
         $trashcanTopic = Topic::selectOne(2);
         $post = Post::selectOne($pid);
 
-        $this->assertEquals($trashcanTopic->fid, $trashcanId, 'New topic is created in trashcan');
-        $this->assertEquals($post->tid, $trashcanTopic->id, 'Post is moved to new trashcan topic');
+        $this->assertEquals(
+            $trashcanTopic->fid,
+            $trashcanId,
+            'New topic is created in trashcan',
+        );
+        $this->assertEquals(
+            $post->tid,
+            $trashcanTopic->id,
+            'Post is moved to new trashcan topic',
+        );
     }
 
     public function testDeletePostsWithoutTrashcan(): void
@@ -384,7 +462,11 @@ final class ModControlsTest extends FeatureTestCase
 
         $this->assertContainsEquals(['modcontrols_clearbox'], $json);
 
-        $this->assertEquals(Post::selectOne($pid)->tid, $tid, 'Post was moved');
+        $this->assertEquals(
+            Post::selectOne($pid)->tid,
+            $tid,
+            'Post was moved',
+        );
     }
 
     public function testMoveTopics(): void
@@ -427,10 +509,16 @@ final class ModControlsTest extends FeatureTestCase
 
         $html = array_find(
             $json,
-            static fn($record): bool => array_key_exists(1, $record) && $record[1] === 'page',
+            static fn($record): bool => array_key_exists(
+                1,
+                $record,
+            ) && $record[1] === 'page',
         )[2];
 
-        $this->assertStringContainsString('Which topic should the topics be merged into?', $html);
+        $this->assertStringContainsString(
+            'Which topic should the topics be merged into?',
+            $html,
+        );
         DOMAssert::assertSelectCount('input[name="ot"][value="1"]', 1, $html);
     }
 
@@ -456,16 +544,34 @@ final class ModControlsTest extends FeatureTestCase
 
         $this->assertContainsEquals(['modcontrols_clearbox'], $json);
 
-        $redirect = array_find($json, static fn($cmd): bool => $cmd[0] === 'location');
+        $redirect = array_find(
+            $json,
+            static fn($cmd): bool => $cmd[0] === 'location',
+        );
         $this->assertStringContainsString(
-            $this->container->get(Router::class)->url('topic', ['id' => $topic->id]),
+            $this->container->get(Router::class)->url(
+                'topic',
+                ['id' => $topic->id],
+            ),
             $redirect[1],
         );
 
         $this->assertNull(Topic::selectOne(1), 'Original topic is deleted');
-        $this->assertEquals($topic->id, Post::selectOne(1)->tid, 'OP moved to new topic');
-        $this->assertEquals(1, Post::selectOne(1)->newtopic, 'Older post becomes OP');
-        $this->assertEquals(0, Post::selectOne(2)->newtopic, 'Newer post gets demoted to reply');
+        $this->assertEquals(
+            $topic->id,
+            Post::selectOne(1)->tid,
+            'OP moved to new topic',
+        );
+        $this->assertEquals(
+            1,
+            Post::selectOne(1)->newtopic,
+            'Older post becomes OP',
+        );
+        $this->assertEquals(
+            0,
+            Post::selectOne(2)->newtopic,
+            'Newer post gets demoted to reply',
+        );
     }
 
     public function testLockTopic(): void

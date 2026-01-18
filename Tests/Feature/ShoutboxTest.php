@@ -91,7 +91,10 @@ final class ShoutboxTest extends FeatureTestCase
         // Configure shoutbox to be enabled
         $this->container->set(
             Config::class,
-            autowire()->constructorParameter('boardConfig', ['shoutbox' => true]),
+            autowire()->constructorParameter(
+                'boardConfig',
+                ['shoutbox' => true],
+            ),
         );
 
         parent::setUp();
@@ -105,7 +108,12 @@ final class ShoutboxTest extends FeatureTestCase
             post: ['shoutbox_shout' => 'test'],
         ));
 
-        DOMAssert::assertSelectEquals('#shoutbox .error', 'You must be logged in to shout!', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '#shoutbox .error',
+            'You must be logged in to shout!',
+            1,
+            $page,
+        );
     }
 
     public function testAuthShout(): void
@@ -116,8 +124,18 @@ final class ShoutboxTest extends FeatureTestCase
             post: ['shoutbox_shout' => 'hello world!'],
         ));
 
-        DOMAssert::assertSelectEquals('#shoutbox .shouts .shout .user2', 'Member', 1, $page);
-        DOMAssert::assertSelectEquals('#shoutbox .shouts .shout', 'hello world!', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '#shoutbox .shouts .shout .user2',
+            'Member',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectEquals(
+            '#shoutbox .shouts .shout',
+            'hello world!',
+            1,
+            $page,
+        );
     }
 
     public function testMeCommand(): void
@@ -128,8 +146,18 @@ final class ShoutboxTest extends FeatureTestCase
             post: ['shoutbox_shout' => '/me did some stuff just now'],
         ));
 
-        DOMAssert::assertSelectEquals('#shoutbox .shouts .shout .user2', 'Member', 1, $page);
-        DOMAssert::assertSelectRegExp('#shoutbox .shouts .shout.action', '/did some stuff just now/', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '#shoutbox .shouts .shout .user2',
+            'Member',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectRegExp(
+            '#shoutbox .shouts .shout.action',
+            '/did some stuff just now/',
+            1,
+            $page,
+        );
     }
 
     public function testViewAllShouts(): void
@@ -141,6 +169,11 @@ final class ShoutboxTest extends FeatureTestCase
             post: ['shoutbox_shout' => 'Howdy partner!'],
         ));
 
-        DOMAssert::assertSelectEquals('.sbhistory .shout', 'Howdy partner!', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '.sbhistory .shout',
+            'Howdy partner!',
+            1,
+            $page,
+        );
     }
 }

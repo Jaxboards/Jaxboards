@@ -13,7 +13,13 @@ final class ProfileComment extends Model
 {
     public const TABLE = 'profile_comments';
 
-    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
+    #[Column(
+        name: 'id',
+        type: 'int',
+        nullable: false,
+        autoIncrement: true,
+        unsigned: true,
+    )]
     #[PrimaryKey]
     public int $id = 0;
 

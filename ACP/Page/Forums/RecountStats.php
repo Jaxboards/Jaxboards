@@ -24,7 +24,9 @@ final readonly class RecountStats
     public function render(): void
     {
         match (true) {
-            $this->request->both('execute') !== null => $this->recountStatistics(),
+            $this->request->both(
+                'execute',
+            ) !== null => $this->recountStatistics(),
             default => $this->showStats(),
         };
     }
@@ -90,7 +92,12 @@ final readonly class RecountStats
             }
 
             if ($countPostsInForum[$post['fid']]) {
-                if (!array_key_exists($post['author'], $stat['member_posts'])) {
+                if (
+                    !array_key_exists(
+                    $post['author'],
+                    $stat['member_posts'],
+                    )
+) {
                     $stat['member_posts'][$post['author']] = 0;
                 }
 

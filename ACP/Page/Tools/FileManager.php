@@ -40,13 +40,23 @@ final readonly class FileManager
             if ($file !== null) {
                 $fileInfo = $this->fileSystem->getFileInfo($file->name);
                 $ext = mb_strtolower($fileInfo->getExtension());
-                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'], true)) {
+                if (
+                    in_array(
+                    $ext,
+                    ['jpg', 'jpeg', 'png', 'gif', 'bmp'],
+                    true,
+                    )
+) {
                     $file->hash .= '.' . $ext;
                 }
 
                 $uploadFilePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash;
 
-                if ($this->fileSystem->getFileInfo($uploadFilePath)->isWritable()) {
+                if (
+                    $this->fileSystem->getFileInfo(
+                    $uploadFilePath,
+                    )->isWritable()
+) {
                     $page .= $this->fileSystem->unlink($uploadFilePath)
                         ? $this->page->success('File deleted')
                         : $this->page->error(
@@ -125,7 +135,9 @@ final readonly class FileManager
                 'tools/file-manager-row.html',
                 [
                     'downloads' => $file->downloads,
-                    'filesize' => $this->fileSystem->fileSizeHumanReadable($file->size),
+                    'filesize' => $this->fileSystem->fileSizeHumanReadable(
+                        $file->size,
+                    ),
                     'id' => $file->id,
                     'linked_in' => array_key_exists($file->id, $linkedIn)
                         ? implode(', ', $linkedIn[$file->id]) : 'Not linked!',

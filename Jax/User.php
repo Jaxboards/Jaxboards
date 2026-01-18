@@ -169,7 +169,11 @@ final class User
 
             if (
                 $forum !== null
-                && in_array((string) $this->member->id, explode(',', $forum->mods), true)
+                && in_array(
+                    (string) $this->member->id,
+                    explode(',', $forum->mods),
+                    true,
+                )
             ) {
                 return true;
             }

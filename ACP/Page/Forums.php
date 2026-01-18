@@ -59,12 +59,24 @@ final readonly class Forums
 
         $edit = $this->request->both('edit');
         $categoryEdit = match (true) {
-            is_string($edit) && str_starts_with($edit, 'c_') => (int) mb_substr($edit, 2),
+            is_string($edit) && str_starts_with(
+                $edit,
+                'c_',
+            ) => (int) mb_substr(
+                $edit,
+                2,
+            ),
             default => null,
         };
         $delete = $this->request->both('delete');
         $categoryDelete = match (true) {
-            is_string($delete) && str_starts_with($delete, 'c_') => (int) mb_substr($delete, 2),
+            is_string($delete) && str_starts_with(
+                $delete,
+                'c_',
+            ) => (int) mb_substr(
+                $delete,
+                2,
+            ),
             default => null,
         };
 
@@ -76,7 +88,9 @@ final readonly class Forums
             },
             'delete' => match (true) {
                 is_numeric($delete) => $this->deleteForum((int) $delete),
-                $categoryDelete !== null => $this->deleteCategory($categoryDelete),
+                $categoryDelete !== null => $this->deleteCategory(
+                    $categoryDelete,
+                ),
                 default => null,
             },
             'order' => $this->orderForums(),
@@ -153,7 +167,11 @@ final readonly class Forums
             $permsTable .= $this->page->render(
                 'forums/create-forum-permissions-row.html',
                 [
-                    'global' => $this->checkbox($group->id, 'global', $groupPerms === null),
+                    'global' => $this->checkbox(
+                        $group->id,
+                        'global',
+                        $groupPerms === null,
+                    ),
                     'poll' => $this->checkbox(
                         $group->id,
                         'poll',
@@ -233,13 +251,19 @@ final readonly class Forums
                     'content' => $subforums !== []
                         // phpstan hates recursion
                         // @phpstan-ignore argument.type
-                        ? $this->printForumTree($subforums, $forums, $highlight)
+                        ? $this->printForumTree(
+                            $subforums,
+                            $forums,
+                            $highlight,
+                        )
                         : '',
                     'id' => $forumId,
                     'mods' => $mods,
                     'title' => $forum->title,
                     'trashcan' => $forum->trashcan
-                        ? $this->page->render('forums/order-forums-tree-item-trashcan.html')
+                        ? $this->page->render(
+                            'forums/order-forums-tree-item-trashcan.html',
+                        )
                         : '',
                 ],
             );
@@ -280,7 +304,10 @@ final readonly class Forums
         $forums = $this->fetchAllForums();
         $forumsByCategory = array_map(
             static fn(array $forums): ForumTree => new ForumTree($forums),
-            Lodash::groupBy($forums, static fn($forum): ?int => $forum->category),
+            Lodash::groupBy(
+                $forums,
+                static fn($forum): ?int => $forum->category,
+            ),
         );
 
         $categories = $this->fetchAllCategories();
@@ -291,7 +318,10 @@ final readonly class Forums
                 'forums/order-forums-tree-item.html',
                 [
                     'class' => 'parentlock',
-                    'content' => array_key_exists($categoryId, $forumsByCategory)
+                    'content' => array_key_exists(
+                        $categoryId,
+                        $forumsByCategory,
+                    )
                         ? $this->printForumTree(
                             $forumsByCategory[$categoryId]->getTree(),
                             $forums,
@@ -435,12 +465,18 @@ final readonly class Forums
         $page .= $this->page->render(
             'forums/create-forum.html',
             [
-                'description' => $forum ? $this->textFormatting->blockhtml($forum->subtitle) : '',
+                'description' => $forum ? $this->textFormatting->blockhtml(
+                    $forum->subtitle,
+                ) : '',
                 'count' => $this->page->checked(!$forum?->nocount),
                 'order_by_options' => $orderByOptions,
-                'redirect_url' => $forum ? $this->textFormatting->blockhtml($forum->redirect) : '',
+                'redirect_url' => $forum ? $this->textFormatting->blockhtml(
+                    $forum->redirect,
+                ) : '',
                 'subforum_options' => $subforumOptions,
-                'title' => $forum ? $this->textFormatting->blockhtml($forum->title) : '',
+                'title' => $forum ? $this->textFormatting->blockhtml(
+                    $forum->title,
+                ) : '',
                 'trashcan' => $this->page->checked((bool) $forum?->trashcan),
             ],
         );
@@ -482,7 +518,9 @@ final readonly class Forums
 
         $this->page->addContentBox(
             ($forum ? 'Edit' : 'Create') . ' Forum'
-                . ($forum ? ' - ' . $this->textFormatting->blockhtml($forum->title) : ''),
+                . ($forum ? ' - ' . $this->textFormatting->blockhtml(
+                    $forum->title,
+                ) : ''),
             $page,
         );
         $this->page->addContentBox('Moderators', $moderators);
@@ -723,7 +761,9 @@ final readonly class Forums
                 [
                     'id' => (string) $category->id,
                     'submit' => $category->id !== 0 ? 'Edit' : 'Create',
-                    'title' => $this->textFormatting->blockhtml($category->title),
+                    'title' => $this->textFormatting->blockhtml(
+                        $category->title,
+                    ),
                 ],
             ),
         );
@@ -800,7 +840,10 @@ final readonly class Forums
     {
         $categories = Category::selectMany('ORDER BY `order`,`id` ASC');
 
-        return Lodash::keyBy($categories, static fn($category): int => $category->id);
+        return Lodash::keyBy(
+            $categories,
+            static fn($category): int => $category->id,
+        );
     }
 
     /**
@@ -818,7 +861,10 @@ final readonly class Forums
      */
     private function fetchAllGroups(): array
     {
-        return Lodash::keyBy(Group::selectMany(), static fn($group): int => $group->id);
+        return Lodash::keyBy(
+            Group::selectMany(),
+            static fn($group): int => $group->id,
+        );
     }
 
     /*

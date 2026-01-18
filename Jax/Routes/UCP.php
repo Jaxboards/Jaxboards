@@ -109,7 +109,10 @@ final readonly class UCP implements Route
             }
         }
 
-        return ($error !== null ? $this->template->render('error', ['message' => $error]) : '')
+        return ($error !== null ? $this->template->render(
+            'error',
+            ['message' => $error],
+        ) : '')
             . $this->template->render(
                 'ucp/notepad',
                 [
@@ -143,7 +146,9 @@ final readonly class UCP implements Route
         if ($this->request->post('submit') !== null) {
             $update = [];
             foreach ($fields as $field) {
-                $update[$field] = $this->request->post($field) !== null ? 1 : 0;
+                $update[$field] = $this->request->post(
+                    $field,
+                ) !== null ? 1 : 0;
             }
 
             $this->user->setBulk($update);
@@ -174,7 +179,10 @@ final readonly class UCP implements Route
     {
         $changeSig = $this->request->asString->post('changesig');
         if ($changeSig !== null) {
-            $this->user->set('sig', $this->textFormatting->linkify($changeSig));
+            $this->user->set(
+                'sig',
+                $this->textFormatting->linkify($changeSig),
+            );
         }
 
         return $this->template->render(
@@ -216,7 +224,10 @@ final readonly class UCP implements Route
             }
 
             if ($error === null) {
-                $hashpass = password_hash((string) $newPass1, PASSWORD_DEFAULT);
+                $hashpass = password_hash(
+                    (string) $newPass1,
+                    PASSWORD_DEFAULT,
+                );
                 $this->user->set('pass', $hashpass);
                 $backURL = $this->router->url('ucp', ['what' => 'pass']);
 
@@ -318,21 +329,37 @@ final readonly class UCP implements Route
         $data = [
             'about' => $this->request->asString->post('about'),
             'contactAIM' => $this->request->asString->post('contactAIM'),
-            'contactBlueSky' => $this->request->asString->post('contactBlueSky'),
-            'contactDiscord' => $this->request->asString->post('contactDiscord'),
-            'contactGoogleChat' => $this->request->asString->post('contactGoogleChat'),
+            'contactBlueSky' => $this->request->asString->post(
+                'contactBlueSky',
+            ),
+            'contactDiscord' => $this->request->asString->post(
+                'contactDiscord',
+            ),
+            'contactGoogleChat' => $this->request->asString->post(
+                'contactGoogleChat',
+            ),
             'contactMSN' => $this->request->asString->post('contactMSN'),
             'contactSkype' => $this->request->asString->post('contactSkype'),
             'contactSteam' => $this->request->asString->post('contactSteam'),
-            'contactTwitter' => $this->request->asString->post('contactTwitter'),
+            'contactTwitter' => $this->request->asString->post(
+                'contactTwitter',
+            ),
             'contactYIM' => $this->request->asString->post('contactYIM'),
-            'contactYoutube' => $this->request->asString->post('contactYoutube'),
-            'displayName' => trim((string) $this->request->asString->post('displayName')),
+            'contactYoutube' => $this->request->asString->post(
+                'contactYoutube',
+            ),
+            'displayName' => trim(
+                (string) $this->request->asString->post('displayName'),
+            ),
             'dob_day' => (int) $this->request->asString->post('dob_day'),
             'dob_month' => (int) $this->request->asString->post('dob_month'),
             'dob_year' => (int) $this->request->asString->post('dob_year'),
             'full_name' => $this->request->asString->post('full_name'),
-            'gender' => in_array($this->request->asString->post('gender'), $genderOptions, true)
+            'gender' => in_array(
+                $this->request->asString->post('gender'),
+                $genderOptions,
+                true,
+            )
                 ? $this->request->asString->post('gender') : '',
             'location' => $this->request->asString->post('location'),
             'usertitle' => $this->request->asString->post('usertitle'),
@@ -362,7 +389,17 @@ final readonly class UCP implements Route
         }
 
         $data['birthdate'] = $data['dob_year'] || $data['dob_month']
-            ? Carbon::create($data['dob_year'], $data['dob_month'], $data['dob_day'], 0, 0, 0, 'UTC')?->format('Y-m-d H:i:s')
+            ? Carbon::create(
+                $data['dob_year'],
+                $data['dob_month'],
+                $data['dob_day'],
+                0,
+                0,
+                0,
+                'UTC',
+            )?->format(
+                'Y-m-d H:i:s',
+            )
             : null;
         unset($data['dob_day'], $data['dob_month'], $data['dob_year']);
 
@@ -426,7 +463,10 @@ final readonly class UCP implements Route
             if (is_string($updateResult)) {
                 $this->page->command('error', $updateResult);
 
-                return $this->template->render('error', ['message' => $updateResult]);
+                return $this->template->render(
+                    'error',
+                    ['message' => $updateResult],
+                );
             }
 
             $editProfileURL = $this->router->url('ucp', ['what' => 'profile']);

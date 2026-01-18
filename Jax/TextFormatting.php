@@ -137,7 +137,10 @@ final readonly class TextFormatting
         foreach ($codes[1] as $index => $language) {
             $code = $codes[2][$index];
 
-            $code = $language === '=php' ? highlight_string($code, true) : preg_replace(
+            $code = $language === '=php' ? highlight_string(
+                $code,
+                true,
+            ) : preg_replace(
                 "@([ \r\n]|^) @m",
                 '$1&nbsp;',
                 $this->blockhtml($code),
@@ -181,7 +184,13 @@ final readonly class TextFormatting
             return '';
         }
 
-        while (($cleaned = (string) preg_replace('@\[(\w+)[^\]]*\](.*)\[/\1\]@Us', '$2', $text)) !== $text) {
+        while (
+            ($cleaned = (string) preg_replace(
+            '@\[(\w+)[^\]]*\](.*)\[/\1\]@Us',
+            '$2',
+            $text,
+            )) !== $text
+) {
             $text = $cleaned;
         }
 
@@ -239,13 +248,24 @@ final readonly class TextFormatting
             && $parts['host'] === $this->request->server('HTTP_HOST')
         ) {
             $inner = match (true) {
-                (bool) preg_match('@pid=(\d+)@', $parts['query'] ?? '', $postMatch) => "Post #{$postMatch[1]}",
-                (bool) preg_match('@^/topic/(\d+)@', $parts['path'] ?? '', $topicMatch) => "Topic #{$topicMatch[1]}",
+                (bool) preg_match(
+                    '@pid=(\d+)@',
+                    $parts['query'] ?? '',
+                    $postMatch,
+                ) => "Post #{$postMatch[1]}",
+                (bool) preg_match(
+                    '@^/topic/(\d+)@',
+                    $parts['path'] ?? '',
+                    $topicMatch,
+                ) => "Topic #{$topicMatch[1]}",
                 default => null,
             };
 
             $stringURL = $parts['path']
-                . (array_key_exists('query', $parts) ? "?{$parts['query']}" : '');
+                . (array_key_exists(
+                    'query',
+                    $parts,
+                ) ? "?{$parts['query']}" : '');
         }
 
         $inner ??= $stringURL;

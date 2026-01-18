@@ -59,8 +59,13 @@ final readonly class Settings
         $boardName = $this->request->asString->post('boardname');
         $logoUrl = $this->request->asString->post('logourl');
         $error = match (true) {
-            !is_string($boardName) || trim($boardName) === '' => 'Board name is required',
-            $logoUrl !== '' && !filter_var($logoUrl, FILTER_VALIDATE_URL) => 'Please enter a valid logo url.',
+            !is_string($boardName) || trim(
+                $boardName,
+            ) === '' => 'Board name is required',
+            $logoUrl !== '' && !filter_var(
+                $logoUrl,
+                FILTER_VALIDATE_URL,
+            ) => 'Please enter a valid logo url.',
             default => null,
         };
 
@@ -68,11 +73,19 @@ final readonly class Settings
             $this->config->write([
                 'boardname' => $this->request->post('boardname'),
                 'logourl' => $this->request->post('logourl'),
-                'boardoffline' => $this->request->post('boardoffline') !== null ? '0' : '1',
+                'boardoffline' => $this->request->post(
+                    'boardoffline',
+                ) !== null ? '0' : '1',
                 'offlinetext' => $this->request->post('offlinetext'),
-                'birthdays' => ($this->request->post('bicon') !== null ? 1 : 0),
-                'hcaptcha_sitekey' => $this->request->post('hcaptcha_sitekey') ?: '',
-                'hcaptcha_secret' => $this->request->post('hcaptcha_secret') ?: '',
+                'birthdays' => ($this->request->post(
+                    'bicon',
+                ) !== null ? 1 : 0),
+                'hcaptcha_sitekey' => $this->request->post(
+                    'hcaptcha_sitekey',
+                ) ?: '',
+                'hcaptcha_secret' => $this->request->post(
+                    'hcaptcha_secret',
+                ) ?: '',
             ]);
         }
 
@@ -91,18 +104,23 @@ final readonly class Settings
         // This is silly, but we need the whole page to be a form
         $this->page->append('content', '<form method="post">');
 
-        $this->page->addContentBox('Board Name/Logo', $status . $this->page->render(
-            'settings/boardname.html',
-            [
-                'board_name' => $this->config->getSetting('boardname'),
-                'logo_url' => $this->config->getSetting('logourl'),
-            ],
-        ));
+        $this->page->addContentBox(
+            'Board Name/Logo',
+            $status . $this->page->render(
+                'settings/boardname.html',
+                [
+                    'board_name' => $this->config->getSetting('boardname'),
+                    'logo_url' => $this->config->getSetting('logourl'),
+                ],
+            ),
+        );
 
         $this->page->addContentBox('Board Online/Offline', $this->page->render(
             'settings/boardname-board-offline.html',
             [
-                'board_offline_checked' => $this->page->checked(!$this->config->getSetting('boardoffline')),
+                'board_offline_checked' => $this->page->checked(
+                    !$this->config->getSetting('boardoffline'),
+                ),
                 'board_offline_text' => $this->textFormatting->blockhtml(
                     $this->config->getSetting('offlinetext') ?? '',
                 ),
@@ -112,15 +130,21 @@ final readonly class Settings
         $this->page->addContentBox('Birthdays', $this->page->render(
             'settings/birthday.html',
             [
-                'checked' => $this->page->checked($this->config->getSetting('birthdays') !== 0),
+                'checked' => $this->page->checked(
+                    $this->config->getSetting('birthdays') !== 0,
+                ),
             ],
         ));
 
         $this->page->addContentBox('HCaptcha Setup', $this->page->render(
             'settings/hcaptcha.html',
             [
-                'hcaptcha_secret' => $this->config->getSetting('hcaptcha_secret'),
-                'hcaptcha_sitekey' => $this->config->getSetting('hcaptcha_sitekey'),
+                'hcaptcha_secret' => $this->config->getSetting(
+                    'hcaptcha_secret',
+                ),
+                'hcaptcha_sitekey' => $this->config->getSetting(
+                    'hcaptcha_sitekey',
+                ),
             ],
         ));
 
@@ -221,7 +245,9 @@ final readonly class Settings
         $page .= $this->page->render(
             'settings/pages-edit.html',
             [
-                'content' => $this->textFormatting->blockhtml($pageRecord->page),
+                'content' => $this->textFormatting->blockhtml(
+                    $pageRecord->page,
+                ),
             ],
         );
         $this->page->addContentBox("Editing Page: {$pageurl}", $page);
@@ -232,7 +258,9 @@ final readonly class Settings
         $shoutboxNum = (int) $this->request->asString->post('sbnum');
 
         if ($shoutboxNum === 0) {
-            return $this->page->error('Shouts to show must be between 1 and 10');
+            return $this->page->error(
+                'Shouts to show must be between 1 and 10',
+            );
         }
 
         $this->config->write([
@@ -262,8 +290,12 @@ final readonly class Settings
         $page .= $this->page->render(
             'settings/shoutbox.html',
             [
-                'shoutbox_avatar_checked' => $this->page->checked((bool) $this->config->getSetting('shoutboxava')),
-                'shoutbox_checked' => $this->page->checked((bool) $this->config->getSetting('shoutbox')),
+                'shoutbox_avatar_checked' => $this->page->checked(
+                    (bool) $this->config->getSetting('shoutboxava'),
+                ),
+                'shoutbox_checked' => $this->page->checked(
+                    (bool) $this->config->getSetting('shoutbox'),
+                ),
                 'show_shouts' => $this->config->getSetting('shoutbox_num'),
             ],
         );
@@ -274,7 +306,9 @@ final readonly class Settings
     {
         if ($submitButton === 'Save') {
             $this->config->write([
-                'badgesEnabled' => $this->request->post('badgesEnabled') ? 1 : 0,
+                'badgesEnabled' => $this->request->post(
+                    'badgesEnabled',
+                ) ? 1 : 0,
             ]);
         }
 
@@ -284,7 +318,9 @@ final readonly class Settings
             $description = $this->request->asString->post('description') ?? '';
 
             if ($imagePath === '' || $badgeTitle === '') {
-                return $this->page->error('Image path and badge title are required');
+                return $this->page->error(
+                    'Image path and badge title are required',
+                );
             }
 
             if (!filter_var($imagePath, FILTER_VALIDATE_URL)) {
@@ -407,7 +443,9 @@ final readonly class Settings
         $this->page->addContentBox('Badges', $this->page->render(
             'settings/badges-enable.html',
             [
-                'badges_enabled' => $this->config->getSetting('badgesEnabled') ? ' checked' : '',
+                'badges_enabled' => $this->config->getSetting(
+                    'badgesEnabled',
+                ) ? ' checked' : '',
             ],
         ));
 

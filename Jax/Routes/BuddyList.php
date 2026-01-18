@@ -87,7 +87,10 @@ final readonly class BuddyList implements Route
             $friends = array_map(
                 static fn(Member $member): array => [
                     'user' => $member,
-                    'class' => array_key_exists($member->id, $online) ? 'online' : 'offline',
+                    'class' => array_key_exists(
+                        $member->id,
+                        $online,
+                    ) ? 'online' : 'offline',
                 ],
                 Member::selectMany(
                     'WHERE `id` IN ? ORDER BY `name` ASC',
@@ -138,7 +141,11 @@ final readonly class BuddyList implements Route
 
         if (
             $this->user->get()->enemies
-            && in_array((string) $uid, explode(',', $this->user->get()->enemies), true)
+            && in_array(
+                (string) $uid,
+                explode(',', $this->user->get()->enemies),
+                true,
+            )
         ) {
             $this->unBlock($uid);
         }

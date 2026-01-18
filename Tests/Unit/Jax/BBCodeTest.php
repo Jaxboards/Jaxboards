@@ -43,50 +43,6 @@ final class BBCodeTest extends UnitTestCase
 {
     private BBCode $bbCode;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // Router is used for URL generation, we don't care to test that here
-        $this->container->set(Router::class, $this->createStub(Router::class));
-        $this->bbCode = $this->container->get(BBCode::class);
-    }
-
-    public function testGetURLS(): void
-    {
-        $this->assertEqualsCanonicalizing(
-            [
-                'http://cnn.com',
-                'http://twitch.com',
-            ],
-            $this->bbCode->getURLs(<<<'BBCODE'
-                [url]http://cnn.com[/url]
-
-                http://foxnews.com
-
-                [url=http://twitch.com]http://google.com[/url]
-                BBCODE),
-        );
-    }
-
-    #[DataProvider('bbcodeToHTMLDataProvider')]
-    public function testToHTML(string $input, string $output): void
-    {
-        if (str_starts_with($output, '/')) {
-            $this->assertMatchesRegularExpression(
-                $output,
-                $this->bbCode->toHTML($input),
-            );
-
-            return;
-        }
-
-        $this->assertEquals(
-            $output,
-            $this->bbCode->toHTML($input),
-        );
-    }
-
     /**
      * @return array<array{string,string}>
      */
@@ -187,5 +143,49 @@ final class BBCodeTest extends UnitTestCase
                 '/YouTube video player/',
             ],
         ];
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Router is used for URL generation, we don't care to test that here
+        $this->container->set(Router::class, $this->createStub(Router::class));
+        $this->bbCode = $this->container->get(BBCode::class);
+    }
+
+    public function testGetURLS(): void
+    {
+        $this->assertEqualsCanonicalizing(
+            [
+                'http://cnn.com',
+                'http://twitch.com',
+            ],
+            $this->bbCode->getURLs(<<<'BBCODE'
+                [url]http://cnn.com[/url]
+
+                http://foxnews.com
+
+                [url=http://twitch.com]http://google.com[/url]
+                BBCODE),
+        );
+    }
+
+    #[DataProvider('bbcodeToHTMLDataProvider')]
+    public function testToHTML(string $input, string $output): void
+    {
+        if (str_starts_with($output, '/')) {
+            $this->assertMatchesRegularExpression(
+                $output,
+                $this->bbCode->toHTML($input),
+            );
+
+            return;
+        }
+
+        $this->assertEquals(
+            $output,
+            $this->bbCode->toHTML($input),
+        );
     }
 }

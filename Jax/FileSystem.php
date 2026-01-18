@@ -79,13 +79,23 @@ final readonly class FileSystem
         }
 
         // Make directories first
-        foreach ($this->glob($this->pathJoin($src, '**'), GLOB_ONLYDIR) as $directory) {
+        foreach (
+            $this->glob(
+            $this->pathJoin($src, '**'),
+            GLOB_ONLYDIR,
+            ) as $directory
+) {
             $destDir = str_replace($src, $dst, $directory);
             $this->mkdir($destDir, recursive: true);
         }
 
         // Then files
-        foreach ($this->glob($this->pathJoin($src, '{**/,}*'), GLOB_BRACE) as $sourceFile) {
+        foreach (
+            $this->glob(
+            $this->pathJoin($src, '{**/,}*'),
+            GLOB_BRACE,
+            ) as $sourceFile
+) {
             if ($this->getFileInfo($sourceFile)->isDir()) {
                 continue;
             }
@@ -105,7 +115,11 @@ final readonly class FileSystem
         $magnitude = (int) log($sizeInBytes, 1 << 10);
 
         return round($sizeInBytes / (1 << 10) ** $magnitude, 2)
-            . ($magnitude !== 0 ? mb_substr(' KMGTE', $magnitude, 1) : '') . 'B';
+            . ($magnitude !== 0 ? mb_substr(
+                ' KMGTE',
+                $magnitude,
+                1,
+            ) : '') . 'B';
     }
 
     public function getContents(string $filenameOrURL): string
@@ -133,7 +147,9 @@ final readonly class FileSystem
         string $filename,
         bool $allowRootBypass = false,
     ): SplFileInfo {
-        return new SplFileInfo($allowRootBypass ? $filename : $this->pathFromRoot($filename));
+        return new SplFileInfo(
+            $allowRootBypass ? $filename : $this->pathFromRoot($filename),
+        );
     }
 
     /**
@@ -144,7 +160,10 @@ final readonly class FileSystem
         string $mode = 'r',
         bool $allowRootBypass = false,
     ): SplFileObject {
-        return new SplFileObject($allowRootBypass ? $filename : $this->pathFromRoot($filename), $mode);
+        return new SplFileObject(
+            $allowRootBypass ? $filename : $this->pathFromRoot($filename),
+            $mode,
+        );
     }
 
     /**

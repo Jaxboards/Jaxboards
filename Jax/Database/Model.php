@@ -54,7 +54,9 @@ abstract class Model
         $reflectionClass = new ReflectionClass(static::class);
 
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-            $maybePrimaryKeys = $reflectionProperty->getAttributes(PrimaryKey::class);
+            $maybePrimaryKeys = $reflectionProperty->getAttributes(
+                PrimaryKey::class,
+            );
             if ($maybePrimaryKeys !== []) {
                 [$column] = $reflectionProperty->getAttributes(Column::class);
 
@@ -73,7 +75,9 @@ abstract class Model
         $reflectionClass = new ReflectionClass(static::class);
         $attributes = array_merge(
             ...array_map(
-                static fn(ReflectionProperty $reflectionProperty): array => $reflectionProperty->getAttributes(Column::class),
+                static fn(ReflectionProperty $reflectionProperty): array => $reflectionProperty->getAttributes(
+                    Column::class,
+                ),
                 $reflectionClass->getProperties(),
             ),
         );
@@ -211,7 +215,10 @@ abstract class Model
 
         // Update insertId on the model
         if ($primaryKey !== null && !$this->{$primaryKey->name}) {
-            $reflectionProperty = new ReflectionProperty(static::class, $primaryKey->name);
+            $reflectionProperty = new ReflectionProperty(
+                static::class,
+                $primaryKey->name,
+            );
             $type = (string) $reflectionProperty->getType();
 
             $insertId = $database->insertId();

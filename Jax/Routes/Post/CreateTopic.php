@@ -70,17 +70,27 @@ final readonly class CreateTopic
         $error = match (true) {
             !$forum => "The forum you're trying to post in does not exist.",
             !$forumPerms['start'] => "You don't have permission to post a new topic in that forum.",
-            !$input['topicTitle'] || trim((string) $input['topicTitle']) === '' => "You didn't specify a topic title!",
-            mb_strlen((string) $input['topicTitle']) > 255 => 'Topic title must not exceed 255 characters',
-            mb_strlen($input['topicDescription'] ?? '') > 255 => 'Topic description must not exceed 255 characters',
+            !$input['topicTitle'] || trim(
+                (string) $input['topicTitle'],
+            ) === '' => "You didn't specify a topic title!",
+            mb_strlen(
+                (string) $input['topicTitle'],
+            ) > 255 => 'Topic title must not exceed 255 characters',
+            mb_strlen(
+                $input['topicDescription'] ?? '',
+            ) > 255 => 'Topic description must not exceed 255 characters',
             default => null,
         };
 
         // Poll input validation
         $error ??= match (true) {
             !$input['pollType'] => null,
-            $input['pollQuestion'] === null || trim($input['pollQuestion']) === '' => "You didn't specify a poll question!",
-            count($input['pollChoices']) > 10 => 'Poll choices must not exceed 10.',
+            $input['pollQuestion'] === null || trim(
+                $input['pollQuestion'],
+            ) === '' => "You didn't specify a poll question!",
+            count(
+                $input['pollChoices'],
+            ) > 10 => 'Poll choices must not exceed 10.',
             $input['pollChoices'] === [] => "You didn't provide any poll choices!",
             $forum && !$forumPerms['poll'] => "You don't have permission to post a poll in that forum",
             default => null,
@@ -161,7 +171,10 @@ final readonly class CreateTopic
             'tid' => $tid,
             'topic' => $topic,
         ]);
-        $page = '<div id="post-preview">' . $this->template->render('post/preview', ['post' => $postData]) . '</div>';
+        $page = '<div id="post-preview">' . $this->template->render(
+            'post/preview',
+            ['post' => $postData],
+        ) . '</div>';
         $page .= $this->template->render('global/box', [
             'title' => $forum->title . ' > New Topic',
             'content' => $form,

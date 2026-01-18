@@ -129,7 +129,10 @@ final class BBCode
 
     public function toInlineHTML(string $text): string
     {
-        return $this->replaceWithRules($text, array_merge(...array_values($this->inlineBBCodes)));
+        return $this->replaceWithRules(
+            $text,
+            array_merge(...array_values($this->inlineBBCodes)),
+        );
     }
 
     /**
@@ -138,7 +141,11 @@ final class BBCode
     private function replaceWithRules(string $text, array $rules): string
     {
         for ($nestLimit = 0; $nestLimit < 10; ++$nestLimit) {
-            $tmp = preg_replace(array_keys($rules), array_values($rules), $text);
+            $tmp = preg_replace(
+                array_keys($rules),
+                array_values($rules),
+                $text,
+            );
             if ($tmp === $text || !is_string($tmp)) {
                 break;
             }
@@ -263,7 +270,10 @@ final class BBCode
         $html = $tag === 'ol' ? '<ol>' : '<ul>';
         $html .= implode('', array_map(
             static fn(string $item): string => '<li>' . trim($item) . '</li>',
-            array_filter($items, static fn(string $line): bool => (bool) trim($line)),
+            array_filter(
+                $items,
+                static fn(string $line): bool => (bool) trim($line),
+            ),
         ));
 
         return $html . ($tag === 'ol' ? '</ol>' : '</ul>');

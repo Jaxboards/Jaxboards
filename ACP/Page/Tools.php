@@ -90,12 +90,17 @@ final readonly class Tools
 
             $ftable = $this->database->ftable($tableName);
             $sqlFileLines[] = "DROP TABLE IF EXISTS {$ftable};";
-            $sqlFileLines[] = $this->databaseUtils->createTableQueryFromModel(new $model()) . ';';
+            $sqlFileLines[] = $this->databaseUtils->createTableQueryFromModel(
+                new $model(),
+            ) . ';';
 
             // Generate INSERTS with all row data
             $select = $this->database->select('*', $tableName);
             foreach ($this->database->arows($select) as $row) {
-                $sqlFileLines[] = $this->databaseUtils->buildInsertQuery($ftable, [$row]);
+                $sqlFileLines[] = $this->databaseUtils->buildInsertQuery(
+                    $ftable,
+                    [$row],
+                );
             }
 
             $sqlFileLines[] = '';
@@ -124,7 +129,9 @@ final readonly class Tools
 
         $tempFile = tempnam(sys_get_temp_dir(), $this->database->getPrefix());
 
-        $boardPath = $this->fileSystem->pathFromRoot($this->domainDefinitions->getBoardPath());
+        $boardPath = $this->fileSystem->pathFromRoot(
+            $this->domainDefinitions->getBoardPath(),
+        );
 
         $zipArchive = new ZipArchive();
         $zipArchive->open($tempFile, ZipArchive::OVERWRITE);
@@ -139,7 +146,11 @@ final readonly class Tools
             '/*/*/*/*/*/*',
         ]);
 
-        $zipArchive->addGlob($boardPath . "{{$globStarStarIsNotSupportedWTF}}/*.*", GLOB_BRACE, ['remove_path' => $boardPath]);
+        $zipArchive->addGlob(
+            $boardPath . "{{$globStarStarIsNotSupportedWTF}}/*.*",
+            GLOB_BRACE,
+            ['remove_path' => $boardPath],
+        );
         $zipArchive->addFromString('backup.sql', $fileContents);
         $zipArchive->close();
 
@@ -167,10 +178,12 @@ final readonly class Tools
         if ($this->fileSystem->getFileInfo($logPath, true)->isReadable()) {
             $logFile = $this->fileSystem->getFileObject($logPath, 'r', true);
 
-            $last100Lines = htmlspecialchars(implode(PHP_EOL, $this->fileSystem->tail(
-                $logFile,
-                100,
-            )));
+            $last100Lines = htmlspecialchars(
+                implode(PHP_EOL, $this->fileSystem->tail(
+                    $logFile,
+                    100,
+                )),
+            );
             $contents = <<<HTML
                 <label for="errorlog">
                     Recent PHP error log output

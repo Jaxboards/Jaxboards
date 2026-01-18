@@ -53,7 +53,10 @@ final class App
         }
 
         $this->page->append('username', $this->user->get()->displayName);
-        $this->page->append('title', $this->config->getSetting('boardname') . ' - ACP');
+        $this->page->append(
+            'title',
+            $this->config->getSetting('boardname') . ' - ACP',
+        );
 
         $this->renderNav();
 
@@ -65,7 +68,10 @@ final class App
         }
 
         if ($this->ipAddress->isLocalHost()) {
-            $this->page->addContentBox('Debug', implode('<br>', $this->debugLog->getLog()));
+            $this->page->addContentBox(
+                'Debug',
+                implode('<br>', $this->debugLog->getLog()),
+            );
         }
 
         $this->page->out();

@@ -139,7 +139,12 @@ final class PostTest extends FeatureTestCase
 
         DOMAssert::assertSelectCount('input[name=ttitle]', 0, $page);
         DOMAssert::assertSelectCount('input[name=tdesc]', 0, $page);
-        DOMAssert::assertSelectRegExp('textarea[name=postdata]', '/matter of time/', 1, $page);
+        DOMAssert::assertSelectRegExp(
+            'textarea[name=postdata]',
+            '/matter of time/',
+            1,
+            $page,
+        );
     }
 
     public function testPostReplySubmit(): void
@@ -202,8 +207,18 @@ final class PostTest extends FeatureTestCase
             ],
         ));
 
-        DOMAssert::assertSelectEquals('#post-preview .title', 'Post Preview', 1, $page);
-        DOMAssert::assertSelectEquals('#post-preview .content', 'Post data', 1, $page);
+        DOMAssert::assertSelectEquals(
+            '#post-preview .title',
+            'Post Preview',
+            1,
+            $page,
+        );
+        DOMAssert::assertSelectEquals(
+            '#post-preview .content',
+            'Post data',
+            1,
+            $page,
+        );
     }
 
     public function testEditOwnPostForm(): void
@@ -212,7 +227,12 @@ final class PostTest extends FeatureTestCase
 
         $page = $this->go('/post?how=edit&tid=1&pid=1');
 
-        DOMAssert::assertSelectRegExp('textarea[name=postdata]', '/matter of time/', 1, $page);
+        DOMAssert::assertSelectRegExp(
+            'textarea[name=postdata]',
+            '/matter of time/',
+            1,
+            $page,
+        );
     }
 
     public function testEditOwnPostFormSubmit(): void
@@ -239,7 +259,11 @@ final class PostTest extends FeatureTestCase
         $this->assertEquals('updated description', $topic->subtitle);
         $this->assertEquals('updated post', $post->post);
 
-        $this->assertRedirect('topic', ['id' => '1', 'findpost' => '1'], $page);
+        $this->assertRedirect(
+            'topic',
+            ['id' => '1', 'findpost' => '1'],
+            $page,
+        );
     }
 
     public function testAdminEditOtherPost(): void
@@ -255,7 +279,12 @@ final class PostTest extends FeatureTestCase
 
         $page = $this->go('/post?how=edit&tid=1&pid=2');
 
-        DOMAssert::assertSelectEquals('textarea[name=postdata]', 'post', 1, $page);
+        DOMAssert::assertSelectEquals(
+            'textarea[name=postdata]',
+            'post',
+            1,
+            $page,
+        );
     }
 
     public function testMemberEditAdminPost(): void
@@ -271,7 +300,12 @@ final class PostTest extends FeatureTestCase
 
         $page = $this->go('/post?how=edit&tid=1&pid=2');
 
-        DOMAssert::assertSelectEquals('.error', "You don't have permission to edit that post!", 1, $page);
+        DOMAssert::assertSelectEquals(
+            '.error',
+            "You don't have permission to edit that post!",
+            1,
+            $page,
+        );
         DOMAssert::assertSelectCount('textarea[name=postdata]', 0, $page);
     }
 }

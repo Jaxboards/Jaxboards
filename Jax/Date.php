@@ -49,7 +49,10 @@ final class Date
             $timestamp = $this->datetimeAsTimestamp($timestamp);
         }
 
-        $formattedDate = gmdate('g:i' . ($seconds ? ':s' : '') . 'a, n/j/y', $timestamp);
+        $formattedDate = gmdate(
+            'g:i' . ($seconds ? ':s' : '') . 'a, n/j/y',
+            $timestamp,
+        );
 
         return $autodate
             ? "<span class='autodate smalldate' title='{$timestamp}'>{$formattedDate}</span>"
@@ -83,8 +86,17 @@ final class Date
         return match (true) {
             $delta < 90 => 'a minute ago',
             $delta < 3600 => round($delta / 60) . ' minutes ago',
-            gmdate('m j Y') === gmdate('m j Y', $date) => "Today @ {$hoursMinutes}",
-            gmdate('m j Y', Carbon::parse('yesterday')->getTimestamp()) === gmdate('m j Y', $date) => "Yesterday @ {$hoursMinutes}",
+            gmdate('m j Y') === gmdate(
+                'm j Y',
+                $date,
+            ) => "Today @ {$hoursMinutes}",
+            gmdate(
+                'm j Y',
+                Carbon::parse('yesterday')->getTimestamp(),
+            ) === gmdate(
+                'm j Y',
+                $date,
+            ) => "Yesterday @ {$hoursMinutes}",
             default => gmdate('M jS, Y @ g:i a', $date),
         };
     }

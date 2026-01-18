@@ -171,7 +171,10 @@ final class Groups
         $permInput = $this->request->post('perm');
         $groupListInput = $this->request->post('grouplist');
         $groupList = is_string($groupListInput)
-            ? array_map(static fn($gid): int => (int) $gid, explode(',', $groupListInput))
+            ? array_map(
+                static fn($gid): int => (int) $gid,
+                explode(',', $groupListInput),
+            )
             : null;
 
         if (
@@ -287,7 +290,9 @@ final class Groups
                     $groupColumns .= $this->page->render(
                         'groups/show-permissions-permission-row-group-column.html',
                         [
-                            'checked' => $this->page->checked((bool) $group->{$field}),
+                            'checked' => $this->page->checked(
+                                (bool) $group->{$field},
+                            ),
                             'groupID' => $groupId,
                             'permission' => $field,
                         ],
@@ -323,9 +328,16 @@ final class Groups
 
         $error = match (true) {
             !$groupName => 'Group name required!',
-            mb_strlen($groupName) > 250 => 'Group name must not exceed 250 characters!',
-            $groupIcon && mb_strlen($groupIcon) > 250 => 'Group icon must not exceed 250 characters!',
-            $groupIcon && !filter_var($groupIcon, FILTER_VALIDATE_URL) => 'Group icon must be a valid image url',
+            mb_strlen(
+                $groupName,
+            ) > 250 => 'Group name must not exceed 250 characters!',
+            $groupIcon && mb_strlen(
+                $groupIcon,
+            ) > 250 => 'Group icon must not exceed 250 characters!',
+            $groupIcon && !filter_var(
+                $groupIcon,
+                FILTER_VALIDATE_URL,
+            ) => 'Group icon must be a valid image url',
             default => null,
         };
 
@@ -374,9 +386,13 @@ final class Groups
         $page .= $this->page->render(
             'groups/create.html',
             [
-                'icon_url' => $group !== null ? $this->textFormatting->blockhtml($group->icon) : '',
+                'icon_url' => $group !== null ? $this->textFormatting->blockhtml(
+                    $group->icon,
+                ) : '',
                 'submit' => $group !== null ? 'Edit' : 'Create',
-                'title' => $group !== null ? $this->textFormatting->blockhtml($group->title) : '',
+                'title' => $group !== null ? $this->textFormatting->blockhtml(
+                    $group->title,
+                ) : '',
             ],
         );
         $this->page->addContentBox(

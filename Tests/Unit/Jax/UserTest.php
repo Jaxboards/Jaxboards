@@ -77,7 +77,10 @@ final class UserTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=', true);
+        $this->encodedForumFlags = base64_decode(
+            'AAEAPgADABgABAAYAAUAGAAGAD8=',
+            true,
+        );
     }
 
     public function testGetForumPermissionAsAdmin(): void
