@@ -1,7 +1,7 @@
 <?php
 
 /*
- * php-cs-fixer configuration
+ * Configuration for `php-cs-fixer`.
  *
  * This document has been generated with
  * https://mlocati.github.io/php-cs-fixer-configurator/#version:3.70.0|configurator
@@ -258,4 +258,3 @@ return (new Config())
             ]),
     )
 ;
-
