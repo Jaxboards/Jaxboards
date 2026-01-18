@@ -1,102 +1,89 @@
 {
-    "name": "jaxboards/jaxboards",
-    "description": "Realtime forum",
-    "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "ACP\\": "ACP",
-            "emoticons\\": "emoticons",
-            "Jax\\": "Jax",
-            "Service\\": "Service",
-            "Tools\\": "Tools",
-            "Tests\\": "Tests"
-        }
+  "name": "jaxboards/jaxboards",
+  "description": "Realtime forum",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "ACP\\": "ACP",
+      "emoticons\\": "emoticons",
+      "Jax\\": "Jax",
+      "Service\\": "Service",
+      "Tools\\": "Tools",
+      "Tests\\": "Tests"
+    }
+  },
+  "config": {
+    "classmap-authoritative": true,
+    "optimize-autoloader": true,
+    "platform": {
+      "composer": "2.9.3",
+      "php": "8.2.12"
     },
-    "config": {
-        "classmap-authoritative": true,
-        "optimize-autoloader": true,
-        "platform": {
-            "composer": "2.9.3",
-            "php": "8.2.12"
-        },
-        "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true
-        }
-    },
-    "minimum-stability": "stable",
-    "prefer-stable": true,
-    "require-dev": {
-        "brianium/paratest": "^7.8",
-        "composer": "2.9.3",
-        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
-        "dg/bypass-finals": "^1.9",
-        "friendsofphp/php-cs-fixer": "^3.73",
-        "php-parallel-lint/php-parallel-lint": "^1.4",
-        "phpmd/phpmd": "^2.15",
-        "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^11.5",
-        "phpunit/phpunit-dom-assertions": "^3.2",
-        "rector/rector": "^2.0",
-        "seanjohnson08/mysqlite": "dev-main",
-        "slevomat/coding-standard": "^8.16",
-        "spatie/phpunit-snapshot-assertions": "^5.2",
-        "squizlabs/php_codesniffer": "^3.12",
-        "vimeo/psalm": "^6.5"
-    },
-    "require": {
-        "composer": "^2.9.2",
-        "composer-plugin-api": "^2.6",
-        "composer-runtime-api": "^2.2",
-        "ext-curl": "*",
-        "ext-date": "*",
-        "ext-json": "*",
-        "ext-mbstring": "*",
-        "ext-openssl": "*",
-        "ext-zip": "*",
-        "lib-curl": "*",
-        "lib-curl-openssl": "*",
-        "lib-openssl": "*",
-        "lib-zip-libzip": "*",
-        "php": "^8.2.12",
-        "php-di/php-di": "^7.0",
-        "symfony/polyfill-php83": "^1.32",
-        "symfony/polyfill-php84": "^1.32",
-        "nesbot/carbon": "^3.9",
-        "lodash-php/lodash-php": "^0.1.0",
-        "geoip2/geoip2": "^3.3",
-        "twig/twig": "^3.22"
-    },
-    "scripts": {
-        "lint": [
-            "@phpcs"
-        ],
-        "migrations": "php Tools/migrations.php",
-        "parallel-lint": "parallel-lint --blame --exclude .git --exclude vendor --exclude node_modules --show-deprecated .",
-        "parallel-lint-report": [
-            "parallel-lint --exclude .git --exclude vendor --exclude node_modules --json --show-deprecated . > parallel-lint-report.json",
-            "php Tools/parallel_lint_to_sonarqube.php parallel-lint-report.json parallel-lint-report-sonarqube.json"
-        ],
-        "php-cs-fixer": "php-cs-fixer fix --allow-risky yes --verbose --verbose",
-        "phpcbf": "phpcbf",
-        "phpcs": "phpcs -s",
-        "phpcs-report": [
-            "phpcs -s --report-file=phpcs-report.json --report=json --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1",
-            "php Tools/php_codesniffer_to_sonarqube.php phpcs-report.json phpcs-report-sonarqube.json"
-        ],
-        "phpstan": "phpstan analyse --memory-limit=1G",
-        "phpstan-report": "phpstan analyse --memory-limit=1G --error-format=prettyJson > phpstan-report.json",
-        "phpmd": "phpmd . ansi phpmd.xml --exclude vendor,node_modules,Jax\\Models",
-        "phpmd-report": [
-            "phpmd . json phpmd.xml --exclude vendor,node_modules,Jax\\Models --ignore-violations-on-exit --report-file phpmd-report.json",
-            "php Tools/phpmd_to_sonarqube.php phpmd-report.json phpmd-report-sonarqube.json"
-        ],
-        "psalm": "psalm",
-        "psalm-report": "psalm --output-format=sonarqube > psalm-report.json",
-        "rector": "rector",
-        "test": [
-            "@putenv XDEBUG_MODE=coverage",
-            "paratest"
-        ]
-    },
-    "version": "3.0.0"
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "require-dev": {
+    "brianium/paratest": "^7.8",
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
+    "dg/bypass-finals": "^1.9",
+    "friendsofphp/php-cs-fixer": "^3.92",
+    "php-parallel-lint/php-parallel-lint": "^1.4",
+    "phpmd/phpmd": "^2.15",
+    "phpstan/phpstan": "^2.1",
+    "phpunit/phpunit": "^11.5",
+    "phpunit/phpunit-dom-assertions": "^3.2",
+    "rector/rector": "^2.3",
+    "seanjohnson08/mysqlite": "dev-main@dev",
+    "slevomat/coding-standard": "^8.26",
+    "spatie/phpunit-snapshot-assertions": "^5.2",
+    "squizlabs/php_codesniffer": "^4.0",
+    "vimeo/psalm": "^6.5"
+  },
+  "require": {
+    "composer": "2.9.3",
+    "php": "8.2.12",
+    "php-di/php-di": "^7.1",
+    "symfony/polyfill-php83": "^1.33",
+    "symfony/polyfill-php84": "^1.33",
+    "nesbot/carbon": "^3.11",
+    "lodash-php/lodash-php": "^0.1.0",
+    "geoip2/geoip2": "^3.3",
+    "twig/twig": "^3.22"
+  },
+  "scripts": {
+    "lint": [
+      "@phpcs"
+    ],
+    "migrations": "php Tools/migrations.php",
+    "parallel-lint": "parallel-lint --blame --exclude .git --exclude vendor --exclude node_modules --show-deprecated .",
+    "parallel-lint-report": [
+      "parallel-lint --exclude .git --exclude vendor --exclude node_modules --json --show-deprecated . > parallel-lint-report.json",
+      "php Tools/parallel_lint_to_sonarqube.php parallel-lint-report.json parallel-lint-report-sonarqube.json"
+    ],
+    "php-cs-fixer": "php-cs-fixer fix --allow-risky yes --verbose --verbose",
+    "phpcbf": "phpcbf",
+    "phpcs": "phpcs -s",
+    "phpcs-report": [
+      "phpcs -s --report-file=phpcs-report.json --report=json --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1",
+      "php Tools/php_codesniffer_to_sonarqube.php phpcs-report.json phpcs-report-sonarqube.json"
+    ],
+    "phpstan": "phpstan analyse --memory-limit=1G",
+    "phpstan-report": "phpstan analyse --memory-limit=1G --error-format=prettyJson > phpstan-report.json",
+    "phpmd": "phpmd . ansi phpmd.xml --exclude vendor,node_modules,Jax\\Models",
+    "phpmd-report": [
+      "phpmd . json phpmd.xml --exclude vendor,node_modules,Jax\\Models --ignore-violations-on-exit --report-file phpmd-report.json",
+      "php Tools/phpmd_to_sonarqube.php phpmd-report.json phpmd-report-sonarqube.json"
+    ],
+    "psalm": "psalm",
+    "psalm-report": "psalm --output-format=sonarqube > psalm-report.json",
+    "rector": "rector",
+    "test": [
+      "@putenv XDEBUG_MODE=coverage",
+      "paratest"
+    ]
+  },
+  "version": "3.0.0"
 }
