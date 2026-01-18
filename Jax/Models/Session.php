@@ -11,7 +11,7 @@ use Jax\Database\Model;
 
 final class Session extends Model
 {
-    public const TABLE = 'session';
+    public const string TABLE = 'session';
 
     #[Column(name: 'id', type: 'string', length: 191, nullable: false)]
     #[PrimaryKey]

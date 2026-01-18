@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Override;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -41,6 +40,7 @@ use Jax\TextRules;
 use Jax\User;
 use Jax\UserOnline;
 use Jax\UsersOnline;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\FeatureTestCase;
 

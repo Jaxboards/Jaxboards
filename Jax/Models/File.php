@@ -12,7 +12,7 @@ use Jax\Database\Model;
 
 final class File extends Model
 {
-    public const TABLE = 'files';
+    public const string TABLE = 'files';
 
     #[Column(
         name: 'id',

@@ -11,7 +11,7 @@ use Jax\Database\Model;
 
 final class Forum extends Model
 {
-    public const TABLE = 'forums';
+    public const string TABLE = 'forums';
 
     #[Column(
         name: 'id',

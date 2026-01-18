@@ -23,6 +23,22 @@ final class FileSystemTest extends UnitTestCase
 {
     private FileSystem $fileSystem;
 
+    /**
+     * @return array<array{int, string}>
+     */
+    public static function fileSizeHumanReadableDataProvider(): array
+    {
+        return [
+            [5, '5B'],
+            [1 << 10, '1KB'],
+            [3 << 9, '1.5KB'],
+            [1 << 20, '1MB'],
+            [1 << 30, '1GB'],
+            [1 << 40, '1TB'],
+            [1 << 50, '1EB'],
+        ];
+    }
+
     protected function setUp(): void
     {
         $this->fileSystem = new FileSystem(sys_get_temp_dir());
@@ -108,21 +124,5 @@ final class FileSystemTest extends UnitTestCase
             $readable,
             $this->fileSystem->fileSizeHumanReadable($fileSize),
         );
-    }
-
-    /**
-     * @return array<array{int, string}>
-     */
-    public static function fileSizeHumanReadableDataProvider(): array
-    {
-        return [
-            [5, '5B'],
-            [1 << 10, '1KB'],
-            [3 << 9, '1.5KB'],
-            [1 << 20, '1MB'],
-            [1 << 30, '1GB'],
-            [1 << 40, '1TB'],
-            [1 << 50, '1EB'],
-        ];
     }
 }

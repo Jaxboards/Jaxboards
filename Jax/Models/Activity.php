@@ -11,7 +11,7 @@ use Jax\Database\Model;
 
 final class Activity extends Model
 {
-    public const TABLE = 'activity';
+    public const string TABLE = 'activity';
 
     #[Column(
         name: 'id',

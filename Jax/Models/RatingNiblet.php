@@ -10,7 +10,7 @@ use Jax\Database\Model;
 
 final class RatingNiblet extends Model
 {
-    public const TABLE = 'ratingniblets';
+    public const string TABLE = 'ratingniblets';
 
     #[Column(
         name: 'id',

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Override;
 use Jax\App;
 use Jax\Constants\Groups;
 use Jax\Database\Database;
@@ -14,6 +13,7 @@ use Jax\Request;
 use Jax\Router;
 use Jax\Session as JaxSession;
 use Jax\User;
+use Override;
 use PHPUnit\Framework\Attributes\CoversNothing;
 
 use function DI\autowire;

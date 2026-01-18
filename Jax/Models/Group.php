@@ -10,7 +10,7 @@ use Jax\Database\Model;
 
 final class Group extends Model
 {
-    public const TABLE = 'member_groups';
+    public const string TABLE = 'member_groups';
 
     #[Column(
         name: 'id',

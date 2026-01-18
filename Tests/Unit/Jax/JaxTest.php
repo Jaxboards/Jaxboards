@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jax;
 
-use Override;
 use DI\Container;
 use Jax\Config;
 use Jax\Constants\Groups;
@@ -15,6 +14,7 @@ use Jax\Jax;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\ServiceConfig;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\UnitTestCase;

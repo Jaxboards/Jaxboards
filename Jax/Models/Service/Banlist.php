@@ -10,7 +10,7 @@ use Jax\Database\Model;
 
 final class Banlist extends Model
 {
-    public const TABLE = 'banlist';
+    public const string TABLE = 'banlist';
 
     #[Column(
         name: 'ipAddress',

@@ -23,7 +23,7 @@ use const SORT_REGULAR;
 
 abstract class Model
 {
-    public const TABLE = '';
+    public const string TABLE = '';
 
     private static Database $database;
 

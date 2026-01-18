@@ -11,7 +11,7 @@ use Jax\Database\Model;
 
 final class ProfileComment extends Model
 {
-    public const TABLE = 'profile_comments';
+    public const string TABLE = 'profile_comments';
 
     #[Column(
         name: 'id',

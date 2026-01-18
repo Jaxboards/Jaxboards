@@ -10,7 +10,7 @@ use Jax\Database\Model;
 
 final class Badge extends Model
 {
-    public const TABLE = 'badges';
+    public const string TABLE = 'badges';
 
     #[Column(
         name: 'id',
