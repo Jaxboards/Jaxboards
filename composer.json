@@ -17,7 +17,7 @@
     "optimize-autoloader": true,
     "platform": {
       "composer": "2.9.3",
-      "php": "8.2.12"
+      "php": "8.5.2"
     },
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true
@@ -52,7 +52,7 @@
     "lib-curl-openssl": "*",
     "lib-openssl": "*",
     "lib-zip-libzip": "*",
-    "php": "8.2.12",
+    "php": "8.5.2",
     "php-di/php-di": "^7.1",
     "symfony/polyfill-php83": "^1.33",
     "symfony/polyfill-php84": "^1.33",
