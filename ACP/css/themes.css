@@ -1,9 +1,9 @@
 .skins td:first-child a,
 .wrappers td:first-child a {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .skins td:first-child:hover a,
 .wrappers td:first-child:hover a {
-    visibility: visible;
+  visibility: visible;
 }
