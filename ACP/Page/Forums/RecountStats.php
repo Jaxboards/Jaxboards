@@ -72,26 +72,26 @@ final readonly class RecountStats
         foreach ($this->database->arows($result) as $post) {
             if (
                 !array_key_exists(
-                (string) $post['tid'],
-                $stat['topic_posts'],
+                    (string) $post['tid'],
+                    $stat['topic_posts'],
                 )
-) {
+            ) {
                 if (
                     !array_key_exists(
-                    (string) $post['fid'],
-                    $stat['forum_topics'],
+                        (string) $post['fid'],
+                        $stat['forum_topics'],
                     )
-) {
+                ) {
                     $stat['forum_topics'][$post['fid']] = 0;
                 }
 
                 ++$stat['forum_topics'][$post['fid']];
                 if (
                     !array_key_exists(
-                    (string) $post['fid'],
-                    $stat['forum_posts'],
+                        (string) $post['fid'],
+                        $stat['forum_posts'],
                     )
-) {
+                ) {
                     $stat['forum_posts'][$post['fid']] = 0;
                 }
 
@@ -101,10 +101,10 @@ final readonly class RecountStats
                 ++$stat['topic_posts'][$post['tid']];
                 if (
                     !array_key_exists(
-                    (string) $post['fid'],
-                    $stat['forum_posts'],
+                        (string) $post['fid'],
+                        $stat['forum_posts'],
                     )
-) {
+                ) {
                     $stat['forum_posts'][$post['fid']] = 0;
                 }
 

@@ -71,7 +71,7 @@ abstract class FeatureTestCase extends TestCase
             $name,
             $params,
         ) ?? $name;
-        self::assertStringContainsString("Location: {$location}", $page);
+        static::assertStringContainsString("Location: {$location}", $page);
     }
 
     /**
