@@ -38,7 +38,6 @@
         "phpunit/phpunit": "^11.5",
         "phpunit/phpunit-dom-assertions": "^3.2",
         "rector/rector": "^2.0",
-        "roave/security-advisories": "dev-master@dev",
         "seanjohnson08/mysqlite": "dev-main",
         "slevomat/coding-standard": "^8.16",
         "spatie/phpunit-snapshot-assertions": "^5.2",
