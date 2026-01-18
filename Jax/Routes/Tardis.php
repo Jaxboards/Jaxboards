@@ -17,9 +17,7 @@ final readonly class Tardis implements Route
 
     public function route($params): void
     {
-        $this->page->command(
-            'script',
-            <<<'JS'
+        $this->page->command('script', <<<'JS'
                 (function() {
                     if (window.tardis) {
                         return;
@@ -53,14 +51,8 @@ final readonly class Tardis implements Route
                     }
                     setInterval(window.tardis, 10);
                 })()
-            JS
-            ,
-        );
+            JS);
         $this->page->command('softurl');
-        $this->page->command(
-            'playsound',
-            'drwho',
-            $this->domainDefinitions->getSoundsUrl() . '/doctorwhotheme.mp3',
-        );
+        $this->page->command('playsound', 'drwho', $this->domainDefinitions->getSoundsUrl() . '/doctorwhotheme.mp3');
     }
 }

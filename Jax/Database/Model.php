@@ -54,9 +54,7 @@ abstract class Model
         $reflectionClass = new ReflectionClass(static::class);
 
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-            $maybePrimaryKeys = $reflectionProperty->getAttributes(
-                PrimaryKey::class,
-            );
+            $maybePrimaryKeys = $reflectionProperty->getAttributes(PrimaryKey::class);
             if ($maybePrimaryKeys !== []) {
                 [$column] = $reflectionProperty->getAttributes(Column::class);
 
@@ -75,17 +73,13 @@ abstract class Model
         $reflectionClass = new ReflectionClass(static::class);
         $attributes = array_merge(
             ...array_map(
-                static fn(
-                    ReflectionProperty $reflectionProperty,
-                ): array => $reflectionProperty->getAttributes(Column::class),
+                static fn(ReflectionProperty $reflectionProperty): array => $reflectionProperty->getAttributes(Column::class),
                 $reflectionClass->getProperties(),
             ),
         );
 
         return array_map(
-            static fn(
-                ReflectionAttribute $reflectionAttribute,
-            ) => $reflectionAttribute->getArguments()['name'],
+            static fn(ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->getArguments()['name'],
             $attributes,
         );
     }
@@ -120,7 +114,10 @@ abstract class Model
 
         $database = self::$database;
         $stmt = $database->select(
-            array_map($database->quoteIdentifier(...), static::getFields()),
+            array_map(
+                $database->quoteIdentifier(...),
+                static::getFields(),
+            ),
             static::TABLE,
             ...$selectArgs,
         );
@@ -173,12 +170,13 @@ abstract class Model
             SORT_REGULAR,
         );
 
-        return $otherIds !== []
-            ? Lodash::keyBy(
-                static::selectMany("WHERE {$key} IN ?", $otherIds),
-                static fn($member): int => $member->{$primaryKey},
-            )
-            : $otherIds;
+        return $otherIds !== [] ? Lodash::keyBy(
+            static::selectMany(
+                "WHERE {$key} IN ?",
+                $otherIds,
+            ),
+            static fn($member): int => $member->{$primaryKey},
+        ) : $otherIds;
     }
 
     public function delete(): ?PDOStatement
@@ -213,16 +211,14 @@ abstract class Model
 
         // Update insertId on the model
         if ($primaryKey !== null && !$this->{$primaryKey->name}) {
-            $reflectionProperty = new ReflectionProperty(
-                static::class,
-                $primaryKey->name,
-            );
+            $reflectionProperty = new ReflectionProperty(static::class, $primaryKey->name);
             $type = (string) $reflectionProperty->getType();
 
             $insertId = $database->insertId();
             if ($insertId) {
-                $this->{$primaryKey->name} =
-                    $type === 'string' ? $insertId : (int) $insertId;
+                $this->{$primaryKey->name} = $type === 'string'
+                    ? $insertId
+                    : (int) $insertId;
             }
         }
 
@@ -247,12 +243,10 @@ abstract class Model
         return $database->update(
             static::TABLE,
             $this->asArray(),
-            ...$primaryKey !== ''
-                ? [
-                    "WHERE {$primaryKey}=?",
-                    $data[static::getPrimaryKey()?->name],
-                ]
-                : [],
+            ...($primaryKey !== '' ? [
+                "WHERE {$primaryKey}=?",
+                $data[static::getPrimaryKey()?->name],
+            ] : []),
         );
     }
 

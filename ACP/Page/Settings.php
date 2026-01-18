@@ -59,10 +59,8 @@ final readonly class Settings
         $boardName = $this->request->asString->post('boardname');
         $logoUrl = $this->request->asString->post('logourl');
         $error = match (true) {
-            !is_string($boardName) || trim($boardName) === ''
-                => 'Board name is required',
-            $logoUrl !== '' && !filter_var($logoUrl, FILTER_VALIDATE_URL)
-                => 'Please enter a valid logo url.',
+            !is_string($boardName) || trim($boardName) === '' => 'Board name is required',
+            $logoUrl !== '' && !filter_var($logoUrl, FILTER_VALIDATE_URL) => 'Please enter a valid logo url.',
             default => null,
         };
 
@@ -70,14 +68,11 @@ final readonly class Settings
             $this->config->write([
                 'boardname' => $this->request->post('boardname'),
                 'logourl' => $this->request->post('logourl'),
-                'boardoffline' =>
-                    $this->request->post('boardoffline') !== null ? '0' : '1',
+                'boardoffline' => $this->request->post('boardoffline') !== null ? '0' : '1',
                 'offlinetext' => $this->request->post('offlinetext'),
-                'birthdays' => $this->request->post('bicon') !== null ? 1 : 0,
-                'hcaptcha_sitekey' =>
-                    $this->request->post('hcaptcha_sitekey') ?: '',
-                'hcaptcha_secret' =>
-                    $this->request->post('hcaptcha_secret') ?: '',
+                'birthdays' => ($this->request->post('bicon') !== null ? 1 : 0),
+                'hcaptcha_sitekey' => $this->request->post('hcaptcha_sitekey') ?: '',
+                'hcaptcha_secret' => $this->request->post('hcaptcha_secret') ?: '',
             ]);
         }
 
@@ -96,47 +91,38 @@ final readonly class Settings
         // This is silly, but we need the whole page to be a form
         $this->page->append('content', '<form method="post">');
 
-        $this->page->addContentBox(
-            'Board Name/Logo',
-            $status .
-                $this->page->render('settings/boardname.html', [
-                    'board_name' => $this->config->getSetting('boardname'),
-                    'logo_url' => $this->config->getSetting('logourl'),
-                ]),
-        );
+        $this->page->addContentBox('Board Name/Logo', $status . $this->page->render(
+            'settings/boardname.html',
+            [
+                'board_name' => $this->config->getSetting('boardname'),
+                'logo_url' => $this->config->getSetting('logourl'),
+            ],
+        ));
 
-        $this->page->addContentBox(
-            'Board Online/Offline',
-            $this->page->render('settings/boardname-board-offline.html', [
-                'board_offline_checked' => $this->page->checked(
-                    !$this->config->getSetting('boardoffline'),
-                ),
+        $this->page->addContentBox('Board Online/Offline', $this->page->render(
+            'settings/boardname-board-offline.html',
+            [
+                'board_offline_checked' => $this->page->checked(!$this->config->getSetting('boardoffline')),
                 'board_offline_text' => $this->textFormatting->blockhtml(
                     $this->config->getSetting('offlinetext') ?? '',
                 ),
-            ]),
-        );
+            ],
+        ));
 
-        $this->page->addContentBox(
-            'Birthdays',
-            $this->page->render('settings/birthday.html', [
-                'checked' => $this->page->checked(
-                    $this->config->getSetting('birthdays') !== 0,
-                ),
-            ]),
-        );
+        $this->page->addContentBox('Birthdays', $this->page->render(
+            'settings/birthday.html',
+            [
+                'checked' => $this->page->checked($this->config->getSetting('birthdays') !== 0),
+            ],
+        ));
 
-        $this->page->addContentBox(
-            'HCaptcha Setup',
-            $this->page->render('settings/hcaptcha.html', [
-                'hcaptcha_secret' => $this->config->getSetting(
-                    'hcaptcha_secret',
-                ),
-                'hcaptcha_sitekey' => $this->config->getSetting(
-                    'hcaptcha_sitekey',
-                ),
-            ]),
-        );
+        $this->page->addContentBox('HCaptcha Setup', $this->page->render(
+            'settings/hcaptcha.html',
+            [
+                'hcaptcha_secret' => $this->config->getSetting('hcaptcha_secret'),
+                'hcaptcha_sitekey' => $this->config->getSetting('hcaptcha_sitekey'),
+            ],
+        ));
 
         $this->page->append('content', '</form>');
     }
@@ -158,9 +144,8 @@ final readonly class Settings
                 $pageAct,
             );
             if ($newact !== $pageAct) {
-                $error =
-                    'The page URL must contain only letters and numbers. ' .
-                    "Invalid characters: {$newact}";
+                $error = 'The page URL must contain only letters and numbers. '
+                    . "Invalid characters: {$newact}";
             } elseif (mb_strlen($newact) > 25) {
                 $error = 'The page URL cannot exceed 25 characters.';
             } else {
@@ -175,30 +160,45 @@ final readonly class Settings
         $pages = ModelsPage::selectMany();
         $table = '';
         foreach ($pages as $pageRecord) {
-            $table .= $this->page->render('settings/pages-row.html', [
-                'act' => $pageRecord->act,
-            ]);
+            $table .= $this->page->render(
+                'settings/pages-row.html',
+                [
+                    'act' => $pageRecord->act,
+                ],
+            );
         }
 
         if ($table !== '') {
-            $page .= $this->page->render('settings/pages.html', [
-                'content' => $table,
-            ]);
+            $page .= $this->page->render(
+                'settings/pages.html',
+                [
+                    'content' => $table,
+                ],
+            );
         }
 
-        $hiddenFields = Template::hiddenFormFields([
-            'act' => 'Settings',
-            'do' => 'pages',
-        ]);
-        $page .= $this->page->render('settings/pages-new.html', [
-            'hidden_fields' => $hiddenFields,
-        ]);
+        $hiddenFields = Template::hiddenFormFields(
+            [
+                'act' => 'Settings',
+                'do' => 'pages',
+            ],
+        );
+        $page .= $this->page->render(
+            'settings/pages-new.html',
+            [
+                'hidden_fields' => $hiddenFields,
+            ],
+        );
         $this->page->addContentBox('Custom Pages', $page);
     }
 
     private function pages_delete(string $page): void
     {
-        $this->database->delete('pages', 'WHERE `act`=?', $page);
+        $this->database->delete(
+            'pages',
+            'WHERE `act`=?',
+            $page,
+        );
     }
 
     private function pagesEdit(string $pageurl): void
@@ -218,9 +218,12 @@ final readonly class Settings
             );
         }
 
-        $page .= $this->page->render('settings/pages-edit.html', [
-            'content' => $this->textFormatting->blockhtml($pageRecord->page),
-        ]);
+        $page .= $this->page->render(
+            'settings/pages-edit.html',
+            [
+                'content' => $this->textFormatting->blockhtml($pageRecord->page),
+            ],
+        );
         $this->page->addContentBox("Editing Page: {$pageurl}", $page);
     }
 
@@ -229,9 +232,7 @@ final readonly class Settings
         $shoutboxNum = (int) $this->request->asString->post('sbnum');
 
         if ($shoutboxNum === 0) {
-            return $this->page->error(
-                'Shouts to show must be between 1 and 10',
-            );
+            return $this->page->error('Shouts to show must be between 1 and 10');
         }
 
         $this->config->write([
@@ -247,7 +248,10 @@ final readonly class Settings
     {
         $page = '';
         if ($this->request->post('clearall') !== null) {
-            $this->database->special('TRUNCATE TABLE %t', ['shouts']);
+            $this->database->special(
+                'TRUNCATE TABLE %t',
+                ['shouts'],
+            );
             $page .= $this->page->success('Shoutbox cleared!');
         }
 
@@ -255,15 +259,14 @@ final readonly class Settings
             $page .= $this->saveShoutboxSettings();
         }
 
-        $page .= $this->page->render('settings/shoutbox.html', [
-            'shoutbox_avatar_checked' => $this->page->checked(
-                (bool) $this->config->getSetting('shoutboxava'),
-            ),
-            'shoutbox_checked' => $this->page->checked(
-                (bool) $this->config->getSetting('shoutbox'),
-            ),
-            'show_shouts' => $this->config->getSetting('shoutbox_num'),
-        ]);
+        $page .= $this->page->render(
+            'settings/shoutbox.html',
+            [
+                'shoutbox_avatar_checked' => $this->page->checked((bool) $this->config->getSetting('shoutboxava')),
+                'shoutbox_checked' => $this->page->checked((bool) $this->config->getSetting('shoutbox')),
+                'show_shouts' => $this->config->getSetting('shoutbox_num'),
+            ],
+        );
         $this->page->addContentBox('Shoutbox', $page);
     }
 
@@ -271,9 +274,7 @@ final readonly class Settings
     {
         if ($submitButton === 'Save') {
             $this->config->write([
-                'badgesEnabled' => $this->request->post('badgesEnabled')
-                    ? 1
-                    : 0,
+                'badgesEnabled' => $this->request->post('badgesEnabled') ? 1 : 0,
             ]);
         }
 
@@ -283,14 +284,13 @@ final readonly class Settings
             $description = $this->request->asString->post('description') ?? '';
 
             if ($imagePath === '' || $badgeTitle === '') {
-                return $this->page->error(
-                    'Image path and badge title are required',
-                );
+                return $this->page->error('Image path and badge title are required');
             }
 
             if (!filter_var($imagePath, FILTER_VALIDATE_URL)) {
                 return $this->page->error('Image path must be a valid URL');
             }
+
 
             $badge = new Badge();
             $badge->imagePath = $imagePath;
@@ -337,6 +337,7 @@ final readonly class Settings
             $saveDataResult .= $this->saveBadgeSettings($submitButton);
         }
 
+
         $delete = (int) $this->request->asString->both('d');
         if ($delete !== 0) {
             $badge = Badge::selectOne($delete);
@@ -363,19 +364,20 @@ final readonly class Settings
         );
         $grantedMembers = Member::joinedOn(
             $grantedBadges,
-            static fn(
-                BadgeAssociation $badgeAssociation,
-            ): int => $badgeAssociation->user,
+            static fn(BadgeAssociation $badgeAssociation): int => $badgeAssociation->user,
         );
 
         $badgesList = '';
         foreach ($badges as $badge) {
-            $badgesList .= $this->page->render('settings/badges-row.html', [
-                'badgeId' => $badge->id,
-                'imagePath' => $badge->imagePath,
-                'badgeTitle' => $badge->badgeTitle,
-                'description' => $badge->description,
-            ]);
+            $badgesList .= $this->page->render(
+                'settings/badges-row.html',
+                [
+                    'badgeId' => $badge->id,
+                    'imagePath' => $badge->imagePath,
+                    'badgeTitle' => $badge->badgeTitle,
+                    'description' => $badge->description,
+                ],
+            );
         }
 
         $badgeOptions = '';
@@ -388,48 +390,45 @@ final readonly class Settings
             $badge = $badges[$grantedBadge->badge];
             $member = $grantedMembers[$grantedBadge->user];
 
-            $grantedBadgesRows .=
-                '<tr>' .
-                "<td><img src='{$badge->imagePath}'></td>" .
-                "<td>{$badge->badgeTitle}</td>" .
-                "<td>{$grantedBadge->reason}</td>" .
-                "<td>{$grantedBadge->badgeCount}</td>" .
-                "<td>{$member->displayName}</td>" .
-                "<td><a href='?act=Settings&do=badges&ungrant={$grantedBadge->id}' onclick='return confirm(\"Are you sure?\")'>Ungrant</a></td>" .
-                '</tr>';
+            $grantedBadgesRows .= '<tr>'
+                . "<td><img src='{$badge->imagePath}'></td>"
+                . "<td>{$badge->badgeTitle}</td>"
+                . "<td>{$grantedBadge->reason}</td>"
+                . "<td>{$grantedBadge->badgeCount}</td>"
+                . "<td>{$member->displayName}</td>"
+                . "<td><a href='?act=Settings&do=badges&ungrant={$grantedBadge->id}' onclick='return confirm(\"Are you sure?\")'>Ungrant</a></td>"
+                . '</tr>';
         }
 
         if ($saveDataResult !== '') {
             $this->page->addContentBox('Save Data', $saveDataResult);
         }
 
-        $this->page->addContentBox(
-            'Badges',
-            $this->page->render('settings/badges-enable.html', [
-                'badges_enabled' => $this->config->getSetting('badgesEnabled')
-                    ? ' checked'
-                    : '',
-            ]),
-        );
+        $this->page->addContentBox('Badges', $this->page->render(
+            'settings/badges-enable.html',
+            [
+                'badges_enabled' => $this->config->getSetting('badgesEnabled') ? ' checked' : '',
+            ],
+        ));
 
-        $this->page->addContentBox(
-            'Manage Badges',
-            $this->page->render('settings/badges-list.html', [
+        $this->page->addContentBox('Manage Badges', $this->page->render(
+            'settings/badges-list.html',
+            [
                 'badges' => $badgesList,
-            ]),
-        );
+            ],
+        ));
 
         if ($badges === []) {
             return;
         }
 
-        $this->page->addContentBox(
-            'Grant Badges',
-            $this->page->render('settings/badges-grant.html', [
+        $this->page->addContentBox('Grant Badges', $this->page->render(
+            'settings/badges-grant.html',
+            [
                 'options' => $badgeOptions,
                 'grantedBadges' => $grantedBadgesRows,
-            ]),
-        );
+            ],
+        ));
     }
 
     private function webhooks(): void
@@ -445,19 +444,16 @@ final readonly class Settings
             $success = 'Settings saved.';
         }
 
-        $webhooks = array_merge(
+        $webhooks = array_merge([
+            'discord' => '',
+        ], $this->config->get()['webhooks'] ?? []);
+        $this->page->addContentBox('Webhooks', $this->page->render(
+            'settings/webhooks.html',
             [
-                'discord' => '',
-            ],
-            $this->config->get()['webhooks'] ?? [],
-        );
-        $this->page->addContentBox(
-            'Webhooks',
-            $this->page->render('settings/webhooks.html', [
                 'error' => $error,
                 'success' => $success,
                 'webhooks' => $webhooks,
-            ]),
-        );
+            ],
+        ));
     }
 }

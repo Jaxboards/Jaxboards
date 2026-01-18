@@ -70,7 +70,7 @@ final class Request
      */
     public function both(string $property): array|string|null
     {
-        return $this->post[$property] ?? ($this->get[$property] ?? null);
+        return $this->post[$property] ?? $this->get[$property] ?? null;
     }
 
     /**
@@ -134,12 +134,16 @@ final class Request
         ?string $cookieValue,
         $expires = 0,
     ): void {
-        setcookie($cookieName, $cookieValue ?? 'false', [
-            'expires' => $expires,
-            'httponly' => true,
-            'samesite' => 'Strict',
-            'secure' => true,
-        ]);
+        setcookie(
+            $cookieName,
+            $cookieValue ?? 'false',
+            [
+                'expires' => $expires,
+                'httponly' => true,
+                'samesite' => 'Strict',
+                'secure' => true,
+            ],
+        );
         $this->cookie[$cookieName] = $cookieValue;
     }
 
@@ -161,8 +165,7 @@ final class Request
      */
     public function isJSUpdate(): bool
     {
-        return $this->jsAccess() === JSAccess::UPDATING->value &&
-            !$this->hasPostData();
+        return $this->jsAccess() === JSAccess::UPDATING->value && !$this->hasPostData();
     }
 
     /**

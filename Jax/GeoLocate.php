@@ -19,11 +19,7 @@ final readonly class GeoLocate
 
     public function __construct(FileSystem $fileSystem)
     {
-        $this->cityReader = new Reader(
-            $fileSystem->pathFromRoot(
-                'Service/maxmind/GeoLite2-City_20251223/GeoLite2-City.mmdb',
-            ),
-        );
+        $this->cityReader = new Reader($fileSystem->pathFromRoot('Service/maxmind/GeoLite2-City_20251223/GeoLite2-City.mmdb'));
     }
 
     public function lookup(string $ip): ?City
@@ -41,10 +37,11 @@ final readonly class GeoLocate
         $letterA = 127462;
 
         $letters = array_map(
-            static fn($letter): string => mb_chr(
-                mb_ord($letter) - $asciiA + $letterA,
-            ),
-            [$isoCode[0], $isoCode[1]],
+            static fn($letter): string => mb_chr(mb_ord($letter) - $asciiA + $letterA),
+            [
+                $isoCode[0],
+                $isoCode[1],
+            ],
         );
 
         return implode('', $letters);

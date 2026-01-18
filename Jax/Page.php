@@ -58,6 +58,7 @@ final class Page
             return;
         }
 
+
         $this->template->append($part, $content);
     }
 
@@ -163,25 +164,13 @@ final class Page
 
         $skin = $this->getSelectedSkin($skinId);
 
-        $themePath =
-            ($skin->custom !== 0
-                ? $this->domainDefinitions->getBoardPath()
-                : '') .
-            '/Themes/' .
-            $skin->title;
-        $themeUrl =
-            ($skin->custom !== 0
-                ? $this->domainDefinitions->getBoardPathUrl()
-                : '') .
-            '/Themes/' .
-            $skin->title;
+        $themePath = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardPath() : '') . '/Themes/' . $skin->title;
+        $themeUrl = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardPathUrl() : '') . '/Themes/' . $skin->title;
 
         // Custom theme found but files not there, also fallback to default
         if (!$this->fileSystem->getFileInfo($themePath)->isDir()) {
             $themePath = $this->domainDefinitions->getDefaultThemePath();
-            $themeUrl =
-                $this->domainDefinitions->getBoardURL() .
-                '/Service/Themes/Default';
+            $themeUrl = $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default';
         }
 
         $this->template->setThemePath($themePath);
@@ -189,33 +178,26 @@ final class Page
         // Load CSS
         $this->append(
             'CSS',
-            <<<HTML
-                <link rel="stylesheet" type="text/css" href="{$themeUrl}/css.css">
-                <link
-                    rel="preload"
-                    as="style"
-                    type="text/css"
-                    href="/Service/wysiwyg.css"
-                    onload="this.onload=null;this.rel='stylesheet'"
-                >
-            HTML
-            ,
+            <<<"HTML"
+                    <link rel="stylesheet" type="text/css" href="{$themeUrl}/css.css">
+                    <link
+                        rel="preload"
+                        as="style"
+                        type="text/css"
+                        href="/Service/wysiwyg.css"
+                        onload="this.onload=null;this.rel='stylesheet'"
+                    >
+                HTML,
         );
 
         // Load Wrapper
-        $skinWrapper =
-            $skin->wrapper !== ''
-                ? $this->domainDefinitions->getBoardPath() .
-                    '/Wrappers/' .
-                    $skin->wrapper .
-                    '.html'
-                : '';
+        $skinWrapper = $skin->wrapper !== ''
+            ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin->wrapper . '.html'
+            : '';
         $this->template->load(
-            $skinWrapper &&
-            $this->fileSystem->getFileInfo($skinWrapper)->isFile()
+            $skinWrapper && $this->fileSystem->getFileInfo($skinWrapper)->isFile()
                 ? $skinWrapper
-                : $this->domainDefinitions->getDefaultThemePath() .
-                    '/wrapper.html',
+                : $this->domainDefinitions->getDefaultThemePath() . '/wrapper.html',
         );
     }
 
@@ -239,7 +221,9 @@ final class Page
      */
     private function getSelectedSkin(?int $skinId): Skin
     {
-        $skin = $skinId ? Skin::selectOne($skinId) : null;
+        $skin = $skinId
+            ? Skin::selectOne($skinId)
+            : null;
 
         // Couldn't find custom skin, get the default
         $skin ??= Skin::selectOne('WHERE `default`=? LIMIT 1', 1);
@@ -249,8 +233,7 @@ final class Page
 
     private function getPageTitle(): string
     {
-        return ($this->config->getSetting('boardname') ?: 'JaxBoards') .
-            ($this->pageTitle !== '' ? ' -> ' . $this->pageTitle : '');
+        return ($this->config->getSetting('boardname') ?: 'JaxBoards') . ($this->pageTitle !== '' ? ' -> ' . $this->pageTitle : '');
     }
 
     private function outputJavascriptCommands(): string

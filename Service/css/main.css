@@ -1,178 +1,178 @@
 body {
-  background: url("../Themes/Default/img/bg.jpg");
-  margin: 0;
-  padding: 0;
-  font-family: Tahoma, Verdana, Arial, sans-serif;
+    background: url('../Themes/Default/img/bg.jpg');
+    margin: 0;
+    padding: 0;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
 }
 
 #container {
-  width: 1024px;
-  margin: auto;
-  border: 1px solid #000;
-  margin-top: 10px;
+    width: 1024px;
+    margin: auto;
+    border: 1px solid #000;
+    margin-top: 10px;
 }
 
 #logo {
-  background: url("../img/header.png");
-  height: 96px;
+    background: url('../img/header.png');
+    height: 96px;
 }
 
 #logo a {
-  display: block;
-  width: 100%;
-  height: 100%;
-  text-decoration: none;
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
 }
 
 #logo a:focus {
-  outline: none;
+    outline: none;
 }
 
 #bar {
-  margin: 0 -10px;
-  background: url("../homepagebar.png");
-  height: 32px;
-  border-bottom: 1px solid #555;
+    margin: 0 -10px;
+    background: url('../homepagebar.png');
+    height: 32px;
+    border-bottom: 1px solid #555;
 }
 
 /* stylelint-disable no-descending-specificity */
 #bar a {
-  display: inline-block;
-  height: 32px;
-  text-indent: -1000px;
+    display: inline-block;
+    height: 32px;
+    text-indent: -1000px;
 }
 /* stylelint-enable no-descending-specificity */
 
 #bar a:hover {
-  background: url("../homepagebar.png");
+    background: url('../homepagebar.png');
 }
 
 #bar a:focus {
-  outline: none;
+    outline: none;
 }
 
 #bar a.support {
-  width: 118px;
+    width: 118px;
 }
 
 #bar a.support:hover {
-  background-position: left bottom;
+    background-position: left bottom;
 }
 
 #bar a.test {
-  width: 94px;
+    width: 94px;
 }
 
 #bar a.test:hover {
-  background-position: -118px bottom;
+    background-position: -118px bottom;
 }
 
 #bar a.resource {
-  width: 94px;
+    width: 94px;
 }
 
 #bar a.resource:hover {
-  background-position: -212px bottom;
+    background-position: -212px bottom;
 }
 
 #content {
-  background: url("../img/pagebg.png") top repeat-x #152b49;
-  padding-top: 10px;
+    background: url('../img/pagebg.png') top repeat-x #152b49;
+    padding-top: 10px;
 }
 
 .box {
-  margin: 10px;
-  border: 1px solid #ccf;
+    margin: 10px;
+    border: 1px solid #ccf;
 }
 
 .box.mini {
-  flex: 1;
+    flex: 1;
 }
 
 .box .content {
-  background: #fff;
-  padding: 20px;
+    background: #fff;
+    padding: 20px;
 }
 
 .box.mini .content {
-  height: 200px;
+    height: 200px;
 }
 
 .box .title {
-  background: url("../Themes/Default/img/boxgrad.png");
-  color: #fff;
-  padding: 5px;
+    background: url('../Themes/Default/img/boxgrad.png');
+    color: #fff;
+    padding: 5px;
 }
 
 /* stylelint-disable no-descending-specificity */
 .box1 .content {
-  background: url("../customizable.png") no-repeat 95% 95% #fff;
+    background: url('../customizable.png') no-repeat 95% 95% #fff;
 }
 
 .box2 .content {
-  background: url("../secure.png") no-repeat 95% 95% #fff;
+    background: url('../secure.png') no-repeat 95% 95% #fff;
 }
 
 .box3 .content {
-  background: url("../norefresh.png") no-repeat 95% 95% #fff;
+    background: url('../norefresh.png') no-repeat 95% 95% #fff;
 }
 /* stylelint-enable no-descending-specificity */
 
 #signup {
-  background: url("../Themes/Default/img/shade.png") bottom repeat-x;
-  border: 2px solid #aac;
-  padding: 30px;
-  max-width: 500px;
-  margin: 30px auto;
+    background: url('../Themes/Default/img/shade.png') bottom repeat-x;
+    border: 2px solid #aac;
+    padding: 30px;
+    max-width: 500px;
+    margin: 30px auto;
 }
 
 label {
-  display: inline-block;
-  width: 200px;
+    display: inline-block;
+    width: 200px;
 }
 
-input[type="text"],
-input[type="password"] {
-  width: 200px;
+input[type='text'],
+input[type='password'] {
+    width: 200px;
 }
 
-input[type="submit"] {
-  margin-top: 10px;
-  padding: 5px;
+input[type='submit'] {
+    margin-top: 10px;
+    padding: 5px;
 }
 
 #post {
-  position: absolute;
-  top: -1000px;
-  left: -1000px;
+    position: absolute;
+    top: -1000px;
+    left: -1000px;
 }
 
 ul {
-  padding-left: 20px;
+    padding-left: 20px;
 }
 
 .error {
-  border: 1px solid #f00;
-  background: #fdd;
-  font-size: smaller;
-  text-align: center;
-  margin-bottom: 10px;
+    border: 1px solid #f00;
+    background: #fdd;
+    font-size: smaller;
+    text-align: center;
+    margin-bottom: 10px;
 }
 
 #copyright {
-  text-align: center;
-  color: #fff;
-  padding: 10px;
+    text-align: center;
+    color: #fff;
+    padding: 10px;
 }
 
 .center {
-  text-align: center;
+    text-align: center;
 }
 
 .flex {
-  display: flex;
+    display: flex;
 }
 
 .flex1 {
-  flex: 1;
+    flex: 1;
 }

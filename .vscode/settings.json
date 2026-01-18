@@ -1,6 +1,6 @@
 {
-  "editor.codeActionsOnSave": {
-    "source.organizeImports": "always"
-  },
-  "files.eol": "\n"
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "always"
+    },
+    "files.eol": "\n"
 }

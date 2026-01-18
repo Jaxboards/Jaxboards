@@ -76,7 +76,9 @@ final class ServiceSignupTest extends FeatureTestCase
         $this->setServiceConfig(['service' => false]);
 
         $page = $this->go(
-            new Request(server: ['SERVER_NAME' => 'www.jaxboards.com']),
+            new Request(
+                server: ['SERVER_NAME' => 'www.jaxboards.com'],
+            ),
             pageClass: ServiceSignup::class,
         );
 
@@ -88,7 +90,9 @@ final class ServiceSignupTest extends FeatureTestCase
         $this->setServiceConfig(['service' => true]);
 
         $page = $this->go(
-            new Request(server: ['SERVER_NAME' => 'www.jaxboards.com']),
+            new Request(
+                server: ['SERVER_NAME' => 'www.jaxboards.com'],
+            ),
             pageClass: ServiceSignup::class,
         );
 
@@ -108,10 +112,10 @@ final class ServiceSignupTest extends FeatureTestCase
 
         // Assert that the boards directory is set up
         $fileSystem = $this->container->get(FileSystem::class);
-        $fileSystem
-            ->expects($this->once())
+        $fileSystem->expects($this->once())
             ->method('copyDirectory')
-            ->with('Service/blueprint', 'boards/boardname');
+            ->with('Service/blueprint', 'boards/boardname')
+        ;
 
         $page = $this->go(
             new Request(

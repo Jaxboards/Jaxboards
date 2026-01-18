@@ -1,5 +1,5 @@
-import { Component } from "../JAX/component";
-import { fromUnixTimestamp } from "../JAX/date";
+import { Component } from '../JAX/component';
+import { fromUnixTimestamp } from '../JAX/date';
 
 /**
  * Fetch the emoji for a given timestamp in the client's local timezone
@@ -9,16 +9,16 @@ import { fromUnixTimestamp } from "../JAX/date";
  * @return {string} The closest clock emoji character
  */
 export function emojiTime(unixTimestamp: number): string {
-  const time = fromUnixTimestamp(unixTimestamp);
+    const time = fromUnixTimestamp(unixTimestamp);
 
-  return String.fromCodePoint(
-    0xd83d,
-    0xdd50 +
-      // the emoji start at 1:00 and end at 12:00
-      ((time.getHours() % 12 || 12) - 1) +
-      // half hours are 12 characters above their base hour
-      (time.getMinutes() > 29 ? 12 : 0),
-  );
+    return String.fromCodePoint(
+        0xd83d,
+        0xdd50 +
+            // the emoji start at 1:00 and end at 12:00
+            ((time.getHours() % 12 || 12) - 1) +
+            // half hours are 12 characters above their base hour
+            (time.getMinutes() > 29 ? 12 : 0),
+    );
 }
 
 /**
@@ -27,22 +27,24 @@ export function emojiTime(unixTimestamp: number): string {
  * @param {HTMLAnchorElement} element Element to add the idle clock to
  */
 export function addIdleClock(element: HTMLAnchorElement) {
-  const lastActionClass = Array.from(element.classList).find((classItem) =>
-    classItem.startsWith("lastAction"),
-  );
-  if (lastActionClass === undefined) {
-    return;
-  }
-  element.prepend(
-    emojiTime(Number.parseInt(lastActionClass.slice("lastAction".length), 10)),
-  );
-  element.classList.remove(lastActionClass);
+    const lastActionClass = Array.from(element.classList).find((classItem) =>
+        classItem.startsWith('lastAction'),
+    );
+    if (lastActionClass === undefined) {
+        return;
+    }
+    element.prepend(
+        emojiTime(
+            Number.parseInt(lastActionClass.slice('lastAction'.length), 10),
+        ),
+    );
+    element.classList.remove(lastActionClass);
 }
 
 export default class IdleClock extends Component<HTMLAnchorElement> {
-  static hydrate(container: HTMLElement): void {
-    container
-      .querySelectorAll<HTMLAnchorElement>(".idle")
-      .forEach((element) => addIdleClock(element));
-  }
+    static hydrate(container: HTMLElement): void {
+        container
+            .querySelectorAll<HTMLAnchorElement>('.idle')
+            .forEach((element) => addIdleClock(element));
+    }
 }

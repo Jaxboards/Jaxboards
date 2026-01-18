@@ -137,14 +137,11 @@ final readonly class TextFormatting
         foreach ($codes[1] as $index => $language) {
             $code = $codes[2][$index];
 
-            $code =
-                $language === '=php'
-                    ? highlight_string($code, true)
-                    : preg_replace(
-                        "@([ \r\n]|^) @m",
-                        '$1&nbsp;',
-                        $this->blockhtml($code),
-                    );
+            $code = $language === '=php' ? highlight_string($code, true) : preg_replace(
+                "@([ \r\n]|^) @m",
+                '$1&nbsp;',
+                $this->blockhtml($code),
+            );
 
             $text = str_replace(
                 "[code]{$index}[/code]",
@@ -161,8 +158,10 @@ final readonly class TextFormatting
      *
      * @param array<array<string>> $codes
      */
-    public function finishCodeTagsBB(string $text, array $codes): string
-    {
+    public function finishCodeTagsBB(
+        string $text,
+        array $codes,
+    ): string {
         foreach ($codes[1] as $index => $language) {
             $code = $codes[2][$index];
 
@@ -182,13 +181,7 @@ final readonly class TextFormatting
             return '';
         }
 
-        while (
-            ($cleaned = (string) preg_replace(
-                '@\[(\w+)[^\]]*\](.*)\[/\1\]@Us',
-                '$2',
-                $text,
-            )) !== $text
-        ) {
+        while (($cleaned = (string) preg_replace('@\[(\w+)[^\]]*\](.*)\[/\1\]@Us', '$2', $text)) !== $text) {
             $text = $cleaned;
         }
 
@@ -241,29 +234,18 @@ final readonly class TextFormatting
         $inner = null;
 
         if (
-            is_array($parts) &&
-            array_key_exists('host', $parts) &&
-            $parts['host'] === $this->request->server('HTTP_HOST')
+            is_array($parts)
+            && array_key_exists('host', $parts)
+            && $parts['host'] === $this->request->server('HTTP_HOST')
         ) {
             $inner = match (true) {
-                (bool) preg_match(
-                    '@pid=(\d+)@',
-                    $parts['query'] ?? '',
-                    $postMatch,
-                )
-                    => "Post #{$postMatch[1]}",
-                (bool) preg_match(
-                    '@^/topic/(\d+)@',
-                    $parts['path'] ?? '',
-                    $topicMatch,
-                )
-                    => "Topic #{$topicMatch[1]}",
+                (bool) preg_match('@pid=(\d+)@', $parts['query'] ?? '', $postMatch) => "Post #{$postMatch[1]}",
+                (bool) preg_match('@^/topic/(\d+)@', $parts['path'] ?? '', $topicMatch) => "Topic #{$topicMatch[1]}",
                 default => null,
             };
 
-            $stringURL =
-                $parts['path'] .
-                (array_key_exists('query', $parts) ? "?{$parts['query']}" : '');
+            $stringURL = $parts['path']
+                . (array_key_exists('query', $parts) ? "?{$parts['query']}" : '');
         }
 
         $inner ??= $stringURL;
@@ -278,10 +260,9 @@ final readonly class TextFormatting
     {
         [, $space, $emoteText] = $match;
 
-        return $space .
-            $this->template->render('bbcode/emote', [
-                'image' => $this->rules->getEmotes()[$emoteText],
-                'text' => $emoteText,
-            ]);
+        return $space . $this->template->render('bbcode/emote', [
+            'image' => $this->rules->getEmotes()[$emoteText],
+            'text' => $emoteText,
+        ]);
     }
 }

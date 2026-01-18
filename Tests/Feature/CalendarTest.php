@@ -86,17 +86,10 @@ final class CalendarTest extends FeatureTestCase
 
     public function testCalendarBirthday(): void
     {
-        $this->actingAs('admin', [
-            'birthdate' => $this->container->get(Database::class)->date(),
-        ]);
+        $this->actingAs('admin', ['birthdate' => $this->container->get(Database::class)->date()]);
 
         $page = $this->go('/calendar');
 
-        DOMAssert::assertSelectEquals(
-            '.today .birthdays .user1',
-            'Admin',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('.today .birthdays .user1', 'Admin', 1, $page);
     }
 }

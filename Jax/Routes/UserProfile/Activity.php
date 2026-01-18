@@ -33,6 +33,7 @@ final readonly class Activity
 
     public function render(Member $member): string
     {
+
         if ($this->request->both('fmt') === 'RSS') {
             $this->renderRSSFeed($member);
 
@@ -45,32 +46,26 @@ final readonly class Activity
     public function renderRSSFeed(Member $member): void
     {
         $boardURL = $this->domainDefinitions->getBoardURL();
-        $rssFeed = new RSSFeed([
-            'description' => $member->usertitle,
-            'link' =>
-                $boardURL .
-                $this->router->url('profile', ['id' => $member->id]),
-            'title' => $member->displayName . "'s recent activity",
-        ]);
+        $rssFeed = new RSSFeed(
+            [
+                'description' => $member->usertitle,
+                'link' => $boardURL . $this->router->url('profile', ['id' => $member->id]),
+                'title' => $member->displayName . "'s recent activity",
+            ],
+        );
         foreach ($this->fetchActivities($member->id) as $entry) {
-            $parsed = $this->parseActivityRSS(
-                $entry->activity,
-                $member,
-                $entry->affectedUser,
+            $parsed = $this->parseActivityRSS($entry->activity, $member, $entry->affectedUser);
+            $link = $this->domainDefinitions->getBoardUrl()
+                . $this->textFormatting->blockhtml($parsed['link']);
+            $rssFeed->additem(
+                [
+                    'description' => $parsed['text'],
+                    'guid' => $link,
+                    'link' => $link,
+                    'pubDate' => $this->date->datetimeAsCarbon($entry->activity->date)?->format('r') ?? '',
+                    'title' => $parsed['text'],
+                ],
             );
-            $link =
-                $this->domainDefinitions->getBoardUrl() .
-                $this->textFormatting->blockhtml($parsed['link']);
-            $rssFeed->additem([
-                'description' => $parsed['text'],
-                'guid' => $link,
-                'link' => $link,
-                'pubDate' =>
-                    $this->date
-                        ->datetimeAsCarbon($entry->activity->date)
-                        ?->format('r') ?? '',
-                'title' => $parsed['text'],
-            ]);
         }
 
         $this->page->earlyFlush($rssFeed->publish());
@@ -96,37 +91,25 @@ final readonly class Activity
                     'id' => $modelsActivity->tid,
                     'findpost' => $modelsActivity->pid,
                 ]),
-                'text' =>
-                    $user->displayName .
-                    ' posted in topic ' .
-                    $modelsActivity->arg1,
+                'text' => $user->displayName . ' posted in topic ' . $modelsActivity->arg1,
             ],
             'new_topic' => [
                 'link' => $this->router->url('topic', [
                     'id' => $modelsActivity->tid,
                 ]),
-                'text' =>
-                    $user->displayName .
-                    ' created new topic ' .
-                    $modelsActivity->arg1,
+                'text' => $user->displayName . ' created new topic ' . $modelsActivity->arg1,
             ],
             'profile_name_change' => [
                 'link' => $this->router->url('profile', [
                     'id' => $modelsActivity->uid,
                 ]),
-                'text' =>
-                    $modelsActivity->arg1 .
-                    ' is now known as ' .
-                    $modelsActivity->arg2,
+                'text' => $modelsActivity->arg1 . ' is now known as ' . $modelsActivity->arg2,
             ],
             'buddy_add' => [
                 'link' => $this->router->url('profile', [
                     'id' => $modelsActivity->uid,
                 ]),
-                'text' =>
-                    $user->displayName .
-                    ' made friends with ' .
-                    $affectedUser->displayName,
+                'text' => $user->displayName . ' made friends with ' . $affectedUser->displayName,
             ],
             default => ['link' => '', 'text' => ''],
         };
@@ -147,27 +130,23 @@ final readonly class Activity
     {
         $activities = ModelsActivity::selectMany(
             <<<'SQL'
-            WHERE `uid`= ?
-            ORDER BY id DESC
-            LIMIT ?
-            SQL
-            ,
+                WHERE `uid`= ?
+                ORDER BY id DESC
+                LIMIT ?
+                SQL,
             $profileId,
             self::ACTIVITY_LIMIT,
         );
 
         $members = Member::joinedOn(
             $activities,
-            static fn(
-                ModelsActivity $modelsActivity,
-            ): ?int => $modelsActivity->affectedUser,
+            static fn(ModelsActivity $modelsActivity): ?int => $modelsActivity->affectedUser,
         );
 
         return array_map(
             static fn(ModelsActivity $modelsActivity): object => (object) [
                 'activity' => $modelsActivity,
-                'affectedUser' =>
-                    $members[$modelsActivity->affectedUser] ?? null,
+                'affectedUser' => $members[$modelsActivity->affectedUser] ?? null,
             ],
             $activities,
         );

@@ -78,24 +78,22 @@ final class ServiceInstallTest extends TestCase
 
         $allowList = ['glob', 'pathJoin', 'pathFromRoot'];
         foreach ($allowList as $method) {
-            $fileSystemMock
-                ->method($method)
-                ->willReturnCallback($originalFileSystem->{$method}(...));
+            $fileSystemMock->method($method)
+                ->willReturnCallback($originalFileSystem->{$method}(...))
+            ;
         }
 
         $this->mockedFiles = [];
-        $fileSystemMock
-            ->method('getFileInfo')
-            ->willReturnCallback(function (string $filename) use (
-                $originalFileSystem,
-            ): SplFileInfo {
+        $fileSystemMock->method('getFileInfo')
+            ->willReturnCallback(function (string $filename) use ($originalFileSystem): SplFileInfo {
                 if (array_key_exists($filename, $this->mockedFiles)) {
                     return $this->mockedFiles[$filename];
                 }
 
                 // Pass through all others
                 return $originalFileSystem->getFileInfo($filename);
-            });
+            })
+        ;
 
         // Stub out FileSystem
         $this->container->set(FileSystem::class, $fileSystemMock);
@@ -112,10 +110,7 @@ final class ServiceInstallTest extends TestCase
 
         $page = $this->goServiceInstall();
 
-        $this->assertStringContainsString(
-            'Detected config.php at root.',
-            $page,
-        );
+        $this->assertStringContainsString('Detected config.php at root.', $page);
     }
 
     public function testInstallerFormNotInstalled(): void
@@ -147,39 +142,34 @@ final class ServiceInstallTest extends TestCase
         );
 
         // Assert that the boards directory is set up
-        $this->fileSystemMock
-            ->expects($this->once())
+        $this->fileSystemMock->expects($this->once())
             ->method('copyDirectory')
-            ->with('Service/blueprint', 'boards/jaxboards');
+            ->with('Service/blueprint', 'boards/jaxboards')
+        ;
 
-        $page = $this->goServiceInstall(
-            new Request(
-                post: [
-                    // 'service' =>
-                    'admin_username' => 'Sean',
-                    'admin_password' => 'password',
-                    'admin_password_2' => 'password',
-                    'admin_email' => 'admin_email@jaxboards.com',
-                    'domain' => 'domain.com',
-                    'sql_db' => 'sql_db',
-                    'sql_host' => 'sql_host',
-                    'sql_username' => 'sql_username',
-                    'sql_password' => 'sql_password',
-                    'sql_driver' => 'sqliteMemory',
-                    'submit' => 'Start your service!',
-                ],
-            ),
-        );
+        $page = $this->goServiceInstall(new Request(
+            post: [
+                // 'service' =>
+                'admin_username' => 'Sean',
+                'admin_password' => 'password',
+                'admin_password_2' => 'password',
+                'admin_email' => 'admin_email@jaxboards.com',
+                'domain' => 'domain.com',
+                'sql_db' => 'sql_db',
+                'sql_host' => 'sql_host',
+                'sql_username' => 'sql_username',
+                'sql_password' => 'sql_password',
+                'sql_driver' => 'sqliteMemory',
+                'submit' => 'Start your service!',
+            ],
+        ));
 
         // Assert the config was written
         $serviceConfig = $this->container->get(ServiceConfig::class)->get();
         $this->assertEquals(false, $serviceConfig['service']);
         $this->assertEquals('Jaxboards', $serviceConfig['boardname']);
         $this->assertEquals('domain.com', $serviceConfig['domain']);
-        $this->assertEquals(
-            'Sean <admin_email@jaxboards.com>',
-            $serviceConfig['mail_from'],
-        );
+        $this->assertEquals('Sean <admin_email@jaxboards.com>', $serviceConfig['mail_from']);
         $this->assertEquals('jaxboards', $serviceConfig['prefix']);
         $this->assertEquals('sql_db', $serviceConfig['sql_db']);
         $this->assertEquals('sql_host', $serviceConfig['sql_host']);
@@ -207,48 +197,43 @@ final class ServiceInstallTest extends TestCase
         );
 
         // Assert that the boards directory is set up
-        $this->fileSystemMock
-            ->expects($this->exactly(2))
+        $this->fileSystemMock->expects($this->exactly(2))
             ->method('copyDirectory')
             ->with(
                 'Service/blueprint',
                 $this->callback(
-                    static fn($path): bool => in_array(
-                        $path,
-                        ['boards/test', 'boards/support'],
-                        true,
-                    ),
+                    static fn($path): bool => in_array($path, [
+                        'boards/test',
+                        'boards/support',
+                    ], true),
                 ),
-            );
+            )
+        ;
 
-        $page = $this->goServiceInstall(
-            new Request(
-                post: [
-                    'service' => 'on',
-                    'admin_username' => 'Sean',
-                    'admin_password' => 'password',
-                    'admin_password_2' => 'password',
-                    'admin_email' => 'admin_email@jaxboards.com',
-                    'domain' => 'domain.com',
-                    'sql_db' => 'sql_db',
-                    'sql_host' => 'sql_host',
-                    'sql_username' => 'sql_username',
-                    'sql_password' => 'sql_password',
-                    'sql_driver' => 'sqliteMemory',
-                    'submit' => 'Start your service!',
-                ],
-            ),
-        );
+
+        $page = $this->goServiceInstall(new Request(
+            post: [
+                'service' => 'on',
+                'admin_username' => 'Sean',
+                'admin_password' => 'password',
+                'admin_password_2' => 'password',
+                'admin_email' => 'admin_email@jaxboards.com',
+                'domain' => 'domain.com',
+                'sql_db' => 'sql_db',
+                'sql_host' => 'sql_host',
+                'sql_username' => 'sql_username',
+                'sql_password' => 'sql_password',
+                'sql_driver' => 'sqliteMemory',
+                'submit' => 'Start your service!',
+            ],
+        ));
 
         // Assert the config was written
         $serviceConfig = $this->container->get(ServiceConfig::class)->get();
         $this->assertEquals(true, $serviceConfig['service']);
         $this->assertEquals('Jaxboards', $serviceConfig['boardname']);
         $this->assertEquals('domain.com', $serviceConfig['domain']);
-        $this->assertEquals(
-            'Sean <admin_email@jaxboards.com>',
-            $serviceConfig['mail_from'],
-        );
+        $this->assertEquals('Sean <admin_email@jaxboards.com>', $serviceConfig['mail_from']);
         $this->assertEquals('', $serviceConfig['prefix']);
         $this->assertEquals('sql_db', $serviceConfig['sql_db']);
         $this->assertEquals('sql_host', $serviceConfig['sql_host']);
@@ -267,10 +252,7 @@ final class ServiceInstallTest extends TestCase
 
         $this->container->get(Database::class)->setPrefix('');
         $directory = Directory::selectOne(1);
-        $this->assertEquals(
-            'admin_email@jaxboards.com',
-            $directory->registrarEmail,
-        );
+        $this->assertEquals('admin_email@jaxboards.com', $directory->registrarEmail);
         $this->assertEquals('support', $directory->boardname);
 
         $this->assertStringContainsString('Redirecting', $page);

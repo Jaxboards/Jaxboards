@@ -18,15 +18,7 @@ final class Token extends Model
     #[PrimaryKey]
     public string $token = '';
 
-    #[
-        Column(
-            name: 'type',
-            type: 'string',
-            default: 'login',
-            length: 20,
-            nullable: false,
-        ),
-    ]
+    #[Column(name: 'type', type: 'string', default: 'login', length: 20, nullable: false)]
     public string $type = 'login';
 
     #[Column(name: 'uid', type: 'int', nullable: false, unsigned: true)]

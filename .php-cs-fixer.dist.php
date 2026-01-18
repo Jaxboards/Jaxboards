@@ -134,9 +134,11 @@ return (new Config())
         // Risky when any of the configured functions to replace are overridden.
         //
         // @see https://cs.symfony.com/doc/rules/language_construct/function_to_constant.html
-        'function_to_constant' => [
-            'functions' => ['php_sapi_name', 'phpversion', 'pi'],
-        ],
+        'function_to_constant' => ['functions' => [
+            'php_sapi_name',
+            'phpversion',
+            'pi',
+        ]],
         // Replaces `is_null($var)` expression with `null === $var`.
         //
         // Risky when the function is_null is overridden.
@@ -249,5 +251,11 @@ return (new Config())
     ->setFinder(
         Finder::create()
             ->in(__DIR__)
-            ->exclude(['.git', 'vendor', 'node_modules']),
-    );
+            ->exclude([
+                '.git',
+                'vendor',
+                'node_modules',
+            ]),
+    )
+;
+

@@ -53,8 +53,8 @@ final readonly class UCP implements Route
     public function route($params): void
     {
         if (
-            $this->user->isGuest() ||
-            $this->user->get()->groupID === Groups::Banned->value
+            $this->user->isGuest()
+            || $this->user->get()->groupID === Groups::Banned->value
         ) {
             $this->router->redirect('index');
 
@@ -83,6 +83,7 @@ final readonly class UCP implements Route
             default => $this->showMain(),
         };
 
+
         if (!$page) {
             return;
         }
@@ -108,12 +109,13 @@ final readonly class UCP implements Route
             }
         }
 
-        return ($error !== null
-            ? $this->template->render('error', ['message' => $error])
-            : '') .
-            $this->template->render('ucp/notepad', [
-                'user' => $this->user->get(),
-            ]);
+        return ($error !== null ? $this->template->render('error', ['message' => $error]) : '')
+            . $this->template->render(
+                'ucp/notepad',
+                [
+                    'user' => $this->user->get(),
+                ],
+            );
     }
 
     private function showucp(string $page): void
@@ -149,23 +151,19 @@ final readonly class UCP implements Route
             foreach ($fields as $field) {
                 $this->page->command(
                     'script',
-                    "window.globalSettings.{$field}=" .
-                        ($this->request->post($field) !== null ? 1 : 0),
+                    "window.globalSettings.{$field}="
+                        . ($this->request->post($field) !== null ? 1 : 0),
                 );
             }
 
             $this->page->command('success', 'Settings saved successfully.');
         }
 
-        $this->page->command(
-            'script',
-            <<<'JS'
+        $this->page->command('script', <<<'JS'
                 if (document.querySelector('#dtnotify') && window.webkitNotifications) {
                     document.querySelector('#dtnotify').checked=(webkitNotifications.checkPermission()==0)
                 }
-            JS
-            ,
-        );
+            JS);
 
         return $this->template->render('ucp/sound-settings', [
             'user' => $this->user->get(),
@@ -179,9 +177,12 @@ final readonly class UCP implements Route
             $this->user->set('sig', $this->textFormatting->linkify($changeSig));
         }
 
-        return $this->template->render('ucp/sig-settings', [
-            'user' => $this->user->get(),
-        ]);
+        return $this->template->render(
+            'ucp/sig-settings',
+            [
+                'user' => $this->user->get(),
+            ],
+        );
     }
 
     private function showPassSettings(): string
@@ -199,9 +200,9 @@ final readonly class UCP implements Route
             }
 
             if (
-                !$newPass1 ||
-                (!$showPassword && !$newPass2) ||
-                !$currentPassword
+                !$newPass1
+                || (!$showPassword && !$newPass2)
+                || !$currentPassword
             ) {
                 $error = 'All form fields are required.';
             }
@@ -220,10 +221,10 @@ final readonly class UCP implements Route
                 $backURL = $this->router->url('ucp', ['what' => 'pass']);
 
                 return <<<HTML
-                Password changed.
-                    <br><br>
-                    <a href="{$backURL}">Back</a>
-                HTML;
+                    Password changed.
+                        <br><br>
+                        <a href="{$backURL}">Back</a>
+                    HTML;
             }
 
             $this->page->command('error', $error);
@@ -254,32 +255,37 @@ final readonly class UCP implements Route
 
             $this->user->setBulk([
                 'email' => $this->request->asString->post('email'),
-                'emailSettings' =>
-                    ($notifications ? 2 : 0) + ($adminEmails ? 1 : 0),
+                'emailSettings' => ($notifications ? 2 : 0) + ($adminEmails ? 1 : 0),
             ]);
 
             $emailSettingsURL = $this->router->url('ucp', ['what' => 'email']);
 
             return <<<HTML
-            Email settings updated.
-            <br><br>
-            <a href="{$emailSettingsURL}">Back</a>
-            HTML;
+                Email settings updated.
+                <br><br>
+                <a href="{$emailSettingsURL}">Back</a>
+                HTML;
         }
 
         $emailSettings = $this->user->get()->emailSettings;
 
-        return $this->template->render('ucp/email-settings', [
-            'changeEmail' => $this->request->both('changeEmail'),
-            'user' => $this->user->get(),
-            'notificationsEnabled' => ($emailSettings & 2) !== 0,
-            'adminEmailsEnabled' => ($emailSettings & 1) !== 0,
-        ]);
+        return $this->template->render(
+            'ucp/email-settings',
+            [
+                'changeEmail' => $this->request->both('changeEmail'),
+                'user' => $this->user->get(),
+                'notificationsEnabled' => ($emailSettings & 2) !== 0,
+                'adminEmailsEnabled' => ($emailSettings & 1) !== 0,
+            ],
+        );
     }
 
     private function saveAvatarSettings(string $newAvatar): ?string
     {
-        if ($newAvatar && !filter_var($newAvatar, FILTER_VALIDATE_URL)) {
+        if (
+            $newAvatar
+            && !filter_var($newAvatar, FILTER_VALIDATE_URL)
+        ) {
             return 'Please enter a valid image URL.';
         }
 
@@ -312,39 +318,22 @@ final readonly class UCP implements Route
         $data = [
             'about' => $this->request->asString->post('about'),
             'contactAIM' => $this->request->asString->post('contactAIM'),
-            'contactBlueSky' => $this->request->asString->post(
-                'contactBlueSky',
-            ),
-            'contactDiscord' => $this->request->asString->post(
-                'contactDiscord',
-            ),
-            'contactGoogleChat' => $this->request->asString->post(
-                'contactGoogleChat',
-            ),
+            'contactBlueSky' => $this->request->asString->post('contactBlueSky'),
+            'contactDiscord' => $this->request->asString->post('contactDiscord'),
+            'contactGoogleChat' => $this->request->asString->post('contactGoogleChat'),
             'contactMSN' => $this->request->asString->post('contactMSN'),
             'contactSkype' => $this->request->asString->post('contactSkype'),
             'contactSteam' => $this->request->asString->post('contactSteam'),
-            'contactTwitter' => $this->request->asString->post(
-                'contactTwitter',
-            ),
+            'contactTwitter' => $this->request->asString->post('contactTwitter'),
             'contactYIM' => $this->request->asString->post('contactYIM'),
-            'contactYoutube' => $this->request->asString->post(
-                'contactYoutube',
-            ),
-            'displayName' => trim(
-                (string) $this->request->asString->post('displayName'),
-            ),
+            'contactYoutube' => $this->request->asString->post('contactYoutube'),
+            'displayName' => trim((string) $this->request->asString->post('displayName')),
             'dob_day' => (int) $this->request->asString->post('dob_day'),
             'dob_month' => (int) $this->request->asString->post('dob_month'),
             'dob_year' => (int) $this->request->asString->post('dob_year'),
             'full_name' => $this->request->asString->post('full_name'),
-            'gender' => in_array(
-                $this->request->asString->post('gender'),
-                $genderOptions,
-                true,
-            )
-                ? $this->request->asString->post('gender')
-                : '',
+            'gender' => in_array($this->request->asString->post('gender'), $genderOptions, true)
+                ? $this->request->asString->post('gender') : '',
             'location' => $this->request->asString->post('location'),
             'usertitle' => $this->request->asString->post('usertitle'),
             'website' => $this->request->asString->post('website'),
@@ -356,7 +345,10 @@ final readonly class UCP implements Route
         }
 
         $badNameChars = $this->config->getSetting('badnamechars');
-        if ($badNameChars && preg_match($badNameChars, $data['displayName'])) {
+        if (
+            $badNameChars
+            && preg_match($badNameChars, $data['displayName'])
+        ) {
             return 'Invalid characters in display name!';
         }
 
@@ -369,18 +361,9 @@ final readonly class UCP implements Route
             return 'That display name is already in use.';
         }
 
-        $data['birthdate'] =
-            $data['dob_year'] || $data['dob_month']
-                ? Carbon::create(
-                    $data['dob_year'],
-                    $data['dob_month'],
-                    $data['dob_day'],
-                    0,
-                    0,
-                    0,
-                    'UTC',
-                )?->format('Y-m-d H:i:s')
-                : null;
+        $data['birthdate'] = $data['dob_year'] || $data['dob_month']
+            ? Carbon::create($data['dob_year'], $data['dob_month'], $data['dob_day'], 0, 0, 0, 'UTC')?->format('Y-m-d H:i:s')
+            : null;
         unset($data['dob_day'], $data['dob_month'], $data['dob_year']);
 
         foreach (
@@ -400,23 +383,19 @@ final readonly class UCP implements Route
                 'location' => 'Location',
                 'usertitle' => 'User Title',
                 'website' => 'Website URL',
-            ]
-            as $field => $fieldLabel
+            ] as $field => $fieldLabel
         ) {
             if (
-                mb_strstr($field, 'contact') !== false &&
-                preg_match('/[^\w.@]/', (string) $data[$field])
+                mb_strstr($field, 'contact') !== false
+                && preg_match('/[^\w.@]/', (string) $data[$field])
             ) {
                 return "Invalid characters in {$fieldLabel}";
             }
 
             $data[$field] ??= '';
-            $length =
-                $field === 'displayName'
-                    ? 30
-                    : ($field === 'location'
-                        ? 100
-                        : 50);
+            $length = $field === 'displayName'
+                ? 30
+                : ($field === 'location' ? 100 : 50);
             if (mb_strlen($data[$field]) <= $length) {
                 continue;
             }
@@ -447,30 +426,30 @@ final readonly class UCP implements Route
             if (is_string($updateResult)) {
                 $this->page->command('error', $updateResult);
 
-                return $this->template->render('error', [
-                    'message' => $updateResult,
-                ]);
+                return $this->template->render('error', ['message' => $updateResult]);
             }
 
             $editProfileURL = $this->router->url('ucp', ['what' => 'profile']);
 
             return <<<HTML
-            Profile successfully updated.
-            <br><br>
-            <a href="{$editProfileURL}">Back</a>
-            HTML;
+                Profile successfully updated.
+                <br><br>
+                <a href="{$editProfileURL}">Back</a>
+                HTML;
         }
 
         $birthdate = $this->user->get()->birthdate;
-        $birthdate =
-            $birthdate !== null
-                ? $this->date->dateAsCarbon($this->user->get()->birthdate)
-                : null;
+        $birthdate = $birthdate !== null
+            ? $this->date->dateAsCarbon($this->user->get()->birthdate)
+            : null;
 
-        return $this->template->render('ucp/profile-settings', [
-            'user' => $this->user->get(),
-            'birthdate' => $birthdate,
-        ]);
+        return $this->template->render(
+            'ucp/profile-settings',
+            [
+                'user' => $this->user->get(),
+                'birthdate' => $birthdate,
+            ],
+        );
     }
 
     private function saveBoardSettings(): ?string
@@ -507,15 +486,17 @@ final readonly class UCP implements Route
             $error = $this->saveBoardSettings();
         }
 
-        $skins =
-            $this->user->get()->groupID !== 2
-                ? Skin::selectMany('WHERE `hidden`!=1 ORDER BY `title` ASC')
-                : Skin::selectMany('ORDER BY `title` ASC');
+        $skins = $this->user->get()->groupID !== 2
+            ? Skin::selectMany('WHERE `hidden`!=1 ORDER BY `title` ASC')
+            : Skin::selectMany('ORDER BY `title` ASC');
 
-        return $this->template->render('ucp/board-settings', [
-            'error' => $error,
-            'skins' => $skins,
-            'user' => $this->user->get(),
-        ]);
+        return $this->template->render(
+            'ucp/board-settings',
+            [
+                'error' => $error,
+                'skins' => $skins,
+                'user' => $this->user->get(),
+            ],
+        );
     }
 }

@@ -59,16 +59,12 @@ final readonly class Forums
 
         $edit = $this->request->both('edit');
         $categoryEdit = match (true) {
-            is_string($edit) && str_starts_with($edit, 'c_') => (int) mb_substr(
-                $edit,
-                2,
-            ),
+            is_string($edit) && str_starts_with($edit, 'c_') => (int) mb_substr($edit, 2),
             default => null,
         };
         $delete = $this->request->both('delete');
         $categoryDelete = match (true) {
-            is_string($delete) && str_starts_with($delete, 'c_')
-                => (int) mb_substr($delete, 2),
+            is_string($delete) && str_starts_with($delete, 'c_') => (int) mb_substr($delete, 2),
             default => null,
         };
 
@@ -80,9 +76,7 @@ final readonly class Forums
             },
             'delete' => match (true) {
                 is_numeric($delete) => $this->deleteForum((int) $delete),
-                $categoryDelete !== null => $this->deleteCategory(
-                    $categoryDelete,
-                ),
+                $categoryDelete !== null => $this->deleteCategory($categoryDelete),
                 default => null,
             },
             'order' => $this->orderForums(),
@@ -134,7 +128,11 @@ final readonly class Forums
                 [
                     'category' => $cat,
                     'order' => $order,
-                    'path' => preg_replace('@\s+@', ' ', $formattedPath),
+                    'path' => preg_replace(
+                        '@\s+@',
+                        ' ',
+                        $formattedPath,
+                    ),
                 ],
                 Database::WHERE_ID_EQUALS,
                 $key,
@@ -144,8 +142,9 @@ final readonly class Forums
 
     private function printForumPermsTable(?Forum $forum): string
     {
-        $perms =
-            $forum !== null ? $this->jax->parseForumPerms($forum->perms) : null;
+        $perms = $forum !== null
+            ? $this->jax->parseForumPerms($forum->perms)
+            : null;
 
         $permsTable = '';
         foreach ($this->fetchAllGroups() as $group) {
@@ -154,11 +153,7 @@ final readonly class Forums
             $permsTable .= $this->page->render(
                 'forums/create-forum-permissions-row.html',
                 [
-                    'global' => $this->checkbox(
-                        $group->id,
-                        'global',
-                        $groupPerms === null,
-                    ),
+                    'global' => $this->checkbox($group->id, 'global', $groupPerms === null),
                     'poll' => $this->checkbox(
                         $group->id,
                         'poll',
@@ -228,32 +223,35 @@ final readonly class Forums
                 $mods = '';
             }
 
-            $html .= $this->page->render('forums/order-forums-tree-item.html', [
-                'class' => implode(' ', [
-                    'nofirstlevel',
-                    $highlight && $forumId === $highlight ? 'highlight' : '',
-                ]),
-                'content' =>
-                    $subforums !== []
-                        ? // phpstan hates recursion
+            $html .= $this->page->render(
+                'forums/order-forums-tree-item.html',
+                [
+                    'class' => implode(' ', [
+                        'nofirstlevel',
+                        $highlight && $forumId === $highlight ? 'highlight' : '',
+                    ]),
+                    'content' => $subforums !== []
+                        // phpstan hates recursion
                         // @phpstan-ignore argument.type
-                        $this->printForumTree($subforums, $forums, $highlight)
+                        ? $this->printForumTree($subforums, $forums, $highlight)
                         : '',
-                'id' => $forumId,
-                'mods' => $mods,
-                'title' => $forum->title,
-                'trashcan' => $forum->trashcan
-                    ? $this->page->render(
-                        'forums/order-forums-tree-item-trashcan.html',
-                    )
-                    : '',
-            ]);
+                    'id' => $forumId,
+                    'mods' => $mods,
+                    'title' => $forum->title,
+                    'trashcan' => $forum->trashcan
+                        ? $this->page->render('forums/order-forums-tree-item-trashcan.html')
+                        : '',
+                ],
+            );
         }
 
-        return $this->page->render('forums/order-forums-tree.html', [
-            'class' => '',
-            'content' => $html,
-        ]);
+        return $this->page->render(
+            'forums/order-forums-tree.html',
+            [
+                'class' => '',
+                'content' => $html,
+            ],
+        );
     }
 
     private function orderForums(int $highlight = 0): void
@@ -282,10 +280,7 @@ final readonly class Forums
         $forums = $this->fetchAllForums();
         $forumsByCategory = array_map(
             static fn(array $forums): ForumTree => new ForumTree($forums),
-            Lodash::groupBy(
-                $forums,
-                static fn($forum): ?int => $forum->category,
-            ),
+            Lodash::groupBy($forums, static fn($forum): ?int => $forum->category),
         );
 
         $categories = $this->fetchAllCategories();
@@ -296,10 +291,7 @@ final readonly class Forums
                 'forums/order-forums-tree-item.html',
                 [
                     'class' => 'parentlock',
-                    'content' => array_key_exists(
-                        $categoryId,
-                        $forumsByCategory,
-                    )
+                    'content' => array_key_exists($categoryId, $forumsByCategory)
                         ? $this->printForumTree(
                             $forumsByCategory[$categoryId]->getTree(),
                             $forums,
@@ -314,12 +306,17 @@ final readonly class Forums
             );
         }
 
-        $page .= $this->page->render('forums/order-forums-tree.html', [
-            'class' => 'tree',
-            'content' => $treeHTML,
-        ]);
+        $page .= $this->page->render(
+            'forums/order-forums-tree.html',
+            [
+                'class' => 'tree',
+                'content' => $treeHTML,
+            ],
+        );
 
-        $page .= $this->page->render('forums/order-forums.html');
+        $page .= $this->page->render(
+            'forums/order-forums.html',
+        );
         $this->page->addContentBox('Forums', $page);
     }
 
@@ -366,13 +363,13 @@ final readonly class Forums
             if ($modId !== 0) {
                 $member = Member::selectOne($modId);
                 if ($member !== null) {
-                    $mods =
-                        $forum->mods !== '' ? explode(',', $forum->mods) : [];
+                    $mods = $forum->mods !== ''
+                        ? explode(',', $forum->mods)
+                        : [];
                     if (!in_array($modId, $mods)) {
-                        $forum->mods =
-                            $forum->mods !== ''
-                                ? $forum->mods . ',' . $modId
-                                : (string) $modId;
+                        $forum->mods = $forum->mods !== ''
+                            ? $forum->mods . ',' . $modId
+                            : (string) $modId;
                     }
                 } else {
                     $error = "You tried to add a moderator that doesn't exist!";
@@ -403,14 +400,14 @@ final readonly class Forums
 
         $subforumOptions = '';
         foreach ($subforumOptionsArray as $value => $label) {
-            $subforumOptions .= $this->page->render('select-option.html', [
-                'label' => $label,
-                'selected' =>
-                    $value === $forum?->showSubForums
-                        ? 'selected="selected"'
-                        : '',
-                'value' => $value,
-            ]);
+            $subforumOptions .= $this->page->render(
+                'select-option.html',
+                [
+                    'label' => $label,
+                    'selected' => $value === $forum?->showSubForums ? 'selected="selected"' : '',
+                    'value' => $value,
+                ],
+            );
         }
 
         $orderByOptionsArray = [
@@ -423,31 +420,30 @@ final readonly class Forums
         ];
         $orderByOptions = '';
         foreach ($orderByOptionsArray as $value => $label) {
-            $orderByOptions .= $this->page->render('select-option.html', [
-                'label' => $label,
-                'selected' =>
-                    $forum && $value === $forum->orderby
-                        ? 'selected="selected"'
-                        : '',
-                'value' => $value,
-            ]);
+            $orderByOptions .= $this->page->render(
+                'select-option.html',
+                [
+                    'label' => $label,
+                    'selected' => $forum && $value === $forum->orderby
+                        ? 'selected="selected"' : '',
+                    'value' => $value,
+                ],
+            );
         }
 
-        $page .= $this->page->render('forums/create-forum.html', [
-            'description' => $forum
-                ? $this->textFormatting->blockhtml($forum->subtitle)
-                : '',
-            'count' => $this->page->checked(!$forum?->nocount),
-            'order_by_options' => $orderByOptions,
-            'redirect_url' => $forum
-                ? $this->textFormatting->blockhtml($forum->redirect)
-                : '',
-            'subforum_options' => $subforumOptions,
-            'title' => $forum
-                ? $this->textFormatting->blockhtml($forum->title)
-                : '',
-            'trashcan' => $this->page->checked((bool) $forum?->trashcan),
-        ]);
+
+        $page .= $this->page->render(
+            'forums/create-forum.html',
+            [
+                'description' => $forum ? $this->textFormatting->blockhtml($forum->subtitle) : '',
+                'count' => $this->page->checked(!$forum?->nocount),
+                'order_by_options' => $orderByOptions,
+                'redirect_url' => $forum ? $this->textFormatting->blockhtml($forum->redirect) : '',
+                'subforum_options' => $subforumOptions,
+                'title' => $forum ? $this->textFormatting->blockhtml($forum->title) : '',
+                'trashcan' => $this->page->checked((bool) $forum?->trashcan),
+            ],
+        );
 
         if ($forum?->mods) {
             $members = Member::selectMany(
@@ -459,11 +455,7 @@ final readonly class Forums
                 $modList .= $this->page->render(
                     'forums/create-forum-moderators-mod.html',
                     [
-                        'delete_link' =>
-                            '?act=Forums&do=edit&edit=' .
-                            $fid .
-                            '&rmod=' .
-                            $member->id,
+                        'delete_link' => '?act=Forums&do=edit&edit=' . $fid . '&rmod=' . $member->id,
                         'username' => $member->displayName,
                     ],
                 );
@@ -489,11 +481,8 @@ final readonly class Forums
         );
 
         $this->page->addContentBox(
-            ($forum ? 'Edit' : 'Create') .
-                ' Forum' .
-                ($forum
-                    ? ' - ' . $this->textFormatting->blockhtml($forum->title)
-                    : ''),
+            ($forum ? 'Edit' : 'Create') . ' Forum'
+                . ($forum ? ' - ' . $this->textFormatting->blockhtml($forum->title) : ''),
             $page,
         );
         $this->page->addContentBox('Moderators', $moderators);
@@ -511,9 +500,12 @@ final readonly class Forums
 
         // Clear trashcan on other forums.
         if ($forum->trashcan !== 0) {
-            $this->database->update('forums', [
-                'trashcan' => 0,
-            ]);
+            $this->database->update(
+                'forums',
+                [
+                    'trashcan' => 0,
+                ],
+            );
         }
 
         $isNewForum = $forum->id === 0;
@@ -566,7 +558,9 @@ final readonly class Forums
         $forum->orderby = $orderby > 0 && $orderby <= 5 ? $orderby : 0;
         $forum->perms = $this->serializePermsFromInput();
         $forum->redirect = $this->request->asString->post('redirect') ?? '';
-        $forum->showLedBy = $this->request->asString->post('showLedBy') ? 1 : 0;
+        $forum->showLedBy = $this->request->asString->post('showLedBy')
+            ? 1
+            : 0;
         $forum->showSubForums = $sub === 1 || $sub === 2 ? $sub : 0;
         $forum->subtitle = $this->request->asString->post('description') ?? '';
         $forum->title = $this->request->asString->post('title') ?? '';
@@ -577,7 +571,9 @@ final readonly class Forums
 
     private function deleteForum(int $forumId): void
     {
-        if ($this->request->post('submit') === 'Cancel') {
+        if (
+            $this->request->post('submit') === 'Cancel'
+        ) {
             $this->page->location('?act=Forums&do=order');
 
             return;
@@ -607,15 +603,14 @@ final readonly class Forums
             } else {
                 $result = $this->database->special(
                     <<<'SQL'
-                    DELETE
-                    FROM %t
-                    WHERE `tid` IN (
-                        SELECT `id`
+                        DELETE
                         FROM %t
-                        WHERE `fid`=?
-                    )
-                    SQL
-                    ,
+                        WHERE `tid` IN (
+                            SELECT `id`
+                            FROM %t
+                            WHERE `fid`=?
+                        )
+                        SQL,
                     ['posts', 'topics'],
                     $forumId,
                 );
@@ -630,18 +625,25 @@ final readonly class Forums
             }
 
             $page = match (true) {
-                $topics > 0 => ($moveTo !== 0 ? 'Moved' : 'Deleted') .
-                    " {$topics} topics" .
-                    ($posts !== 0 ? " and {$posts} posts" : ''),
+                $topics > 0 => (
+                    $moveTo !== 0 ? 'Moved' : 'Deleted'
+                )
+                    . " {$topics} topics"
+                    . (
+                        $posts !== 0 ? " and {$posts} posts" : ''
+                    ),
                 default => 'This forum was empty, so no topics were moved.',
             };
 
             $this->page->addContentBox(
                 'Forum Deletion',
                 $this->page->success(
-                    $this->page->render('forums/delete-forum-deleted.html', [
-                        'content' => $page,
-                    ]),
+                    $this->page->render(
+                        'forums/delete-forum-deleted.html',
+                        [
+                            'content' => $page,
+                        ],
+                    ),
                 ),
             );
 
@@ -651,11 +653,14 @@ final readonly class Forums
         $forumOptions = '';
         $forums = $this->fetchAllForums();
         foreach ($forums as $forum) {
-            $forumOptions .= $this->page->render('select-option.html', [
-                'label' => $forum->title,
-                'selected' => '',
-                'value' => $forum->id,
-            ]);
+            $forumOptions .= $this->page->render(
+                'select-option.html',
+                [
+                    'label' => $forum->title,
+                    'selected' => '',
+                    'value' => $forum->id,
+                ],
+            );
         }
 
         if (!array_key_exists($forumId, $forums)) {
@@ -669,9 +674,12 @@ final readonly class Forums
 
         $this->page->addContentBox(
             'Deleting Forum: ' . $forums[$forumId]->title,
-            $this->page->render('forums/delete-forum.html', [
-                'forum_options' => $forumOptions,
-            ]),
+            $this->page->render(
+                'forums/delete-forum.html',
+                [
+                    'forum_options' => $forumOptions,
+                ],
+            ),
         );
     }
 
@@ -679,7 +687,9 @@ final readonly class Forums
     {
         $categoryName = $this->request->asString->post('cat_name');
 
-        if ($categoryName === null || trim($categoryName) === '') {
+        if (
+            $categoryName === null || trim($categoryName) === ''
+        ) {
             return 'All fields required';
         }
 
@@ -694,7 +704,9 @@ final readonly class Forums
         $page = '';
         $cid = $cid ?: (int) $this->request->asString->post('category');
 
-        $category = $cid !== 0 ? Category::selectOne($cid) : null;
+        $category = $cid !== 0
+            ? Category::selectOne($cid)
+            : null;
         $category ??= new Category();
 
         if ($this->request->post('submit') !== null) {
@@ -706,14 +718,14 @@ final readonly class Forums
 
         $this->page->addContentBox(
             ($category->id !== 0 ? 'Edit' : 'Create') . ' Category',
-            $page .
-                $this->page->render('forums/create-category.html', [
+            $page . $this->page->render(
+                'forums/create-category.html',
+                [
                     'id' => (string) $category->id,
                     'submit' => $category->id !== 0 ? 'Edit' : 'Create',
-                    'title' => $this->textFormatting->blockhtml(
-                        $category->title,
-                    ),
-                ]),
+                    'title' => $this->textFormatting->blockhtml($category->title),
+                ],
+            ),
         );
     }
 
@@ -729,7 +741,10 @@ final readonly class Forums
         }
 
         $moveTo = (int) $this->request->asString->post('moveto');
-        if ($error === null && $this->request->post('submit') !== null) {
+        if (
+            $error === null
+            && $this->request->post('submit') !== null
+        ) {
             if (!array_key_exists($moveTo, $categories)) {
                 $error = 'Invalid category to move forums to.';
             } else {
@@ -757,16 +772,22 @@ final readonly class Forums
         } else {
             $categoryOptions = '';
             foreach ($categories as $categoryId => $category) {
-                $categoryOptions .= $this->page->render('select-option.html', [
-                    'label' => $category->title,
-                    'selected' => '',
-                    'value' => '' . $categoryId,
-                ]);
+                $categoryOptions .= $this->page->render(
+                    'select-option.html',
+                    [
+                        'label' => $category->title,
+                        'selected' => '',
+                        'value' => '' . $categoryId,
+                    ],
+                );
             }
 
-            $page .= $this->page->render('forums/delete-category.html', [
-                'category_options' => $categoryOptions,
-            ]);
+            $page .= $this->page->render(
+                'forums/delete-category.html',
+                [
+                    'category_options' => $categoryOptions,
+                ],
+            );
         }
 
         $this->page->addContentBox('Category Deletion', $page);
@@ -779,10 +800,7 @@ final readonly class Forums
     {
         $categories = Category::selectMany('ORDER BY `order`,`id` ASC');
 
-        return Lodash::keyBy(
-            $categories,
-            static fn($category): int => $category->id,
-        );
+        return Lodash::keyBy($categories, static fn($category): int => $category->id);
     }
 
     /**
@@ -800,10 +818,7 @@ final readonly class Forums
      */
     private function fetchAllGroups(): array
     {
-        return Lodash::keyBy(
-            Group::selectMany(),
-            static fn($group): int => $group->id,
-        );
+        return Lodash::keyBy(Group::selectMany(), static fn($group): int => $group->id);
     }
 
     /*
@@ -813,9 +828,12 @@ final readonly class Forums
      */
     private function updatePerForumModFlag(): void
     {
-        $this->database->update('members', [
-            'mod' => 0,
-        ]);
+        $this->database->update(
+            'members',
+            [
+                'mod' => 0,
+            ],
+        );
 
         $mods = [];
         foreach ($this->fetchAllForums() as $forum) {
@@ -851,10 +869,9 @@ final readonly class Forums
             'forums/create-forum-permissions-row-checkbox.html',
             [
                 'checked' => $this->page->checked((bool) $checked),
-                'global' =>
-                    $name === 'global'
-                        ? 'onchange="globaltoggle(this.parentNode.parentNode,this.checked);"'
-                        : '',
+                'global' => $name === 'global'
+                    ? 'onchange="globaltoggle(this.parentNode.parentNode,this.checked);"'
+                    : '',
                 'id' => $checkId,
                 'name' => $name,
             ],

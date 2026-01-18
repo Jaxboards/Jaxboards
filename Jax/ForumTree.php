@@ -47,8 +47,10 @@ final class ForumTree
     /**
      * @param array<mixed> $forums
      */
-    private function recurseInto(array $forums, int $depth = 0): Generator
-    {
+    private function recurseInto(
+        array $forums,
+        int $depth = 0,
+    ): Generator {
         foreach ($forums as $forumId => $subForums) {
             yield $depth => $forumId;
             if ($subForums === []) {

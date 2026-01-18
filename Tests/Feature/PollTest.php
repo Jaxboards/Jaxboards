@@ -101,17 +101,8 @@ final class PollTest extends FeatureTestCase
 
         $page = $this->go('/topic/' . $topic->id);
 
-        DOMAssert::assertSelectCount(
-            '#poll form input[type="radio"]',
-            3,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            '#poll .title',
-            'What is your favorite pet?',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectCount('#poll form input[type="radio"]', 3, $page);
+        DOMAssert::assertSelectEquals('#poll .title', 'What is your favorite pet?', 1, $page);
         DOMAssert::assertSelectEquals('label[for="poll_0"]', 'Dog', 1, $page);
         DOMAssert::assertSelectEquals('label[for="poll_1"]', 'Cat', 1, $page);
         DOMAssert::assertSelectEquals('label[for="poll_2"]', 'Fish', 1, $page);
@@ -123,27 +114,16 @@ final class PollTest extends FeatureTestCase
 
         $topic = $this->createPoll();
 
-        $page = $this->go(
-            new Request(
-                get: ['path' => "/topic/{$topic->id}"],
-                post: ['choice' => '1', 'votepoll' => '1'],
-            ),
-        );
+        $page = $this->go(new Request(
+            get: ['path' => "/topic/{$topic->id}"],
+            post: ['choice' => '1', 'votepoll' => '1'],
+        ));
 
-        DOMAssert::assertSelectEquals(
-            '#poll .title',
-            'What is your favorite pet?',
-            1,
-            $page,
-        );
+
+        DOMAssert::assertSelectEquals('#poll .title', 'What is your favorite pet?', 1, $page);
         DOMAssert::assertSelectEquals('.numvotes', '4 votes', 1, $page);
         DOMAssert::assertSelectEquals('.numvotes', '3 votes', 2, $page);
-        DOMAssert::assertSelectEquals(
-            '.totalvotes',
-            'Total Votes: 10',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('.totalvotes', 'Total Votes: 10', 1, $page);
     }
 
     public function testViewPollMultiChoice(): void
@@ -154,17 +134,8 @@ final class PollTest extends FeatureTestCase
 
         $page = $this->go('/topic/' . $topic->id);
 
-        DOMAssert::assertSelectCount(
-            '#poll form input[type="checkbox"]',
-            3,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            '#poll .title',
-            'What is your favorite pet?',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectCount('#poll form input[type="checkbox"]', 3, $page);
+        DOMAssert::assertSelectEquals('#poll .title', 'What is your favorite pet?', 1, $page);
         DOMAssert::assertSelectEquals('label[for="poll_0"]', 'Dog', 1, $page);
         DOMAssert::assertSelectEquals('label[for="poll_1"]', 'Cat', 1, $page);
         DOMAssert::assertSelectEquals('label[for="poll_2"]', 'Fish', 1, $page);
@@ -176,27 +147,15 @@ final class PollTest extends FeatureTestCase
 
         $topic = $this->createPoll(['pollType' => 'multi']);
 
-        $page = $this->go(
-            new Request(
-                get: ['path' => 'topic/' . $topic->id],
-                post: ['choice' => ['0', '1'], 'votepoll' => '1'],
-            ),
-        );
+        $page = $this->go(new Request(
+            get: ['path' => 'topic/' . $topic->id],
+            post: ['choice' => ['0', '1'], 'votepoll' => '1'],
+        ));
 
-        DOMAssert::assertSelectEquals(
-            '#poll .title',
-            'What is your favorite pet?',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('#poll .title', 'What is your favorite pet?', 1, $page);
         DOMAssert::assertSelectEquals('.numvotes', '4 votes', 2, $page);
         DOMAssert::assertSelectEquals('.numvotes', '3 votes', 1, $page);
-        DOMAssert::assertSelectEquals(
-            '.totalvotes',
-            'Total Votes: 10',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('.totalvotes', 'Total Votes: 10', 1, $page);
     }
 
     private function createPoll($props = ['pollType' => 'single']): ModelsTopic

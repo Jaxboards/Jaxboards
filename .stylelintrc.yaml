@@ -1,4 +1,4 @@
 extends:
-  - stylelint-config-standard
+    - stylelint-config-standard
 rules:
-  no-descending-specificity: null
+    no-descending-specificity: null

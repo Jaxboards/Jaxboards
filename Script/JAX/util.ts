@@ -1,58 +1,60 @@
-import { date, smalldate } from "./date";
+import { date, smalldate } from './date';
 
 export function onImagesLoaded(imgs: HTMLImageElement[], timeout = 1000) {
-  return new Promise<void>((resolve) => {
-    const images = new Set();
-    const imagesToWaitOn = Array.from(imgs).filter((img) => !img.complete);
+    return new Promise<void>((resolve) => {
+        const images = new Set();
+        const imagesToWaitOn = Array.from(imgs).filter((img) => !img.complete);
 
-    if (!imagesToWaitOn.length) {
-      resolve();
-      return;
-    }
+        if (!imagesToWaitOn.length) {
+            resolve();
+            return;
+        }
 
-    function markImageLoaded(this: HTMLImageElement) {
-      images.delete(this.src);
-      if (images.size === 0) {
-        resolve();
-      }
-    }
+        function markImageLoaded(this: HTMLImageElement) {
+            images.delete(this.src);
+            if (images.size === 0) {
+                resolve();
+            }
+        }
 
-    imagesToWaitOn.forEach((img) => {
-      if (!images.has(img.src)) {
-        images.add(img.src);
-        img.addEventListener("error", markImageLoaded);
-        img.addEventListener("load", markImageLoaded);
-      }
+        imagesToWaitOn.forEach((img) => {
+            if (!images.has(img.src)) {
+                images.add(img.src);
+                img.addEventListener('error', markImageLoaded);
+                img.addEventListener('load', markImageLoaded);
+            }
+        });
+
+        if (timeout) {
+            setTimeout(resolve, timeout);
+        }
     });
-
-    if (timeout) {
-      setTimeout(resolve, timeout);
-    }
-  });
 }
 
 export function updateDates() {
-  const dates = document.querySelectorAll(".autodate");
-  const dateTitles: HTMLElement[] = Array.from(
-    document.querySelectorAll("[data-timestamp]"),
-  );
-  if (!dates) {
-    return;
-  }
-  dates.forEach((el) => {
-    const timestamp = Number.parseInt(el.getAttribute("title") ?? "", 10);
-    const parsed = el.classList.contains("smalldate")
-      ? smalldate(timestamp)
-      : date(timestamp);
-    if (parsed !== el.innerHTML) {
-      el.innerHTML = parsed;
+    const dates = document.querySelectorAll('.autodate');
+    const dateTitles: HTMLElement[] = Array.from(
+        document.querySelectorAll('[data-timestamp]'),
+    );
+    if (!dates) {
+        return;
     }
-  });
-  dateTitles.forEach((el) => {
-    if (!el.title) {
-      el.title = smalldate(Number.parseInt(el.dataset.timestamp ?? "", 10));
-    }
-  });
+    dates.forEach((el) => {
+        const timestamp = Number.parseInt(el.getAttribute('title') ?? '', 10);
+        const parsed = el.classList.contains('smalldate')
+            ? smalldate(timestamp)
+            : date(timestamp);
+        if (parsed !== el.innerHTML) {
+            el.innerHTML = parsed;
+        }
+    });
+    dateTitles.forEach((el) => {
+        if (!el.title) {
+            el.title = smalldate(
+                Number.parseInt(el.dataset.timestamp ?? '', 10),
+            );
+        }
+    });
 }
 
 /**
@@ -61,17 +63,17 @@ export function updateDates() {
  * @param {Function} callback
  */
 export function onDOMReady(callback: () => void) {
-  if (document.readyState === "complete") {
-    callback();
-  } else {
-    document.addEventListener("DOMContentLoaded", callback);
-  }
+    if (document.readyState === 'complete') {
+        callback();
+    } else {
+        document.addEventListener('DOMContentLoaded', callback);
+    }
 }
 
 export function supportsDateInput() {
-  const input = document.createElement("input");
-  input.setAttribute("type", "date");
-  return input.type === "date";
+    const input = document.createElement('input');
+    input.setAttribute('type', 'date');
+    return input.type === 'date';
 }
 
 /**
@@ -80,19 +82,21 @@ export function supportsDateInput() {
  * @return {boolean}
  */
 export function supportsEmoji(): boolean {
-  // validate if a 2-code point emoji
-  // has the same width as 1-code point emoji
-  const widths = [
-    String.fromCodePoint(0x261d, 0x1f3ff), // dark hand
-    String.fromCodePoint(0x261d), // yellow hand
-  ].map((character: string): number => {
-    const element = document.body.appendChild(document.createElement("span"));
-    element.appendChild(document.createTextNode(character));
-    const width = element.offsetWidth;
-    element.remove();
+    // validate if a 2-code point emoji
+    // has the same width as 1-code point emoji
+    const widths = [
+        String.fromCodePoint(0x261d, 0x1f3ff), // dark hand
+        String.fromCodePoint(0x261d), // yellow hand
+    ].map((character: string): number => {
+        const element = document.body.appendChild(
+            document.createElement('span'),
+        );
+        element.appendChild(document.createTextNode(character));
+        const width = element.offsetWidth;
+        element.remove();
 
-    return width;
-  });
+        return width;
+    });
 
-  return widths[0] === widths[1];
+    return widths[0] === widths[1];
 }

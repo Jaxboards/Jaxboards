@@ -48,13 +48,10 @@ final readonly class CreateTopic
             'topicDescription' => $this->request->asString->post('tdesc'),
             'topicTitle' => $this->request->asString->post('ttitle'),
         ];
-        $input['pollChoices'] =
-            $input['pollChoices'] !== null
-                ? array_filter(
-                    preg_split("@[\r\n]+@", $input['pollChoices']) ?: [],
-                    static fn(string $line): bool => trim($line) !== '',
-                )
-                : [];
+        $input['pollChoices'] = $input['pollChoices'] !== null ? array_filter(
+            preg_split("@[\r\n]+@", $input['pollChoices']) ?: [],
+            static fn(string $line): bool => trim($line) !== '',
+        ) : [];
 
         return $input;
     }
@@ -65,35 +62,27 @@ final readonly class CreateTopic
     public function validateInput(array $input): ?string
     {
         $forum = Forum::selectOne($input['fid']);
-        $forumPerms =
-            $forum !== null ? $this->user->getForumPerms($forum->perms) : [];
+        $forumPerms = $forum !== null
+            ? $this->user->getForumPerms($forum->perms)
+            : [];
 
         // New topic input validation
         $error = match (true) {
             !$forum => "The forum you're trying to post in does not exist.",
-            !$forumPerms['start']
-                => "You don't have permission to post a new topic in that forum.",
-            !$input['topicTitle'] || trim((string) $input['topicTitle']) === ''
-                => "You didn't specify a topic title!",
-            mb_strlen((string) $input['topicTitle']) > 255
-                => 'Topic title must not exceed 255 characters',
-            mb_strlen($input['topicDescription'] ?? '') > 255
-                => 'Topic description must not exceed 255 characters',
+            !$forumPerms['start'] => "You don't have permission to post a new topic in that forum.",
+            !$input['topicTitle'] || trim((string) $input['topicTitle']) === '' => "You didn't specify a topic title!",
+            mb_strlen((string) $input['topicTitle']) > 255 => 'Topic title must not exceed 255 characters',
+            mb_strlen($input['topicDescription'] ?? '') > 255 => 'Topic description must not exceed 255 characters',
             default => null,
         };
 
         // Poll input validation
         $error ??= match (true) {
             !$input['pollType'] => null,
-            $input['pollQuestion'] === null ||
-                trim($input['pollQuestion']) === ''
-                => "You didn't specify a poll question!",
-            count($input['pollChoices']) > 10
-                => 'Poll choices must not exceed 10.',
-            $input['pollChoices'] === []
-                => "You didn't provide any poll choices!",
-            $forum && !$forumPerms['poll']
-                => "You don't have permission to post a poll in that forum",
+            $input['pollQuestion'] === null || trim($input['pollQuestion']) === '' => "You didn't specify a poll question!",
+            count($input['pollChoices']) > 10 => 'Poll choices must not exceed 10.',
+            $input['pollChoices'] === [] => "You didn't provide any poll choices!",
+            $forum && !$forumPerms['poll'] => "You don't have permission to post a poll in that forum",
             default => null,
         };
 
@@ -111,10 +100,9 @@ final readonly class CreateTopic
         $topic->fid = $input['fid'];
         $topic->lastPostDate = $postDate;
         $topic->lastPostUser = $uid;
-        $topic->pollChoices =
-            $input['pollChoices'] !== []
-                ? json_encode($input['pollChoices'], JSON_THROW_ON_ERROR)
-                : '';
+        $topic->pollChoices = $input['pollChoices'] !== []
+            ? (json_encode($input['pollChoices'], JSON_THROW_ON_ERROR))
+            : '';
         $topic->pollQuestion = $input['pollQuestion'] ?: '';
         $topic->pollType = $input['pollType'] ?? '';
         $topic->replies = 0;
@@ -123,7 +111,9 @@ final readonly class CreateTopic
             (string) preg_replace(
                 '@\s+@',
                 ' ',
-                $this->textFormatting->textOnly($this->postData ?? ''),
+                $this->textFormatting->textOnly(
+                    $this->postData ?? '',
+                ),
             ),
             0,
             50,
@@ -171,10 +161,7 @@ final readonly class CreateTopic
             'tid' => $tid,
             'topic' => $topic,
         ]);
-        $page =
-            '<div id="post-preview">' .
-            $this->template->render('post/preview', ['post' => $postData]) .
-            '</div>';
+        $page = '<div id="post-preview">' . $this->template->render('post/preview', ['post' => $postData]) . '</div>';
         $page .= $this->template->render('global/box', [
             'title' => $forum->title . ' > New Topic',
             'content' => $form,

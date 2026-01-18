@@ -81,13 +81,13 @@ final readonly class BuddyList implements Route
         $friends = [];
         $enemies = [];
 
-        if ($this->user->get()->friends !== '') {
+        if (
+            $this->user->get()->friends !== ''
+        ) {
             $friends = array_map(
                 static fn(Member $member): array => [
                     'user' => $member,
-                    'class' => array_key_exists($member->id, $online)
-                        ? 'online'
-                        : 'offline',
+                    'class' => array_key_exists($member->id, $online) ? 'online' : 'offline',
                 ],
                 Member::selectMany(
                     'WHERE `id` IN ? ORDER BY `name` ASC',
@@ -109,17 +109,23 @@ final readonly class BuddyList implements Route
             );
         }
 
-        $this->page->command('window', [
-            'content' => $this->template->render('buddylist/contacts', [
-                'enemies' => $enemies,
-                'friends' => $friends,
-                'isInvisible' => $this->session->get()->hide !== 0,
-                'user' => $this->user->get(),
-            ]),
-            'id' => 'buddylist',
-            'pos' => 'tr 20 20',
-            'title' => 'Buddies',
-        ]);
+        $this->page->command(
+            'window',
+            [
+                'content' => $this->template->render(
+                    'buddylist/contacts',
+                    [
+                        'enemies' => $enemies,
+                        'friends' => $friends,
+                        'isInvisible' => $this->session->get()->hide !== 0,
+                        'user' => $this->user->get(),
+                    ],
+                ),
+                'id' => 'buddylist',
+                'pos' => 'tr 20 20',
+                'title' => 'Buddies',
+            ],
+        );
     }
 
     private function addBuddy(int $uid): bool
@@ -131,12 +137,8 @@ final readonly class BuddyList implements Route
         $error = null;
 
         if (
-            $this->user->get()->enemies &&
-            in_array(
-                (string) $uid,
-                explode(',', $this->user->get()->enemies),
-                true,
-            )
+            $this->user->get()->enemies
+            && in_array((string) $uid, explode(',', $this->user->get()->enemies), true)
         ) {
             $this->unBlock($uid);
         }
@@ -147,9 +149,8 @@ final readonly class BuddyList implements Route
         }
 
         if (!$user) {
-            $error =
-                'This user does not exist, and therefore could ' .
-                'not be added to your contacts list.';
+            $error = 'This user does not exist, and therefore could '
+                . 'not be added to your contacts list.';
         } elseif (in_array((string) $uid, $friends, true)) {
             $error = 'This user is already in your contacts list.';
         }
@@ -176,14 +177,12 @@ final readonly class BuddyList implements Route
     private function block(int $uid): bool
     {
         $error = null;
-        $enemies =
-            $this->user->get()->enemies !== ''
-                ? explode(',', $this->user->get()->enemies)
-                : [];
-        $friends =
-            $this->user->get()->friends !== ''
-                ? explode(',', $this->user->get()->friends)
-                : [];
+        $enemies = $this->user->get()->enemies !== ''
+            ? explode(',', $this->user->get()->enemies)
+            : [];
+        $friends = $this->user->get()->friends !== ''
+            ? explode(',', $this->user->get()->friends)
+            : [];
 
         $isenemy = array_search((string) $uid, $enemies, true);
         $isfriend = array_search((string) $uid, $friends, true);
@@ -241,8 +240,8 @@ final readonly class BuddyList implements Route
     private function setStatus(string $status): bool
     {
         if (
-            $this->user->isGuest() ||
-            $this->user->get()->usertitle === $status
+            $this->user->isGuest()
+            || $this->user->get()->usertitle === $status
         ) {
             return false;
         }

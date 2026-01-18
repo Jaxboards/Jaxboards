@@ -1,93 +1,96 @@
-import toast from "../JAX/toast";
-import Commands from "./commands";
+import toast from '../JAX/toast';
+import Commands from './commands';
 
 const UPDATE_INTERVAL = 5000;
 
 export default class Stream {
-  private readonly commands: typeof Commands;
+    private readonly commands: typeof Commands;
 
-  private lastURL: string;
+    private lastURL: string;
 
-  private timeout = 0;
+    private timeout = 0;
 
-  constructor() {
-    this.lastURL = `${document.location.pathname}${document.location.search}`;
-    this.commands = Commands;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  handleRequestData(url: string, cmds: any[], requestType = 1) {
-    let softurl = false;
-    cmds.forEach(([cmd, ...args]: [string, ...unknown[]]) => {
-      if (cmd === "softurl") {
-        softurl = true;
-      } else if (cmd in this.commands) {
-        // @ts-expect-error I tried for 30 minutes to fix this type error
-        this.commands[cmd].apply(null, args);
-      }
-    });
-
-    if (requestType === 2) {
-      if (!softurl) {
-        globalThis.history.pushState({ lastURL: url }, "", url);
-        // pushstate is not a real browser event unfortunately, so I have to trigger it myself
-        globalThis.dispatchEvent(new Event("pushstate"));
-        this.lastURL = url;
-      }
+    constructor() {
+        this.lastURL = `${document.location.pathname}${document.location.search}`;
+        this.commands = Commands;
     }
-    this.pollData();
-  }
 
-  location(path: string, requestType = 2) {
-    void this.load(path, { requestType });
-  }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    handleRequestData(url: string, cmds: any[], requestType = 1) {
+        let softurl = false;
+        cmds.forEach(([cmd, ...args]: [string, ...unknown[]]) => {
+            if (cmd === 'softurl') {
+                softurl = true;
+            } else if (cmd in this.commands) {
+                // @ts-expect-error I tried for 30 minutes to fix this type error
+                this.commands[cmd].apply(null, args);
+            }
+        });
 
-  async load(
-    url: string,
-    {
-      body,
-      method = "POST",
-      requestType = 1,
-    }: {
-      body?: URLSearchParams;
-      method?: string;
-      requestType?: number;
-    } = {},
-  ) {
-    const request = await fetch(url, {
-      method,
-      body,
-      headers: {
-        "X-JSACCESS": `${requestType}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-
-    if (request.ok) {
-      const json = (await request.json()) as [unknown[]];
-      this.handleRequestData(url, json, requestType);
-    } else {
-      toast.error(
-        "An unrecoverable error has occurred.<br>Please try again later.",
-      );
+        if (requestType === 2) {
+            if (!softurl) {
+                globalThis.history.pushState({ lastURL: url }, '', url);
+                // pushstate is not a real browser event unfortunately, so I have to trigger it myself
+                globalThis.dispatchEvent(new Event('pushstate'));
+                this.lastURL = url;
+            }
+        }
+        this.pollData();
     }
-  }
 
-  pollData(isEager = false) {
-    if (isEager) {
-      void this.load(this.lastURL);
+    location(path: string, requestType = 2) {
+        void this.load(path, { requestType });
     }
-    clearTimeout(this.timeout);
-    if (document.cookie.includes(`actw=${window.name}`)) {
-      this.timeout = setTimeout(() => this.load(this.lastURL), UPDATE_INTERVAL);
-    }
-  }
 
-  updatePage(lastURL: string) {
-    // this function makes the back/forward buttons actually do something,
-    // using anchors
-    if (lastURL !== this.lastURL) {
-      this.location(lastURL, 3);
+    async load(
+        url: string,
+        {
+            body,
+            method = 'POST',
+            requestType = 1,
+        }: {
+            body?: URLSearchParams;
+            method?: string;
+            requestType?: number;
+        } = {},
+    ) {
+        const request = await fetch(url, {
+            method,
+            body,
+            headers: {
+                'X-JSACCESS': `${requestType}`,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        });
+
+        if (request.ok) {
+            const json = (await request.json()) as [unknown[]];
+            this.handleRequestData(url, json, requestType);
+        } else {
+            toast.error(
+                'An unrecoverable error has occurred.<br>Please try again later.',
+            );
+        }
     }
-  }
+
+    pollData(isEager = false) {
+        if (isEager) {
+            void this.load(this.lastURL);
+        }
+        clearTimeout(this.timeout);
+        if (document.cookie.includes(`actw=${window.name}`)) {
+            this.timeout = setTimeout(
+                () => this.load(this.lastURL),
+                UPDATE_INTERVAL,
+            );
+        }
+    }
+
+    updatePage(lastURL: string) {
+        // this function makes the back/forward buttons actually do something,
+        // using anchors
+        if (lastURL !== this.lastURL) {
+            this.location(lastURL, 3);
+        }
+    }
 }

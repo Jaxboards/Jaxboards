@@ -21,15 +21,7 @@ final class Session extends Model
     #[ForeignKey(table: 'members', field: 'id', onDelete: 'cascade')]
     public ?int $uid = null;
 
-    #[
-        Column(
-            name: 'ip',
-            type: 'binary',
-            default: '',
-            length: 16,
-            nullable: false,
-        ),
-    ]
+    #[Column(name: 'ip', type: 'binary', default: '', length: 16, nullable: false)]
     public string $ip = '';
 
     #[Column(name: 'vars', type: 'text', default: '', nullable: false)]
@@ -49,38 +41,16 @@ final class Session extends Model
     #[Column(name: 'location', type: 'text', default: '', nullable: false)]
     public string $location = '';
 
-    #[
-        Column(
-            name: 'usersOnlineCache',
-            type: 'text',
-            default: '',
-            nullable: false,
-        ),
-    ]
+    #[Column(name: 'usersOnlineCache', type: 'text', default: '', nullable: false)]
     public string $usersOnlineCache = '';
 
     #[Column(name: 'isBot', type: 'bool')]
     public int $isBot = 0;
 
-    #[
-        Column(
-            name: 'buddyListCache',
-            type: 'text',
-            default: '',
-            nullable: false,
-        ),
-    ]
+    #[Column(name: 'buddyListCache', type: 'text', default: '', nullable: false)]
     public string $buddyListCache = '';
 
-    #[
-        Column(
-            name: 'locationVerbose',
-            type: 'string',
-            default: '',
-            length: 100,
-            nullable: false,
-        ),
-    ]
+    #[Column(name: 'locationVerbose', type: 'string', default: '', length: 100, nullable: false)]
     public string $locationVerbose = '';
 
     #[Column(name: 'useragent', type: 'text', default: '', nullable: false)]

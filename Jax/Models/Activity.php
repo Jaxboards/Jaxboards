@@ -13,15 +13,7 @@ final class Activity extends Model
 {
     public const TABLE = 'activity';
 
-    #[
-        Column(
-            name: 'id',
-            type: 'int',
-            nullable: false,
-            autoIncrement: true,
-            unsigned: true,
-        ),
-    ]
+    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
     #[PrimaryKey]
     public int $id = 0;
 
@@ -50,14 +42,6 @@ final class Activity extends Model
     #[ForeignKey(table: 'posts', field: 'id', onDelete: 'cascade')]
     public ?int $pid = null;
 
-    #[
-        Column(
-            name: 'arg2',
-            type: 'string',
-            default: '',
-            length: 255,
-            nullable: false,
-        ),
-    ]
+    #[Column(name: 'arg2', type: 'string', default: '', length: 255, nullable: false)]
     public string $arg2 = '';
 }

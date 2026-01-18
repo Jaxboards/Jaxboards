@@ -140,13 +140,9 @@ final class Forum implements Route
         $numpages = (int) ceil($forum->topics / $this->numperpage);
         $forumpages = '';
         if ($numpages !== 0) {
-            $forumpages = implode(
-                ' · ',
-                array_map(function (int $pageNumber) use ($forum): string {
-                    $activeClass =
-                        $pageNumber - 1 === $this->pageNumber
-                            ? 'class="active"'
-                            : '';
+            $forumpages = implode(' · ', array_map(
+                function (int $pageNumber) use ($forum): string {
+                    $activeClass = ($pageNumber - 1 === $this->pageNumber ? 'class="active"' : '');
                     $pageURL = $this->router->url('forum', [
                         'id' => $forum->id,
                         'page' => $pageNumber,
@@ -154,26 +150,27 @@ final class Forum implements Route
                     ]);
 
                     return "<a href='{$pageURL}' {$activeClass}>{$pageNumber}</a> ";
-                }, $this->jax->pages($numpages, $this->pageNumber + 1, 10)),
-            );
+                },
+                $this->jax->pages($numpages, $this->pageNumber + 1, 10),
+            ));
         }
 
-        $orderby =
-            match ($forum->orderby & ~1) {
-                2 => 'id',
-                4 => 'title',
-                default => 'lastPostDate',
-            } .
-            ' ' .
-            (($forum->orderby & 1) !== 0 ? 'ASC' : 'DESC');
+        $orderby = match ($forum->orderby & ~1) {
+            2 => 'id',
+            4 => 'title',
+            default => 'lastPostDate',
+        } . ' ' . (
+            ($forum->orderby & 1) !== 0
+            ? 'ASC'
+            : 'DESC'
+        );
 
         $topics = Topic::selectMany(
             <<<SQL
-            WHERE `fid`=?
-            ORDER BY `pinned` DESC,{$orderby}
-            LIMIT ?,?
-            SQL
-            ,
+                WHERE `fid`=?
+                ORDER BY `pinned` DESC,{$orderby}
+                LIMIT ?,?
+                SQL,
             $fid,
             $this->pageNumber * $this->numperpage,
             $this->numperpage,
@@ -182,8 +179,8 @@ final class Forum implements Route
         // If they're on the first page and all topics are read
         // mark the whole forum as read
         if (
-            $this->pageNumber === 0 &&
-            array_all($topics, $this->isTopicRead(...))
+            $this->pageNumber === 0
+            && array_all($topics, $this->isTopicRead(...))
         ) {
             $this->markRead($fid);
         }
@@ -218,35 +215,29 @@ final class Forum implements Route
     ): string {
         $memberIds = array_merge(
             ...array_map(
-                static fn(Topic $topic): array => [
-                    $topic->author,
-                    $topic->lastPostUser,
-                ],
+                static fn(Topic $topic): array => [$topic->author, $topic->lastPostUser],
                 $topics,
             ),
         );
 
-        $membersById =
-            $memberIds !== []
-                ? Lodash::keyBy(
-                    Member::selectMany(Database::WHERE_ID_IN, $memberIds),
-                    static fn(Member $member): int => $member->id,
-                )
-                : [];
+        $membersById = $memberIds !== [] ? Lodash::keyBy(
+            Member::selectMany(
+                Database::WHERE_ID_IN,
+                $memberIds,
+            ),
+            static fn(Member $member): int => $member->id,
+        ) : [];
 
         $isForumModerator = $this->isForumModerator($modelsForum);
 
-        $rows = array_map(
-            fn(Topic $topic): array => [
-                'author' => $membersById[$topic->author],
-                'topic' => $topic,
-                'lastPostUser' => $membersById[$topic->lastPostUser] ?? null,
-                'isRead' => $this->isTopicRead($topic),
-                'isForumModerator' => $isForumModerator,
-                'pages' => $this->renderTopicPages($topic),
-            ],
-            $topics,
-        );
+        $rows = array_map(fn(Topic $topic): array => [
+            'author' => $membersById[$topic->author],
+            'topic' => $topic,
+            'lastPostUser' => $membersById[$topic->lastPostUser] ?? null,
+            'isRead' => $this->isTopicRead($topic),
+            'isForumModerator' => $isForumModerator,
+            'pages' => $this->renderTopicPages($topic),
+        ], $topics);
 
         return $this->template->render('forum/table', [
             'forum' => $modelsForum,
@@ -264,10 +255,7 @@ final class Forum implements Route
         }
 
         $pageArray = [];
-        foreach (
-            $this->jax->pages((int) ceil(($topic->replies + 1) / 10), 1, 10)
-            as $pageNumber
-        ) {
+        foreach ($this->jax->pages((int) ceil(($topic->replies + 1) / 10), 1, 10) as $pageNumber) {
             $pageURL = $this->router->url('topic', [
                 'id' => $topic->id,
                 'page' => $pageNumber,
@@ -285,30 +273,19 @@ final class Forum implements Route
     {
         // Start building the nav path.
         $category = Category::selectOne($forum->category);
-        $breadCrumbs =
-            $category !== null
-                ? [
-                    $this->router->url('category', [
-                        'id' => $forum->category,
-                    ]) => $category->title,
-                ]
-                : [];
+        $breadCrumbs = $category !== null
+            ? [$this->router->url('category', ['id' => $forum->category]) => $category->title]
+            : [];
 
         // Subforum breadcrumbs
         if ($forum->path !== '') {
-            $path = array_map(
-                static fn($fid): int => (int) $fid,
-                explode(' ', $forum->path),
-            );
+            $path = array_map(static fn($fid): int => (int) $fid, explode(' ', $forum->path));
             $forums = ModelsForum::selectMany(Database::WHERE_ID_IN, $path);
             // This has to be two steps because WHERE ID IN(1,2,3)
             // does not select records in the same order
             $forumTitles = array_reduce(
                 $forums,
-                static function (
-                    array $forumTitles,
-                    ModelsForum $modelsForum,
-                ): array {
+                static function (array $forumTitles, ModelsForum $modelsForum): array {
                     $forumTitles[$modelsForum->id] = $modelsForum->title;
 
                     return $forumTitles;
@@ -316,20 +293,19 @@ final class Forum implements Route
                 [],
             );
             foreach ($path as $pathId) {
-                $breadCrumbs[$this->router->url('forum', ['id' => $pathId])] =
-                    $forumTitles[$pathId];
+                $breadCrumbs[$this->router->url('forum', ['id' => $pathId])] = $forumTitles[$pathId];
             }
         }
 
-        $breadCrumbs[$this->router->url('forum', ['id' => $forum->id])] =
-            $forum->title;
+        $breadCrumbs[$this->router->url('forum', ['id' => $forum->id])] = $forum->title;
         $this->page->setBreadCrumbs($breadCrumbs);
     }
 
     private function renderSubforums(ModelsForum $forum): string
     {
         $subforums = ModelsForum::selectMany(
-            'WHERE path=? OR path LIKE ? ' . 'ORDER BY `order`',
+            'WHERE path=? OR path LIKE ? '
+                . 'ORDER BY `order`',
             (string) $forum->id,
             "% {$forum->id}",
         );
@@ -350,22 +326,18 @@ final class Forum implements Route
 
             $rows[] = [
                 'subforum' => $subforum,
-                'lastPostUser' => $subforum->lastPostUser
-                    ? $lastPostUsers[$subforum->lastPostUser]
-                    : null,
+                'lastPostUser' => $subforum->lastPostUser ? $lastPostUsers[$subforum->lastPostUser] : null,
                 'isRead' => $this->isForumRead($subforum),
             ];
         }
 
-        return $rows === []
-            ? ''
-            : $this->page->collapseBox(
-                'Subforums',
-                $this->template->render('forum/subforum-table', [
-                    'rows' => $rows,
-                ]),
-                'subforums_' . $forum->id,
-            );
+        return $rows === [] ? '' : $this->page->collapseBox(
+            'Subforums',
+            $this->template->render('forum/subforum-table', [
+                'rows' => $rows,
+            ]),
+            'subforums_' . $forum->id,
+        );
     }
 
     private function getReplySummary(int $tid): void
@@ -378,54 +350,43 @@ final class Forum implements Route
 
         $result = $this->database->special(
             <<<'SQL'
-            SELECT
-                m.`displayName` AS `name`,
-                COUNT(p.`id`) AS `replies`
-            FROM %t p
-            LEFT JOIN %t m
-                ON p.`author`=m.`id`
-            WHERE `tid`=?
-            GROUP BY p.`author`
-            ORDER BY `replies` DESC
-            SQL
-            ,
+                SELECT
+                    m.`displayName` AS `name`,
+                    COUNT(p.`id`) AS `replies`
+                FROM %t p
+                LEFT JOIN %t m
+                    ON p.`author`=m.`id`
+                WHERE `tid`=?
+                GROUP BY p.`author`
+                ORDER BY `replies` DESC
+                SQL,
             ['posts', 'members'],
             $tid,
         );
         $page = '';
         foreach ($this->database->arows($result) as $summary) {
-            $page .=
-                '<tr><td>' .
-                $summary['name'] .
-                '</td><td>' .
-                $summary['replies'] .
-                '</td></tr>';
+            $page .= '<tr><td>' . $summary['name'] . '</td><td>' . $summary['replies'] . '</td></tr>';
         }
 
         $this->page->command('softurl');
-        $this->page->command('window', [
-            'content' => '<table>' . $page . '</table>',
-            'title' => 'Post Summary',
-        ]);
+        $this->page->command(
+            'window',
+            [
+                'content' => '<table>' . $page . '</table>',
+                'title' => 'Post Summary',
+            ],
+        );
     }
 
     private function isTopicRead(Topic $topic): bool
     {
         if ($this->topicsRead === []) {
-            $this->topicsRead = json_decode(
-                $this->session->get()->topicsread,
-                true,
-                flags: JSON_THROW_ON_ERROR,
-            );
+            $this->topicsRead = json_decode($this->session->get()->topicsread, true, flags: JSON_THROW_ON_ERROR);
         }
 
         $forumReadTime = 0;
         if ($this->forumsRead === null) {
-            $forumsRead = json_decode(
-                $this->session->get()->forumsread,
-                true,
-                flags: JSON_THROW_ON_ERROR,
-            );
+            $forumsRead = json_decode($this->session->get()->forumsread, true, flags: JSON_THROW_ON_ERROR);
             if ($topic->fid && array_key_exists($topic->fid, $forumsRead)) {
                 $forumReadTime = $forumsRead[$topic->fid];
             }
@@ -439,10 +400,10 @@ final class Forum implements Route
             $topic->lastPostDate ?? $topic->date,
         );
 
-        return $timestamp <=
-            (max($this->topicsRead[$topic->id], $forumReadTime) ?:
-            $this->session->get()->readDate ?:
-                $this->user->get()->lastVisit);
+        return $timestamp <= (
+            (max($this->topicsRead[$topic->id], $forumReadTime) ?: $this->session->get()->readDate)
+            ?: $this->user->get()->lastVisit
+        );
     }
 
     private function isForumRead(ModelsForum $modelsForum): bool
@@ -451,20 +412,17 @@ final class Forum implements Route
             return true;
         }
 
+
         if ($this->forumsRead === null) {
-            $this->forumsRead = json_decode(
-                $this->session->get()->forumsread,
-                true,
-                flags: JSON_THROW_ON_ERROR,
-            );
+            $this->forumsRead = json_decode($this->session->get()->forumsread, true, flags: JSON_THROW_ON_ERROR);
         }
 
-        return $this->date->datetimeAsTimestamp($modelsForum->lastPostDate) <=
-            ($this->forumsRead[$modelsForum->id] ?? null ?:
-            $this->date->datetimeAsTimestamp($this->session->get()->readDate) ?:
-                $this->date->datetimeAsTimestamp(
-                    $this->user->get()->lastVisit,
-                ));
+
+        return $this->date->datetimeAsTimestamp($modelsForum->lastPostDate) <= (
+            $this->forumsRead[$modelsForum->id] ?? null
+            ?: $this->date->datetimeAsTimestamp($this->session->get()->readDate)
+            ?: $this->date->datetimeAsTimestamp($this->user->get()->lastVisit)
+        );
     }
 
     private function isForumModerator(ModelsForum $modelsForum): bool
@@ -473,25 +431,14 @@ final class Forum implements Route
             return true;
         }
 
-        return in_array(
-            (string) $this->user->get()->id,
-            explode(',', $modelsForum->mods),
-            true,
-        );
+        return in_array((string) $this->user->get()->id, explode(',', $modelsForum->mods), true);
     }
 
     private function markRead(int $id): void
     {
-        $forumsread = json_decode(
-            $this->session->get()->forumsread,
-            true,
-            flags: JSON_THROW_ON_ERROR,
-        );
+        $forumsread = json_decode($this->session->get()->forumsread, true, flags: JSON_THROW_ON_ERROR);
         $forumsread[$id] = Carbon::now('UTC')->getTimestamp();
-        $this->session->set(
-            'forumsread',
-            json_encode($forumsread, JSON_THROW_ON_ERROR),
-        );
+        $this->session->set('forumsread', json_encode($forumsread, JSON_THROW_ON_ERROR));
     }
 
     private function markForumAsRead(int $id): void

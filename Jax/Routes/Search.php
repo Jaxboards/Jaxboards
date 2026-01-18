@@ -74,8 +74,8 @@ final class Search implements Route
         $this->perpage = 10;
 
         if (
-            $this->request->both('searchterm') !== null ||
-            $this->request->asString->both('page') !== null
+            $this->request->both('searchterm') !== null
+            || $this->request->asString->both('page') !== null
         ) {
             $this->dosearch();
         } else {
@@ -89,11 +89,14 @@ final class Search implements Route
             return;
         }
 
-        $page = $this->template->render('search/form', [
-            'searchTerm' => $this->session->getVar('searcht') ?? '',
-            'forumSelect' => $this->getForumSelection(),
-            'searchResults' => $pageContents,
-        ]);
+        $page = $this->template->render(
+            'search/form',
+            [
+                'searchTerm' => $this->session->getVar('searcht') ?? '',
+                'forumSelect' => $this->getForumSelection(),
+                'searchResults' => $pageContents,
+            ],
+        );
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
     }
@@ -109,15 +112,11 @@ final class Search implements Route
             $this->fids,
         );
 
-        $titles = array_reduce(
-            $forums,
-            static function (array $titles, Forum $forum): array {
-                $titles[$forum->id] = $forum->title;
+        $titles = array_reduce($forums, static function (array $titles, Forum $forum): array {
+            $titles[$forum->id] = $forum->title;
 
-                return $titles;
-            },
-            [],
-        );
+            return $titles;
+        }, []);
         $forumTree = new ForumTree($forums);
 
         return $this->getForumSelect($forumTree, $titles);
@@ -126,8 +125,10 @@ final class Search implements Route
     /**
      * @param array<string> $titles
      */
-    private function getForumSelect(ForumTree $forumTree, array $titles): string
-    {
+    private function getForumSelect(
+        ForumTree $forumTree,
+        array $titles,
+    ): string {
         $options = '';
         $generator = $forumTree->getIterator();
         foreach ($generator as $depth => $forumId) {
@@ -135,47 +136,40 @@ final class Search implements Route
             $options .= "<option value='{$forumId}'>{$text}</option>";
         }
 
-        return '<select size="15" title="List of forums" multiple="multiple" name="fids[]">' .
-            $options .
-            '</select>';
+        return '<select size="15" title="List of forums" multiple="multiple" name="fids[]">' . $options . '</select>';
     }
 
     private function dosearch(): void
     {
+
         if ($this->request->isJSUpdate()) {
             return;
         }
 
-        $searchTerm =
-            $this->request->asString->both('searchterm') ?:
-            (string) $this->session->getVar('searcht');
+        $searchTerm = $this->request->asString->both('searchterm') ?: (string) $this->session->getVar('searcht');
 
         $ids = '';
 
-        if ($this->request->both('searchterm') === null) {
+        if (
+            $this->request->both('searchterm') === null
+        ) {
             $ids = (string) $this->session->getVar('search');
         } else {
             $this->getSearchableForums();
             $fidsInput = $this->request->both('fids');
             $fids = is_array($fidsInput)
-                ? array_filter(
-                    $fidsInput,
-                    fn($fid): bool => in_array((int) $fid, $this->fids, true),
-                )
+                ? array_filter($fidsInput, fn($fid): bool => in_array((int) $fid, $this->fids, true))
                 : $this->fids;
 
             $datestart = null;
             if ($this->request->asString->both('datestart')) {
-                $datestart = Carbon::parse(
-                    $this->request->asString->both('datestart'),
-                )->getTimestamp();
+                $datestart = Carbon::parse($this->request->asString->both('datestart'))->getTimestamp();
             }
+
 
             $dateend = null;
             if ($this->request->asString->both('dateend')) {
-                $dateend = Carbon::parse(
-                    $this->request->asString->both('dateend'),
-                )->getTimestamp();
+                $dateend = Carbon::parse($this->request->asString->both('dateend'))->getTimestamp();
             }
 
             $authorId = (int) $this->request->asString->both('mid');
@@ -214,44 +208,37 @@ final class Search implements Route
                 $topicValues[] = $this->database->datetime($datestart);
             }
 
-            $postWhere = implode(
-                ' ',
-                array_map(static fn($q): string => "AND {$q}", $postParams),
-            );
-            $topicWhere = implode(
-                ' ',
-                array_map(static fn($q): string => "AND {$q}", $topicParams),
-            );
+            $postWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $postParams));
+            $topicWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $topicParams));
 
             $sanitizedSearchTerm = $searchTerm;
 
             $result = $this->database->special(
-                <<<SQL
-                    SELECT
-                        `id`,
-                        SUM(`relevance`) AS `relevance`
-                    FROM (
-                        (
-                            SELECT
-                                p.`id` AS `id`,
-                                MATCH(p.`post`) AGAINST(?) AS `relevance`
-                            FROM %t p
-                            LEFT JOIN %t t
-                                ON p.`tid`=t.`id`
-                            WHERE MATCH(p.`post`) AGAINST(? IN BOOLEAN MODE)
-                                {$postWhere}
-                            ORDER BY `relevance` DESC LIMIT 100
-                        ) UNION (
-                            SELECT t.`op` AS `op`,MATCH(t.`title`) AGAINST(?) AS `relevance`
-                            FROM %t t
-                            WHERE MATCH(`title`) AGAINST(? IN BOOLEAN MODE)
-                                {$topicWhere}
-                            ORDER BY `relevance` DESC LIMIT 100
-                        )
-                    ) dt
-                    GROUP BY `id` ORDER BY `relevance` DESC
-                SQL
-                ,
+                <<<"SQL"
+                        SELECT
+                            `id`,
+                            SUM(`relevance`) AS `relevance`
+                        FROM (
+                            (
+                                SELECT
+                                    p.`id` AS `id`,
+                                    MATCH(p.`post`) AGAINST(?) AS `relevance`
+                                FROM %t p
+                                LEFT JOIN %t t
+                                    ON p.`tid`=t.`id`
+                                WHERE MATCH(p.`post`) AGAINST(? IN BOOLEAN MODE)
+                                    {$postWhere}
+                                ORDER BY `relevance` DESC LIMIT 100
+                            ) UNION (
+                                SELECT t.`op` AS `op`,MATCH(t.`title`) AGAINST(?) AS `relevance`
+                                FROM %t t
+                                WHERE MATCH(`title`) AGAINST(? IN BOOLEAN MODE)
+                                    {$topicWhere}
+                                ORDER BY `relevance` DESC LIMIT 100
+                            )
+                        ) dt
+                        GROUP BY `id` ORDER BY `relevance` DESC
+                    SQL,
                 ['posts', 'topics', 'topics'],
                 // Posts
                 ...[$sanitizedSearchTerm, $sanitizedSearchTerm],
@@ -260,6 +247,7 @@ final class Search implements Route
                 ...[$sanitizedSearchTerm, $sanitizedSearchTerm],
                 ...$topicValues,
             );
+
 
             while ($id = $this->database->arow($result)) {
                 if (!$id['id']) {
@@ -287,18 +275,17 @@ final class Search implements Route
 
             $result = $this->database->special(
                 <<<SQL
-                SELECT
-                    p.`id` AS `id`,
-                    p.`tid` AS `tid`,
-                    p.`post` AS `post`,
-                    t.`title` AS `title`
-                FROM %t p
-                LEFT JOIN %t t
-                    ON p.`tid`=t.`id`
-                WHERE p.`id` IN ?
-                ORDER BY FIELD(p.`id`,{$ids})
-                SQL
-                ,
+                    SELECT
+                        p.`id` AS `id`,
+                        p.`tid` AS `tid`,
+                        p.`post` AS `post`,
+                        t.`title` AS `title`
+                    FROM %t p
+                    LEFT JOIN %t t
+                        ON p.`tid`=t.`id`
+                    WHERE p.`id` IN ?
+                    ORDER BY FIELD(p.`id`,{$ids})
+                    SQL,
                 ['posts', 'topics'],
                 $idarray,
             );
@@ -325,29 +312,27 @@ final class Search implements Route
 
             $post = nl2br($post, false);
 
-            $page .= $this->template->render('search/result', [
-                'post' => $postRow,
-                'titleHighlighted' => preg_replace(
-                    '@' . implode('|', $terms) . '@i',
-                    $this->template->render('search/highlight', [
-                        'searchTerm' => '$0',
-                    ]),
-                    $title,
-                ),
-                'postHighlighted' => preg_replace(
-                    '@' . implode('|', $terms) . '@i',
-                    $this->template->render('search/highlight', [
-                        'searchTerm' => '$0',
-                    ]),
-                    $post,
-                ),
-            ]);
+            $page .= $this->template->render(
+                'search/result',
+                [
+                    'post' => $postRow,
+                    'titleHighlighted' => preg_replace(
+                        '@' . implode('|', $terms) . '@i',
+                        $this->template->render('search/highlight', ['searchTerm' => '$0']),
+                        $title,
+                    ),
+                    'postHighlighted' => preg_replace(
+                        '@' . implode('|', $terms) . '@i',
+                        $this->template->render('search/highlight', ['searchTerm' => '$0']),
+                        $post,
+                    ),
+                ],
+            );
         }
 
         if ($numresults === 0) {
-            $error =
-                'No results found. ' .
-                'Try refining your search, or using longer terms.';
+            $error = 'No results found. '
+                . 'Try refining your search, or using longer terms.';
 
             $omitted = [];
             foreach ($terms as $term) {
@@ -359,9 +344,8 @@ final class Search implements Route
             }
 
             if ($omitted !== []) {
-                $error .=
-                    'The following terms were omitted due to length: ' .
-                    implode(', ', $omitted);
+                $error .= 'The following terms were omitted due to length: '
+                    . implode(', ', $omitted);
             }
 
             $page = $this->page->error($error);
@@ -372,9 +356,7 @@ final class Search implements Route
                 10,
             );
             foreach ($resultsArray as $resultArray) {
-                $searchURL = $this->router->url('search', [
-                    'page' => $resultArray,
-                ]);
+                $searchURL = $this->router->url('search', ['page' => $resultArray]);
                 $pages .= "<a href='{$searchURL}'>{$resultArray}</a> ";
             }
         }
@@ -384,7 +366,10 @@ final class Search implements Route
             'content' => $page,
         ]);
 
-        if ($this->request->isJSAccess() && !$this->request->isJSDirectLink()) {
+        if (
+            $this->request->isJSAccess()
+            && !$this->request->isJSDirectLink()
+        ) {
             $this->page->command('update', 'searchresults', $page);
         } else {
             $this->form($page);

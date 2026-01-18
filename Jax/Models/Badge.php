@@ -12,15 +12,7 @@ final class Badge extends Model
 {
     public const TABLE = 'badges';
 
-    #[
-        Column(
-            name: 'id',
-            type: 'int',
-            nullable: false,
-            autoIncrement: true,
-            unsigned: true,
-        ),
-    ]
+    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
     #[PrimaryKey]
     public int $id = 0;
 

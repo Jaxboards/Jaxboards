@@ -80,9 +80,12 @@ final class ProfileTabs
 
     private function showTabAbout(Member $member): string
     {
-        return $this->template->render('userprofile/about', [
-            'member' => $member,
-        ]);
+        return $this->template->render(
+            'userprofile/about',
+            [
+                'member' => $member,
+            ],
+        );
     }
 
     /**
@@ -137,10 +140,13 @@ final class ProfileTabs
                 continue;
             }
 
-            $tabHTML .= $this->template->render('userprofile/topic', [
-                'post' => $post,
-                'topic' => $topic,
-            ]);
+            $tabHTML .= $this->template->render(
+                'userprofile/topic',
+                [
+                    'post' => $post,
+                    'topic' => $topic,
+                ],
+            );
         }
 
         if ($tabHTML === '') {
@@ -169,22 +175,22 @@ final class ProfileTabs
             static fn(Topic $topic): ?int => $topic->fid,
         );
 
-        return implode(
-            '',
-            array_map(function (Post $post) use ($topics, $forums): string {
-                $topic = $topics[$post->tid];
-                $forum = $forums[$topic->fid];
+        return implode('', array_map(function (Post $post) use ($topics, $forums): string {
+            $topic = $topics[$post->tid];
+            $forum = $forums[$topic->fid];
 
-                $perms = $this->user->getForumPerms($forum->perms);
-                if (!$perms['read']) {
-                    return '';
-                }
+            $perms = $this->user->getForumPerms($forum->perms);
+            if (!$perms['read']) {
+                return '';
+            }
 
-                return $this->template->render('userprofile/post', [
+            return $this->template->render(
+                'userprofile/post',
+                [
                     'topic' => $topic,
                     'post' => $post,
-                ]);
-            }, $posts),
-        );
+                ],
+            );
+        }, $posts));
     }
 }

@@ -95,12 +95,10 @@ final class PrivateMessageTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go(
-            new Request(
-                post: ['im_uid' => '1', 'im_im' => 'test'],
-                server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-            ),
-        );
+        $page = $this->go(new Request(
+            post: ['im_uid' => '1', 'im_im' => 'test'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
 
         $json = json_decode($page, true);
 

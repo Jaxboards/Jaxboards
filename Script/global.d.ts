@@ -1,18 +1,18 @@
-import type { AppState } from "./run";
+import type { AppState } from './run';
 
 export {};
 
 declare global {
-  const globalSettings: {
-    canIM: boolean;
-    groupID: number;
-    soundIM: boolean;
-    soundShout: boolean;
-    shoutLimit: number;
-    userID: number;
-    username: string;
-    wysiwyg: boolean;
-  };
+    const globalSettings: {
+        canIM: boolean;
+        groupID: number;
+        soundIM: boolean;
+        soundShout: boolean;
+        shoutLimit: number;
+        userID: number;
+        username: string;
+        wysiwyg: boolean;
+    };
 
-  const RUN: AppState;
+    const RUN: AppState;
 }

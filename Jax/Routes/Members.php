@@ -68,13 +68,12 @@ final class Members implements Route
 
         $page = '';
 
-        $sorthow =
-            $this->request->asString->both('how') === 'DESC' ? 'DESC' : 'ASC';
+        $sorthow = $this->request->asString->both('how') === 'DESC'
+            ? 'DESC' : 'ASC';
         $sortByInput = $this->request->asString->both('sortby');
-        $sortby =
-            $sortByInput !== null && array_key_exists($sortByInput, $fields)
-                ? $sortByInput
-                : 'displayName';
+        $sortby = $sortByInput !== null && array_key_exists($sortByInput, $fields)
+            ? $sortByInput
+            : 'displayName';
 
         $filter = $this->request->asString->get('filter');
 
@@ -90,19 +89,17 @@ final class Members implements Route
                 static fn(Group $group): int => $group->id,
                 array_filter(
                     $groups,
-                    static fn(Group $group): bool => $group->canAccessACP ===
-                        1 || $group->canModerate === 1,
+                    static fn(Group $group): bool => $group->canAccessACP === 1 || $group->canModerate === 1,
                 ),
             ),
         );
-        $where =
-            $filter === 'staff' ? "WHERE groupID IN ({$staffGroupIds})" : '';
+        $where = ($filter === 'staff' ? "WHERE groupID IN ({$staffGroupIds})" : '');
 
         $pages = '';
 
         $members = Member::selectMany(
-            $where .
-                "ORDER BY {$sortby} {$sorthow}
+            $where
+                . "ORDER BY {$sortby} {$sorthow}
             LIMIT ?, ?",
             $this->pageNumber * $this->perpage,
             $this->perpage,
@@ -110,14 +107,13 @@ final class Members implements Route
 
         $numMemberQuery = $this->database->special(
             <<<EOT
-            SELECT COUNT(m.`id`) AS `num_members`
-            FROM %t m
-            LEFT JOIN %t g
-                ON g.id=m.groupID
-            {$where}
+                SELECT COUNT(m.`id`) AS `num_members`
+                FROM %t m
+                LEFT JOIN %t g
+                    ON g.id=m.groupID
+                {$where}
 
-            EOT
-            ,
+                EOT,
             ['members', 'member_groups'],
         );
         $thisrow = $this->database->arow($numMemberQuery);
@@ -134,55 +130,50 @@ final class Members implements Route
                 'how' => $sorthow,
                 'page' => $pageNumber,
             ]);
-            $pages .=
-                "<a href='{$pageURL}'" .
-                ($pageNumber - 1 === $this->pageNumber
-                    ? ' class="active"'
-                    : '') .
-                ">{$pageNumber}</a> ";
+            $pages .= "<a href='{$pageURL}'"
+                . ($pageNumber - 1 === $this->pageNumber ? ' class="active"' : '') . ">{$pageNumber}</a> ";
         }
 
         $links = [];
         foreach ($fields as $field => $fieldLabel) {
-            $url = $this->router->url('members', [
-                'page' => $this->pageNumber + 1,
-                'filter' => $filter,
-                'sortby' => $field,
-                'how' =>
-                    $sortby === $field && $sorthow === 'ASC' ? 'DESC' : 'ASC',
-            ]);
-            $links[] =
-                "<a href='{$url}'" .
-                ($sortby === $field
-                    ? "class='sort" . ($sorthow === 'DESC' ? ' desc' : '') . "'"
-                    : '') .
-                ">{$fieldLabel}</a>";
+            $url = $this->router->url(
+                'members',
+                [
+                    'page' => $this->pageNumber + 1,
+                    'filter' => $filter,
+                    'sortby' => $field,
+                    'how' => $sortby === $field && $sorthow === 'ASC' ? 'DESC' : 'ASC',
+                ],
+            );
+            $links[] = "<a href='{$url}'"
+                . ($sortby === $field ? "class='sort" . ($sorthow === 'DESC' ? ' desc' : '') . "'" : '')
+                . ">{$fieldLabel}</a>";
         }
 
-        $rows = array_map(
-            fn(Member $member): array => [
-                'member' => $member,
-                'group' => $groups[$member->groupID],
-                'contactDetails' => $this->contactDetails->getContactLinks(
-                    $member,
-                ),
-            ],
-            $members,
-        );
+        $rows = array_map(fn(Member $member): array => [
+            'member' => $member,
+            'group' => $groups[$member->groupID],
+            'contactDetails' => $this->contactDetails->getContactLinks($member),
+        ], $members);
 
-        $page = $this->template->render('members/table', [
-            'links' => $links,
-            'rows' => $rows,
-        ]);
-        $page =
-            "<div class='pages pages-top'>{$pages}</div><div class='forum-pages-top'>&nbsp;</div>" .
-            $this->template->render('global/box', [
-                'boxID' => 'memberlist',
-                'title' => 'Members',
-                'content' => $page,
-            ]) .
-            "<div class='pages pages-bottom'>{$pages}</div>" .
-            "<div class='clear'></div>";
+        $page = $this->template->render(
+            'members/table',
+            [
+                'links' => $links,
+                'rows' => $rows,
+            ],
+        );
+        $page = "<div class='pages pages-top'>{$pages}</div><div class='forum-pages-top'>&nbsp;</div>"
+            . $this->template->render(
+                'global/box',
+                [
+                    'boxID' => 'memberlist',
+                    'title' => 'Members',
+                    'content' => $page,
+                ],
+            )
+            . "<div class='pages pages-bottom'>{$pages}</div>"
+            . "<div class='clear'></div>";
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
     }

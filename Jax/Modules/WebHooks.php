@@ -52,9 +52,8 @@ final readonly class WebHooks implements Module
         }
 
         $boardURL = $this->domainDefinitions->getBoardURL();
-        $topicURL =
-            $boardURL .
-            $this->router->url('topic', [
+        $topicURL = $boardURL
+            . $this->router->url('topic', [
                 'id' => $topic->id,
                 'findpost' => $post->id,
             ]);
@@ -64,15 +63,12 @@ final readonly class WebHooks implements Module
         $member = $this->user->get();
         $this->sendJSON($discord, [
             'username' => $member->displayName,
-            'avatar_url' =>
-                $member->avatar ??
-                $boardURL . '/Service/Themes/Default/avatars/default.gif',
+            'avatar_url' => $member->avatar ?? $boardURL . '/Service/Themes/Default/avatars/default.gif',
             'content' => <<<MARKDOWN
-            [{$topic->title}](<{$topicURL}>)
+                [{$topic->title}](<{$topicURL}>)
 
-            {$postContent}
-            MARKDOWN
-        ,
+                {$postContent}
+                MARKDOWN,
         ]);
     }
 
@@ -84,10 +80,7 @@ final readonly class WebHooks implements Module
         $json = json_encode($payload, JSON_THROW_ON_ERROR);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Content-Length: ' . mb_strlen($json),
-        ]);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Content-Length: ' . mb_strlen($json)]);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

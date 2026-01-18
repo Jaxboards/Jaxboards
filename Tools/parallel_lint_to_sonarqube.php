@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 declare(strict_types=1);
 
 // phpcs:disable Generic.Files.LineLength.TooLong,PSR12.Files.FileHeader.IncorrectOrder,Squiz.Commenting.InlineComment.DocBlock,Squiz.Commenting.BlockComment.WrongStart
@@ -37,8 +38,8 @@ $sonarQubeReport = $argv[2] ?? '';
 if ($sonarQubeReport === '') {
     fwrite(
         STDERR,
-        'Please enter the path to where to save your SonarQube report json ' .
-            'file',
+        'Please enter the path to where to save your SonarQube report json '
+        . 'file',
     );
 
     exit(1);
@@ -58,13 +59,22 @@ if (!is_readable($parallelLintReport)) {
 }
 
 if (file_exists($sonarQubeReport) && !is_writable($sonarQubeReport)) {
-    fwrite(STDERR, 'SonarQube report file already exists and is not writable');
+    fwrite(
+        STDERR,
+        'SonarQube report file already exists and is not writable',
+    );
 
     exit(1);
 }
 
-if (!file_exists($sonarQubeReport) && !is_writable(dirname($sonarQubeReport))) {
-    fwrite(STDERR, 'SonarQube report file directory is not writable');
+if (
+    !file_exists($sonarQubeReport)
+    && !is_writable(dirname($sonarQubeReport))
+) {
+    fwrite(
+        STDERR,
+        'SonarQube report file directory is not writable',
+    );
 
     exit(1);
 }
@@ -84,8 +94,8 @@ $data = json_decode(
 if (!is_array($data['results']['errors'] ?? null)) {
     fwrite(
         STDERR,
-        'Provided parallel-lint report json file does not have ' .
-            '`results`.`errors` array',
+        'Provided parallel-lint report json file does not have '
+        . '`results`.`errors` array',
     );
 
     exit(1);
@@ -143,4 +153,3 @@ file_put_contents(
     ),
     LOCK_EX,
 );
-

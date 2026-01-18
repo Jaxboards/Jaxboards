@@ -55,17 +55,17 @@ final class BBCodeTest extends UnitTestCase
     public function testGetURLS(): void
     {
         $this->assertEqualsCanonicalizing(
-            ['http://cnn.com', 'http://twitch.com'],
-            $this->bbCode->getURLs(
-                <<<'BBCODE'
+            [
+                'http://cnn.com',
+                'http://twitch.com',
+            ],
+            $this->bbCode->getURLs(<<<'BBCODE'
                 [url]http://cnn.com[/url]
 
                 http://foxnews.com
 
                 [url=http://twitch.com]http://google.com[/url]
-                BBCODE
-                ,
-            ),
+                BBCODE),
         );
     }
 
@@ -81,7 +81,10 @@ final class BBCodeTest extends UnitTestCase
             return;
         }
 
-        $this->assertEquals($output, $this->bbCode->toHTML($input));
+        $this->assertEquals(
+            $output,
+            $this->bbCode->toHTML($input),
+        );
     }
 
     /**
@@ -90,8 +93,14 @@ final class BBCodeTest extends UnitTestCase
     public static function bbcodeToHTMLDataProvider(): array
     {
         return [
-            ['[b]bold[/b]', '<strong>bold</strong>'],
-            ['[i]italic[/i]', '<em>italic</em>'],
+            [
+                '[b]bold[/b]',
+                '<strong>bold</strong>',
+            ],
+            [
+                '[i]italic[/i]',
+                '<em>italic</em>',
+            ],
             [
                 '[u]underline[/u]',
                 '<span style="text-decoration:underline">underline</span>',
@@ -148,13 +157,21 @@ final class BBCodeTest extends UnitTestCase
                 '[img=An image]http://example.com/image.jpg[/img]',
                 '<img src="http://example.com/image.jpg" title="An image" alt="An image" class="bbcodeimg">',
             ],
-            ['[h2]Header 2[/h2]', '<h2>Header 2</h2>'],
+            [
+                '[h2]Header 2[/h2]',
+                '<h2>Header 2</h2>',
+            ],
             [
                 '[spoiler]hidden text[/spoiler]',
                 '<span class="spoilertext">hidden text</span>',
             ],
             [
-                implode(PHP_EOL, ['[ul]', '*Item 1', '*Item 2', '[/ul]']),
+                implode(PHP_EOL, [
+                    '[ul]',
+                    '*Item 1',
+                    '*Item 2',
+                    '[/ul]',
+                ]),
                 '<ul><li>Item 1</li><li>Item 2</li></ul>',
             ],
             [

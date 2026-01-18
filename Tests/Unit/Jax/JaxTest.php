@@ -108,7 +108,10 @@ final class JaxTest extends UnitTestCase
         $result = $this->jax->parseForumPerms($this->encodedForumFlags);
 
         foreach (array_keys($this->decoded) as $groupId) {
-            self::assertSame($this->decoded[$groupId], $result[$groupId]);
+            self::assertSame(
+                $this->decoded[$groupId],
+                $result[$groupId],
+            );
         }
     }
 

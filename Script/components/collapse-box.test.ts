@@ -1,7 +1,7 @@
-import CollapseBox from "./collapse-box";
+import CollapseBox from './collapse-box';
 
-test("collapse box", function () {
-  document.body.innerHTML = `
+test('collapse box', function () {
+    document.body.innerHTML = `
         <div class="collapse-box" id="test-box">
             <button class="collapse-button">
             <div class="collapse-content">
@@ -10,14 +10,14 @@ test("collapse box", function () {
         </div>
     `;
 
-  CollapseBox.hydrate(document.body);
+    CollapseBox.hydrate(document.body);
 
-  const collapseContent =
-    document.querySelector<HTMLDivElement>(".collapse-content");
+    const collapseContent =
+        document.querySelector<HTMLDivElement>('.collapse-content');
 
-  expect(collapseContent?.style.height).toBe("");
+    expect(collapseContent?.style.height).toBe('');
 
-  document.querySelector<HTMLButtonElement>(".collapse-button")?.click();
+    document.querySelector<HTMLButtonElement>('.collapse-button')?.click();
 
-  expect(collapseContent?.style.height).toBe("0px");
+    expect(collapseContent?.style.height).toBe('0px');
 });

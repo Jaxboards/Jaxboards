@@ -107,16 +107,10 @@ final class ReactionsTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go('/topic/1');
-        $url = $this->container
-            ->get(Router::class)
-            ->url('topic', ['id' => '1', 'ratepost' => '1', 'niblet' => '1']);
+        $url = $this->container->get(Router::class)->url('topic', ['id' => '1', 'ratepost' => '1', 'niblet' => '1']);
 
         DOMAssert::assertSelectCount(".postrating a[href^='{$url}']", 1, $page);
-        DOMAssert::assertSelectCount(
-            '.postrating img[src="image"][title="title"]',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectCount('.postrating img[src="image"][title="title"]', 1, $page);
     }
 
     public function testReactionsReactToPost(): void
@@ -125,10 +119,7 @@ final class ReactionsTest extends FeatureTestCase
 
         $this->go('/topic/1?ratepost=1&niblet=1');
 
-        $this->assertEquals(
-            json_encode(['1' => [1]]),
-            Post::selectOne(1)->rating,
-        );
+        $this->assertEquals(json_encode(['1' => [1]]), Post::selectOne(1)->rating);
     }
 
     public function testListReactions(): void
@@ -139,12 +130,10 @@ final class ReactionsTest extends FeatureTestCase
         $post->rating = json_encode(['1' => [1]], JSON_THROW_ON_ERROR);
         $post->update();
 
-        $page = $this->go(
-            new Request(
-                get: ['path' => 'topic/1', 'listrating' => '1'],
-                server: ['HTTP_X_JSACCESS' => JSAccess::UPDATING->value],
-            ),
-        );
+        $page = $this->go(new Request(
+            get: ['path' => 'topic/1', 'listrating' => '1'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::UPDATING->value],
+        ));
 
         $json = json_decode($page);
 

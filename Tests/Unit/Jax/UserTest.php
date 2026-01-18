@@ -77,10 +77,7 @@ final class UserTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->encodedForumFlags = base64_decode(
-            'AAEAPgADABgABAAYAAUAGAAGAD8=',
-            true,
-        );
+        $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=', true);
     }
 
     public function testGetForumPermissionAsAdmin(): void
@@ -88,14 +85,25 @@ final class UserTest extends UnitTestCase
         // admin? where are these defined? these should be constants or an enum
         $database = self::getMockBuilder(Database::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['arow', 'disposeresult', 'select'])
-            ->getMock();
+            ->onlyMethods([
+                'arow',
+                'disposeresult',
+                'select',
+            ])
+            ->getMock()
+        ;
 
-        $database->expects(self::never())->method('select');
+        $database->expects(self::never())
+            ->method('select')
+        ;
 
-        $database->expects(self::never())->method('arow');
+        $database->expects(self::never())
+            ->method('arow')
+        ;
 
-        $database->expects(self::never())->method('disposeresult');
+        $database->expects(self::never())
+            ->method('disposeresult')
+        ;
 
         $container = new Container([
             Database::class => $database,
@@ -135,14 +143,25 @@ final class UserTest extends UnitTestCase
         // guest? where are these defined? these should be constants or an enum
         $database = self::getMockBuilder(Database::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['arow', 'disposeresult', 'select'])
-            ->getMock();
+            ->onlyMethods([
+                'arow',
+                'disposeresult',
+                'select',
+            ])
+            ->getMock()
+        ;
 
-        $database->expects(self::never())->method('select');
+        $database->expects(self::never())
+            ->method('select')
+        ;
 
-        $database->expects(self::never())->method('arow');
+        $database->expects(self::never())
+            ->method('arow')
+        ;
 
-        $database->expects(self::never())->method('disposeresult');
+        $database->expects(self::never())
+            ->method('disposeresult')
+        ;
 
         $container = new Container([
             Database::class => $database,
@@ -171,14 +190,25 @@ final class UserTest extends UnitTestCase
     {
         $database = self::getMockBuilder(Database::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['arow', 'disposeresult', 'select'])
-            ->getMock();
+            ->onlyMethods([
+                'arow',
+                'disposeresult',
+                'select',
+            ])
+            ->getMock()
+        ;
 
-        $database->expects(self::never())->method('select');
+        $database->expects(self::never())
+            ->method('select')
+        ;
 
-        $database->expects(self::never())->method('arow');
+        $database->expects(self::never())
+            ->method('arow')
+        ;
 
-        $database->expects(self::never())->method('disposeresult');
+        $database->expects(self::never())
+            ->method('disposeresult')
+        ;
 
         $container = new Container([
             Database::class => $database,

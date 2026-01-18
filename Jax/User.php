@@ -168,12 +168,8 @@ final class User
             $forum = Forum::selectOne($modelsTopic->fid);
 
             if (
-                $forum !== null &&
-                in_array(
-                    (string) $this->member->id,
-                    explode(',', $forum->mods),
-                    true,
-                )
+                $forum !== null
+                && in_array((string) $this->member->id, explode(',', $forum->mods), true)
             ) {
                 return true;
             }

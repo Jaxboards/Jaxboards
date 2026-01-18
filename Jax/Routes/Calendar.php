@@ -44,19 +44,24 @@ final readonly class Calendar implements Route
         }
 
         $today = gmdate('n j Y');
-        [$offset, $daysInMonth, $monthName, $year, $month] = explode(
+        [
+            $offset,
+            $daysInMonth,
+            $monthName,
+            $year,
+            $month,
+        ] = explode(
             ' ',
-            Carbon::today('UTC')->addMonths($monthOffset)->format('w t F Y n'),
+            Carbon::today('UTC')
+                ->addMonths($monthOffset)
+                ->format('w t F Y n'),
         );
         $offset = (int) $offset;
         $daysInMonth = (int) $daysInMonth;
         $year = (int) $year;
         $month = (int) $month;
 
-        $this->session->set(
-            'locationVerbose',
-            'Checking out the calendar for ' . $monthName . ' ' . $year,
-        );
+        $this->session->set('locationVerbose', 'Checking out the calendar for ' . $monthName . ' ' . $year);
         $members = Member::selectMany(
             'WHERE MONTH(`birthdate`)=? AND YEAR(`birthdate`)<=?',
             $month,
@@ -76,12 +81,13 @@ final readonly class Calendar implements Route
         }
 
         $weeks = [];
-        $days = [['offset' => $offset]];
+        $days = [
+            ['offset' => $offset],
+        ];
 
         for ($x = 1; $x <= $daysInMonth; ++$x) {
             $days[] = [
-                'class' =>
-                    $month . ' ' . $x . ' ' . $year === $today ? 'today' : '',
+                'class' => $month . ' ' . $x . ' ' . $year === $today ? 'today' : '',
                 'day' => $x,
                 'birthdays' => $birthdays[$x] ?? [],
             ];
@@ -100,10 +106,7 @@ final readonly class Calendar implements Route
             'weeks' => $weeks,
             'year' => $year,
         ]);
-        $page = $this->template->render('global/box', [
-            'title' => 'Calendar',
-            'content' => $page,
-        ]);
+        $page = $this->template->render('global/box', ['title' => 'Calendar', 'content' => $page]);
 
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);

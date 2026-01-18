@@ -14,15 +14,7 @@ final class Post extends Model
 {
     public const TABLE = 'posts';
 
-    #[
-        Column(
-            name: 'id',
-            type: 'int',
-            nullable: false,
-            autoIncrement: true,
-            unsigned: true,
-        ),
-    ]
+    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
     #[PrimaryKey]
     public int $id = 0;
 
@@ -34,14 +26,7 @@ final class Post extends Model
     #[Key(fulltext: true)]
     public string $post = '';
 
-    #[
-        Column(
-            name: 'openGraphMetadata',
-            type: 'json',
-            default: '{}',
-            nullable: false,
-        ),
-    ]
+    #[Column(name: 'openGraphMetadata', type: 'json', default: '{}', nullable: false)]
     public string $openGraphMetadata = '{}';
 
     #[Column(name: 'date', type: 'datetime')]
@@ -60,15 +45,7 @@ final class Post extends Model
     #[Column(name: 'newtopic', type: 'bool')]
     public int $newtopic = 0;
 
-    #[
-        Column(
-            name: 'ip',
-            type: 'binary',
-            default: '',
-            length: 16,
-            nullable: false,
-        ),
-    ]
+    #[Column(name: 'ip', type: 'binary', default: '', length: 16, nullable: false)]
     #[Key]
     public string $ip = '';
 

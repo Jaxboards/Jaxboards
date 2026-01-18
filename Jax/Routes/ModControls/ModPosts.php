@@ -87,10 +87,7 @@ final readonly class ModPosts
 
         $shouldClear = match ($doAct) {
             'move' => $this->page->command('modcontrols_move', 1),
-            'moveto' => $this->movePostsTo(
-                $pids,
-                (int) $this->request->post('id'),
-            ),
+            'moveto' => $this->movePostsTo($pids, (int) $this->request->post('id')),
             'delete' => $this->deletePosts($pids),
             default => null,
         };
@@ -133,13 +130,16 @@ final readonly class ModPosts
     {
         $trashCanForum = Forum::selectOne('WHERE `trashcan`=?', 1);
 
-        $posts = Post::selectMany(Database::WHERE_ID_IN, $pids);
+        $posts = Post::selectMany(
+            Database::WHERE_ID_IN,
+            $pids,
+        );
 
         // Build list of topic ids that the posts were in.
-        $tids = array_unique(
-            array_map(static fn(Post $post): int => $post->id, $posts),
-            SORT_REGULAR,
-        );
+        $tids = array_unique(array_map(
+            static fn(Post $post): int => $post->id,
+            $posts,
+        ), SORT_REGULAR);
 
         if ($trashCanForum !== null) {
             $tids[] = $this->movePostsToTrashcan(
@@ -150,7 +150,11 @@ final readonly class ModPosts
         }
 
         if ($trashCanForum === null) {
-            $this->database->delete('posts', Database::WHERE_ID_IN, $pids);
+            $this->database->delete(
+                'posts',
+                Database::WHERE_ID_IN,
+                $pids,
+            );
         }
 
         $this->updateTopicStats($tids);
@@ -158,27 +162,18 @@ final readonly class ModPosts
         // Fix forum last post for all forums topics were in.
         // Add trashcan here too.
         $topics = Topic::selectMany(Database::WHERE_ID_IN, $tids);
-        $fids = array_unique(
-            array_merge(
-                $trashCanForum !== null ? [$trashCanForum->id] : [],
-                array_map(
-                    static fn(Topic $topic): int => (int) $topic->fid,
-                    $topics,
-                ),
+        $fids = array_unique(array_merge(
+            $trashCanForum !== null ? [$trashCanForum->id] : [],
+            array_map(
+                static fn(Topic $topic): int => (int) $topic->fid,
+                $topics,
             ),
-            SORT_REGULAR,
-        );
+        ), SORT_REGULAR);
 
         array_map(Forum::fixLastPost(...), $fids);
 
         // Remove them from the page.
-        array_map(
-            fn(int $postId) => $this->page->command(
-                'removeel',
-                '#pid_' . $postId,
-            ),
-            $pids,
-        );
+        array_map(fn(int $postId) => $this->page->command('removeel', '#pid_' . $postId), $pids);
 
         return true;
     }
@@ -191,13 +186,9 @@ final readonly class ModPosts
     private function getModPids(): array
     {
         $modPids = (string) $this->session->getVar('modpids');
-        $intPids =
-            $modPids !== ''
-                ? array_map(
-                    static fn($pid): int => (int) $pid,
-                    explode(',', $modPids),
-                )
-                : [];
+        $intPids = $modPids !== ''
+            ? array_map(static fn($pid): int => (int) $pid, explode(',', $modPids))
+            : [];
         sort($intPids);
 
         return $intPids;
@@ -209,13 +200,12 @@ final readonly class ModPosts
     private function fetchForumMods(Post $post): array
     {
         $topic = Topic::selectOne($post->tid);
-        $forum = $topic !== null ? Forum::selectOne($topic->fid) : null;
+        $forum = $topic !== null
+            ? Forum::selectOne($topic->fid)
+            : null;
 
         return $forum?->mods
-            ? array_map(
-                static fn($mid): int => (int) $mid,
-                explode(',', $forum->mods),
-            )
+            ? array_map(static fn($mid): int => (int) $mid, explode(',', $forum->mods))
             : [];
     }
 
@@ -275,7 +265,12 @@ final readonly class ModPosts
      */
     private function updatePosts(array $pids, array $data): void
     {
-        $this->database->update('posts', $data, Database::WHERE_ID_IN, $pids);
+        $this->database->update(
+            'posts',
+            $data,
+            Database::WHERE_ID_IN,
+            $pids,
+        );
     }
 
     /**
@@ -287,12 +282,11 @@ final readonly class ModPosts
             // Recount replies.
             $this->database->special(
                 <<<'SQL'
-                UPDATE %t
-                SET `replies`=(
-                    SELECT COUNT(`id`) FROM %t WHERE `tid`=?)-1
-                WHERE `id`=?
-                SQL
-                ,
+                    UPDATE %t
+                    SET `replies`=(
+                        SELECT COUNT(`id`) FROM %t WHERE `tid`=?)-1
+                    WHERE `id`=?
+                    SQL,
                 ['topics', 'posts'],
                 $tid,
                 $tid,

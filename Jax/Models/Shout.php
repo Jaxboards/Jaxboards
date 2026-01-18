@@ -14,15 +14,7 @@ final class Shout extends Model
 {
     public const TABLE = 'shouts';
 
-    #[
-        Column(
-            name: 'id',
-            type: 'int',
-            nullable: false,
-            autoIncrement: true,
-            unsigned: true,
-        ),
-    ]
+    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
     #[PrimaryKey]
     public int $id = 0;
 
@@ -36,15 +28,7 @@ final class Shout extends Model
     #[Column(name: 'date', type: 'datetime')]
     public ?string $date = null;
 
-    #[
-        Column(
-            name: 'ip',
-            type: 'binary',
-            default: '',
-            length: 16,
-            nullable: false,
-        ),
-    ]
+    #[Column(name: 'ip', type: 'binary', default: '', length: 16, nullable: false)]
     #[Key]
     public string $ip = '';
 }

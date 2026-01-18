@@ -96,9 +96,9 @@ final readonly class App
 
         // Fix ip if necessary.
         if (
-            !$this->user->isGuest() &&
-            $this->session->get()->ip &&
-            $this->session->get()->ip !== $this->user->get()->ip
+            !$this->user->isGuest()
+            && $this->session->get()->ip
+            && $this->session->get()->ip !== $this->user->get()->ip
         ) {
             $this->user->set('ip', $this->ipAddress->asBinary());
         }
@@ -108,9 +108,9 @@ final readonly class App
         // but the session variable has changed/been removed/not updated for some reason
         // this fixes it.
         if (
-            !$this->session->get()->isBot &&
-            $this->user->get()->id !== 0 &&
-            $this->user->get()->id !== $this->session->get()->uid
+            !$this->session->get()->isBot
+            && $this->user->get()->id !== 0
+            && $this->user->get()->id !== $this->session->get()->uid
         ) {
             $this->session->clean((int) $this->user->get()->id);
             $this->session->set('uid', $this->user->get()->id);
@@ -119,8 +119,8 @@ final readonly class App
 
         // If the user's navigated to a new page, change their action time.
         if (
-            !$this->request->isJSNewLocation() &&
-            $this->request->isJSAccess()
+            !$this->request->isJSNewLocation()
+            && $this->request->isJSAccess()
         ) {
             return;
         }
@@ -137,9 +137,7 @@ final readonly class App
 
         foreach ($modules as $module) {
             $fileInfo = $this->fileSystem->getFileInfo((string) $module);
-            $moduleName = $fileInfo->getBasename(
-                '.' . $fileInfo->getExtension(),
-            );
+            $moduleName = $fileInfo->getBasename('.' . $fileInfo->getExtension());
 
             $module = $this->container->get('Jax\Modules\\' . $moduleName);
 
@@ -154,9 +152,7 @@ final readonly class App
         }
 
         // Redirect to index instead of 404
-        if (
-            $this->router->route($this->request->asString->both('path') ?? '')
-        ) {
+        if ($this->router->route($this->request->asString->both('path') ?? '')) {
             return;
         }
 
@@ -167,25 +163,27 @@ final readonly class App
     {
         $this->page->append(
             'SCRIPT',
-            '<script src="' .
-                $this->domainDefinitions->getBoardURL() .
-                '/dist/app.js" defer></script>',
+            '<script src="' . $this->domainDefinitions->getBoardURL() . '/dist/app.js" defer></script>',
         );
 
         $this->page->append(
             'LOGO',
-            $this->template->render('global/logo', [
-                'logoURL' =>
-                    $this->config->getSetting('logourl') ?:
-                    $this->domainDefinitions->getBoardURL() .
-                        '/Service/Themes/Default/img/logo.png',
-            ]),
+            $this->template->render(
+                'global/logo',
+                [
+                    'logoURL' => $this->config->getSetting('logourl')
+                        ?: $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default/img/logo.png',
+                ],
+            ),
         );
         $this->page->append(
             'NAVIGATION',
-            $this->template->render('global/navigation', [
-                'perms' => $this->user->getGroup(),
-            ]),
+            $this->template->render(
+                'global/navigation',
+                [
+                    'perms' => $this->user->getGroup(),
+                ],
+            ),
         );
 
         $unreadMessages = $this->getUnreadMessages();
@@ -195,13 +193,16 @@ final readonly class App
             'USERBOX',
             $this->user->isGuest()
                 ? $this->template->render('global/userbox-logged-out')
-                : $this->template->render('global/userbox-logged-in', [
-                    'user' => $this->user->get(),
-                    'lastVisit' => $this->date->smallDate(
-                        $this->user->get()->lastVisit,
-                    ),
-                    'unreadMessages' => $unreadMessages,
-                ]),
+                : $this->template->render(
+                    'global/userbox-logged-in',
+                    [
+                        'user' => $this->user->get(),
+                        'lastVisit' => $this->date->smallDate(
+                            $this->user->get()->lastVisit,
+                        ),
+                        'unreadMessages' => $unreadMessages,
+                    ],
+                ),
         );
     }
 
@@ -222,9 +223,7 @@ final readonly class App
         if ($unreadMessages !== 0) {
             $this->page->append(
                 'FOOTER',
-                $this->template->render('notifications/unread-messages', [
-                    'unreadMessages' => $unreadMessages,
-                ]),
+                $this->template->render('notifications/unread-messages', ['unreadMessages' => $unreadMessages]),
             );
         }
 
@@ -233,28 +232,23 @@ final readonly class App
             if ($reportCount !== 0) {
                 $this->page->append(
                     'FOOTER',
-                    $this->template->render('notifications/post-reports', [
-                        'reportCount' => $reportCount,
-                    ]),
+                    $this->template->render('notifications/post-reports', ['reportCount' => $reportCount]),
                 );
             }
         }
 
-        $version =
-            json_decode(
-                $this->fileSystem->getContents('composer.json') ?: '',
-                null,
-                flags: JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
-            )['version'] ?? 'Unknown';
+        $version = json_decode(
+            $this->fileSystem->getContents('composer.json') ?: '',
+            null,
+            flags: JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
+        )['version'] ?? 'Unknown';
 
         $this->page->append(
             'FOOTER',
-            '<div class="footer">' .
-                "<a href=\"https://jaxboards.github.io\">Jaxboards</a> {$version}! " .
+            '<div class="footer">'
+                . "<a href=\"https://jaxboards.github.io\">Jaxboards</a> {$version}! "
                 // Removed the defunct URL
-                '&copy; 2007-' .
-                gmdate('Y') .
-                '</div>',
+                . '&copy; 2007-' . gmdate('Y') . '</div>',
         );
     }
 
@@ -265,44 +259,42 @@ final readonly class App
         $this->page->command(
             'update',
             'pagegen',
-            $pagegen =
-                'Page Generated in ' .
-                round(1_000 * (microtime(true) - $this->microtime)) .
-                ' ms',
+            $pagegen = 'Page Generated in '
+                . round(1_000 * (microtime(true) - $this->microtime)) . ' ms',
         );
         $this->page->append(
             'DEBUG',
-            $this->page->collapseBox('Debug', $debug, 'debug') .
-                "<div id='pagegen' style='text-align: center'>{$pagegen}</div>",
+            $this->page->collapseBox(
+                'Debug',
+                $debug,
+                'debug',
+            ) . "<div id='pagegen' style='text-align: center'>{$pagegen}</div>",
         );
     }
 
     private function renderNavigation(): void
     {
-        $this->page->setBreadCrumbs([
-            $this->router->url('index') =>
-                $this->config->getSetting('boardname') ?: 'Home',
-        ]);
+        $this->page->setBreadCrumbs(
+            [
+                $this->router->url('index') => ($this->config->getSetting('boardname') ?: 'Home'),
+            ],
+        );
     }
 
     private function setPageVars(): void
     {
-        $globalSettings = $this->user->isGuest()
-            ? []
-            : [
-                'canIM' => $this->user->getGroup()?->canIM,
-                'groupID' => $this->user->get()->groupID,
-                'soundIM' => $this->user->get()->soundIM,
-                'userID' => $this->user->get()->id,
-                'username' => $this->user->get()->displayName,
-                'wysiwyg' => $this->user->get()->wysiwyg,
-            ];
+        $globalSettings = $this->user->isGuest() ? [] : [
+            'canIM' => $this->user->getGroup()?->canIM,
+            'groupID' => $this->user->get()->groupID,
+            'soundIM' => $this->user->get()->soundIM,
+            'userID' => $this->user->get()->id,
+            'username' => $this->user->get()->displayName,
+            'wysiwyg' => $this->user->get()->wysiwyg,
+        ];
 
         $this->page->append(
             'SCRIPT',
-            '<script>window.globalSettings=' .
-                json_encode($globalSettings, JSON_FORCE_OBJECT) .
-                '</script>',
+            '<script>window.globalSettings=' . json_encode($globalSettings, JSON_FORCE_OBJECT) . '</script>',
         );
     }
 }

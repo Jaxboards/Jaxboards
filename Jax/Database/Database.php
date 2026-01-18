@@ -140,10 +140,8 @@ final class Database
         $fieldsString = is_array($fields) ? implode(', ', $fields) : $fields;
 
         // Where.
-        $query =
-            "SELECT {$fieldsString} FROM " .
-            $this->ftable($table) .
-            ($where !== null ? ' ' . $where : '');
+        $query = "SELECT {$fieldsString} FROM "
+            . $this->ftable($table) . ($where !== null ? ' ' . $where : '');
 
         return $this->query($query, ...$vars);
     }
@@ -177,9 +175,8 @@ final class Database
 
         return $this->query(
             <<<SQL
-            INSERT INTO {$this->ftable($table)} ({$keys}) VALUES ?;
-            SQL
-            ,
+                INSERT INTO {$this->ftable($table)} ({$keys}) VALUES ?;
+                SQL,
             $values,
         );
     }
@@ -201,13 +198,7 @@ final class Database
 
         $keysPrepared = $this->buildUpdate($keyValuePairs);
         $values = array_values($keyValuePairs);
-        $query =
-            'UPDATE ' .
-            $this->ftable($table) .
-            ' SET ' .
-            $keysPrepared .
-            ' ' .
-            $whereFormat;
+        $query = 'UPDATE ' . $this->ftable($table) . ' SET ' . $keysPrepared . ' ' . $whereFormat;
 
         return $this->query($query, ...$values, ...$whereParams);
     }
@@ -220,10 +211,8 @@ final class Database
         string $whereformat,
         ...$vars,
     ): ?PDOStatement {
-        $query =
-            'DELETE FROM ' .
-            $this->ftable($table) .
-            ($whereformat !== '' ? ' ' . $whereformat : '');
+        $query = 'DELETE FROM ' . $this->ftable($table)
+            . ($whereformat !== '' ? ' ' . $whereformat : '');
 
         // Put the format string back.
         return $this->query($query, ...$vars);
@@ -293,11 +282,7 @@ final class Database
 
         if ($args !== []) {
             foreach ($outArgs as $index => $value) {
-                $pdoStmt->bindValue(
-                    $index + 1,
-                    $value,
-                    $this->queryTypeForPDOValue($value),
-                );
+                $pdoStmt->bindValue($index + 1, $value, $this->queryTypeForPDOValue($value));
             }
         }
 
@@ -319,7 +304,9 @@ final class Database
             return 'NULL';
         }
 
-        return is_int($value) ? $value : $this->escape((string) $value);
+        return is_int($value)
+            ? $value
+            : $this->escape((string) $value);
     }
 
     public function escape(string $string): string
@@ -348,14 +335,20 @@ final class Database
      * @param array<int,string> $tablenames
      * @param mixed             $args
      */
-    public function special(string $format, array $tablenames, ...$args): mixed
-    {
+    public function special(
+        string $format,
+        array $tablenames,
+        ...$args,
+    ): mixed {
         // Table names.
         $tempformat = str_replace('%t', '%s', $format);
 
         $newformat = vsprintf(
             $tempformat,
-            array_map($this->ftable(...), $tablenames),
+            array_map(
+                $this->ftable(...),
+                $tablenames,
+            ),
         );
 
         // Put the format string back.
@@ -376,14 +369,14 @@ final class Database
             where the first " = ?," comes from the implode.
          */
 
-        return implode(
-            PHP_EOL . ', ',
-            array_map(static function (string $key): string {
+        return implode(PHP_EOL . ', ', array_map(
+            static function (string $key): string {
                 $value = '?';
 
                 return "`{$key}` = {$value}";
-            }, array_keys($keyValuePairs)),
-        );
+            },
+            array_keys($keyValuePairs),
+        ));
     }
 
     private function queryTypeForPDOValue(

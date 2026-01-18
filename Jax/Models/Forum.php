@@ -13,15 +13,7 @@ final class Forum extends Model
 {
     public const TABLE = 'forums';
 
-    #[
-        Column(
-            name: 'id',
-            type: 'int',
-            nullable: false,
-            autoIncrement: true,
-            unsigned: true,
-        ),
-    ]
+    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
     #[PrimaryKey]
     public int $id = 0;
 
@@ -46,131 +38,43 @@ final class Forum extends Model
     #[ForeignKey(table: 'topics', field: 'id', onDelete: 'null')]
     public ?int $lastPostTopic = null;
 
-    #[
-        Column(
-            name: 'lastPostTopicTitle',
-            type: 'string',
-            default: '',
-            length: 255,
-            nullable: false,
-        ),
-    ]
+    #[Column(name: 'lastPostTopicTitle', type: 'string', default: '', length: 255, nullable: false)]
     public string $lastPostTopicTitle = '';
 
-    #[
-        Column(
-            name: 'path',
-            type: 'string',
-            default: '',
-            length: 100,
-            nullable: false,
-        ),
-    ]
+    #[Column(name: 'path', type: 'string', default: '', length: 100, nullable: false)]
     public string $path = '';
 
-    #[
-        Column(
-            name: 'showSubForums',
-            type: 'tinyint',
-            default: 0,
-            nullable: false,
-            unsigned: true,
-        ),
-    ]
+    #[Column(name: 'showSubForums', type: 'tinyint', default: 0, nullable: false, unsigned: true)]
     public int $showSubForums = 0;
 
-    #[
-        Column(
-            name: 'redirect',
-            type: 'string',
-            default: '',
-            length: 255,
-            nullable: false,
-        ),
-    ]
+    #[Column(name: 'redirect', type: 'string', default: '', length: 255, nullable: false)]
     public string $redirect = '';
 
-    #[
-        Column(
-            name: 'topics',
-            type: 'int',
-            default: 0,
-            nullable: false,
-            unsigned: true,
-        ),
-    ]
+    #[Column(name: 'topics', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $topics = 0;
 
-    #[
-        Column(
-            name: 'posts',
-            type: 'int',
-            default: 0,
-            nullable: false,
-            unsigned: true,
-        ),
-    ]
+    #[Column(name: 'posts', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $posts = 0;
 
-    #[
-        Column(
-            name: 'order',
-            type: 'int',
-            default: 0,
-            nullable: false,
-            unsigned: true,
-        ),
-    ]
+    #[Column(name: 'order', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $order = 0;
 
-    #[
-        Column(
-            name: 'perms',
-            type: 'binary',
-            default: '',
-            length: 48,
-            nullable: false,
-        ),
-    ]
+    #[Column(name: 'perms', type: 'binary', default: '', length: 48, nullable: false)]
     public string $perms = '';
 
-    #[
-        Column(
-            name: 'orderby',
-            type: 'tinyint',
-            default: 0,
-            nullable: false,
-            unsigned: true,
-        ),
-    ]
+    #[Column(name: 'orderby', type: 'tinyint', default: 0, nullable: false, unsigned: true)]
     public int $orderby = 0;
 
     #[Column(name: 'nocount', type: 'bool')]
     public int $nocount = 0;
 
-    #[
-        Column(
-            name: 'redirects',
-            type: 'int',
-            default: 0,
-            nullable: false,
-            unsigned: true,
-        ),
-    ]
+    #[Column(name: 'redirects', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $redirects = 0;
 
     #[Column(name: 'trashcan', type: 'bool')]
     public int $trashcan = 0;
 
-    #[
-        Column(
-            name: 'mods',
-            type: 'string',
-            default: '',
-            length: 255,
-            nullable: false,
-        ),
-    ]
+    #[Column(name: 'mods', type: 'string', default: '', length: 255, nullable: false)]
     public string $mods = '';
 
     #[Column(name: 'showLedBy', type: 'bool')]
