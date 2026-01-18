@@ -138,6 +138,8 @@
   <rule ref="SlevomatCodingStandard.Classes.RequireMultiLineMethodSignature">
     <properties>
       <property name="minLineLength" value="80"/>
+      <property name="withParametersWithAttributes" value="true"/>
+      <property name="withPromotedProperties" value="true"/>
     </properties>
   </rule>
   <rule ref="SlevomatCodingStandard.Classes.RequireSelfReference"/>
@@ -196,7 +198,8 @@
       <property name="booleanOperatorOnPreviousLine" value="false"/>
     </properties>
   </rule>
-  <rule ref="SlevomatCodingStandard.ControlStructures.RequireMultiLineTernaryOperator">
+  <!-- disabled from auto-formatting due to a bug in the sniff code -->
+  <rule ref="SlevomatCodingStandard.ControlStructures.RequireMultiLineTernaryOperator" phpcs-only="true">
     <properties>
       <property name="lineLengthLimit" value="80"/>
     </properties>
@@ -222,7 +225,7 @@
     <exclude-pattern>./Tests/</exclude-pattern>
   </rule>
   <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
-  	<properties>
+    <properties>
       <property name="rootNamespaces" type="array">
         <element key="ACP" value="ACP"/>
         <element key="emoticons" value="emoticons"/>
@@ -242,19 +245,24 @@
   </rule>
 
   <rule ref="SlevomatCodingStandard.Functions.RequireArrowFunction"/>
-  <!-- disable this rule which unfortunately crashes PHP_CodeSniffer -->
-  <!--rule ref="SlevomatCodingStandard.Functions.RequireMultiLineCall">
+  <rule ref="SlevomatCodingStandard.Functions.RequireMultiLineCall">
     <properties>
       <property name="minLineLength" value="80"/>
     </properties>
-  </rule-->
+  </rule>
   <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInCall"/>
   <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInClosureUse"/>
   <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInDeclaration"/>
   <rule ref="SlevomatCodingStandard.Functions.StaticClosure"/>
   <rule ref="SlevomatCodingStandard.Functions.StrictCall"/>
   <rule ref="SlevomatCodingStandard.Functions.UnusedInheritedVariablePassedToClosure"/>
-  <rule ref="SlevomatCodingStandard.Functions.UnusedParameter"/>
+  <rule ref="SlevomatCodingStandard.Functions.UnusedParameter">
+    <properties>
+      <property name="allowedParameterPatterns" type="array">
+        <element value="/^_/"/>
+      </property>
+    </properties>
+  </rule>
   <rule ref="SlevomatCodingStandard.Functions.UselessParameterDefaultValue"/>
   <rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses"/>
   <rule ref="SlevomatCodingStandard.Namespaces.DisallowGroupUse"/>
@@ -281,7 +289,13 @@
   <rule ref="SlevomatCodingStandard.PHP.OptimizedFunctionsWithoutUnpacking"/>
   <rule ref="SlevomatCodingStandard.PHP.ShortList"/>
   <rule ref="SlevomatCodingStandard.PHP.TypeCast"/>
-  <rule ref="SlevomatCodingStandard.PHP.UselessParentheses" phpcs-only="true"/>
+  <rule ref="SlevomatCodingStandard.PHP.UselessParentheses" phpcs-only="true">
+    <properties>
+      <property name="ignoreComplexTernaryConditions" value="true"/>
+      <property name="enableCheckAroundNew" value="false"/>
+    </properties>
+    <type>warning</type>
+  </rule>
   <rule ref="SlevomatCodingStandard.PHP.UselessSemicolon"/>
   <rule ref="SlevomatCodingStandard.Strings.DisallowVariableParsing">
     <properties>
