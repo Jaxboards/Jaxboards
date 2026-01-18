@@ -39,6 +39,7 @@ use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
@@ -85,6 +86,7 @@ use const PASSWORD_DEFAULT;
 #[CoversClass(Template::class)]
 #[CoversClass(TextFormatting::class)]
 #[CoversClass(User::class)]
+#[Medium]
 final class UCPTest extends FeatureTestCase
 {
     protected function setUp(): void
