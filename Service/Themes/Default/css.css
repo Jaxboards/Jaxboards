@@ -1452,6 +1452,10 @@ textarea {
     float: right;
 }
 
+#topic-users-online .content {
+    padding: 5px;
+}
+
 /* stylelint-disable-next-line selector-class-pattern */
 .postrating_list {
     position: absolute;
@@ -1942,6 +1946,14 @@ textarea {
     white-space: nowrap;
 }
 
+#statusers a::after {
+    content: ',';
+}
+
+#statusers a:last-child::after {
+    content: '';
+}
+
 #statusers .idle {
     font-style: italic;
 }
@@ -1962,14 +1974,6 @@ textarea {
     padding: 10px 25px;
     background: url('icons/boardstats.png') left center no-repeat;
     border-top: 1px solid #ccf;
-}
-
-#statusers a::after {
-    content: ',';
-}
-
-#statusers a:last-child::after {
-    content: '';
 }
 
 /* Member List */
