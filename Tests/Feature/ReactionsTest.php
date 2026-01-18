@@ -23,6 +23,7 @@ use Jax\FileSystem;
 use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Lodash;
 use Jax\Models\Post;
 use Jax\Models\RatingNiblet;
 use Jax\Modules\PrivateMessage;
@@ -72,6 +73,7 @@ use const JSON_THROW_ON_ERROR;
 #[CoversClass(FileSystem::class)]
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
+#[CoversClass(Lodash::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(PrivateMessage::class)]
 #[CoversClass(Shoutbox::class)]

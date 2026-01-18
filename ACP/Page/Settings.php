@@ -7,6 +7,7 @@ namespace ACP\Page;
 use ACP\Page;
 use Jax\Config;
 use Jax\Database\Database;
+use Jax\Lodash;
 use Jax\Models\Badge;
 use Jax\Models\BadgeAssociation;
 use Jax\Models\Member;
@@ -15,7 +16,6 @@ use Jax\Request;
 use Jax\Template;
 use Jax\TextFormatting;
 
-use function _\keyBy;
 use function array_merge;
 use function filter_var;
 use function is_string;
@@ -354,7 +354,7 @@ final readonly class Settings
             }
         }
 
-        $badges = keyBy(
+        $badges = Lodash::keyBy(
             Badge::selectMany(),
             static fn(Badge $badge): int => $badge->id,
         );

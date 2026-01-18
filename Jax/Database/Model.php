@@ -6,13 +6,13 @@ namespace Jax\Database;
 
 use Jax\Attributes\Column;
 use Jax\Attributes\PrimaryKey;
+use Jax\Lodash;
 use PDO;
 use PDOStatement;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionProperty;
 
-use function _\keyBy;
 use function array_filter;
 use function array_map;
 use function array_merge;
@@ -170,7 +170,7 @@ abstract class Model
             SORT_REGULAR,
         );
 
-        return $otherIds !== [] ? keyBy(
+        return $otherIds !== [] ? Lodash::keyBy(
             static::selectMany(
                 "WHERE {$key} IN ?",
                 $otherIds,

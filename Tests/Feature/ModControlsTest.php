@@ -24,6 +24,7 @@ use Jax\GeoLocate;
 use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Lodash;
 use Jax\Models\Forum;
 use Jax\Models\Post;
 use Jax\Models\Session as ModelsSession;
@@ -75,6 +76,7 @@ use function json_encode;
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
 #[CoversClass(Key::class)]
+#[CoversClass(Lodash::class)]
 #[CoversClass(ModControls::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(ModPosts::class)]

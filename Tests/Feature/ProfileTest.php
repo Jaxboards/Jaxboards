@@ -24,6 +24,7 @@ use Jax\FileSystem;
 use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Lodash;
 use Jax\Models\Activity as ModelsActivity;
 use Jax\Models\ProfileComment;
 use Jax\Modules\PrivateMessage;
@@ -74,6 +75,7 @@ use function json_decode;
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
 #[CoversClass(Key::class)]
+#[CoversClass(Lodash::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(Page::class)]
 #[CoversClass(PrivateMessage::class)]

@@ -9,6 +9,7 @@ use Jax\Database\Database;
 use Jax\Date;
 use Jax\Interfaces\Route;
 use Jax\Jax;
+use Jax\Lodash;
 use Jax\Models\Category;
 use Jax\Models\Forum as ModelsForum;
 use Jax\Models\Member;
@@ -21,7 +22,6 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function _\keyBy;
 use function array_all;
 use function array_key_exists;
 use function array_map;
@@ -220,7 +220,7 @@ final class Forum implements Route
             ),
         );
 
-        $membersById = $memberIds !== [] ? keyBy(
+        $membersById = $memberIds !== [] ? Lodash::keyBy(
             Member::selectMany(
                 Database::WHERE_ID_IN,
                 $memberIds,

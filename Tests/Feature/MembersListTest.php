@@ -23,6 +23,7 @@ use Jax\FileSystem;
 use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Lodash;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
 use Jax\Modules\WebHooks;
@@ -61,6 +62,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(Jax::class)]
 #[CoversClass(Key::class)]
 #[CoversClass(Members::class)]
+#[CoversClass(Lodash::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(Page::class)]
 #[CoversClass(PrivateMessage::class)]

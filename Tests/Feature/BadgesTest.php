@@ -22,6 +22,7 @@ use Jax\FileSystem;
 use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Lodash;
 use Jax\Models\Badge;
 use Jax\Models\BadgeAssociation;
 use Jax\Modules\PrivateMessage;
@@ -73,6 +74,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
 #[CoversClass(Key::class)]
+#[CoversClass(Lodash::class)]
 #[CoversClass(Page::class)]
 #[CoversClass(Poll::class)]
 #[CoversClass(PrivateMessage::class)]

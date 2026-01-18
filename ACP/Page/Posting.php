@@ -7,12 +7,12 @@ namespace ACP\Page;
 use ACP\Page;
 use Jax\Config;
 use Jax\Database\Database;
+use Jax\Lodash;
 use Jax\Models\RatingNiblet;
 use Jax\Models\TextRule;
 use Jax\Request;
 use Jax\TextFormatting;
 
-use function _\keyBy;
 use function array_key_exists;
 use function array_reverse;
 use function krsort;
@@ -49,9 +49,9 @@ final readonly class Posting
         $page = '';
 
         /** @var array<string,TextRule> $badWords */
-        $badWords = keyBy(
+        $badWords = Lodash::keyBy(
             TextRule::selectMany("WHERE `type`='badword'"),
-            static fn($textRule) => $textRule->needle,
+            static fn($textRule): string => $textRule->needle,
         );
 
         // Delete.
@@ -139,9 +139,9 @@ final readonly class Posting
         }
 
         /** @var array<TextRule> $emoticons */
-        $emoticons = keyBy(
+        $emoticons = Lodash::keyBy(
             TextRule::selectMany("WHERE `type`='emote'"),
-            static fn($textRule) => $textRule->needle,
+            static fn($textRule): string => $textRule->needle,
         );
 
         // Insert emoticon.
@@ -247,9 +247,9 @@ final readonly class Posting
     {
         $page = '';
         $page2 = '';
-        $niblets = keyBy(
+        $niblets = Lodash::keyBy(
             RatingNiblet::selectMany('ORDER BY `id` DESC'),
-            static fn($niblet) => $niblet->id,
+            static fn($niblet): int => $niblet->id,
         );
 
         // Delete.

@@ -22,6 +22,7 @@ use Jax\FileSystem;
 use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Lodash;
 use Jax\Models\Post as ModelsPost;
 use Jax\Models\Topic;
 use Jax\Modules\PrivateMessage;
@@ -65,6 +66,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
 #[CoversClass(Key::class)]
+#[CoversClass(Lodash::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(OpenGraph::class)]
 #[CoversClass(OpenGraph::class)]

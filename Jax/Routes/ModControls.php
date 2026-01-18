@@ -11,6 +11,7 @@ use Jax\Database\Database;
 use Jax\GeoLocate;
 use Jax\Interfaces\Route;
 use Jax\IPAddress;
+use Jax\Lodash;
 use Jax\Models\Member;
 use Jax\Models\Post;
 use Jax\Models\Report;
@@ -25,7 +26,6 @@ use Jax\Session;
 use Jax\Template;
 use Jax\User;
 
-use function _\groupBy;
 use function array_filter;
 use function array_map;
 use function arsort;
@@ -294,7 +294,7 @@ final readonly class ModControls implements Route
         );
 
         /** @var array<string,ModelsSession[]> */
-        $groupedSessions = groupBy($allSessions, static fn(ModelsSession $modelsSession): string => $modelsSession->useragent);
+        $groupedSessions = Lodash::groupBy($allSessions, static fn(ModelsSession $modelsSession): string => $modelsSession->useragent);
         arsort($groupedSessions);
 
         $rows = [];

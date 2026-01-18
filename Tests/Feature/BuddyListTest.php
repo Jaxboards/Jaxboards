@@ -23,6 +23,7 @@ use Jax\FileSystem;
 use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Lodash;
 use Jax\Models\Activity;
 use Jax\Models\Member;
 use Jax\Modules\PrivateMessage;
@@ -66,6 +67,7 @@ use function json_decode;
 #[CoversClass(DomainDefinitions::class)]
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
+#[CoversClass(Lodash::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(PrivateMessage::class)]
 #[CoversClass(Shoutbox::class)]

@@ -22,6 +22,7 @@ use Jax\FileSystem;
 use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Lodash;
 use Jax\Models\Member;
 use Jax\Models\Stats;
 use Jax\Models\Token;
@@ -63,6 +64,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(DomainDefinitions::class)]
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
+#[CoversClass(Lodash::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(PrivateMessage::class)]
 #[CoversClass(Shoutbox::class)]

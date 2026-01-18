@@ -9,6 +9,7 @@ use ACP\Page\Forums\RecountStats;
 use Jax\Database\Database;
 use Jax\ForumTree;
 use Jax\Jax;
+use Jax\Lodash;
 use Jax\Models\Category;
 use Jax\Models\Forum;
 use Jax\Models\Group;
@@ -16,9 +17,6 @@ use Jax\Models\Member;
 use Jax\Request;
 use Jax\TextFormatting;
 
-use function _\first;
-use function _\groupBy;
-use function _\keyBy;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
@@ -34,6 +32,7 @@ use function json_decode;
 use function mb_strstr;
 use function mb_substr;
 use function preg_replace;
+use function reset;
 use function sscanf;
 use function str_starts_with;
 use function trim;
@@ -280,8 +279,8 @@ final readonly class Forums
 
         $forums = $this->fetchAllForums();
         $forumsByCategory = array_map(
-            static fn($forums): ForumTree => new ForumTree($forums),
-            groupBy($forums, static fn($forum) => $forum->category),
+            static fn(array $forums): ForumTree => new ForumTree($forums),
+            Lodash::groupBy($forums, static fn($forum): ?int => $forum->category),
         );
 
         $categories = $this->fetchAllCategories();
@@ -552,7 +551,7 @@ final readonly class Forums
 
         if ($forum === null) {
             $forum = new Forum();
-            $forum->category = first($categories)->id;
+            $forum->category = reset($categories)->id;
         }
 
         $forum->nocount = $this->request->asString->post('count') ? 0 : 1;
@@ -801,7 +800,7 @@ final readonly class Forums
     {
         $categories = Category::selectMany('ORDER BY `order`,`id` ASC');
 
-        return keyBy($categories, static fn($category) => $category->id);
+        return Lodash::keyBy($categories, static fn($category): int => $category->id);
     }
 
     /**
@@ -811,7 +810,7 @@ final readonly class Forums
     {
         $forums = Forum::selectMany('ORDER BY `order`,`title`');
 
-        return keyBy($forums, static fn($forum) => $forum->id);
+        return Lodash::keyBy($forums, static fn($forum): int => $forum->id);
     }
 
     /**
@@ -819,7 +818,7 @@ final readonly class Forums
      */
     private function fetchAllGroups(): array
     {
-        return keyBy(Group::selectMany(), static fn($group) => $group->id);
+        return Lodash::keyBy(Group::selectMany(), static fn($group): int => $group->id);
     }
 
     /*

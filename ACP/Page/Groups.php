@@ -7,11 +7,11 @@ namespace ACP\Page;
 use ACP\Page;
 use Jax\Constants\Groups as ConstantsGroups;
 use Jax\Database\Database;
+use Jax\Lodash;
 use Jax\Models\Group;
 use Jax\Request;
 use Jax\TextFormatting;
 
-use function _\keyBy;
 use function array_flip;
 use function array_key_exists;
 use function array_keys;
@@ -161,7 +161,7 @@ final class Groups
             ...($groupIds ? [$groupIds] : []),
         );
 
-        return keyBy($groups, static fn($group) => $group->id);
+        return Lodash::keyBy($groups, static fn($group): int => $group->id);
     }
 
     private function showPerms(): void

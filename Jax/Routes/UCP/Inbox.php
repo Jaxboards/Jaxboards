@@ -7,6 +7,7 @@ namespace Jax\Routes\UCP;
 use Jax\Database\Database;
 use Jax\DomainDefinitions;
 use Jax\Jax;
+use Jax\Lodash;
 use Jax\Models\Member;
 use Jax\Models\Message;
 use Jax\Page;
@@ -15,7 +16,6 @@ use Jax\Router;
 use Jax\Template;
 use Jax\User;
 
-use function _\countBy;
 use function array_map;
 use function ceil;
 use function implode;
@@ -391,7 +391,7 @@ final readonly class Inbox
             $getMessageMemberId,
         );
 
-        $readCounts = countBy(
+        $readCounts = Lodash::countBy(
             $messages,
             static fn(Message $message): string => $message->read !== 0 ? 'read' : 'unread',
         );
