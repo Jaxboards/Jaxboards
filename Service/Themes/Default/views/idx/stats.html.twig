@@ -37,6 +37,7 @@
                     {%- if canModerate -%}
                         <a href="{{ url('modcontrols', { do: 'onlineSessions' }) }}">{{ guestCount }} guest{% if guestCount>0 %}s{% endif %}</a>
                     {%- else -%}
+                        {%- if usersOnline %}and {% endif -%}
                         {{ guestCount }} guest{% if guestCount>1 %}s{% endif %}
                     {%- endif -%}
                 {%- endif -%}
