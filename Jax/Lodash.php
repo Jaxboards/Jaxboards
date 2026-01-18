@@ -12,8 +12,9 @@ use function array_key_exists;
 final class Lodash
 {
     /**
-     * @param array<mixed>                 $data
-     * @param callable(mixed $data):string $iteratee
+     * @template T
+     * @param array<T>                 $data
+     * @param callable(T $data):string $iteratee
      *
      * @return array<int>
      */
@@ -35,9 +36,8 @@ final class Lodash
 
     /**
      * @template T
-     *
-     * @param array<T>                     $data
-     * @param callable(mixed $data):string $iteratee
+     * @param array<T>                 $data
+     * @param callable(T $data):string $iteratee
      *
      * @return array<array<T>>
      */
@@ -59,9 +59,8 @@ final class Lodash
 
     /**
      * @template T
-     *
-     * @param array<T>                     $data
-     * @param callable(mixed $data):string $iteratee
+     * @param array<T>                 $data
+     * @param callable(T $data):string $iteratee
      *
      * @return array<T>
      */
