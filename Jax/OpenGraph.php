@@ -105,9 +105,7 @@ final readonly class OpenGraph
             }
 
             return $metaValues;
-        } catch (Exception) {
-            return [];
-        } catch (Error) {
+        } catch (Exception|Error) {
             return [];
         }
     }
