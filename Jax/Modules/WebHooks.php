@@ -25,6 +25,7 @@ use const CURLOPT_HTTPHEADER;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
 use const CURLOPT_URL;
+use const JSON_THROW_ON_ERROR;
 
 final readonly class WebHooks implements Module
 {
@@ -76,7 +77,7 @@ final readonly class WebHooks implements Module
      */
     private function sendJSON(string $url, array $payload): void
     {
-        $payload = json_encode($payload, JSON_THROW_ON_ERROR);
+        json_encode($payload, JSON_THROW_ON_ERROR);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Content-Length: ' . mb_strlen($json)]);
