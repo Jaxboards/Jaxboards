@@ -69,7 +69,7 @@ final readonly class Report implements Route
             return;
         }
 
-        $this->page->command('alert', 'Thank you for your report');
+        $this->page->command('success', 'Thank you for your report');
     }
 
     private function reportPostForm(int $pid): void

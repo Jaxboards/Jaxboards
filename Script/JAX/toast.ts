@@ -4,7 +4,7 @@ import { getHighestZIndex } from './el';
 const TOP_SPACING = '50px';
 
 class Toast {
-    alert(message: string) {
+    success(message: string) {
         this.showToast(message, 'success', 3000);
     }
 

@@ -517,13 +517,13 @@ final class Topic implements Route
         }
 
         if ($post === null) {
-            $this->page->command('alert', 'Post not found!');
+            $this->page->command('error', 'Post not found!');
 
             return;
         }
 
         if (!$this->canEdit($modelsTopic, $post)) {
-            $this->page->command('alert', "You don't have permission to edit this post.");
+            $this->page->command('error', "You don't have permission to edit this post.");
 
             return;
         }
@@ -555,7 +555,7 @@ final class Topic implements Route
 
         if ($post === null) {
             $error = "That post doesn't exist!";
-            $this->page->command('alert', $error);
+            $this->page->command('error', $error);
             $this->page->append('PAGE', $this->template->render('error', ['message' => $error]));
 
             return;
@@ -645,7 +645,7 @@ final class Topic implements Route
 
         $this->page->command('softurl');
         if ($postPosition === null) {
-            $this->page->command('alert', "that post doesn't exist");
+            $this->page->command('error', "that post doesn't exist");
 
             return;
         }

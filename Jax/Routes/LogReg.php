@@ -159,7 +159,7 @@ final class LogReg implements Route
         };
 
         if ($error !== null) {
-            $this->page->command('alert', $error);
+            $this->page->command('error', $error);
             $this->page->append('PAGE', $this->template->render('error', ['message' => $error]));
 
             return;
@@ -179,7 +179,7 @@ final class LogReg implements Route
         };
 
         if ($error !== null) {
-            $this->page->command('alert', $error);
+            $this->page->command('error', $error);
             $this->page->append('PAGE', $this->template->render('error', ['message' => $error]));
 
             return;

@@ -74,7 +74,7 @@ final readonly class Reactions
         $members = array_merge(...$ratings);
 
         if ($members === []) {
-            $this->page->command('alert', 'This post has no ratings yet!');
+            $this->page->command('error', 'This post has no ratings yet!');
 
             return;
         }

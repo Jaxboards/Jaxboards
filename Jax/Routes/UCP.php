@@ -156,7 +156,7 @@ final readonly class UCP implements Route
                 );
             }
 
-            $this->page->command('alert', 'Settings saved successfully.');
+            $this->page->command('success', 'Settings saved successfully.');
         }
 
         $this->page->command('script', <<<'JS'
@@ -248,7 +248,7 @@ final readonly class UCP implements Route
             }
 
             if ($error !== null) {
-                $this->page->command('alert', $error);
+                $this->page->command('error', $error);
 
                 return null;
             }

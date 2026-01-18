@@ -44,8 +44,8 @@ export default {
     error(message: string) {
         toast.error(message);
     },
-    alert(message: string) {
-        toast.alert(message);
+    success(message: string) {
+        toast.success(message);
     },
     reload(timeout = 0) {
         setTimeout(() => globalThis.location.reload(), timeout);

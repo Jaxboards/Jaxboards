@@ -117,7 +117,7 @@ final class Forum implements Route
 
         $forumPerms = $this->user->getForumPerms($forum->perms);
         if (!$forumPerms['read']) {
-            $this->page->command('alert', 'no permission');
+            $this->page->command('error', 'no permission');
 
             $this->router->redirect('index');
 

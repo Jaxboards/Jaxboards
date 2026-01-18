@@ -173,7 +173,7 @@ final readonly class ModTopics
         }
 
         $this->cancel();
-        $this->page->command('alert', 'topics deleted!');
+        $this->page->command('success', 'topics deleted!');
     }
 
     private function mergeTopics(): void
@@ -331,7 +331,7 @@ final readonly class ModTopics
             $this->getModTids(),
         );
         $this->page->command(
-            'alert',
+            'success',
             'topics locked!',
         );
         $this->cancel();
@@ -348,7 +348,7 @@ final readonly class ModTopics
             $this->getModTids(),
         );
         $this->page->command(
-            'alert',
+            'success',
             'topics pinned!',
         );
         $this->cancel();
@@ -364,7 +364,7 @@ final readonly class ModTopics
             Database::WHERE_ID_IN,
             $this->getModTids(),
         );
-        $this->page->command('alert', 'topics unlocked!');
+        $this->page->command('success', 'topics unlocked!');
         $this->cancel();
     }
 
@@ -379,7 +379,7 @@ final readonly class ModTopics
             $this->getModTids(),
         );
         $this->page->command(
-            'alert',
+            'success',
             'topics unpinned!',
         );
         $this->cancel();
