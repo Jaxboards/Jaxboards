@@ -26,6 +26,7 @@ export default defineConfig(
     rules: {
       // Disables the rule preventing modifying properties on objects passed in
       "no-param-reassign": [2, { props: false }],
+      "prettier/prettier": ["error", { singleQuote: true }],
       "import/extensions": 0,
       "@typescript-eslint/consistent-type-definitions": ["error", "type"],
       "no-console": "error",
