@@ -66,6 +66,7 @@
     <exclude name="Squiz.Commenting.BlockComment.InvalidEndChar" />
     <exclude name="Squiz.Commenting.BlockComment.LastLineIndent" />
     <exclude name="Squiz.Commenting.BlockComment.NotCapital" />
+    <exclude name="Squiz.Commenting.BlockComment.WrongStart" />
   </rule>
   <rule ref="SlevomatCodingStandard.Arrays.ArrayAccess"/>
   <rule ref="SlevomatCodingStandard.Arrays.DisallowImplicitArrayCreation"/>
