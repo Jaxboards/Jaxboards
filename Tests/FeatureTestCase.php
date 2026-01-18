@@ -105,6 +105,7 @@ abstract class FeatureTestCase extends TestCase
 
     /**
      * @param array<mixed> $memberOverrides
+     *
      * @return array<Member>
      */
     private function insertMembers(array $memberOverrides = []): array
@@ -145,6 +146,7 @@ abstract class FeatureTestCase extends TestCase
             foreach ($memberOverrides as $property => $value) {
                 $member->{$property} = $value;
             }
+
             $member->insert();
         }
 
