@@ -53,9 +53,6 @@
     "lib-zip-libzip": "*",
     "php": "8.5.2",
     "php-di/php-di": "^7.1",
-    "symfony/polyfill-php83": "^1.33",
-    "symfony/polyfill-php84": "^1.33",
-    "symfony/polyfill-php85": "^1.33",
     "nesbot/carbon": "^3.11",
     "geoip2/geoip2": "^3.3",
     "twig/twig": "^3.22"
