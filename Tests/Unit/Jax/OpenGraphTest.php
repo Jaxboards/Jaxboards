@@ -101,7 +101,7 @@ final class OpenGraphTest extends UnitTestCase
             ],
             [
                 'https://bibbyteam.com/',
-                ''
+                '',
             ],
         ];
     }
