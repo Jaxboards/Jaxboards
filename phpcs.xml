@@ -57,8 +57,9 @@
   </rule>
   <!-- Here's some comment rules we can follow -->
   <rule ref="Squiz.Commenting.InlineComment">
-    <exclude name="Squiz.Commenting.InlineComment.NotCapital" />
+    <exclude name="Squiz.Commenting.InlineComment.DocBlock" />
     <exclude name="Squiz.Commenting.InlineComment.InvalidEndChar" />
+    <exclude name="Squiz.Commenting.InlineComment.NotCapital" />
   </rule>
   <rule ref="Squiz.Commenting.PostStatementComment" />
   <rule ref="Squiz.Commenting.BlockComment">
