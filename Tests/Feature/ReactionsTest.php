@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\Lodash;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -72,6 +73,7 @@ use const JSON_THROW_ON_ERROR;
 #[CoversClass(FileSystem::class)]
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
+#[CoversClass(Lodash::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(PrivateMessage::class)]
 #[CoversClass(Shoutbox::class)]

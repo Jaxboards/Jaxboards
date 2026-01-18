@@ -6,6 +6,7 @@ namespace Jax\Routes\Topic;
 
 use Jax\Config;
 use Jax\Database\Database;
+use Jax\Lodash;
 use Jax\Models\Member;
 use Jax\Models\Post;
 use Jax\Models\RatingNiblet;
@@ -14,7 +15,6 @@ use Jax\Router;
 use Jax\Template;
 use Jax\User;
 
-use function _\keyBy;
 use function array_diff;
 use function array_key_exists;
 use function array_merge;
@@ -48,7 +48,7 @@ final readonly class Reactions
             return $ratingNiblets;
         }
 
-        return $ratingNiblets = keyBy(
+        return $ratingNiblets = Lodash::keyBy(
             RatingNiblet::selectMany(),
             static fn($niblet) => $niblet->id,
         );
@@ -79,7 +79,7 @@ final readonly class Reactions
             return;
         }
 
-        $mdata = keyBy(
+        $mdata = Lodash::keyBy(
             Member::selectMany(Database::WHERE_ID_IN, $members),
             static fn($member) => $member->id,
         );

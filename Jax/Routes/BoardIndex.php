@@ -9,6 +9,7 @@ use Jax\Config;
 use Jax\Database\Database;
 use Jax\Date;
 use Jax\Interfaces\Route;
+use Jax\Lodash;
 use Jax\Models\Category;
 use Jax\Models\Forum;
 use Jax\Models\Group;
@@ -22,8 +23,6 @@ use Jax\User;
 use Jax\UserOnline;
 use Jax\UsersOnline;
 
-use function _\groupBy;
-use function _\keyBy;
 use function array_filter;
 use function array_flip;
 use function array_key_exists;
@@ -117,7 +116,7 @@ final class BoardIndex implements Route
 
         $forums = $this->fetchIndexForums();
         $lastPostMembers = $this->fetchLastPostMembers($forums);
-        $forumsByCatID = groupBy($forums, static fn(Forum $forum): ?int => $forum->category);
+        $forumsByCatID = Lodash::groupBy($forums, static fn(Forum $forum): ?int => $forum->category);
 
         $this->setModsFromForums($forums);
 
@@ -183,7 +182,7 @@ final class BoardIndex implements Route
 
         $modIDs = array_unique($modIDs, SORT_REGULAR);
 
-        $this->mods = $modIDs === [] ? [] : keyBy(
+        $this->mods = $modIDs === [] ? [] : Lodash::keyBy(
             Member::selectMany(Database::WHERE_ID_IN, $modIDs),
             static fn(Member $member): int => $member->id,
         );

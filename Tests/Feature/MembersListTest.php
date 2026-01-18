@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\Lodash;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -61,6 +62,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(Jax::class)]
 #[CoversClass(Key::class)]
 #[CoversClass(Members::class)]
+#[CoversClass(Lodash::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(Page::class)]
 #[CoversClass(PrivateMessage::class)]

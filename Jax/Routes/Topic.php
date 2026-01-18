@@ -11,6 +11,7 @@ use Jax\DomainDefinitions;
 use Jax\Interfaces\Route;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Lodash;
 use Jax\Models\Category;
 use Jax\Models\Forum;
 use Jax\Models\Group;
@@ -30,7 +31,6 @@ use Jax\User;
 use Jax\UserOnline;
 use Jax\UsersOnline;
 
-use function _\keyBy;
 use function array_filter;
 use function array_flip;
 use function array_key_exists;
@@ -152,7 +152,7 @@ final class Topic implements Route
      */
     private function fetchMembersById(array $memberIds): array
     {
-        return $memberIds !== [] ? keyBy(
+        return $memberIds !== [] ? Lodash::keyBy(
             Member::selectMany(
                 Database::WHERE_ID_IN,
                 array_unique($memberIds, SORT_REGULAR),

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\Lodash;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -75,6 +76,7 @@ use function json_encode;
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
 #[CoversClass(Key::class)]
+#[CoversClass(Lodash::class)]
 #[CoversClass(ModControls::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(ModPosts::class)]

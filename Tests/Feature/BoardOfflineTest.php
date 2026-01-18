@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\Lodash;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -56,6 +57,7 @@ use function DI\autowire;
 #[CoversClass(Config::class)]
 #[CoversClass(SQLite::class)]
 #[CoversClass(Database::class)]
+#[CoversClass(Lodash::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(Utils::class)]
 #[CoversClass(Date::class)]

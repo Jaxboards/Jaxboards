@@ -8,6 +8,7 @@ use Jax\ContactDetails;
 use Jax\Database\Database;
 use Jax\Interfaces\Route;
 use Jax\Jax;
+use Jax\Lodash;
 use Jax\Models\Group;
 use Jax\Models\Member;
 use Jax\Page;
@@ -15,7 +16,6 @@ use Jax\Request;
 use Jax\Router;
 use Jax\Template;
 
-use function _\keyBy;
 use function array_filter;
 use function array_key_exists;
 use function array_map;
@@ -78,7 +78,7 @@ final class Members implements Route
         $filter = $this->request->asString->get('filter');
 
         // fetch all groups
-        $groups = keyBy(
+        $groups = Lodash::keyBy(
             Group::selectMany(),
             static fn(Group $group): int => $group->id,
         );
