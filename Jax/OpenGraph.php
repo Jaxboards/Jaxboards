@@ -6,6 +6,7 @@ namespace Jax;
 
 use Dom\HTMLDocument;
 use DOMDocument;
+use Error;
 use Exception;
 
 use function array_filter;
@@ -105,6 +106,8 @@ final readonly class OpenGraph
 
             return $metaValues;
         } catch (Exception) {
+            return [];
+        } catch (Error) {
             return [];
         }
     }
