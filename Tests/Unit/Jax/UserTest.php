@@ -96,15 +96,15 @@ final class UserTest extends UnitTestCase
             ->getMock()
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('select')
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('arow')
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('disposeresult')
         ;
 
@@ -154,15 +154,15 @@ final class UserTest extends UnitTestCase
             ->getMock()
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('select')
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('arow')
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('disposeresult')
         ;
 
@@ -201,15 +201,15 @@ final class UserTest extends UnitTestCase
             ->getMock()
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('select')
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('arow')
         ;
 
-        $database->expects(self::never())
+        $database->expects($this->never())
             ->method('disposeresult')
         ;
 

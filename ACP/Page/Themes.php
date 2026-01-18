@@ -194,9 +194,9 @@ final readonly class Themes
 
             if (
                 $this->fileSystem->getFileInfo(
-                $this->themesPath . $newName,
+                    $this->themesPath . $newName,
                 )->isDir()
-) {
+            ) {
                 return 'That skin name is already being used.';
             }
 
@@ -235,9 +235,9 @@ final readonly class Themes
 
             if (
                 !$this->fileSystem->getFileInfo(
-                $this->pathToWrapper($wrapperName),
+                    $this->pathToWrapper($wrapperName),
                 )->isFile()
-) {
+            ) {
                 continue;
             }
 
@@ -251,9 +251,9 @@ final readonly class Themes
 
             if (
                 $this->fileSystem->getFileInfo(
-                $this->pathToWrapper($wrapperNewName),
+                    $this->pathToWrapper($wrapperNewName),
                 )->isFile()
-) {
+            ) {
                 return "That wrapper name ({$wrapperNewName}) is already being used.";
             }
 

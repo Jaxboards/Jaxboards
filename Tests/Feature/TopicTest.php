@@ -241,8 +241,8 @@ final class TopicTest extends FeatureTestCase
         $json = json_decode($page, true);
 
         // TODO: Test that there are new posts
-        $this->assertEquals('onlinelist', $json[0][0]);
-        $this->assertEquals('GoogleBot', $json[0][1][0]['name']);
+        self::assertEquals('onlinelist', $json[0][0]);
+        self::assertEquals('GoogleBot', $json[0][1][0]['name']);
     }
 
     public function testQuickReplyWindow(): void
@@ -256,7 +256,7 @@ final class TopicTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        $this->assertContainsEquals(['softurl'], $json);
+        self::assertContainsEquals(['softurl'], $json);
         $window = array_find(
             $json,
             static fn($item): bool => $item[0] === 'window',

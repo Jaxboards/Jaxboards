@@ -156,9 +156,9 @@ final readonly class App
         // Redirect to index instead of 404
         if (
             $this->router->route(
-            $this->request->asString->both('path') ?? '',
+                $this->request->asString->both('path') ?? '',
             )
-) {
+        ) {
             return;
         }
 

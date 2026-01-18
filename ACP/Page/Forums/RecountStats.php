@@ -94,10 +94,10 @@ final readonly class RecountStats
             if ($countPostsInForum[$post['fid']]) {
                 if (
                     !array_key_exists(
-                    $post['author'],
-                    $stat['member_posts'],
+                        $post['author'],
+                        $stat['member_posts'],
                     )
-) {
+                ) {
                     $stat['member_posts'][$post['author']] = 0;
                 }
 

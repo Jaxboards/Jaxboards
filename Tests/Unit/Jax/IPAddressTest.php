@@ -33,18 +33,6 @@ final class IPAddressTest extends UnitTestCase
 {
     public const TESTIP = '192.168.1.1';
 
-    /**
-     * @return array<array{string,bool}>
-     */
-    public static function localHostDataProvider(): array
-    {
-        return [
-            ['127.0.0.1', true],
-            ['::1', true],
-            [self::TESTIP, false],
-        ];
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -54,7 +42,7 @@ final class IPAddressTest extends UnitTestCase
     {
         $ipAddress = $this->getIPAddress();
 
-        $this->assertEquals(
+        self::assertEquals(
             self::TESTIP,
             $ipAddress->asHumanReadable($ipAddress->asBinary()),
         );
@@ -66,11 +54,11 @@ final class IPAddressTest extends UnitTestCase
 
         $ipAddress->ban(self::TESTIP);
 
-        $this->assertTrue($ipAddress->isBanned());
+        self::assertTrue($ipAddress->isBanned());
 
         $ipAddress->unBan(self::TESTIP);
 
-        $this->assertFalse($ipAddress->isBanned());
+        self::assertFalse($ipAddress->isBanned());
     }
 
     #[DataProvider('localHostDataProvider')]
@@ -80,7 +68,19 @@ final class IPAddressTest extends UnitTestCase
     ): void {
         $ipAddress = $this->getIPAddress($ipHumanReadable);
 
-        $this->assertEquals($isLocalHost, $ipAddress->isLocalHost());
+        self::assertEquals($isLocalHost, $ipAddress->isLocalHost());
+    }
+
+    /**
+     * @return array<array{string,bool}>
+     */
+    public static function localHostDataProvider(): array
+    {
+        return [
+            ['127.0.0.1', true],
+            ['::1', true],
+            [self::TESTIP, false],
+        ];
     }
 
     private function getIPAddress(string $ipAddress = self::TESTIP): IPAddress

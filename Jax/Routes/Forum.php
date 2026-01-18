@@ -259,11 +259,11 @@ final class Forum implements Route
         $pageArray = [];
         foreach (
             $this->jax->pages(
-            (int) ceil(($topic->replies + 1) / 10),
-            1,
-            10,
+                (int) ceil(($topic->replies + 1) / 10),
+                1,
+                10,
             ) as $pageNumber
-) {
+        ) {
             $pageURL = $this->router->url('topic', [
                 'id' => $topic->id,
                 'page' => $pageNumber,

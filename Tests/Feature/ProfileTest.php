@@ -158,31 +158,31 @@ final class ProfileTest extends FeatureTestCase
 
         $page = $this->go('/profile/1/activity?fmt=RSS');
 
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             "<title>Admin's recent activity</title>",
             $page,
         );
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             '<link>https://jaxboards.com/profile/1</link>',
             $page,
         );
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             '<description>Admin made friends with Admin</description>',
             $page,
         );
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             '<description>Prince is now known as Admin</description>',
             $page,
         );
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             '<description>Admin posted in topic Post</description>',
             $page,
         );
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             '<description>Admin created new topic Topic</description>',
             $page,
         );
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             "<description>Admin commented on Admin's profile</description>",
             $page,
         );
@@ -351,14 +351,14 @@ final class ProfileTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        $this->assertContains(['softurl'], $json);
+        self::assertContains(['softurl'], $json);
 
         $window = array_find(
             $json,
             static fn($cmd): bool => $cmd[0] === 'window',
         );
-        $this->assertEquals('Contact Card', $window[1]['title']);
-        $this->assertStringContainsString(
+        self::assertEquals('Contact Card', $window[1]['title']);
+        self::assertStringContainsString(
             'Add Contact',
             $window[1]['content'],
         );

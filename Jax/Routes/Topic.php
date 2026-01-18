@@ -225,11 +225,11 @@ final class Topic implements Route
         $pageLinks = [];
         foreach (
             $this->jax->pages(
-            $totalpages,
-            $this->pageNumber + 1,
-            10,
+                $totalpages,
+                $this->pageNumber + 1,
+                10,
             ) as $pageNumber
-) {
+        ) {
             $pageURL = $this->router->url(
                 'topic',
                 ['id' => $modelsTopic->id, 'page' => $pageNumber],

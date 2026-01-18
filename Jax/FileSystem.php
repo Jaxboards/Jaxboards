@@ -81,10 +81,10 @@ final readonly class FileSystem
         // Make directories first
         foreach (
             $this->glob(
-            $this->pathJoin($src, '**'),
-            GLOB_ONLYDIR,
+                $this->pathJoin($src, '**'),
+                GLOB_ONLYDIR,
             ) as $directory
-) {
+        ) {
             $destDir = str_replace($src, $dst, $directory);
             $this->mkdir($destDir, recursive: true);
         }
@@ -92,10 +92,10 @@ final readonly class FileSystem
         // Then files
         foreach (
             $this->glob(
-            $this->pathJoin($src, '{**/,}*'),
-            GLOB_BRACE,
+                $this->pathJoin($src, '{**/,}*'),
+                GLOB_BRACE,
             ) as $sourceFile
-) {
+        ) {
             if ($this->getFileInfo($sourceFile)->isDir()) {
                 continue;
             }

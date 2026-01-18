@@ -235,9 +235,9 @@ final readonly class Posting
         $emoticonRows = '';
         foreach (
             $this->textFormatting->rules->getEmotePack(
-            $emotepack,
+                $emotepack,
             ) as $emoticon => $smileyFile
-) {
+        ) {
             $emoticonRows .= $this->page->render(
                 'posting/emoticon-packs-row.html',
                 [

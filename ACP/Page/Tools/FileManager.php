@@ -42,11 +42,11 @@ final readonly class FileManager
                 $ext = mb_strtolower($fileInfo->getExtension());
                 if (
                     in_array(
-                    $ext,
-                    ['jpg', 'jpeg', 'png', 'gif', 'bmp'],
-                    true,
+                        $ext,
+                        ['jpg', 'jpeg', 'png', 'gif', 'bmp'],
+                        true,
                     )
-) {
+                ) {
                     $file->hash .= '.' . $ext;
                 }
 
@@ -54,9 +54,9 @@ final readonly class FileManager
 
                 if (
                     $this->fileSystem->getFileInfo(
-                    $uploadFilePath,
+                        $uploadFilePath,
                     )->isWritable()
-) {
+                ) {
                     $page .= $this->fileSystem->unlink($uploadFilePath)
                         ? $this->page->success('File deleted')
                         : $this->page->error(

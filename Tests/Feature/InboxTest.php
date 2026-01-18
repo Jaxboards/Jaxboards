@@ -88,7 +88,7 @@ final class InboxTest extends FeatureTestCase
 
         $page = $this->go('/ucp/inbox');
 
-        $this->assertStringContainsString('No messages.', $page);
+        self::assertStringContainsString('No messages.', $page);
     }
 
     public function testInboxWithMessage(): void
@@ -154,7 +154,7 @@ final class InboxTest extends FeatureTestCase
             post: ['dmessage' => ['1']],
         ));
 
-        $this->assertStringContainsString('No messages.', $page);
+        self::assertStringContainsString('No messages.', $page);
     }
 
     public function testInboxComposeMessage(): void
@@ -178,10 +178,10 @@ final class InboxTest extends FeatureTestCase
             $page,
         );
         $message = Message::selectOne(1);
-        $this->assertEquals('Hello there', $message->title);
-        $this->assertEquals('How have you been?', $message->message);
-        $this->assertEquals(1, $message->from);
-        $this->assertEquals(1, $message->to);
+        self::assertEquals('Hello there', $message->title);
+        self::assertEquals('How have you been?', $message->message);
+        self::assertEquals(1, $message->from);
+        self::assertEquals(1, $message->to);
     }
 
     public function testInboxFlagMessage(): void
@@ -195,7 +195,7 @@ final class InboxTest extends FeatureTestCase
         $this->assertRedirect('inbox', [], $page);
 
         $message = Message::selectOne(1);
-        $this->assertEquals(1, $message->flag);
+        self::assertEquals(1, $message->flag);
     }
 
     public function testInboxUnflagMessage(): void
@@ -209,7 +209,7 @@ final class InboxTest extends FeatureTestCase
         $this->assertRedirect('inbox', [], $page);
 
         $message = Message::selectOne(1);
-        $this->assertEquals(0, $message->flag);
+        self::assertEquals(0, $message->flag);
     }
 
     private function insertMessage(?array $messageProperties = []): void

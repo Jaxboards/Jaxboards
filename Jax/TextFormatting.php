@@ -186,11 +186,11 @@ final readonly class TextFormatting
 
         while (
             ($cleaned = (string) preg_replace(
-            '@\[(\w+)[^\]]*\](.*)\[/\1\]@Us',
-            '$2',
-            $text,
+                '@\[(\w+)[^\]]*\](.*)\[/\1\]@Us',
+                '$2',
+                $text,
             )) !== $text
-) {
+        ) {
             $text = $cleaned;
         }
 

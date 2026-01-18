@@ -147,9 +147,9 @@ final readonly class Poll
 
         foreach (
             $this->parsePollResults(
-            $topic->pollResults,
+                $topic->pollResults,
             ) as $optionIndex => $voters
-) {
+        ) {
             $numVotes[$optionIndex] = count($voters);
 
             foreach ($voters as $voter) {

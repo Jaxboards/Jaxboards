@@ -102,7 +102,7 @@ final class EasterEggsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        $this->assertEquals('loadscript', $json[0][0]);
+        self::assertEquals('loadscript', $json[0][0]);
     }
 
     public function testKatamari(): void
@@ -114,7 +114,7 @@ final class EasterEggsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        $this->assertEquals('loadscript', $json[0][0]);
+        self::assertEquals('loadscript', $json[0][0]);
     }
 
     public function testEarthbound(): void
@@ -126,7 +126,7 @@ final class EasterEggsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        $this->assertEquals('loadscript', $json[0][0]);
+        self::assertEquals('loadscript', $json[0][0]);
     }
 
     public function testRainbow(): void
@@ -138,7 +138,7 @@ final class EasterEggsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        $this->assertEquals('loadscript', $json[0][0]);
+        self::assertEquals('loadscript', $json[0][0]);
     }
 
     public function testSolitaire(): void
@@ -150,7 +150,7 @@ final class EasterEggsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        $this->assertEquals('loadscript', $json[0][0]);
+        self::assertEquals('loadscript', $json[0][0]);
     }
 
     public function testTardis(): void
@@ -162,6 +162,6 @@ final class EasterEggsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        $this->assertEquals('script', $json[0][0]);
+        self::assertEquals('script', $json[0][0]);
     }
 }

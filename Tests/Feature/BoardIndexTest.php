@@ -138,7 +138,7 @@ final class BoardIndexTest extends FeatureTestCase
             server: ['HTTP_X_JSACCESS' => JSAccess::UPDATING->value],
         ));
 
-        $this->assertStringContainsString('onlinelist', $page);
+        self::assertStringContainsString('onlinelist', $page);
     }
 
     public function testDebugInfo(): void

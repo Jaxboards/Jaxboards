@@ -73,7 +73,7 @@ final class TextFormattingTest extends UnitTestCase
         );
 
         // Router is used for URL generation, we don't care to test that here
-        $this->container->set(Router::class, $this->createStub(Router::class));
+        $this->container->set(Router::class, self::createStub(Router::class));
 
         $databaseUtils = $this->container->get(DatabaseUtils::class);
         $databaseUtils->install();
@@ -91,7 +91,7 @@ final class TextFormattingTest extends UnitTestCase
                 TEXT,
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             <<<'HTML'
                 <div class="bbcode code ">hello</div><br>
                 <img src="/emoticons/keshaemotes/smile.gif" data-emoji=":)" alt=":)"><br>
@@ -103,15 +103,15 @@ final class TextFormattingTest extends UnitTestCase
 
     public function testLinkify(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             '[url=http://google.com]http://google.com[/url]',
             $this->textFormatting->linkify('http://google.com'),
         );
-        $this->assertEquals(
+        self::assertEquals(
             '[url=/topic/1]Topic #1[/url]',
             $this->textFormatting->linkify('http://jaxboards.com/topic/1'),
         );
-        $this->assertEquals(
+        self::assertEquals(
             '[url=/topic/3?findpost=33&pid=33]Post #33[/url]',
             $this->textFormatting->linkify(
                 'http://jaxboards.com/topic/3?findpost=33&pid=33',

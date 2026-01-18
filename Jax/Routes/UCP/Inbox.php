@@ -386,9 +386,9 @@ final readonly class Inbox
                         'page' => $pageNumber,
                     ]);
 
-                return <<<HTML
-				<a href="{$pageURL}" {$active}>{$pageNumber}</a>
-				HTML;
+                    return <<<HTML
+                        <a href="{$pageURL}" {$active}>{$pageNumber}</a>
+                        HTML;
                 },
                 $pageNumbers,
             ),
