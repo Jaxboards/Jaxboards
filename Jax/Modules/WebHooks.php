@@ -25,6 +25,11 @@ use const JSON_THROW_ON_ERROR;
 
 final class WebHooks implements Module
 {
+    /**
+     * @var ?array<mixed> $webhooks
+     */
+    private ?array $webhooks = null;
+
     public function __construct(
         private readonly Config $config,
         private readonly DomainDefinitions $domainDefinitions,
@@ -33,19 +38,23 @@ final class WebHooks implements Module
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
         // for testing
-        private ?Curl $curl,
+        private ?Curl $curl = null,
     ) {
-        $this->curl = $curl ?? new Curl();
+        $this->webhooks = $this->config->get()['webhooks'] ?? [];
     }
 
     public function init(): void
     {
+        if ($this->webhooks == []) {
+            return;
+        }
+
         $this->hooks->addListener('post', $this->hookPost(...));
     }
 
     private function hookPost(Post $post, Topic $topic): void
     {
-        $discord = $this->config->get()['webhooks']['discord'] ?? null;
+        $discord = $this->webhooks['discord'] ?? null;
 
         if (!$discord) {
             return;
@@ -79,7 +88,7 @@ final class WebHooks implements Module
     {
         $json = json_encode($payload, JSON_THROW_ON_ERROR);
 
-        $curl = $this->curl;
+        $curl = $this->curl ?? new Curl();
         $curl->setUrl($url);
         $curl->setHeader('Content-Type', 'application/json');
         $curl->setHeader('Content-Length', mb_strlen(
