@@ -5,7 +5,7 @@
         <section class="badge">
             <div class="badge-image">
                 <a href="{{ url('badges', { badgeId: badge.id }) }}" title="View all users with this badge">
-                    <img src='{{ badge.imagePath }}' title='{{ badge.badgeTitle }}'>
+                    <img src='{{ badge.imagePath }}' title='{{ badge.badgeTitle }}' alt="{{ badge.badgeTitle }}">
                 </a>
             </div>
             <h3 class="badge-title">

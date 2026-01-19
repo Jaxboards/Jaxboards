@@ -9,8 +9,13 @@
 
 <form method="post">
     {% for service,url in webhooks%}
-        <label>{{ service|capitalize }} URL:</label>
-        <input type="text" name="webhooks[{{ service }}]" value="{{ url }}">
+        <label for="webhooks_{{ service }}">{{ service|capitalize }} URL:</label>
+        <input
+          type="text"
+          id=="webhooks_{{ service }}"
+          name="webhooks[{{ service }}]"
+          value="{{ url }}"
+        >
         <br>
     {% endfor %}
     <br>

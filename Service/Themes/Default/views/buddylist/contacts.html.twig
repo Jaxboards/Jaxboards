@@ -1,6 +1,8 @@
 <div class="contacts">
     <form action="{{ url('buddylist') }}" data-ajax-form="true">
-        <a href="{{ url('toggleInvisible') }}" id="status" class="{% if isInvisible %}invisible{% endif %}" data-label="Toggle Invisible">
+        <a href="{{ url('toggleInvisible') }}" id="status" class="{% if isInvisible %}invisible{% endif %}">
+          Toggle Invisible
+        </a>
         </a>
         <input style="width:100%;padding-left:20px;" type="text" name="status"
             onblur="this.form.requestSubmit()" value="{{ user.usertitle }}"/>
