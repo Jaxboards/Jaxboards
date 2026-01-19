@@ -23,7 +23,7 @@ use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
 use const JSON_THROW_ON_ERROR;
 
-final readonly class WebHooks implements Module
+final class WebHooks implements Module
 {
     public function __construct(
         private Config $config,
