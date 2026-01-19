@@ -24,6 +24,7 @@ use Jax\RequestStringGetter;
 use Jax\Routes\ServiceInstall;
 use Jax\ServiceConfig;
 use Jax\Template;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -70,6 +71,7 @@ final class ServiceInstallTest extends TestCase
      */
     private array $mockedFiles = [];
 
+    #[Override]
     protected function setUp(): void
     {
         $originalFileSystem = $this->container->get(FileSystem::class);

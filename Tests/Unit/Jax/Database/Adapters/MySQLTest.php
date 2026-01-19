@@ -12,6 +12,7 @@ use Jax\Database\Database;
 use Jax\Database\Model;
 use Jax\Models\Member;
 use Jax\ServiceConfig;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use Spatie\Snapshots\MatchesSnapshots;
@@ -34,6 +35,7 @@ final class MySQLTest extends UnitTestCase
 
     private MySQL $mySQL;
 
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

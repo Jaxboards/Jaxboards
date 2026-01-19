@@ -20,6 +20,7 @@ use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\ServiceConfig;
 use Jax\User;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\UnitTestCase;
@@ -73,6 +74,7 @@ final class UserTest extends UnitTestCase
 
     // phpcs:enable
 
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

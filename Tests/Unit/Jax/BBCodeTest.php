@@ -15,6 +15,7 @@ use Jax\RequestStringGetter;
 use Jax\Router;
 use Jax\ServiceConfig;
 use Jax\Template;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Small;
@@ -43,6 +44,7 @@ final class BBCodeTest extends UnitTestCase
 {
     private BBCode $bbCode;
 
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();
