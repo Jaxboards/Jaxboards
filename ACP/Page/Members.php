@@ -17,7 +17,6 @@ use Jax\Models\Group;
 use Jax\Models\Member;
 use Jax\Models\Message;
 use Jax\Request;
-use Jax\Template;
 use Jax\User;
 
 use function array_map;
@@ -151,24 +150,20 @@ final readonly class Members
             }
 
             $member = $members[0];
-            if (
-                $member->groupID === Groups::Admin->value
+            $page
+                = $member->groupID === Groups::Admin->value
                 && $this->user->get()->id !== 1
                 && $this->user->get()->id !== $member->id
-            ) {
-                $page = $this->page->error(
-                    'You do not have permission to edit this profile. ',
-                );
-            } else {
-                $page = $this->page->render(
-                    'members/edit-form.html',
-                    [
-                        'content' => $page,
-                        'groups' => Group::selectMany('ORDER BY `title` DESC'),
-                        'member' => $member,
-                    ],
-                );
-            }
+             ? $this->page->error(
+                 'You do not have permission to edit this profile. ',
+             ) : $this->page->render(
+                 'members/edit-form.html',
+                 [
+                     'content' => $page,
+                     'groups' => Group::selectMany('ORDER BY `title` DESC'),
+                     'member' => $member,
+                 ],
+             );
         } else {
             $page = $this->page->render('members/edit.html');
         }
