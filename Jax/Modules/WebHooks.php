@@ -26,7 +26,7 @@ use const JSON_THROW_ON_ERROR;
 final class WebHooks implements Module
 {
     /**
-     * @var ?array<mixed> $webhooks
+     * @var ?array<mixed>
      */
     private ?array $webhooks = null;
 
@@ -38,14 +38,14 @@ final class WebHooks implements Module
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
         // for testing
-        private ?Curl $curl = null,
+        private readonly ?Curl $curl = null,
     ) {
         $this->webhooks = $this->config->get()['webhooks'] ?? [];
     }
 
     public function init(): void
     {
-        if ($this->webhooks == []) {
+        if ($this->webhooks === []) {
             return;
         }
 
