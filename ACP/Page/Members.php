@@ -160,111 +160,13 @@ final readonly class Members
                     'You do not have permission to edit this profile. ',
                 );
             } else {
-                $page .= Template::hiddenFormFields(
-                    ['mid' => (string) $member->id],
-                );
-                $page .= $this->inputText(
-                    'Display Name:',
-                    'displayName',
-                    $member->displayName,
-                );
-                $page .= $this->inputText('Username:', 'name', $member->name);
-                $page .= $this->inputText(
-                    'Real Name:',
-                    'full_name',
-                    $member->full_name,
-                );
-                $page .= $this->inputText('Password:', 'password', '');
-                $page .= $this->getGroups($member->groupID);
-                $page .= $this->heading('Profile Fields');
-                $page .= $this->inputText(
-                    'User Title:',
-                    'usertitle',
-                    $member->usertitle,
-                );
-                $page .= $this->inputText(
-                    'Location:',
-                    'location',
-                    $member->location,
-                );
-                $page .= $this->inputText(
-                    'Website:',
-                    'website',
-                    $member->website,
-                );
-                $page .= $this->inputText(
-                    'Avatar:',
-                    'avatar',
-                    $member->avatar,
-                );
-                $page .= $this->textArea('About:', 'about', $member->about);
-                $page .= $this->textArea('Signature:', 'sig', $member->sig);
-                $page .= $this->inputText('Email:', 'email', $member->email);
-                $page .= $this->textArea(
-                    'UCP Notepad:',
-                    'ucpnotepad',
-                    $member->ucpnotepad,
-                );
-                $page .= $this->heading('Contact Details');
-                $page .= $this->inputText(
-                    'AIM:',
-                    'contactAIM',
-                    $member->contactAIM,
-                );
-                $page .= $this->inputText(
-                    'Bluesky:',
-                    'contactBlueSky',
-                    $member->contactBlueSky,
-                );
-                $page .= $this->inputText(
-                    'Discord:',
-                    'contactDiscord',
-                    $member->contactDiscord,
-                );
-                $page .= $this->inputText(
-                    'Google Chat:',
-                    'contactGoogleChat',
-                    $member->contactGoogleChat,
-                );
-                $page .= $this->inputText(
-                    'MSN:',
-                    'contactMSN',
-                    $member->contactMSN,
-                );
-                $page .= $this->inputText(
-                    'Skype:',
-                    'contactSkype',
-                    $member->contactSkype,
-                );
-                $page .= $this->inputText(
-                    'Steam:',
-                    'contactSteam',
-                    $member->contactSteam,
-                );
-                $page .= $this->inputText(
-                    'Twitter:',
-                    'contactTwitter',
-                    $member->contactTwitter,
-                );
-                $page .= $this->inputText(
-                    'YIM:',
-                    'contactYIM',
-                    $member->contactYIM,
-                );
-                $page .= $this->inputText(
-                    'YouTube:',
-                    'contactYoutube',
-                    $member->contactYoutube,
-                );
-                $page .= $this->heading('System-Generated Variables');
-                $page .= $this->inputText(
-                    'Post Count:',
-                    'posts',
-                    (string) $member->posts,
-                );
                 $page = $this->page->render(
                     'members/edit-form.html',
-                    ['content' => $page],
+                    [
+                        'content' => $page,
+                        'groups' => Group::selectMany('ORDER BY `title` DESC'),
+                        'member' => $member,
+                    ],
                 );
             }
         } else {
@@ -398,29 +300,6 @@ final readonly class Members
 
         $page .= $this->page->render('members/pre-register.html');
         $this->page->addContentBox('Pre-Register', $page);
-    }
-
-    private function getGroups(int $groupId = 0): string
-    {
-        $page = '';
-        $groups = Group::selectMany('ORDER BY `title` DESC');
-        foreach ($groups as $group) {
-            $page .= $this->page->render(
-                'select-option.html',
-                [
-                    'label' => $group->title,
-                    'selected' => $groupId === $group->id ? ' selected="selected"' : '',
-                    'value' => $group->id,
-                ],
-            );
-        }
-
-        return $this->page->render(
-            'members/get-groups.html',
-            [
-                'content' => $page,
-            ],
-        );
     }
 
     private function mergeMembers(int $mid1, int $mid2): ?string
@@ -810,45 +689,5 @@ final readonly class Members
             ],
         ) : 'There are currently no members awaiting validation.';
         $this->page->addContentBox('Members Awaiting Validation', $page);
-    }
-
-    private function inputText(
-        string $label,
-        string $name,
-        string $value,
-    ): string {
-        return $this->page->render(
-            'members/edit-form-field-text.html',
-            [
-                'label' => $label,
-                'title' => $name,
-                'value' => $value,
-            ],
-        );
-    }
-
-    private function textArea(
-        string $label,
-        string $name,
-        string $value,
-    ): string {
-        return $this->page->render(
-            'members/edit-form-field-textarea.html',
-            [
-                'label' => $label,
-                'title' => $name,
-                'value' => $value,
-            ],
-        );
-    }
-
-    private function heading(string $value): string
-    {
-        return $this->page->render(
-            'members/edit-heading.html',
-            [
-                'value' => $value,
-            ],
-        );
     }
 }

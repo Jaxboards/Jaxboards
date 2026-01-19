@@ -1,4 +1,113 @@
 <form method="post">
   {{ content }}
+
+  <input type="hidden" name="mid" value="{{ member.id }}">
+
+  <label for="displayName">Display Name:</label>
+  <input type="text" id="displayName" name="displayName" value="{{ member.displayName }}">
+  <br>
+
+  <label for="name">Username:</label>
+  <input type="text" id="name" name="name" value="{{ member.name }}">
+  <br>
+  <label for="full_name">Real Name:</label>
+  <input type="text" id="full_name" name="full_name" value="{{ member.full_name }}">
+  <br>
+
+  <label for="password">Password:</label>
+  <input type="text" id="password" name="password" value="">
+  <br>
+
+  <label for="groupID">Group:</label>
+  <select id="groupID" name="groupID" title="Select member's group">
+    {% for group in groups %}
+      <option value="{{ group.id }}" {% if member.groupID == group.id %}selected{% endif %}>
+        {{ group.title }}
+      </option>
+    {% endfor %}
+  </select>
+
+  <h2>Profile Fields</h2>
+
+  <label for="avatar">Avatar:</label>
+  <input type="text" id="avatar" name="avatar" value="{{ member.avatar }}">
+  <br>
+
+  <label for="email">Email:</label>
+  <input type="text" id="email" name="email" value="{{ member.email }}">
+  <br>
+
+  <label for="location">Location:</label>
+  <input type="text" id="location" name="location" value="{{ member.location }}">
+  <br>
+
+  <label for="usertitle">User Title:</label>
+  <input type="text" id="usertitle" name="usertitle" value="{{ member.usertitle }}">
+  <br>
+
+  <label for="website">Website:</label>
+  <input type="text" id="website" name="website" value="{{ member.website }}">
+  <br>
+
+  <label for="about" style="vertical-align:top;">About:</label>
+  <textarea id="about" name="about">{{ member.about }}</textarea>
+  <br>
+
+  <label for="sig" style="vertical-align:top;">Signature:</label>
+  <textarea id="sig" name="sig">{{ member.sig }}</textarea>
+  <br>
+
+  <label for="ucpnotepad" style="vertical-align:top;">UCP Notepad:</label>
+  <textarea id="ucpnotepad" name="ucpnotepad">{{ member.ucpnotepad }}</textarea>
+  <br>
+
+  <h2>Contact Details</h2>
+
+  <label for="contactAIM">AIM:</label>
+  <input type="text" id="contactAIM" name="contactAIM" value="{{ member.contactAIM }}">
+  <br>
+
+  <label for="contactBlueSky">Bluesky:</label>
+  <input type="text" id="contactBlueSky" name="contactBlueSky" value="{{ member.contactBlueSky }}">
+  <br>
+
+  <label for="contactDiscord">Discord:</label>
+  <input type="text" id="contactDiscord" name="contactDiscord" value="{{ member.contactDiscord }}">
+  <br>
+
+  <label for="contactGoogleChat">Google Chat:</label>
+  <input type="text" id="contactGoogleChat" name="contactGoogleChat" value="{{ member.contactGoogleChat }}">
+  <br>
+
+  <label for="contactMSN">MSN:</label>
+  <input type="text" id="contactMSN" name="contactMSN" value="{{ member.contactMSN }}">
+  <br>
+
+  <label for="contactSkype">Skype:</label>
+  <input type="text" id="contactSkype" name="contactSkype" value="{{ member.contactSkype }}">
+  <br>
+
+  <label for="contactSteam">Steam:</label>
+  <input type="text" id="contactSteam" name="contactSteam" value="{{ member.contactSteam }}">
+  <br>
+
+  <label for="contactTwitter">Twitter:</label>
+  <input type="text" id="contactTwitter" name="contactTwitter" value="{{ member.contactTwitter }}">
+  <br>
+
+  <label for="contactYIM">YIM:</label>
+  <input type="text" id="contactYIM" name="contactYIM" value="{{ member.contactYIM }}">
+  <br>
+
+  <label for="contactYoutube">YouTube:</label>
+  <input type="text" id="contactYoutube" name="contactYoutube" value="{{ member.contactYoutube }}">
+  <br>
+
+  <h2>System-Generated Variables</h2>
+
+  <label for="posts">Post Count:</label>
+  <input type="text" id="posts" name="posts" value="{{ member.posts }}">
+  <br>
+
   <input type="submit" name="savedata" value="Save">
 </form>
