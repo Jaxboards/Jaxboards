@@ -157,7 +157,7 @@ final readonly class Activity
         return array_map(
             static fn(ModelsActivity $modelsActivity): object => (object) [
                 'activity' => $modelsActivity,
-                'affectedUser' => $members[$modelsActivity->affectedUser] ?? null,
+                'affectedUser' => $members[$modelsActivity->affectedUser ?? ''] ?? null,
             ],
             $activities,
         );
