@@ -30,7 +30,7 @@ const tagsToBBCode: Record<string, (inner: string, el: HTMLElement) => string> =
       return this.em(...args);
     },
 
-    img: (inner, img) => {
+    img: (_inner, img) => {
       const alt = img.getAttribute("alt") ?? "";
       const src = img.getAttribute("src");
       if (img.dataset.emoji) {
@@ -83,11 +83,11 @@ const styleToBBCode: Record<
   "font-family": (fontFace, inner) =>
     `[font=${fontFace.replaceAll(/['"]/g, "")}]${inner}[/font]`,
 
-  "font-style": (fontStyle, inner) => `[i]${inner}[/i]`,
+  "font-style": (_fontStyle, inner) => `[i]${inner}[/i]`,
 
   "font-size": (size, inner) => `[size=${size}]${inner}[/size]`,
 
-  "font-weight": (weight, inner) => `[b]${inner}[/b]`,
+  "font-weight": (_weight, inner) => `[b]${inner}[/b]`,
 
   "text-align": (align, inner) => `[align=${align}]${inner}[/align]`,
 
