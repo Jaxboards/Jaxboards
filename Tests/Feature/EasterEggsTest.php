@@ -41,7 +41,6 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\FeatureTestCase;
 
@@ -89,12 +88,6 @@ use function json_decode;
 #[CoversClass(User::class)]
 final class EasterEggsTest extends FeatureTestCase
 {
-    #[Override]
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testAsteroids(): void
     {
         $page = $this->go(new Request(

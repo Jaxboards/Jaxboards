@@ -42,7 +42,6 @@ use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
 use Jax\UsersOnline;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
@@ -89,12 +88,6 @@ use Tests\FeatureTestCase;
 #[CoversClass(UsersOnline::class)]
 final class PollTest extends FeatureTestCase
 {
-    #[Override]
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testViewPollSingleChoice(): void
     {
         $this->actingAs('admin');

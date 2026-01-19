@@ -40,7 +40,6 @@ use Jax\TextRules;
 use Jax\User;
 use Jax\UserOnline;
 use Jax\UsersOnline;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\FeatureTestCase;
 
@@ -87,12 +86,6 @@ use function json_decode;
 #[CoversClass(UsersOnline::class)]
 final class PrivateMessageTest extends FeatureTestCase
 {
-    #[Override]
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testSendMessage(): void
     {
         $this->actingAs('admin');

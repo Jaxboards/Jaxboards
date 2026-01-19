@@ -90,6 +90,8 @@ final class ShoutboxTest extends FeatureTestCase
     #[Override]
     protected function setUp(): void
     {
+        parent::setUp();
+
         // Configure shoutbox to be enabled
         $this->container->set(
             Config::class,
@@ -98,8 +100,6 @@ final class ShoutboxTest extends FeatureTestCase
                 ['shoutbox' => true],
             ),
         );
-
-        parent::setUp();
     }
 
     public function testUnauthShout(): void

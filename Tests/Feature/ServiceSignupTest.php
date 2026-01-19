@@ -28,7 +28,6 @@ use Jax\ServiceConfig;
 use Jax\Session;
 use Jax\Template;
 use Jax\User;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
@@ -67,12 +66,6 @@ use Tests\FeatureTestCase;
 #[CoversClass(User::class)]
 final class ServiceSignupTest extends FeatureTestCase
 {
-    #[Override]
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testSignupFormServiceModeDisabled(): void
     {
         $this->setServiceConfig(['service' => false]);

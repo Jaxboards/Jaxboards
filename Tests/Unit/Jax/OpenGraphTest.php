@@ -7,7 +7,6 @@ namespace Tests\Unit\Jax;
 use Jax\BBCode;
 use Jax\FileSystem;
 use Jax\OpenGraph;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Snapshots\MatchesSnapshots;
@@ -22,12 +21,6 @@ use function implode;
 final class OpenGraphTest extends UnitTestCase
 {
     use MatchesSnapshots;
-
-    #[Override]
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
 
     #[DataProvider('fetchDataProvider')]
     public function testFetch(string $url, string $htmlInput): void

@@ -37,7 +37,6 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\FeatureTestCase;
 
@@ -81,12 +80,6 @@ use function json_decode;
 #[CoversClass(WebHooks::class)]
 final class APITest extends FeatureTestCase
 {
-    #[Override]
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testSearchMembers(): void
     {
         $this->actingAs('admin');

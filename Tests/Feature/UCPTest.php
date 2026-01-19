@@ -38,7 +38,6 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\DOMAssert;
@@ -90,12 +89,6 @@ use const PASSWORD_DEFAULT;
 #[Medium]
 final class UCPTest extends FeatureTestCase
 {
-    #[Override]
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testUCPNotePad(): void
     {
         $this->actingAs('member', ['ucpnotepad' => 'pikachu']);

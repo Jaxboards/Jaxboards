@@ -74,6 +74,8 @@ final class ServiceInstallTest extends TestCase
     #[Override]
     protected function setUp(): void
     {
+        parent::setUp();
+
         $originalFileSystem = $this->container->get(FileSystem::class);
         $this->fileSystemMock = $this->createMock(FileSystem::class);
         $fileSystemMock = $this->fileSystemMock;
@@ -101,8 +103,6 @@ final class ServiceInstallTest extends TestCase
 
         // Stub out FileSystem
         $this->container->set(FileSystem::class, $fileSystemMock);
-
-        parent::setUp();
     }
 
     public function testInstallerFormInstalled(): void

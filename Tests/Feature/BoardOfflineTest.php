@@ -91,6 +91,7 @@ final class BoardOfflineTest extends FeatureTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->container->set(
             Config::class,
             autowire()->constructorParameter('boardConfig', [

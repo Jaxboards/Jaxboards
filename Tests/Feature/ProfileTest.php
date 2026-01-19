@@ -46,7 +46,6 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
@@ -98,12 +97,6 @@ use function json_decode;
 #[CoversClass(UserProfile::class)]
 final class ProfileTest extends FeatureTestCase
 {
-    #[Override]
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testViewMissingUser(): void
     {
         $page = $this->go('/profile/5');

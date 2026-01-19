@@ -13,7 +13,6 @@ use Jax\IPAddress;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\ServiceConfig;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\UnitTestCase;
@@ -33,12 +32,6 @@ use Tests\UnitTestCase;
 final class IPAddressTest extends UnitTestCase
 {
     public const string TESTIP = '192.168.1.1';
-
-    #[Override]
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
 
     public function testBinaryConversions(): void
     {

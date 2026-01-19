@@ -27,8 +27,9 @@ final class FileSystemTest extends UnitTestCase
     #[Override]
     protected function setUp(): void
     {
-        $this->fileSystem = new FileSystem(sys_get_temp_dir());
         parent::setUp();
+
+        $this->fileSystem = new FileSystem(sys_get_temp_dir());
     }
 
     public function testOperations(): void

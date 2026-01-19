@@ -41,7 +41,6 @@ use Jax\TextRules;
 use Jax\User;
 use Jax\UserOnline;
 use Jax\UsersOnline;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
@@ -87,12 +86,6 @@ use Tests\FeatureTestCase;
 #[CoversClass(UserOnline::class)]
 final class BoardIndexTest extends FeatureTestCase
 {
-    #[Override]
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testViewForumIndexAsAdmin(): void
     {
         $this->actingAs('admin');

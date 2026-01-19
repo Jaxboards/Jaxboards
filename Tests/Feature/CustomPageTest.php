@@ -39,7 +39,6 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
-use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
@@ -83,12 +82,6 @@ use Tests\FeatureTestCase;
 #[CoversClass(User::class)]
 final class CustomPageTest extends FeatureTestCase
 {
-    #[Override]
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testLoadCustomPage(): void
     {
         $pageModel = new ModelsPage();
