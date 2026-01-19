@@ -11,7 +11,7 @@ use Jax\Database\Model;
 
 final class Stats extends Model
 {
-    public const TABLE = 'stats';
+    public const string TABLE = 'stats';
 
     #[Column(name: 'id', type: 'int', nullable: false, unsigned: true)]
     #[PrimaryKey]

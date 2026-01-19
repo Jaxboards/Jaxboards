@@ -82,11 +82,6 @@ use Tests\FeatureTestCase;
 #[CoversClass(User::class)]
 final class LogRegTest extends FeatureTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testRegistrationForm(): void
     {
         $page = $this->go('/register');

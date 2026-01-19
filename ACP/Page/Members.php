@@ -30,7 +30,7 @@ use const PASSWORD_DEFAULT;
 
 final readonly class Members
 {
-    private const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
+    private const string DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
 
     public function __construct(
         private Config $config,

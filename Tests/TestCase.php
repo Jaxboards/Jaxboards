@@ -8,6 +8,7 @@ use DI\Container;
 use Jax\Config;
 use Jax\FileSystem;
 use Jax\ServiceConfig;
+use Override;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
@@ -19,10 +20,16 @@ use function DI\autowire;
 #[CoversNothing]
 abstract class TestCase extends PHPUnitTestCase
 {
-    protected readonly Container $container;
+    protected Container $container;
 
-    public function __construct(string $name)
+    /**
+     * Set up for tests, runs before each test.
+     */
+    #[Override]
+    protected function setUp(): void
     {
+        parent::setUp();
+
         $this->container = new Container();
 
         // Prevent test suite from mutating files
@@ -43,8 +50,6 @@ abstract class TestCase extends PHPUnitTestCase
 
         $this->setServiceConfig();
         $this->setBoardConfig();
-
-        return parent::__construct($name);
     }
 
     protected function setServiceConfig($config = []): void

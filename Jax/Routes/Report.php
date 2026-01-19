@@ -18,7 +18,7 @@ use function mb_substr;
 
 final readonly class Report implements Route
 {
-    public const REPORT_REASONS = [
+    public const array REPORT_REASONS = [
         'spam' => 'Spam',
         'trolling' => 'Flaming/Trolling',
         'inappropriate' => 'Inappropriate Content',
@@ -50,7 +50,7 @@ final readonly class Report implements Route
 
         match (true) {
             array_key_exists(
-                $reason,
+                (string) $reason,
                 self::REPORT_REASONS,
             ) => $this->reportPost(
                 $pid,

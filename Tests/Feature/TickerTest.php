@@ -79,11 +79,6 @@ use Tests\FeatureTestCase;
 #[CoversClass(User::class)]
 final class TickerTest extends FeatureTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testTickerView(): void
     {
         $this->actingAs('admin');

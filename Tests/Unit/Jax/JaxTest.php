@@ -14,6 +14,7 @@ use Jax\Jax;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\ServiceConfig;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\UnitTestCase;
@@ -89,6 +90,7 @@ final class JaxTest extends UnitTestCase
 
     // phpcs:enable SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder
 
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

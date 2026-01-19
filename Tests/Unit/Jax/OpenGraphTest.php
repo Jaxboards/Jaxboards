@@ -17,15 +17,11 @@ use function implode;
 /**
  * @internal
  */
+#[CoversClass(FileSystem::class)]
 #[CoversClass(OpenGraph::class)]
 final class OpenGraphTest extends UnitTestCase
 {
     use MatchesSnapshots;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
 
     #[DataProvider('fetchDataProvider')]
     public function testFetch(string $url, string $htmlInput): void

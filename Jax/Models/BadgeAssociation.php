@@ -11,7 +11,7 @@ use Jax\Database\Model;
 
 final class BadgeAssociation extends Model
 {
-    public const TABLE = 'badge_associations';
+    public const string TABLE = 'badge_associations';
 
     #[Column(
         name: 'id',

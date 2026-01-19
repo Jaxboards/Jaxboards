@@ -9,6 +9,9 @@ use Jax\DebugLog;
 use Jax\ServiceConfig;
 use MySQLite\MySQLite;
 use PDO;
+use Pdo\Mysql;
+use Pdo\Pgsql;
+use Pdo\Sqlite;
 use PDOStatement;
 
 use function array_keys;
@@ -32,13 +35,13 @@ final class Database
 {
     // This is a bit silly, but these constants shows up so often in our codebase
     // that I'm defining them here to make our linters happy.
-    public const WHERE_ID_EQUALS = 'WHERE `id`=?';
+    public const string WHERE_ID_EQUALS = 'WHERE `id`=?';
 
-    public const WHERE_ID_IN = 'WHERE `id` IN ?';
+    public const string WHERE_ID_IN = 'WHERE `id` IN ?';
 
-    public const DATE = 'Y-m-d';
+    public const string DATE = 'Y-m-d';
 
-    public const DATE_TIME = 'Y-m-d H:i:s';
+    public const string DATE_TIME = 'Y-m-d H:i:s';
 
     public string $driver = 'mysql';
 
@@ -78,21 +81,19 @@ final class Database
         string $prefix = '',
         string $driver = '',
     ): void {
-        $connectionArgs = match ($driver) {
-            'postgres' => [
+        $this->pdo = match ($driver) {
+            'sqliteMemory' => new Sqlite('sqlite::memory:'),
+            'postgres' => new Pgsql(
                 "postgres:host={$host};dbname={$database}",
                 $user,
                 $password,
-            ],
-            'sqliteMemory' => ['sqlite::memory:'],
-            default => [
+            ),
+            default => new Mysql(
                 "mysql:host={$host};dbname={$database};charset=utf8mb4",
                 $user,
                 $password,
-            ],
+            ),
         };
-
-        $this->pdo = new PDO(...$connectionArgs);
 
         // All datetimes are GMT for jaxboards
         match ($driver) {

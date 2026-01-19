@@ -26,6 +26,7 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\UnitTestCase;
@@ -61,6 +62,7 @@ final class TextFormattingTest extends UnitTestCase
 {
     private TextFormatting $textFormatting;
 
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -12,7 +12,7 @@ use Jax\Database\Model;
 
 final class Post extends Model
 {
-    public const TABLE = 'posts';
+    public const string TABLE = 'posts';
 
     #[Column(
         name: 'id',

@@ -10,7 +10,7 @@ use Jax\Database\Model;
 
 final class Skin extends Model
 {
-    public const TABLE = 'skins';
+    public const string TABLE = 'skins';
 
     #[Column(
         name: 'id',

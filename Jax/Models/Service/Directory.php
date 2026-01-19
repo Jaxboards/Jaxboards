@@ -10,7 +10,7 @@ use Jax\Database\Model;
 
 final class Directory extends Model
 {
-    public const TABLE = 'directory';
+    public const string TABLE = 'directory';
 
     #[Column(
         name: 'id',

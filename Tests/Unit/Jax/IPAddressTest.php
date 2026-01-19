@@ -31,12 +31,7 @@ use Tests\UnitTestCase;
 #[CoversClass(IPAddress::class)]
 final class IPAddressTest extends UnitTestCase
 {
-    public const TESTIP = '192.168.1.1';
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
+    public const string TESTIP = '192.168.1.1';
 
     public function testBinaryConversions(): void
     {

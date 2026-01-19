@@ -88,11 +88,6 @@ use Tests\FeatureTestCase;
 #[CoversClass(UsersOnline::class)]
 final class PollTest extends FeatureTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testViewPollSingleChoice(): void
     {
         $this->actingAs('admin');

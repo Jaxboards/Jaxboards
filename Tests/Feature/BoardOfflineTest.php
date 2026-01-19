@@ -40,6 +40,7 @@ use Jax\TextRules;
 use Jax\User;
 use Jax\UserOnline;
 use Jax\UsersOnline;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\FeatureTestCase;
 
@@ -86,9 +87,11 @@ use function DI\autowire;
 #[CoversClass(UsersOnline::class)]
 final class BoardOfflineTest extends FeatureTestCase
 {
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->container->set(
             Config::class,
             autowire()->constructorParameter('boardConfig', [

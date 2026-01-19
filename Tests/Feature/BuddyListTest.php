@@ -87,11 +87,6 @@ use function json_decode;
 #[CoversClass(UsersOnline::class)]
 final class BuddyListTest extends FeatureTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testBuddyList(): void
     {
         $this->actingAs('admin');

@@ -88,11 +88,6 @@ use function json_decode;
 #[CoversClass(User::class)]
 final class EasterEggsTest extends FeatureTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testAsteroids(): void
     {
         $page = $this->go(new Request(

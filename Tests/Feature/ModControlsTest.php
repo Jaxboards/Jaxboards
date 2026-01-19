@@ -98,11 +98,6 @@ use function json_encode;
 #[CoversClass(User::class)]
 final class ModControlsTest extends FeatureTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testModCPIndexAdmin(): void
     {
         $this->actingAs('admin');

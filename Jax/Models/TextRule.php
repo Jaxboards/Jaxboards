@@ -10,7 +10,7 @@ use Jax\Database\Model;
 
 final class TextRule extends Model
 {
-    public const TABLE = 'textrules';
+    public const string TABLE = 'textrules';
 
     #[Column(
         name: 'id',

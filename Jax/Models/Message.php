@@ -11,7 +11,7 @@ use Jax\Database\Model;
 
 final class Message extends Model
 {
-    public const TABLE = 'messages';
+    public const string TABLE = 'messages';
 
     #[Column(
         name: 'id',

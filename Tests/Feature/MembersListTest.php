@@ -81,11 +81,6 @@ use Tests\FeatureTestCase;
 #[CoversClass(User::class)]
 final class MembersListTest extends FeatureTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testViewMembers(): void
     {
         $this->actingAs('admin');

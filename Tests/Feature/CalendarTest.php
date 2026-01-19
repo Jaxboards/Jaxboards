@@ -79,11 +79,6 @@ use Tests\FeatureTestCase;
 #[CoversClass(User::class)]
 final class CalendarTest extends FeatureTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testCalendarBirthday(): void
     {
         $this->actingAs(

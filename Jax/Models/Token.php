@@ -12,7 +12,7 @@ use Jax\Database\Model;
 
 final class Token extends Model
 {
-    public const TABLE = 'tokens';
+    public const string TABLE = 'tokens';
 
     #[Column(name: 'token', type: 'string', length: 191, nullable: false)]
     #[PrimaryKey]

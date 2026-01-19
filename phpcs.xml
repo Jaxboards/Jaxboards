@@ -10,9 +10,9 @@
   <exclude-pattern>./node_modules</exclude-pattern>
   <!-- PHP Version -->
   <!-- Reference https://github.com/squizlabs/PHP_CodeSniffer/wiki/Configuration-Options#setting-the-php-version -->
-  <config name="php_version" value="80230"/>
-  <!-- Make sure this works with PHP 8.2+ -->
-  <config name="testVersion" value="8.2-" />
+  <config name="php_version" value="80500"/>
+  <!-- Make sure this works with PHP 8.5+ -->
+  <config name="testVersion" value="8.5-" />
   <!-- Use UTF-8 encoding -->
   <config name="encoding" value="utf-8"/>
   <!-- Return error codes on exit if there are errros -->
@@ -63,6 +63,7 @@
   </rule>
   <rule ref="Squiz.Commenting.PostStatementComment" />
   <rule ref="Squiz.Commenting.BlockComment">
+    <exclude name="Squiz.Commenting.BlockComment.HasEmptyLineBefore" />
     <exclude name="Squiz.Commenting.BlockComment.InvalidEndChar" />
     <exclude name="Squiz.Commenting.BlockComment.LastLineIndent" />
     <exclude name="Squiz.Commenting.BlockComment.NotCapital" />

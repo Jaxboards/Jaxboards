@@ -80,11 +80,6 @@ use function json_decode;
 #[CoversClass(WebHooks::class)]
 final class APITest extends FeatureTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testSearchMembers(): void
     {
         $this->actingAs('admin');

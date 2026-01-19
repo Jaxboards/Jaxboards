@@ -112,7 +112,7 @@ final class UsersOnline
 
         $usersOnline = [];
         foreach ($sessions as $session) {
-            $member = $members[$session->uid] ?? null;
+            $member = $members[$session->uid ?? ''] ?? null;
 
             if ($session->hide && !$this->user->isAdmin()) {
                 continue;

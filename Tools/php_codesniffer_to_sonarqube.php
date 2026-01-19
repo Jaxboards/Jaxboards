@@ -39,7 +39,7 @@ if ($sonarQubeReport === '') {
     fwrite(
         STDERR,
         'Please enter the path to where to save your SonarQube report json '
-        . 'file',
+            . 'file',
     );
 
     exit(1);
@@ -113,6 +113,9 @@ const RULE_DESCRIPTION_REPLACEMENTS = [
     '/Method [\\\\\w]+::\w+\(\) does not have/' => 'Method does not have',
     '/inside string is disallowed, found "\$\w+"/' => 'inside string is disallowed',
     '/is deprecated as of PHP 8.2, found "\$\{\w+\}"/' => 'is deprecated as of PHP 8.2',
+    '/is deprecated as of PHP 8.3, found "\$\{\w+\}"/' => 'is deprecated as of PHP 8.3',
+    '/is deprecated as of PHP 8.4, found "\$\{\w+\}"/' => 'is deprecated as of PHP 8.4',
+    '/is deprecated as of PHP 8.5, found "\$\{\w+\}"/' => 'is deprecated as of PHP 8.5',
     '/on property "\$\w+"/' => 'on property',
     '/on method "\w+"/' => 'on method',
     '/variable \$\w+/' => 'varaible',
@@ -203,7 +206,7 @@ $rules = array_reduce(
     static fn(array $rules, array $file): array => array_reduce(
         $file['messages'],
         static function (array $rules, array $message): array {
-            if (array_key_exists($message['source'], $rules)) {
+            if (array_key_exists((string) $message['source'], $rules)) {
                 return $rules;
             }
 

@@ -45,6 +45,7 @@ use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
 use Jax\UsersOnline;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
@@ -95,6 +96,7 @@ use function json_decode;
 #[CoversClass(RSSFeed::class)]
 final class TopicTest extends FeatureTestCase
 {
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

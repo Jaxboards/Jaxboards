@@ -13,6 +13,7 @@ use Jax\Request;
 use Jax\Router;
 use Jax\Session as JaxSession;
 use Jax\User;
+use Override;
 use PHPUnit\Framework\Attributes\CoversNothing;
 
 use function DI\autowire;
@@ -32,12 +33,14 @@ use const PASSWORD_DEFAULT;
 #[CoversNothing]
 abstract class FeatureTestCase extends TestCase
 {
+    #[Override]
     protected function setUp(): void
     {
+        parent::setUp();
+
         session_id('paratest-' . getenv('TEST_TOKEN'));
 
         $this->setupDB();
-        parent::setUp();
     }
 
     public function go(

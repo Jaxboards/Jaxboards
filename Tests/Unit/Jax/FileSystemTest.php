@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Jax;
 
 use Jax\FileSystem;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Small;
@@ -23,10 +24,12 @@ final class FileSystemTest extends UnitTestCase
 {
     private FileSystem $fileSystem;
 
+    #[Override]
     protected function setUp(): void
     {
-        $this->fileSystem = new FileSystem(sys_get_temp_dir());
         parent::setUp();
+
+        $this->fileSystem = new FileSystem(sys_get_temp_dir());
     }
 
     public function testOperations(): void

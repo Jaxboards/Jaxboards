@@ -89,11 +89,6 @@ use const PASSWORD_DEFAULT;
 #[Medium]
 final class UCPTest extends FeatureTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testUCPNotePad(): void
     {
         $this->actingAs('member', ['ucpnotepad' => 'pikachu']);

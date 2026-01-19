@@ -8,7 +8,9 @@ use Jax\Database\Adapters\SQLite;
 use Jax\Database\Database;
 use Jax\Database\Model;
 use Jax\Database\Utils as DatabaseUtils;
+use Jax\FileSystem;
 use Jax\ServiceConfig;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\UnitTestCase;
@@ -18,6 +20,7 @@ use Tests\UnitTestCase;
  */
 #[CoversClass(DatabaseUtils::class)]
 #[CoversClass(Database::class)]
+#[CoversClass(FileSystem::class)]
 #[CoversClass(SQLite::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(ServiceConfig::class)]
@@ -26,6 +29,7 @@ final class UtilsTest extends UnitTestCase
 {
     private DatabaseUtils $databaseUtils;
 
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

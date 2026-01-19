@@ -52,7 +52,8 @@ $composerData = json_decode(
 
 $composerData['config']['platform']['composer'] = $version;
 ksort($composerData['config']['platform']);
-$composerData['require-dev']['composer'] = $version;
+$composerData['require']['composer'] = $version;
+ksort($composerData['require']);
 ksort($composerData['require-dev']);
 
 file_put_contents(

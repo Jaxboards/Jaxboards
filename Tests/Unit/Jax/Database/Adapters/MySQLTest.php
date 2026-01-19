@@ -10,8 +10,10 @@ use Jax\Attributes\Key;
 use Jax\Database\Adapters\MySQL;
 use Jax\Database\Database;
 use Jax\Database\Model;
+use Jax\FileSystem;
 use Jax\Models\Member;
 use Jax\ServiceConfig;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use Spatie\Snapshots\MatchesSnapshots;
@@ -22,6 +24,7 @@ use Tests\UnitTestCase;
  */
 #[CoversClass(MySQL::class)]
 #[CoversClass(Column::class)]
+#[CoversClass(FileSystem::class)]
 #[CoversClass(ForeignKey::class)]
 #[CoversClass(Key::class)]
 #[CoversClass(Database::class)]
@@ -34,6 +37,7 @@ final class MySQLTest extends UnitTestCase
 
     private MySQL $mySQL;
 
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

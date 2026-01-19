@@ -97,11 +97,6 @@ use function json_decode;
 #[CoversClass(UserProfile::class)]
 final class ProfileTest extends FeatureTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testViewMissingUser(): void
     {
         $page = $this->go('/profile/5');

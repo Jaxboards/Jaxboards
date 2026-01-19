@@ -344,7 +344,7 @@ final class Topic implements Route
 
             $newcache[] = $userOnline->uid;
 
-            if (!array_key_exists($userOnline->uid, $oldcache)) {
+            if (!array_key_exists((string) $userOnline->uid, $oldcache)) {
                 $list[] = $userOnline;
 
                 continue;

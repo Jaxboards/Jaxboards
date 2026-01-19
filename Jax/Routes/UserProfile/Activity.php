@@ -19,7 +19,7 @@ use function array_map;
 
 final readonly class Activity
 {
-    private const ACTIVITY_LIMIT = 30;
+    private const int ACTIVITY_LIMIT = 30;
 
     public function __construct(
         private Date $date,
@@ -157,7 +157,7 @@ final readonly class Activity
         return array_map(
             static fn(ModelsActivity $modelsActivity): object => (object) [
                 'activity' => $modelsActivity,
-                'affectedUser' => $members[$modelsActivity->affectedUser] ?? null,
+                'affectedUser' => $members[$modelsActivity->affectedUser ?? ''] ?? null,
             ],
             $activities,
         );

@@ -39,6 +39,7 @@ use Jax\TextRules;
 use Jax\User;
 use Jax\UserOnline;
 use Jax\UsersOnline;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
@@ -86,8 +87,11 @@ use function DI\autowire;
 #[CoversClass(UsersOnline::class)]
 final class ShoutboxTest extends FeatureTestCase
 {
+    #[Override]
     protected function setUp(): void
     {
+        parent::setUp();
+
         // Configure shoutbox to be enabled
         $this->container->set(
             Config::class,
@@ -96,8 +100,6 @@ final class ShoutboxTest extends FeatureTestCase
                 ['shoutbox' => true],
             ),
         );
-
-        parent::setUp();
     }
 
     public function testUnauthShout(): void

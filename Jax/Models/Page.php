@@ -10,7 +10,7 @@ use Jax\Database\Model;
 
 final class Page extends Model
 {
-    public const TABLE = 'pages';
+    public const string TABLE = 'pages';
 
     #[Column(name: 'act', type: 'string', length: 25, nullable: false)]
     #[PrimaryKey]

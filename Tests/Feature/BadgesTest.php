@@ -98,11 +98,6 @@ use Tests\FeatureTestCase;
 #[CoversClass(UsersOnline::class)]
 final class BadgesTest extends FeatureTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testBadgesInProfileNoBadgesYet(): void
     {
         $this->actingAs('admin');

@@ -86,11 +86,6 @@ use function json_decode;
 #[CoversClass(UsersOnline::class)]
 final class PrivateMessageTest extends FeatureTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testSendMessage(): void
     {
         $this->actingAs('admin');

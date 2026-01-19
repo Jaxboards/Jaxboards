@@ -17,7 +17,7 @@
     "optimize-autoloader": true,
     "platform": {
       "composer": "2.9.3",
-      "php": "8.2.12"
+      "php": "8.5"
     },
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true
@@ -27,7 +27,6 @@
   "prefer-stable": true,
   "require-dev": {
     "brianium/paratest": "^7.8",
-    "composer": "2.9.3",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
     "dg/bypass-finals": "^1.9",
     "friendsofphp/php-cs-fixer": "^3.92",
@@ -35,30 +34,27 @@
     "phpmd/phpmd": "^2.15",
     "phpstan/phpstan": "^2.1",
     "phpunit/phpunit": "^11.5",
-    "phpunit/phpunit-dom-assertions": "^3.2",
+    "phpunit/phpunit-dom-assertions": "^3.7",
     "rector/rector": "^2.3",
     "seanjohnson08/mysqlite": "dev-main@dev",
     "slevomat/coding-standard": "^8.26",
     "spatie/phpunit-snapshot-assertions": "^5.2",
     "squizlabs/php_codesniffer": "^4.0",
-    "vimeo/psalm": "^6.5"
+    "vimeo/psalm": "^6.14"
   },
   "require": {
     "composer": "2.9.3",
     "ext-mbstring": "*",
     "ext-openssl": "*",
     "ext-zip": "*",
+    "geoip2/geoip2": "^3.3",
     "lib-curl": "*",
     "lib-curl-openssl": "*",
     "lib-openssl": "*",
     "lib-zip-libzip": "*",
-    "php": "8.2.12",
-    "php-di/php-di": "^7.1",
-    "symfony/polyfill-php83": "^1.33",
-    "symfony/polyfill-php84": "^1.33",
-    "symfony/polyfill-php85": "^1.33",
     "nesbot/carbon": "^3.11",
-    "geoip2/geoip2": "^3.3",
+    "php": "8.5",
+    "php-di/php-di": "^7.1",
     "twig/twig": "^3.22"
   },
   "scripts": {
@@ -93,5 +89,5 @@
       "paratest"
     ]
   },
-  "version": "3.0.0"
+  "version": "4.0.0"
 }

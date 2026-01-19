@@ -10,7 +10,7 @@ use Jax\Database\Model;
 
 final class Category extends Model
 {
-    public const TABLE = 'categories';
+    public const string TABLE = 'categories';
 
     #[Column(
         name: 'id',

@@ -86,11 +86,6 @@ use Tests\FeatureTestCase;
 #[CoversClass(UserOnline::class)]
 final class BoardIndexTest extends FeatureTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testViewForumIndexAsAdmin(): void
     {
         $this->actingAs('admin');
