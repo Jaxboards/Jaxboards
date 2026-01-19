@@ -283,8 +283,12 @@ final class Shoutbox implements Module
         );
 
         if (!$candelete) {
-            $this->router->redirect('index');
+            if ($this->request->isJSAccess()) {
+                $this->page->command('error', "You don't have permission to delete that shout");
+                return;
+            }
 
+            $this->router->redirect('index');
             return;
         }
 
