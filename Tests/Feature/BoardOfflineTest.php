@@ -92,13 +92,10 @@ final class BoardOfflineTest extends FeatureTestCase
     {
         parent::setUp();
 
-        $this->container->set(
-            Config::class,
-            autowire()->constructorParameter('boardConfig', [
-                'boardoffline' => true,
-                'offlinetext' => 'pikachu',
-            ]),
-        );
+        $this->setBoardConfig([
+            'boardoffline' => true,
+            'offlinetext' => 'pikachu',
+        ]);
     }
 
     public function testViewBoardWhenBoardOfflineAsMember(): void

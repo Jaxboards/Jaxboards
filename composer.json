@@ -55,7 +55,8 @@
     "nesbot/carbon": "^3.11",
     "php": "8.5",
     "php-di/php-di": "^7.1",
-    "twig/twig": "^3.22"
+    "twig/twig": "^3.22",
+    "php-curl-class/php-curl-class": "^12.0"
   },
   "scripts": {
     "lint": [

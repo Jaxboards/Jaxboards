@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Modules;
 
+use Curl\Curl;
 use Jax\Config;
 use Jax\DomainDefinitions;
 use Jax\Hooks;
@@ -14,17 +15,12 @@ use Jax\Router;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function curl_exec;
-use function curl_init;
-use function curl_setopt;
 use function json_encode;
 use function mb_strlen;
 
 use const CURLOPT_CUSTOMREQUEST;
-use const CURLOPT_HTTPHEADER;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
-use const CURLOPT_URL;
 use const JSON_THROW_ON_ERROR;
 
 final readonly class WebHooks implements Module
@@ -36,7 +32,11 @@ final readonly class WebHooks implements Module
         private Router $router,
         private TextFormatting $textFormatting,
         private User $user,
-    ) {}
+        // for testing
+        private ?Curl $curl
+    ) {
+        $this->curl = $curl ?? new Curl();
+    }
 
     public function init(): void
     {
@@ -75,22 +75,20 @@ final readonly class WebHooks implements Module
     /**
      * @param array<mixed> $payload
      */
-    private function sendJSON(string $url, array $payload): void
+    public function sendJSON(string $url, array $payload): void
     {
         $json = json_encode($payload, JSON_THROW_ON_ERROR);
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt(
-            $ch,
-            CURLOPT_HTTPHEADER,
-            ['Content-Type: application/json', 'Content-Length: ' . mb_strlen(
-                $json,
-            )],
-        );
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-        curl_exec($ch);
+        $curl = $this->curl;
+        $curl->setUrl($url);
+        $curl->setHeader('Content-Type', 'application/json');
+        $curl->setHeader('Content-Length', mb_strlen(
+            $json,
+        ));
+        $curl->setOpt(CURLOPT_CUSTOMREQUEST, 'POST');
+        $curl->setOpt(CURLOPT_POSTFIELDS, $json);
+        $curl->setOpt(CURLOPT_RETURNTRANSFER, true);
+        $curl->exec();
+        $curl->reset();
     }
 }
