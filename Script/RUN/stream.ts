@@ -69,13 +69,17 @@ export default class Stream {
         this.handleRequestData(url, json, requestType);
         return;
       }
+      // server error
+      toast.error(
+        "An unrecoverable error has occurred.<br>Please try again later.",
+      );
     } catch (_) {
-      // pass through to the error toast
+      if (!navigator.onLine) {
+        toast.error("You appear to be offline.");
+      } else {
+        toast.error("Network fetch failed: timeout");
+      }
     }
-
-    toast.error(
-      "An unrecoverable error has occurred.<br>Please try again later.",
-    );
   }
 
   pollData(isEager = false) {
