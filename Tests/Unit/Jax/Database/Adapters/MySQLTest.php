@@ -10,6 +10,7 @@ use Jax\Attributes\Key;
 use Jax\Database\Adapters\MySQL;
 use Jax\Database\Database;
 use Jax\Database\Model;
+use Jax\FileSystem;
 use Jax\Models\Member;
 use Jax\ServiceConfig;
 use Override;
@@ -23,6 +24,7 @@ use Tests\UnitTestCase;
  */
 #[CoversClass(MySQL::class)]
 #[CoversClass(Column::class)]
+#[CoversClass(FileSystem::class)]
 #[CoversClass(ForeignKey::class)]
 #[CoversClass(Key::class)]
 #[CoversClass(Database::class)]

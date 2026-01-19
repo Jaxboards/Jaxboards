@@ -17,6 +17,7 @@ use function implode;
 /**
  * @internal
  */
+#[CoversClass(FileSystem::class)]
 #[CoversClass(OpenGraph::class)]
 final class OpenGraphTest extends UnitTestCase
 {
