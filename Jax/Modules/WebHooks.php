@@ -26,12 +26,12 @@ use const JSON_THROW_ON_ERROR;
 final class WebHooks implements Module
 {
     public function __construct(
-        private Config $config,
-        private DomainDefinitions $domainDefinitions,
-        private Hooks $hooks,
-        private Router $router,
-        private TextFormatting $textFormatting,
-        private User $user,
+        private readonly Config $config,
+        private readonly DomainDefinitions $domainDefinitions,
+        private readonly Hooks $hooks,
+        private readonly Router $router,
+        private readonly TextFormatting $textFormatting,
+        private readonly User $user,
         // for testing
         private ?Curl $curl,
     ) {
