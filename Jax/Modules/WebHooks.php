@@ -33,7 +33,7 @@ final readonly class WebHooks implements Module
         private TextFormatting $textFormatting,
         private User $user,
         // for testing
-        private ?Curl $curl
+        private ?Curl $curl,
     ) {
         $this->curl = $curl ?? new Curl();
     }
@@ -41,6 +41,26 @@ final readonly class WebHooks implements Module
     public function init(): void
     {
         $this->hooks->addListener('post', $this->hookPost(...));
+    }
+
+    /**
+     * @param array<mixed> $payload
+     */
+    public function sendJSON(string $url, array $payload): void
+    {
+        $json = json_encode($payload, JSON_THROW_ON_ERROR);
+
+        $curl = $this->curl;
+        $curl->setUrl($url);
+        $curl->setHeader('Content-Type', 'application/json');
+        $curl->setHeader('Content-Length', mb_strlen(
+            $json,
+        ));
+        $curl->setOpt(CURLOPT_CUSTOMREQUEST, 'POST');
+        $curl->setOpt(CURLOPT_POSTFIELDS, $json);
+        $curl->setOpt(CURLOPT_RETURNTRANSFER, true);
+        $curl->exec();
+        $curl->reset();
     }
 
     private function hookPost(Post $post, Topic $topic): void
@@ -70,25 +90,5 @@ final readonly class WebHooks implements Module
                 {$postContent}
                 MARKDOWN,
         ]);
-    }
-
-    /**
-     * @param array<mixed> $payload
-     */
-    public function sendJSON(string $url, array $payload): void
-    {
-        $json = json_encode($payload, JSON_THROW_ON_ERROR);
-
-        $curl = $this->curl;
-        $curl->setUrl($url);
-        $curl->setHeader('Content-Type', 'application/json');
-        $curl->setHeader('Content-Length', mb_strlen(
-            $json,
-        ));
-        $curl->setOpt(CURLOPT_CUSTOMREQUEST, 'POST');
-        $curl->setOpt(CURLOPT_POSTFIELDS, $json);
-        $curl->setOpt(CURLOPT_RETURNTRANSFER, true);
-        $curl->exec();
-        $curl->reset();
     }
 }

@@ -54,9 +54,9 @@
     "lib-zip-libzip": "*",
     "nesbot/carbon": "^3.11",
     "php": "8.5",
+    "php-curl-class/php-curl-class": "^12.0",
     "php-di/php-di": "^7.1",
-    "twig/twig": "^3.22",
-    "php-curl-class/php-curl-class": "^12.0"
+    "twig/twig": "^3.22"
   },
   "scripts": {
     "lint": [

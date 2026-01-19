@@ -44,8 +44,6 @@ use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\FeatureTestCase;
 
-use function DI\autowire;
-
 /**
  * @internal
  */
