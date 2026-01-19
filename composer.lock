@@ -5521,12 +5521,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/seanjohnson08/mysqlite.git",
-                "reference": "646f1bc1ff45f2fe307bf37e3677e374bdc785a9"
+                "reference": "92a97571fd00a3dca71088b18ba6cb0dac2c74d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seanjohnson08/mysqlite/zipball/646f1bc1ff45f2fe307bf37e3677e374bdc785a9",
-                "reference": "646f1bc1ff45f2fe307bf37e3677e374bdc785a9",
+                "url": "https://api.github.com/repos/seanjohnson08/mysqlite/zipball/92a97571fd00a3dca71088b18ba6cb0dac2c74d5",
+                "reference": "92a97571fd00a3dca71088b18ba6cb0dac2c74d5",
                 "shasum": ""
             },
             "require-dev": {
@@ -5555,7 +5555,7 @@
                 "issues": "https://github.com/seanjohnson08/mysqlite/issues",
                 "source": "https://github.com/seanjohnson08/mysqlite/tree/main"
             },
-            "time": "2025-12-06T02:05:10+00:00"
+            "time": "2026-01-19T01:11:10+00:00"
         },
         {
             "name": "sebastian/cli-parser",
