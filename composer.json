@@ -17,7 +17,7 @@
     "optimize-autoloader": true,
     "platform": {
       "composer": "2.9.3",
-      "php": "8.5.2"
+      "php": "8.4.17"
     },
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true
@@ -53,7 +53,7 @@
     "lib-openssl": "*",
     "lib-zip-libzip": "*",
     "nesbot/carbon": "^3.11",
-    "php": "8.5.2",
+    "php": "8.4.17",
     "php-di/php-di": "^7.1",
     "twig/twig": "^3.22"
   },

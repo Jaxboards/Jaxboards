@@ -115,7 +115,6 @@ const RULE_DESCRIPTION_REPLACEMENTS = [
     '/is deprecated as of PHP 8.2, found "\$\{\w+\}"/' => 'is deprecated as of PHP 8.2',
     '/is deprecated as of PHP 8.3, found "\$\{\w+\}"/' => 'is deprecated as of PHP 8.3',
     '/is deprecated as of PHP 8.4, found "\$\{\w+\}"/' => 'is deprecated as of PHP 8.4',
-    '/is deprecated as of PHP 8.5, found "\$\{\w+\}"/' => 'is deprecated as of PHP 8.5',
     '/on property "\$\w+"/' => 'on property',
     '/on method "\w+"/' => 'on method',
     '/variable \$\w+/' => 'varaible',
