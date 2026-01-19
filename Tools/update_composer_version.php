@@ -54,6 +54,7 @@ $composerData['config']['platform']['composer'] = $version;
 ksort($composerData['config']['platform']);
 $composerData['require']['composer'] = $version;
 ksort($composerData['require']);
+ksort($composerData['require-dev']);
 
 file_put_contents(
     COMPOSER_FILE,
