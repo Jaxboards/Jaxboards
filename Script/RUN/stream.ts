@@ -54,23 +54,28 @@ export default class Stream {
       requestType?: number;
     } = {},
   ) {
-    const request = await fetch(url, {
-      method,
-      body,
-      headers: {
-        "X-JSACCESS": `${requestType}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+    try {
+      const request = await fetch(url, {
+        method,
+        body,
+        headers: {
+          "X-JSACCESS": `${requestType}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
 
-    if (request.ok) {
-      const json = (await request.json()) as [unknown[]];
-      this.handleRequestData(url, json, requestType);
-    } else {
-      toast.error(
-        "An unrecoverable error has occurred.<br>Please try again later.",
-      );
+      if (request.ok) {
+        const json = (await request.json()) as [unknown[]];
+        this.handleRequestData(url, json, requestType);
+        return;
+      }
+    } catch (_) {
+      // pass through to the error toast
     }
+
+    toast.error(
+      "An unrecoverable error has occurred.<br>Please try again later.",
+    );
   }
 
   pollData(isEager = false) {
