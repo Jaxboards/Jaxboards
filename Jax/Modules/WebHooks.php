@@ -43,26 +43,6 @@ final readonly class WebHooks implements Module
         $this->hooks->addListener('post', $this->hookPost(...));
     }
 
-    /**
-     * @param array<mixed> $payload
-     */
-    public function sendJSON(string $url, array $payload): void
-    {
-        $json = json_encode($payload, JSON_THROW_ON_ERROR);
-
-        $curl = $this->curl;
-        $curl->setUrl($url);
-        $curl->setHeader('Content-Type', 'application/json');
-        $curl->setHeader('Content-Length', mb_strlen(
-            $json,
-        ));
-        $curl->setOpt(CURLOPT_CUSTOMREQUEST, 'POST');
-        $curl->setOpt(CURLOPT_POSTFIELDS, $json);
-        $curl->setOpt(CURLOPT_RETURNTRANSFER, true);
-        $curl->exec();
-        $curl->reset();
-    }
-
     private function hookPost(Post $post, Topic $topic): void
     {
         $discord = $this->config->get()['webhooks']['discord'] ?? null;
@@ -90,5 +70,25 @@ final readonly class WebHooks implements Module
                 {$postContent}
                 MARKDOWN,
         ]);
+    }
+
+    /**
+     * @param array<mixed> $payload
+     */
+    private function sendJSON(string $url, array $payload): void
+    {
+        $json = json_encode($payload, JSON_THROW_ON_ERROR);
+
+        $curl = $this->curl;
+        $curl->setUrl($url);
+        $curl->setHeader('Content-Type', 'application/json');
+        $curl->setHeader('Content-Length', mb_strlen(
+            $json,
+        ));
+        $curl->setOpt(CURLOPT_CUSTOMREQUEST, 'POST');
+        $curl->setOpt(CURLOPT_POSTFIELDS, $json);
+        $curl->setOpt(CURLOPT_RETURNTRANSFER, true);
+        $curl->exec();
+        $curl->reset();
     }
 }
