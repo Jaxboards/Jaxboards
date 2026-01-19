@@ -47,14 +47,14 @@
     "ext-mbstring": "*",
     "ext-openssl": "*",
     "ext-zip": "*",
+    "geoip2/geoip2": "^3.3",
     "lib-curl": "*",
     "lib-curl-openssl": "*",
     "lib-openssl": "*",
     "lib-zip-libzip": "*",
+    "nesbot/carbon": "^3.11",
     "php": "8.5.2",
     "php-di/php-di": "^7.1",
-    "nesbot/carbon": "^3.11",
-    "geoip2/geoip2": "^3.3",
     "twig/twig": "^3.22"
   },
   "scripts": {
