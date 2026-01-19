@@ -36,10 +36,11 @@ abstract class FeatureTestCase extends TestCase
     #[Override]
     protected function setUp(): void
     {
+        parent::setUp();
+
         session_id('paratest-' . getenv('TEST_TOKEN'));
 
         $this->setupDB();
-        parent::setUp();
     }
 
     public function go(
