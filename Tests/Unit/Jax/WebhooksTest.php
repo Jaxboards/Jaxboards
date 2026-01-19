@@ -12,6 +12,7 @@ use Jax\Models\Topic;
 use Jax\Modules\WebHooks;
 use Jax\TextRules;
 use Jax\User;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use Tests\UnitTestCase;
 
 use function DI\autowire;
@@ -25,9 +26,8 @@ use const CURLOPT_RETURNTRANSFER;
 
 /**
  * @internal
- *
- * @coversNothing
  */
+#[CoversNothing]
 final class WebhooksTest extends UnitTestCase
 {
     public function testDiscordWebhook(): void
