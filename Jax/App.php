@@ -58,8 +58,7 @@ final readonly class App
 
         $this->page->loadSkin();
 
-        // Set Navigation.
-        $this->renderNavigation();
+        $this->setPageMetadata();
 
         if (!$this->request->isJSAccess()) {
             $this->renderBaseHTML();
@@ -284,8 +283,15 @@ final readonly class App
         );
     }
 
-    private function renderNavigation(): void
+    private function setPageMetadata(): void
     {
+        $this->page->setOpenGraphData([
+            'site_name' => $this->config->getSetting(
+                'boardname',
+            ),
+            'type' => 'website'
+        ]);
+
         $this->page->setBreadCrumbs(
             [
                 $this->router->url('index') => ($this->config->getSetting(
