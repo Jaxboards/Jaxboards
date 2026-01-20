@@ -242,7 +242,7 @@ final class Page
             array_filter(
                 $data,
                 static fn(?string $value): ?string => $value,
-            )
+            ),
         );
     }
 
