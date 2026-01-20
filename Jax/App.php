@@ -289,7 +289,7 @@ final readonly class App
             'site_name' => $this->config->getSetting(
                 'boardname',
             ),
-            'type' => 'website'
+            'type' => 'website',
         ]);
 
         $this->page->setBreadCrumbs(
