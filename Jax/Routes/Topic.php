@@ -189,6 +189,10 @@ final class Topic implements Route
         $topicTitle = $this->textFormatting->wordFilter($modelsTopic->title);
 
         $this->page->setPageTitle($topicTitle);
+        $this->page->setOpenGraphData([
+            'title' => $topicTitle,
+            'description' => $modelsTopic->subtitle,
+        ]);
         $this->session->set(
             'locationVerbose',
             "In topic '" . $topicTitle . "'",

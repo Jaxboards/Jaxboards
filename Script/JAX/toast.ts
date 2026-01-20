@@ -44,7 +44,7 @@ class Toast {
     closeButton.title = "close notification";
     closeButton.addEventListener("click", close, { once: true });
 
-    toast.appendChild(closeButton);
+    toast.append(closeButton);
     document.body.appendChild(toast);
 
     await animate(
@@ -61,5 +61,7 @@ class Toast {
     }
   }
 }
+
+window.Toast = new Toast();
 
 export default new Toast();

@@ -90,11 +90,19 @@ final class Template
 
     public function out(): string
     {
-        $header = ['CSS', 'SCRIPT', 'TITLE', 'DEBUG'];
+        $addWrapperDiv = [
+            'NAVIGATION',
+            'LOGO',
+            'USERBOX',
+            'PATH',
+            'SHOUTBOX',
+            'PAGE',
+            'FOOTER'
+        ];
 
         $html = $this->template;
         foreach ($this->parts as $part => $contents) {
-            if (!in_array($part, $header, true)) {
+            if (in_array($part, $addWrapperDiv, true)) {
                 $contents = '<div id="' . mb_strtolower(
                     $part,
                 ) . '">' . $contents . '</div>';
