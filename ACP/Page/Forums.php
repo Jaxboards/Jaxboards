@@ -17,6 +17,7 @@ use Jax\Models\Member;
 use Jax\Request;
 use Jax\TextFormatting;
 
+use function array_first;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
@@ -32,7 +33,6 @@ use function json_decode;
 use function mb_strstr;
 use function mb_substr;
 use function preg_replace;
-use function reset;
 use function sscanf;
 use function str_starts_with;
 use function trim;
