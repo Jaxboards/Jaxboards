@@ -6,8 +6,8 @@ namespace Jax;
 
 use Exception;
 use Jax\Models\Skin;
-use PHP_CodeSniffer\Generators\HTML;
 
+use function array_filter;
 use function array_keys;
 use function array_map;
 use function array_merge;
@@ -39,7 +39,8 @@ final class Page
     private array $breadCrumbs = [];
 
     /**
-     * Open graph data for the current page (used by embeds)
+     * Open graph data for the current page (used by embeds).
+     *
      * @var array <string, string>
      */
     private array $openGraphData = [];
@@ -231,11 +232,15 @@ final class Page
 
     /**
      * Sets open graph data. Drops empty values.
+     *
      * @param array<string,?string> $data
      */
-    public function setOpenGraphData(array $data)
+    public function setOpenGraphData(array $data): void
     {
-        $this->openGraphData = array_filter($data, fn($value) => $value);
+        $this->openGraphData = array_filter(
+            $data,
+            static fn(?string $value): ?string => $value,
+        );
     }
 
     /**

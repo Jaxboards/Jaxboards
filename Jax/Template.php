@@ -97,7 +97,7 @@ final class Template
             'PATH',
             'SHOUTBOX',
             'PAGE',
-            'FOOTER'
+            'FOOTER',
         ];
 
         $html = $this->template;
