@@ -589,7 +589,7 @@ final readonly class Forums
 
         if ($forum === null) {
             $forum = new Forum();
-            $forum->category = reset($categories)->id;
+            $forum->category = array_first($categories)->id;
         }
 
         $forum->nocount = $this->request->asString->post('count') ? 0 : 1;
