@@ -237,9 +237,12 @@ final class Page
      */
     public function setOpenGraphData(array $data): void
     {
-        $this->openGraphData = array_filter(
-            $data,
-            static fn(?string $value): ?string => $value,
+        $this->openGraphData = array_merge(
+            $this->openGraphData,
+            array_filter(
+                $data,
+                static fn(?string $value): ?string => $value,
+            )
         );
     }
 
