@@ -1,16 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\Routes;
 
 use Jax\Config;
 use Jax\Interfaces\Route;
 use Jax\Page;
 
-class Manifest implements Route
+use function json_encode;
+
+use const JSON_PRETTY_PRINT;
+
+final class Manifest implements Route
 {
     public function __construct(
-        private Config $config,
-        private Page $page
+        private readonly Config $config,
+        private readonly Page $page,
     ) {}
 
     public function route($params): void
@@ -21,12 +27,12 @@ class Manifest implements Route
                 'icons' => [[
                     'src' => '/Service/img/jax.svg',
                     'type' => 'image/svg',
-                    'sizes' => 'any'
+                    'sizes' => 'any',
                 ]],
                 'start_url' => '/',
                 'display' => 'standalone',
             ],
-            JSON_PRETTY_PRINT
+            JSON_PRETTY_PRINT,
         ));
     }
 }
