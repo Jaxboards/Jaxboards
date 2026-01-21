@@ -11,6 +11,7 @@ use Jax\Page;
 use function json_encode;
 
 use const JSON_PRETTY_PRINT;
+use const JSON_UNESCAPED_SLASHES;
 
 final readonly class Manifest implements Route
 {
