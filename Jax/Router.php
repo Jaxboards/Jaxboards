@@ -18,6 +18,7 @@ use Jax\Routes\Earthbound;
 use Jax\Routes\Forum;
 use Jax\Routes\Katamari;
 use Jax\Routes\LogReg;
+use Jax\Routes\Manifest;
 use Jax\Routes\Members;
 use Jax\Routes\ModControls;
 use Jax\Routes\Post;
@@ -81,6 +82,7 @@ final class Router
         $this->get('members', '/members', Members::class);
         $this->get('modcontrols', '/modcontrols/{do}', ModControls::class);
         $this->get('forum', '/forum/{id}/{slug}', Forum::class);
+        $this->get('manifest.json', '/manifest.json', Manifest::class);
         $this->get('post', '/post', Post::class);
         $this->get('profile', '/profile/{id}/{page}', UserProfile::class);
         $this->get('rainbow', '/rainbow', Rainbow::class);
