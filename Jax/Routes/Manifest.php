@@ -26,13 +26,13 @@ final readonly class Manifest implements Route
                 'name' => $this->config->get()['boardname'] ?? 'Jaxboards',
                 'icons' => [[
                     'src' => '/Service/img/jax.svg',
-                    'type' => 'image/svg',
+                    'type' => 'image/svg+xml',
                     'sizes' => 'any',
                 ]],
                 'start_url' => '/',
                 'display' => 'standalone',
             ],
-            JSON_PRETTY_PRINT,
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
         ));
     }
 }
