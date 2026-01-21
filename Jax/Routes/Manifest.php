@@ -12,11 +12,11 @@ use function json_encode;
 
 use const JSON_PRETTY_PRINT;
 
-final class Manifest implements Route
+final readonly class Manifest implements Route
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Page $page,
+        private Config $config,
+        private Page $page,
     ) {}
 
     public function route($params): void
