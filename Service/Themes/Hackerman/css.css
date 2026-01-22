@@ -4,7 +4,7 @@ html {
 }
 
 body {
-  background: url("./img/background.jpg") center no-repeat fixed;
+  background: url("./img/background.jpg") black center no-repeat fixed;
   font-family: Arial, sans-serif;
   font-size: 1.6rem;
   color: #fff;
