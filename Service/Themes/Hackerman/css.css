@@ -1447,14 +1447,17 @@ textarea {
   margin: 10px;
 }
 
-.forum-buttons-top a, .forum-buttons-bottom a,
-.topic-buttons-top a, .topic-buttons-bottom a,
-.pages-top a, .pages-bottom a {
+.forum-buttons-top a,
+.forum-buttons-bottom a,
+.topic-buttons-top a,
+.topic-buttons-bottom a,
+.pages-top a,
+.pages-bottom a {
   font-family: Consolas, monospace;
   background: black;
   padding: 5px;
-  border: 1px solid #0F0;
-  color: #0F0;
+  border: 1px solid #0f0;
+  color: #0f0;
 }
 
 .topic-tools {
