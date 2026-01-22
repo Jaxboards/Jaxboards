@@ -667,7 +667,7 @@ textarea {
 .userprofile #pfbox {
   border: 1px solid #000;
   padding: 10px;
-  background: rgba(0,0,0,.9);
+  background: rgb(0 0 0 / 90%);
 }
 
 .userprofile .pftabs a {
