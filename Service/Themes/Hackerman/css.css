@@ -1599,18 +1599,13 @@ textarea {
   width: 100%;
 }
 
-#qreply textarea {
-  border-style: none none solid;
-  height: 150px;
-}
-
 #qreply .editor {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-#qreply .editorframe {
+#qreply .editorframe, #qreply textarea {
   flex: 1;
 }
 

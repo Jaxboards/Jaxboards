@@ -1641,9 +1641,8 @@ textarea {
   background: #fff url("img/shade.png") bottom repeat-x;
 }
 
-#qreply textarea {
-  border-style: none none solid;
-  height: 150px;
+#qreply .editorframe, #qreply textarea {
+  flex: 1;
 }
 
 #qreply .editor {
