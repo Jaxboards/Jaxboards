@@ -443,9 +443,6 @@ textarea {
   min-width: 200px;
 }
 
-.shout {
-}
-
 .shout.highlight {
   background: #ff0;
 }
@@ -453,9 +450,6 @@ textarea {
 .shoutform {
   align-content: center;
   margin: 10px 20px;
-}
-
-#shoutbox .title {
 }
 
 #shoutbox .title a {
@@ -1004,9 +998,6 @@ textarea {
   padding-left: 0;
 }
 
-#path a {
-}
-
 /* Board Index */
 .idxtools {
   font-size: smaller;
@@ -1264,9 +1255,6 @@ textarea {
 
 #intopic .avatar {
   margin-top: 10px;
-}
-
-#intopic .avatar img {
 }
 
 #intopic .username {
