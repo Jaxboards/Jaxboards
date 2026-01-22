@@ -27,7 +27,7 @@ export default class Stream {
       }
     });
 
-    if (requestType === 2) {
+    if (requestType >= 2) {
       if (!softurl) {
         globalThis.history.pushState({ lastURL: url }, "", url);
         // pushstate is not a real browser event unfortunately, so I have to trigger it myself
