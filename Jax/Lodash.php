@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use function array_key_exists;
+use function in_array;
 
 /**
  * An implementation of some of my favorite lodash functions.

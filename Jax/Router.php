@@ -35,7 +35,6 @@ use Jax\Routes\UserProfile;
 use function array_key_exists;
 use function header;
 use function http_build_query;
-use function in_array;
 use function ksort;
 use function preg_match;
 use function preg_replace;
@@ -209,6 +208,14 @@ final class Router
     }
 
     /**
+     * Returns the root URL of the application.
+     */
+    public function getRootURL(): string
+    {
+        return $this->domainDefinitions->getBoardURL();
+    }
+
+    /**
      * Add a new potential route.
      */
     private function get(string $name, string $path, string $classString): void
@@ -253,13 +260,5 @@ final class Router
 
         return $this->config->getSetting('boardoffline')
             && !$this->user->getGroup()->canViewOfflineBoard;
-    }
-
-    /**
-     * Returns the root URL of the application
-     */
-    public function getRootURL(): string
-    {
-        return $this->domainDefinitions->getBoardURL();
     }
 }

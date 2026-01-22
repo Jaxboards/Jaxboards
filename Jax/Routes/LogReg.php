@@ -9,7 +9,6 @@ use Jax\Config;
 use Jax\Database\Database;
 use Jax\Interfaces\Route;
 use Jax\IPAddress;
-use Jax\Jax;
 use Jax\Mailer;
 use Jax\Models\Member;
 use Jax\Models\Stats;

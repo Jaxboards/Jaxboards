@@ -7,7 +7,6 @@ namespace Jax\Routes;
 use Carbon\Carbon;
 use Jax\Database\Database;
 use Jax\Date;
-use Jax\DomainDefinitions;
 use Jax\Interfaces\Route;
 use Jax\IPAddress;
 use Jax\Jax;
@@ -62,7 +61,6 @@ final class Topic implements Route
         private readonly Badges $badges,
         private readonly Database $database,
         private readonly Date $date,
-        private readonly DomainDefinitions $domainDefinitions,
         private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
         private readonly Page $page,

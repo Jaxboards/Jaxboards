@@ -11,7 +11,6 @@ use function floor;
 use function pack;
 use function unpack;
 
-
 final readonly class Jax
 {
     public const array FORUM_PERMS_ORDER = ['upload', 'reply', 'start', 'read', 'view', 'poll'];
