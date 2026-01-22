@@ -36,7 +36,8 @@ final class UsersOnline
     ) {
         $this->idleTimestamp = Carbon::now('UTC')
             ->subSeconds($this->serviceConfig->getSetting('timetoidle') ?? 300)
-            ->getTimestamp();
+            ->getTimestamp()
+        ;
         $this->fetchUsersOnline();
     }
 
@@ -84,9 +85,9 @@ final class UsersOnline
     {
         // Sort sessions by last update so that most recent dates are used in the case of multiple sessions for a user
         $sessions = Session::selectMany(<<<'SQL'
-            WHERE uid AND hide = 0
-            ORDER BY lastUpdate ASC
-        SQL);
+                WHERE uid AND hide = 0
+                ORDER BY lastUpdate ASC
+            SQL);
 
         return array_map(function (UserOnline $userOnline): UserOnline {
             $userOnline->lastOnlineRelative = $this->date->relativeTime(
