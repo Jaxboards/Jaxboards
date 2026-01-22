@@ -59,7 +59,6 @@ textarea {
 
 /* All windows */
 .window {
-  background: url("img/shadowAlpha.png") bottom right;
   position: fixed;
   box-shadow: 0 0 5px white;
 }
@@ -1094,7 +1093,6 @@ textarea {
 
 .forumindex td {
   padding: 10px;
-  background: url("img/shade.png") bottom repeat-x;
   border: 1px solid #99c;
 }
 
@@ -1498,7 +1496,7 @@ textarea {
 }
 
 #poll .bar {
-  background: url("img/pollbar1.png");
+  background: url("/Service/Themes/Default/img/pollbar1.png");
   height: 16px;
   display: inline-block;
   border: 1px solid #1234b4;
@@ -1589,7 +1587,6 @@ textarea {
 #polloptions textarea {
   height: 200px;
   width: 100%;
-  background: #fff url("img/shade.png") bottom repeat-x;
 }
 
 #qreply textarea {
@@ -1757,15 +1754,8 @@ textarea {
 
 /* Boxes/Collapse Boxes (Global) */
 
-/* DISCLAIMER: the borders around the title are actually not borders,
- * but an image behind it (in .box)
- * if you want to remove that border, just remove the background from .box
- * and remove the margin on .box>.title */
 .box {
   margin: 10px 0;
-  background: url("img/silver_grad.png") repeat-x;
-
-  /* border: 1px solid #000; */
 }
 
 .box > .title {
@@ -2086,7 +2076,7 @@ a.mgroup4 {
 }
 
 .tooltip td {
-  background: url("img/tooltip.png");
+  background: url("/Service/Themes/Default/img/tooltip.png");
 }
 
 .tooltip .top {
