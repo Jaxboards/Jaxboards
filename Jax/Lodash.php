@@ -77,4 +77,26 @@ final class Lodash
 
         return $result;
     }
+
+    /**
+     * Returns a newly constructed array without $keys.
+     *
+     * @param array<string,mixed> $array
+     * @param array<string>       $keys
+     *
+     * @return array<string,mixed>
+     */
+    public static function without(array $array, array $keys): array
+    {
+        $newArray = [];
+        foreach ($array as $key => $value) {
+            if (in_array($key, $keys, true)) {
+                continue;
+            }
+
+            $newArray[$key] = $value;
+        }
+
+        return $newArray;
+    }
 }

@@ -189,7 +189,7 @@ final class Router
             );
 
             // Anything not a path param gets added on as a query parameter
-            $queryParams = $this->without($params, $foundParams);
+            $queryParams = Lodash::without($params, $foundParams);
 
             return $path . ($queryParams !== [] ? '?' . http_build_query(
                 $queryParams,
@@ -250,27 +250,5 @@ final class Router
 
         return $this->config->getSetting('boardoffline')
             && !$this->user->getGroup()->canViewOfflineBoard;
-    }
-
-    /**
-     * Returns a newly constructed array without $keys.
-     *
-     * @param array<string,mixed> $array
-     * @param array<string>       $keys
-     *
-     * @return array<string,mixed>
-     */
-    private function without(array $array, array $keys): array
-    {
-        $newArray = [];
-        foreach ($array as $key => $value) {
-            if (in_array($key, $keys, true)) {
-                continue;
-            }
-
-            $newArray[$key] = $value;
-        }
-
-        return $newArray;
     }
 }
