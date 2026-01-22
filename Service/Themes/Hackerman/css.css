@@ -1163,11 +1163,6 @@ textarea {
   visibility: visible;
 }
 
-.forum-buttons-top {
-  text-align: right;
-  margin: 10px;
-}
-
 /* Subforums (in forum listings) */
 .subindex {
   width: 100%;
@@ -1440,10 +1435,26 @@ textarea {
   font-size: 0.6em;
 }
 
+/* New topic, reply, quick reply buttons */
 .topic-buttons-top,
 .topic-buttons-bottom {
   margin: 10px;
   text-align: right;
+}
+
+.forum-buttons-top {
+  text-align: right;
+  margin: 10px;
+}
+
+.forum-buttons-top a, .forum-buttons-bottom a,
+.topic-buttons-top a, .topic-buttons-bottom a,
+.pages-top a, .pages-bottom a {
+  font-family: Consolas, monospace;
+  background: black;
+  padding: 5px;
+  border: 1px solid #0F0;
+  color: #0F0;
 }
 
 .topic-tools {
@@ -1594,7 +1605,6 @@ textarea {
 /* New Post Form */
 .postform {
   padding: 10px;
-  background: #eef;
 }
 
 .postform textarea {
