@@ -194,7 +194,6 @@ final class Page
         $this->append(
             'CSS',
             <<<"HTML"
-                    <link rel="stylesheet" type="text/css" href="{$themeUrl}/css.css">
                     <link
                         rel="preload"
                         as="style"
@@ -202,6 +201,7 @@ final class Page
                         href="/Service/wysiwyg.css"
                         onload="this.onload=null;this.rel='stylesheet'"
                     >
+                    <link rel="stylesheet" type="text/css" href="{$themeUrl}/css.css">
                 HTML,
         );
 

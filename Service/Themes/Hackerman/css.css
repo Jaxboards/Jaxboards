@@ -30,7 +30,7 @@ a:hover {
 
 textarea {
   background: #000;
-  border: 1px solid #000;
+  border: 1px solid #fff;
   color: #fff;
 }
 
@@ -401,19 +401,16 @@ textarea {
 
 .inbox .messageview {
   border: 1px solid #000;
-  background: #eef;
   padding: 10px;
 }
 
 .inbox .message {
   margin-top: 10px;
-  background: #fff;
   border: 1px solid #669;
   padding: 10px;
 }
 
 .inbox .messageinfo {
-  background: #f5f5ff;
   font-size: 1.4rem;
 }
 
@@ -1752,7 +1749,7 @@ textarea {
 }
 
 .calendar .birthdays::before {
-  content: "ðŸŽ‚";
+  content: "Ã°Å¸Å½â€š";
 }
 
 .no-emoji .calendar .birthdays::before {
@@ -1959,7 +1956,7 @@ textarea {
 
 /* Member/Group Specific */
 a.birthday::before {
-  content: "ðŸŽ‚";
+  content: "Ã°Å¸Å½â€š";
 }
 
 a.mgroup2 {
@@ -2168,4 +2165,8 @@ a.mgroup4 {
 
 .display-none {
   display: none;
+}
+
+.editorframe {
+  border: 1px solid white;
 }
