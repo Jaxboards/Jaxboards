@@ -1027,7 +1027,8 @@ textarea {
 
 /* stylelint-disable-next-line selector-class-pattern */
 .boardindex .last_post::first-letter {
-  background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
+  background: url("/Service/Themes/Default/icons/last.gif") center left
+    no-repeat;
   padding-left: 15px;
 }
 
@@ -1119,7 +1120,8 @@ textarea {
 
 /* stylelint-disable-next-line selector-class-pattern */
 .forumindex .last_post::first-letter {
-  background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
+  background: url("/Service/Themes/Default/icons/last.gif") center left
+    no-repeat;
   padding-left: 15px;
 }
 
@@ -1195,7 +1197,8 @@ textarea {
 
 /* stylelint-disable-next-line selector-class-pattern */
 .subindex .last_post::first-letter {
-  background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
+  background: url("/Service/Themes/Default/icons/last.gif") center left
+    no-repeat;
   padding-left: 15px;
 }
 
@@ -1281,7 +1284,8 @@ textarea {
 #intopic .quotepost {
   padding-left: 18px;
   padding-bottom: 2px;
-  background: url("/Service/Themes/Default/icons/posticons.png") no-repeat top left;
+  background: url("/Service/Themes/Default/icons/posticons.png") no-repeat top
+    left;
 }
 
 #intopic textarea {
@@ -1543,7 +1547,8 @@ textarea {
 .postoptions .addpoll {
   padding: 0 20px;
   margin: 10px;
-  background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat top left;
+  background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat top
+    left;
 }
 
 .postoptions .uploadbutton {
@@ -1602,7 +1607,8 @@ textarea {
 }
 
 .postform .uploadbutton {
-  background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat 0 -32px;
+  background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat
+    0 -32px;
   padding-left: 16px;
   width: 100px;
   height: 1em;
@@ -1819,7 +1825,8 @@ textarea {
 
 #notification.newmessage {
   padding-left: 60px;
-  background: url("/Service/Themes/Default/icons/newmessage.png") no-repeat 20px center #fff;
+  background: url("/Service/Themes/Default/icons/newmessage.png") no-repeat 20px
+    center #fff;
 }
 
 .pages .active {
@@ -1914,7 +1921,8 @@ textarea {
 #stats .stats {
   margin-top: 10px;
   padding: 10px 25px;
-  background: url("/Service/Themes/Default/icons/boardstats.png") left center no-repeat;
+  background: url("/Service/Themes/Default/icons/boardstats.png") left center
+    no-repeat;
   border-top: 1px solid #ccf;
 }
 
