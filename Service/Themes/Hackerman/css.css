@@ -1605,7 +1605,8 @@ textarea {
   flex-direction: column;
 }
 
-#qreply .editorframe, #qreply textarea {
+#qreply .editorframe,
+#qreply textarea {
   flex: 1;
 }
 
