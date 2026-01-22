@@ -16,7 +16,7 @@
             Contact Details:
             <div class="content">
                 {% for service,link in contactLinks %}
-                    <div class="contact {{ service }}"><a href="{{ link.href }}">{{ link.username }}</a></div>
+                    <div class="contact {{ service }}"><a href="{{ link.href }}" rel="me">{{ link.username }}</a></div>
                 {% endfor %}
                 <div class="contact im">
                     <button
@@ -89,6 +89,7 @@
         {% for tab in tabs %}
             <a
                 href="{{ url('profile', { id: member.id, page: tab }) }}"
+                rel="me"
                 {% if selectedTab == tab %}class="active"{% endif %}
             >{{ tab|capitalize }}</a>
         {% endfor %}
