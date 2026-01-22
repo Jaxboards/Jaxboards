@@ -596,14 +596,15 @@ textarea {
   float: left;
   width: 200px;
   border: 1px solid #000;
-  background: #ddf;
+  background: #000;
 }
 
 .userprofile .leftbar .username {
-  background: #eef;
-  border-bottom: 1px solid #aaf;
   padding: 0.5em;
   font-weight: bold;
+  background: linear-gradient(0deg, #1f0424, #560b53);
+  font-size: 1.6rem;
+  border: 1px solid #99f;
 }
 
 .userprofile .username .moderate {
@@ -626,9 +627,9 @@ textarea {
 }
 
 .userprofile .infobox {
-  background: #ddd;
+  background: #1f0424;
+  border: 1px solid #99f;
   margin: 20px 5px 10px;
-  border: 1px solid #35485e;
   padding: 5px;
 }
 
@@ -653,7 +654,6 @@ textarea {
 .userprofile .rightbar .postdate {
   font-size: 1rem;
   margin: 10px;
-  background: #ccf;
   border: 1px solid #339;
   padding: 5px;
 }
@@ -667,6 +667,7 @@ textarea {
 .userprofile #pfbox {
   border: 1px solid #000;
   padding: 10px;
+  background: rgba(0,0,0,.9);
 }
 
 .userprofile .pftabs a {
@@ -719,8 +720,8 @@ textarea {
 }
 
 .userprofile .contacts .contact {
-  background: #fff;
-  border: 1px solid #fff;
+  background: none;
+  border: 1px solid #99f;
   cursor: pointer;
   padding: 30px 10px;
   min-height: 80px;
@@ -730,8 +731,7 @@ textarea {
 }
 
 .userprofile .contacts .contact:hover {
-  background: #ddf;
-  border: 1px solid #35485e;
+  background: #1f0424;
 }
 
 .userprofile .contacts .contact .avatar img {
@@ -1746,7 +1746,7 @@ textarea {
 }
 
 .calendar .birthdays::before {
-  content: "ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Å¡";
+  content: "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡";
 }
 
 .no-emoji .calendar .birthdays::before {
@@ -1948,7 +1948,7 @@ textarea {
 
 /* Member/Group Specific */
 a.birthday::before {
-  content: "ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Å¡";
+  content: "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡";
 }
 
 a.mgroup2 {
