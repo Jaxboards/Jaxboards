@@ -252,7 +252,7 @@ final class Page
      * If not available, gets the board default.
      * If THAT isn't available, get jaxboards default skin.
      */
-    private function getSelectedSkin(?int $skinId): Skin
+    public function getSelectedSkin(?int $skinId): Skin
     {
         $skin = $skinId
             ? Skin::selectOne($skinId)

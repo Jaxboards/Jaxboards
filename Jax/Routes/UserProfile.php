@@ -143,6 +143,7 @@ final readonly class UserProfile implements Route
                     : '',
                 'member' => $member,
                 'selectedTab' => $page ?: 'activity',
+                'skin' => $this->page->getSelectedSkin($member->skinID),
                 'tabHTML' => $tabHTML,
                 'tabs' => $this->profileTabs->getTabs(),
             ],
