@@ -7,7 +7,7 @@ body {
   background: url("./img/background.jpg") center no-repeat fixed;
   font-family: Arial, sans-serif;
   font-size: 1.6rem;
-  color: #fff;
+  color: #FFF;
   overflow-y: scroll;
   word-wrap: break-word;
 }
@@ -115,7 +115,7 @@ textarea {
 .window .content,
 .window .title {
   border: 1px solid #000;
-  background: rgb(0 0 0 / 90%);
+  background: rgba(0,0,0,.9);
 }
 
 /* IM windows */
@@ -182,7 +182,7 @@ textarea {
 
 /* User Control Panel */
 #ucp .content {
-  background: rgb(0 0 0 / 90%);
+  background: rgba(0,0,0,.9);
 }
 
 #ucp textarea {
@@ -244,7 +244,7 @@ textarea {
 }
 
 #ucppage {
-  background: rgb(0 0 0 / 90%);
+  background: rgba(0,0,0,.9);
   border-left: 1px solid #000;
   margin-left: 170px;
   padding: 20px;
@@ -273,12 +273,14 @@ textarea {
 }
 
 #modcp .minibox {
-  border: 1px solid #99f;
+  border: 1px solid #000;
   margin: 10px;
 }
 
 #modcp .minibox .title {
   padding: 5px;
+  background:  linear-gradient(0deg, #1f0424, #560b53);
+  border: 1px solid #99f;
 }
 
 #modcp .minibox .content {
@@ -321,7 +323,7 @@ textarea {
 }
 
 #modcp .onlinesessions td {
-  border: 1px solid #000;
+  border: 1px solid #99f;
   padding: 5px;
 }
 
@@ -827,12 +829,7 @@ textarea {
   content: "";
   position: absolute;
   inset: 3px;
-  background-image: linear-gradient(
-    #2d0537 5%,
-    #3a165c 50%,
-    #23022a 70%,
-    #1d0422 85%
-  );
+  background-image: linear-gradient(#2d0537 5%, #3a165c 50%, #23022a 70%, #1d0422 85%);
   filter: blur(1px);
 }
 
@@ -1374,9 +1371,9 @@ textarea {
 }
 
 #intopic .opengraph {
-  border: 1px solid #27002f;
+  border: 1px solid #192c44;
   border-left-width: 5px;
-  background: #460053;
+  background: #eef;
   max-width: 80%;
   margin: 10px 0;
   padding: 10px;
@@ -1762,13 +1759,12 @@ textarea {
 .box {
   margin: 10px 0;
   background: url("img/silver_grad.png") repeat-x;
-
   /* border: 1px solid #000; */
 }
 
 .box > .title {
   position: relative;
-  background: linear-gradient(45deg, black, rgb(0 0 0 / 50%));
+  background: linear-gradient(45deg, black, rgba(0,0,0,.5));
   padding: 7px;
   color: #fff;
 }
@@ -1795,7 +1791,7 @@ textarea {
 }
 
 .box .content {
-  background: rgb(0 0 0 / 90%);
+  background: rgba(0,0,0,.9);
 }
 
 .box .content > .error {
