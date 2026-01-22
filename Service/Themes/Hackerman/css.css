@@ -1757,7 +1757,7 @@ textarea {
 
 .box > .title {
   position: relative;
-  background: linear-gradient(45deg, black, rgb(0 0 0 / 50%));
+  background: linear-gradient(45deg, #1f0424, rgb(0 0 0 / 50%));
   padding: 7px;
   color: #fff;
 }
