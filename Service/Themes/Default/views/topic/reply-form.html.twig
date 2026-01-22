@@ -2,7 +2,7 @@
     <form method="post" action="{{ url('post') }}" data-ajax-form="true" onsubmit="this.submitButton.disabled=true;">
         <input type="hidden" name="how" value="qreply">
         <input type="hidden" name="tid" value="{{ topic.id }}">
-        <div class="replybox" style="width:390px">
+        <div class="quickreply" style="width:390px">
             <textarea name="postdata" title="Post Text" class="bbcode-editor">{{ text }}</textarea>
         </div>
         <div class="submitbutton">

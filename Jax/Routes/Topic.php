@@ -443,7 +443,7 @@ final class Topic implements Route
                     ],
                 ),
                 'id' => 'qreply',
-                'resize' => '.replybox',
+                'resize' => '.quickreply',
                 'title' => $this->textFormatting->wordFilter(
                     $modelsTopic->title,
                 ),

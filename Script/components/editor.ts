@@ -89,7 +89,9 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     super(element);
 
     // Create DOM
-    this.container = document.createElement("div");
+    this.container = Object.assign(document.createElement("div"), {
+      className: "editor",
+    });
     this.iframe = document.createElement("iframe");
     this.iframe.style.display = "none";
 

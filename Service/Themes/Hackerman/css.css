@@ -1604,6 +1604,16 @@ textarea {
   height: 150px;
 }
 
+#qreply .editor {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#qreply .editorframe {
+  flex: 1;
+}
+
 /* New Post Form */
 .postform {
   padding: 10px;
