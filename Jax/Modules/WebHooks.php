@@ -6,7 +6,6 @@ namespace Jax\Modules;
 
 use Curl\Curl;
 use Jax\Config;
-use Jax\DomainDefinitions;
 use Jax\Hooks;
 use Jax\Interfaces\Module;
 use Jax\Models\Post;
@@ -32,7 +31,6 @@ final class WebHooks implements Module
 
     public function __construct(
         private readonly Config $config,
-        private readonly DomainDefinitions $domainDefinitions,
         private readonly Hooks $hooks,
         private readonly Router $router,
         private readonly TextFormatting $textFormatting,
@@ -60,8 +58,8 @@ final class WebHooks implements Module
             return;
         }
 
-        $boardURL = $this->domainDefinitions->getBoardURL();
-        $topicURL = $boardURL
+        $rootURL = $this->router->getRootURL();
+        $topicURL = $rootURL
             . $this->router->url('topic', [
                 'id' => $topic->id,
                 'findpost' => $post->id,
@@ -72,7 +70,7 @@ final class WebHooks implements Module
         $member = $this->user->get();
         $this->sendJSON($discord, [
             'username' => $member->displayName,
-            'avatar_url' => $member->avatar ?? $boardURL . '/Service/Themes/Default/avatars/default.gif',
+            'avatar_url' => $member->avatar ?? $rootURL . '/Service/Themes/Default/avatars/default.gif',
             'content' => <<<MARKDOWN
                 [{$topic->title}](<{$topicURL}>)
 

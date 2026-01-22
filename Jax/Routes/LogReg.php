@@ -7,10 +7,10 @@ namespace Jax\Routes;
 use Carbon\Carbon;
 use Jax\Config;
 use Jax\Database\Database;
-use Jax\DomainDefinitions;
 use Jax\Interfaces\Route;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Mailer;
 use Jax\Models\Member;
 use Jax\Models\Stats;
 use Jax\Models\Token;
@@ -54,9 +54,8 @@ final class LogReg implements Route
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
-        private readonly DomainDefinitions $domainDefinitions,
         private readonly IPAddress $ipAddress,
-        private readonly Jax $jax,
+        private readonly Mailer $mailer,
         private readonly Page $page,
         private readonly Request $request,
         private readonly Router $router,
@@ -463,14 +462,14 @@ final class LogReg implements Route
                     $token->uid = $member->id;
                     $token->insert();
 
-                    $link = $this->domainDefinitions->getBoardURL() . $this->router->url(
+                    $link = $this->router->getRootURL() . $this->router->url(
                         'forgotPassword',
                         [
                             'uid' => $member->id,
                             'tokenId' => rawurlencode($forgotpasswordtoken),
                         ],
                     );
-                    $mailResult = $this->jax->mail(
+                    $mailResult = $this->mailer->mail(
                         $member->email,
                         'Recover Your Password!',
                         <<<HTML

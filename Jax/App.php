@@ -168,7 +168,7 @@ final readonly class App
     {
         $this->page->append(
             'SCRIPT',
-            '<script src="' . $this->domainDefinitions->getBoardURL() . '/dist/app.js" defer></script>',
+            '<script src="' . $this->router->getRootURL() . '/dist/app.js" defer></script>',
         );
 
         $this->page->append(
@@ -177,7 +177,7 @@ final readonly class App
                 'global/logo',
                 [
                     'logoURL' => $this->config->getSetting('logourl')
-                        ?: $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default/img/logo.png',
+                        ?: $this->router->getRootURL() . '/Service/Themes/Default/img/logo.png',
                 ],
             ),
         );

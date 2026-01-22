@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Jax\Routes\UCP;
 
 use Jax\Database\Database;
-use Jax\DomainDefinitions;
 use Jax\Jax;
 use Jax\Lodash;
+use Jax\Mailer;
 use Jax\Models\Member;
 use Jax\Models\Message;
 use Jax\Page;
@@ -34,8 +34,8 @@ final readonly class Inbox
 
     public function __construct(
         private Database $database,
-        private DomainDefinitions $domainDefinitions,
         private Jax $jax,
+        private Mailer $mailer,
         private Page $page,
         private Request $request,
         private Router $router,
@@ -125,14 +125,14 @@ final readonly class Inbox
             $member->id,
         );
 
-        $inboxURL = $this->domainDefinitions->getBoardUrl() . $this->router->url(
+        $inboxURL = $this->router->getRootURL() . $this->router->url(
             'inbox',
         );
 
         // Send em an email!
         if (($member->emailSettings & 2) !== 0) {
             $fromName = $this->user->get()->displayName;
-            $this->jax->mail(
+            $this->mailer->mail(
                 $member->email,
                 "PM From {$fromName}",
                 <<<HTML

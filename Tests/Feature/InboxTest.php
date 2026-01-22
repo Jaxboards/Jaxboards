@@ -23,6 +23,7 @@ use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Lodash;
+use Jax\Mailer;
 use Jax\Models\Message;
 use Jax\Modules\PrivateMessage;
 use Jax\Modules\Shoutbox;
@@ -64,6 +65,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
 #[CoversClass(Lodash::class)]
+#[CoversClass(Mailer::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(PrivateMessage::class)]
 #[CoversClass(Shoutbox::class)]

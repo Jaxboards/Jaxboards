@@ -6,9 +6,9 @@ namespace ACP\Page;
 
 use ACP\Page;
 use Jax\Config;
-use Jax\DomainDefinitions;
 use Jax\Models\Member;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\User;
 
@@ -18,21 +18,21 @@ final readonly class Login
 {
     public function __construct(
         private Config $config,
-        private DomainDefinitions $domainDefinitions,
         private Page $page,
         private Request $request,
+        private Router $router,
         private User $user,
         private Session $session,
     ) {}
 
     public function render(): void
     {
-        $boardUrl = $this->domainDefinitions->getBoardURL();
+        $rootUrl = $this->router->getRootURL();
         $pageElements = [
             'board_name' => $this->config->getSetting('boardname'),
-            'board_url' => $boardUrl,
+            'board_url' => $rootUrl,
             'content' => '',
-            'css_url' => $boardUrl . '/ACP/css/login.css',
+            'css_url' => $rootUrl . '/ACP/css/login.css',
         ];
 
         if ($this->request->post('submit') !== null) {

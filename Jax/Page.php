@@ -54,6 +54,7 @@ final class Page
         private readonly DomainDefinitions $domainDefinitions,
         private readonly FileSystem $fileSystem,
         private readonly Request $request,
+        private readonly Router $router,
         private readonly Session $session,
         private readonly Template $template,
         private readonly User $user,
@@ -184,7 +185,7 @@ final class Page
         // Custom theme found but files not there, also fallback to default
         if (!$this->fileSystem->getFileInfo($themePath)->isDir()) {
             $themePath = $this->domainDefinitions->getDefaultThemePath();
-            $themeUrl = $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default';
+            $themeUrl = $this->router->getRootURL() . '/Service/Themes/Default';
         }
 
         $this->template->setThemePath($themePath);

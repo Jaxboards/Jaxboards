@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace ACP;
 
-use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\Request;
+use Jax\Router;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -30,9 +30,9 @@ final class Page
     private readonly FilesystemLoader $filesystemLoader;
 
     public function __construct(
-        private readonly DomainDefinitions $domainDefinitions,
         private readonly FileSystem $fileSystem,
         private readonly Request $request,
+        private readonly Router $router,
     ) {
         $this->initializeTwig();
     }
@@ -96,11 +96,11 @@ final class Page
     {
         $data = $this->parts;
 
-        $boardURL = $this->domainDefinitions->getBoardURL();
-        $data['css_url'] = $boardURL . '/ACP/css/css.css';
-        $data['bbcode_css_url'] = $boardURL . '/Service/Themes/Default/bbcode.css';
-        $data['themes_css_url'] = $boardURL . '/ACP/css/themes.css';
-        $data['admin_js_url'] = $boardURL . '/dist/acp.js';
+        $rootURL = $this->router->getRootURL();
+        $data['css_url'] = $rootURL . '/ACP/css/css.css';
+        $data['bbcode_css_url'] = $rootURL . '/Service/Themes/Default/bbcode.css';
+        $data['themes_css_url'] = $rootURL . '/ACP/css/themes.css';
+        $data['admin_js_url'] = $rootURL . '/dist/acp.js';
 
         echo $this->render(
             'admin.html',

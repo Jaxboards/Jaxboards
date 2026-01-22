@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax\Routes\UserProfile;
 
 use Jax\Date;
-use Jax\DomainDefinitions;
 use Jax\Models\Activity as ModelsActivity;
 use Jax\Models\Member;
 use Jax\Page;
@@ -23,7 +22,6 @@ final readonly class Activity
 
     public function __construct(
         private Date $date,
-        private DomainDefinitions $domainDefinitions,
         private Page $page,
         private Request $request,
         private Router $router,
@@ -45,11 +43,11 @@ final readonly class Activity
 
     public function renderRSSFeed(Member $member): void
     {
-        $boardURL = $this->domainDefinitions->getBoardURL();
+        $rootURL = $this->router->getRootURL();
         $rssFeed = new RSSFeed(
             [
                 'description' => $member->usertitle,
-                'link' => $boardURL . $this->router->url(
+                'link' => $rootURL . $this->router->url(
                     'profile',
                     ['id' => $member->id],
                 ),
@@ -62,7 +60,7 @@ final readonly class Activity
                 $member,
                 $entry->affectedUser,
             );
-            $link = $this->domainDefinitions->getBoardUrl()
+            $link = $rootURL
                 . $this->textFormatting->blockhtml($parsed['link']);
             $rssFeed->additem(
                 [

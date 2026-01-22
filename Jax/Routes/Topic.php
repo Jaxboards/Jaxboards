@@ -745,13 +745,13 @@ final class Topic implements Route
 
     private function viewRSS(ModelsTopic $modelsTopic): void
     {
-        $boardURL = $this->domainDefinitions->getBoardURL();
+        $rootURL = $this->router->getRootURL();
         $rssFeed = new RSSFeed(
             [
                 'description' => $this->textFormatting->wordFilter(
                     $modelsTopic->subtitle,
                 ),
-                'link' => $boardURL . $this->router->url(
+                'link' => $rootURL . $this->router->url(
                     'topic',
                     ['id' => $modelsTopic->id],
                 ),
@@ -769,7 +769,7 @@ final class Topic implements Route
         );
 
         foreach ($posts as $post) {
-            $link = $boardURL . $this->router->url('topic', [
+            $link = $rootURL . $this->router->url('topic', [
                 'id' => $modelsTopic->id,
                 'findpost' => $post->id,
             ]);

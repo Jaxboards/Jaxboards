@@ -64,7 +64,7 @@ final class Router
         private readonly Request $request,
         private readonly Config $config,
         private readonly Container $container,
-        private readonly Page $page,
+        private readonly DomainDefinitions $domainDefinitions,
         private readonly Session $session,
         private readonly User $user,
     ) {
@@ -120,15 +120,18 @@ final class Router
             $newLocation .= '&sessid=' . $this->session->get()->id;
         }
 
+        // Avoid circular dependency
+        $page = $this->container->get(Page::class);
+
         if ($this->request->isJSAccess()) {
-            $this->page->command('softurl');
-            $this->page->command('location', $newLocation);
+            $page->command('softurl');
+            $page->command('location', $newLocation);
 
             return;
         }
 
         header("Location: {$newLocation}");
-        $this->page->append(
+        $page->append(
             'PAGE',
             "Should've redirected to Location: {$newLocation}",
         );
@@ -250,5 +253,13 @@ final class Router
 
         return $this->config->getSetting('boardoffline')
             && !$this->user->getGroup()->canViewOfflineBoard;
+    }
+
+    /**
+     * Returns the root URL of the application
+     */
+    public function getRootURL(): string
+    {
+        return $this->domainDefinitions->getBoardURL();
     }
 }
