@@ -113,14 +113,13 @@ final readonly class Themes
                 $wrapper,
             ) > 50 => 'Wrapper name must be less than 50 characters.',
             $newWrapperFileInfo->isFile() => 'That wrapper already exists.',
-            !$newWrapperFileInfo->isWritable() => 'Wrapper is not writable.',
 
             $this->fileSystem->putContents(
                 $newWrapperPath,
                 $this->fileSystem->getContents(
                     $this->fileSystem->pathJoin(
                         $this->domainDefinitions->getDefaultThemePath(),
-                        'wrappers.html',
+                        'wrapper.html',
                     ),
                 ),
             ) === false => 'Wrapper could not be created.',
