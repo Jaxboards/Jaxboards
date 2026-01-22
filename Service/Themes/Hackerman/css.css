@@ -273,18 +273,16 @@ textarea {
 }
 
 #modcp .minibox {
-  border: 1px solid #000;
+  border: 1px solid #99f;
   margin: 10px;
 }
 
 #modcp .minibox .title {
-  background: #cdf;
   padding: 5px;
 }
 
 #modcp .minibox .content {
   padding: 5px;
-  background: #fff;
 }
 
 #modcp .minibox .post {
@@ -1742,7 +1740,7 @@ textarea {
 }
 
 .calendar .birthdays::before {
-  content: "Ã°Å¸Å½â€š";
+  content: "ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Å¡";
 }
 
 .no-emoji .calendar .birthdays::before {
@@ -1950,7 +1948,7 @@ textarea {
 
 /* Member/Group Specific */
 a.birthday::before {
-  content: "Ã°Å¸Å½â€š";
+  content: "ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Å¡";
 }
 
 a.mgroup2 {
