@@ -16,7 +16,7 @@
     "classmap-authoritative": true,
     "optimize-autoloader": true,
     "platform": {
-      "composer": "2.9.3",
+      "composer": "2.9.4",
       "php": "8.5"
     },
     "allow-plugins": {
@@ -43,7 +43,7 @@
     "vimeo/psalm": "^6.14"
   },
   "require": {
-    "composer": "2.9.3",
+    "composer": "2.9.4",
     "ext-mbstring": "*",
     "ext-openssl": "*",
     "ext-zip": "*",
