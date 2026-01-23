@@ -105,7 +105,7 @@ final class TextFormattingTest extends UnitTestCase
     }
 
     #[DataProvider('linkifyDataProvider')]
-    public function testLinkify($input, $expectation): void
+    public function testLinkify(string $input, string $expectation): void
     {
         self::assertEquals(
             $expectation,
@@ -120,8 +120,8 @@ final class TextFormattingTest extends UnitTestCase
             ['http://jaxboards.com/topic/1', '[url=/topic/1]Topic #1[/url]'],
             ['http://jaxboards.com/topic/3?findpost=33&pid=33', '[url=/topic/3?findpost=33&pid=33]Post #33[/url]'],
             [
-                'nbsp http://google.com',
-                'nbsp [url=http://google.com]http://google.com[/url]'
+                "nbsp\u{a0}http://google.com",
+                "nbsp\u{a0}[url=http://google.com]http://google.com[/url]",
             ],
         ];
     }
