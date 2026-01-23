@@ -1,3 +1,11 @@
+:root {
+  --purple: #460053;
+  --deep-purple: #1f0424;
+  --border-blue: #99f;
+  --text-color: #fff;
+  --black-bg-transparent: rgb(0 0 0 / 90%);
+}
+
 html {
   font-size: 62.5%; /* set 1rem to 10px */
   text-size-adjust: none;
@@ -7,7 +15,7 @@ body {
   background: url("./img/background.jpg") black center no-repeat fixed;
   font-family: Arial, sans-serif;
   font-size: 1.6rem;
-  color: #fff;
+  color: var(--text-color);
   overflow-y: scroll;
   word-wrap: break-word;
 }
@@ -31,7 +39,7 @@ a:hover {
 textarea {
   background: #000;
   border: 1px solid #fff;
-  color: #fff;
+  color: var(--text-color);
 }
 
 /* Misc (Global) */
@@ -67,7 +75,7 @@ textarea {
   padding: 5px 20px;
   cursor: move;
   text-align: center;
-  color: #fff;
+  color: var(--text-color);
   border-radius: 10px 10px 0 0;
 }
 
@@ -114,7 +122,7 @@ textarea {
 .window .content,
 .window .title {
   border: 1px solid #000;
-  background: rgb(0 0 0 / 90%);
+  background: var(--black-bg-transparent);
 }
 
 /* IM windows */
@@ -181,7 +189,7 @@ textarea {
 
 /* User Control Panel */
 #ucp .content {
-  background: rgb(0 0 0 / 90%);
+  background: var(--black-bg-transparent);
 }
 
 #ucp textarea {
@@ -208,9 +216,9 @@ textarea {
 
 #ucp .leftbar h2 {
   margin: 0;
-  background: linear-gradient(0deg, #1f0424, #560b53);
+  background: linear-gradient(0deg, var(--deep-purple), #560b53);
   font-size: 1.6rem;
-  border: 1px solid #99f;
+  border: 1px solid var(--border-blue);
   padding: 3px;
 }
 
@@ -243,7 +251,7 @@ textarea {
 }
 
 #ucppage {
-  background: rgb(0 0 0 / 90%);
+  background: var(--black-bg-transparent);
   border-left: 1px solid #000;
   margin-left: 170px;
   padding: 20px;
@@ -251,7 +259,7 @@ textarea {
 }
 
 #ucppage h2 {
-  border-bottom: 1px solid #aaf;
+  border-bottom: 1px solid var(--border-blue);
   font-size: 2rem;
 }
 
@@ -278,8 +286,8 @@ textarea {
 
 #modcp .minibox .title {
   padding: 5px;
-  background: linear-gradient(0deg, #1f0424, #560b53);
-  border: 1px solid #99f;
+  background: linear-gradient(0deg, var(--deep-purple), #560b53);
+  border: 1px solid var(--border-blue);
 }
 
 #modcp .minibox .content {
@@ -287,7 +295,7 @@ textarea {
 }
 
 #modcp .minibox .post {
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid var(--border-blue);
   padding: 10px;
 }
 
@@ -322,7 +330,7 @@ textarea {
 }
 
 #modcp .onlinesessions td {
-  border: 1px solid #99f;
+  border: 1px solid var(--border-blue);
   padding: 5px;
 }
 
@@ -335,7 +343,7 @@ textarea {
 }
 
 .inbox .listing {
-  border: 1px solid #99c;
+  border: 1px solid var(--border-blue);
   font-size: 1.4rem;
   width: 100%;
   border-collapse: collapse;
@@ -347,7 +355,7 @@ textarea {
 
 .inbox .listing td {
   padding: 2px;
-  border: 1px solid #99c;
+  border: 1px solid var(--border-blue);
   border-style: solid none;
 }
 
@@ -370,12 +378,8 @@ textarea {
   background-position: 0 -128px;
 }
 
-.inbox .compose a {
-  color: #090;
-}
-
 .inbox .composeform {
-  background: #eef;
+  background: var(--deep-purple);
   padding: 10px;
   border: 1px solid #669;
 }
@@ -434,7 +438,7 @@ textarea {
 
 .shouts {
   padding: 3px;
-  border-right: 1px solid #99c;
+  border-right: 1px solid var(--border-blue);
   font:
     1.4rem Arial,
     sans-serif;
@@ -521,7 +525,7 @@ textarea {
   cursor: pointer;
   min-height: 32px;
   padding: 5px;
-  border-bottom: 1px solid #aaf;
+  border-bottom: 1px solid var(--border-blue);
   background: none;
 }
 
@@ -598,9 +602,9 @@ textarea {
 .userprofile .leftbar .username {
   padding: 0.5em;
   font-weight: bold;
-  background: linear-gradient(0deg, #1f0424, #560b53);
+  background: linear-gradient(0deg, var(--deep-purple), #560b53);
   font-size: 1.6rem;
-  border: 1px solid #99f;
+  border: 1px solid var(--border-blue);
 }
 
 .userprofile .username .moderate {
@@ -623,8 +627,8 @@ textarea {
 }
 
 .userprofile .infobox {
-  background: #1f0424;
-  border: 1px solid #99f;
+  background: var(--deep-purple);
+  border: 1px solid var(--border-blue);
   margin: 20px 5px 10px;
   padding: 5px;
 }
@@ -643,7 +647,7 @@ textarea {
 }
 
 .userprofile .rightbar .post {
-  border-bottom: 1px solid #35485e;
+  border-bottom: 1px solid var(--border-blue);
   padding: 10px;
 }
 
@@ -663,7 +667,7 @@ textarea {
 .userprofile #pfbox {
   border: 1px solid #000;
   padding: 10px;
-  background: rgb(0 0 0 / 90%);
+  background: var(--black-bg-transparent);
 }
 
 .userprofile .pftabs a {
@@ -673,7 +677,7 @@ textarea {
   border: 1px solid #000;
   border-bottom: none;
   background: #35485e;
-  color: #fff;
+  color: var(--text-color);
 }
 
 .userprofile .pftabs a.active {
@@ -708,7 +712,7 @@ textarea {
   right: 0;
   padding: 0;
   font-size: smaller;
-  color: #aaf;
+  color: var(--border-blue);
 }
 
 .userprofile .contacts {
@@ -717,7 +721,7 @@ textarea {
 
 .userprofile .contacts .contact {
   background: none;
-  border: 1px solid #99f;
+  border: 1px solid var(--border-blue);
   cursor: pointer;
   padding: 30px 10px;
   min-height: 80px;
@@ -727,7 +731,7 @@ textarea {
 }
 
 .userprofile .contacts .contact:hover {
-  background: #1f0424;
+  background: var(--deep-purple);
 }
 
 .userprofile .contacts .contact .avatar img {
@@ -872,7 +876,7 @@ textarea {
 }
 
 .navigation a {
-  color: #fff;
+  color: var(--text-color);
 }
 
 .footer {
@@ -904,7 +908,7 @@ textarea {
   border-width: 3px;
   box-shadow: 2px 2px 5px rgb(0 0 0 / 40%);
   box-sizing: border-box;
-  color: #fff;
+  color: var(--text-color);
   padding: 20px;
   position: relative;
   z-index: 1;
@@ -929,7 +933,7 @@ textarea {
 }
 
 #userbox a:first-child {
-  color: #fff;
+  color: var(--text-color);
 }
 
 #userbox .welcome {
@@ -956,17 +960,17 @@ textarea {
 #userbox .settings a {
   background: url("/Service/Themes/Default/icons/wrench.png") no-repeat;
   padding-left: 20px;
-  color: #fff;
+  color: var(--text-color);
 }
 
 #userbox .forgot {
   font-size: smaller;
   float: right;
-  color: #fff;
+  color: var(--text-color);
 }
 
 #userbox a.num-messages {
-  color: #fff;
+  color: var(--text-color);
 }
 
 /* Breadcrumbs */
@@ -974,8 +978,8 @@ textarea {
   font:
     1.4rem Arial,
     sans-serif;
-  background: #000;
-  border: 1px solid #99f;
+  background: var(--black-bg-transparent);
+  border: 1px solid var(--border-blue);
   border-style: solid none;
   margin-top: 10px;
   padding: 0.5em 0 0.5em 1em;
@@ -1014,7 +1018,7 @@ textarea {
 }
 
 .boardindex td {
-  border: 1px solid #99c;
+  border: 1px solid var(--border-blue);
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
@@ -1090,7 +1094,7 @@ textarea {
 
 .forumindex td {
   padding: 10px;
-  border: 1px solid #99c;
+  border: 1px solid var(--border-blue);
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
@@ -1173,7 +1177,7 @@ textarea {
 }
 
 .subindex td {
-  border: 1px solid #99c;
+  border: 1px solid var(--border-blue);
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
@@ -1243,7 +1247,7 @@ textarea {
 
 #intopic td {
   vertical-align: top;
-  border: 1px solid #99f;
+  border: 1px solid var(--border-blue);
 }
 
 #intopic .userdata {
@@ -1256,9 +1260,9 @@ textarea {
 }
 
 #intopic .username {
-  background: linear-gradient(0deg, #1f0424, #560b53);
+  background: linear-gradient(0deg, var(--deep-purple), #560b53);
   padding: 3px;
-  border-bottom: 1px solid #aaf;
+  border-bottom: 1px solid var(--border-blue);
 }
 
 #intopic .username a {
@@ -1368,9 +1372,9 @@ textarea {
 }
 
 #intopic .opengraph {
-  border: 1px solid #1f0424;
+  border: 1px solid var(--deep-purple);
   border-left-width: 5px;
-  background: #460053;
+  background: var(--purple);
   max-width: 80%;
   margin: 10px 0;
   padding: 10px;
@@ -1403,7 +1407,7 @@ textarea {
   position: absolute;
   overflow: hidden;
   background: #eef;
-  border: 1px solid #99f;
+  border: 1px solid var(--border-blue);
   font-size: smaller;
 }
 
@@ -1420,7 +1424,7 @@ textarea {
   margin: 0;
   max-height: 200px;
   overflow-y: auto;
-  border: 1px dashed #99f;
+  border: 1px dashed var(--border-blue);
 }
 
 /* end post ratings */
@@ -1428,8 +1432,8 @@ textarea {
   font-size: smaller;
   text-align: left;
   padding: 10px;
-  background: #1f0424;
-  border: 1px solid #99f;
+  background: var(--deep-purple);
+  border: 1px solid var(--border-blue);
   margin: 10px;
 }
 
@@ -1476,7 +1480,7 @@ textarea {
 }
 
 #poll .content {
-  background: #eef;
+  background: var(--black-bg-transparent);
   padding: 10px;
 }
 
@@ -1488,31 +1492,30 @@ textarea {
 #poll .choice {
   padding: 5px;
   margin-bottom: 10px;
-  background: #fff;
-  border: 1px solid #ccf;
+  background: var(--deep-purple);
+  border: 1px solid var(--border-blue);
 }
 
 #poll .choice:hover {
-  background: #ddf;
+  background: var(--purple);
   border: 1px solid #000;
 }
 
 #poll table {
   border-collapse: collapse;
-  background: #fff;
+  background: var(--purple);
   width: 100%;
 }
 
 #poll td {
-  border: 1px solid #ccf;
+  border: 1px solid var(--border-blue);
   padding: 5px;
 }
 
 #poll .bar {
-  background: url("/Service/Themes/Default/img/pollbar1.png");
+  background: linear-gradient(0deg, #000, #111);
   height: 16px;
   display: inline-block;
-  border: 1px solid #1234b4;
 }
 
 #poll .numvotes {
@@ -1527,7 +1530,7 @@ textarea {
 
 /* New Topic Form */
 .topicform {
-  border: 1px solid #000;
+  border: 1px solid var(--border-blue);
   padding: 20px;
 }
 
@@ -1555,7 +1558,6 @@ textarea {
   margin-bottom: 10px;
 }
 
-.postoptions .uploadbutton,
 .postoptions .addpoll {
   padding: 0 20px;
   margin: 10px;
@@ -1563,37 +1565,10 @@ textarea {
     left;
 }
 
-.postoptions .uploadbutton {
-  background-position: 0 -32px;
-}
-
-.topicform .files .file {
-  border: 1px solid #ccf;
-  background: #ddf;
-}
-
-.topicform .files .file .name {
-  display: inline;
-}
-
-.topicform .progressbar {
-  margin-left: 10px;
-  display: inline-block;
-  width: 200px;
-  height: 20px;
-  border: 1px solid #000;
-  background: #fff;
-}
-
-.topicform .progressbar .progress {
-  height: 100%;
-  background: #2663c3;
-}
-
 #polloptions {
   padding: 10px;
-  background: #ddf;
-  border: 1px solid #ccf;
+  background: var(--purple);
+  border: 1px solid var(--border-blue);
 }
 
 #polloptions textarea {
@@ -1622,38 +1597,6 @@ textarea {
   width: 100%;
 }
 
-.postform .uploadbutton {
-  background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat
-    0 -32px;
-  padding-left: 16px;
-  width: 100px;
-  height: 1em;
-}
-
-.postform .files .file {
-  border: 1px solid #ccf;
-  background: #ddf;
-}
-
-.postform .files .file .name {
-  display: inline-block;
-  width: 300px;
-  overflow: hidden;
-}
-
-.postform .progressbar {
-  display: inline-block;
-  width: 200px;
-  height: 1.1em;
-  border: 1px solid #000;
-  background: #fff;
-}
-
-.postform .progressbar .progress {
-  height: 100%;
-  background: #2663c3;
-}
-
 .postform .buttons {
   text-align: center;
 }
@@ -1669,7 +1612,7 @@ textarea {
 }
 
 .searchresult {
-  border-bottom: 1px solid #aaf;
+  border-bottom: 1px solid var(--border-blue);
   padding: 10px;
 }
 
@@ -1708,7 +1651,7 @@ textarea {
   display: flex;
   align-items: center;
   padding: 10px 5px;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid var(--border-blue);
 }
 
 #ticker .tick-title {
@@ -1754,7 +1697,7 @@ textarea {
 }
 
 .calendar .today {
-  background: #200425;
+  background: var(--deep-purple);
 }
 
 .calendar .birthdays {
@@ -1777,9 +1720,9 @@ textarea {
 
 .box > .title {
   position: relative;
-  background: linear-gradient(45deg, #1f0424, rgb(0 0 0 / 50%));
+  background: linear-gradient(45deg, var(--deep-purple), rgb(0 0 0 / 50%));
   padding: 7px;
-  color: #fff;
+  color: var(--text-color);
 }
 
 .box > .title .x {
@@ -1804,7 +1747,7 @@ textarea {
 }
 
 .box .content {
-  background: rgb(0 0 0 / 90%);
+  background: var(--black-bg-transparent);
 }
 
 .box .content > .error {
@@ -1820,8 +1763,8 @@ textarea {
 /* Function-Specific */
 #notification,
 #modbox {
-  background: #fff;
-  border: 1px solid #000;
+  background: var(--purple);
+  border: 1px solid var(--border-blue);
   bottom: 10px;
   cursor: pointer;
   font-size: 1.4rem;
@@ -1835,7 +1778,7 @@ textarea {
 #notification.newmessage {
   padding-left: 60px;
   background: url("/Service/Themes/Default/icons/newmessage.png") no-repeat 20px
-    center #fff;
+    center var(--purple);
 }
 
 .pages .active {
@@ -1923,7 +1866,7 @@ textarea {
 #stats .userstoday {
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid #ccf;
+  border-top: 1px solid var(--border-blue);
 }
 
 #stats .stats {
@@ -1931,7 +1874,7 @@ textarea {
   padding: 10px 25px;
   background: url("/Service/Themes/Default/icons/boardstats.png") left center
     no-repeat;
-  border-top: 1px solid #ccf;
+  border-top: 1px solid var(--border-blue);
 }
 
 /* Member List */
@@ -1959,7 +1902,7 @@ textarea {
 
 #memberlist td {
   padding: 10px;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid var(--border-blue);
 }
 
 /* Member/Group Specific */
@@ -1978,8 +1921,8 @@ a.mgroup4 {
 
 /* BBcodes */
 .quote {
-  border: 1px solid #aaf;
-  background: #460053;
+  border: 1px solid var(--border-blue);
+  background: var(--purple);
   padding: 10px;
 }
 
@@ -1989,8 +1932,8 @@ a.mgroup4 {
 }
 
 .code {
-  border: 1px solid #aaf;
-  background: #1f0424;
+  border: 1px solid var(--border-blue);
+  background: var(--deep-purple);
   padding: 10px;
   font-family: Consolas, Fixedsys, monospace;
   font-size: 1.2rem;
@@ -1999,9 +1942,9 @@ a.mgroup4 {
 
 .spoilertext {
   display: inline-block;
-  background: #fff;
-  color: #fff;
-  border: 1px solid #aaf;
+  background: var(--deep-purple);
+  color: var(--deep-purple);
+  border: 1px solid var(--border-blue);
 }
 
 .spoilertext * {
@@ -2013,8 +1956,8 @@ a.mgroup4 {
 }
 
 .spoilertext:hover {
-  background: #fff;
-  color: #000;
+  background: none;
+  color: inherit;
 }
 
 /* Contact icons */
@@ -2087,7 +2030,7 @@ a.mgroup4 {
 .tooltip {
   position: absolute;
   border-collapse: collapse;
-  color: #fff;
+  color: var(--text-color);
   max-width: 550px;
 }
 
@@ -2133,7 +2076,7 @@ a.mgroup4 {
 #autocomplete {
   position: absolute;
   border: 1px solid #000;
-  background: #eef;
+  background: var(--purple);
   text-align: left;
 }
 
@@ -2144,9 +2087,8 @@ a.mgroup4 {
 
 #autocomplete div:hover,
 #autocomplete div.selected {
-  color: #00f;
-  background: #f5f5ff;
-  border: 1px solid #669;
+  background: var(--deep-purple);
+  border: 1px solid var(--border-blue);
   border-style: solid none;
 }
 
@@ -2176,5 +2118,5 @@ a.mgroup4 {
 }
 
 .editorframe {
-  border: 1px solid white;
+  border: 1px solid var(--border-blue);
 }

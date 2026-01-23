@@ -7,11 +7,13 @@
                 <td>{{ choice }}</td>
                 <td class="numvotes">{{ numVotes[index] }} vote{% if numVotes[index]!=1 %}s{% endif %}</td>
                 <td style="width:200px">
+                  {% if percentOfVotes %}
                     <div
                         class="bar"
                         style="width:{{ percentOfVotes }}%;"
                         aria-label="{{ percentOfVotes }}% of users voted for {{ choice }}"
-                    >{% if percentOfVotes %}{{ percentOfVotes }}%{% endif %}</div>
+                    >{{ percentOfVotes }}%</div>
+                  {% endif %}
                 </td>
             </tr>
         {% endfor %}

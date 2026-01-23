@@ -383,10 +383,6 @@ textarea {
   background-position: 0 -128px;
 }
 
-.inbox .compose a {
-  color: #090;
-}
-
 .inbox .composeform {
   background: #eef;
   padding: 10px;
@@ -1597,38 +1593,10 @@ textarea {
   margin-bottom: 10px;
 }
 
-.postoptions .uploadbutton,
 .postoptions .addpoll {
   padding: 0 20px;
   margin: 10px;
   background: url("icons/postoptions.png") no-repeat top left;
-}
-
-.postoptions .uploadbutton {
-  background-position: 0 -32px;
-}
-
-.topicform .files .file {
-  border: 1px solid #ccf;
-  background: #ddf;
-}
-
-.topicform .files .file .name {
-  display: inline;
-}
-
-.topicform .progressbar {
-  margin-left: 10px;
-  display: inline-block;
-  width: 200px;
-  height: 20px;
-  border: 1px solid #000;
-  background: #fff;
-}
-
-.topicform .progressbar .progress {
-  height: 100%;
-  background: #2663c3;
 }
 
 #polloptions {
@@ -1674,30 +1642,6 @@ textarea {
   padding-left: 16px;
   width: 100px;
   height: 1em;
-}
-
-.postform .files .file {
-  border: 1px solid #ccf;
-  background: #ddf;
-}
-
-.postform .files .file .name {
-  display: inline-block;
-  width: 300px;
-  overflow: hidden;
-}
-
-.postform .progressbar {
-  display: inline-block;
-  width: 200px;
-  height: 1.1em;
-  border: 1px solid #000;
-  background: #fff;
-}
-
-.postform .progressbar .progress {
-  height: 100%;
-  background: #2663c3;
 }
 
 .postform .buttons {
