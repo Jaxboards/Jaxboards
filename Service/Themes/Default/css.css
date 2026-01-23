@@ -10,7 +10,7 @@ body {
   color: #004;
   text-align: center;
   overflow-y: scroll;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 img {
