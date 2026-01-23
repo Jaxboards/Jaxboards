@@ -1309,7 +1309,7 @@ textarea {
 /* stylelint-disable-next-line selector-class-pattern */
 #intopic .post_content {
   padding: 20px;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   hyphens: auto;
 }
 
