@@ -43,7 +43,7 @@ final readonly class TextFormatting
     public function linkify(string $text): string
     {
         return (string) preg_replace_callback(
-            '@(^|\s)(https?://[^\s\)\(<>]+)@',
+            '@(^|\s)(https?://[^\s\)\(<>]+)@u',
             $this->linkifyCallback(...),
             $text,
         );

@@ -28,6 +28,7 @@ use Jax\TextRules;
 use Jax\User;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\UnitTestCase;
 
@@ -103,21 +104,25 @@ final class TextFormattingTest extends UnitTestCase
         );
     }
 
-    public function testLinkify(): void
+    #[DataProvider('linkifyDataProvider')]
+    public function testLinkify($input, $expectation): void
     {
         self::assertEquals(
-            '[url=http://google.com]http://google.com[/url]',
-            $this->textFormatting->linkify('http://google.com'),
+            $expectation,
+            $this->textFormatting->linkify($input),
         );
-        self::assertEquals(
-            '[url=/topic/1]Topic #1[/url]',
-            $this->textFormatting->linkify('http://jaxboards.com/topic/1'),
-        );
-        self::assertEquals(
-            '[url=/topic/3?findpost=33&pid=33]Post #33[/url]',
-            $this->textFormatting->linkify(
-                'http://jaxboards.com/topic/3?findpost=33&pid=33',
-            ),
-        );
+    }
+
+    public static function linkifyDataProvider(): array
+    {
+        return [
+            ['http://google.com', '[url=http://google.com]http://google.com[/url]'],
+            ['http://jaxboards.com/topic/1', '[url=/topic/1]Topic #1[/url]'],
+            ['http://jaxboards.com/topic/3?findpost=33&pid=33', '[url=/topic/3?findpost=33&pid=33]Post #33[/url]'],
+            [
+                'nbsp http://google.com',
+                'nbsp [url=http://google.com]http://google.com[/url]'
+            ],
+        ];
     }
 }
