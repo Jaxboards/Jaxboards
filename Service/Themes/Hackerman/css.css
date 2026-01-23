@@ -1305,6 +1305,8 @@ textarea {
 /* stylelint-disable-next-line selector-class-pattern */
 #intopic .post_content {
   padding: 20px;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 #intopic .posttop {
