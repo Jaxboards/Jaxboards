@@ -1135,15 +1135,17 @@ textarea {
   text-align: center;
 }
 
-.forumindex .locked .topic > a:first-child {
-  background: url("/Service/Themes/Default/icons/lock.png") left no-repeat;
-  padding-left: 14px;
-}
 
-.forumindex .pinned .topic > a:first-child {
+
+
+.locked .topic > a:first-child::before {
+  content: "🔒";
+}
+.pinned .topic > a:first-child::before {
+  content: "📌";
+}
+.pinned .topic > a:first-child {
   font-style: italic;
-  background: url("/Service/Themes/Default/icons/pin.gif") center left no-repeat;
-  padding-left: 14px;
 }
 
 .forumindex .error {
