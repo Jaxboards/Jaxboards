@@ -1135,15 +1135,14 @@ textarea {
   text-align: center;
 }
 
-
-
-
 .locked .topic > a:first-child::before {
   content: "🔒";
 }
+
 .pinned .topic > a:first-child::before {
   content: "📌";
 }
+
 .pinned .topic > a:first-child {
   font-style: italic;
 }
