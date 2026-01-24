@@ -18,10 +18,16 @@ export async function animate<T extends HTMLElement>(
       easing,
     });
 
-    animation.addEventListener("finish", () => {
-      Object.assign(el.style, keyframes.at(-1));
-      res(el);
-    });
+    animation.addEventListener(
+      "finish",
+      () => {
+        Object.assign(el.style, keyframes.at(-1));
+        res(el);
+      },
+      {
+        once: true,
+      },
+    );
   });
 }
 
