@@ -70,31 +70,34 @@ final class Router
     ) {
         $this->get('', '/', BoardIndex::class);
         $this->get('api', '/api/{method}', API::class);
-        $this->get('asteroids', '/asteroids', Asteroids::class);
         $this->get('badges', '/badges', Badges::class);
         $this->get('buddylist', '/buddylist', BuddyList::class);
         $this->get('calendar', '/calendar', Calendar::class);
         $this->get('category', '/', BoardIndex::class);
         $this->get('download', '/download', Download::class);
-        $this->get('earthbound', '/earthbound', Earthbound::class);
         $this->get('index', '/', BoardIndex::class);
-        $this->get('katamari', '/katamari', Katamari::class);
         $this->get('members', '/members', Members::class);
         $this->get('modcontrols', '/modcontrols/{do}', ModControls::class);
         $this->get('forum', '/forum/{id}/{slug}', Forum::class);
         $this->get('manifest.json', '/manifest.json', Manifest::class);
         $this->get('post', '/post', Post::class);
         $this->get('profile', '/profile/{id}/{page}', UserProfile::class);
-        $this->get('rainbow', '/rainbow', Rainbow::class);
         $this->get('report', '/report', Report::class);
         $this->get('search', '/search', Search::class);
-        $this->get('solitaire', '/solitaire', Solitaire::class);
-        $this->get('spin', '/spin', Spin::class);
-        $this->get('tardis', '/tardis', Tardis::class);
         $this->get('ticker', '/ticker', Ticker::class);
         $this->get('topic', '/topic/{id}/{slug}', Topic::class);
         $this->get('ucp', '/ucp/{what}', UCP::class);
 
+        // Easter eggs
+        $this->get('asteroids', '/asteroids', Asteroids::class);
+        $this->get('earthbound', '/earthbound', Earthbound::class);
+        $this->get('katamari', '/katamari', Katamari::class);
+        $this->get('rainbow', '/rainbow', Rainbow::class);
+        $this->get('solitaire', '/solitaire', Solitaire::class);
+        $this->get('spin', '/spin', Spin::class);
+        $this->get('tardis', '/tardis', Tardis::class);
+
+        // Authentication
         $this->get('register', '/register', LogReg::class);
         $this->get('logout', '/logout', LogReg::class);
         $this->get('login', '/login', LogReg::class);
