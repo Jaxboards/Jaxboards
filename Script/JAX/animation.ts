@@ -15,6 +15,7 @@ export async function animate<T extends HTMLElement>(
   el.animate(keyframes, {
     duration,
     easing,
+    fill: "forwards",
   });
 
   return new Promise<T>((res) =>
