@@ -42,7 +42,13 @@ final readonly class BotDetector
         'ImagesiftBot' => 'Imagesift',
         'linkdexbot' => 'Linkdex',
         'Mail.RU_Bot' => 'Mail.RU',
+
+        // Meta crawlers: https://developers.facebook.com/docs/sharing/webmasters/web-crawlers/
         'meta-externalagent' => 'Meta',
+        'meta-externalads' => 'Meta',
+        'meta-externalfetcher' => 'Meta',
+        'meta-webindexer' => 'Meta',
+
         'mj12bot' => 'Majestic',
         'MojeekBot' => 'Mojeek',
         'OAI-SearchBot' => 'OpenAI',
