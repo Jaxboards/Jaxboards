@@ -26,6 +26,7 @@ use Jax\Routes\Rainbow;
 use Jax\Routes\Report;
 use Jax\Routes\Search;
 use Jax\Routes\Solitaire;
+use Jax\Routes\Spin;
 use Jax\Routes\Tardis;
 use Jax\Routes\Ticker;
 use Jax\Routes\Topic;
@@ -88,6 +89,7 @@ final class Router
         $this->get('report', '/report', Report::class);
         $this->get('search', '/search', Search::class);
         $this->get('solitaire', '/solitaire', Solitaire::class);
+        $this->get('spin', '/spin', Spin::class);
         $this->get('tardis', '/tardis', Tardis::class);
         $this->get('ticker', '/ticker', Ticker::class);
         $this->get('topic', '/topic/{id}/{slug}', Topic::class);

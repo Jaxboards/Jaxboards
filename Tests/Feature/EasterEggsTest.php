@@ -160,4 +160,16 @@ final class EasterEggsTest extends FeatureTestCase
 
         self::assertEquals('script', $json[0][0]);
     }
+
+    public function testSpin(): void
+    {
+        $page = $this->go(new Request(
+            get: ['path' => '/spin'],
+            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
+        ));
+
+        $json = json_decode($page, true);
+
+        self::assertEquals('script', $json[0][0]);
+    }
 }
