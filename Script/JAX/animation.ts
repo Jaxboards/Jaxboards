@@ -12,18 +12,17 @@ export async function animate<T extends HTMLElement>(
   duration = 600,
   easing = "linear",
 ): Promise<T> {
-  el.animate(keyframes, {
-    duration,
-    easing,
-    fill: "forwards",
-  });
+  return new Promise<T>((res) => {
+    const animation = el.animate(keyframes, {
+      duration,
+      easing,
+    });
 
-  return new Promise<T>((res) =>
-    setTimeout(() => {
-      el.style.transition = "";
+    animation.addEventListener("finish", () => {
+      Object.assign(el.style, keyframes.at(-1));
       res(el);
-    }, duration),
-  );
+    });
+  });
 }
 
 /**
