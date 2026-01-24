@@ -35,6 +35,7 @@ use Jax\Routes\Earthbound;
 use Jax\Routes\Katamari;
 use Jax\Routes\Rainbow;
 use Jax\Routes\Solitaire;
+use Jax\Routes\Spin;
 use Jax\Routes\Tardis;
 use Jax\ServiceConfig;
 use Jax\Session;
@@ -84,6 +85,7 @@ use function json_decode;
 #[CoversClass(Router::class)]
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(Session::class)]
+#[CoversClass(Spin::class)]
 #[CoversClass(Template::class)]
 #[CoversClass(TextFormatting::class)]
 #[CoversClass(User::class)]
