@@ -1,6 +1,6 @@
 <a
     href="{{ url('shoutbox', { shoutbox_delete: shout.id }) }}"
     class="delete"
-    onclick="return confirm('Delete shout?') && (this.parentNode.style.display='none')"
+    onclick="return (event.shiftKey || confirm('Delete shout?')) && (this.parentNode.style.display='none')"
     title="delete"
 >[X]</a>
