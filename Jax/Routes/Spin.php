@@ -13,14 +13,12 @@ final readonly class Spin implements Route
 
     public function route($params): void
     {
-        $this->page->command('script', <<<JAVASCRIPT
+        $this->page->command('script', <<<'JAVASCRIPT'
             document.querySelector('#container').animate(
-                // Keyframes: an array of objects
                 [
-                    { transform: 'rotateZ(0px)' }, // from
-                    { transform: 'rotateZ(1turn)' } // to
+                    { transform: 'rotateZ(0turn)' },
+                    { transform: 'rotateZ(1turn)' }
                 ],
-                // Timing options: an object
                 {
                     duration: 1000,
                     iterations: 1,
