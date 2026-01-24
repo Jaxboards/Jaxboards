@@ -282,7 +282,7 @@ export default {
     let c;
     if (prdiv) {
       if (prdiv.style.display !== "none") {
-        animate(prdiv, { height: "200px" }, { height: "0px" }, 300).then(
+        animate(prdiv, [{ height: "200px" }, { height: "0px" }], 300).then(
           (el) => (el.style.display = "none"),
         );
         return;
@@ -304,6 +304,6 @@ export default {
       document.querySelector<HTMLDivElement>("#page")?.appendChild(prdiv);
     }
     prdiv.innerHTML = html;
-    animate(prdiv, { height: "0px" }, { height: "200px" }, 300);
+    animate(prdiv, [{ height: "0px" }, { height: "200px" }], 300);
   },
 };

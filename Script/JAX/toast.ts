@@ -19,7 +19,7 @@ class Toast {
   ): Promise<void> {
     const toast = document.createElement("div");
     const close = async () => {
-      await animate(toast, { top: TOP_SPACING }, { top: `-${TOP_SPACING}` });
+      await animate(toast, [{ top: TOP_SPACING }, { top: `-${TOP_SPACING}` }]);
       toast.remove();
     };
 
@@ -49,8 +49,7 @@ class Toast {
 
     await animate(
       toast,
-      { top: "0" },
-      { top: TOP_SPACING },
+      [{ top: "0" }, { top: TOP_SPACING }],
       600,
       "ease-in-out",
     );
@@ -61,7 +60,5 @@ class Toast {
     }
   }
 }
-
-window.Toast = new Toast();
 
 export default new Toast();

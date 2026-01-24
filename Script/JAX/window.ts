@@ -251,8 +251,7 @@ class Window {
     if (this.animate || shouldAnimate) {
       animate(
         container,
-        { top: `${y - 100}px` },
-        { top: `${y}px` },
+        [{ top: `${y - 100}px` }, { top: `${y}px` }],
         300,
         "ease-out",
       );
