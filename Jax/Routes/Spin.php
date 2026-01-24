@@ -14,17 +14,17 @@ final readonly class Spin implements Route
     public function route($params): void
     {
         $this->page->command('script', <<<'JAVASCRIPT'
-            document.querySelector('#container').animate(
-                [
-                    { transform: 'rotateZ(0turn)' },
-                    { transform: 'rotateZ(1turn)' }
-                ],
-                {
-                    duration: 1000,
-                    iterations: 1,
-                }
-            );
-        JAVASCRIPT);
+                document.querySelector('#container').animate(
+                    [
+                        { transform: 'rotateZ(0turn)' },
+                        { transform: 'rotateZ(1turn)' }
+                    ],
+                    {
+                        duration: 1000,
+                        iterations: 1,
+                    }
+                );
+            JAVASCRIPT);
         $this->page->command('softurl');
     }
 }
