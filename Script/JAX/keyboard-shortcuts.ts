@@ -26,6 +26,7 @@ function openShortcutsWindow() {
         <dt>c</dt><dd>Compose</dd>
         <dt>i</dt><dd>Inbox</dd>
         <dt>f</dt><dd>Flagged Messages</dd>
+        <dt>r</dt><dd>Reply to Message</dd>
       </dl>
 
       <h3>Forum/Topic</h3>
