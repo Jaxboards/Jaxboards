@@ -346,7 +346,7 @@ final class Database
         string $format,
         array $tablenames,
         ...$args,
-    ): mixed {
+    ): ?PDOStatement {
         // Table names.
         $tempformat = str_replace('%t', '%s', $format);
 

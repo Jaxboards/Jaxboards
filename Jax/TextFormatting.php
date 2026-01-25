@@ -184,14 +184,14 @@ final readonly class TextFormatting
             return '';
         }
 
-        while (
-            ($cleaned = (string) preg_replace(
+        for ($i = 0; $i < 10; $i++) {
+            $text = (string) preg_replace(
                 '@\[(\w+)[^\]]*\](.*)\[/\1\]@Us',
                 '$2',
                 $text,
-            )) !== $text
-        ) {
-            $text = $cleaned;
+                count: $count
+            );
+            if ($count === 0) break;
         }
 
         return $text;

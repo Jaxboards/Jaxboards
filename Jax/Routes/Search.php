@@ -77,7 +77,7 @@ final class Search implements Route
             $this->request->both('searchterm') !== null
             || $this->request->asString->both('page') !== null
         ) {
-            $this->dosearch();
+            $this->doSearch();
         } else {
             $this->form();
         }
@@ -143,9 +143,8 @@ final class Search implements Route
         return '<select size="15" title="List of forums" multiple="multiple" name="fids[]">' . $options . '</select>';
     }
 
-    private function dosearch(): void
+    private function doSearch(): void
     {
-
         if ($this->request->isJSUpdate()) {
             return;
         }
@@ -156,12 +155,12 @@ final class Search implements Route
             'searcht',
         );
 
-        $ids = '';
+        $postIDs = '';
 
         if (
             $this->request->both('searchterm') === null
         ) {
-            $ids = (string) $this->session->getVar('search');
+            $postIDs = (string) $this->session->getVar('search');
         } else {
             $this->getSearchableForums();
             $fidsInput = $this->request->both('fids');
@@ -234,7 +233,7 @@ final class Search implements Route
 
             $sanitizedSearchTerm = $searchTerm;
 
-            $result = $this->database->special(
+            $searchResults = $this->database->arows($this->database->special(
                 <<<"SQL"
                         SELECT
                             `id`,
@@ -267,35 +266,65 @@ final class Search implements Route
                 // Topics
                 ...[$sanitizedSearchTerm, $sanitizedSearchTerm],
                 ...$topicValues,
+            ));
+
+            $postIDs = implode(
+                ',',
+                array_filter(
+                    array_map(
+                        fn($searchResult) => $searchResult['id'],
+                        $searchResults
+                    ),
+                    fn($id) => !empty($id)
+                )
             );
 
-
-            while ($id = $this->database->arow($result)) {
-                if (!$id['id']) {
-                    continue;
-                }
-
-                $ids .= $id['id'] . ',';
-            }
-
-            $ids = mb_substr($ids, 0, -1);
-            $this->session->addVar('search', $ids);
+            $this->session->addVar('search', $postIDs);
             $this->session->addVar('searcht', $searchTerm);
             $this->pageNum = 0;
         }
 
-        $result = null;
-        if ($ids !== '') {
-            $numresults = count(explode(',', $ids));
-            $idarray = array_slice(
-                explode(',', $ids),
-                $this->pageNum * $this->perpage,
-                $this->perpage,
-            );
-            $ids = implode(',', $idarray);
+        $terms = [];
+        foreach (preg_split('@\W+@', $searchTerm) ?: [] as $v) {
+            if (trim($v) === '') {
+                continue;
+            }
 
-            $result = $this->database->special(
-                <<<SQL
+            $terms[] = preg_quote($v);
+        }
+
+        if ($postIDs === '') {
+            $page = $this->noResultsFound($terms);
+        } else {
+            $page = $this->renderSearchResults($terms, explode(',', $postIDs));
+        }
+
+        if (
+            $this->request->isJSAccess()
+            && !$this->request->isJSDirectLink()
+        ) {
+            $this->page->command('update', 'searchresults', $page);
+        } else {
+            $this->form($page);
+        }
+    }
+
+    /**
+     * @param array<string> $terms
+     * @param array<string> $postIDs
+     */
+    private function renderSearchResults(array $terms, array $postIDs)
+    {
+        $numresults = count($postIDs);
+        $idarray = array_slice(
+            $postIDs,
+            $this->pageNum * $this->perpage,
+            $this->perpage,
+        );
+        $ids = implode(',', $idarray);
+
+        $result = $this->database->special(
+            <<<SQL
                     SELECT
                         p.`id` AS `id`,
                         p.`tid` AS `tid`,
@@ -307,27 +336,14 @@ final class Search implements Route
                     WHERE p.`id` IN ?
                     ORDER BY FIELD(p.`id`,{$ids})
                     SQL,
-                ['posts', 'topics'],
-                $idarray,
-            );
-        } else {
-            $numresults = 0;
-        }
+            ['posts', 'topics'],
+            $idarray,
+        );
 
         $page = '';
         $pages = '';
 
-        $terms = [];
-
-        foreach (preg_split('@\W+@', $searchTerm) ?: [] as $v) {
-            if (trim($v) === '') {
-                continue;
-            }
-
-            $terms[] = preg_quote($v);
-        }
-
-        while ($postRow = $this->database->arow($result)) {
+        foreach ($this->database->arows($result) as $postRow) {
             $title = $this->textFormatting->textOnly($postRow['title']);
             $post = $this->textFormatting->textOnly($postRow['post']);
 
@@ -357,53 +373,51 @@ final class Search implements Route
             );
         }
 
-        if ($numresults === 0) {
-            $error = 'No results found. '
-                . 'Try refining your search, or using longer terms.';
-
-            $omitted = [];
-            foreach ($terms as $term) {
-                if (mb_strlen($term) >= 3) {
-                    continue;
-                }
-
-                $omitted[] = $term;
-            }
-
-            if ($omitted !== []) {
-                $error .= 'The following terms were omitted due to length: '
-                    . implode(', ', $omitted);
-            }
-
-            $page = $this->page->error($error);
-        } else {
-            $resultsArray = $this->jax->pages(
-                (int) ceil($numresults / $this->perpage),
-                $this->pageNum,
-                10,
+        $resultsArray = $this->jax->pages(
+            (int) ceil($numresults / $this->perpage),
+            $this->pageNum,
+            10,
+        );
+        foreach ($resultsArray as $resultArray) {
+            $searchURL = $this->router->url(
+                'search',
+                ['page' => $resultArray],
             );
-            foreach ($resultsArray as $resultArray) {
-                $searchURL = $this->router->url(
-                    'search',
-                    ['page' => $resultArray],
-                );
-                $pages .= "<a href='{$searchURL}'>{$resultArray}</a> ";
-            }
+            $pages .= "<a href='{$searchURL}'>{$resultArray}</a> ";
         }
 
-        $page = $this->template->render('global/box', [
+        return $this->template->render('global/box', [
             'title' => 'Search Results - ' . $pages,
             'content' => $page,
         ]);
+    }
 
-        if (
-            $this->request->isJSAccess()
-            && !$this->request->isJSDirectLink()
-        ) {
-            $this->page->command('update', 'searchresults', $page);
-        } else {
-            $this->form($page);
+    /**
+     * @param array<string> $terms
+     */
+    private function noResultsFound(array $terms)
+    {
+        $error = 'No results found. '
+            . 'Try refining your search, or using longer terms.';
+
+        $omitted = [];
+        foreach ($terms as $term) {
+            if (mb_strlen($term) >= 3) {
+                continue;
+            }
+
+            $omitted[] = $term;
         }
+
+        if ($omitted !== []) {
+            $error .= 'The following terms were omitted due to length: '
+                . implode(', ', $omitted);
+        }
+
+        return $this->template->render('global/box', [
+            'title' => 'Search Results',
+            'content' => $this->page->error($error),
+        ]);
     }
 
     /**
