@@ -13,6 +13,8 @@ final readonly class BotDetector
         'AhrefsBot' => 'Ahrefs',
         'AliyunSecBot' => 'AliyunSecBot',
         'Amazonbot' => 'Amazon',
+        'Amzn-User' => 'Amazon',
+        'Amzn-SearchBot' => 'Amazon',
         'Applebot' => 'Applebot',
         'archive.org_bot' => 'Internet Archive',
         'AwarioBot' => 'Awario',
