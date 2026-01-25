@@ -12,7 +12,7 @@ function openShortcutsWindow() {
       </style>
       <h3>Navigation</h3>
       <dl>
-        <dt>/</dt><dd>This help window</dd>
+        <dt>?</dt><dd>This help window</dd>
         <dt>i</dt><dd>Inbox</dd>
         <dt>s</dt><dd>Settings</dd>
         ` +
@@ -49,7 +49,7 @@ export function handleKeyboardShortcuts(event: KeyboardEvent) {
     return;
   }
 
-  if (event.key === "/") {
+  if (event.key === "?") {
     openShortcutsWindow();
     return;
   }
