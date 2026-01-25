@@ -174,8 +174,7 @@ export default {
       return;
     }
     const win = new Window(options);
-
-    if (win.element) gracefulDegrade(win.element);
+    gracefulDegrade(win.render());
   },
   closewindow(windowSelector: string) {
     const el = document.querySelector<HTMLElement>(windowSelector);

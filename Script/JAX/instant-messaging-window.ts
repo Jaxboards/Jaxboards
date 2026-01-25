@@ -59,8 +59,7 @@ function createMessagingWindow({
     id: `im_${fromId}`,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const win = imWindow.element!;
+  const win = imWindow.render();
 
   gracefulDegrade(win);
 

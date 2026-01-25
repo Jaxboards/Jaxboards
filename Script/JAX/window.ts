@@ -52,12 +52,6 @@ class Window {
     this.zIndex = getHighestZIndex();
 
     Object.assign(this, options);
-
-    this.createDom();
-  }
-
-  get element() {
-    return this.windowContainer;
   }
 
   /**
@@ -77,9 +71,9 @@ class Window {
     } while (element);
   }
 
-  private createDom() {
-    this.windowContainer = document.createElement("div");
-    const { windowContainer } = this;
+  public render() {
+    const windowContainer = document.createElement("div");
+    this.windowContainer = windowContainer;
 
     const titleBar = document.createElement("div");
     const contentContainer = document.createElement("div");
@@ -159,6 +153,8 @@ class Window {
         .apply(rsize);
       targ.style.width = `${windowContainer.clientWidth}px`;
       rsize.style.left = `${windowContainer.clientWidth - 16}px`;
+
+      return this.windowContainer;
     }
 
     const s = windowContainer.style;
