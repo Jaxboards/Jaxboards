@@ -21,11 +21,10 @@ export default class MediaPlayer extends Component<HTMLDivElement> {
 
     popoutLink?.addEventListener("click", (event) => {
       event.preventDefault();
-      const win = new Window({
+      new Window({
         title: popoutLink.href,
         content: movie.innerHTML,
       });
-      win.create();
     });
 
     inlineLink?.addEventListener("click", (event) => {

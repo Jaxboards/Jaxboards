@@ -59,12 +59,15 @@ function createMessagingWindow({
     id: `im_${fromId}`,
   });
 
-  const win = imWindow.create();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const win = imWindow.element!;
+
   gracefulDegrade(win);
+
   const focus = () => {
     win.querySelector<HTMLInputElement>('form input[name="im_im"]')?.focus();
   };
-  win.onclick = focus;
+  win.addEventListener("click", focus);
   focus();
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

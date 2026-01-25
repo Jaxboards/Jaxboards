@@ -1,7 +1,7 @@
 import Window from "./window";
 
 function openShortcutsWindow() {
-  const win = new Window({
+  new Window({
     title: "Keyboard Shortcuts",
     id: "shortcuts",
     content:
@@ -37,8 +37,6 @@ function openShortcutsWindow() {
       </dl>
       `,
   });
-
-  win.create();
 }
 
 export function handleKeyboardShortcuts(event: KeyboardEvent) {

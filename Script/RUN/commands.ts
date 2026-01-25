@@ -8,7 +8,7 @@ import { messageReceived } from "../JAX/instant-messaging-window";
 import toast from "../JAX/toast";
 import openTooltip from "../JAX/tooltip";
 import { onImagesLoaded } from "../JAX/util";
-import Window from "../JAX/window";
+import Window, { WindowOptions } from "../JAX/window";
 import Sound from "../sound";
 
 // Comes from UserOnline struct/class
@@ -167,24 +167,15 @@ export default {
   imtoggleoffline(a: string) {
     document.querySelector(`#im_${a}`)?.classList.add("offline");
   },
-  window(options: Window) {
+  window(options: WindowOptions) {
     const existingWindow = options.id && document.getElementById(options.id);
 
     if (existingWindow) {
       return;
     }
-    const win = new Window();
-    win.title = options.title;
-    win.content = options.content;
-    win.minimizable = options.minimizable || false;
-    win.animate = options.animate ?? true;
-    win.resize = options.resize || undefined;
-    win.className = options.className || "";
-    if (options.pos) win.pos = options.pos;
+    const win = new Window(options);
 
-    const winElement = win.create();
-    winElement.id = options.id || "";
-    gracefulDegrade(winElement);
+    if (win.element) gracefulDegrade(win.element);
   },
   closewindow(windowSelector: string) {
     const el = document.querySelector<HTMLElement>(windowSelector);

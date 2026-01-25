@@ -3,7 +3,7 @@ import Drag, { DragSession } from "./drag";
 import { getHighestZIndex } from "./el";
 import { onImagesLoaded } from "./util";
 
-type WindowOptions = Partial<{
+export type WindowOptions = Partial<{
   title: string;
   content: string;
   id: string;
@@ -52,6 +52,12 @@ class Window {
     this.zIndex = getHighestZIndex();
 
     Object.assign(this, options);
+
+    this.createDom();
+  }
+
+  get element() {
+    return this.windowContainer;
   }
 
   /**
@@ -71,12 +77,10 @@ class Window {
     } while (element);
   }
 
-  create() {
-    if (this.windowContainer) {
-      // DOM already created
-      return this.windowContainer;
-    }
-    const windowContainer = document.createElement("div");
+  private createDom() {
+    this.windowContainer = document.createElement("div");
+    const { windowContainer } = this;
+
     const titleBar = document.createElement("div");
     const contentContainer = document.createElement("div");
     const windowControls = document.createElement("div");
@@ -84,7 +88,6 @@ class Window {
     const closeButton = document.createElement("div");
     const { pos } = this;
 
-    this.windowContainer = windowContainer;
     if (this.id) {
       windowContainer.id = this.id;
     }
