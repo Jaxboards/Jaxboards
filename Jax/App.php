@@ -166,9 +166,10 @@ final readonly class App
 
     private function renderBaseHTML(): void
     {
+        $timestamp = $this->fileSystem->getFileInfo('dist/app.js')->getMTime();
         $this->page->append(
             'SCRIPT',
-            '<script src="' . $this->router->getRootURL() . '/dist/app.js" defer></script>',
+            '<script src="' . $this->router->getRootURL() . "/dist/app.js?{$timestamp}\" defer></script>",
         );
 
         $this->page->append(
