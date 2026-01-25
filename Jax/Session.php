@@ -67,7 +67,7 @@ final class Session
     public function loginWithToken(): ?int
     {
         $this->fetchSessionData(
-            session_id() ?: $this->request->asString->get('sessid')
+            session_id() ?: $this->request->asString->get('sessid'),
         );
 
         if ($this->modelsSession->isBot !== 0) {

@@ -7,6 +7,7 @@ namespace Jax;
 use SplFileInfo;
 use SplFileObject;
 
+use function array_filter;
 use function array_map;
 use function array_reverse;
 use function copy;
@@ -168,6 +169,7 @@ final readonly class FileSystem
 
     /**
      * Returns an array of lines in a file.
+     *
      * @return array<string>
      */
     public function getLines(string $filename): array
@@ -176,17 +178,21 @@ final readonly class FileSystem
 
         $file->setFlags(SplFileObject::DROP_NEW_LINE);
 
-        return array_filter(iterator_to_array($file), fn($line) => is_string($line));
+        return array_filter(iterator_to_array($file), is_string(...));
     }
 
     /**
      * Returns list of files that match pattern relative to jaxboards root.
+     *
      * @return array<string>
      */
     public function glob(string $pattern, int $flags = 0): array
     {
         return array_map(
-            fn($path): string => mb_substr($path, mb_strlen($this->root)),
+            fn(string $path): string => mb_substr(
+                $path,
+                mb_strlen($this->root),
+            ),
             glob($this->pathFromRoot($pattern), $flags) ?: [],
         );
     }

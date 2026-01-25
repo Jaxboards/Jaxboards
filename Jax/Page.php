@@ -180,7 +180,7 @@ final class Page
 
         $skin = $this->getSelectedSkin($skinId);
 
-        if (!$skin) {
+        if (!$skin instanceof Skin) {
             throw new Error('Unable to get any available board skin');
         }
 

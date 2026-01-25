@@ -53,6 +53,7 @@ final class Config
         }
 
         $this->boardConfig = $boardConfig;
+
         return $boardConfig;
     }
 

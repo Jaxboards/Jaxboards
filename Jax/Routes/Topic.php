@@ -509,7 +509,10 @@ final class Topic implements Route
                 'topic/post-row',
                 [
                     'author' => $author,
-                    'badges' => $author && array_key_exists($author->id, $badgesPerAuthor) ? $badgesPerAuthor[$author->id] : '',
+                    'badges' => $author && array_key_exists(
+                        $author->id,
+                        $badgesPerAuthor,
+                    ) ? $badgesPerAuthor[$author->id] : '',
                     'canEdit' => $this->canEdit($modelsTopic, $post),
                     'canModerate' => $canModerateTopic,
                     'canReport' => !$this->user->isGuest(),

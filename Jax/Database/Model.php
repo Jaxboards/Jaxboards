@@ -16,8 +16,11 @@ use ReflectionProperty;
 use function array_filter;
 use function array_map;
 use function array_merge;
+use function array_slice;
 use function array_unique;
+use function assert;
 use function count;
+use function is_string;
 
 use const SORT_REGULAR;
 
@@ -117,12 +120,12 @@ abstract class Model
         if ($args === []) {
             $where = null;
             $selectArgs = [];
-        } else if (count($args) === 1) {
+        } elseif (count($args) === 1) {
             $where = Database::WHERE_ID_EQUALS;
             $selectArgs = [$args[0]];
         } else {
-            /** @var string $where */
             $where = $args[0];
+            assert(is_string($where));
             $selectArgs = array_slice($args, 1);
         }
 

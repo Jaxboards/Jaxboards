@@ -54,7 +54,8 @@ final class Router
     private array $urls = [];
 
     /**
-     * Map of paths to class-string
+     * Map of paths to class-string.
+     *
      * @var array<string,string>
      */
     private array $paths = [];

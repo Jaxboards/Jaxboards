@@ -355,12 +355,12 @@ final readonly class ModControls implements Route
     private function showReport(int $reportId): string
     {
         $report = Report::selectOne($reportId);
-        if (!$report) {
+        if (!$report instanceof Report) {
             return '';
         }
 
         $post = Post::selectOne($report->pid);
-        if (!$post) {
+        if (!$post instanceof Post) {
             return '';
         }
 

@@ -39,8 +39,8 @@ final class Lodash
     /**
      * @template T
      *
-     * @param array<T>                 $data
-     * @param callable(T $data):(string|int) $iteratee
+     * @param array<T>                       $data
+     * @param callable(T $data):(int|string) $iteratee
      *
      * @return array<array<T>>
      */
@@ -63,8 +63,8 @@ final class Lodash
     /**
      * @template T
      *
-     * @param array<T>                 $data
-     * @param callable(T $data):(string|int) $iteratee
+     * @param array<T>                       $data
+     * @param callable(T $data):(int|string) $iteratee
      *
      * @return array<T>
      */

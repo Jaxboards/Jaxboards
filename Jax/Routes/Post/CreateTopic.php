@@ -50,10 +50,10 @@ final readonly class CreateTopic
             !$forum => "The forum you're trying to post in does not exist.",
             !$forumPerms['start'] => "You don't have permission to post a new topic in that forum.",
             !$input->topicTitle || trim(
-                (string) $input->topicTitle,
+                $input->topicTitle,
             ) === '' => "You didn't specify a topic title!",
             mb_strlen(
-                (string) $input->topicTitle,
+                $input->topicTitle,
             ) > 255 => 'Topic title must not exceed 255 characters',
             mb_strlen(
                 $input->topicDescription ?? '',

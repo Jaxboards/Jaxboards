@@ -36,7 +36,8 @@ final class UsersOnline
     ) {
         $this->idleTimestamp = Carbon::now('UTC')
             ->subSeconds($this->serviceConfig->getSetting('timetoidle') ?? 300)
-            ->getTimestamp();
+            ->getTimestamp()
+        ;
         $this->fetchUsersOnline();
     }
 
@@ -160,9 +161,11 @@ final class UsersOnline
                 : 'active';
             $userOnline->uid = $uid;
 
-            if ($uid) {
-                $usersOnline[$uid] = $userOnline;
+            if (!$uid) {
+                continue;
             }
+
+            $usersOnline[$uid] = $userOnline;
         }
 
         return $usersOnline;

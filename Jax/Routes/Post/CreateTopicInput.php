@@ -1,10 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\Routes\Post;
 
 use Jax\Request;
 
-class CreateTopicInput
+use function array_filter;
+use function preg_split;
+use function trim;
+
+final class CreateTopicInput
 {
     public ?int $fid;
 
@@ -17,7 +23,7 @@ class CreateTopicInput
     public ?string $topicTitle;
 
     /**
-     * @var array<string> $pollChoices
+     * @var array<string>
      */
     public array $pollChoices;
 

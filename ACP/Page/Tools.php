@@ -7,13 +7,13 @@ namespace ACP\Page;
 use ACP\Page;
 use ACP\Page\Tools\FileManager;
 use Jax\Database\Database;
-use Jax\Database\Model;
 use Jax\Database\Utils as DatabaseUtils;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\Request;
 use ZipArchive;
 
+use function assert;
 use function class_exists;
 use function gmdate;
 use function header;
@@ -91,8 +91,8 @@ final readonly class Tools
 
             $ftable = $this->database->ftable($tableName);
             $sqlFileLines[] = "DROP TABLE IF EXISTS {$ftable};";
-            /** @var Model $modelInstance */
-            $modelInstance = new $model;
+            $modelInstance = new $model();
+            assert($modelInstance instanceof Model);
             $sqlFileLines[] = $this->databaseUtils->createTableQueryFromModel(
                 $modelInstance,
             ) . ';';

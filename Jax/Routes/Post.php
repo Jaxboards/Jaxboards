@@ -247,11 +247,13 @@ final class Post implements Route
         $topicTitle = $this->request->asString->post('ttitle');
         $topicDesc = $this->request->asString->post('tdesc');
 
-        if ($topicTitle == null || trim(
-            $topicTitle,
-        ) === '') {
+        if (
+            $topicTitle === null || trim(
+                $topicTitle,
+            ) === ''
+        ) {
             return 'You must supply a topic title!';
-        };
+        }
 
         $topic->title = $topicTitle;
         $topic->subtitle = $topicDesc ?? '';
@@ -413,7 +415,7 @@ final class Post implements Route
         }
 
         // Actually PUT THE POST IN!
-        $postData = $postData ?? '';
+        $postData ??= '';
         $post = new ModelsPost();
         $post->author = $uid;
         $post->date = $postDate;

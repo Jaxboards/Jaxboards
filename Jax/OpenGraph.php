@@ -115,13 +115,14 @@ final readonly class OpenGraph
             }
 
             return $metaValues;
-        } catch (Exception | Error) {
+        } catch (Exception|Error) {
             return [];
         }
     }
 
     /**
-     * Returns a map of url -> open graph metadata
+     * Returns a map of url -> open graph metadata.
+     *
      * @return array<string,array<string,string>>
      */
     public function fetchFromBBCode(string $text): array
@@ -130,7 +131,7 @@ final readonly class OpenGraph
 
         $urls = array_filter(
             $this->bbCode->getURLs($text),
-            fn($url) => (bool) $this->filterHTTPURL($url)
+            fn(string $url): bool => (bool) $this->filterHTTPURL($url),
         );
 
         // Limit # of embeddings to prevent abuse

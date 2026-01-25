@@ -99,7 +99,7 @@ final class Database
         // All datetimes are GMT for jaxboards
         if ($this->pdo instanceof Pgsql) {
             $this->pdo->query('SET TIME ZONE "UTC"');
-        } else if ($this->pdo instanceof Sqlite) {
+        } elseif ($this->pdo instanceof Sqlite) {
             MySQLite::install($this->pdo);
         } else {
             $this->pdo->query("SET time_zone = '+0:00'");
