@@ -78,7 +78,7 @@ onDOMReady(function featureDetectionClasses() {
   document.documentElement.classList.add("js-enabled");
 });
 onDOMReady(() => {
-  globalThis.addEventListener("keypress", handleKeyboardShortcuts);
+  globalThis.addEventListener("keyup", handleKeyboardShortcuts);
 });
 
 export default RUN;

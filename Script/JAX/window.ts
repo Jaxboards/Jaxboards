@@ -98,6 +98,7 @@ class Window {
       minimizeButton.innerHTML = "-";
       minimizeButton.addEventListener("click", () => this.minimize());
     }
+    closeButton.dataset.shortcut = "Escape";
     closeButton.innerHTML = "X";
     closeButton.addEventListener("click", () => this.close());
     windowControls.appendChild(minimizeButton);
