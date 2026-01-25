@@ -12,10 +12,17 @@
             <label for="to">
                 To:
             </label>
-            <input type="hidden" id="mid" name="mid" value="{{ recipient.id }}" autofocus>
-            <input type="text" id="to" name="to" title="To Member" value="{{ recipient.displayName }}" autocomplete="off"
-                data-autocomplete-action="searchmembers" data-autocomplete-output="#mid"
-                data-autocomplete-indicator="#validname">
+            <input type="hidden" id="mid" name="mid" value="{{ recipient.id }}">
+            <input
+              type="text"
+              id="to"
+              name="to"
+              title="To Member" value="{{ recipient.displayName }}"
+              autocomplete="off"
+              autofocus
+              data-autocomplete-action="searchmembers" data-autocomplete-output="#mid"
+              data-autocomplete-indicator="#validname"
+            >
             <span id="validname" class="{% if recipient %}valid{% endif %}">
             </span>
         </div>

@@ -78,6 +78,7 @@ ${o==="&nbsp"?"":o}
       <h3>Navigation</h3>
       <dl>
         <dt>?</dt><dd>This help window</dd>
+        <dt>h</dt><dd>Home / Board Index</dd>
         <dt>i</dt><dd>Inbox</dd>
         <dt>s</dt><dd>Settings</dd>
         `+(globalSettings.isAdmin?"<dt>a</dt><dd>Admin CP</dd>":"")+(globalSettings.isMod?"<dt>m</dt><dd>Moderator CP</dd>":"")+`</dl>
