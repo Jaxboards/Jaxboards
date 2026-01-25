@@ -40,7 +40,8 @@
     "slevomat/coding-standard": "^8.26",
     "spatie/phpunit-snapshot-assertions": "^5.2",
     "squizlabs/php_codesniffer": "^4.0",
-    "vimeo/psalm": "^6.14"
+    "vimeo/psalm": "^6.14",
+    "joeymckenzie/nasastan": "^0.1.2"
   },
   "require": {
     "composer": "2.9.4",

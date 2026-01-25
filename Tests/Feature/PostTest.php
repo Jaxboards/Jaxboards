@@ -36,6 +36,7 @@ use Jax\Router;
 use Jax\Routes\API;
 use Jax\Routes\Post;
 use Jax\Routes\Post\CreateTopic;
+use Jax\Routes\Post\CreateTopicInput;
 use Jax\ServiceConfig;
 use Jax\Session;
 use Jax\Template;
@@ -55,6 +56,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(BotDetector::class)]
 #[CoversClass(Column::class)]
 #[CoversClass(Config::class)]
+#[CoversClass(CreateTopicInput::class)]
 #[CoversClass(Database::class)]
 #[CoversClass(DatabaseUtils::class)]
 #[CoversClass(Date::class)]

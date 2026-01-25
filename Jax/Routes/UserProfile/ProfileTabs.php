@@ -56,9 +56,6 @@ final class ProfileTabs
         return $this->tabs;
     }
 
-    /**
-     * @return list{list<string>,string}
-     */
     public function render(string $page, Member $member): string
     {
         $selectedTab = in_array($page, $this->tabs, true) ? $page : 'activity';
@@ -133,11 +130,13 @@ final class ProfileTabs
 
         foreach ($posts as $post) {
             $topic = $topics[$post->tid];
-            $forum = $forums[$topic->fid];
+            if ($topic->fid) {
+                $forum = $forums[$topic->fid];
 
-            $perms = $this->user->getForumPerms($forum->perms);
-            if (!$perms['read']) {
-                continue;
+                $perms = $this->user->getForumPerms($forum->perms);
+                if (!$perms['read']) {
+                    continue;
+                }
             }
 
             $tabHTML .= $this->template->render(
@@ -179,11 +178,14 @@ final class ProfileTabs
             '',
             array_map(function (Post $post) use ($topics, $forums): string {
                 $topic = $topics[$post->tid];
-                $forum = $forums[$topic->fid];
 
-                $perms = $this->user->getForumPerms($forum->perms);
-                if (!$perms['read']) {
-                    return '';
+                if ($topic->fid) {
+                    $forum = $forums[$topic->fid];
+
+                    $perms = $this->user->getForumPerms($forum->perms);
+                    if (!$perms['read']) {
+                        return '';
+                    }
                 }
 
                 return $this->template->render(

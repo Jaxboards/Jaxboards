@@ -12,12 +12,11 @@ parameters:
       - vendor
   level: 8
   paths:
-    - Script
-    - Service
     - ACP
-    - api
     - config.default.php
     - Jax
-    - tools
+    - Script
+    - Service
+    - Tools
     - index.php
 

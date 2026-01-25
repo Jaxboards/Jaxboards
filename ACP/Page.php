@@ -25,9 +25,9 @@ final class Page
         'title' => '',
     ];
 
-    private readonly Environment $twigEnvironment;
+    private Environment $twigEnvironment;
 
-    private readonly FilesystemLoader $filesystemLoader;
+    private FilesystemLoader $filesystemLoader;
 
     public function __construct(
         private readonly FileSystem $fileSystem,
@@ -140,7 +140,7 @@ final class Page
      * Parse a template file, replacing {{ key }} with the value of $data['key'].
      *
      * @param string                         $templateFile the path to the template file
-     * @param array<string,float|int|string> $data         Template variables to be replaced
+     * @param array<string,mixed> $data         Template variables to be replaced
      *
      * @return string returns the template with the data replaced
      */

@@ -81,6 +81,7 @@ final class Database
         string $prefix = '',
         string $driver = '',
     ): void {
+
         $this->pdo = match ($driver) {
             'sqliteMemory' => new Sqlite('sqlite::memory:'),
             'postgres' => new Pgsql(
@@ -96,11 +97,13 @@ final class Database
         };
 
         // All datetimes are GMT for jaxboards
-        match ($driver) {
-            'postgres' => $this->pdo->query('SET TIME ZONE "UTC"'),
-            'sqliteMemory' => MySQLite::install($this->pdo),
-            default => $this->pdo->query("SET time_zone = '+0:00'"),
-        };
+        if ($this->pdo instanceof Pgsql) {
+            $this->pdo->query('SET TIME ZONE "UTC"');
+        } else if ($this->pdo instanceof Sqlite) {
+            MySQLite::install($this->pdo);
+        } else {
+            $this->pdo->query("SET time_zone = '+0:00'");
+        }
 
         $this->setPrefix($prefix);
         $this->driver = $driver;

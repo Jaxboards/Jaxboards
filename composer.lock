@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "33a24060a6321a70521b7ed07cc01850",
+    "content-hash": "2769c4c1c6a50061c30db3ed68db6557",
     "packages": [
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -3207,6 +3207,64 @@
                 "source": "https://github.com/Jean85/pretty-package-versions/tree/2.1.1"
             },
             "time": "2025-03-19T14:43:43+00:00"
+        },
+        {
+            "name": "joeymckenzie/nasastan",
+            "version": "0.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/JoeyMckenzie/nasastan.git",
+                "reference": "d162b0ff9314188ed9e16711bd11cea02b685976"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/JoeyMckenzie/nasastan/zipball/d162b0ff9314188ed9e16711bd11cea02b685976",
+                "reference": "d162b0ff9314188ed9e16711bd11cea02b685976",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.21",
+                "peckphp/peck": "^0.1.2",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^12.0",
+                "rector/rector": "^2.0",
+                "symfony/process": "^7.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Examples\\": "examples/",
+                    "NASAStan\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joey McKenzie",
+                    "email": "joey.mckenzie27@gmail.com"
+                }
+            ],
+            "description": "A PHPStan extension to enforce NASA's Power of Ten rules.",
+            "keywords": [
+                "NASA",
+                "PHPStan",
+                "static analysis"
+            ],
+            "support": {
+                "issues": "https://github.com/JoeyMckenzie/nasastan/issues",
+                "source": "https://github.com/JoeyMckenzie/nasastan/tree/0.1.2"
+            },
+            "time": "2025-03-13T19:06:47+00:00"
         },
         {
             "name": "kelunik/certificate",

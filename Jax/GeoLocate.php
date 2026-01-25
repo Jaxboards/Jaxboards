@@ -35,8 +35,12 @@ final readonly class GeoLocate
         }
     }
 
-    public function getFlagEmoji(string $isoCode): string
+    public function getFlagEmoji(?string $isoCode): string
     {
+        if (!$isoCode) {
+            return '';
+        }
+
         $asciiA = 65;
         $letterA = 127462;
 

@@ -195,7 +195,7 @@ final readonly class Inbox
 
                 $messageTitle = ($todo === 'reply' ? 'RE:' : 'FWD:') . $message->title;
                 $messageBody = PHP_EOL . PHP_EOL . PHP_EOL
-                    . "[quote={$sender->displayName}]{$message->message}[/quote]";
+                    . "[quote={$sender?->displayName}]{$message->message}[/quote]";
             }
         }
 
@@ -411,7 +411,7 @@ final readonly class Inbox
         );
         $rows = array_map(static fn(Message $message): array => [
             'message' => $message,
-            'otherMember' => $membersById[$getMessageMemberId($message)],
+            'otherMember' => $membersById[$getMessageMemberId($message) ?? 0],
         ], $messages);
 
         if ($view === 'inbox') {

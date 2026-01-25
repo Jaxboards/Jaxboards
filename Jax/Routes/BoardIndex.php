@@ -125,7 +125,7 @@ final class BoardIndex implements Route
         $lastPostMembers = $this->fetchLastPostMembers($forums);
         $forumsByCatID = Lodash::groupBy(
             $forums,
-            static fn(Forum $forum): ?int => $forum->category,
+            static fn(Forum $forum): int => $forum->category ?? 0,
         );
 
         $this->setModsFromForums($forums);
@@ -294,7 +294,7 @@ final class BoardIndex implements Route
                 $list[] = $userOnline;
             }
 
-            if ($oldcache !== null) {
+            if ($oldcache !== null && $userOnline->uid) {
                 unset($oldcache[$userOnline->uid]);
             }
 
@@ -349,7 +349,7 @@ final class BoardIndex implements Route
                 "{$forumSelector}_lastpost",
                 $this->formatLastPost(
                     $unreadForum,
-                    $lastPostMembers[$unreadForum->lastPostUser] ?? null,
+                    $unreadForum->lastPostUser ? $lastPostMembers[$unreadForum->lastPostUser] : null,
                 ),
                 '1',
             );
@@ -393,7 +393,7 @@ final class BoardIndex implements Route
             );
         }
 
-        if (!array_key_exists($forum->id, $this->forumsread)) {
+        if (!array_key_exists($forum->id, $this->forumsread ?? [])) {
             $this->forumsread[$forum->id] = 0;
         }
 

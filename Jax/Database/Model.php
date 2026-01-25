@@ -29,6 +29,9 @@ abstract class Model
 
     private bool $fromDatabase = false;
 
+    /**
+     * @param array<mixed> $properties
+     */
     public function __construct($properties = [])
     {
         foreach ($properties as $property => $value) {
@@ -100,7 +103,7 @@ abstract class Model
             ...$args,
         );
 
-        return $stmt?->fetch(PDO::FETCH_OBJ)?->count ?? 0;
+        return $stmt?->fetch(PDO::FETCH_OBJ)->count ?? 0;
     }
 
     /**
@@ -111,10 +114,17 @@ abstract class Model
      */
     public static function selectOne(...$args): ?static
     {
-        $selectArgs = match (count($args)) {
-            1 => [Database::WHERE_ID_EQUALS, $args[0]],
-            default => $args,
-        };
+        if ($args === []) {
+            $where = null;
+            $selectArgs = [];
+        } else if (count($args) === 1) {
+            $where = Database::WHERE_ID_EQUALS;
+            $selectArgs = [$args[0]];
+        } else {
+            /** @var string $where */
+            $where = $args[0];
+            $selectArgs = array_slice($args, 1);
+        }
 
         $database = self::$database;
         $stmt = $database->select(
@@ -123,6 +133,7 @@ abstract class Model
                 static::getFields(),
             ),
             static::TABLE,
+            $where,
             ...$selectArgs,
         );
         $record = $stmt?->fetchObject(static::class) ?: null;
@@ -250,9 +261,9 @@ abstract class Model
         return $database->update(
             static::TABLE,
             $this->asArray(),
-            ...($primaryKey !== '' ? [
+            ...($primaryKey ? [
                 "WHERE {$primaryKey}=?",
-                $data[static::getPrimaryKey()?->name],
+                $data[$primaryKey],
             ] : []),
         );
     }

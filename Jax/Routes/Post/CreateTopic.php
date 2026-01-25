@@ -15,13 +15,11 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function array_filter;
 use function count;
 use function json_encode;
 use function mb_strlen;
 use function mb_substr;
 use function preg_replace;
-use function preg_split;
 use function trim;
 
 use const JSON_THROW_ON_ERROR;
@@ -29,6 +27,7 @@ use const JSON_THROW_ON_ERROR;
 final readonly class CreateTopic
 {
     public function __construct(
+        private CreateTopicInput $createTopicInput,
         private Database $database,
         private Page $page,
         private Request $request,
@@ -38,30 +37,10 @@ final readonly class CreateTopic
         private User $user,
     ) {}
 
-    public function getInput(): array
+    public function validateInput(): ?string
     {
-        $input = [
-            'fid' => (int) $this->request->both('fid'),
-            'pollChoices' => $this->request->asString->post('pollchoices'),
-            'pollQuestion' => $this->request->asString->post('pollq'),
-            'pollType' => $this->request->asString->post('pollType'),
-            'topicDescription' => $this->request->asString->post('tdesc'),
-            'topicTitle' => $this->request->asString->post('ttitle'),
-        ];
-        $input['pollChoices'] = $input['pollChoices'] !== null ? array_filter(
-            preg_split("@[\r\n]+@", $input['pollChoices']) ?: [],
-            static fn(string $line): bool => trim($line) !== '',
-        ) : [];
-
-        return $input;
-    }
-
-    /**
-     * @param array<mixed> $input
-     */
-    public function validateInput(array $input): ?string
-    {
-        $forum = Forum::selectOne($input['fid']);
+        $input = $this->createTopicInput;
+        $forum = Forum::selectOne($input->fid);
         $forumPerms = $forum !== null
             ? $this->user->getForumPerms($forum->perms)
             : [];
@@ -70,28 +49,28 @@ final readonly class CreateTopic
         $error = match (true) {
             !$forum => "The forum you're trying to post in does not exist.",
             !$forumPerms['start'] => "You don't have permission to post a new topic in that forum.",
-            !$input['topicTitle'] || trim(
-                (string) $input['topicTitle'],
+            !$input->topicTitle || trim(
+                (string) $input->topicTitle,
             ) === '' => "You didn't specify a topic title!",
             mb_strlen(
-                (string) $input['topicTitle'],
+                (string) $input->topicTitle,
             ) > 255 => 'Topic title must not exceed 255 characters',
             mb_strlen(
-                $input['topicDescription'] ?? '',
+                $input->topicDescription ?? '',
             ) > 255 => 'Topic description must not exceed 255 characters',
             default => null,
         };
 
         // Poll input validation
         $error ??= match (true) {
-            !$input['pollType'] => null,
-            $input['pollQuestion'] === null || trim(
-                $input['pollQuestion'],
+            !$input->pollType => null,
+            $input->pollQuestion === null || trim(
+                $input->pollQuestion,
             ) === '' => "You didn't specify a poll question!",
             count(
-                $input['pollChoices'],
+                $input->pollChoices,
             ) > 10 => 'Poll choices must not exceed 10.',
-            $input['pollChoices'] === [] => "You didn't provide any poll choices!",
+            $input->pollChoices === [] => "You didn't provide any poll choices!",
             $forum && !$forumPerms['poll'] => "You don't have permission to post a poll in that forum",
             default => null,
         };
@@ -99,36 +78,37 @@ final readonly class CreateTopic
         return $error;
     }
 
-    public function createTopic(array $input): Topic
+    public function createTopic(?string $postBody): Topic
     {
+        $input = $this->createTopicInput;
         $uid = $this->user->get()->id;
         $postDate = $this->database->datetime();
 
         $topic = new Topic();
         $topic->author = $uid;
         $topic->date = $postDate;
-        $topic->fid = $input['fid'];
+        $topic->fid = $input->fid;
         $topic->lastPostDate = $postDate;
         $topic->lastPostUser = $uid;
-        $topic->pollChoices = $input['pollChoices'] !== []
-            ? (json_encode($input['pollChoices'], JSON_THROW_ON_ERROR))
+        $topic->pollChoices = $input->pollChoices !== []
+            ? (json_encode($input->pollChoices, JSON_THROW_ON_ERROR))
             : '';
-        $topic->pollQuestion = $input['pollQuestion'] ?: '';
-        $topic->pollType = $input['pollType'] ?? '';
+        $topic->pollQuestion = $input->pollQuestion ?: '';
+        $topic->pollType = $input->pollType ?? '';
         $topic->replies = 0;
-        $topic->subtitle = $input['topicDescription'] ?? '';
+        $topic->subtitle = $input->topicDescription ?? '';
         $topic->summary = mb_substr(
             (string) preg_replace(
                 '@\s+@',
                 ' ',
                 $this->textFormatting->textOnly(
-                    $this->postData ?? '',
+                    $postBody,
                 ),
             ),
             0,
             50,
         );
-        $topic->title = $input['topicTitle'];
+        $topic->title = $input->topicTitle ?? '';
         $topic->views = 0;
         $topic->insert();
 

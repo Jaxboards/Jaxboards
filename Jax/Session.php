@@ -67,7 +67,7 @@ final class Session
     public function loginWithToken(): ?int
     {
         $this->fetchSessionData(
-            session_id() ?? $this->request->get('sessid') ?? null,
+            session_id() ?: $this->request->asString->get('sessid')
         );
 
         if ($this->modelsSession->isBot !== 0) {
@@ -336,7 +336,7 @@ final class Session
 
         libxml_clear_errors();
 
-        return $domDocument->saveHTML();
+        return $domDocument->saveHTML() ?: '';
     }
 
     private function createSession(): void
@@ -345,7 +345,7 @@ final class Session
         $sid = $botName;
 
         if (!$sid) {
-            $sid = session_id();
+            $sid = session_id() ?: '';
             $this->setPHPSessionValue('sid', $sid);
         }
 

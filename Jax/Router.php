@@ -46,11 +46,6 @@ use function trim;
 final class Router
 {
     /**
-     * @var array<string,class-string>
-     */
-    private array $staticRoutes = [];
-
-    /**
      * Keys: names of routes
      * Values: paths for URLs with params.
      *
@@ -58,6 +53,10 @@ final class Router
      */
     private array $urls = [];
 
+    /**
+     * Map of paths to class-string
+     * @var array<string,string>
+     */
     private array $paths = [];
 
     public function __construct(
@@ -225,7 +224,6 @@ final class Router
      */
     private function get(string $name, string $path, string $classString): void
     {
-        $this->staticRoutes[$name] = $classString;
         $this->urls[$name] = $path;
 
         // Replaces {param} with a name-captured subgroup (?<param>.*) and makes a full regex

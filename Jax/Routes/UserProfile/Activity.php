@@ -93,7 +93,7 @@ final readonly class Activity
                 'link' => $this->router->url('profile', [
                     'id' => $modelsActivity->affectedUser,
                 ]),
-                'text' => "{$user->displayName} commented on {$affectedUser->displayName}'s profile",
+                'text' => "{$user->displayName} commented on {$affectedUser?->displayName}'s profile",
             ],
             'new_post' => [
                 'link' => $this->router->url('topic', [
@@ -118,7 +118,7 @@ final readonly class Activity
                 'link' => $this->router->url('profile', [
                     'id' => $modelsActivity->uid,
                 ]),
-                'text' => $user->displayName . ' made friends with ' . $affectedUser->displayName,
+                'text' => $user->displayName . ' made friends with ' . $affectedUser?->displayName,
             ],
             default => ['link' => '', 'text' => ''],
         };

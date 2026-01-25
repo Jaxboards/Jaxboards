@@ -72,7 +72,7 @@ final class BBCode
     /**
      * Returns list of all URLs (extracted from BBCode) in the $text.
      *
-     * @returns string[]
+     * @return string[]
      */
     public function getURLs(string $text): array
     {

@@ -7,6 +7,7 @@ namespace ACP\Page;
 use ACP\Page;
 use ACP\Page\Tools\FileManager;
 use Jax\Database\Database;
+use Jax\Database\Model;
 use Jax\Database\Utils as DatabaseUtils;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
@@ -90,8 +91,10 @@ final readonly class Tools
 
             $ftable = $this->database->ftable($tableName);
             $sqlFileLines[] = "DROP TABLE IF EXISTS {$ftable};";
+            /** @var Model $modelInstance */
+            $modelInstance = new $model;
             $sqlFileLines[] = $this->databaseUtils->createTableQueryFromModel(
-                new $model(),
+                $modelInstance,
             ) . ';';
 
             // Generate INSERTS with all row data

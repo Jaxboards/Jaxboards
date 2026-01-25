@@ -69,7 +69,7 @@
                 <div id="reaction_p{{ post.id }}">{{ postRating|raw }}</div>
             {% endif %}
             <div class="signature">
-                {% if canUseSignatures %}
+                {% if group.canUseSignatures %}
                     {{ author.sig|theWorks }}
                 {% endif %}
             </div>

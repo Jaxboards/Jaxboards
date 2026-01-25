@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Error;
+
 use function preg_match;
 use function str_replace;
 
@@ -17,7 +19,7 @@ final class DomainDefinitions
 {
     private string $boardURL = '';
 
-    private readonly ?string $prefix;
+    private readonly string $prefix;
 
     public function __construct(
         private readonly FileSystem $fileSystem,
@@ -92,7 +94,7 @@ final class DomainDefinitions
      *
      * Given: "test.jaxboards.com" returns "test"
      */
-    private function getPrefix(string $host): ?string
+    private function getPrefix(string $host): string
     {
         if ($this->serviceConfig->getSetting('service')) {
             $domainMatch = str_replace(
@@ -114,6 +116,12 @@ final class DomainDefinitions
             }
         }
 
-        return $this->serviceConfig->getSetting('prefix');
+        $prefix = $this->serviceConfig->getSetting('prefix');
+
+        if (!is_string($prefix)) {
+            throw new Error('Unable to determine board prefix');
+        }
+
+        return $prefix;
     }
 }

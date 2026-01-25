@@ -117,7 +117,7 @@ final readonly class Poll
                     $results[$c][] = $this->user->get()->id;
                 }
             }
-        } else {
+        } else if ($choice !== null) {
             $results[$choice][] = $this->user->get()->id;
         }
 

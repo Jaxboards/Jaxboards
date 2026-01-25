@@ -247,16 +247,11 @@ final class Post implements Route
         $topicTitle = $this->request->asString->post('ttitle');
         $topicDesc = $this->request->asString->post('tdesc');
 
-        $error = match (true) {
-            $topicTitle === null || trim(
-                $topicTitle,
-            ) === '' => 'You must supply a topic title!',
-            default => null,
+        if ($topicTitle == null || trim(
+            $topicTitle,
+        ) === '') {
+            return 'You must supply a topic title!';
         };
-
-        if ($error) {
-            return $error;
-        }
 
         $topic->title = $topicTitle;
         $topic->subtitle = $topicDesc ?? '';
@@ -298,7 +293,7 @@ final class Post implements Route
             return "You don't have permission to edit that post!";
         }
 
-        $removeEmbed = $this->request->both('removeEmbed');
+        $removeEmbed = $this->request->asString->both('removeEmbed');
         if ($removeEmbed !== null) {
             $openGraphMetadata = json_decode(
                 $post->openGraphMetadata,
@@ -324,7 +319,7 @@ final class Post implements Route
                 return $error;
             }
 
-            $post->post = $postData;
+            $post->post = $postData ?? '';
             $this->updatePost($post);
 
             if ($isTopicPost) {
@@ -360,10 +355,7 @@ final class Post implements Route
 
     private function createTopic(): null
     {
-        $topicInput = $this->createTopic->getInput();
-        $error = $this->createTopic->validateInput(
-            $topicInput,
-        ) ?? $this->validatePost(
+        $error = $this->createTopic->validateInput() ?? $this->validatePost(
             $this->postData,
         );
 
@@ -377,7 +369,7 @@ final class Post implements Route
             return null;
         }
 
-        $topic = $this->createTopic->createTopic($topicInput);
+        $topic = $this->createTopic->createTopic($this->postData);
         $this->createPost($topic->id, true);
 
         return null;
@@ -421,12 +413,13 @@ final class Post implements Route
         }
 
         // Actually PUT THE POST IN!
+        $postData = $postData ?? '';
         $post = new ModelsPost();
         $post->author = $uid;
         $post->date = $postDate;
         $post->ip = $this->ipAddress->asBinary() ?? '';
         $post->newtopic = $newtopic ? 1 : 0;
-        $post->post = $postData ?? '';
+        $post->post = $postData;
         $post->tid = $tid;
         $post->openGraphMetadata = json_encode(
             $this->openGraph->fetchFromBBCode($postData),

@@ -34,9 +34,9 @@ final class Template
 
     private string $template;
 
-    private readonly Environment $twigEnvironment;
+    private Environment $twigEnvironment;
 
-    private readonly FilesystemLoader $filesystemLoader;
+    private FilesystemLoader $filesystemLoader;
 
     public function __construct(
         private readonly Container $container,
@@ -78,6 +78,9 @@ final class Template
         $this->template = $this->fileSystem->getContents($file) ?: '';
     }
 
+    /**
+     * @param array<mixed> $context
+     */
     public function render(string $name, array $context = []): string
     {
         return $this->twigEnvironment->render($name . '.html.twig', $context);

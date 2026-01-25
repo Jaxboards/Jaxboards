@@ -144,7 +144,7 @@ final readonly class ServiceSignup
         $directory->date = $this->database->datetime();
         $directory->referral = $this->request->asString->both('r');
         $directory->registrarEmail = $email;
-        $directory->registrarIP = $this->ipAddress->asBinary();
+        $directory->registrarIP = $this->ipAddress->asBinary() ?? '';
         $directory->insert();
 
         $this->database->setPrefix($boardURLLowercase . '_');

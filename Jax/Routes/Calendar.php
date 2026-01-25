@@ -77,10 +77,12 @@ final readonly class Calendar implements Route
             }
 
             $birthday = $this->date->dateAsCarbon($member->birthdate);
-            $birthdays[$birthday?->day][] = [
-                'member' => $member,
-                'age' => $birthday->age,
-            ];
+            if ($birthday) {
+                $birthdays[$birthday->day][] = [
+                    'member' => $member,
+                    'age' => $birthday->age,
+                ];
+            }
         }
 
         $weeks = [];

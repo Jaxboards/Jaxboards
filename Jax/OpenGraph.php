@@ -97,7 +97,7 @@ final readonly class OpenGraph
                     mb_substr($property ?? '', 3),
                 )] = $metumTag->getAttribute(
                     'content',
-                );
+                ) ?? '';
             }
 
             libxml_clear_errors();
@@ -115,18 +115,22 @@ final readonly class OpenGraph
             }
 
             return $metaValues;
-        } catch (Exception|Error) {
+        } catch (Exception | Error) {
             return [];
         }
     }
 
+    /**
+     * Returns a map of url -> open graph metadata
+     * @return array<string,array<string,string>>
+     */
     public function fetchFromBBCode(string $text): array
     {
         $openGraphData = [];
 
         $urls = array_filter(
             $this->bbCode->getURLs($text),
-            $this->filterHTTPURL(...),
+            fn($url) => (bool) $this->filterHTTPURL($url)
         );
 
         // Limit # of embeddings to prevent abuse

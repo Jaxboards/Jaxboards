@@ -508,10 +508,10 @@ final readonly class Themes
 
     private function submitCreateSkin(): ?string
     {
-        $skinName = $this->request->asString->post('skinname');
-        $wrapperName = $this->request->asString->post('wrapper');
+        $skinName = $this->request->asString->post('skinname') ?? '';
+        $wrapperName = $this->request->asString->post('wrapper') ?? '';
         $error = match (true) {
-            !$skinName => 'No skin name supplied!',
+            $skinName === '' => 'No skin name supplied!',
             !$this->isValidFilename(
                 $skinName,
             ) => 'Skinname must only consist of letters, numbers, and spaces.',
@@ -550,8 +550,8 @@ final readonly class Themes
         $skin->custom = 1;
         $skin->default = $this->request->post('default') ? 1 : 0;
         $skin->hidden = $this->request->post('hidden') ? 1 : 0;
-        $skin->title = $skinName ?? '';
-        $skin->wrapper = $wrapperName ?? '';
+        $skin->title = $skinName;
+        $skin->wrapper = $wrapperName;
         $skin->insert();
 
         if ($this->request->post('default')) {

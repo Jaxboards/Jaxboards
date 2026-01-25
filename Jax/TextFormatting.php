@@ -180,7 +180,7 @@ final readonly class TextFormatting
 
     public function textOnly(?string $text): string
     {
-        if ((string) $text === '') {
+        if ($text === null || $text === '') {
             return '';
         }
 
@@ -263,7 +263,7 @@ final readonly class TextFormatting
                 default => null,
             };
 
-            $stringURL = $parts['path']
+            $stringURL = ($parts['path'] ?? '')
                 . (array_key_exists(
                     'query',
                     $parts,

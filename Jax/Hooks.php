@@ -28,6 +28,7 @@ final class Hooks
 
     /**
      * Dispatches an event to all listeners.
+     * @param array<mixed> $payload
      */
     public function dispatch(string $hookName, ...$payload): void
     {

@@ -215,12 +215,12 @@ final class Forum implements Route
         ModelsForum $modelsForum,
         array $topics,
     ): string {
-        $memberIds = array_merge(
+        $memberIds = $topics !== [] ? array_merge(
             ...array_map(
                 static fn(Topic $topic): array => [$topic->author, $topic->lastPostUser],
                 $topics,
             ),
-        );
+        ) : [];
 
         $membersById = $memberIds !== [] ? Lodash::keyBy(
             Member::selectMany(
@@ -233,9 +233,9 @@ final class Forum implements Route
         $isForumModerator = $this->isForumModerator($modelsForum);
 
         $rows = array_map(fn(Topic $topic): array => [
-            'author' => $membersById[$topic->author],
+            'author' => $topic->author ? $membersById[$topic->author] : null,
             'topic' => $topic,
-            'lastPostUser' => $membersById[$topic->lastPostUser] ?? null,
+            'lastPostUser' => $topic->lastPostUser ? $membersById[$topic->lastPostUser] : null,
             'isRead' => $this->isTopicRead($topic),
             'isForumModerator' => $isForumModerator,
             'pages' => $this->renderTopicPages($topic),

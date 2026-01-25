@@ -33,7 +33,7 @@ final readonly class Manifest implements Route
                 'start_url' => '/',
                 'display' => 'standalone',
             ],
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
-        ));
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
+        ) ?: '');
     }
 }

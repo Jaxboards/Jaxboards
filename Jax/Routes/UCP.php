@@ -480,7 +480,7 @@ final readonly class UCP implements Route
 
         $birthdate = $this->user->get()->birthdate;
         $birthdate = $birthdate !== null
-            ? $this->date->dateAsCarbon($this->user->get()->birthdate)
+            ? $this->date->dateAsCarbon($birthdate)
             : null;
 
         return $this->template->render(

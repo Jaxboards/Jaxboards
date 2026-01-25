@@ -249,9 +249,9 @@ final readonly class Forums
                         $highlight && $forumId === $highlight ? 'highlight' : '',
                     ]),
                     'content' => $subforums !== []
-                        // phpstan hates recursion
-                        // @phpstan-ignore argument.type
                         ? $this->printForumTree(
+                            // phpstan hates recursion
+                            // @phpstan-ignore argument.type
                             $subforums,
                             $forums,
                             $highlight,
@@ -306,7 +306,7 @@ final readonly class Forums
             static fn(array $forums): ForumTree => new ForumTree($forums),
             Lodash::groupBy(
                 $forums,
-                static fn($forum): ?int => $forum->category,
+                static fn($forum): int => $forum->category ?? 0,
             ),
         );
 
@@ -589,7 +589,7 @@ final readonly class Forums
 
         if ($forum === null) {
             $forum = new Forum();
-            $forum->category = array_first($categories)->id;
+            $forum->category = array_first($categories)?->id;
         }
 
         $forum->nocount = $this->request->asString->post('count') ? 0 : 1;

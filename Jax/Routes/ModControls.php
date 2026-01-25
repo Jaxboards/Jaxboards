@@ -355,7 +355,14 @@ final readonly class ModControls implements Route
     private function showReport(int $reportId): string
     {
         $report = Report::selectOne($reportId);
+        if (!$report) {
+            return '';
+        }
+
         $post = Post::selectOne($report->pid);
+        if (!$post) {
+            return '';
+        }
 
         if ($report->acknowledger === null) {
             $report->acknowledger = $this->user->get()->id;
@@ -397,7 +404,7 @@ final readonly class ModControls implements Route
             'report' => $report,
             'post' => $posts[$report->pid],
             'reporter' => $reporters[$report->reporter],
-            'acknowledger' => $acknowledgers[$report->acknowledger] ?? null,
+            'acknowledger' => $report->acknowledger ? $acknowledgers[$report->acknowledger] : null,
         ], $reports);
 
         return $this->template->render(

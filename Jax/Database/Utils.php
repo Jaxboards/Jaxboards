@@ -47,6 +47,8 @@ final readonly class Utils implements Adapter
      * Returns fully-qualified class names like `Jax\\Models\\Post`.
      *
      * @param mixed $directory
+     *
+     * @return array<string>
      */
     public function getModels($directory = 'Jax/Models/'): array
     {
@@ -137,13 +139,14 @@ final readonly class Utils implements Adapter
     }
 
     /**
-     * @param array<class-string> $models
+     * @param array<string> $models
      */
     private function installTablesFromModels(array $models): void
     {
         $queries = [];
 
         foreach ($models as $modelClass) {
+            /** @var Model */
             $model = new $modelClass();
             $queries[] = 'DROP TABLE IF EXISTS ' . $this->database->ftable(
                 $model::TABLE,

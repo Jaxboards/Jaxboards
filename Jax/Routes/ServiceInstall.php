@@ -144,7 +144,7 @@ final readonly class ServiceInstall
 
         // This only exists so the test can set it, although
         // it could be a form field one day (so the user can choose the driver)
-        $sqlDriver = $this->request->asString->post('sql_driver');
+        $sqlDriver = $this->request->asString->post('sql_driver') ?? '';
 
         if (
             $domain !== null

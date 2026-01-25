@@ -39,7 +39,7 @@ final class Config
             return $this->boardConfig;
         }
 
-        $this->boardConfig = [];
+        $boardConfig = [];
 
         $boardConfigPath = $this->fileSystem->pathJoin(
             $this->domainDefinitions->getBoardPath(),
@@ -47,12 +47,13 @@ final class Config
         );
 
         if ($this->fileSystem->getFileInfo($boardConfigPath)->isFile()) {
-            $this->boardConfig = require_once $this->fileSystem->pathFromRoot(
+            $boardConfig = require_once $this->fileSystem->pathFromRoot(
                 $boardConfigPath,
             );
         }
 
-        return $this->boardConfig;
+        $this->boardConfig = $boardConfig;
+        return $boardConfig;
     }
 
     public function getSetting(string $key): mixed

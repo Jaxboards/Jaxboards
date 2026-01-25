@@ -104,10 +104,13 @@ final class Ticker implements Route
 
         foreach ($posts as $post) {
             $topic = $topics[$post->tid];
-            $forum = $forums[$topic->fid];
 
-            if (!$this->user->getForumPerms($forum->perms)['read']) {
-                continue;
+            if ($topic->fid) {
+                $forum = $forums[$topic->fid];
+
+                if (!$this->user->getForumPerms($forum->perms)['read']) {
+                    continue;
+                }
             }
 
             $ticks[] = [

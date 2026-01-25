@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Error;
 use Exception;
 use Jax\Models\Skin;
 
@@ -179,6 +180,10 @@ final class Page
 
         $skin = $this->getSelectedSkin($skinId);
 
+        if (!$skin) {
+            throw new Error('Unable to get any available board skin');
+        }
+
         $themePath = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardPath() : '') . '/Themes/' . $skin->title;
         $themeUrl = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardPathUrl() : '') . '/Themes/' . $skin->title;
 
@@ -242,7 +247,7 @@ final class Page
             $this->openGraphData,
             array_filter(
                 $data,
-                static fn(?string $value): ?string => $value,
+                static fn(?string $value): bool => (bool) $value,
             ),
         );
     }
@@ -252,7 +257,7 @@ final class Page
      * If not available, gets the board default.
      * If THAT isn't available, get jaxboards default skin.
      */
-    public function getSelectedSkin(?int $skinId): Skin
+    public function getSelectedSkin(?int $skinId): ?Skin
     {
         $skin = $skinId
             ? Skin::selectOne($skinId)

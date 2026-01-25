@@ -37,7 +37,7 @@ final readonly class Report implements Route
     public function route(array $params): void
     {
         $pid = (int) $this->request->both('pid');
-        $reason = $this->request->asString->post('reason');
+        $reason = $this->request->asString->post('reason') ?? '';
 
         if ($this->user->isGuest()) {
             $this->page->command(
@@ -50,7 +50,7 @@ final readonly class Report implements Route
 
         match (true) {
             array_key_exists(
-                (string) $reason,
+                $reason,
                 self::REPORT_REASONS,
             ) => $this->reportPost(
                 $pid,
