@@ -29,7 +29,6 @@ use function implode;
 use function in_array;
 use function is_array;
 use function mb_strlen;
-use function mb_substr;
 use function nl2br;
 use function preg_quote;
 use function preg_replace;
@@ -272,11 +271,11 @@ final class Search implements Route
                 ',',
                 array_filter(
                     array_map(
-                        fn($searchResult) => $searchResult['id'],
-                        $searchResults
+                        static fn(array $searchResult): mixed => $searchResult['id'],
+                        $searchResults,
                     ),
-                    fn($id) => !empty($id)
-                )
+                    static fn($id): bool => !empty($id),
+                ),
             );
 
             $this->session->addVar('search', $postIDs);
@@ -293,11 +292,12 @@ final class Search implements Route
             $terms[] = preg_quote($v);
         }
 
-        if ($postIDs === '') {
-            $page = $this->noResultsFound($terms);
-        } else {
-            $page = $this->renderSearchResults($terms, explode(',', $postIDs));
-        }
+        $page = $postIDs === '' ? $this->noResultsFound(
+            $terms,
+        ) : $this->renderSearchResults(
+            $terms,
+            explode(',', $postIDs),
+        );
 
         if (
             $this->request->isJSAccess()
@@ -313,7 +313,7 @@ final class Search implements Route
      * @param array<string> $terms
      * @param array<string> $postIDs
      */
-    private function renderSearchResults(array $terms, array $postIDs)
+    private function renderSearchResults(array $terms, array $postIDs): string
     {
         $numresults = count($postIDs);
         $idarray = array_slice(
@@ -325,17 +325,17 @@ final class Search implements Route
 
         $result = $this->database->special(
             <<<SQL
-                    SELECT
-                        p.`id` AS `id`,
-                        p.`tid` AS `tid`,
-                        p.`post` AS `post`,
-                        t.`title` AS `title`
-                    FROM %t p
-                    LEFT JOIN %t t
-                        ON p.`tid`=t.`id`
-                    WHERE p.`id` IN ?
-                    ORDER BY FIELD(p.`id`,{$ids})
-                    SQL,
+                SELECT
+                    p.`id` AS `id`,
+                    p.`tid` AS `tid`,
+                    p.`post` AS `post`,
+                    t.`title` AS `title`
+                FROM %t p
+                LEFT JOIN %t t
+                    ON p.`tid`=t.`id`
+                WHERE p.`id` IN ?
+                ORDER BY FIELD(p.`id`,{$ids})
+                SQL,
             ['posts', 'topics'],
             $idarray,
         );
@@ -395,7 +395,7 @@ final class Search implements Route
     /**
      * @param array<string> $terms
      */
-    private function noResultsFound(array $terms)
+    private function noResultsFound(array $terms): string
     {
         $error = 'No results found. '
             . 'Try refining your search, or using longer terms.';
