@@ -44,7 +44,7 @@ class Window {
 
   onclose?: () => void;
 
-  animate = false;
+  animate = true;
 
   private oldpos?: string;
 
@@ -252,7 +252,7 @@ class Window {
     if (x < 0) x = 0;
     if (y < 0) y = 0;
     container.style.left = `${x}px`;
-    if (this.animate || shouldAnimate) {
+    if (this.animate && shouldAnimate) {
       animate(
         container,
         [{ top: `${y - 100}px` }, { top: `${y}px` }],
