@@ -126,11 +126,13 @@ final class TextFormattingTest extends UnitTestCase
         ];
     }
 
-    public function testTextOnly()
+    public function testTextOnly(): void
     {
         self::assertEquals(
-            $this->textFormatting->textOnly('[b][i][u][quote=Sean]content[/quote][/u][/i][/b]'),
-            'content'
+            $this->textFormatting->textOnly(
+                '[b][i][u][quote=Sean]content[/quote][/u][/i][/b]',
+            ),
+            'content',
         );
     }
 }
