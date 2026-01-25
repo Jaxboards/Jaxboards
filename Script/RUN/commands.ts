@@ -78,6 +78,11 @@ export default {
     const el = document.querySelector<HTMLElement>(selector);
     if (!el) return;
     el.innerHTML = html;
+
+    const autofocusElement = el.querySelector<HTMLElement>("[autofocus]");
+    if (autofocusElement) {
+      autofocusElement.focus();
+    }
     if (shouldHighlight) {
       dehighlight(el);
     }

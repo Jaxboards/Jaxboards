@@ -305,6 +305,8 @@ final readonly class App
     {
         $globalSettings = $this->user->isGuest() ? [] : [
             'canIM' => $this->user->getGroup()?->canIM,
+            'isAdmin' => $this->user->getGroup()?->canAccessACP,
+            'isMod' => $this->user->getGroup()?->canModerate,
             'groupID' => $this->user->get()->groupID,
             'soundIM' => $this->user->get()->soundIM,
             'userID' => $this->user->get()->id,

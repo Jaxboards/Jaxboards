@@ -165,6 +165,10 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     setTimeout(() => {
       this.setSource(bbcodeToHTML(element.value));
       this.switchMode(this.htmlMode);
+
+      if (element.hasAttribute("autofocus")) {
+        this.window?.focus();
+      }
     }, 100);
   }
 

@@ -1,6 +1,7 @@
 import createSnow from "./eggs/snow";
 import { stopTitleFlashing } from "./JAX/flashing-title";
 import gracefulDegrade from "./JAX/graceful-degrade";
+import { handleKeyboardShortcuts } from "./JAX/keyboard-shortcuts";
 import { onDOMReady, supportsEmoji, updateDates } from "./JAX/util";
 import Stream from "./RUN/stream";
 import Sound from "./sound";
@@ -75,6 +76,9 @@ onDOMReady(function featureDetectionClasses() {
     document.documentElement.classList.add("no-emoji");
   }
   document.documentElement.classList.add("js-enabled");
+});
+onDOMReady(() => {
+  globalThis.addEventListener("keypress", handleKeyboardShortcuts);
 });
 
 export default RUN;

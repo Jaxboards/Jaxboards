@@ -15,10 +15,21 @@
       <a href="{{ url('ucp', { what: 'board' }) }}">Board Customization</a>
 
       <h2>Private Messaging</h2>
-      <a href="{{ url('inbox', { view: 'compose' }) }}" class="icon compose">Compose</a>
+      <a
+        href="{{ url('inbox', { view: 'compose' }) }}"
+        class="icon compose"
+        data-shortcut="c"
+      >Compose</a>
       <a href="{{ url('inbox') }}" class="icon inbox">Inbox</a>
-      <a href="{{ url('inbox', { view: 'sent' }) }}" class="icon sent">Sent</a>
-      <a href="{{ url('inbox', { view: 'flagged' }) }}" class="icon flagged">Flagged</a>
+      <a
+        href="{{ url('inbox', { view: 'sent' }) }}"
+        class="icon sent"
+      >Sent</a>
+      <a
+        href="{{ url('inbox', { view: 'flagged' }) }}"
+        class="icon flagged"
+        data-shortcut="f"
+      >Flagged</a>
     </div>
     <div id="ucppage" class="inbox">
       {{ page|raw }}

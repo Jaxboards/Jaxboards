@@ -20,12 +20,12 @@
         </li>
         {% if perms.canModerate %}
         <li>
-            <a href="{{ url('modcontrols') }}">Mod CP</a>
+            <a href="{{ url('modcontrols') }}" data-shortcut="m">Mod CP</a>
         </li>
         {% endif %}
         {% if perms.canAccessACP %}
         <li>
-            <a href="{{ url('acp') }}" target="_blank">ACP</a>
+            <a href="{{ url('acp') }}" target="_blank" data-shortcut="a">ACP</a>
         </li>
         {% endif %}
         <li class="spacer">&nbsp;</li>

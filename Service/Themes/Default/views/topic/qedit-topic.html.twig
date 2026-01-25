@@ -3,7 +3,14 @@
     <input type="hidden" name="tid" value="{{ topic.id }}">
     <input type="hidden" name="pid" value="{{ post.id }}">
     <label for="ttitle">Topic Title:</label>
-    <input type="text" id="ttitle" name="ttitle" title="Topic Title" value="{{ topic.title }}">
+    <input
+      type="text"
+      id="ttitle"
+      name="ttitle"
+      title="Topic Title"
+      value="{{ topic.title }}"
+      autofocus
+    >
     <br>
     <label for="tdesc">Topic Description:</label>
     <input type="text" id="tdesc" name="tdesc" title="Topic Description (extra information about your topic)"

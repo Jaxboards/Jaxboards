@@ -5,6 +5,8 @@ export {};
 declare global {
   const globalSettings: {
     canIM: boolean;
+    isAdmin: boolean;
+    isMod: boolean;
     groupID: number;
     soundIM: boolean;
     soundShout: boolean;
