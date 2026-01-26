@@ -82,7 +82,7 @@ textarea {
 .window .title .controls {
   cursor: pointer;
   position: absolute;
-  top: 7px;
+  top: 4px;
   right: 2px;
   font-size: smaller;
 }
