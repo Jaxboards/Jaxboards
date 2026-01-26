@@ -18,7 +18,6 @@ use function array_map;
 use function array_merge;
 use function array_slice;
 use function array_unique;
-use function assert;
 use function count;
 use function is_string;
 
