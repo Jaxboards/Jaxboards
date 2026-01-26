@@ -7,6 +7,7 @@ namespace ACP\Page;
 use ACP\Page;
 use ACP\Page\Tools\FileManager;
 use Jax\Database\Database;
+use Jax\Database\Model;
 use Jax\Database\Utils as DatabaseUtils;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;

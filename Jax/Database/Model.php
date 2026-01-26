@@ -124,8 +124,7 @@ abstract class Model
             $where = Database::WHERE_ID_EQUALS;
             $selectArgs = [$args[0]];
         } else {
-            $where = $args[0];
-            assert(is_string($where));
+            $where = is_string($args[0]) ? $args[0] : null;
             $selectArgs = array_slice($args, 1);
         }
 
