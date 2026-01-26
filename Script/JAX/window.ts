@@ -153,8 +153,6 @@ class Window {
         .apply(rsize);
       targ.style.width = `${windowContainer.clientWidth}px`;
       rsize.style.left = `${windowContainer.clientWidth - 16}px`;
-
-      return this.windowContainer;
     }
 
     const s = windowContainer.style;
