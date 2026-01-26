@@ -10,6 +10,8 @@ use Jax\FileSystem;
 use Jax\ServiceConfig;
 use Override;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\MockObject\MockBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 use function DI\autowire;
@@ -33,23 +35,27 @@ abstract class TestCase extends PHPUnitTestCase
         $this->container = new Container();
 
         // Prevent test suite from mutating files
-        $this->container->set(
-            FileSystem::class,
-            $this->getMockBuilder(FileSystem::class)
-                ->onlyMethods([
-                    'copy',
-                    'copyDirectory',
-                    'mkdir',
-                    'putContents',
-                    'removeDirectory',
-                    'rename',
-                    'unlink',
-                ])
-                ->getMock(),
-        );
+        $this->stubFileSystem();
 
         $this->setServiceConfig();
         $this->setBoardConfig();
+    }
+
+    protected function stubFileSystem($type = 'stub'): void
+    {
+        $fileSystem = $type === 'mock' ? $this->getMockBuilder(FileSystem::class) : $this->getStubBuilder(FileSystem::class);
+        $fileSystem->onlyMethods([
+            'copy',
+            'copyDirectory',
+            'mkdir',
+            'putContents',
+            'removeDirectory',
+            'rename',
+            'unlink',
+        ]);
+
+        $fileSystem = $fileSystem instanceof MockBuilder ? $fileSystem->getMock() : $fileSystem->getStub();
+        $this->container->set(Filesystem::class, $fileSystem);
     }
 
     protected function setServiceConfig($config = []): void

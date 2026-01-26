@@ -106,6 +106,7 @@ final class ServiceSignupTest extends FeatureTestCase
         $this->container->get(DatabaseUtils::class)->installServiceTables();
 
         // Assert that the boards directory is set up
+        $this->stubFileSystem('mock');
         $fileSystem = $this->container->get(FileSystem::class);
         $fileSystem->expects($this->once())
             ->method('copyDirectory')

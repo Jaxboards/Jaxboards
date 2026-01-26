@@ -42,7 +42,7 @@ final class WebhooksTest extends UnitTestCase
 
         // Mocks
         $curlMock = $this->createMock(Curl::class);
-        $this->container->set(User::class, $this->createConfiguredMock(
+        $this->container->set(User::class, $this->createConfiguredStub(
             User::class,
             [
                 'get' => new Member(

@@ -76,8 +76,6 @@ use function DI\autowire;
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(Session::class)]
 #[CoversClass(Shoutbox::class)]
-#[CoversClass(Hooks::class)]
-#[CoversClass(WebHooks::class)]
 #[CoversClass(SQLite::class)]
 #[CoversClass(Template::class)]
 #[CoversClass(TextFormatting::class)]
@@ -85,6 +83,7 @@ use function DI\autowire;
 #[CoversClass(User::class)]
 #[CoversClass(UserOnline::class)]
 #[CoversClass(UsersOnline::class)]
+#[CoversClass(WebHooks::class)]
 final class ShoutboxTest extends FeatureTestCase
 {
     #[Override]

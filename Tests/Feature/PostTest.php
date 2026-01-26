@@ -50,12 +50,13 @@ use Tests\FeatureTestCase;
 /**
  * @internal
  */
-#[CoversClass(App::class)]
 #[CoversClass(API::class)]
+#[CoversClass(App::class)]
 #[CoversClass(BBCode::class)]
 #[CoversClass(BotDetector::class)]
 #[CoversClass(Column::class)]
 #[CoversClass(Config::class)]
+#[CoversClass(CreateTopic::class)]
 #[CoversClass(CreateTopicInput::class)]
 #[CoversClass(Database::class)]
 #[CoversClass(DatabaseUtils::class)]
@@ -71,10 +72,8 @@ use Tests\FeatureTestCase;
 #[CoversClass(Lodash::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(OpenGraph::class)]
-#[CoversClass(OpenGraph::class)]
 #[CoversClass(Page::class)]
 #[CoversClass(Post::class)]
-#[CoversClass(CreateTopic::class)]
 #[CoversClass(PrivateMessage::class)]
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
@@ -82,13 +81,12 @@ use Tests\FeatureTestCase;
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(Session::class)]
 #[CoversClass(Shoutbox::class)]
-#[CoversClass(Hooks::class)]
-#[CoversClass(WebHooks::class)]
 #[CoversClass(SQLite::class)]
 #[CoversClass(Template::class)]
 #[CoversClass(TextFormatting::class)]
 #[CoversClass(TextRules::class)]
 #[CoversClass(User::class)]
+#[CoversClass(WebHooks::class)]
 final class PostTest extends FeatureTestCase
 {
     public function testPostNewTopic(): void
