@@ -29,7 +29,6 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\DOMAssert;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\MockObject\Stub;
 use SplFileInfo;
 use Tests\TestCase;
 
@@ -47,6 +46,7 @@ use function password_verify;
  *
  * @internal
  */
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(ServiceInstall::class)]
 #[CoversClass(Column::class)]
 #[CoversClass(ForeignKey::class)]
@@ -64,7 +64,6 @@ use function password_verify;
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(Template::class)]
-#[AllowMockObjectsWithoutExpectations]
 final class ServiceInstallTest extends TestCase
 {
     private MockObject&FileSystem $fileSystemMock;
