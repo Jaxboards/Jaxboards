@@ -59,7 +59,6 @@ textarea {
 
 /* All windows */
 .window {
-  background: url("img/shadowAlpha.png") bottom right;
   position: fixed;
 }
 
@@ -75,7 +74,7 @@ textarea {
 .window .title .controls {
   cursor: pointer;
   position: absolute;
-  top: 7px;
+  top: 4px;
   right: 2px;
   font-size: smaller;
 }
@@ -115,9 +114,6 @@ textarea {
 
 .window .content,
 .window .title {
-  position: relative;
-  top: -5px;
-  left: -5px;
   border: 1px solid #000;
 }
 
