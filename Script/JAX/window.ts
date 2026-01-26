@@ -72,38 +72,20 @@ class Window {
   }
 
   public render() {
-    const windowContainer = document.createElement("div");
+    const windowContainer = Object.assign(document.createElement("div"), {
+      id: this.id,
+      className: `window${this.className ? ` ${this.className}` : ""}`,
+    });
     this.windowContainer = windowContainer;
 
-    const titleBar = document.createElement("div");
-    const contentContainer = document.createElement("div");
-    const windowControls = document.createElement("div");
-    const minimizeButton = document.createElement("div");
-    const closeButton = document.createElement("div");
     const { pos } = this;
 
-    if (this.id) {
-      windowContainer.id = this.id;
-    }
+    const contentContainer = Object.assign(document.createElement("div"), {
+      className: "content",
+      innerHTML: this.content,
+    });
 
-    windowContainer.className = `window${
-      this.className ? ` ${this.className}` : ""
-    }`;
-    titleBar.className = "title";
-    contentContainer.className = "content";
-    if (this.minimizable) {
-      minimizeButton.innerHTML = "-";
-      minimizeButton.addEventListener("click", () => this.minimize());
-    }
-    closeButton.dataset.shortcut = "Escape";
-    closeButton.innerHTML = "X";
-    closeButton.addEventListener("click", () => this.close());
-    windowControls.appendChild(minimizeButton);
-    windowControls.appendChild(closeButton);
-    windowControls.className = "controls";
-    titleBar.innerHTML = this.title;
-    contentContainer.innerHTML = this.content;
-    titleBar.appendChild(windowControls);
+    const titleBar = this.renderTitleBar();
     windowContainer.appendChild(titleBar);
     windowContainer.appendChild(contentContainer);
 
@@ -119,40 +101,7 @@ class Window {
     document.body.appendChild(windowContainer);
 
     if (this.resize) {
-      const targ: HTMLElement | null = windowContainer.querySelector(
-        this.resize,
-      );
-      if (!targ) {
-        throw new Error("Resize target not found");
-      }
-      targ.style.width = `${targ.clientWidth}px`;
-      targ.style.height = `${targ.clientHeight}px`;
-      const rsize = document.createElement("div");
-      rsize.className = "resize";
-      windowContainer.appendChild(rsize);
-      rsize.style.left = `${windowContainer.clientWidth - 16}px`;
-      rsize.style.top = `${windowContainer.clientHeight - 16}px`;
-      new Drag()
-        .boundingBox(100, 100, Infinity, Infinity)
-        .addListener({
-          ondrag(a: DragSession) {
-            const w = Number.parseFloat(targ.style.width) + (a.dx ?? 0);
-            const h = Number.parseFloat(targ.style.height) + (a.dy ?? 0);
-            targ.style.width = `${w}px`;
-            if (w < windowContainer.clientWidth - 20) {
-              targ.style.width = `${windowContainer.clientWidth}px`;
-            } else {
-              rsize.style.left = `${windowContainer.clientWidth - 16}px`;
-            }
-            targ.style.height = `${h}px`;
-          },
-          ondrop() {
-            rsize.style.left = `${windowContainer.clientWidth - 16}px`;
-          },
-        })
-        .apply(rsize);
-      targ.style.width = `${windowContainer.clientWidth}px`;
-      rsize.style.left = `${windowContainer.clientWidth - 16}px`;
+      this.renderResizeHandle(this.resize);
     }
 
     const s = windowContainer.style;
@@ -176,10 +125,77 @@ class Window {
         document.documentElement.clientHeight - 50,
       )
       .apply(windowContainer, titleBar);
+
     return Object.assign(windowContainer, {
       close: () => this.close(),
       minimize: () => this.minimize(),
     });
+  }
+
+  private renderTitleBar() {
+    const windowControls = document.createElement("div");
+    windowControls.className = "controls";
+
+    if (this.minimizable) {
+      const minimizeButton = document.createElement("div");
+      minimizeButton.innerHTML = "-";
+      minimizeButton.addEventListener("click", () => this.minimize());
+      windowControls.appendChild(minimizeButton);
+    }
+
+    const closeButton = document.createElement("div");
+    closeButton.dataset.shortcut = "Escape";
+    closeButton.innerHTML = "X";
+    closeButton.addEventListener("click", () => this.close());
+    windowControls.appendChild(closeButton);
+
+    const titleBar = Object.assign(document.createElement("div"), {
+      className: "title",
+      innerHTML: this.title,
+    });
+    titleBar.appendChild(windowControls);
+
+    return titleBar;
+  }
+
+  private renderResizeHandle(resizeTargetSelector: string) {
+    const { windowContainer } = this;
+    if (!windowContainer) {
+      return;
+    }
+    const targ: HTMLElement | null =
+      windowContainer.querySelector(resizeTargetSelector);
+    if (!targ) {
+      throw new Error("Resize target not found");
+    }
+    targ.style.width = `${targ.clientWidth}px`;
+    targ.style.height = `${targ.clientHeight}px`;
+    const rsize = document.createElement("div");
+    rsize.className = "resize";
+    windowContainer.appendChild(rsize);
+    rsize.style.left = `${windowContainer.clientWidth - 16}px`;
+    rsize.style.top = `${windowContainer.clientHeight - 16}px`;
+    new Drag()
+      .boundingBox(100, 100, Infinity, Infinity)
+      .addListener({
+        ondrag(a: DragSession) {
+          const w = Number.parseFloat(targ.style.width) + (a.dx ?? 0);
+          const h = Number.parseFloat(targ.style.height) + (a.dy ?? 0);
+          targ.style.width = `${w}px`;
+          if (w < windowContainer.clientWidth - 20) {
+            targ.style.width = `${windowContainer.clientWidth}px`;
+          } else {
+            rsize.style.left = `${windowContainer.clientWidth - 16}px`;
+          }
+          targ.style.height = `${h}px`;
+        },
+        ondrop() {
+          rsize.style.left = `${windowContainer.clientWidth - 16}px`;
+        },
+      })
+      .apply(rsize);
+    targ.style.width = `${windowContainer.clientWidth}px`;
+    rsize.style.left = `${windowContainer.clientWidth - 16}px`;
   }
 
   close() {
