@@ -12,14 +12,14 @@
 <div class="right">
     {% if not isGuest %}
         <button
-            data-window-close="true"
+            data-action="close"
             onclick="IMWindow('{{ member.id }}',this.innerHTML.match(/IM (.+)/)[1]);"
             type="button"
         >
             IM {{ member.displayName }}
         </button>
         <br>
-        <a href="{{ url('inbox', { view: 'compose', mid: member.id }) }}" data-window-close="true">
+        <a href="{{ url('inbox', { view: 'compose', mid: member.id }) }}" data-action="close">
             PM {{ member.displayName }}
         </a>
         <br>
@@ -39,7 +39,7 @@
         <br>
     {% endif %}
 
-    <a href="{{ url('profile', { id: member.id, page: 'activity' }) }}" data-window-close="true">
+    <a href="{{ url('profile', { id: member.id, page: 'activity' }) }}" data-action="close">
         Full Profile
     </a>
     <div class="contact_details">

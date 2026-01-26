@@ -19,6 +19,12 @@ export type WindowOptions = Partial<{
   zIndex: number;
 }>;
 
+function toDOM<T extends HTMLElement>(html: string) {
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  return div.firstElementChild as T;
+}
+
 class Window {
   title = "Title";
 
@@ -54,48 +60,28 @@ class Window {
     Object.assign(this, options);
   }
 
-  /**
-   * Given an element, attempt to find the window that the element is contained in and close it.
-   * @static
-   * @param  {Element} windowElementDescendant window element or child element of a window
-   * @return {Void}
-   */
-  static close(window: HTMLElement) {
-    let element: HTMLElement | null = window;
-    do {
-      if ("close" in element && typeof element.close === "function") {
-        element.close();
-        break;
-      }
-      element = element.parentElement;
-    } while (element);
-  }
-
   public render() {
-    const windowContainer = Object.assign(document.createElement("div"), {
-      id: this.id,
-      className: `window${this.className ? ` ${this.className}` : ""}`,
-    });
+    const windowContainer = toDOM<HTMLDivElement>(`
+      <div id="${this.id || ""}" class="window ${this.className}">
+        <div class="title">
+          ${this.title}
+          <div class="controls">
+            ${this.minimizable ? `<button data-action="minimize">-</button>` : ""}
+            <button data-action="close" data-shortcut="Escape">X</button>
+          </div>
+        </div>
+        <div class="content">${this.content}</div>
+      </div>`);
     this.windowContainer = windowContainer;
 
-    const { pos } = this;
-
-    const contentContainer = Object.assign(document.createElement("div"), {
-      className: "content",
-      innerHTML: this.content,
+    windowContainer.addEventListener("click", (event) => {
+      if (event.target instanceof HTMLElement) {
+        const action = event.target.dataset.action;
+        if (action && action in this) {
+          (this[action as keyof Window] as () => void)();
+        }
+      }
     });
-
-    const titleBar = this.renderTitleBar();
-    windowContainer.appendChild(titleBar);
-    windowContainer.appendChild(contentContainer);
-
-    // add close window functionality
-    const close = () => this.close();
-    windowContainer
-      .querySelectorAll("[data-window-close]")
-      .forEach((closeElement) => {
-        closeElement.addEventListener("click", close);
-      });
 
     // Add the window to the document
     document.body.appendChild(windowContainer);
@@ -107,6 +93,7 @@ class Window {
     const s = windowContainer.style;
     s.zIndex = `${this.zIndex + 5}`;
 
+    const { pos } = this;
     if (this.wait) {
       void onImagesLoaded(
         Array.from(windowContainer.querySelectorAll("img")),
@@ -124,38 +111,12 @@ class Window {
         document.documentElement.clientWidth - 50,
         document.documentElement.clientHeight - 50,
       )
-      .apply(windowContainer, titleBar);
+      .apply(
+        windowContainer,
+        windowContainer.querySelector<HTMLDivElement>(".title") || undefined,
+      );
 
-    return Object.assign(windowContainer, {
-      close: () => this.close(),
-      minimize: () => this.minimize(),
-    });
-  }
-
-  private renderTitleBar() {
-    const windowControls = document.createElement("div");
-    windowControls.className = "controls";
-
-    if (this.minimizable) {
-      const minimizeButton = document.createElement("div");
-      minimizeButton.innerHTML = "-";
-      minimizeButton.addEventListener("click", () => this.minimize());
-      windowControls.appendChild(minimizeButton);
-    }
-
-    const closeButton = document.createElement("div");
-    closeButton.dataset.shortcut = "Escape";
-    closeButton.innerHTML = "X";
-    closeButton.addEventListener("click", () => this.close());
-    windowControls.appendChild(closeButton);
-
-    const titleBar = Object.assign(document.createElement("div"), {
-      className: "title",
-      innerHTML: this.title,
-    });
-    titleBar.appendChild(windowControls);
-
-    return titleBar;
+    return windowContainer;
   }
 
   private renderResizeHandle(resizeTargetSelector: string) {
@@ -170,11 +131,14 @@ class Window {
     }
     targ.style.width = `${targ.clientWidth}px`;
     targ.style.height = `${targ.clientHeight}px`;
+
     const rsize = document.createElement("div");
     rsize.className = "resize";
     windowContainer.appendChild(rsize);
+
     rsize.style.left = `${windowContainer.clientWidth - 16}px`;
     rsize.style.top = `${windowContainer.clientHeight - 16}px`;
+
     new Drag()
       .boundingBox(100, 100, Infinity, Infinity)
       .addListener({

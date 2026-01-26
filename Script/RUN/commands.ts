@@ -177,9 +177,11 @@ export default {
     gracefulDegrade(win.render());
   },
   closewindow(windowSelector: string) {
-    const el = document.querySelector<HTMLElement>(windowSelector);
+    const el = document.querySelector<HTMLElement>(
+      windowSelector + " [data-action=close]",
+    );
     if (el) {
-      Window.close(el);
+      el.click();
     }
   },
   onlinelist(users: UserOnline[]) {
