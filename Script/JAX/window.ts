@@ -1,4 +1,5 @@
 import { animate } from "./animation";
+import { toDOM } from "./dom";
 import Drag, { DragSession } from "./drag";
 import { getHighestZIndex } from "./el";
 import { onImagesLoaded } from "./util";
@@ -18,12 +19,6 @@ export type WindowOptions = Partial<{
   pos: "center";
   zIndex: number;
 }>;
-
-function toDOM<T extends HTMLElement>(html: string) {
-  const div = document.createElement("div");
-  div.innerHTML = html;
-  return div.firstElementChild as T;
-}
 
 class Window {
   title = "Title";
@@ -137,8 +132,7 @@ class Window {
     targ.style.width = `${targ.clientWidth}px`;
     targ.style.height = `${targ.clientHeight}px`;
 
-    const rsize = document.createElement("div");
-    rsize.className = "resize";
+    const rsize = toDOM('<div class="resize"></div>');
     windowContainer.appendChild(rsize);
 
     rsize.style.left = `${windowContainer.clientWidth - 16}px`;
