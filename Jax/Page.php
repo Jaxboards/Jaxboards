@@ -195,7 +195,9 @@ final class Page
 
         $this->template->setThemePath($themePath);
 
-        $themeUrl .= '/css.css?' . $this->fileSystem->getFileInfo($themePath)->getMTime();
+        $themeUrl .= '/css.css?' . $this->fileSystem->getFileInfo(
+            $themePath,
+        )->getMTime();
         // Load CSS
         $this->append(
             'CSS',
