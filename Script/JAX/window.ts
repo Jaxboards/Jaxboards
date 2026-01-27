@@ -52,7 +52,7 @@ class Window {
 
   animate = true;
 
-  private oldpos: string = "";
+  private oldpos = "";
 
   constructor(options: WindowOptions = {}) {
     this.zIndex = getHighestZIndex();
