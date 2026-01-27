@@ -184,8 +184,8 @@ final class Page
             throw new Error('Unable to get any available board skin');
         }
 
-        $themePath = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardPath() : '') . '/Themes/' . $skin->title;
-        $themeUrl = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardPathUrl() : '') . '/Themes/' . $skin->title;
+        $themePath = $this->fileSystem->pathJoin($skin->custom !== 0 ? $this->domainDefinitions->getBoardPath() : '', 'Themes', $skin->title, 'css.css');
+        $themeUrl = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardURL() : '') . '/' . $themePath;
 
         // Custom theme found but files not there, also fallback to default
         if (!$this->fileSystem->getFileInfo($themePath)->isDir()) {
