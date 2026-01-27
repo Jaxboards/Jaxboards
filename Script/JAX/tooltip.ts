@@ -4,7 +4,6 @@ import { toDOM } from "./dom";
 import { getCoordinates, getHighestZIndex } from "./el";
 
 export default function toolTip(el: HTMLElement) {
-  let tooltip = document.querySelector<HTMLTableElement>("#tooltip_thingy");
   const pos = getCoordinates(el);
 
   let title = el.getAttribute("title");
@@ -16,24 +15,11 @@ export default function toolTip(el: HTMLElement) {
 
   if (!title) return;
 
+  let tooltip = document.querySelector<HTMLTableElement>("#tooltip");
   if (!tooltip) {
-    tooltip = toDOM<HTMLTableElement>(`
-      <table id="tooltip_thingy" class="tooltip">
-        <tr class="top">
-          <td class="left" colspan="2"></td>
-          <td class="right"></td>
-        </tr>
-        <tr class="content">
-          <td class="left"></td>
-          <td>default text</td>
-          <td class="right"></td>
-        </tr>
-        <tr class="bottom">
-          <td class="left" colspan="2"></td>
-          <td class="right"></td>
-        </tr>
-      </table>
-    `);
+    tooltip = toDOM<HTMLTableElement>(
+      `<div id="tooltip" class="tooltip">Default text</div>`,
+    );
 
     document.body.appendChild(tooltip);
   }
@@ -42,15 +28,16 @@ export default function toolTip(el: HTMLElement) {
   el.title = "";
   el.addEventListener("mouseout", () => {
     el.title = title;
-    tooltip.style.display = "none";
+    // tooltip.style.display = "none";
   });
 
-  tooltip.rows[1].cells[1].innerText = title;
+  tooltip.innerText = title;
 
-  // must set display first for clientHeight to be calculable
+  // must set display first for height to be calculable
   tooltip.style.display = "";
+
   Object.assign(tooltip.style, {
-    top: `${pos.y - tooltip.clientHeight}px`,
+    top: `${pos.y - tooltip.offsetHeight}px`,
     left: `${pos.x}px`,
     zIndex: `${getHighestZIndex()}`,
   });

@@ -2041,47 +2041,12 @@ a.mgroup4 {
 /* Tooltip */
 .tooltip {
   position: absolute;
-  border-collapse: collapse;
+  border-width: 10px 10px 15px 10px;
+  border-style: solid;
+  border-image: url("/Service/Themes/Default/img/tooltip.png") 20 fill;
+
   color: var(--text-color);
   max-width: 550px;
-}
-
-.tooltip td {
-  background: url("/Service/Themes/Default/img/tooltip.png");
-}
-
-.tooltip .top {
-  height: 10px;
-}
-
-.tooltip .bottom {
-  height: 15px;
-}
-
-.tooltip .top .right {
-  background-position: top right;
-}
-
-.tooltip .content td {
-  background-position: center center;
-}
-
-.tooltip .content .left {
-  background-position: center left;
-  width: 10px;
-}
-
-.tooltip .content .right {
-  background-position: center right;
-  width: 10px;
-}
-
-.tooltip .bottom .left {
-  background-position: bottom left;
-}
-
-.tooltip .bottom .right {
-  background-position: bottom right;
 }
 
 /* AutoComplete */
