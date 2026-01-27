@@ -30,7 +30,7 @@ function generateSnow(snowDensity = 200) {
     document.body.prepend(snowWrapper);
   }
   snowWrapper.innerHTML = "";
-  for (let i = 1; i < snowDensity; i += 1) {
+  for (let i = 1; i <= snowDensity; i += 1) {
     const board = document.createElement("div");
     board.className = "snowflake";
     snowWrapper.appendChild(board);
@@ -77,7 +77,7 @@ function generateSnowCSS(snowDensity = 200) {
   const snowflakeName = "snowflake";
   let rule = baseCSS;
 
-  for (let i = 1; i < snowDensity; i += 1) {
+  for (let i = 1; i <= snowDensity; i += 1) {
     const randomX = Math.random() * 100; // vw
     const randomOffset = Math.random() * 10; // vw;
     const randomXEnd = randomX + randomOffset;
