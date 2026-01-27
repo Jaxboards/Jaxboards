@@ -192,8 +192,10 @@ final class Page
         );
         $themeUrl = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardURL() : '') . '/' . $themePath;
 
+        var_dump($themePath);
+
         // Custom theme found but files not there, also fallback to default
-        if (!$this->fileSystem->getFileInfo($themePath)->isDir()) {
+        if (!$this->fileSystem->getFileInfo($themePath)->isFile()) {
             $themePath = $this->fileSystem->pathjoin($this->domainDefinitions->getDefaultThemePath(), 'css.css');
             $themeUrl = $this->router->getRootURL() . '/' . $themePath;
         }
