@@ -53,7 +53,7 @@ final readonly class ModTopics
 
     public function addTopic(int $tid): void
     {
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
 
         $topic = $tid !== 0
             ? Topic::selectOne($tid)

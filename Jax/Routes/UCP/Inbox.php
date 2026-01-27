@@ -294,7 +294,7 @@ final readonly class Inbox
 
     private function flag(int $messageId): null
     {
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
 
         $message = Message::selectOne(
             'WHERE `id`=? AND `to`=?',

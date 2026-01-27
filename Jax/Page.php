@@ -77,7 +77,7 @@ final class Page
      */
     public function command(...$args): void
     {
-        if ($args[0] === 'softurl') {
+        if ($args[0] === 'preventNavigation') {
             $this->session->erase('location');
         }
 

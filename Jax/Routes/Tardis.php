@@ -52,7 +52,7 @@ final readonly class Tardis implements Route
                     setInterval(window.tardis, 10);
                 })()
             JS);
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
         $this->page->command(
             'playsound',
             'drwho',

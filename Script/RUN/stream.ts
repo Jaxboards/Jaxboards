@@ -17,10 +17,10 @@ export default class Stream {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleRequestData(url: string, cmds: any[], requestType = 1) {
-    let softurl = false;
+    let preventNavigation = false;
     cmds.forEach(([cmd, ...args]: [string, ...unknown[]]) => {
-      if (cmd === "softurl") {
-        softurl = true;
+      if (cmd === "preventNavigation") {
+        preventNavigation = true;
       } else if (cmd in this.commands) {
         // @ts-expect-error I tried for 30 minutes to fix this type error
         this.commands[cmd].apply(null, args);
@@ -28,7 +28,7 @@ export default class Stream {
     });
 
     if (requestType >= 2) {
-      if (!softurl) {
+      if (!preventNavigation) {
         globalThis.history.pushState({ lastURL: url }, "", url);
         // pushstate is not a real browser event unfortunately, so I have to trigger it myself
         globalThis.dispatchEvent(new Event("pushstate"));

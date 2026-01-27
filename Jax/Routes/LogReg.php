@@ -328,7 +328,7 @@ final class LogReg implements Route
                 'global/userbox-logged-out',
             ),
         );
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
         $this->page->append(
             'PAGE',
             $this->template->render(
@@ -353,7 +353,7 @@ final class LogReg implements Route
             'setstatus',
             $this->session->get()->hide !== 0 ? 'invisible' : 'online',
         );
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
     }
 
     private function forgotPasswordHasToken(string $tokenId): ?string

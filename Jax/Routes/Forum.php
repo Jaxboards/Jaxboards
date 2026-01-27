@@ -105,7 +105,7 @@ final class Forum implements Route
         }
 
         if ($forum->redirect !== '') {
-            $this->page->command('softurl');
+            $this->page->command('preventNavigation');
 
             ++$forum->redirects;
             $forum->update();
@@ -388,7 +388,7 @@ final class Forum implements Route
             $page .= '<tr><td>' . $summary['name'] . '</td><td>' . $summary['replies'] . '</td></tr>';
         }
 
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
         $this->page->command(
             'window',
             [

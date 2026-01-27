@@ -130,7 +130,7 @@ final class Router
         $page = $this->container->get(Page::class);
 
         if ($this->request->isJSAccess()) {
-            $page->command('softurl');
+            $page->command('preventNavigation');
             $page->command('location', $newLocation);
 
             return;

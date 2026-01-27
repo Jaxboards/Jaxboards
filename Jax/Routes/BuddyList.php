@@ -36,7 +36,7 @@ final readonly class BuddyList implements Route
 
     public function route($params): void
     {
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
         if ($this->user->isGuest()) {
             $this->page->command(
                 'error',
@@ -74,7 +74,7 @@ final readonly class BuddyList implements Route
             return;
         }
 
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
 
         $online = $this->usersOnline->getUsersOnline();
 

@@ -98,7 +98,7 @@ final class BuddyListTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['softurl'], $json);
+        self::assertContainsEquals(['preventNavigation'], $json);
 
         $window = array_find(
             $json,
@@ -119,7 +119,7 @@ final class BuddyListTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['softurl'], $json);
+        self::assertContainsEquals(['preventNavigation'], $json);
 
         $window = array_find(
             $json,
@@ -151,7 +151,7 @@ final class BuddyListTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['softurl'], $json);
+        self::assertContainsEquals(['preventNavigation'], $json);
 
         $window = array_find(
             $json,
@@ -181,7 +181,7 @@ final class BuddyListTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['softurl'], $json);
+        self::assertContainsEquals(['preventNavigation'], $json);
 
         $window = array_find(
             $json,
@@ -217,7 +217,7 @@ final class BuddyListTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['softurl'], $json);
+        self::assertContainsEquals(['preventNavigation'], $json);
 
         $window = array_find(
             $json,

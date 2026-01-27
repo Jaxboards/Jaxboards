@@ -17,7 +17,7 @@ final readonly class Rainbow implements Route
 
     public function route($params): void
     {
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
         $this->page->command('script', "(function() {
             let i = 0;
 

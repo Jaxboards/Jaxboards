@@ -14,6 +14,6 @@ final readonly class Solitaire implements Route
     public function route($params): void
     {
         $this->page->command('loadscript', '/Script/eggs/solitaire.js');
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
     }
 }

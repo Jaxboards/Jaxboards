@@ -82,7 +82,7 @@ final readonly class UserProfile implements Route
 
     private function showContactCard(Member $member): void
     {
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
         $this->page->command(
             'window',
             [

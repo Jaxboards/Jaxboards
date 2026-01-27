@@ -61,7 +61,7 @@ final readonly class ModPosts
             return;
         }
 
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
 
         $pids = $this->getModPids();
 

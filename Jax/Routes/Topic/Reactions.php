@@ -60,7 +60,7 @@ final readonly class Reactions
             return;
         }
 
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
         $post = Post::selectOne($pid);
 
         $ratings = $post !== null && $post->rating !== ''
@@ -159,7 +159,7 @@ final readonly class Reactions
 
     public function toggleReaction(int $postid, int $nibletid): void
     {
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
 
         $post = Post::selectOne($postid);
 

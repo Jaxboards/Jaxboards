@@ -239,7 +239,7 @@ final class Post implements Route
             "#pid_{$modelsPost->id} .post_content",
             $this->textFormatting->theWorks($modelsPost->post ?? ''),
         );
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
     }
 
     private function updateTopic(Topic $topic): ?string

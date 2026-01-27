@@ -346,7 +346,7 @@ final class ProfileTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContains(['softurl'], $json);
+        self::assertContains(['preventNavigation'], $json);
 
         $window = array_find(
             $json,

@@ -14,5 +14,6 @@ final readonly class Snow implements Route
     public function route($params): void
     {
         $this->page->command('snow');
+        $this->page->command('preventNavigation');
     }
 }

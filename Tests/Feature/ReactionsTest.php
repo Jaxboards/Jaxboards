@@ -153,7 +153,7 @@ final class ReactionsTest extends FeatureTestCase
 
         $json = json_decode($page);
 
-        self::assertContainsEquals(['softurl'], $json);
+        self::assertContainsEquals(['preventNavigation'], $json);
         self::assertEquals('listrating', $json[1][0]);
         self::assertEquals(1, $json[1][1]);
         self::assertStringContainsString('Admin', $json[1][2]);

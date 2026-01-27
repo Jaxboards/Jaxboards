@@ -28,6 +28,6 @@ final readonly class Spin implements Route
                     );
                 })();
             JAVASCRIPT);
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
     }
 }

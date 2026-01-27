@@ -268,7 +268,7 @@ final class ModControlsTest extends FeatureTestCase
         $json = json_decode($page, true);
         $sessionData = ModelsSession::selectOne();
 
-        self::assertContainsEquals(['softurl'], $json);
+        self::assertContainsEquals(['preventNavigation'], $json);
         self::assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
         self::assertEquals(
             json_encode(['modtids' => '1']),
@@ -290,7 +290,7 @@ final class ModControlsTest extends FeatureTestCase
         $json = json_decode($page, true);
         $sessionData = ModelsSession::selectOne();
 
-        self::assertContainsEquals(['softurl'], $json);
+        self::assertContainsEquals(['preventNavigation'], $json);
         self::assertContainsEquals(['modcontrols_postsync', $pid, ''], $json);
         self::assertEquals(
             json_encode(['modpids' => $pid]),
@@ -310,7 +310,7 @@ final class ModControlsTest extends FeatureTestCase
         $json = json_decode($page, true);
         $sessionData = ModelsSession::selectOne();
 
-        self::assertContainsEquals(['softurl'], $json);
+        self::assertContainsEquals(['preventNavigation'], $json);
         self::assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
         self::assertEquals(
             json_encode(['modtids' => '1']),

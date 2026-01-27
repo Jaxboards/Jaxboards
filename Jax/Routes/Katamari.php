@@ -14,6 +14,6 @@ final readonly class Katamari implements Route
     public function route($params): void
     {
         $this->page->command('loadscript', '/Script/eggs/katamari.js');
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
     }
 }

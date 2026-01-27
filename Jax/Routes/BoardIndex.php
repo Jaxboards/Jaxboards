@@ -75,7 +75,7 @@ final class BoardIndex implements Route
 
     private function markEverythingRead(): void
     {
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
         $this->session->set('forumsread', '{}');
         $this->session->set('topicsread', '{}');
         $this->session->set(

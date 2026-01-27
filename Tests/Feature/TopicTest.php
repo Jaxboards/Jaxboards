@@ -258,7 +258,7 @@ final class TopicTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['softurl'], $json);
+        self::assertContainsEquals(['preventNavigation'], $json);
         $window = array_find(
             $json,
             static fn($item): bool => $item[0] === 'window',

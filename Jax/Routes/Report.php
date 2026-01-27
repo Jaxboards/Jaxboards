@@ -96,7 +96,7 @@ final readonly class Report implements Route
             return;
         }
 
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
         $this->page->command('window', [
             'title' => "What's wrong with this post?",
             'id' => "report{$post->id}",

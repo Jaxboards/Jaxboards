@@ -297,7 +297,7 @@ final class Shoutbox implements Module
             return;
         }
 
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
         $this->database->delete(
             'shouts',
             Database::WHERE_ID_EQUALS,

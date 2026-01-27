@@ -408,7 +408,7 @@ final class Topic implements Route
     private function quickReplyForm(ModelsTopic $modelsTopic): void
     {
         $prefilled = '';
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
         if (
             $this->session->getVar('multiquote')
         ) {
@@ -567,7 +567,7 @@ final class Topic implements Route
             return;
         }
 
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
         $post = Post::selectOne($pid);
 
         if (!$this->request->isJSNewLocation()) {
@@ -655,7 +655,7 @@ final class Topic implements Route
             }
         }
 
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
     }
 
     private function getLastPost(ModelsTopic $modelsTopic): void
@@ -678,7 +678,7 @@ final class Topic implements Route
             return;
         }
 
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
         $this->router->redirect(
             'topic',
             [
@@ -709,7 +709,7 @@ final class Topic implements Route
             }
         }
 
-        $this->page->command('softurl');
+        $this->page->command('preventNavigation');
         if ($postPosition === null) {
             $this->page->command('error', "that post doesn't exist");
 
