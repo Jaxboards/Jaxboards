@@ -105,6 +105,12 @@ class Window {
     new Drag()
       .autoZ()
       .noChildActivation()
+      .boundingBox(
+        0,
+        0,
+        document.documentElement.clientWidth - 50,
+        document.documentElement.clientHeight - 50,
+      )
       .apply(
         windowContainer,
         windowContainer.querySelector<HTMLDivElement>(".title") || undefined,
