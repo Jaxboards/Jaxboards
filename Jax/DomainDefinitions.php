@@ -63,7 +63,7 @@ final class DomainDefinitions
 
     public function getDefaultThemePath(): string
     {
-        return 'Service/Themes/Default/';
+        return 'Service/Themes/Default';
     }
 
     public function getSoundsURL(): string

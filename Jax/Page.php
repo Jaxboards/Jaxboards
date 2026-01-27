@@ -190,11 +190,12 @@ final class Page
         // Custom theme found but files not there, also fallback to default
         if (!$this->fileSystem->getFileInfo($themePath)->isDir()) {
             $themePath = $this->domainDefinitions->getDefaultThemePath();
-            $themeUrl = $this->router->getRootURL() . '/Service/Themes/Default';
+            $themeUrl = $this->router->getRootURL() . '/' . $themePath;
         }
 
         $this->template->setThemePath($themePath);
 
+        $themeUrl .= '/css.css?' . $this->fileSystem->getFileInfo($themePath)->getMTime();
         // Load CSS
         $this->append(
             'CSS',
@@ -206,7 +207,7 @@ final class Page
                         href="/Service/wysiwyg.css"
                         onload="this.onload=null;this.rel='stylesheet'"
                     >
-                    <link rel="stylesheet" type="text/css" href="{$themeUrl}/css.css">
+                    <link rel="stylesheet" type="text/css" href="{$themeUrl}">
                 HTML,
         );
 
