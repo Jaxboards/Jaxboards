@@ -193,8 +193,20 @@ export default {
       let link = document.querySelector<HTMLAnchorElement>(
         `#statusers .user${userOnline.uid}`,
       );
+
       if (!link) {
         link = document.createElement("a");
+
+        link.addEventListener("click", function click() {
+          if (this.href) RUN.stream.location(this.href);
+        });
+        link.addEventListener("mouseover", function mouseover() {
+          openTooltip(this);
+        });
+      }
+
+      if (userOnline.profileURL) {
+        link.href = userOnline.profileURL;
       }
       link.innerHTML = userOnline.name;
       link.className = [
@@ -204,15 +216,8 @@ export default {
         `lastAction${userOnline.lastAction}`,
       ].join(" ");
 
-      if (userOnline.profileURL) {
-        link.href = userOnline.profileURL;
-        link.addEventListener("click", function click() {
-          RUN.stream.location(this.href);
-        });
-      }
       if (userOnline.locationVerbose) {
         link.title = userOnline.locationVerbose;
-        link.addEventListener("mouseover", () => openTooltip(link));
       }
       if (userOnline.status === "idle") {
         addIdleClock(link);
