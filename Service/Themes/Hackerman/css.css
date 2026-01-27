@@ -2041,10 +2041,9 @@ a.mgroup4 {
 /* Tooltip */
 .tooltip {
   position: absolute;
-  border-width: 10px 10px 15px 10px;
+  border-width: 10px 10px 15px;
   border-style: solid;
   border-image: url("/Service/Themes/Default/img/tooltip.png") 20 fill;
-
   color: var(--text-color);
   max-width: 550px;
 }
