@@ -92,6 +92,17 @@ textarea {
   padding: 0 5px;
 }
 
+.windows {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
+
+.window.minimized {
+  position: relative;
+  float: left;
+}
+
 .window.minimized .content {
   top: 0;
   left: 0;
@@ -101,7 +112,7 @@ textarea {
 .window.minimized .title {
   top: 0;
   left: 0;
-  padding-right: 50px;
+  padding-right: 70px;
 }
 
 .window .resize {

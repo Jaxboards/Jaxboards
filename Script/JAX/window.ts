@@ -52,7 +52,7 @@ class Window {
 
   animate = true;
 
-  private oldpos?: string;
+  private oldpos: string = "";
 
   constructor(options: WindowOptions = {}) {
     this.zIndex = getHighestZIndex();
@@ -84,7 +84,12 @@ class Window {
     });
 
     // Add the window to the document
-    document.body.appendChild(windowContainer);
+    let windows = document.querySelector(".windows");
+    if (!windows) {
+      windows = toDOM('<div class="windows"></div>');
+      document.body.appendChild(windows);
+    }
+    windows.appendChild(windowContainer);
 
     if (this.resize) {
       this.renderResizeHandle(this.resize);
@@ -172,25 +177,24 @@ class Window {
   }
 
   minimize() {
-    const c = this.windowContainer;
-    if (!c) return;
-    const isMinimized = c.classList.contains("minimized");
-    c.classList.toggle("minimized");
+    const { windowContainer } = this;
+    if (!windowContainer) return;
+    const isMinimized = windowContainer.classList.contains("minimized");
+    windowContainer.classList.toggle("minimized");
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    windowContainer.querySelector<HTMLButtonElement>(
+      ".controls [data-action=minimize]",
+    )!.innerHTML = isMinimized ? "-" : "🗖";
+
     if (isMinimized) {
-      c.removeAttribute("draggable");
-      this.setPosition(this.oldpos ?? "");
+      windowContainer.removeAttribute("draggable");
     } else {
-      c.setAttribute("draggable", "false");
-      const wins = Array.from(document.querySelectorAll(".window"));
-      const width = wins.reduce((w, window) => {
-        if (window.classList.contains("minimized")) {
-          return w + Number(window.clientWidth);
-        }
-        return w;
-      }, 0);
-      this.oldpos = this.getPosition();
-      this.setPosition(`bl ${width} 0`, false);
+      windowContainer.setAttribute("draggable", "false");
+      this.oldpos = this.pos;
     }
+
+    this.setPosition(isMinimized ? this.oldpos : "", false);
   }
 
   setPosition(pos: string, shouldAnimate = true) {
@@ -200,31 +204,16 @@ class Window {
     let y = 0;
     const cH = document.documentElement.clientHeight;
     const cW = document.documentElement.clientWidth;
-    const position = /(\d+) (\d+)/.exec(pos);
-    if (position) {
-      x = Number(position[1]);
-      y = Number(position[2]);
+    if (pos === "center") {
+      y = Math.floor((cH - container.clientHeight) / 2);
+      x = Math.floor((cW - container.clientWidth) / 2);
+    } else {
+      const position = /(\d+) (\d+)/.exec(pos);
+      if (position) {
+        x = Number(position[1]);
+        y = Number(position[2]);
+      }
     }
-    x = Math.floor(x);
-    y = Math.floor(y);
-    if (pos.charAt(1) === "r") {
-      x = cW - x - container.clientWidth;
-    }
-    switch (pos.charAt(0)) {
-      case "b":
-        y = cH - y - container.clientHeight;
-        break;
-      case "c":
-        y = (cH - container.clientHeight) / 2;
-        x = (cW - container.clientWidth) / 2;
-        break;
-      default:
-    }
-    x = Math.floor(x);
-    y = Math.floor(y);
-
-    if (x < 0) x = 0;
-    if (y < 0) y = 0;
     container.style.left = `${x}px`;
     if (this.animate && shouldAnimate) {
       animate(
