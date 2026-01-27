@@ -194,15 +194,15 @@ final class Page
 
         // Custom theme found but files not there, also fallback to default
         if (!$this->fileSystem->getFileInfo($themePath)->isDir()) {
-            $themePath = $this->domainDefinitions->getDefaultThemePath();
+            $themePath = $this->fileSystem->pathjoin($this->domainDefinitions->getDefaultThemePath(), 'css.css');
             $themeUrl = $this->router->getRootURL() . '/' . $themePath;
         }
 
         $this->template->setThemePath($themePath);
 
-        $themeUrl .= '/css.css?' . $this->fileSystem->getFileInfo(
-            $themePath,
-        )->getMTime();
+        // Add cache busting
+        $themeUrl .= '?' . $this->fileSystem->getFileInfo($themePath)->getMTime();
+
         // Load CSS
         $this->append(
             'CSS',
