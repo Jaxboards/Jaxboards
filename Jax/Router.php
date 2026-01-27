@@ -94,7 +94,7 @@ final class Router
         $this->get('earthbound', '/earthbound', Earthbound::class);
         $this->get('katamari', '/katamari', Katamari::class);
         $this->get('rainbow', '/rainbow', Rainbow::class);
-        $this->get('snow', '/snow', Snow::class);
+        $this->get('snow', '/snow/{snowFlakeCount}', Snow::class);
         $this->get('solitaire', '/solitaire', Solitaire::class);
         $this->get('spin', '/spin', Spin::class);
         $this->get('tardis', '/tardis', Tardis::class);

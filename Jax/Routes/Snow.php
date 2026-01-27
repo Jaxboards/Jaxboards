@@ -13,7 +13,9 @@ final readonly class Snow implements Route
 
     public function route($params): void
     {
-        $this->page->command('snow');
+        $snowFlakeCount = (int) ($params['snowFlakeCount'] ?? 200);
+        $snowFlakeCount = max(0, min(5000, $snowFlakeCount));
+        $this->page->command('snow', $snowFlakeCount);
         $this->page->command('preventNavigation');
     }
 }

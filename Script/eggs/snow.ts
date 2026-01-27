@@ -1,4 +1,3 @@
-const snowflakesCount = 200;
 const baseCSS = ``;
 
 // Creating snowflakes
@@ -110,7 +109,7 @@ function generateSnowCSS(snowDensity = 200) {
 }
 
 // Load the rules and execute after the DOM loads
-export default function createSnow() {
+export default function createSnow(snowflakesCount = 200) {
   generateSnowCSS(snowflakesCount);
   generateSnow(snowflakesCount);
 }
