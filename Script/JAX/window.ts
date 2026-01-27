@@ -179,8 +179,8 @@ class Window {
   minimize() {
     const { windowContainer } = this;
     if (!windowContainer) return;
-    const isMinimized = windowContainer.classList.contains("minimized");
-    windowContainer.classList.toggle("minimized");
+
+    const isMinimized = !windowContainer.classList.toggle("minimized");
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     windowContainer.querySelector<HTMLButtonElement>(
@@ -191,7 +191,7 @@ class Window {
       windowContainer.removeAttribute("draggable");
     } else {
       windowContainer.setAttribute("draggable", "false");
-      this.oldpos = this.pos;
+      this.oldpos = this.getPosition();
     }
 
     this.setPosition(isMinimized ? this.oldpos : "", false);
@@ -229,7 +229,7 @@ class Window {
   getPosition(): string {
     if (!this.windowContainer) return "";
     const s = this.windowContainer.style;
-    return `tl ${Number.parseFloat(s.left)} ${Number.parseFloat(s.top)}`;
+    return `${Number.parseFloat(s.left)} ${Number.parseFloat(s.top)}`;
   }
 }
 
