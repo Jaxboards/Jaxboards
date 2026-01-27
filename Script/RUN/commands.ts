@@ -1,6 +1,7 @@
 /* global RUN, globalSettings */
 
 import { addIdleClock } from "../components/idle-clock";
+import createSnow from "../eggs/snow";
 import { animate, dehighlight } from "../JAX/animation";
 import { getCoordinates } from "../JAX/el";
 import gracefulDegrade from "../JAX/graceful-degrade";
@@ -228,6 +229,9 @@ export default {
         statusers.insertBefore(link, statusers.firstChild);
       } else statusers.appendChild(link);
     });
+  },
+  snow() {
+    createSnow();
   },
   setoffline(userIds: string) {
     const statusers = document.querySelector("#statusers");

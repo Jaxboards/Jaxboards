@@ -25,6 +25,7 @@ use Jax\Routes\Post;
 use Jax\Routes\Rainbow;
 use Jax\Routes\Report;
 use Jax\Routes\Search;
+use Jax\Routes\Snow;
 use Jax\Routes\Solitaire;
 use Jax\Routes\Spin;
 use Jax\Routes\Tardis;
@@ -93,6 +94,7 @@ final class Router
         $this->get('earthbound', '/earthbound', Earthbound::class);
         $this->get('katamari', '/katamari', Katamari::class);
         $this->get('rainbow', '/rainbow', Rainbow::class);
+        $this->get('snow', '/snow', Snow::class);
         $this->get('solitaire', '/solitaire', Solitaire::class);
         $this->get('spin', '/spin', Spin::class);
         $this->get('tardis', '/tardis', Tardis::class);
