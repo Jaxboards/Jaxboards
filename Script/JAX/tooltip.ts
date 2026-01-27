@@ -28,7 +28,7 @@ export default function toolTip(el: HTMLElement) {
   el.title = "";
   el.addEventListener("mouseout", () => {
     el.title = title;
-    // tooltip.style.display = "none";
+    tooltip.style.display = "none";
   });
 
   tooltip.innerText = title;
