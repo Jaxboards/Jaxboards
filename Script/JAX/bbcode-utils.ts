@@ -14,8 +14,10 @@ const tagsToBBCode: Record<string, (inner: string, el: HTMLElement) => string> =
 
     em: (inner) => `[i]${inner}[/i]`,
 
-    font: (inner, el) =>
-      `[font=${el.style.fontFamily || el.getAttribute("face")}]${inner}[/font]`,
+    font: (inner, el) => {
+      const font = el.style.fontFamily || el.getAttribute("face");
+      return font ? `[font=${font}]${inner}[/font]` : inner;
+    },
 
     h1: (inner) => `[h1]${inner}[/h1]`,
     h2: (inner) => `[h2]${inner}[/h2]`,
