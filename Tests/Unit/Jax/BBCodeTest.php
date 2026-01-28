@@ -277,7 +277,7 @@ final class BBCodeTest extends UnitTestCase
             ],
             [
                 "[ul]*item\n*item 2[/ul]",
-                "\n*item\n*item 2",
+                "*item\n*item 2",
             ],
             [
                 '[quote]quoted text[/quote]',
