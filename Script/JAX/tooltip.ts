@@ -21,7 +21,7 @@ export default function toolTip(el: HTMLElement) {
       `<div id="tooltip" class="tooltip">Default text</div>`,
     );
 
-    document.querySelector("#page").appendChild(tooltip);
+    document.querySelector("#page")?.appendChild(tooltip);
   }
 
   // Prevent the browser from showing its own title but put it back when done
