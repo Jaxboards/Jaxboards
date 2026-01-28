@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Jax\Modules;
 
 use Curl\Curl;
+use Jax\BBCode;
 use Jax\Config;
 use Jax\Hooks;
 use Jax\Interfaces\Module;
 use Jax\Models\Post;
 use Jax\Models\Topic;
 use Jax\Router;
-use Jax\TextFormatting;
 use Jax\User;
 
 use function json_encode;
@@ -30,10 +30,10 @@ final class WebHooks implements Module
     private ?array $webhooks = null;
 
     public function __construct(
+        private readonly BBCode $bbcode,
         private readonly Config $config,
         private readonly Hooks $hooks,
         private readonly Router $router,
-        private readonly TextFormatting $textFormatting,
         private readonly User $user,
         // for testing
         private readonly ?Curl $curl = null,
@@ -65,7 +65,7 @@ final class WebHooks implements Module
                 'findpost' => $post->id,
             ]);
 
-        $postContent = $this->textFormatting->textOnly($post->post);
+        $postContent = $this->bbcode->toMarkdown($post->post);
 
         $member = $this->user->get();
         $this->sendJSON($discord, [

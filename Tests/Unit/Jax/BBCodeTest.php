@@ -89,6 +89,15 @@ final class BBCodeTest extends UnitTestCase
         );
     }
 
+    #[DataProvider('bbcodeToMarkdownDataProvider')]
+    public function testToMarkdown(string $input, string $output): void
+    {
+        self::assertEquals(
+            $output,
+            $this->bbCode->toMarkdown($input),
+        );
+    }
+
     /**
      * @return array<array{string,string}>
      */
@@ -148,10 +157,6 @@ final class BBCodeTest extends UnitTestCase
                 '<a href="/katamari">Katamari</a>',
             ],
             [
-                '[url=/katamari]Katamari[/url]',
-                '<a href="/katamari">Katamari</a>',
-            ],
-            [
                 '[img]http://example.com/image.jpg[/img]',
                 '<img src="http://example.com/image.jpg" title="" alt="" class="bbcodeimg">',
             ],
@@ -187,6 +192,110 @@ final class BBCodeTest extends UnitTestCase
             [
                 '[video]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/video]',
                 '/YouTube video player/',
+            ],
+        ];
+    }
+
+
+    /**
+     * @return array<array{string,string}>
+     */
+    public static function bbcodeToMarkdownDataProvider(): array
+    {
+        return [
+            [
+                '[b]bold[/b]',
+                '**bold**',
+            ],
+            [
+                '[i]italic[/i]',
+                '*italic*',
+            ],
+            [
+                '[u]underline[/u]',
+                '__underline__',
+            ],
+            [
+                '[s]strikethrough[/s]',
+                '~~strikethrough~~',
+            ],
+            [
+                '[color=red]red text[/color]',
+                'red text',
+            ],
+            [
+                '[bg=#FFFF00]yellow background[/bg]',
+                'yellow background',
+            ],
+            [
+                '[font=Arial]Arial font[/font]',
+                'Arial font',
+            ],
+            [
+                '[align=center]centered text[/align]',
+                'centered text',
+            ],
+            [
+                '[url]http://example.com[/url]',
+                '[http://example.com](http://example.com)',
+            ],
+            [
+                '[url]https://example.com[/url]',
+                '[https://example.com](https://example.com)',
+            ],
+            [
+                '[url=http://example.com]Example[/url]',
+                '[Example](http://example.com)',
+            ],
+            [
+                '[url=https://example.com]Example[/url]',
+                '[Example](https://example.com)',
+            ],
+            [
+                '[url=/katamari]Katamari[/url]',
+                '[Katamari](/katamari)',
+            ],
+            [
+                '[img]http://example.com/image.jpg[/img]',
+                '![](http://example.com/image.jpg)',
+            ],
+            [
+                '[img=An image]http://example.com/image.jpg[/img]',
+                '![An image](http://example.com/image.jpg)',
+            ],
+            [
+                '[h2]Header 2[/h2]',
+                "# Header 2\n",
+            ],
+            [
+                '[spoiler]hidden text[/spoiler]',
+                '||hidden text||',
+            ],
+
+            [
+                "[attachment]5[/attachment]",
+                ""
+            ],
+            [
+                "[ul]*item\n*item 2[/ul]",
+                "\n*item\n*item 2",
+            ],
+            [
+                '[quote]quoted text[/quote]',
+                "> quoted text",
+            ],
+            [
+                '[quote=Sean]quoted text[/quote]',
+                "> quoted text",
+            ],
+
+            [
+                '[size=5]text[/size]',
+                "text",
+            ],
+            [
+                "[video]http://youtube.com[/video]",
+                "\nhttp://youtube.com"
             ],
         ];
     }

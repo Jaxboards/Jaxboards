@@ -36,19 +36,19 @@ final class BBCode
      */
     private array $inlineBBCodes = [
         'text' => [
-            '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi' => '<span style="background:$2">$3</span>',
-            '@\[b\](.*)\[/b\]@Usi' => '<strong>$1</strong>',
-            '@\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[/color\]@Usi' => '<span style="color:$1">$2</span>',
-            '@\[font=([\s\w]+)](.*)\[/font\]@Usi' => '<span style="font-family:$1">$2</span>',
-            '@\[i\](.*)\[/i\]@Usi' => '<em>$1</em>',
-            '@\[s\](.*)\[/s\]@Usi' => '<span style="text-decoration:line-through">$1</span>',
-            '@\[u\](.*)\[/u\]@Usi' => '<span style="text-decoration:underline">$1</span>',
-            '@\[spoiler\](.*)\[/spoiler\]@Usi' => '<span class="spoilertext">$1</span>',
+            'background' => '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi',
+            'bold' => '@\[b\](.*)\[/b\]@Usi',
+            'color' => '@\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[/color\]@Usi',
+            'font' => '@\[font=([\s\w]+)](.*)\[/font\]@Usi',
+            'italic' => '@\[i\](.*)\[/i\]@Usi',
+            'spoiler' => '@\[spoiler\](.*)\[/spoiler\]@Usi',
+            'strikethrough' => '@\[s\](.*)\[/s\]@Usi',
+            'underline' => '@\[u\](.*)\[/u\]@Usi',
         ],
         // Consider adding nofollow if admin approval of new accounts is not enabled
         'urls' => [
-            '@\[url\](?P<url>(?:[?/]|https?|ftp|mailto:).*)\[/url\]@Ui' => '<a href="$1">$1</a>',
-            '@\[url=(?P<url>(?:[?/]|https?|ftp|mailto:)[^\]]+)\](.+?)\[/url\]@i' => '<a href="$1">$2</a>',
+            'url' => '@\[url\](?P<url>(?:[?/]|https?|ftp|mailto:).*)\[/url\]@Ui',
+            'urlWithLink' => '@\[url=(?P<url>(?:[?/]|https?|ftp|mailto:)[^\]]+)\](.+?)\[/url\]@i',
         ],
     ];
 
@@ -56,11 +56,58 @@ final class BBCode
      * @var array<string,string>
      */
     private array $blockBBCodes = [
-        '@\[align=(center|left|right)\](.*)\[/align\]@Usi' => '<p style="text-align:$1">$2</p>',
-        '@\[h([1-5])\](.*)\[/h\1\]@Usi' => '<h$1>$2</h$1>',
-        '@\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[/img\]@Ui' => <<<'HTML'
-            <img src="$2" title="$1" alt="$1" class="bbcodeimg">
-            HTML,
+        'align' => '@\[align=(center|left|right)\](.*)\[/align\]@Usi',
+        'header' => '@\[h([1-5])\](.*)\[/h\1\]@Usi',
+        'image' => '@\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[/img\]@Ui',
+    ];
+
+    /**
+     * @var array<string,string>
+     */
+    private array $callbackBBCodes = [
+        'attachment' => '@\[attachment\](\d+)\[/attachment\]@',
+        'list' => '@\[(ul|ol)\](.*)\[/\1\]@Usi',
+        'quote' => '@\[quote(?>=([^\]]+))?\](.*?)\[/quote\]\r?\n?@is',
+        'size' => '@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi',
+        'video' => '@\[video\](.*)\[/video\]@Ui',
+    ];
+
+    /**
+     * @var array<string,string>
+     */
+    private array $htmlReplacements = [
+        'align' => '<p style="text-align:$1">$2</p>',
+        'background' => '<span style="background:$2">$3</span>',
+        'bold' => '<strong>$1</strong>',
+        'color' => '<span style="color:$1">$2</span>',
+        'font' => '<span style="font-family:$1">$2</span>',
+        'header' => '<h$1>$2</h$1>',
+        'image' => '<img src="$2" title="$1" alt="$1" class="bbcodeimg">',
+        'italic' => '<em>$1</em>',
+        'spoiler' => '<span class="spoilertext">$1</span>',
+        'strikethrough' => '<span style="text-decoration:line-through">$1</span>',
+        'underline' => '<span style="text-decoration:underline">$1</span>',
+        'url' => '<a href="$1">$1</a>',
+        'urlWithLink' => '<a href="$1">$2</a>',
+    ];
+
+    /**
+     * @var array<string,string>
+     */
+    private array $markdownReplacements = [
+        'align' => '$2',
+        'background' => '$3',
+        'bold' => '**$1**',
+        'color' => '$2',
+        'font' => '$2',
+        'header' => "# $2\n",
+        'image' => '![$1]($2)',
+        'italic' => '*$1*',
+        'spoiler' => '||$1||',
+        'strikethrough' => '~~$1~~',
+        'underline' => '__$1__',
+        'url' => '[$1]($1)',
+        'urlWithLink' => '[$2]($1)',
     ];
 
     public function __construct(
@@ -77,7 +124,7 @@ final class BBCode
     public function getURLs(string $text): array
     {
         $urls = [];
-        foreach (array_keys($this->inlineBBCodes['urls']) as $regex) {
+        foreach (array_values($this->inlineBBCodes['urls']) as $regex) {
             preg_match_all($regex, $text, $matches);
             $urls = array_merge($matches['url'], $urls);
         }
@@ -89,49 +136,82 @@ final class BBCode
     {
         $text = $this->toInlineHTML($text);
 
-        $text = $this->replaceWithRules($text, $this->blockBBCodes);
+        $rules = [];
+        foreach ($this->blockBBCodes as $name => $regex) {
+            if (array_key_exists($name, $this->htmlReplacements)) {
+                $rules[$regex] = $this->htmlReplacements[$name];
+            }
+        }
+        $text = $this->replaceWithRules($text, $rules);
 
         // [ul] and [ol]
         $text = $this->replaceWithCallback(
             $text,
-            '@\[(ul|ol)\](.*)\[/\1\]@Usi',
+            $this->callbackBBCodes['list'],
             $this->bbcodeLICallback(...),
         );
 
         // [size]
         $text = $this->replaceWithCallback(
             $text,
-            '@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi',
+            $this->callbackBBCodes['size'],
             $this->bbcodeSizeCallback(...),
         );
 
         // [quote]
         $text = $this->replaceWithCallback(
             $text,
-            '@\[quote(?>=([^\]]+))?\](.*?)\[/quote\]\r?\n?@is',
+            $this->callbackBBCodes['quote'],
             $this->bbcodeQuoteCallback(...),
         );
 
         // [attachment]
         $text = $this->replaceWithCallback(
             $text,
-            '@\[attachment\](\d+)\[/attachment\]@',
+            $this->callbackBBCodes['attachment'],
             $this->attachmentCallback(...),
         );
 
         // [video]
         return (string) preg_replace_callback(
-            '@\[video\](.*)\[/video\]@Ui',
+            $this->callbackBBCodes['video'],
             $this->bbcodeVideoCallback(...),
             $text,
         );
     }
 
-    public function toInlineHTML(string $text): string
+    public function toMarkdown(string $text)
     {
+        $rules = [];
+
+        $rules[$this->callbackBBCodes['attachment']] = '';
+        $rules[$this->callbackBBCodes['list']] = "\n$2";
+        $rules[$this->callbackBBCodes['quote']] = '> $2';
+        $rules[$this->callbackBBCodes['size']] = '$3';
+        $rules[$this->callbackBBCodes['video']] = "\n$1";
+
+        foreach (array_merge($this->blockBBCodes, ...array_values($this->inlineBBCodes)) as $name => $regex) {
+            if (array_key_exists($name, $this->markdownReplacements)) {
+                $rules[$regex] = $this->markdownReplacements[$name];
+            }
+        }
         return $this->replaceWithRules(
             $text,
-            array_merge(...array_values($this->inlineBBCodes)),
+            $rules,
+        );
+    }
+
+    public function toInlineHTML(string $text): string
+    {
+        $rules = [];
+        foreach (array_merge(...array_values($this->inlineBBCodes)) as $name => $regex) {
+            if (array_key_exists($name, $this->htmlReplacements)) {
+                $rules[$regex] = $this->htmlReplacements[$name];
+            }
+        }
+        return $this->replaceWithRules(
+            $text,
+            $rules,
         );
     }
 
