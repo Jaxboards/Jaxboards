@@ -151,7 +151,7 @@ final class BBCode
         $text = $this->replaceWithCallback(
             $text,
             $this->callbackBBCodes['list'],
-            $this->bbcodeLICallback(...),
+            $this->bbcodeListCallback(...),
         );
 
         // [size]
@@ -358,7 +358,7 @@ final class BBCode
     /**
      * @param array{string,'ol'|'ul',string} $match
      */
-    private function bbcodeLICallback(array $match): string
+    private function bbcodeListCallback(array $match): string
     {
         $tag = $match[1];
         $items = preg_split("@([\r\n]+|^)\\*@", $match[2]) ?: [];

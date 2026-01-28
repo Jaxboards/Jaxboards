@@ -477,12 +477,12 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         break;
       case "insertorderedlist":
         if (!this.htmlMode) {
-          bbcode = `[ol]${selection.replaceAll(/(.+([\r\n]+|$))/i, "*$1")}[/ol]`;
+          bbcode = `[ol]${selection.replaceAll(/(.+([\r\n]+|$))/i, "* $1")}[/ol]`;
         }
         break;
       case "insertunorderedlist":
         if (!this.htmlMode) {
-          bbcode = `[ul]${selection.replaceAll(/(.+([\r\n]+|$))/i, "*$1")}[/ul]`;
+          bbcode = `[ul]${selection.replaceAll(/(.+([\r\n]+|$))/i, "* $1")}[/ul]`;
         }
         break;
       case "createlink":

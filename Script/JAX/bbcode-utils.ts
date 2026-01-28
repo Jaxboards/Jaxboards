@@ -44,7 +44,7 @@ const tagsToBBCode: Record<string, (inner: string, el: HTMLElement) => string> =
       return alt;
     },
 
-    li: (inner) => `*${inner.replace(/[\n\r]+/, "")}\n`,
+    li: (inner) => `* ${inner.replace(/[\n\r]+/, "")}\n`,
 
     meta: () => "\n",
 
@@ -191,7 +191,7 @@ export function bbcodeToHTML(bbcode: string) {
     .replaceAll(
       /\[(ul|ol)\]([^]*?)\[\/\1\]/gi,
       (_, tag: string, contents: string) => {
-        const listItems = contents.split(/(^|[\r\n]+)\*/);
+        const listItems = contents.split(/(^|[\r\n]+)\* ?/);
         const lis = listItems
           .filter((text: string) => text.trim())
           .map((text: string) => `<li>${text}</li>`)
