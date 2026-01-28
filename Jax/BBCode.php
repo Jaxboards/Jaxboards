@@ -188,7 +188,7 @@ final class BBCode
         $rules = [];
 
         $rules[$this->callbackBBCodes['attachment']] = '';
-        $rules[$this->callbackBBCodes['list']] = "$2";
+        $rules[$this->callbackBBCodes['list']] = '$2';
         $rules[$this->callbackBBCodes['quote']] = '> $2';
         $rules[$this->callbackBBCodes['size']] = '$3';
         $rules[$this->callbackBBCodes['video']] = "\n$1";
