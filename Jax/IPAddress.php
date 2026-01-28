@@ -178,6 +178,9 @@ final class IPAddress
 
     private function getIp(): string
     {
-        return $this->request->server('REMOTE_ADDR') ?? '';
+        return $this->request->server('HTTP_CF_CONNECTING_IP') // Cloudflare
+            ?: $this->request->server('HTTP_X_FORWARDED_FOR') // Most proxies
+            ?: $this->request->server('REMOTE_ADDR') // The OG
+            ?: '';
     }
 }
