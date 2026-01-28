@@ -138,10 +138,13 @@ final class BBCode
 
         $rules = [];
         foreach ($this->blockBBCodes as $name => $regex) {
-            if (array_key_exists($name, $this->htmlReplacements)) {
-                $rules[$regex] = $this->htmlReplacements[$name];
+            if (!array_key_exists($name, $this->htmlReplacements)) {
+                continue;
             }
+
+            $rules[$regex] = $this->htmlReplacements[$name];
         }
+
         $text = $this->replaceWithRules($text, $rules);
 
         // [ul] and [ol]
@@ -180,7 +183,7 @@ final class BBCode
         );
     }
 
-    public function toMarkdown(string $text)
+    public function toMarkdown(string $text): string
     {
         $rules = [];
 
@@ -190,11 +193,19 @@ final class BBCode
         $rules[$this->callbackBBCodes['size']] = '$3';
         $rules[$this->callbackBBCodes['video']] = "\n$1";
 
-        foreach (array_merge($this->blockBBCodes, ...array_values($this->inlineBBCodes)) as $name => $regex) {
-            if (array_key_exists($name, $this->markdownReplacements)) {
-                $rules[$regex] = $this->markdownReplacements[$name];
+        foreach (
+            array_merge(
+                $this->blockBBCodes,
+                ...array_values($this->inlineBBCodes),
+            ) as $name => $regex
+        ) {
+            if (!array_key_exists($name, $this->markdownReplacements)) {
+                continue;
             }
+
+            $rules[$regex] = $this->markdownReplacements[$name];
         }
+
         return $this->replaceWithRules(
             $text,
             $rules,
@@ -204,11 +215,18 @@ final class BBCode
     public function toInlineHTML(string $text): string
     {
         $rules = [];
-        foreach (array_merge(...array_values($this->inlineBBCodes)) as $name => $regex) {
-            if (array_key_exists($name, $this->htmlReplacements)) {
-                $rules[$regex] = $this->htmlReplacements[$name];
+        foreach (
+            array_merge(
+                ...array_values($this->inlineBBCodes),
+            ) as $name => $regex
+        ) {
+            if (!array_key_exists($name, $this->htmlReplacements)) {
+                continue;
             }
+
+            $rules[$regex] = $this->htmlReplacements[$name];
         }
+
         return $this->replaceWithRules(
             $text,
             $rules,

@@ -89,15 +89,6 @@ final class BBCodeTest extends UnitTestCase
         );
     }
 
-    #[DataProvider('bbcodeToMarkdownDataProvider')]
-    public function testToMarkdown(string $input, string $output): void
-    {
-        self::assertEquals(
-            $output,
-            $this->bbCode->toMarkdown($input),
-        );
-    }
-
     /**
      * @return array<array{string,string}>
      */
@@ -196,6 +187,14 @@ final class BBCodeTest extends UnitTestCase
         ];
     }
 
+    #[DataProvider('bbcodeToMarkdownDataProvider')]
+    public function testToMarkdown(string $input, string $output): void
+    {
+        self::assertEquals(
+            $output,
+            $this->bbCode->toMarkdown($input),
+        );
+    }
 
     /**
      * @return array<array{string,string}>
@@ -273,8 +272,8 @@ final class BBCodeTest extends UnitTestCase
             ],
 
             [
-                "[attachment]5[/attachment]",
-                ""
+                '[attachment]5[/attachment]',
+                '',
             ],
             [
                 "[ul]*item\n*item 2[/ul]",
@@ -282,20 +281,20 @@ final class BBCodeTest extends UnitTestCase
             ],
             [
                 '[quote]quoted text[/quote]',
-                "> quoted text",
+                '> quoted text',
             ],
             [
                 '[quote=Sean]quoted text[/quote]',
-                "> quoted text",
+                '> quoted text',
             ],
 
             [
                 '[size=5]text[/size]',
-                "text",
+                'text',
             ],
             [
-                "[video]http://youtube.com[/video]",
-                "\nhttp://youtube.com"
+                '[video]http://youtube.com[/video]',
+                "\nhttp://youtube.com",
             ],
         ];
     }
