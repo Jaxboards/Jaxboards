@@ -546,8 +546,12 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     }
     if (this.htmlMode) {
       this.doc?.execCommand(realCommand, false, arg1);
+      this.doc?.dispatchEvent(new Event("input"));
       this.window?.focus();
-    } else replaceSelection(this.element, bbcode);
+    } else {
+      replaceSelection(this.element, bbcode);
+      this.element.dispatchEvent(new Event("input"));
+    }
   }
 
   getSelection() {
