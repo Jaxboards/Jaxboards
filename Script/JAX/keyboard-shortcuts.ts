@@ -33,7 +33,6 @@ function openShortcutsWindow() {
       <dl>
         <dt>t</dt><dd>New Topic</dd>
         <dt>r</dt><dd>Reply</dd>
-        <dt>p</dt><dd>Full Reply</dd>
       </dl>
       `,
   });

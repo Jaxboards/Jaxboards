@@ -101,7 +101,7 @@ final class Post implements Route
         }
 
         $error = match (true) {
-            $submit === 'Preview' || $submit === 'Full Reply' => $this->previewPost(),
+            $submit === 'Preview' || $submit === 'Preview Post' => $this->previewPost(),
             (bool) $this->pid && $this->how === 'edit' => $this->editPost(),
             $this->how === 'newtopic' => $this->createTopic(),
             $this->postData !== null => $this->createPost($this->tid),

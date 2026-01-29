@@ -1,5 +1,5 @@
 <div class="topic-reply-form">
-    <form method="post" action="{{ url('post') }}" data-ajax-form="true" onsubmit="this.submitButton.disabled=true;">
+    <form method="post" action="{{ url('post') }}" data-ajax-form="true">
         <input type="hidden" name="how" value="qreply">
         <input type="hidden" name="tid" value="{{ topic.id }}">
         <div class="quickreply" style="width:390px">
@@ -7,6 +7,8 @@
         </div>
         <div class="submitbutton">
             <input type="submit" name="submit" title="Submit your post" value="Post"
+                onclick="this.form.submitButton=this;">
+            <input type="submit" name="submit" title="Preview your post" value="Preview Post"
                 onclick="this.form.submitButton=this;">
         </div>
     </form>
