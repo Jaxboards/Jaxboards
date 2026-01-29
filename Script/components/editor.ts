@@ -401,7 +401,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
 
     const colorwin = toDOM<HTMLDivElement>(`
       <div>
-        ${colors.map((color) => `<button style="background-color:${color}"></button>`).join("")}
+        ${colors.map((color) => `<button style="background-color:${color}" data-color="${color}"></button>`).join("")}
       </div>
     `);
 
@@ -419,8 +419,11 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     });
 
     colorwin.addEventListener("click", (event: PointerEvent) => {
-      if (event.target instanceof HTMLButtonElement) {
-        this.colorHandler(cmd, event.target.style.backgroundColor);
+      if (
+        event.target instanceof HTMLButtonElement &&
+        event.target.dataset.color
+      ) {
+        this.colorHandler(cmd, event.target.dataset.color);
       }
     });
 
