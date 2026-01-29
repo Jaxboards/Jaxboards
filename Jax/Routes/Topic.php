@@ -633,31 +633,33 @@ final class Topic implements Route
         $prefilled = '[quote=' . $author?->displayName . ']' . $quotedText . '[/quote]'
             . PHP_EOL . PHP_EOL;
 
+        // Quick reply window is open so update it
         if ($qreplyOpen) {
             $this->page->command('updateqreply', $prefilled);
-        } else {
-            $multiquote = (string) ($this->session->getVar(
-                'multiquote',
-            ) ?: '');
-            $multiquotes = explode(',', $multiquote);
-            if (!in_array((string) $pid, $multiquotes, true)) {
-                $multiquotes[] = (string) $pid;
-                $this->session->addVar(
-                    'multiquote',
-                    implode(',', $multiquotes),
-                );
-            }
-
-            // This line toggles whether or not the qreply window should open
-            // on quote.
-            if ($this->request->isJSAccess()) {
-                $this->quickReplyForm($modelsTopic, $prefilled);
-            } else {
-                $this->router->redirect('post', ['tid' => $modelsTopic->id]);
-            }
+            $this->page->command('preventNavigation');
+            return;
         }
 
-        $this->page->command('preventNavigation');
+        // Open populated quick reply window since they have javascript enabled
+        if ($this->request->isJSAccess()) {
+            $this->quickReplyForm($modelsTopic, $prefilled);
+            return;
+        }
+
+        // They don't allow javascript, so store quoted post IDs in the session
+        // and send them to full reply form
+        $multiquote = (string) ($this->session->getVar(
+            'multiquote',
+        ) ?: '');
+        $multiquotes = explode(',', $multiquote);
+        if (!in_array((string) $pid, $multiquotes, true)) {
+            $multiquotes[] = (string) $pid;
+            $this->session->addVar(
+                'multiquote',
+                implode(',', $multiquotes),
+            );
+        }
+        $this->router->redirect('post', ['tid' => $modelsTopic->id]);
     }
 
     private function getLastPost(ModelsTopic $modelsTopic): void
