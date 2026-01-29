@@ -186,7 +186,7 @@ final class Member extends Model
         name: 'gender',
         type: 'string',
         default: '',
-        length: 10,
+        length: 50,
         nullable: false,
     )]
     public string $gender = '';

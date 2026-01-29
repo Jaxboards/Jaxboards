@@ -31,15 +31,12 @@
     <input type="text" name="location" id="location" title="Location" value="{{ user.location }}">
 
     <h2><label for="gender">Gender</label></h2>
-    <select name="gender" id="gender" title="Your gender">
-        <option>Not Telling</option>
-        {% for gender in ['male', 'female', 'other'] %}
-            <option
-                value="{{ gender }}"
-                {% if user.gender == gender %}selected{% endif %}
-            >{{ gender|capitalize }}</option>
-        {% endfor %}
-    </select>
+    <input type="text" name="gender" id="gender" title="Your gender" list="gender-suggestions">
+    <datalist id="gender-suggestions">
+      <option>Not Telling</option>
+      <option>Male</option>
+      <option>Female</option>
+    </datalist>
 
     <h2><label for="dob_month">Birthday</label></h2>
     {% set year = "now"|date("Y") %}
