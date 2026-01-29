@@ -81,7 +81,7 @@ class Window {
     // Add the window to the document
     let windows = document.querySelector(".windows");
     if (!windows) {
-      windows = toDOM('<div class="windows"></div>');
+      windows = toDOM('<div class="windows" style="z-index: 1"></div>');
       document.body.appendChild(windows);
     }
     windows.appendChild(windowContainer);

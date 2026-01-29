@@ -1,3 +1,16 @@
+:root {
+  --text-color: #004;
+  --link-color: #1d71cf;
+  --blue-border: #99f;
+
+  --barely-blue: #f6f6ff;
+  --light-blue: #e0e0ff;
+  --medium-blue: #ccf;
+
+  --shade: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, .05));
+  --header: linear-gradient(to bottom, #424242, #010101);
+}
+
 html {
   font-size: 62.5%; /* set 1rem to 10px */
   text-size-adjust: none;
@@ -7,7 +20,7 @@ body {
   background: url("img/bg.jpg");
   font-family: Arial, sans-serif;
   font-size: 1.6rem;
-  color: #004;
+  color: var(--text-color);
   text-align: center;
   overflow-y: scroll;
   overflow-wrap: break-word;
@@ -21,7 +34,7 @@ img {
 a:active,
 a:visited,
 a:link {
-  color: #1d71cf;
+  color: var(--link-color);
   text-decoration: none;
 }
 
@@ -66,7 +79,7 @@ textarea {
   padding: 5px 20px;
   cursor: move;
   text-align: center;
-  background: url("img/boxgrad.png") bottom;
+  background: var(--header);
   color: #fff;
   border-radius: 10px 10px 0 0;
 }
@@ -196,7 +209,7 @@ textarea {
 
 /* User Control Panel */
 #ucp .content {
-  background: url("img/shade.png") #ccf bottom repeat-x;
+  background: var(--medium-blue);
 }
 
 #ucp textarea {
@@ -258,7 +271,7 @@ textarea {
 }
 
 #ucppage {
-  background: url("img/shade.png") repeat-x bottom #fff;
+  background: #fff;
   border-left: 1px solid #000;
   margin-left: 170px;
   padding: 20px;
@@ -266,7 +279,7 @@ textarea {
 }
 
 #ucppage h2 {
-  border-bottom: 1px solid #aaf;
+  border-bottom: 1px solid var(--blue-border);
   font-size: 2rem;
 }
 
@@ -284,7 +297,7 @@ textarea {
 #modcp > .content {
   display: flex;
   flex-wrap: wrap;
-  background: #ccf;
+  background: var(--medium-blue);
 }
 
 #modcp .minibox {
@@ -352,7 +365,7 @@ textarea {
 }
 
 .inbox .listing {
-  border: 1px solid #99c;
+  border: 1px solid var(--blue-border);
   font-size: 1.4rem;
   width: 100%;
   border-collapse: collapse;
@@ -364,7 +377,7 @@ textarea {
 
 .inbox .listing td {
   padding: 2px;
-  border: 1px solid #99c;
+  border: 1px solid var(--blue-border);
   border-style: solid none;
   background: #eef;
 }
@@ -454,7 +467,7 @@ textarea {
 .shouts {
   padding: 3px;
   background: #eef;
-  border-right: 1px solid #99c;
+  border-right: 1px solid var(--blue-border);
   font:
     1.4rem Arial,
     sans-serif;
@@ -532,7 +545,7 @@ textarea {
 
 /* Buddy/Contacts List */
 #buddylist .online .name {
-  color: #1d71cf;
+  color: var(--link-color);
 }
 
 #buddylist .offline .name {
@@ -555,7 +568,7 @@ textarea {
   cursor: pointer;
   min-height: 32px;
   padding: 5px;
-  border-bottom: 1px solid #aaf;
+  border-bottom: 1px solid var(--blue-border);
 }
 
 #buddylist .contact:hover {
@@ -630,7 +643,7 @@ textarea {
 
 .userprofile .leftbar .username {
   background: #eef;
-  border-bottom: 1px solid #aaf;
+  border-bottom: 1px solid var(--blue-border);
   padding: 0.5em;
   font-weight: bold;
 }
@@ -682,7 +695,7 @@ textarea {
 .userprofile .rightbar .postdate {
   font-size: 1rem;
   margin: 10px;
-  background: #ccf;
+  background: var(--medium-blue);
   border: 1px solid #339;
   padding: 5px;
 }
@@ -736,11 +749,11 @@ textarea {
 
 .userprofile .comment .date {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 10px;
+  right: 10px;
   padding: 0;
   font-size: smaller;
-  color: #aaf;
+  color: var(--blue-border);
 }
 
 .userprofile .contacts {
@@ -1012,7 +1025,7 @@ textarea {
     1.4rem Arial,
     sans-serif;
   background: #eef;
-  border: 1px solid #99f;
+  border: 1px solid var(--blue-border);
   border-style: solid none;
   margin-top: 10px;
   padding: 0.5em 0 0.5em 1em;
@@ -1055,13 +1068,13 @@ textarea {
 }
 
 .boardindex td {
-  background: url("img/shade.png") bottom repeat-x;
-  border: 1px solid #99c;
+  background: var(--shade);
+  border: 1px solid var(--blue-border);
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
 .boardindex .last_post {
-  background: #e0e0ff;
+  background: var(--light-blue);
   padding: 10px;
   border-right: none;
 }
@@ -1080,7 +1093,7 @@ textarea {
 /* stylelint-disable-next-line selector-class-pattern */
 .boardindex .f_icon {
   border-style: solid none;
-  background-color: #f6f6ff;
+  background-color: var(--barely-blue);
   width: 40px;
   vertical-align: middle;
   text-align: center;
@@ -1092,7 +1105,7 @@ textarea {
 
 .boardindex .forum {
   border-left: none;
-  background-color: #f6f6ff;
+  background-color: var(--barely-blue);
   padding: 20px;
   padding-left: 10px;
 }
@@ -1118,7 +1131,7 @@ textarea {
   font-size: 1.2rem;
   width: 20vw;
   max-width: 165px;
-  background: #f6f6f6;
+  background: #fff;
   text-align: center;
   padding: 5px 2px;
   border-right: none;
@@ -1135,8 +1148,8 @@ textarea {
 
 .forumindex td {
   padding: 10px;
-  background: url("img/shade.png") bottom repeat-x;
-  border: 1px solid #99c;
+  background: var(--shade);
+  border: 1px solid var(--blue-border);
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
@@ -1160,7 +1173,7 @@ textarea {
 .forumindex .last_post {
   width: 20vw;
   max-width: 250px;
-  background-color: #e0e0ff;
+  background-color: var(--medium-blue);
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
@@ -1226,13 +1239,13 @@ textarea {
 }
 
 .subindex td {
-  background: url("img/shade.png") bottom repeat-x;
-  border: 1px solid #99c;
+  background: var(--shade);
+  border: 1px solid var(--blue-border);
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
 .subindex .last_post {
-  background-color: #e0e0ff;
+  background-color: var(--medium-blue);
   padding: 10px;
   border-right: none;
 }
@@ -1251,7 +1264,7 @@ textarea {
 /* stylelint-disable-next-line selector-class-pattern */
 .subindex .f_icon {
   border-style: solid none;
-  background-color: #f6f6ff;
+  background-color: var(--barely-blue);
   width: 40px;
   vertical-align: middle;
   text-align: center;
@@ -1259,7 +1272,7 @@ textarea {
 
 .subindex .forum {
   border-left: none;
-  background-color: #f6f6ff;
+  background-color: var(--barely-blue);
   padding: 20px;
   padding-left: 10px;
 }
@@ -1281,7 +1294,7 @@ textarea {
   font-size: 1.2rem;
   width: 20vw;
   max-width: 165px;
-  background: #f6f6f6;
+  background: #fff;
   text-align: center;
   padding: 5px 2px;
   border-right: none;
@@ -1296,7 +1309,6 @@ textarea {
 
 #intopic .topic-post-row {
   clear: both;
-  background: #e0e0ff url("img/shade.png") bottom repeat-x;
 }
 
 #intopic td {
@@ -1305,6 +1317,7 @@ textarea {
 }
 
 #intopic .userdata {
+  background: var(--light-blue) var(--shade);
   text-align: center;
   width: 150px;
 }
@@ -1320,7 +1333,7 @@ textarea {
 #intopic .username {
   background: #eef;
   padding: 3px;
-  border-bottom: 1px solid #aaf;
+  border-bottom: 1px solid var(--blue-border);
 }
 
 #intopic .username a {
@@ -1466,7 +1479,7 @@ textarea {
   position: absolute;
   overflow: hidden;
   background: #eef;
-  border: 1px solid #99f;
+  border: 1px solid var(--blue-border);
   font-size: smaller;
 }
 
@@ -1483,7 +1496,7 @@ textarea {
   margin: 0;
   max-height: 200px;
   overflow-y: auto;
-  border: 1px dashed #99f;
+  border: 1px dashed var(--blue-border);
 }
 
 /* end post ratings */
@@ -1491,8 +1504,8 @@ textarea {
   font-size: smaller;
   text-align: left;
   padding: 10px;
-  background: #ccf;
-  border: 1px solid #99f;
+  background: var(--medium-blue);
+  border: 1px solid var(--blue-border);
   margin: 10px;
 }
 
@@ -1533,7 +1546,7 @@ textarea {
   padding: 5px;
   margin-bottom: 10px;
   background: #fff;
-  border: 1px solid #ccf;
+  border: 1px solid var(--blue-border);
 }
 
 #poll .choice:hover {
@@ -1548,7 +1561,7 @@ textarea {
 }
 
 #poll td {
-  border: 1px solid #ccf;
+  border: 1px solid var(--blue-border);
   padding: 5px;
 }
 
@@ -1609,13 +1622,12 @@ textarea {
 #polloptions {
   padding: 10px;
   background: #ddf;
-  border: 1px solid #ccf;
+  border: 1px solid var(--blue-border);
 }
 
 #polloptions textarea {
   height: 200px;
   width: 100%;
-  background: #fff url("img/shade.png") bottom repeat-x;
 }
 
 #qreply .editorframe,
@@ -1666,7 +1678,7 @@ textarea {
 }
 
 .searchresult {
-  border-bottom: 1px solid #aaf;
+  border-bottom: 1px solid var(--blue-border);
   padding: 10px;
 }
 
@@ -1774,14 +1786,15 @@ textarea {
  * and remove the margin on .box>.title */
 .box {
   margin: 10px 5px;
-  background: url("img/silver_grad.png") repeat-x;
+  background: linear-gradient(to bottom, #fff, #333333);
+  background-size: 100% 50px;
   border: 1px solid #000;
 }
 
 .box > .title {
   position: relative;
   margin: 1px 1px 0;
-  background: url("img/boxgrad.png") repeat-x #000;
+  background: var(--header);
   padding: 7px;
   color: #fff;
 }
@@ -1924,20 +1937,20 @@ textarea {
 
 #stats .content {
   padding: 20px;
-  background: url("img/shade.png") bottom repeat-x #fff;
+  background: #fff var(--shade);
 }
 
 #stats .userstoday {
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid #ccf;
+  border-top: 1px solid var(--blue-border);
 }
 
 #stats .stats {
   margin-top: 10px;
   padding: 10px 25px;
   background: url("icons/boardstats.png") left center no-repeat;
-  border-top: 1px solid #ccf;
+  border-top: 1px solid var(--blue-border);
 }
 
 /* Member List */
@@ -1984,8 +1997,8 @@ a.mgroup4 {
 
 /* BBcodes */
 .quote {
-  border: 1px solid #aaf;
-  background: url("icons/quote.png") top right no-repeat #e0e0ff;
+  border: 1px solid var(--blue-border);
+  background: url("icons/quote.png") top right no-repeat var(--medium-blue);
   padding: 10px;
 }
 
@@ -2000,8 +2013,8 @@ a.mgroup4 {
 }
 
 .code {
-  border: 1px solid #aaf;
-  background: #e0e0ff;
+  border: 1px solid var(--blue-border);
+  background: var(--medium-blue);
   padding: 10px;
   font-family: Consolas, Fixedsys, monospace;
   font-size: 1.2rem;
@@ -2012,7 +2025,7 @@ a.mgroup4 {
   display: inline-block;
   background: #fff;
   color: #fff;
-  border: 1px solid #aaf;
+  border: 1px solid var(--blue-border);
 }
 
 .spoilertext * {
