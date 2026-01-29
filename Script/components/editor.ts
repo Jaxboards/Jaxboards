@@ -3,7 +3,8 @@
 import { bbcodeToHTML, htmlToBBCode } from "../JAX/bbcode-utils";
 import Browser from "../JAX/browser";
 import register, { Component } from "../JAX/component";
-import { getComputedStyle, insertBefore } from "../JAX/el";
+import { toDOM } from "../JAX/dom";
+import { getComputedStyle, getHighestZIndex, insertBefore } from "../JAX/el";
 import { replaceSelection } from "../JAX/selection";
 
 const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
@@ -67,7 +68,7 @@ const webSafeFonts: Record<string, string[]> = {
 export default class Editor extends Component<HTMLTextAreaElement> {
   iframe: HTMLIFrameElement;
 
-  colorWindow?: HTMLTableElement;
+  colorWindow?: HTMLDivElement;
 
   container: HTMLDivElement;
 
@@ -397,40 +398,32 @@ export default class Editor extends Component<HTMLTextAreaElement> {
       "#00FFFF",
       "#FF00FF",
     ];
-    const l = colors.length;
-    const sq = Math.ceil(Math.sqrt(l));
 
-    const colorwin = document.createElement("table");
+    const colorwin = toDOM<HTMLDivElement>(`
+      <div>
+        ${colors.map((color) => `<button style="background-color:${color}"></button>`).join("")}
+      </div>
+    `);
+
     Object.assign(colorwin.style, {
-      borderCollapse: "collapse",
+      display: "grid",
+      gridTemplateColumns: "20px 20px 20px",
+      gridTemplateRows: "20px 20px 20px",
+
       position: "absolute",
       top: `${posy}px`,
       left: `${posx}px`,
+
+      cursor: "pointer",
+      zIndex: getHighestZIndex(),
     });
 
-    for (let y = 0; y < sq; y += 1) {
-      const r = colorwin.insertRow(y);
-      for (let x = 0; x < sq; x += 1) {
-        const c = r.insertCell(x);
-        const color = colors[x + y * sq];
-        if (!color) {
-          continue;
-        }
-        c.style.border = "1px solid #000";
-        c.style.padding = "0px";
-        const a = document.createElement("a");
-        a.href = "javascript:void(0)";
-        a.addEventListener("click", () => this.colorHandler(cmd, color));
-        c.appendChild(a);
-        Object.assign(a.style, {
-          display: "block",
-          backgroundColor: color,
-          height: "20px",
-          width: "20px",
-          margin: 0,
-        });
+    colorwin.addEventListener("click", (event: PointerEvent) => {
+      if (event.target instanceof HTMLButtonElement) {
+        this.colorHandler(cmd, event.target.style.backgroundColor);
       }
-    }
+    });
+
     this.colorWindow = colorwin;
     document.querySelector("#page")?.appendChild(colorwin);
     return null;
