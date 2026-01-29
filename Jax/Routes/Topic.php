@@ -405,11 +405,11 @@ final class Topic implements Route
         return $badgesPerAuthorHTML;
     }
 
-    private function quickReplyForm(ModelsTopic $modelsTopic, $prefilled = ''): void
+    private function quickReplyForm(ModelsTopic $modelsTopic, string $prefilled = ''): void
     {
         $this->page->command('preventNavigation');
         if (
-            $this->session->getVar('multiquote') && $prefilled == ''
+            $this->session->getVar('multiquote') && $prefilled === ''
         ) {
             $posts = Post::selectMany(
                 'WHERE `id` IN ?',
