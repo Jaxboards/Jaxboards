@@ -1,9 +1,13 @@
 :root {
+  --black: #000;
+  --white: #fff;
   --purple: #460053;
   --deep-purple: #1f0424;
   --border-blue: #99f;
-  --text-color: #fff;
+  --text-color: var(--white);
   --black-bg-transparent: rgb(0 0 0 / 90%);
+
+  --heading: linear-gradient(0deg, var(--deep-purple), #560b53);
 }
 
 html {
@@ -41,8 +45,8 @@ a:hover {
 }
 
 textarea {
-  background: #000;
-  border: 1px solid #fff;
+  background: var(--black);
+  border: 1px solid var(--white);
   color: var(--text-color);
 }
 
@@ -136,7 +140,7 @@ textarea {
 
 .window .content,
 .window .title {
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   background: var(--black-bg-transparent);
 }
 
@@ -198,7 +202,7 @@ textarea {
 
 .immenu,
 .emotewin {
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   background: #eef;
 }
 
@@ -231,7 +235,7 @@ textarea {
 
 #ucp .leftbar h2 {
   margin: 0;
-  background: linear-gradient(0deg, var(--deep-purple), #560b53);
+  background: var(--heading);
   font-size: 1.6rem;
   border: 1px solid var(--border-blue);
   padding: 3px;
@@ -267,7 +271,7 @@ textarea {
 
 #ucppage {
   background: var(--black-bg-transparent);
-  border-left: 1px solid #000;
+  border-left: 1px solid var(--black);
   margin-left: 170px;
   padding: 20px;
   min-height: 400px;
@@ -295,13 +299,13 @@ textarea {
 }
 
 #modcp .minibox {
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   margin: 10px;
 }
 
 #modcp .minibox .title {
   padding: 5px;
-  background: linear-gradient(0deg, var(--deep-purple), #560b53);
+  background: var(--heading);
   border: 1px solid var(--border-blue);
 }
 
@@ -321,7 +325,7 @@ textarea {
 
 #modcp .modcppage {
   flex: 1;
-  border-left: 1px solid #000;
+  border-left: 1px solid var(--black);
   padding: 10px;
   min-height: 200px;
 }
@@ -418,7 +422,7 @@ textarea {
 }
 
 .inbox .messageview {
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   padding: 10px;
 }
 
@@ -610,14 +614,14 @@ textarea {
 .userprofile .leftbar {
   float: left;
   width: 200px;
-  border: 1px solid #000;
-  background: #000;
+  border: 1px solid var(--black);
+  background: var(--black);
 }
 
 .userprofile .leftbar .username {
   padding: 0.5em;
   font-weight: bold;
-  background: linear-gradient(0deg, var(--deep-purple), #560b53);
+  background: var(--heading);
   font-size: 1.6rem;
   border: 1px solid var(--border-blue);
 }
@@ -632,7 +636,7 @@ textarea {
 }
 
 .userprofile .leftbar .avatar img {
-  border: 1px solid #000;
+  border: 1px solid var(--black);
 }
 
 .userprofile .leftbar .usertitle {
@@ -680,7 +684,7 @@ textarea {
 }
 
 .userprofile #pfbox {
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   padding: 10px;
   background: var(--black-bg-transparent);
 }
@@ -689,15 +693,15 @@ textarea {
   margin-left: 5px;
   display: inline-block;
   padding: 0.5em;
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   border-bottom: none;
-  background: #35485e;
+  background: var(--heading);
   color: var(--text-color);
 }
 
 .userprofile .pftabs a.active {
-  background: #fff;
-  color: #000;
+  background: var(--white);
+  color: var(--black);
 }
 
 .userprofile .comment {
@@ -761,7 +765,7 @@ textarea {
     "badgeImage title awardDate"
     "badgeImage description description"
     "badgeImage reason reason";
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid var(--black);
   padding: 10px 5px;
 }
 
@@ -822,7 +826,7 @@ textarea {
 
 /* Surrounding Container/Template for Board */
 #container {
-  /* background: #fff; */
+  /* background: var(--white); */
   margin: 5px auto;
   max-width: 1280px;
   text-align: left;
@@ -1116,7 +1120,7 @@ textarea {
 .forumindex .f_icon {
   width: 12px;
   padding: 0;
-  background: #fff;
+  background: var(--white);
   display: none;
 }
 
@@ -1276,7 +1280,7 @@ textarea {
 }
 
 #intopic .username {
-  background: linear-gradient(0deg, var(--deep-purple), #560b53);
+  background: var(--heading);
   padding: 3px;
   border-bottom: 1px solid var(--border-blue);
 }
@@ -1514,7 +1518,7 @@ textarea {
 
 #poll .choice:hover {
   background: var(--purple);
-  border: 1px solid #000;
+  border: 1px solid var(--black);
 }
 
 #poll table {
@@ -1529,7 +1533,7 @@ textarea {
 }
 
 #poll .bar {
-  background: linear-gradient(0deg, #000, #111);
+  background: linear-gradient(0deg, var(--black), #111);
   height: 16px;
   display: inline-block;
 }
@@ -1653,7 +1657,7 @@ textarea {
   text-align: center;
   vertical-align: top;
   padding: 10px;
-  border-right: 1px solid #000;
+  border-right: 1px solid var(--black);
 }
 
 #searchadvanced th {
@@ -1704,7 +1708,7 @@ textarea {
 .calendar td {
   height: 100px;
   width: 14%;
-  border: 1px solid #000;
+  border: 1px solid var(--black);
 }
 
 .calendar td > div {
@@ -2055,7 +2059,7 @@ a.mgroup4 {
 /* AutoComplete */
 #autocomplete {
   position: absolute;
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   background: var(--purple);
   text-align: left;
 }
