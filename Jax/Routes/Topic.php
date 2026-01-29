@@ -630,7 +630,7 @@ final class Topic implements Route
         $author = Member::selectOne($post->author);
         $quotedText = $quotedText ?: $post->post;
 
-        $prefilled = '[quote=' . $author?->name . ']' . $quotedText . '[/quote]'
+        $prefilled = '[quote=' . $author?->displayName . ']' . $quotedText . '[/quote]'
             . PHP_EOL . PHP_EOL;
 
         if ($qreplyOpen) {
