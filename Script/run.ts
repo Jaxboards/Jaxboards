@@ -46,10 +46,22 @@ export class AppState {
     Sound.load("imnewwindow", "/Sounds/receive.mp3", false);
   }
 
-  handleQuoting(link: HTMLLinkElement) {
-    void this.stream.load(
-      `${link.href}&qreply=${document.querySelector("#qreply") ? "1" : "0"}`,
-    );
+  handleQuoting(link: HTMLAnchorElement) {
+    const params = new URLSearchParams(link.search);
+    const pid = params.get("quote");
+
+    // If the user has selected text in the post, use it instead of the entire post
+    if (pid) {
+      const post = document.querySelector(`#pid_${pid} .post_content`);
+      const selection = window.getSelection();
+      if (post && selection && post.contains(selection.anchorNode)) {
+        params.set("quotedText", selection.toString());
+      }
+    }
+
+    params.set("qreply", document.querySelector("#qreply") ? "1" : "0");
+
+    void this.stream.load(`${link.pathname}?${params.toString()}`);
   }
 
   setWindowActive() {

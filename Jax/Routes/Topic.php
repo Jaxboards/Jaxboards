@@ -405,12 +405,11 @@ final class Topic implements Route
         return $badgesPerAuthorHTML;
     }
 
-    private function quickReplyForm(ModelsTopic $modelsTopic): void
+    private function quickReplyForm(ModelsTopic $modelsTopic, $prefilled = ''): void
     {
-        $prefilled = '';
         $this->page->command('preventNavigation');
         if (
-            $this->session->getVar('multiquote')
+            $this->session->getVar('multiquote') && $prefilled == ''
         ) {
             $posts = Post::selectMany(
                 'WHERE `id` IN ?',
@@ -608,6 +607,9 @@ final class Topic implements Route
     private function multiQuote(ModelsTopic $modelsTopic): void
     {
         $pid = (int) $this->request->asString->both('quote');
+        $quotedText = $this->request->asString->both('quotedText');
+        $qreplyOpen = (bool) $this->request->both('qreply');
+
         if ($pid === 0) {
             return;
         }
@@ -626,13 +628,13 @@ final class Topic implements Route
         }
 
         $author = Member::selectOne($post->author);
+        $quotedText = $quotedText ?: $post->post;
 
-        if ($this->request->both('qreply')) {
-            $this->page->command(
-                'updateqreply',
-                '[quote=' . $author?->name . ']' . $post->post . '[/quote]'
-                    . PHP_EOL . PHP_EOL,
-            );
+        $prefilled = '[quote=' . $author?->name . ']' . $quotedText . '[/quote]'
+            . PHP_EOL . PHP_EOL;
+
+        if ($qreplyOpen) {
+            $this->page->command('updateqreply', $prefilled);
         } else {
             $multiquote = (string) ($this->session->getVar(
                 'multiquote',
@@ -649,7 +651,7 @@ final class Topic implements Route
             // This line toggles whether or not the qreply window should open
             // on quote.
             if ($this->request->isJSAccess()) {
-                $this->quickReplyForm($modelsTopic);
+                $this->quickReplyForm($modelsTopic, $prefilled);
             } else {
                 $this->router->redirect('post', ['tid' => $modelsTopic->id]);
             }
