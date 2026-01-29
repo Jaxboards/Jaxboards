@@ -22,7 +22,7 @@ CREATE TABLE `jaxboards_members` (
     `full_name` varchar(50) NOT NULL DEFAULT '',
     `contactSteam` varchar(50) NOT NULL DEFAULT '',
     `location` varchar(100) NOT NULL DEFAULT '',
-    `gender` varchar(10) NOT NULL DEFAULT '',
+    `gender` varchar(50) NOT NULL DEFAULT '',
     `friends` text NOT NULL DEFAULT '',
     `enemies` text NOT NULL DEFAULT '',
     `soundShout` tinyint(1) unsigned NOT NULL DEFAULT '0',

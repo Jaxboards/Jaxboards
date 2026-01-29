@@ -324,7 +324,6 @@ final readonly class UCP implements Route
      */
     private function updateProfileSettings(): ?string
     {
-        $genderOptions = ['', 'male', 'female', 'other'];
         // Insert the profile info into the database.
         $data = [
             'about' => $this->request->asString->post('about'),
@@ -355,12 +354,7 @@ final readonly class UCP implements Route
             'dob_month' => (int) $this->request->asString->post('dob_month'),
             'dob_year' => (int) $this->request->asString->post('dob_year'),
             'full_name' => $this->request->asString->post('full_name'),
-            'gender' => in_array(
-                $this->request->asString->post('gender'),
-                $genderOptions,
-                true,
-            )
-                ? $this->request->asString->post('gender') : '',
+            'gender' => $this->request->asString->post('gender') ?? '',
             'location' => $this->request->asString->post('location'),
             'usertitle' => $this->request->asString->post('usertitle'),
             'website' => $this->request->asString->post('website'),

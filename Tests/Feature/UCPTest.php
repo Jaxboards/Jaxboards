@@ -230,7 +230,6 @@ final class UCPTest extends FeatureTestCase
                     'dob_month',
                     'dob_day',
                     'dob_year',
-                    'gender',
                 ], true) => DOMAssert::assertSelectCount(
                     "select[name={$field}]",
                     1,
