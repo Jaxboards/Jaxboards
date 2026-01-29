@@ -1,7 +1,7 @@
 <nav class="navigation tabs" data-tab-selector="li">
     <ul>
         <li class="active">
-            <a href="{{ url('index') }}" data-shortcut="h">Home</a>
+            <a href="{{ url('index') }}" data-shortcut="h"><u>H</u>ome</a>
         </li>
         <li>
             <a href="{{ url('buddylist') }}">Contacts</a>
@@ -20,12 +20,12 @@
         </li>
         {% if perms.canModerate %}
         <li>
-            <a href="{{ url('modcontrols') }}" data-shortcut="m">Mod CP</a>
+            <a href="{{ url('modcontrols') }}" data-shortcut="m"><u>M</u>od CP</a>
         </li>
         {% endif %}
         {% if perms.canAccessACP %}
         <li>
-            <a href="{{ url('acp') }}" target="_blank" data-shortcut="a">ACP</a>
+            <a href="{{ url('acp') }}" target="_blank" data-shortcut="a"><u>A</u>CP</a>
         </li>
         {% endif %}
         <li class="spacer">&nbsp;</li>
