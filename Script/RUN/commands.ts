@@ -260,6 +260,7 @@ export default {
     if (textarea) {
       textarea.focus();
       textarea.value += content;
+      textarea.dispatchEvent(new Event("input"));
     }
   },
   newmessage(message: string, fromMID: number) {

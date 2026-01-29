@@ -121,6 +121,12 @@ export default class Editor extends Component<HTMLTextAreaElement> {
 
     this.htmlMode = globalSettings.wysiwyg;
 
+    // sync textarea -> editor
+    element.addEventListener("input", () => {
+      this.setSource(bbcodeToHTML(element.value));
+    });
+
+    // sync editor -> textarea
     this.doc?.addEventListener("input", () => {
       if (!this.doc) return;
       // keep textarea updated with BBCode in real time
@@ -569,7 +575,6 @@ export default class Editor extends Component<HTMLTextAreaElement> {
   switchMode(htmlMode: boolean) {
     const { element, iframe } = this;
     if (htmlMode) {
-      this.setSource(bbcodeToHTML(element.value));
       element.style.display = "none";
       iframe.style.display = "";
     } else {
