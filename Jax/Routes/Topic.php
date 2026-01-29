@@ -637,12 +637,14 @@ final class Topic implements Route
         if ($qreplyOpen) {
             $this->page->command('updateqreply', $prefilled);
             $this->page->command('preventNavigation');
+
             return;
         }
 
         // Open populated quick reply window since they have javascript enabled
         if ($this->request->isJSAccess()) {
             $this->quickReplyForm($modelsTopic, $prefilled);
+
             return;
         }
 
@@ -659,6 +661,7 @@ final class Topic implements Route
                 implode(',', $multiquotes),
             );
         }
+
         $this->router->redirect('post', ['tid' => $modelsTopic->id]);
     }
 
