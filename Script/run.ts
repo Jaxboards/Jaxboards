@@ -54,7 +54,12 @@ export class AppState {
     if (pid) {
       const post = document.querySelector(`#pid_${pid} .post_content`);
       const selection = window.getSelection();
-      if (post && selection && post.contains(selection.anchorNode)) {
+      if (
+        post &&
+        selection &&
+        post.contains(selection.anchorNode) &&
+        post.contains(selection.focusNode)
+      ) {
         params.set("quotedText", selection.toString());
       }
     }
