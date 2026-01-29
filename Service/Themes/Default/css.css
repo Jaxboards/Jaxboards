@@ -29,6 +29,10 @@ img {
   max-width: 100%;
 }
 
+img.avatar {
+  max-width: 150px;
+}
+
 a:active,
 a:visited,
 a:link {
