@@ -22,7 +22,6 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function filter_var;
-use function in_array;
 use function is_string;
 use function mb_strlen;
 use function mb_strstr;
