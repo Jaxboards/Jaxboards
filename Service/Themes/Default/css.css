@@ -1,4 +1,7 @@
 :root {
+  --black: #000;
+  --white: #fff;
+  --gray-border: #35485e;
   --text-color: #004;
   --link-color: #1d71cf;
   --blue-border: #99f;
@@ -45,8 +48,8 @@ a:hover {
 }
 
 textarea {
-  background: #fff;
-  border: 1px solid #000;
+  background: var(--white);
+  border: 1px solid var(--black);
 }
 
 /* Misc (Global) */
@@ -82,7 +85,7 @@ textarea {
   cursor: move;
   text-align: center;
   background: var(--header);
-  color: #fff;
+  color: var(--white);
   border-radius: 10px 10px 0 0;
 }
 
@@ -132,7 +135,7 @@ textarea {
 
 .window .content {
   text-align: left;
-  background: #fff;
+  background: var(--white);
   overflow: hidden;
   border-radius: 0 0 10px 10px;
   padding-bottom: 5px;
@@ -140,7 +143,7 @@ textarea {
 
 .window .content,
 .window .title {
-  border: 1px solid #000;
+  border: 1px solid var(--black);
 }
 
 /* IM windows */
@@ -152,7 +155,7 @@ textarea {
 }
 
 .im .ims div {
-  background: #fff;
+  background: var(--white);
 }
 
 .im .content {
@@ -205,7 +208,7 @@ textarea {
 
 .immenu,
 .emotewin {
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   background: #eef;
 }
 
@@ -240,7 +243,7 @@ textarea {
   margin: 0;
   background: #ddf;
   font-size: 1.6rem;
-  border: 1px solid #fff;
+  border: 1px solid var(--white);
   padding: 3px;
 }
 
@@ -273,8 +276,8 @@ textarea {
 }
 
 #ucppage {
-  background: #fff;
-  border-left: 1px solid #000;
+  background: var(--white);
+  border-left: 1px solid var(--black);
   margin-left: 170px;
   padding: 20px;
   min-height: 400px;
@@ -303,7 +306,7 @@ textarea {
 }
 
 #modcp .minibox {
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   margin: 10px;
 }
 
@@ -314,7 +317,7 @@ textarea {
 
 #modcp .minibox .content {
   padding: 5px;
-  background: #fff;
+  background: var(--white);
 }
 
 #modcp .minibox .post {
@@ -329,9 +332,9 @@ textarea {
 
 #modcp .modcppage {
   flex: 1;
-  border-left: 1px solid #000;
+  border-left: 1px solid var(--black);
   padding: 10px;
-  background: #fff;
+  background: var(--white);
   min-height: 200px;
 }
 
@@ -354,7 +357,7 @@ textarea {
 }
 
 #modcp .onlinesessions td {
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   padding: 5px;
 }
 
@@ -385,7 +388,7 @@ textarea {
 }
 
 .inbox .listing tr:hover td {
-  background: #fff;
+  background: var(--white);
 }
 
 .inbox .listing th {
@@ -430,14 +433,14 @@ textarea {
 }
 
 .inbox .messageview {
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   background: #eef;
   padding: 10px;
 }
 
 .inbox .message {
   margin-top: 10px;
-  background: #fff;
+  background: var(--white);
   border: 1px solid #669;
   padding: 10px;
 }
@@ -565,7 +568,7 @@ textarea {
 }
 
 #buddylist .contact {
-  background: #fff;
+  background: var(--white);
   position: relative;
   cursor: pointer;
   min-height: 32px;
@@ -639,7 +642,7 @@ textarea {
 .userprofile .leftbar {
   float: left;
   width: 200px;
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   background: #ddf;
 }
 
@@ -660,7 +663,7 @@ textarea {
 }
 
 .userprofile .leftbar .avatar img {
-  border: 1px solid #000;
+  border: 1px solid var(--black);
 }
 
 .userprofile .leftbar .usertitle {
@@ -672,7 +675,7 @@ textarea {
 .userprofile .infobox {
   background: #ddd;
   margin: 20px 5px 10px;
-  border: 1px solid #35485e;
+  border: 1px solid var(--gray-border);
   padding: 5px;
 }
 
@@ -690,7 +693,7 @@ textarea {
 }
 
 .userprofile .rightbar .post {
-  border-bottom: 1px solid #35485e;
+  border-bottom: 1px solid var(--gray-border);
   padding: 10px;
 }
 
@@ -709,7 +712,7 @@ textarea {
 }
 
 .userprofile #pfbox {
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   padding: 10px;
 }
 
@@ -717,21 +720,21 @@ textarea {
   margin-left: 5px;
   display: inline-block;
   padding: 0.5em;
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   border-bottom: none;
-  background: #35485e;
-  color: #fff;
+  background: var(--gray-border);
+  color: var(--white);
 }
 
 .userprofile .pftabs a.active {
-  background: #fff;
-  color: #000;
+  background: var(--white);
+  color: var(--black);
 }
 
 .userprofile .comment {
   position: relative;
   min-height: 80px;
-  border-bottom: 1px solid #35485e;
+  border-bottom: 1px solid var(--gray-border);
   padding: 10px;
 }
 
@@ -763,8 +766,8 @@ textarea {
 }
 
 .userprofile .contacts .contact {
-  background: #fff;
-  border: 1px solid #fff;
+  background: var(--white);
+  border: 1px solid var(--white);
   cursor: pointer;
   padding: 30px 10px;
   min-height: 80px;
@@ -775,7 +778,7 @@ textarea {
 
 .userprofile .contacts .contact:hover {
   background: #ddf;
-  border: 1px solid #35485e;
+  border: 1px solid var(--gray-border);
 }
 
 .userprofile .contacts .contact .avatar img {
@@ -790,7 +793,7 @@ textarea {
     "badgeImage title awardDate"
     "badgeImage description description"
     "badgeImage reason reason";
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid var(--black);
   padding: 10px 5px;
 }
 
@@ -851,7 +854,7 @@ textarea {
 
 /* Surrounding Container/Template for Board */
 #container {
-  background: #fff;
+  background: var(--white);
   margin: 5px auto;
   max-width: 1280px;
   text-align: left;
@@ -910,7 +913,7 @@ textarea {
   background: linear-gradient(#2f2f2f, black);
   border-width: 1px;
   border-style: solid;
-  border-image: linear-gradient(white, #393939) 1;
+  border-image: linear-gradient(var(--white), #393939) 1;
   border-bottom: 0;
 }
 
@@ -924,7 +927,7 @@ textarea {
 }
 
 .navigation a {
-  color: #fff;
+  color: var(--white);
 }
 
 .footer {
@@ -956,7 +959,7 @@ textarea {
   border-width: 3px;
   box-shadow: 2px 2px 5px rgb(0 0 0 / 40%);
   box-sizing: border-box;
-  color: #fff;
+  color: var(--white);
   padding: 20px;
   position: relative;
   z-index: 1;
@@ -981,7 +984,7 @@ textarea {
 }
 
 #userbox a:first-child {
-  color: #fff;
+  color: var(--white);
 }
 
 #userbox .welcome {
@@ -1008,17 +1011,17 @@ textarea {
 #userbox .settings a {
   background: url("icons/wrench.png") no-repeat;
   padding-left: 20px;
-  color: #fff;
+  color: var(--white);
 }
 
 #userbox .forgot {
   font-size: smaller;
   float: right;
-  color: #fff;
+  color: var(--white);
 }
 
 #userbox a.num-messages {
-  color: #fff;
+  color: var(--white);
 }
 
 /* Breadcrumbs */
@@ -1052,7 +1055,7 @@ textarea {
 }
 
 #path a {
-  color: #000;
+  color: var(--black);
 }
 
 /* Board Index */
@@ -1133,7 +1136,7 @@ textarea {
   font-size: 1.2rem;
   width: 20vw;
   max-width: 165px;
-  background: #fff;
+  background: var(--white);
   text-align: center;
   padding: 5px 2px;
   border-right: none;
@@ -1158,7 +1161,7 @@ textarea {
 .forumindex .f_icon {
   width: 12px;
   padding: 0;
-  background: #fff;
+  background: var(--white);
   display: none;
 }
 
@@ -1167,7 +1170,7 @@ textarea {
 }
 
 .forumindex .topic {
-  background-color: #fff;
+  background-color: var(--white);
   border-left: none;
 }
 
@@ -1296,7 +1299,7 @@ textarea {
   font-size: 1.2rem;
   width: 20vw;
   max-width: 165px;
-  background: #fff;
+  background: var(--white);
   text-align: center;
   padding: 5px 2px;
   border-right: none;
@@ -1315,7 +1318,7 @@ textarea {
 
 #intopic td {
   vertical-align: top;
-  border: 1px solid #000;
+  border: 1px solid var(--black);
 }
 
 #intopic .userdata {
@@ -1329,7 +1332,7 @@ textarea {
 }
 
 #intopic .avatar img {
-  border: 1px solid #000;
+  border: 1px solid var(--black);
 }
 
 #intopic .username {
@@ -1371,7 +1374,7 @@ textarea {
 
 #intopic .post {
   line-height: 140%;
-  background: #fff;
+  background: var(--white);
   max-width: 700px;
 }
 
@@ -1416,7 +1419,7 @@ textarea {
   text-align: right;
   border-top: hidden;
   padding: 5px;
-  background: #fff;
+  background: var(--white);
 }
 
 /* Post Ratings */
@@ -1547,18 +1550,18 @@ textarea {
 #poll .choice {
   padding: 5px;
   margin-bottom: 10px;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--blue-border);
 }
 
 #poll .choice:hover {
   background: #ddf;
-  border: 1px solid #000;
+  border: 1px solid var(--black);
 }
 
 #poll table {
   border-collapse: collapse;
-  background: #fff;
+  background: var(--white);
   width: 100%;
 }
 
@@ -1586,7 +1589,7 @@ textarea {
 
 /* New Topic Form */
 .topicform {
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   padding: 20px;
   background: #eef;
 }
@@ -1705,7 +1708,7 @@ textarea {
   text-align: center;
   vertical-align: top;
   padding: 10px;
-  border-right: 1px solid #000;
+  border-right: 1px solid var(--black);
 }
 
 #searchadvanced th {
@@ -1756,7 +1759,7 @@ textarea {
 .calendar td {
   height: 100px;
   width: 14%;
-  border: 1px solid #000;
+  border: 1px solid var(--black);
 }
 
 .calendar td > div {
@@ -1788,9 +1791,9 @@ textarea {
  * and remove the margin on .box>.title */
 .box {
   margin: 10px 5px;
-  background: linear-gradient(to bottom, #fff, #333);
+  background: linear-gradient(to bottom, var(--white), #333);
   background-size: 100% 50px;
-  border: 1px solid #000;
+  border: 1px solid var(--black);
 }
 
 .box > .title {
@@ -1798,7 +1801,7 @@ textarea {
   margin: 1px 1px 0;
   background: var(--header);
   padding: 7px;
-  color: #fff;
+  color: var(--white);
 }
 
 .box > .title .x {
@@ -1823,7 +1826,7 @@ textarea {
 }
 
 .box .content {
-  background: #fff;
+  background: var(--white);
 }
 
 .box .content > .error {
@@ -1841,8 +1844,8 @@ textarea {
 /* Function-Specific */
 #notification,
 #modbox {
-  background: #fff;
-  border: 1px solid #000;
+  background: var(--white);
+  border: 1px solid var(--black);
   bottom: 10px;
   cursor: pointer;
   font-size: 1.4rem;
@@ -1855,7 +1858,7 @@ textarea {
 
 #notification.newmessage {
   padding-left: 60px;
-  background: url("icons/newmessage.png") no-repeat 20px center #fff;
+  background: url("icons/newmessage.png") no-repeat 20px center var(--white);
 }
 
 .pages .active {
@@ -1939,7 +1942,7 @@ textarea {
 
 #stats .content {
   padding: 20px;
-  background: #fff var(--shade);
+  background: var(--white) var(--shade);
 }
 
 #stats .userstoday {
@@ -2006,7 +2009,7 @@ a.mgroup4 {
 
 .quote .quote,
 .quote .code {
-  background-color: #fff;
+  background-color: var(--white);
 }
 
 .quote .quotee {
@@ -2025,8 +2028,8 @@ a.mgroup4 {
 
 .spoilertext {
   display: inline-block;
-  background: #fff;
-  color: #fff;
+  background: var(--white);
+  color: var(--white);
   border: 1px solid var(--blue-border);
 }
 
@@ -2039,8 +2042,8 @@ a.mgroup4 {
 }
 
 .spoilertext:hover {
-  background: #fff;
-  color: #000;
+  background: var(--white);
+  color: var(--black);
 }
 
 /* Contact icons */
@@ -2115,14 +2118,14 @@ a.mgroup4 {
   border-width: 10px 10px 15px;
   border-style: solid;
   border-image: url("./img/tooltip.png") 20 fill;
-  color: #fff;
+  color: var(--white);
   max-width: 550px;
 }
 
 /* AutoComplete */
 #autocomplete {
   position: absolute;
-  border: 1px solid #000;
+  border: 1px solid var(--black);
   background: #eef;
   text-align: left;
 }
