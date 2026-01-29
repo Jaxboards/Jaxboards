@@ -6,7 +6,6 @@
   --border-blue: #99f;
   --text-color: var(--white);
   --black-bg-transparent: rgb(0 0 0 / 90%);
-
   --heading: linear-gradient(0deg, var(--deep-purple), #560b53);
 }
 
