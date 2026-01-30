@@ -12,6 +12,7 @@
     "eslint-import-resolver-node": "^0.3.9",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.5.5",
+    "globals": "^17.2.0",
     "husky": "^9.1.7",
     "node-composer-runner": "^0.4.0",
     "prettier": "^3.8.0",
@@ -60,8 +61,5 @@
     "test": "bun test --coverage",
     "typecheck": "tsc --noEmit"
   },
-  "type": "module",
-  "dependencies": {
-    "globals": "^17.2.0"
-  }
+  "type": "module"
 }
