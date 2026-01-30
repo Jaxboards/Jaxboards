@@ -21,7 +21,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\UnitTestCase;
 
+use function array_map;
 use function implode;
+use function range;
 use function str_starts_with;
 
 use const PHP_EOL;
@@ -156,11 +158,11 @@ final class BBCodeTest extends UnitTestCase
                 '<img src="http://example.com/image.jpg" title="An image" alt="An image" class="bbcodeimg">',
             ],
             ...array_map(
-                fn($num) => [
+                static fn(int $num): array => [
                     "[h{$num}]Header {$num}[/h{$num}]",
                     "<h{$num}>Header {$num}</h{$num}>",
                 ],
-                range(1, 6)
+                range(1, 6),
             ),
             [
                 '[spoiler]hidden text[/spoiler]',
