@@ -294,7 +294,7 @@ final class BBCodeTest extends UnitTestCase
             ],
             [
                 '[video]http://youtube.com[/video]',
-                "\nhttp://youtube.com",
+                "http://youtube.com",
             ],
         ];
     }
