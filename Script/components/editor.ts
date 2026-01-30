@@ -133,7 +133,13 @@ export default class Editor extends Component<HTMLTextAreaElement> {
       // keep textarea updated with BBCode in real time
       this.element.value = htmlToBBCode(this.doc.body);
     });
+    this.doc?.addEventListener("paste", (event) => {
+      event.preventDefault();
 
+      const text = event.clipboardData?.getData("text/plain");
+
+      this.doc?.execCommand("insertText", false, text);
+    });
     this.doc?.addEventListener("drop", (event) => {
       if (!event.dataTransfer?.files.length) {
         return;
