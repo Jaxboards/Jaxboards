@@ -1,8 +1,10 @@
 {
   "name": "jaxboards",
+  "version": "4.0.0",
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.2",
+    "@happy-dom/global-registrator": "^20.4.0",
     "@types/jest": "^30.0.0",
     "esbuild": "^0.25.12",
     "eslint": "^9.39.2",
@@ -11,8 +13,6 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.5.5",
     "husky": "^9.1.7",
-    "jest": "^30.2.0",
-    "jest-environment-jsdom": "^30.2.0",
     "node-composer-runner": "^0.4.0",
     "prettier": "^3.8.0",
     "stylelint": "^16.26.1",
@@ -24,20 +24,19 @@
   },
   "engines": {
     "composer": "2.9.5",
-    "node": "^25.3",
-    "npm": "^11.7"
+    "node": "^25.3"
   },
   "license": "MIT",
   "private": true,
   "scripts": {
-    "autofix": "npm run-script prettier && npm run-script eslint-fix && npm run-script stylelint-fix && npm run-script rector && npm run-script phpcbf && npm run-script php-cs-fixer",
-    "dev": "npm run build -- --watch",
-    "build": "esbuild Script/app.ts Script/acp.ts --outdir=dist/ --bundle --minify",
-    "ci-lint": "npm run-script eslint-report && npm run-script stylelint-report && npm run-script parallel-lint-report && npm run-script phpcs-report && npm run-script phpstan-report && npm run-script psalm-report && npm run-script phpmd-report",
+    "autofix": "bun run prettier && bun run eslint-fix && bun run stylelint-fix && bun run rector && bun run phpcbf && bun run php-cs-fixer",
+    "dev": "bun run build -- --watch",
+    "build": "bun build --entrypoints Script/app.ts Script/acp.ts --outdir=dist/ --bundle --minify",
+    "ci-lint": "bun run eslint-report && bun run stylelint-report && bun run parallel-lint-report && bun run phpcs-report && bun run phpstan-report && bun run psalm-report && bun run phpmd-report",
     "eslint": "eslint \"Script/**/*.ts\"",
     "eslint-fix": "eslint \"Script/**/*.ts\" --fix",
     "eslint-report": "eslint \"Script/**/*.ts\" --format json --output-file eslint-report.json",
-    "lint": "npm run-script eslint && npm run-script stylelint && npm run-script parallel-lint && npm run-script phpcs && npm run-script phpstan && npm run-script psalm && npm run-script phpmd",
+    "lint": "bun run eslint && bun run stylelint && bun run parallel-lint && bun run phpcs && bun run phpstan && bun run psalm && bun run phpmd",
     "parallel-lint": "composer-runner -- run-script --no-interaction parallel-lint",
     "parallel-lint-report": "composer-runner -- run-script --no-interaction parallel-lint-report",
     "php-cs-fixer": "composer-runner -- run-script --no-interaction php-cs-fixer",
@@ -58,9 +57,11 @@
     "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\" --ignore-path .gitignore",
     "stylelint-report": "stylelint \"./**/*.{c,sa,sc,le}ss\" --formatter json --output-file stylelint-report.json --ignore-path .gitignore",
     "prepare": "husky",
-    "test": "jest --coverage",
+    "test": "bun test --coverage",
     "typecheck": "tsc --noEmit"
   },
   "type": "module",
-  "version": "4.0.0"
+  "dependencies": {
+    "globals": "^17.2.0"
+  }
 }

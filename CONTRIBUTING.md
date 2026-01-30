@@ -27,20 +27,15 @@ We use a few tools made with node.js.
 Install the node.js tools with this command in the Jaxboards directory:
 
 ```bash
-npm install
+bun install
 ```
 
-The tools have `npm` scripts for them, so you can easily get the tools working.
+The tools have `bun` scripts for them, so you can easily get the tools working.
 
-#### JS Compilation
-
-All Javascript sourcecode is modularized into ES6
-classes, and is bundled together using
-[rollup](https://www.npmjs.com/package/rollup). To build a bundled source
-("jsnew.js") from the modules, run:
+#### Build
 
 ```bash
-npm run-script build
+bun run build
 ```
 
 #### Prettier
@@ -54,7 +49,7 @@ However, it does support CSS, JavaScript, YAML, and JSON, which we make use of.
 Run with this command in the Jaxboards directory to run it on all the files:
 
 ```bash
-npm run-script prettier
+bun run prettier
 ```
 
 #### Linters
@@ -67,7 +62,7 @@ clean and help us avoid trouble in the future with over-complicated CSS rules.
 Run with this command in the Jaxboards directory to run it on all the files:
 
 ```bash
-npm run-script stylelint
+bun run stylelint
 ```
 
 In additon, Stylelint supports automatic code fixing for some rules. This won't
@@ -76,7 +71,7 @@ not. Run this fixer on all the files with this command in the Jaxboards
 directory:
 
 ```bash
-npm run-script stylelint-fix
+bun run stylelint-fix
 ```
 
 #### ESLint
@@ -84,7 +79,7 @@ npm run-script stylelint-fix
 [ESLint](https://eslint.org/) keeps the javascript clean. Run with:
 
 ```bash
-npm run-script eslint
+bun run eslint
 ```
 
 ### Composer tools
@@ -93,8 +88,8 @@ npm run-script eslint
 in PHP. As Jaxboards is a PHP project, it shouldn't be too surprising we make
 use of some PHP tools. We're using
 [node-composer-runner](https://github.com/garthenweb/node-composer-runner) to
-run composer commands with `npm`, so composer packages should be installed after
-you run `npm install`.
+run composer commands with `bun`, so composer packages should be installed after
+you run `bun install`.
 
 #### PHP_CodeSniffer
 
@@ -105,13 +100,13 @@ fixable issues, which helps keep code looking great.
 Run on all files with the following command in the Jaxboards directory:
 
 ```bash
-npm run-script phpcs
+bun run phpcs
 ```
 
 And run this in the Jaxboards directory to run the fixer tool on all files:
 
 ```bash
-npm run-script phpcbf
+bun run phpcbf
 ```
 
 ### Tests
@@ -119,5 +114,5 @@ npm run-script phpcbf
 All changes are run against our test suite through github actions, but if you want to run them yourself locally:
 
 ```bash
-npm run-script test
+bun run test
 ```

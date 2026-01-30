@@ -1,97 +1,96 @@
 name: Lint & Test
 
 concurrency:
-    group: ${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-    run-linters:
-        name: Lint & Test
-        runs-on: ubuntu-latest
-        permissions:
-            # Give the default GITHUB_TOKEN write permission to commit and push the
-            # added or changed files to the repository.
-            contents: write
-        if: github.event.pull_request.draft == false
-        steps:
-            - uses: awalsh128/cache-apt-pkgs-action@v1
-              with:
-                  packages: jq
-                  version: 1.0
-            - uses: actions/checkout@v4
-              with:
-                  # disable shallow clones for better SonarQube analysis
-                  fetch-depth: 0
-                  ref: ${{ github.head_ref }}
-                  token: ${{ secrets.WTL420_PERSONAL_ACCESS_TOKEN }}
-            - uses: shivammathur/setup-php@v2
-              with:
-                  extensions: mbstring
-            - uses: actions/setup-node@v4
-              with:
-                  node-version-file: package.json
-                  cache: npm
-            - uses: ramsey/composer-install@v3
-            - run: npm clean-install
-            - run: ./Tools/update_composer_version.php
-            # get the package-lock.json and composer.lock files up to date
-            - run: npm clean-install --ignore-scripts --package-lock-only
-            - run: composer update --lock
-            # run npm install _again_ due to --package-lock-only above
-            - run: npm clean-install
-            - run: echo "BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
-            - run: echo "VERSION=$(./Tools/greater_version.php composer.json package.json)" >> $GITHUB_ENV
-            - if: env.BRANCH == 'main'
-              run: |
-                  jq ".version = \"$VERSION\"" composer.json > /tmp/composer.json && \
-                  mv /tmp/composer.json composer.json
-              shell: bash
-            - if: env.BRANCH == 'main'
-              run: |
-                  jq ".version = \"$VERSION\"" package.json > /tmp/package.json && \
-                  mv /tmp/package.json package.json
-              shell: bash
-            - run: composer run-script --no-interaction rector
-            - run: npm run-script prettier
-            - run: npm run-script eslint-fix
-            - run: npm run-script stylelint-fix
-            - run: |
-                  set +e; \
-                  composer run-script --no-interaction phpcbf; \
-                  PHPCBF_RESULT=$?; \
-                  if [ "$PHPCBF_RESULT" -eq 1 ]; then PHPCBF_RESULT=0; fi; \
-                  exit $PHPCBF_RESULT;
-              shell: bash
-            - run: composer run-script --no-interaction php-cs-fixer
-            - run: npm run-script build
-            - uses: stefanzweifel/git-auto-commit-action@v5
-              with:
-                  commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
-            - run: |
-                  echo "[]" > eslint-report.json &&
-                  echo "[]" > stylelint-report.json &&
-                  echo '{"issues":[],"rules":[]}' > parallel-lint-report-sonarqube.json &&
-                  echo '{"issues":[],"rules":[]}' > phpcs-report-sonarqube.json &&
-                  echo '{"issues":[],"rules":[]}' > phpmd-report-sonarqube.json &&
-                  echo '{"totals":{"errors":0,"file_errors":0},"files":{},"errors":[]}' > phpstan-report.json &&
-                  echo "[]" > psalm-report.json
-              shell: bash
-            - run: npm run-script ci-lint
-            - run: composer run-script test
-            - run: npm test
-            - name: SonarQube Scan
-              if: ${{ !cancelled() }}
-              uses: SonarSource/sonarqube-scan-action@v6
-              env:
-                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  run-linters:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
+    if: github.event.pull_request.draft == false
+    steps:
+      - uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: jq
+          version: 1.0
+      - uses: actions/checkout@v4
+        with:
+          # disable shallow clones for better SonarQube analysis
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.WTL420_PERSONAL_ACCESS_TOKEN }}
+      - uses: shivammathur/setup-php@v2
+        with:
+          extensions: mbstring
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - uses: ramsey/composer-install@v3
+      - run: bun install --frozen-lockfile
+      - run: ./Tools/update_composer_version.php
+      # get the package-lock.json and composer.lock files up to date
+      - run: bun install --frozen-lockfile --ignore-scripts --package-lock-only
+      - run: composer update --lock
+      # run install _again_ due to --package-lock-only above
+      - run: bun install --frozen-lockfile
+      - run: echo "BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
+      - run: echo "VERSION=$(./Tools/greater_version.php composer.json package.json)" >> $GITHUB_ENV
+      - if: env.BRANCH == 'main'
+        run: |
+          jq ".version = \"$VERSION\"" composer.json > /tmp/composer.json && \
+          mv /tmp/composer.json composer.json
+        shell: bash
+      - if: env.BRANCH == 'main'
+        run: |
+          jq ".version = \"$VERSION\"" package.json > /tmp/package.json && \
+          mv /tmp/package.json package.json
+        shell: bash
+      - run: composer run-script --no-interaction rector
+      - run: bun run prettier
+      - run: bun run eslint-fix
+      - run: bun run stylelint-fix
+      - run: |
+          set +e; \
+          composer run-script --no-interaction phpcbf; \
+          PHPCBF_RESULT=$?; \
+          if [ "$PHPCBF_RESULT" -eq 1 ]; then PHPCBF_RESULT=0; fi; \
+          exit $PHPCBF_RESULT;
+        shell: bash
+      - run: composer run-script --no-interaction php-cs-fixer
+      - run: bun run build
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+      - run: |
+          echo "[]" > eslint-report.json &&
+          echo "[]" > stylelint-report.json &&
+          echo '{"issues":[],"rules":[]}' > parallel-lint-report-sonarqube.json &&
+          echo '{"issues":[],"rules":[]}' > phpcs-report-sonarqube.json &&
+          echo '{"issues":[],"rules":[]}' > phpmd-report-sonarqube.json &&
+          echo '{"totals":{"errors":0,"file_errors":0},"files":{},"errors":[]}' > phpstan-report.json &&
+          echo "[]" > psalm-report.json
+        shell: bash
+      - run: bun run ci-lint
+      - run: composer run-script test
+      - run: bun test --coverage
+      - name: SonarQube Scan
+        if: ${{ !cancelled() }}
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 on:
-    push:
-        branches:
-            - main
-    pull_request:
-        types:
-            - opened
-            - ready_for_review
-            - reopened
-            - synchronize
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
