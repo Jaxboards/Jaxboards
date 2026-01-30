@@ -52,7 +52,7 @@ final class BBCode
      */
     private array $blockBBCodes = [
         'align' => '@\[align=(center|left|right)\](.*)\[/align\]@Usi',
-        'header' => '@\[h([1-5])\](.*)\[/h\1\]@Usi',
+        'header' => '@\[h([1-6])\](.*)\[/h\1\]@Usi',
         'image' => '@\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[/img\]@Ui',
     ];
 

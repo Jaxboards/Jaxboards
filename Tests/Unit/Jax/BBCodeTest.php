@@ -155,10 +155,13 @@ final class BBCodeTest extends UnitTestCase
                 '[img=An image]http://example.com/image.jpg[/img]',
                 '<img src="http://example.com/image.jpg" title="An image" alt="An image" class="bbcodeimg">',
             ],
-            [
-                '[h2]Header 2[/h2]',
-                '<h2>Header 2</h2>',
-            ],
+            ...array_map(
+                fn($num) => [
+                    "[h{$num}]Header {$num}[/h{$num}]",
+                    "<h{$num}>Header {$num}</h{$num}>",
+                ],
+                range(1, 6)
+            ),
             [
                 '[spoiler]hidden text[/spoiler]',
                 '<span class="spoilertext">hidden text</span>',
