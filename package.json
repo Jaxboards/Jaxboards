@@ -18,14 +18,12 @@
     "prettier": "^3.8.0",
     "stylelint": "^16.26.1",
     "stylelint-config-standard": "^37.0.0",
-    "ts-jest": "^29.4.6",
     "tslib": "^2.8.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.53.0"
   },
   "engines": {
-    "composer": "2.9.5",
-    "node": "^25.3"
+    "composer": "2.9.5"
   },
   "license": "MIT",
   "private": true,
