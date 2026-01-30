@@ -32,10 +32,18 @@ bun install
 
 The tools have `bun` scripts for them, so you can easily get the tools working.
 
-#### Build
+#### Building the Frontend
+
+To run the build once:
 
 ```bash
 bun run build
+```
+
+To run the build under watch mode (rebuild on changes):
+
+```bash
+bun dev
 ```
 
 #### Prettier
