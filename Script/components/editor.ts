@@ -1,7 +1,7 @@
 /* global globalSettings */
 
 import { bbcodeToHTML, htmlToBBCode } from "../JAX/bbcode-utils";
-import { default as browser, default as Browser } from "../JAX/browser";
+import Browser from "../JAX/browser";
 import register, { Component } from "../JAX/component";
 import { toDOM } from "../JAX/dom";
 import { getComputedStyle, getHighestZIndex, insertBefore } from "../JAX/el";
@@ -564,7 +564,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         bbcode = `[${arg1}]${selection}[/${arg1}]`;
 
         // Chrome doesn't support 'heading' so switch to formatBlock
-        if (browser.chrome) {
+        if (Browser.chrome) {
           realCommand = "formatBlock";
           arg1 = `<${arg1}>`;
         }
