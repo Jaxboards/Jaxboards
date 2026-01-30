@@ -6,7 +6,6 @@
     "@eslint/js": "^9.39.2",
     "@happy-dom/global-registrator": "^20.4.0",
     "@types/jest": "^30.0.0",
-    "esbuild": "^0.25.12",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-node": "^0.3.9",
