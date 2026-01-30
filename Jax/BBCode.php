@@ -123,7 +123,7 @@ final class BBCode
         foreach (
             [
                 $this->inlineBBCodes['url'],
-                $this->inlineBBCodes['urlWithLink']
+                $this->inlineBBCodes['urlWithLink'],
             ] as $regex
         ) {
             preg_match_all($regex, $text, $matches);
