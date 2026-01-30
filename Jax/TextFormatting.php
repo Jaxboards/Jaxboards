@@ -21,6 +21,7 @@ use function preg_match_all;
 use function preg_quote;
 use function preg_replace;
 use function preg_replace_callback;
+use function str_contains;
 use function str_ireplace;
 use function str_replace;
 use function trim;
@@ -50,14 +51,14 @@ final readonly class TextFormatting
     }
 
     /**
-     * Replace all URLs that link to video services with a [video] bbcode
+     * Replace all URLs that link to video services with a [video] bbcode.
      */
     public function videoify(string $text): string
     {
         return (string) preg_replace_callback(
             '@(^|\s)(https?://[^\s\)\(<>]+)@u',
             $this->videoifyCallback(...),
-            $text
+            $text,
         );
     }
 
@@ -293,10 +294,10 @@ final readonly class TextFormatting
 
         $serviceURLs = [
             'https://www.youtube.com/watch',
-            'https://youtu.be/'
+            'https://youtu.be/',
         ];
-        foreach ($serviceURLs as $url) {
-            if (str_contains($stringURL, $url)) {
+        foreach ($serviceURLs as $serviceURL) {
+            if (str_contains((string) $stringURL, $serviceURL)) {
                 return "{$before}[video]{$stringURL}[/video]";
             }
         }

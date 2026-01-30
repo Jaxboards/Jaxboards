@@ -139,8 +139,10 @@ final class TextFormattingTest extends UnitTestCase
     public function testVideoify(): void
     {
         self::assertEquals(
-            $this->textFormatting->videoify('check out this video https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
-            'check out this video [video]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/video]'
+            $this->textFormatting->videoify(
+                'check out this video https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            ),
+            'check out this video [video]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/video]',
         );
     }
 }
