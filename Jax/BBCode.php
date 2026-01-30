@@ -32,24 +32,19 @@ final class BBCode
     private array $attachmentData = [];
 
     /**
-     * @var array<string,array<string,string>>
+     * @var array<string,string>
      */
     private array $inlineBBCodes = [
-        'text' => [
-            'background' => '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi',
-            'bold' => '@\[b\](.*)\[/b\]@Usi',
-            'color' => '@\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[/color\]@Usi',
-            'font' => '@\[font=([\s\w]+)](.*)\[/font\]@Usi',
-            'italic' => '@\[i\](.*)\[/i\]@Usi',
-            'spoiler' => '@\[spoiler\](.*)\[/spoiler\]@Usi',
-            'strikethrough' => '@\[s\](.*)\[/s\]@Usi',
-            'underline' => '@\[u\](.*)\[/u\]@Usi',
-        ],
-        // Consider adding nofollow if admin approval of new accounts is not enabled
-        'urls' => [
-            'url' => '@\[url\](?P<url>(?:[?/]|https?|ftp|mailto:).*)\[/url\]@Ui',
-            'urlWithLink' => '@\[url=(?P<url>(?:[?/]|https?|ftp|mailto:)[^\]]+)\](.+?)\[/url\]@i',
-        ],
+        'background' => '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi',
+        'bold' => '@\[b\](.*)\[/b\]@Usi',
+        'color' => '@\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[/color\]@Usi',
+        'font' => '@\[font=([\s\w]+)](.*)\[/font\]@Usi',
+        'italic' => '@\[i\](.*)\[/i\]@Usi',
+        'spoiler' => '@\[spoiler\](.*)\[/spoiler\]@Usi',
+        'strikethrough' => '@\[s\](.*)\[/s\]@Usi',
+        'underline' => '@\[u\](.*)\[/u\]@Usi',
+        'url' => '@\[url\](?P<url>(?:[?/]|https?|ftp|mailto:).*)\[/url\]@Ui',
+        'urlWithLink' => '@\[url=(?P<url>(?:[?/]|https?|ftp|mailto:)[^\]]+)\](.+?)\[/url\]@i',
     ];
 
     /**
@@ -87,6 +82,7 @@ final class BBCode
         'spoiler' => '<span class="spoilertext">$1</span>',
         'strikethrough' => '<span style="text-decoration:line-through">$1</span>',
         'underline' => '<span style="text-decoration:underline">$1</span>',
+        // Consider adding nofollow if admin approval of new accounts is not enabled
         'url' => '<a href="$1">$1</a>',
         'urlWithLink' => '<a href="$1">$2</a>',
     ];
@@ -124,7 +120,12 @@ final class BBCode
     public function getURLs(string $text): array
     {
         $urls = [];
-        foreach (array_values($this->inlineBBCodes['urls']) as $regex) {
+        foreach (
+            [
+                $this->inlineBBCodes['url'],
+                $this->inlineBBCodes['urlWithLink']
+            ] as $regex
+        ) {
             preg_match_all($regex, $text, $matches);
             $urls = array_merge($matches['url'], $urls);
         }
@@ -196,7 +197,7 @@ final class BBCode
         foreach (
             array_merge(
                 $this->blockBBCodes,
-                ...array_values($this->inlineBBCodes),
+                $this->inlineBBCodes,
             ) as $name => $regex
         ) {
             if (!array_key_exists($name, $this->markdownReplacements)) {
@@ -215,11 +216,7 @@ final class BBCode
     public function toInlineHTML(string $text): string
     {
         $rules = [];
-        foreach (
-            array_merge(
-                ...array_values($this->inlineBBCodes),
-            ) as $name => $regex
-        ) {
+        foreach ($this->inlineBBCodes as $name => $regex) {
             if (!array_key_exists($name, $this->htmlReplacements)) {
                 continue;
             }
