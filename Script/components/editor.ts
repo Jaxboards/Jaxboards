@@ -1,7 +1,7 @@
 /* global globalSettings */
 
 import { bbcodeToHTML, htmlToBBCode } from "../JAX/bbcode-utils";
-import Browser from "../JAX/browser";
+import { default as browser, default as Browser } from "../JAX/browser";
 import register, { Component } from "../JAX/component";
 import { toDOM } from "../JAX/dom";
 import { getComputedStyle, getHighestZIndex, insertBefore } from "../JAX/el";
@@ -258,7 +258,17 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     const editbar = document.createElement("div");
     editbar.className = "editbar";
     editbar.innerHTML = [
-      `<select class="fontface"><option value="">Default Font</option></select>`,
+      `<select class="fontface">
+        <option value="">Default Font</option>
+        <optgroup label="Headings">
+          <option value="heading_1" style="font-weight:bold;font-size: 2em">Heading 1</option>
+          <option value="heading_2" style="font-weight:bold;font-size: 1.5em">Heading 2</option>
+          <option value="heading_3" style="font-weight:bold;font-size: 1.17em">Heading 3</option>
+          <option value="heading_4" style="font-weight:bold;font-size: 1em">Heading 4</option>
+          <option value="heading_5" style="font-weight:bold;font-size: 0.83em">Heading 5</option>
+          <option value="heading_6" style="font-weight:bold;font-size: 0.67em">Heading 6</option>
+        </optgroup>
+      </select>`,
       `<a class="bold" title="Bold"></a>`,
       `<a class="italic" title="Italic"></a>`,
       `<a class="underline" title="Underline"></a>`,
@@ -294,7 +304,16 @@ export default class Editor extends Component<HTMLTextAreaElement> {
       editbar.querySelector<HTMLSelectElement>("select.fontface");
     if (fontFace) {
       fontFace.addEventListener("input", (evt) => {
-        this.editbarCommand(evt as MouseEvent, "fontname", fontFace.value);
+        const value = fontFace.value;
+        if (value.startsWith("heading_")) {
+          this.editbarCommand(
+            evt as MouseEvent,
+            "heading",
+            value.replace("heading_", "h"),
+          );
+        } else if (value) {
+          this.editbarCommand(evt as MouseEvent, "fontname", value);
+        }
       });
       for (const group of Object.keys(webSafeFonts)) {
         const options = webSafeFonts[group].map(
@@ -540,6 +559,15 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         break;
       case "inserthtml":
         bbcode = arg1 || "";
+        break;
+      case "heading":
+        bbcode = `[${arg1}]${selection}[/${arg1}]`;
+
+        // Chrome doesn't support 'heading' so switch to formatBlock
+        if (browser.chrome) {
+          realCommand = "formatBlock";
+          arg1 = `<${arg1}>`;
+        }
         break;
       default:
         throw new Error(`Unsupported editor command ${command}`);
