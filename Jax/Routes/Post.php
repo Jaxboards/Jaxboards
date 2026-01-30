@@ -85,6 +85,7 @@ final class Post implements Route
             [$postData, $codes] = $this->textFormatting->startCodeTags(
                 $postData,
             );
+            $postData = $this->textFormatting->videoify($postData);
             $postData = $this->textFormatting->linkify($postData);
             $postData = $this->textFormatting->finishCodeTagsBB(
                 $postData,

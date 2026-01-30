@@ -49,6 +49,18 @@ final readonly class TextFormatting
         );
     }
 
+    /**
+     * Replace all URLs that link to video services with a [video] bbcode
+     */
+    public function videoify(string $text): string
+    {
+        return (string) preg_replace_callback(
+            '@(^|\s)(https?://[^\s\)\(<>]+)@u',
+            $this->videoifyCallback(...),
+            $text
+        );
+    }
+
     public function blockhtml(string $text): string
     {
         return htmlspecialchars($text, ENT_QUOTES);
@@ -273,6 +285,24 @@ final readonly class TextFormatting
         $inner ??= $stringURL;
 
         return "{$before}[url={$stringURL}]{$inner}[/url]";
+    }
+
+    private function videoifyCallback(array $match): string
+    {
+        [, $before, $stringURL] = $match;
+
+        $serviceURLs = [
+            'https://www.youtube.com/watch',
+            'https://youtu.be/'
+        ];
+        foreach ($serviceURLs as $url) {
+            if (str_contains($stringURL, $url)) {
+                return "{$before}[video]{$stringURL}[/video]";
+            }
+        }
+
+        // return unmodified
+        return "{$before}{$stringURL}";
     }
 
     /**
