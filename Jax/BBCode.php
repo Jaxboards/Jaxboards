@@ -191,7 +191,7 @@ final class BBCode
         $rules[$this->callbackBBCodes['list']] = '$2';
         $rules[$this->callbackBBCodes['quote']] = '> $2';
         $rules[$this->callbackBBCodes['size']] = '$3';
-        $rules[$this->callbackBBCodes['video']] = "$1";
+        $rules[$this->callbackBBCodes['video']] = '$1';
 
         foreach (
             array_merge(
