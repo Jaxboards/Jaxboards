@@ -87,10 +87,8 @@ textarea {
 }
 
 .window {
-  & {
-    position: fixed;
-    box-shadow: 0 0 5px white;
-  }
+  position: fixed;
+  box-shadow: 0 0 5px white;
 
   & .title {
     padding: 5px 20px;
@@ -187,13 +185,11 @@ textarea {
   }
 
   & .action {
+    color: #522994;
+
     & .you,
     & .them {
       font-style: italic;
-    }
-
-    & {
-      color: #522994;
     }
   }
 
@@ -1724,6 +1720,7 @@ textarea {
 
     &::before {
       content: "🎂";
+
       .no-emoji & {
         content: "Birthdays: ";
       }
