@@ -2,6 +2,7 @@
 
 import commands from "../RUN/commands";
 import Sound from "../sound";
+import { toDOM } from "./dom";
 import { flashTitle } from "./flashing-title";
 import gracefulDegrade from "./graceful-degrade";
 import Window from "./window";
@@ -44,15 +45,15 @@ function createMessagingWindow({
   const imWindow = new Window({
     title: `${fromName}`,
     content: `
-            <div class='ims'></div>
-            <div class='offline'>This user may be offline</div>
-            <div>
-                <form data-ajax-form='resetOnSubmit' method='post'>
-                    <input type='hidden' name='im_uid' value='%s'>
-                    <input type='text' name='im_im' autocomplete='off'>
-                </form>
-            </div>
-        `.replaceAll("%s", `${fromId}`),
+        <div class='ims'></div>
+        <div class='offline'>This user may be offline</div>
+        <div>
+            <form data-ajax-form='resetOnSubmit' method='post'>
+                <input type='hidden' name='im_uid' value='${fromId}'>
+                <input type='text' name='im_im' autocomplete='off'>
+            </form>
+        </div>
+    `,
     className: "im",
     resize: ".ims",
     animate: true,
@@ -114,30 +115,30 @@ export function messageReceived({
     return;
   }
 
-  const div = document.createElement("div");
   const isAction = message.startsWith("/me");
-  if (isAction) {
-    div.className = "action";
-    /* eslint-disable no-param-reassign */
-    message = message.substring(3);
-    fromName = `***${fromName}`;
-    /* eslint-enable no-param-reassign */
-  }
-  div.classList.add(fromMe ? "you" : "them");
+
+  // Remove "user may be offline" message
   if (!fromMe) {
     document.querySelector(`#im_${fromId}`)?.classList.remove("offline");
   }
-  div.innerHTML = `<a href='/profile/${
-    fromMe || fromId
-  }' class='name'>${fromName}</a> ${isAction ? "" : ": "}${message}`;
-  div.dataset.timestamp = `${timestamp}`;
-  const test =
-    messagesContainer.scrollTop >
-    messagesContainer.scrollHeight - messagesContainer.clientHeight - 50;
+
+  // build and insert message dom
+  const div = toDOM<HTMLDivElement>(`
+    <div class="${isAction ? "action" : ""} ${fromMe ? "you" : "them"}" data-timestamp="${timestamp}">
+      <a href="/profile/${fromMe || fromId}" class="name">${isAction ? "***" + fromName : fromName}</a>
+      ${isAction ? message.substring(3) : ": " + message}
+    </div>
+  `);
   messagesContainer.appendChild(div);
-  if (test) {
+  gracefulDegrade(div);
+
+  // Auto scroll to bottom if needed
+  if (
+    messagesContainer.scrollTop >
+    messagesContainer.scrollHeight - messagesContainer.clientHeight - 50
+  ) {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
-  gracefulDegrade(div);
+
   if (globalSettings.soundIM) Sound.play("imbeep");
 }
