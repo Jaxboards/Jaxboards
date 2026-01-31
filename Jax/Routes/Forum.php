@@ -153,7 +153,7 @@ final class Forum implements Route
 
                     return "<a href='{$pageURL}' {$activeClass}>{$pageNumber}</a> ";
                 },
-                $this->jax->pages($numpages, $this->pageNumber + 1, 10),
+                $this->jax->pages($numpages, $this->pageNumber + 1, 6),
             ));
         }
 

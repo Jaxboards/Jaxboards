@@ -69,15 +69,16 @@ final class WebHooks implements Module
 
         $postContent = $this->bbcode->toMarkdown($post->post);
 
-        $content = <<<MARKDOWN
+        // Trim content to remain under discord's character limit
+        $content = mb_substr(
+            <<<MARKDOWN
             [{$topic->title}](<{$topicURL}>)
 
             {$postContent}
-            MARKDOWN;
-
-        if (mb_strlen($content) > self::DISCORD_CHARACTER_LIMIT) {
-            return;
-        }
+            MARKDOWN,
+            0,
+            self::DISCORD_CHARACTER_LIMIT
+        );
 
         $member = $this->user->get();
         $this->sendJSON($discord, [
