@@ -594,13 +594,11 @@ textarea {
   padding: 10px 0;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .contact-card .contact_details {
   font-size: 1.2rem;
   margin-top: 20px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .contact-card .contact_details a:hover {
   text-decoration: none;
 }
@@ -803,22 +801,18 @@ textarea {
   background: url("/Service/Themes/Default/icons/activity.png") no-repeat;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .activity.new_post {
   background-position: 0 -64px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .activity.profile_name_change {
   background-position: 0 -128px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .activity.profile_comment {
   background-position: 0 -194px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .activity.buddy_add {
   background-position: 0 -258px;
 }
@@ -1039,25 +1033,21 @@ textarea {
   border: 1px solid var(--border-blue);
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .boardindex .last_post {
   padding: 10px;
   border-right: none;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .boardindex .last_post::first-letter {
   background: url("/Service/Themes/Default/icons/last.gif") center left
     no-repeat;
   padding-left: 15px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .boardindex .last_post a {
   color: #e77700;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .boardindex .f_icon {
   border-style: solid none;
   width: 40px;
@@ -1089,9 +1079,7 @@ textarea {
   font-size: 1rem;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .boardindex .item_1,
-/* stylelint-disable-next-line selector-class-pattern */
 .boardindex .item_2 {
   font-size: 1.2rem;
   width: 20vw;
@@ -1115,7 +1103,6 @@ textarea {
   border: 1px solid var(--border-blue);
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .forumindex .f_icon {
   width: 12px;
   padding: 0;
@@ -1131,22 +1118,18 @@ textarea {
   border-left: none;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .forumindex .last_post {
   width: 20vw;
   max-width: 250px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .forumindex .last_post::first-letter {
   background: url("/Service/Themes/Default/icons/last.gif") center left
     no-repeat;
   padding-left: 15px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .forumindex .item_1,
-/* stylelint-disable-next-line selector-class-pattern */
 .forumindex .item_2 {
   width: 10vw;
   max-width: 75px;
@@ -1199,25 +1182,21 @@ textarea {
   border: 1px solid var(--border-blue);
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .subindex .last_post {
   padding: 10px;
   border-right: none;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .subindex .last_post a {
   color: #e77700;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .subindex .last_post::first-letter {
   background: url("/Service/Themes/Default/icons/last.gif") center left
     no-repeat;
   padding-left: 15px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .subindex .f_icon {
   border-style: solid none;
   width: 40px;
@@ -1241,9 +1220,7 @@ textarea {
   font-weight: bold;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .subindex .item_1,
-/* stylelint-disable-next-line selector-class-pattern */
 .subindex .item_2 {
   font-size: 1.2rem;
   width: 20vw;
@@ -1325,7 +1302,6 @@ textarea {
   font-size: smaller;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 #intopic .post_content {
   padding: 20px;
   overflow-wrap: anywhere;
@@ -1338,7 +1314,6 @@ textarea {
   flex-wrap: wrap;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 #intopic .post_buttons {
   flex: 1;
   flex-wrap: wrap;
@@ -1349,7 +1324,6 @@ textarea {
   padding: 4px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 #intopic .post_info {
   padding: 4px;
   text-align: right;
@@ -1421,7 +1395,6 @@ textarea {
   padding: 5px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .postrating_list {
   position: absolute;
   overflow: hidden;
@@ -1430,13 +1403,11 @@ textarea {
   font-size: smaller;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .postrating_list .column {
   width: 90px;
   float: left;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .postrating_list ul {
   list-style-type: none;
   padding: 0;
@@ -1760,7 +1731,6 @@ textarea {
   background-position: 0 -9px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .box .content_top {
   display: none;
 }
@@ -1774,7 +1744,6 @@ textarea {
   padding: 10px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .box .content_bottom {
   height: 5px;
 }

@@ -366,18 +366,18 @@ textarea {
 
   & .onlinesessions {
     border-collapse: collapse;
-  }
 
-  & .onlinesessions td {
-    border: 1px solid var(--black);
-    padding: 5px;
+    & td {
+      border: 1px solid var(--black);
+      padding: 5px;
 
-    &:nth-child(2) {
-      text-align: center;
-    }
+      &:nth-child(2) {
+        text-align: center;
+      }
 
-    &:nth-child(3) {
-      width: 25%;
+      &:nth-child(3) {
+        width: 25%;
+      }
     }
   }
 }
@@ -462,10 +462,10 @@ textarea {
   & .messageinfo {
     background: #f5f5ff;
     font-size: 1.4rem;
-  }
 
-  & .messageinfo .title {
-    font-weight: bold;
+    & .title {
+      font-weight: bold;
+    }
   }
 
   & .messagebuttons {
@@ -481,10 +481,10 @@ textarea {
   & .title {
     background: #cdf;
     color: #005;
-  }
 
-  & .title a {
-    color: #229;
+    & a {
+      color: #229;
+    }
   }
 }
 
@@ -676,10 +676,10 @@ textarea {
   & .leftbar .avatar {
     margin-top: 20px;
     text-align: center;
-  }
 
-  & .leftbar .avatar img {
-    border: 1px solid var(--black);
+    & img {
+      border: 1px solid var(--black);
+    }
   }
 
   & .leftbar .usertitle {
@@ -693,38 +693,38 @@ textarea {
     margin: 20px 5px 10px;
     border: 1px solid var(--gray-border);
     padding: 5px;
-  }
 
-  & .infobox .content {
-    font-size: 1rem;
-  }
+    & .content {
+      font-size: 1rem;
+    }
 
-  & .infobox div {
-    font-size: 1rem;
-    margin: 5px;
+    & div {
+      font-size: 1rem;
+      margin: 5px;
+    }
   }
 
   & .rightbar {
     margin-left: 210px;
-  }
 
-  & .rightbar .post {
-    border-bottom: 1px solid var(--gray-border);
-    padding: 10px;
-  }
+    & .post {
+      border-bottom: 1px solid var(--gray-border);
+      padding: 10px;
+    }
 
-  & .rightbar .postdate {
-    font-size: 1rem;
-    margin: 10px;
-    background: var(--medium-blue);
-    border: 1px solid #339;
-    padding: 5px;
-  }
+    & .postdate {
+      font-size: 1rem;
+      margin: 10px;
+      background: var(--medium-blue);
+      border: 1px solid #339;
+      padding: 5px;
+    }
 
-  & .rightbar .signature {
-    border-top: 1px dashed #ccc;
-    margin: 10px 0;
-    padding-top: 10px;
+    & .signature {
+      border-top: 1px dashed #ccc;
+      margin: 10px 0;
+      padding-top: 10px;
+    }
   }
 
   & #pfbox {
@@ -740,11 +740,11 @@ textarea {
     border-bottom: none;
     background: var(--gray-border);
     color: var(--white);
-  }
 
-  & .pftabs a.active {
-    background: var(--white);
-    color: var(--black);
+    &.active {
+      background: var(--white);
+      color: var(--black);
+    }
   }
 
   & .comment {
@@ -752,54 +752,54 @@ textarea {
     min-height: 80px;
     border-bottom: 1px solid var(--gray-border);
     padding: 10px;
-  }
 
-  & .comment img {
-    max-height: 50px;
-    max-width: 50px;
-  }
+    & img {
+      max-height: 50px;
+      max-width: 50px;
+    }
 
-  & .comment .userdata {
-    position: absolute;
-  }
+    & .userdata {
+      position: absolute;
+    }
 
-  & .comment .commenttext {
-    margin-left: 100px;
-    padding: 10px;
-  }
+    & .commenttext {
+      margin-left: 100px;
+      padding: 10px;
+    }
 
-  & .comment .date {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 0;
-    font-size: smaller;
-    color: var(--blue-border);
+    & .date {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 0;
+      font-size: smaller;
+      color: var(--blue-border);
+    }
   }
 
   & .contacts {
     display: inline-block;
-  }
 
-  & .contacts .contact {
-    background: var(--white);
-    border: 1px solid var(--white);
-    cursor: pointer;
-    padding: 30px 10px;
-    min-height: 80px;
-    width: 120px;
-    float: left;
-    text-align: center;
-  }
+    & .contact {
+      background: var(--white);
+      border: 1px solid var(--white);
+      cursor: pointer;
+      padding: 30px 10px;
+      min-height: 80px;
+      width: 120px;
+      float: left;
+      text-align: center;
+    }
 
-  & .contacts .contact:hover {
-    background: #ddf;
-    border: 1px solid var(--gray-border);
-  }
+    & .contact:hover {
+      background: #ddf;
+      border: 1px solid var(--gray-border);
+    }
 
-  & .contacts .contact .avatar img {
-    max-width: 50px;
-    max-height: 50px;
+    & .contact .avatar img {
+      max-width: 50px;
+      max-height: 50px;
+    }
   }
 }
 
@@ -813,35 +813,35 @@ textarea {
       "badgeImage reason reason";
     border-bottom: 1px solid var(--black);
     padding: 10px 5px;
-  }
 
-  & .badge .badge-title {
-    grid-area: title;
-    margin: 0;
-  }
+    & .badge-title {
+      grid-area: title;
+      margin: 0;
+    }
 
-  & .badge .badge-image {
-    grid-area: badgeImage;
-  }
+    & .badge-image {
+      grid-area: badgeImage;
 
-  & .badge .badge-image img {
-    position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+      & img {
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
 
-  & .badge .description {
-    grid-area: description;
-  }
+    & .description {
+      grid-area: description;
+    }
 
-  & .badge .award-date {
-    grid-area: awardDate;
-    text-align: right;
-  }
+    & .award-date {
+      grid-area: awardDate;
+      text-align: right;
+    }
 
-  & .badge .reason {
-    grid-area: reason;
+    & .reason {
+      grid-area: reason;
+    }
   }
 }
 
@@ -850,22 +850,18 @@ textarea {
   padding: 10px 10px 10px 36px;
   background: url("icons/activity.png") no-repeat;
 
-  /* stylelint-disable-next-line selector-class-pattern */
   &.new_post {
     background-position: 0 -64px;
   }
 
-  /* stylelint-disable-next-line selector-class-pattern */
   &.profile_name_change {
     background-position: 0 -128px;
   }
 
-  /* stylelint-disable-next-line selector-class-pattern */
   &.profile_comment {
     background-position: 0 -194px;
   }
 
-  /* stylelint-disable-next-line selector-class-pattern */
   &.buddy_add {
     background-position: 0 -258px;
   }
@@ -924,26 +920,26 @@ textarea {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
-  }
 
-  & ul li {
-    margin-right: 1px;
-    padding: 11px 20px;
-    white-space: nowrap;
-    background: linear-gradient(#2f2f2f, black);
-    border-width: 1px;
-    border-style: solid;
-    border-image: linear-gradient(var(--white), #393939) 1;
-    border-bottom: 0;
+    & li {
+      margin-right: 1px;
+      padding: 11px 20px;
+      white-space: nowrap;
+      background: linear-gradient(#2f2f2f, black);
+      border-width: 1px;
+      border-style: solid;
+      border-image: linear-gradient(var(--white), #393939) 1;
+      border-bottom: 0;
+
+      &.active {
+        background: linear-gradient(#384b61, #22354b);
+      }
+    }
   }
 
   & .spacer {
     flex: 1;
     padding: 0;
-  }
-
-  & ul li.active {
-    background: linear-gradient(#384b61, #22354b);
   }
 
   & a {
@@ -988,14 +984,14 @@ textarea {
   & form {
     margin: 0;
     font-size: 1.6rem;
-  }
 
-  & form input {
-    width: 200px;
-  }
+    & input {
+      width: 200px;
+    }
 
-  & form input[type="submit"] {
-    width: auto;
+    & input[type="submit"] {
+      width: auto;
+    }
   }
 
   & .logout,
@@ -1026,12 +1022,11 @@ textarea {
     text-align: right;
     float: left;
     width: 50%;
-  }
-
-  & .settings a {
-    background: url("icons/wrench.png") no-repeat;
-    padding-left: 20px;
-    color: var(--white);
+    & a {
+      background: url("icons/wrench.png") no-repeat;
+      padding-left: 20px;
+      color: var(--white);
+    }
   }
 
   & .forgot {
@@ -1060,18 +1055,18 @@ textarea {
     list-style: none;
     margin: 0;
     padding: 0;
-  }
 
-  & ul li {
-    background: url("icons/pathsplitter.png") no-repeat;
-    padding-left: 20px;
-    margin-right: 10px;
-    float: left;
-  }
+    & li {
+      background: url("icons/pathsplitter.png") no-repeat;
+      padding-left: 20px;
+      margin-right: 10px;
+      float: left;
 
-  & ul li:first-child {
-    background: none;
-    padding-left: 0;
+      &:first-child {
+        background: none;
+        padding-left: 0;
+      }
+    }
   }
 
   & a {
@@ -1101,15 +1096,15 @@ textarea {
     background: var(--light-blue);
     padding: 10px;
     border-right: none;
-  }
 
-  & .last_post::first-letter {
-    background: url("icons/last.gif") center left no-repeat;
-    padding-left: 15px;
-  }
+    &::first-letter {
+      background: url("icons/last.gif") center left no-repeat;
+      padding-left: 15px;
+    }
 
-  & .last_post a {
-    color: #e77700;
+    & a {
+      color: #e77700;
+    }
   }
 
   & .f_icon {
@@ -1129,12 +1124,12 @@ textarea {
     background-color: var(--barely-blue);
     padding: 20px;
     padding-left: 10px;
-  }
 
-  & .forum a {
-    font:
-      1.4rem Arial,
-      sans-serif;
+    & a {
+      font:
+        1.4rem Arial,
+        sans-serif;
+    }
   }
 
   & .subforums,
@@ -1171,7 +1166,6 @@ textarea {
     border: 1px solid var(--blue-border);
   }
 
-  /* stylelint-disable-next-line selector-class-pattern */
   & .f_icon {
     width: 12px;
     padding: 0;
@@ -1188,23 +1182,19 @@ textarea {
     border-left: none;
   }
 
-  /* stylelint-disable-next-line selector-class-pattern */
   & .last_post {
     width: 20vw;
     max-width: 250px;
     background-color: var(--medium-blue);
+
+    &::first-letter {
+      background: url("icons/last.gif") center left no-repeat;
+      padding-left: 15px;
+    }
   }
 
-  /* stylelint-disable-next-line selector-class-pattern */
-  & .last_post::first-letter {
-    background: url("icons/last.gif") center left no-repeat;
-    padding-left: 15px;
-  }
-
-  /* stylelint-disable-next-line selector-class-pattern */
   & .item_1,
-/* stylelint-disable-next-line selector-class-pattern */
-& .item_2 {
+  & .item_2 {
     width: 10vw;
     max-width: 75px;
     text-align: center;
@@ -1266,15 +1256,15 @@ textarea {
     background-color: var(--medium-blue);
     padding: 10px;
     border-right: none;
-  }
 
-  & .last_post a {
-    color: #e77700;
-  }
+    & a {
+      color: #e77700;
+    }
 
-  & .last_post::first-letter {
-    background: url("icons/last.gif") center left no-repeat;
-    padding-left: 15px;
+    &::first-letter {
+      background: url("icons/last.gif") center left no-repeat;
+      padding-left: 15px;
+    }
   }
 
   & .f_icon {
@@ -1290,12 +1280,12 @@ textarea {
     background-color: var(--barely-blue);
     padding: 20px;
     padding-left: 10px;
-  }
 
-  & .forum a {
-    font:
-      1.4rem Arial,
-      sans-serif;
+    & a {
+      font:
+        1.4rem Arial,
+        sans-serif;
+    }
   }
 
   & .unread .forum a {
@@ -1337,20 +1327,20 @@ textarea {
 
   & .avatar {
     margin-top: 10px;
-  }
 
-  & .avatar img {
-    border: 1px solid var(--black);
+    & img {
+      border: 1px solid var(--black);
+    }
   }
 
   & .username {
     background: #eef;
     padding: 3px;
     border-bottom: 1px solid var(--blue-border);
-  }
 
-  & .username a {
-    font-weight: bold;
+    & a {
+      font-weight: bold;
+    }
   }
 
   & .signature {
@@ -1390,7 +1380,6 @@ textarea {
     font-size: smaller;
   }
 
-  /* stylelint-disable-next-line selector-class-pattern */
   & .post_content {
     padding: 20px;
     overflow-wrap: anywhere;
@@ -1403,7 +1392,6 @@ textarea {
     flex-wrap: wrap;
   }
 
-  /* stylelint-disable-next-line selector-class-pattern */
   & .post_buttons {
     flex: 1;
     flex-wrap: wrap;
@@ -1414,7 +1402,6 @@ textarea {
     padding: 4px;
   }
 
-  /* stylelint-disable-next-line selector-class-pattern */
   & .post_info {
     padding: 4px;
     text-align: right;
@@ -1434,14 +1421,18 @@ textarea {
   & .postrating {
     min-height: 1.4em;
     padding-left: 20px;
-  }
 
-  & .postrating .form {
-    display: none;
-  }
+    & .form {
+      display: none;
+    }
 
-  & .postrating .form img {
-    opacity: 0.5;
+    & .form img {
+      opacity: 0.5;
+    }
+
+    & a:hover img {
+      opacity: 1;
+    }
   }
 
   & .topic-post-row:hover .postrating .showrating {
@@ -1452,10 +1443,6 @@ textarea {
     display: block;
   }
 
-  & .postrating a:hover img {
-    opacity: 1;
-  }
-
   & .opengraph {
     border: 1px solid #192c44;
     border-left-width: 5px;
@@ -1463,24 +1450,24 @@ textarea {
     max-width: 80%;
     margin: 10px 0;
     padding: 10px;
-  }
 
-  & .opengraph img {
-    max-width: 100%;
-    max-height: 160px;
-  }
+    & img {
+      max-width: 100%;
+      max-height: 160px;
+    }
 
-  & .opengraph h4 {
-    margin: 1em 0;
-    font-size: 1.2rem;
-  }
+    & h4 {
+      margin: 1em 0;
+      font-size: 1.2rem;
+    }
 
-  & .opengraph p {
-    font-size: 1.2rem;
-  }
+    & p {
+      font-size: 1.2rem;
+    }
 
-  & .opengraph .remove {
-    float: right;
+    & .remove {
+      float: right;
+    }
   }
 
   & .userstats {
@@ -1501,7 +1488,6 @@ textarea {
   padding: 5px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .postrating_list {
   position: absolute;
   overflow: hidden;
@@ -1782,10 +1768,10 @@ textarea {
 
   & .birthdays {
     font-size: smaller;
-  }
 
-  & .birthdays::before {
-    content: "🎂";
+    &::before {
+      content: "🎂";
+    }
   }
 
   .no-emoji & .birthdays::before {
@@ -1811,39 +1797,37 @@ textarea {
     background: var(--header);
     padding: 7px;
     color: var(--white);
-  }
 
-  & > .title .x {
-    background: url("icons/collapse.png");
-    position: absolute;
-    top: 0.75em;
-    right: 10px;
-    width: 9px;
-    height: 9px;
-    text-indent: 10px;
-    overflow: hidden;
-    cursor: pointer;
+    & .x {
+      background: url("icons/collapse.png");
+      position: absolute;
+      top: 0.75em;
+      right: 10px;
+      width: 9px;
+      height: 9px;
+      text-indent: 10px;
+      overflow: hidden;
+      cursor: pointer;
+    }
   }
 
   &.collapsed .title .x {
     background-position: 0 -9px;
   }
 
-  /* stylelint-disable-next-line selector-class-pattern */
   & .content_top {
     display: none;
   }
 
   & .content {
     background: var(--white);
+
+    & > .error {
+      margin: 0;
+      padding: 10px;
+    }
   }
 
-  & .content > .error {
-    margin: 0;
-    padding: 10px;
-  }
-
-  /* stylelint-disable-next-line selector-class-pattern */
   & .content_bottom {
     height: 5px;
     background: #bbd;
@@ -1939,14 +1923,14 @@ textarea {
   & a {
     margin-right: 5px;
     white-space: nowrap;
-  }
 
-  & a::after {
-    content: ",";
-  }
+    &::after {
+      content: ",";
+    }
 
-  & a:last-child::after {
-    content: "";
+    &:last-child::after {
+      content: "";
+    }
   }
 
   & .idle {
@@ -1989,11 +1973,10 @@ textarea {
 
   & .avatar {
     width: 50px;
-  }
-
-  & .avatar img {
-    max-width: 50px;
-    max-height: 50px;
+    & img {
+      max-width: 50px;
+      max-height: 50px;
+    }
   }
 
   & td {
@@ -2052,13 +2035,13 @@ a.mgroup4 {
     visibility: hidden;
   }
 
-  &:hover * {
-    visibility: visible;
-  }
-
   &:hover {
     background: var(--white);
     color: var(--black);
+
+    & * {
+      visibility: visible;
+    }
   }
 }
 

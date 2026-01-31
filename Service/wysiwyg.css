@@ -70,7 +70,6 @@ body {
   background-position: -222px 0;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_email {
   width: 27px;
   background-position: -250px 0;
@@ -91,25 +90,21 @@ body {
   background-position: -330px 0;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_youtube {
   width: 28px;
   background-position: -356px 0;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_code {
   width: 26px;
   background-position: -384px 0;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_quote {
   width: 25px;
   background-position: -410px 0;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_spoiler {
   width: 29px;
   background-position: -435px 0;
@@ -125,13 +120,11 @@ body {
   background-position: -492px 0;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_smileys {
   width: 29px;
   background-position: -520px 0;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_switcheditmode {
   width: 29px;
   background-position: -549px 0;

@@ -234,7 +234,6 @@ a:visited {
   background: url("../img/acp-box-content.png") top repeat-x #e2e2e2;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .dropdownMenu {
   display: none;
   border: 1px solid #000;
@@ -246,7 +245,6 @@ a:visited {
 }
 
 /* stylelint-disable no-descending-specificity */
-/* stylelint-disable-next-line selector-class-pattern */
 .dropdownMenu a {
   display: block;
   color: #333;
@@ -258,7 +256,6 @@ a:visited {
 /* stylelint-enable no-descending-specificity */
 
 /* stylelint-disable no-descending-specificity */
-/* stylelint-disable-next-line selector-class-pattern */
 .dropdownMenu a:hover {
   background: #bbb;
   border: 1px solid #000;
