@@ -34,7 +34,7 @@ final readonly class BotDetector
         'DotBot' => 'DotBot',
         'DuckDuckBot' => 'DuckDuckGo',
         'Expanse' => 'Expanse',
-	'expo-research-bot' => 'ExpoResearch',
+        'expo-research-bot' => 'ExpoResearch',
         'facebookexternalhit' => 'Facebook',
         'Friendly_Crawler' => 'FriendlyCrawler',
         'Googlebot' => 'Google',
