@@ -85,6 +85,7 @@ textarea {
 /* All windows */
 .window {
   position: fixed;
+
   & .title {
     padding: 5px 20px;
     cursor: move;
@@ -106,6 +107,7 @@ textarea {
     display: inline-block;
     padding: 0 5px;
   }
+
   &.minimized {
     position: relative;
     float: left;
@@ -158,6 +160,7 @@ textarea {
     width: 200px;
     height: 100px;
     overflow: auto;
+
     & div {
       background: var(--white);
     }
@@ -1998,6 +2001,7 @@ textarea {
     border-top: 1px solid #ccc;
   }
 }
+
 /* Member/Group Specific */
 a.birthday::before {
   content: "🎂";
@@ -2043,9 +2047,7 @@ a.mgroup4 {
   background: var(--white);
   color: var(--white);
   border: 1px solid var(--blue-border);
-}
 
-.spoilertext {
   & * {
     visibility: hidden;
   }
