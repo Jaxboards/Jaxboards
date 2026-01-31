@@ -24,6 +24,8 @@ use const JSON_THROW_ON_ERROR;
 
 final class WebHooks implements Module
 {
+    const DISCORD_CHARACTER_LIMIT = 2_000;
+
     /**
      * @var ?array<mixed>
      */
@@ -67,16 +69,20 @@ final class WebHooks implements Module
 
         $postContent = $this->bbcode->toMarkdown($post->post);
 
-        $member = $this->user->get();
-        $this->sendJSON($discord, [
-            'username' => $member->displayName,
-            'avatar_url' => $member->avatar ?? $rootURL . '/Service/Themes/Default/avatars/default.gif',
-            'content' => <<<MARKDOWN
-                [{$topic->title}](<{$topicURL}>)
+        $content = <<<MARKDOWN
+            [{$topic->title}](<{$topicURL}>)
 
-                {$postContent}
-                MARKDOWN,
-        ]);
+            {$postContent}
+            MARKDOWN;
+
+        if (strlen($content) <= self::DISCORD_CHARACTER_LIMIT) {
+            $member = $this->user->get();
+            $this->sendJSON($discord, [
+                'username' => $member->displayName,
+                'avatar_url' => $member->avatar ?? $rootURL . '/Service/Themes/Default/avatars/default.gif',
+                'content' => $content
+            ]);
+        }
     }
 
     /**
