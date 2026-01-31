@@ -16,6 +16,7 @@ use Jax\User;
 
 use function json_encode;
 use function mb_strlen;
+use function mb_substr;
 
 use const CURLOPT_CUSTOMREQUEST;
 use const CURLOPT_POSTFIELDS;
@@ -72,12 +73,12 @@ final class WebHooks implements Module
         // Trim content to remain under discord's character limit
         $content = mb_substr(
             <<<MARKDOWN
-            [{$topic->title}](<{$topicURL}>)
+                [{$topic->title}](<{$topicURL}>)
 
-            {$postContent}
-            MARKDOWN,
+                {$postContent}
+                MARKDOWN,
             0,
-            self::DISCORD_CHARACTER_LIMIT
+            self::DISCORD_CHARACTER_LIMIT,
         );
 
         $member = $this->user->get();
