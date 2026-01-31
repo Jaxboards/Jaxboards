@@ -52,8 +52,7 @@ final readonly class Calendar implements Route
             $month,
         ] = explode(
             ' ',
-            Carbon::today('UTC')
-                ->addMonthNoOverflow($monthOffset)
+            Carbon::today('UTC')->addMonthNoOverflow()
                 ->format('w t F Y n'),
         );
         $offset = (int) $offset;
