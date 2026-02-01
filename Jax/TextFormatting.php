@@ -81,7 +81,7 @@ final readonly class TextFormatting
             array_keys($emotes),
         ));
         $text = (string) preg_replace_callback(
-            "/(\s)({$emotesEscaped})/",
+            "/(\\s)({$emotesEscaped})/",
             $this->emoteCallback(...),
             ' ' . $text,
             $emoticonLimit,
