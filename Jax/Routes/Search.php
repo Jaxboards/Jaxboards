@@ -355,7 +355,7 @@ final class Search implements Route
                 [
                     'post' => $postRow,
                     'titleHighlighted' => preg_replace(
-                        '/{$termsOr}/i',
+                        "/{$termsOr}/i",
                         $this->template->render(
                             'search/highlight',
                             ['searchTerm' => '$0'],
@@ -363,7 +363,7 @@ final class Search implements Route
                         $title,
                     ),
                     'postHighlighted' => preg_replace(
-                        '/{$termsOr}/i',
+                        "/{$termsOr}/i",
                         $this->template->render(
                             'search/highlight',
                             ['searchTerm' => '$0'],
