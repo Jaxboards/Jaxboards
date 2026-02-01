@@ -218,7 +218,7 @@ final readonly class FileSystem
      */
     public function pathJoin(string ...$paths): string
     {
-        return (string) preg_replace('@\/+@', '/', implode('/', $paths));
+        return (string) preg_replace('/\/+/', '/', implode('/', $paths));
     }
 
     /**

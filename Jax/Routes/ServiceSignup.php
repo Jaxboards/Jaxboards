@@ -102,7 +102,7 @@ final readonly class ServiceSignup
             return 'WWW is reserved.';
         }
 
-        if (preg_match('@\W@', $boardURL)) {
+        if (preg_match('/\W/', $boardURL)) {
             return 'board url needs to consist of letters, '
                 . 'numbers, and underscore only';
         }
@@ -115,7 +115,7 @@ final readonly class ServiceSignup
             return 'username too long';
         }
 
-        if (preg_match('@\W@', $username)) {
+        if (preg_match('/\W/', $username)) {
             return 'username needs to consist of letters, '
                 . 'numbers, and underscore only';
         }

@@ -163,7 +163,7 @@ final readonly class Settings
         $pageAct = $this->request->asString->both('page');
         if ($pageAct !== null) {
             $newact = preg_replace(
-                '@\W@',
+                '/\W/',
                 '<span style="font-weight:bold;color:#F00;">$0</span>',
                 $pageAct,
             );

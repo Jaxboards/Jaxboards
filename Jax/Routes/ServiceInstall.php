@@ -150,7 +150,7 @@ final readonly class ServiceInstall
             $domain !== null
             && !parse_url($domain, PHP_URL_HOST)
         ) {
-            if (preg_match('@[^\w\-.]@', $domain)) {
+            if (preg_match('/[^\w\-.]/', $domain)) {
                 $errors[] = 'Invalid domain';
             } else {
                 // Looks like we have a proper hostname,
@@ -180,7 +180,7 @@ final readonly class ServiceInstall
 
         if (mb_strlen((string) $adminUsername) > 50) {
             $errors[] = 'Admin username is too long';
-        } elseif (preg_match('@\W@', (string) $adminUsername)) {
+        } elseif (preg_match('/\W/', (string) $adminUsername)) {
             $errors[] = 'Admin username needs to consist of letters,'
                 . 'numbers, and underscore only';
         }

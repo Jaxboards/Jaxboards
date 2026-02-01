@@ -260,7 +260,7 @@ final class Post implements Route
         $topic->subtitle = $topicDesc ?? '';
         $topic->summary = mb_substr(
             (string) preg_replace(
-                '@\s+@',
+                '/\s+/',
                 ' ',
                 $this->textFormatting->wordFilter(
                     $this->textFormatting->textOnly(

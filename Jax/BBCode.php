@@ -35,36 +35,37 @@ final class BBCode
      * @var array<string,string>
      */
     private array $inlineBBCodes = [
-        'background' => '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi',
-        'bold' => '@\[b\](.*)\[/b\]@Usi',
-        'color' => '@\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[/color\]@Usi',
-        'font' => '@\[font=([\s\w]+)](.*)\[/font\]@Usi',
-        'italic' => '@\[i\](.*)\[/i\]@Usi',
-        'spoiler' => '@\[spoiler\](.*)\[/spoiler\]@Usi',
-        'strikethrough' => '@\[s\](.*)\[/s\]@Usi',
-        'underline' => '@\[u\](.*)\[/u\]@Usi',
-        'url' => '@\[url\](?P<url>(?:[?/]|https?|ftp|mailto:).*)\[/url\]@Ui',
-        'urlWithLink' => '@\[url=(?P<url>(?:[?/]|https?|ftp|mailto:)[^\]]+)\](.+?)\[/url\]@i',
+        'background' => '/\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[\/\1\]/Usi',
+        'bold' => '/\[b\](.*)\[\/b\]/Usi',
+        'color' => '/\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[\/color\]/Usi',
+        'font' => '/\[font=([\s\w]+)](.*)\[\/font\]/Usi',
+        'italic' => '/\[i\](.*)\[\/i\]/Usi',
+        'spoiler' => '/\[spoiler\](.*)\[\/spoiler\]/Usi',
+        'strikethrough' => '/\[s\](.*)\[\/s\]/Usi',
+        'underline' => '/\[u\](.*)\[\/u\]/Usi',
+        'url' => '/\[url\](?P<url>(?:[?\/]|https?|ftp|mailto:).*)\[\/url\]/Ui',
+        'urlWithLink' => '/\[url=(?P<url>(?:[?\/]|https?|ftp|mailto:)[^\]]+)\](.+?)\[\/url\]/i',
     ];
 
     /**
      * @var array<string,string>
      */
     private array $blockBBCodes = [
-        'align' => '@\[align=(center|left|right)\](.*)\[/align\]@Usi',
-        'header' => '@\[h([1-6])\](.*)\[/h\1\]@Usi',
-        'image' => '@\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[/img\]@Ui',
+        'align' => '/\[align=(center|left|right)\](.*)\[\/align\]/Usi',
+        'header' => '/\[h([1-6])\](.*)\[\/h\1\]/Usi',
+        'image' => '/\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[\/img\]/Ui',
     ];
 
     /**
      * @var array<string,string>
      */
     private array $callbackBBCodes = [
-        'attachment' => '@\[attachment\](\d+)\[/attachment\]@',
-        'list' => '@\[(ul|ol)\](.*)\[/\1\]@Usi',
-        'quote' => '@\[quote(?>=([^\]]+))?\](.*?)\[/quote\]\r?\n?@is',
-        'size' => '@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi',
-        'video' => '@\[video\](.*)\[/video\]@Ui',
+        'attachment' => '/\[attachment\](\d+)\[\/attachment\]/',
+        'list' => '/\[(ul|ol)\](.*)\[\/\1\]/Usi',
+        'quote' => '/\[quote(?>=([^\]]+))?\](.*?)\[\/quote\]\r?\n?/is',
+        'size' => '/\[size=([0-4]?\d)(px|pt|em|)\](.*)\[\/size\]/Usi',
+        'table' => '/\[table\](.*)\[\/table\]/Usi',
+        'video' => '/\[video\](.*)\[\/video\]/Ui',
     ];
 
     /**
@@ -336,14 +337,14 @@ final class BBCode
     {
 
         if (str_contains($match[1], 'youtube.com')) {
-            preg_match('@v=([\w-]+)@', $match[1], $youtubeMatches);
+            preg_match('/v=([\w-]+)/', $match[1], $youtubeMatches);
             $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
 
             return $this->youtubeEmbedHTML($match[1], $embedUrl);
         }
 
         if (str_contains($match[1], 'youtu.be')) {
-            preg_match('@youtu.be/(.+)$@', $match[1], $youtubeMatches);
+            preg_match('/youtu.be\/(.+)$/', $match[1], $youtubeMatches);
             $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
 
             return $this->youtubeEmbedHTML($match[1], $embedUrl);

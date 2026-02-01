@@ -284,7 +284,7 @@ final class Search implements Route
         }
 
         $terms = [];
-        foreach (preg_split('@\W+@', $searchTerm) ?: [] as $v) {
+        foreach (preg_split('/\W+/', $searchTerm) ?: [] as $v) {
             if (trim($v) === '') {
                 continue;
             }
@@ -348,13 +348,14 @@ final class Search implements Route
             $post = $this->textFormatting->textOnly($postRow['post']);
 
             $post = nl2br($post, false);
+            $termsOr = implode('|', $terms);
 
             $page .= $this->template->render(
                 'search/result',
                 [
                     'post' => $postRow,
                     'titleHighlighted' => preg_replace(
-                        '@' . implode('|', $terms) . '@i',
+                        '/{$termsOr}/i',
                         $this->template->render(
                             'search/highlight',
                             ['searchTerm' => '$0'],
@@ -362,7 +363,7 @@ final class Search implements Route
                         $title,
                     ),
                     'postHighlighted' => preg_replace(
-                        '@' . implode('|', $terms) . '@i',
+                        '/{$termsOr}/i',
                         $this->template->render(
                             'search/highlight',
                             ['searchTerm' => '$0'],

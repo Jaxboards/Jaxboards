@@ -143,7 +143,7 @@ final readonly class Forums
                     'category' => $cat,
                     'order' => $order,
                     'path' => preg_replace(
-                        '@\s+@',
+                        '/\s+/',
                         ' ',
                         $formattedPath,
                     ),

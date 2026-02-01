@@ -99,7 +99,7 @@ final readonly class CreateTopic
         $topic->subtitle = $input->topicDescription ?? '';
         $topic->summary = mb_substr(
             (string) preg_replace(
-                '@\s+@',
+                '/\s+/',
                 ' ',
                 $this->textFormatting->textOnly(
                     $postBody,

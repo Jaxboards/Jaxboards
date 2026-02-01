@@ -650,6 +650,6 @@ final readonly class Themes
      */
     private function isValidFilename(string $filename): bool
     {
-        return !preg_match('@[^\w ]@', $filename);
+        return !preg_match('/[^\w ]/', $filename);
     }
 }

@@ -100,7 +100,7 @@ final readonly class FileManager
 
         foreach ($posts as $post) {
             preg_match_all(
-                '@\[attachment\](\d+)\[/attachment\]@',
+                '/\[attachment\](\d+)\[\/attachment\]/',
                 $post->post,
                 $matches,
             );

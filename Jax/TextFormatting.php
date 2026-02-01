@@ -44,7 +44,7 @@ final readonly class TextFormatting
     public function linkify(string $text): string
     {
         return (string) preg_replace_callback(
-            '@(^|\s)(https?://[^\s\)\(<>]+)@u',
+            '/(^|\s)(https?:\/\/[^\s\)\(<>]+)/u',
             $this->linkifyCallback(...),
             $text,
         );
@@ -56,7 +56,7 @@ final readonly class TextFormatting
     public function videoify(string $text): string
     {
         return (string) preg_replace_callback(
-            '@(^|\s)(https?://[^\s\)\(<>]+)@u',
+            '/(^|\s)(https?:\/\/[^\s\)\(<>]+)/u',
             $this->videoifyCallback(...),
             $text,
         );
@@ -76,12 +76,12 @@ final readonly class TextFormatting
             return $text;
         }
 
-        $emotesEscaped = array_map(
-            static fn(string $emote): string => preg_quote($emote, '@'),
+        $emotesEscaped = implode('|', array_map(
+            static fn(string $emote): string => preg_quote($emote, '/'),
             array_keys($emotes),
-        );
+        ));
         $text = (string) preg_replace_callback(
-            '@(\s)(' . implode('|', $emotesEscaped) . ')@',
+            "/(\s)({$emotesEscaped})/",
             $this->emoteCallback(...),
             ' ' . $text,
             $emoticonLimit,
@@ -131,7 +131,7 @@ final readonly class TextFormatting
      */
     public function startCodeTags(string $text): array
     {
-        preg_match_all('@\[code(=\w+)?\](.*?)\[/code\]@is', $text, $codes);
+        preg_match_all('/\[code(=\w+)?\](.*?)\[\/code\]/is', $text, $codes);
         foreach ($codes[0] as $key => $fullMatch) {
             $text = str_replace($fullMatch, "[code]{$key}[/code]", $text);
         }
@@ -199,7 +199,7 @@ final readonly class TextFormatting
 
         for ($i = 0; $i < 10; ++$i) {
             $text = (string) preg_replace(
-                '@\[(\w+)[^\]]*\](.*)\[/\1\]@Us',
+                '/\[(\w+)[^\]]*\](.*)\[\/\1\]/Us',
                 '$2',
                 $text,
                 count: $count,
@@ -264,12 +264,12 @@ final readonly class TextFormatting
         ) {
             $inner = match (true) {
                 (bool) preg_match(
-                    '@pid=(\d+)@',
+                    '/pid=(\d+)/',
                     $parts['query'] ?? '',
                     $postMatch,
                 ) => "Post #{$postMatch[1]}",
                 (bool) preg_match(
-                    '@^/topic/(\d+)@',
+                    '/^\/topic\/(\d+)/',
                     $parts['path'] ?? '',
                     $topicMatch,
                 ) => "Topic #{$topicMatch[1]}",
@@ -288,6 +288,9 @@ final readonly class TextFormatting
         return "{$before}[url={$stringURL}]{$inner}[/url]";
     }
 
+    /**
+     * @param array<string> $match
+     */
     private function videoifyCallback(array $match): string
     {
         [, $before, $stringURL] = $match;
@@ -297,7 +300,7 @@ final readonly class TextFormatting
             'https://youtu.be/',
         ];
         foreach ($serviceURLs as $serviceURL) {
-            if (str_contains((string) $stringURL, $serviceURL)) {
+            if (str_contains($stringURL, $serviceURL)) {
                 return "{$before}[video]{$stringURL}[/video]";
             }
         }
