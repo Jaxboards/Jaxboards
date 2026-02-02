@@ -373,6 +373,7 @@ final class BBCode
 
         // Sonar is complaining this HTML table doesn't have headers
         $table = 'table';
+
         return "<{$table}>{$html}</{$table}>";
     }
 
