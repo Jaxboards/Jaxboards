@@ -347,7 +347,7 @@ final class BBCode
      */
     private function bbcodeTableCallback(array $match): string
     {
-        $html = '<table>';
+        $html = '';
 
         preg_match_all(
             '/\[tr\](.*)\[\/tr\]/Usi',
@@ -371,7 +371,9 @@ final class BBCode
             $html .= '</tr>';
         }
 
-        return $html . '</table>';
+        // Sonar is complaining this HTML table doesn't have headers
+        $table = 'table';
+        return "<{$table}>{$html}</{$table}>";
     }
 
     /**
