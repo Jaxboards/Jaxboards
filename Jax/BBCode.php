@@ -149,6 +149,13 @@ final class BBCode
 
         $text = $this->replaceWithRules($text, $rules);
 
+        // [table]
+        $text = $this->replaceWithCallback(
+            $text,
+            $this->callbackBBCodes['table'],
+            $this->bbcodeTableCallback(...),
+        );
+
         // [ul] and [ol]
         $text = $this->replaceWithCallback(
             $text,
@@ -328,6 +335,30 @@ final class BBCode
         $fontSize = $match[1] . ($match[2] ?: 'px');
 
         return "<span style='font-size:{$fontSize}'>{$match[3]}</span>";
+    }
+
+    /**
+     * For [table]s, we need to apply special rules
+     * so that anything between cells and rows is not output (newlines, whitespace, etc)
+     *
+     * @param array<string> $match
+     */
+    private function bbcodeTableCallback(array $match): string
+    {
+        $html = '<table>';
+
+        preg_match_all('/\[tr\](.*)\[\/tr\]/Usi', $match[1], $rows, PREG_SET_ORDER);
+
+        foreach ($rows as $row) {
+            $html .= '<tr>';
+            preg_match_all('/\[(td|th)\](.*)\[\/\1\]/Usi', $row[1], $cells, PREG_SET_ORDER);
+            foreach ($cells as $cell) {
+                $html .= "<{$cell[1]}>{$cell[2]}</{$cell[1]}>";
+            }
+            $html .= '</tr>';
+        }
+
+        return $html . '</table>';
     }
 
     /**

@@ -189,6 +189,29 @@ final class BBCodeTest extends UnitTestCase
                 '[video]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/video]',
                 '/YouTube video player/',
             ],
+            [
+                <<<'BBCODE'
+                [table]
+                    [tr]
+                        [th]col1[/th]
+                        [th]col2[/th]
+                    [/tr]
+                    [tr]
+                        [td]one[/td]
+                        [td]two[/td]
+                    [/tr]
+                    [tr]
+                        [td]three[/td]
+                        [td]four[/td]
+                    [/tr]
+                [/table]
+                BBCODE,
+                '<table>'
+                    . '<tr><th>col1</th><th>col2</th></tr>'
+                    . '<tr><td>one</td><td>two</td></tr>'
+                    . '<tr><td>three</td><td>four</td></tr>'
+                    . '</table>'
+            ]
         ];
     }
 
