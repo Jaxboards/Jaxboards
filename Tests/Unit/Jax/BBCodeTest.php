@@ -191,27 +191,27 @@ final class BBCodeTest extends UnitTestCase
             ],
             [
                 <<<'BBCODE'
-                [table]
-                    [tr]
-                        [th]col1[/th]
-                        [th]col2[/th]
-                    [/tr]
-                    [tr]
-                        [td]one[/td]
-                        [td]two[/td]
-                    [/tr]
-                    [tr]
-                        [td]three[/td]
-                        [td]four[/td]
-                    [/tr]
-                [/table]
-                BBCODE,
+                    [table]
+                    	[tr]
+                    		[th]col1[/th]
+                    		[th]col2[/th]
+                    	[/tr]
+                    	[tr]
+                    		[td]one[/td]
+                    		[td]two[/td]
+                    	[/tr]
+                    	[tr]
+                    		[td]three[/td]
+                    		[td]four[/td]
+                    	[/tr]
+                    [/table]
+                    BBCODE,
                 '<table>'
                     . '<tr><th>col1</th><th>col2</th></tr>'
                     . '<tr><td>one</td><td>two</td></tr>'
                     . '<tr><td>three</td><td>four</td></tr>'
-                    . '</table>'
-            ]
+                    . '</table>',
+            ],
         ];
     }
 

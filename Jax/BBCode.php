@@ -24,6 +24,8 @@ use function preg_split;
 use function str_contains;
 use function trim;
 
+use const PREG_SET_ORDER;
+
 final class BBCode
 {
     /**
@@ -339,7 +341,7 @@ final class BBCode
 
     /**
      * For [table]s, we need to apply special rules
-     * so that anything between cells and rows is not output (newlines, whitespace, etc)
+     * so that anything between cells and rows is not output (newlines, whitespace, etc).
      *
      * @param array<string> $match
      */
@@ -347,14 +349,25 @@ final class BBCode
     {
         $html = '<table>';
 
-        preg_match_all('/\[tr\](.*)\[\/tr\]/Usi', $match[1], $rows, PREG_SET_ORDER);
+        preg_match_all(
+            '/\[tr\](.*)\[\/tr\]/Usi',
+            $match[1],
+            $rows,
+            PREG_SET_ORDER,
+        );
 
         foreach ($rows as $row) {
             $html .= '<tr>';
-            preg_match_all('/\[(td|th)\](.*)\[\/\1\]/Usi', $row[1], $cells, PREG_SET_ORDER);
+            preg_match_all(
+                '/\[(td|th)\](.*)\[\/\1\]/Usi',
+                $row[1],
+                $cells,
+                PREG_SET_ORDER,
+            );
             foreach ($cells as $cell) {
                 $html .= "<{$cell[1]}>{$cell[2]}</{$cell[1]}>";
             }
+
             $html .= '</tr>';
         }
 
