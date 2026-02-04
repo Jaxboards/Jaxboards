@@ -251,7 +251,7 @@ final class BBCodeTest extends UnitTestCase
                 'red text',
             ],
             [
-                '[bg=#FFFF00]yellow background[/bg]',
+                '[bgcolor=#FFFF00]yellow background[/bgcolor]',
                 'yellow background',
             ],
             [
