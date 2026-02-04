@@ -13,6 +13,8 @@ use function array_map;
 use function array_merge;
 use function array_unique;
 use function array_values;
+use function highlight_string;
+use function htmlspecialchars;
 use function implode;
 use function in_array;
 use function is_string;
@@ -22,8 +24,10 @@ use function preg_replace;
 use function preg_replace_callback;
 use function preg_split;
 use function str_contains;
+use function str_replace;
 use function trim;
 
+use const ENT_QUOTES;
 use const PREG_SET_ORDER;
 
 final class BBCode
@@ -195,7 +199,7 @@ final class BBCode
         );
 
         if ($codeBlocks !== []) {
-            $text = $this->finishCodeTags($text, $codeBlocks);
+            return $this->finishCodeTags($text, $codeBlocks);
         }
 
         return $text;
@@ -234,10 +238,8 @@ final class BBCode
         // Code blocks have to come last since they may include bbcode that should be unparsed
         $text = preg_replace_callback(
             $this->callbackBBCodes['code'],
-            function ($match) use ($codes) {
-                return "```{$codes[$match[2]][2]}```";
-            },
-            $text
+            static fn($match) => "```{$codes[$match[2]][2]}```",
+            $text,
         );
 
         return $text;
@@ -270,7 +272,12 @@ final class BBCode
      */
     public function startCodeTags(string $text): array
     {
-        preg_match_all($this->callbackBBCodes['code'], $text, $codes, PREG_SET_ORDER);
+        preg_match_all(
+            $this->callbackBBCodes['code'],
+            $text,
+            $codes,
+            PREG_SET_ORDER,
+        );
         foreach ($codes as $key => $match) {
             $text = str_replace($match[0], "[code]{$key}[/code]", $text);
         }
@@ -278,6 +285,33 @@ final class BBCode
         return [$text, $codes];
     }
 
+    /**
+     * Puts code blocks back into the post, and does code highlighting.
+     * Currently only php is supported.
+     *
+     * @param array<array<string>> $codes
+     */
+    public function finishCodeTags(string $text, array $codes): string
+    {
+        foreach ($codes as $index => [, $language, $code]) {
+            $code = $language === '=php' ? highlight_string(
+                $code,
+                true,
+            ) : preg_replace(
+                "@([ \r\n]|^) @m",
+                '$1&nbsp;',
+                htmlspecialchars($code, ENT_QUOTES),
+            );
+
+            $text = str_replace(
+                "[code]{$index}[/code]",
+                "<div class=\"bbcode code {$language}\">{$code}</div>",
+                $text,
+            );
+        }
+
+        return $text;
+    }
 
     /**
      * @param array<string,string> $rules
@@ -459,34 +493,6 @@ final class BBCode
         ));
 
         return $html . ($tag === 'ol' ? '</ol>' : '</ul>');
-    }
-
-    /**
-     * Puts code blocks back into the post, and does code highlighting.
-     * Currently only php is supported.
-     *
-     * @param array<array<string>> $codes
-     */
-    public function finishCodeTags(string $text, array $codes): string
-    {
-        foreach ($codes as $index => [, $language, $code]) {
-            $code = $language === '=php' ? highlight_string(
-                $code,
-                true,
-            ) : preg_replace(
-                "@([ \r\n]|^) @m",
-                '$1&nbsp;',
-                htmlspecialchars($code, ENT_QUOTES),
-            );
-
-            $text = str_replace(
-                "[code]{$index}[/code]",
-                "<div class=\"bbcode code {$language}\">{$code}</div>",
-                $text,
-            );
-        }
-
-        return $text;
     }
 
     private function youtubeEmbedHTML(
