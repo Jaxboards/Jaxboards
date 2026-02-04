@@ -324,6 +324,10 @@ final class BBCodeTest extends UnitTestCase
                 '[video]http://youtube.com[/video]',
                 'http://youtube.com',
             ],
+            [
+                '[code][b]this should not be bold[/b][/code]',
+                '```[b]this should not be bold[/b]```',
+            ],
         ];
     }
 }

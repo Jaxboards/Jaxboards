@@ -63,6 +63,7 @@ final class BBCode
      */
     private array $callbackBBCodes = [
         'attachment' => '/\[attachment\](\d+)\[\/attachment\]/',
+        'code' => '/\[code(=\w+)?\](.*?)\[\/code\]/is',
         'list' => '/\[(ul|ol)\](.*)\[\/\1\]/Usi',
         'quote' => '/\[quote(?>=([^\]]+))?\](.*?)\[\/quote\]\r?\n?/is',
         'size' => '/\[size=([0-4]?\d)(px|pt|em|)\](.*)\[\/size\]/Usi',
@@ -136,7 +137,7 @@ final class BBCode
         return array_unique($urls);
     }
 
-    public function toHTML(string $text): string
+    public function toHTML(string $text, $codeBlocks = []): string
     {
         $text = $this->toInlineHTML($text);
 
@@ -187,15 +188,23 @@ final class BBCode
         );
 
         // [video]
-        return (string) preg_replace_callback(
+        $text = (string) preg_replace_callback(
             $this->callbackBBCodes['video'],
             $this->bbcodeVideoCallback(...),
             $text,
         );
+
+        if ($codeBlocks !== []) {
+            $text = $this->finishCodeTags($text, $codeBlocks);
+        }
+
+        return $text;
     }
 
-    public function toMarkdown(string $text): string
+    public function toMarkdown(string $text, $codes = []): string
     {
+        [$text, $codes] = $this->startCodeTags($text);
+
         $rules = [];
 
         $rules[$this->callbackBBCodes['attachment']] = '';
@@ -217,10 +226,21 @@ final class BBCode
             $rules[$regex] = $this->markdownReplacements[$name];
         }
 
-        return $this->replaceWithRules(
+        $text = $this->replaceWithRules(
             $text,
             $rules,
         );
+
+        // Code blocks have to come last since they may include bbcode that should be unparsed
+        $text = preg_replace_callback(
+            $this->callbackBBCodes['code'],
+            function ($match) use ($codes) {
+                return "```{$codes[$match[2]][2]}```";
+            },
+            $text
+        );
+
+        return $text;
     }
 
     public function toInlineHTML(string $text): string
@@ -239,6 +259,25 @@ final class BBCode
             $rules,
         );
     }
+
+    /**
+     * Replaces all code tags with an ID.
+     * This essentially pulls all code blocks out of the input text so that code
+     * is not treated with badword, emote, and bbcode replacements.
+     * finishCodeTags puts the code back into the post.
+     *
+     * @return array{string,array<array<string>>}
+     */
+    public function startCodeTags(string $text): array
+    {
+        preg_match_all($this->callbackBBCodes['code'], $text, $codes, PREG_SET_ORDER);
+        foreach ($codes as $key => $match) {
+            $text = str_replace($match[0], "[code]{$key}[/code]", $text);
+        }
+
+        return [$text, $codes];
+    }
+
 
     /**
      * @param array<string,string> $rules
@@ -420,6 +459,34 @@ final class BBCode
         ));
 
         return $html . ($tag === 'ol' ? '</ol>' : '</ul>');
+    }
+
+    /**
+     * Puts code blocks back into the post, and does code highlighting.
+     * Currently only php is supported.
+     *
+     * @param array<array<string>> $codes
+     */
+    public function finishCodeTags(string $text, array $codes): string
+    {
+        foreach ($codes as $index => [, $language, $code]) {
+            $code = $language === '=php' ? highlight_string(
+                $code,
+                true,
+            ) : preg_replace(
+                "@([ \r\n]|^) @m",
+                '$1&nbsp;',
+                htmlspecialchars($code, ENT_QUOTES),
+            );
+
+            $text = str_replace(
+                "[code]{$index}[/code]",
+                "<div class=\"bbcode code {$language}\">{$code}</div>",
+                $text,
+            );
+        }
+
+        return $text;
     }
 
     private function youtubeEmbedHTML(

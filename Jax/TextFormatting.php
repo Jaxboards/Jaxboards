@@ -122,51 +122,13 @@ final readonly class TextFormatting
     }
 
     /**
-     * Replaces all code tags with an ID.
-     * This essentially pulls all code blocks out of the input text so that code
-     * is not treated with badword, emote, and bbcode replacements.
-     * finishCodeTags puts the code back into the post.
+     * @see BBCode::startCodeTags
      *
      * @return array{string,array<array<string>>}
      */
     public function startCodeTags(string $text): array
     {
-        preg_match_all('/\[code(=\w+)?\](.*?)\[\/code\]/is', $text, $codes);
-        foreach ($codes[0] as $key => $fullMatch) {
-            $text = str_replace($fullMatch, "[code]{$key}[/code]", $text);
-        }
-
-        return [$text, $codes];
-    }
-
-    /**
-     * Puts code blocks back into the post, and does code highlighting.
-     * Currently only php is supported.
-     *
-     * @param array<array<string>> $codes
-     */
-    public function finishCodeTags(string $text, array $codes): string
-    {
-        foreach ($codes[1] as $index => $language) {
-            $code = $codes[2][$index];
-
-            $code = $language === '=php' ? highlight_string(
-                $code,
-                true,
-            ) : preg_replace(
-                "@([ \r\n]|^) @m",
-                '$1&nbsp;',
-                $this->blockhtml($code),
-            );
-
-            $text = str_replace(
-                "[code]{$index}[/code]",
-                "<div class=\"bbcode code {$language}\">{$code}</div>",
-                $text,
-            );
-        }
-
-        return $text;
+        return $this->bbCode->startCodeTags($text);
     }
 
     /**
@@ -178,9 +140,7 @@ final readonly class TextFormatting
         string $text,
         array $codes,
     ): string {
-        foreach ($codes[1] as $index => $language) {
-            $code = $codes[2][$index];
-
+        foreach ($codes as $index => [, $language, $code]) {
             $text = str_replace(
                 "[code]{$index}[/code]",
                 "[code{$language}]{$code}[/code]",
@@ -227,8 +187,7 @@ final readonly class TextFormatting
         $text = $this->blockhtml($text);
         $text = nl2br($text, false);
         $text = $this->emotes($text);
-        $text = $this->bbCode->toHTML($text);
-        $text = $this->finishCodeTags($text, $codes);
+        $text = $this->bbCode->toHTML($text, $codes);
 
         return $this->wordFilter($text);
     }

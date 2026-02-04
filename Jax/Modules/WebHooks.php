@@ -68,7 +68,8 @@ final class WebHooks implements Module
                 'findpost' => $post->id,
             ]);
 
-        $postContent = $this->bbcode->toMarkdown($post->post);
+        [$postContent, $codes] = $this->bbcode->startCodeTags($post->post);
+        $postContent = $this->bbcode->toMarkdown($postContent, $codes);
 
         // Trim content to remain under discord's character limit
         $content = mb_substr(
