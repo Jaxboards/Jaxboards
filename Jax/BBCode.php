@@ -238,7 +238,7 @@ final class BBCode
         // Code blocks have to come last since they may include bbcode that should be unparsed
         $text = preg_replace_callback(
             $this->callbackBBCodes['code'],
-            static fn($match) => "```{$codes[$match[2]][2]}```",
+            static fn($match): string => "```{$codes[$match[2]][2]}```",
             $text,
         );
 
