@@ -41,7 +41,7 @@ final class BBCode
      * @var array<string,string>
      */
     private array $inlineBBCodes = [
-        'background' => '/\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[\/\1\]/Usi',
+        'background' => '/\[bgcolor=(#?[\s\w\d]+)\](.*)\[\/bgcolor\]/Usi',
         'bold' => '/\[b\](.*)\[\/b\]/Usi',
         'color' => '/\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[\/color\]/Usi',
         'font' => '/\[font=([\s\w]+)](.*)\[\/font\]/Usi',
@@ -80,7 +80,7 @@ final class BBCode
      */
     private array $htmlReplacements = [
         'align' => '<p style="text-align:$1">$2</p>',
-        'background' => '<span style="background:$2">$3</span>',
+        'background' => '<span style="background:$1">$2</span>',
         'bold' => '<strong>$1</strong>',
         'color' => '<span style="color:$1">$2</span>',
         'font' => '<span style="font-family:$1">$2</span>',
@@ -100,7 +100,7 @@ final class BBCode
      */
     private array $markdownReplacements = [
         'align' => '$2',
-        'background' => '$3',
+        'background' => '$2',
         'bold' => '**$1**',
         'color' => '$2',
         'font' => '$2',
