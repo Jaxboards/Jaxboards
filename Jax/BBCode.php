@@ -205,7 +205,7 @@ final class BBCode
         return $text;
     }
 
-    public function toMarkdown(string $text, $codes = []): string
+    public function toMarkdown(string $text): string
     {
         [$text, $codes] = $this->startCodeTags($text);
 
