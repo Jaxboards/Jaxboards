@@ -145,7 +145,7 @@ final class BBCode
     }
 
     /**
-     * @param array<array<string>> $codes $codeBlocks
+     * @param mixed $codeBlocks
      */
     public function toHTML(string $text, $codeBlocks = []): string
     {
@@ -516,7 +516,9 @@ final class BBCode
         [, $fen] = $match;
 
         // If it's empty, start a new game
-        $fen = trim($fen) === '' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR' : $fen;
+        $fen = trim(
+            $fen,
+        ) === '' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR' : $fen;
 
         // replace numbers with empty squares
         $fen = preg_replace_callback(
