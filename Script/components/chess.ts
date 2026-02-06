@@ -1,15 +1,11 @@
-/* global RUN */
-
 import register, { Component } from "../JAX/component";
 import Drag, { DragSession } from "../JAX/drag";
 
 export default class Chess extends Component<HTMLTableElement> {
-  private readonly resetOnSubmit: boolean;
-
   static hydrate(container: HTMLElement): void {
     register(
       "Chess",
-      container.querySelectorAll<HTMLFormElement>(".chess"),
+      container.querySelectorAll<HTMLTableElement>(".chess"),
       this,
     );
   }
