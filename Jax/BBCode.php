@@ -568,7 +568,7 @@ final class BBCode
                     $piece,
                     $chessUnicode,
                 ) ? $chessUnicode[$piece] : '';
-                $cells .= "<td>" . ($piece ?  "<div class='piece' data-piece='{$piece}' style='{$color}'>$character</div>" : '') . '</td>';
+                $cells .= '<td>' . ($piece !== '' && $piece !== '0' ? "<div class='piece' data-piece='{$piece}' style='{$color}'>{$character}</div>" : '') . '</td>';
             }
 
             $board .= "<tr><th scope='row'>" . (8 - $rows) . "</th>{$cells}</tr>";

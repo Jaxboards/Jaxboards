@@ -197,7 +197,6 @@ body {
 }
 
 .chess {
-
   & th,
   & td {
     width: 30px;
