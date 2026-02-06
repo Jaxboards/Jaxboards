@@ -512,7 +512,7 @@ final class BBCode
         $fen = preg_replace_callback('/[0-8]/', fn($match) => str_repeat(' ', (int) $match[0]), $fen);
         $fen = explode('/', $fen);
 
-        $board = <<<HTML
+        $board = <<<'HTML'
             <tr>
                 <th style="height:30px;width:30px"></th>
                 <th style="width:30px;text-align:center;">A</th>
