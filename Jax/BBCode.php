@@ -515,7 +515,7 @@ final class BBCode
             static fn($match) => str_repeat(' ', (int) $match[0]),
             (string) $fen,
         );
-        $fen = explode('/', $fen);
+        $fen = explode('/', (string) $fen);
 
         $board = <<<'HTML'
             <tr>
