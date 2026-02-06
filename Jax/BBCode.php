@@ -519,15 +519,15 @@ final class BBCode
 
         $board = <<<'HTML'
             <tr>
-                <th scope="col" style="height:30px;width:30px"></th>
-                <th scope="col" style="width:30px;text-align:center;">A</th>
-                <th scope="col" style="width:30px;text-align:center;">B</th>
-                <th scope="col" style="width:30px;text-align:center;">C</th>
-                <th scope="col" style="width:30px;text-align:center;">D</th>
-                <th scope="col" style="width:30px;text-align:center;">E</th>
-                <th scope="col" style="width:30px;text-align:center;">F</th>
-                <th scope="col" style="width:30px;text-align:center;">G</th>
-                <th scope="col" style="width:30px;text-align:center;">H</th>
+                <th scope="col"></th>
+                <th scope="col">A</th>
+                <th scope="col">B</th>
+                <th scope="col">C</th>
+                <th scope="col">D</th>
+                <th scope="col">E</th>
+                <th scope="col">F</th>
+                <th scope="col">G</th>
+                <th scope="col">H</th>
             </tr>
             HTML;
 
@@ -564,20 +564,19 @@ final class BBCode
                 $color = array_key_exists($piece, $white)
                     ? 'color:white;-webkit-text-stroke: 1px #222;'
                     : (array_key_exists($piece, $black) ? 'color:black;' : '');
-                $bgColor = ($columns + $rows) % 2 !== 0 ? 'brown' : 'tan';
                 $piece = array_key_exists(
                     $piece,
                     $chessUnicode,
                 ) ? $chessUnicode[$piece] : '';
-                $cells .= "<td style='text-align:center;font-size:30px;line-height:30px;background-color:{$bgColor};{$color}'>" . ($piece ?? '-') . '</td>';
+                $cells .= "<td style='{$color}'>" . ($piece ?? '-') . '</td>';
             }
 
-            $board .= "<tr><th scope='row' style='height:30px'>" . (8 - $rows) . "</th>{$cells}</tr>";
+            $board .= "<tr><th scope='row'>" . (8 - $rows) . "</th>{$cells}</tr>";
         }
 
         $table = 'table';
 
-        return "<{$table}>{$board}</table>";
+        return "<{$table} class='chess'>{$board}</table>";
     }
 
     private function youtubeEmbedHTML(

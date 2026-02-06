@@ -1,3 +1,4 @@
+/* global reset */
 html,
 body {
   margin: 0;
@@ -13,121 +14,121 @@ body {
   display: block;
   text-align: left;
   overflow: hidden;
-}
 
-.editbar a {
-  background: url("wysiwygbar.png");
-  height: 24px;
-  display: inline-block;
-  cursor: pointer;
-}
+  & a {
+    background: url("wysiwygbar.png");
+    height: 24px;
+    display: inline-block;
+    cursor: pointer;
+  }
 
-.editbar a:hover {
-  background-position-y: -24px;
-}
+  & a:hover {
+    background-position-y: -24px;
+  }
 
-.editbar .fontface {
-  vertical-align: top;
-  height: 24px;
-}
+  & .fontface {
+    vertical-align: top;
+    height: 24px;
+  }
 
-.editbar .bold {
-  width: 32px;
-}
+  & .bold {
+    width: 32px;
+  }
 
-.editbar .italic {
-  width: 33px;
-  background-position: -32px 0;
-}
+  & .italic {
+    width: 33px;
+    background-position: -32px 0;
+  }
 
-.editbar .underline {
-  width: 35px;
-  background-position: -65px 0;
-}
+  & .underline {
+    width: 35px;
+    background-position: -65px 0;
+  }
 
-.editbar .strikethrough {
-  width: 30px;
-  background-position: -100px 0;
-}
+  & .strikethrough {
+    width: 30px;
+    background-position: -100px 0;
+  }
 
-.editbar .forecolor {
-  width: 31px;
-  background-position: -130px 0;
-}
+  & .forecolor {
+    width: 31px;
+    background-position: -130px 0;
+  }
 
-.editbar .backcolor {
-  width: 32px;
-  background-position: -161px 0;
-}
+  & .backcolor {
+    width: 32px;
+    background-position: -161px 0;
+  }
 
-.editbar .insertimage {
-  width: 29px;
-  background-position: -193px 0;
-}
+  & .insertimage {
+    width: 29px;
+    background-position: -193px 0;
+  }
 
-.editbar .createlink {
-  width: 28px;
-  background-position: -222px 0;
-}
+  & .createlink {
+    width: 28px;
+    background-position: -222px 0;
+  }
 
-.editbar .c_email {
-  width: 27px;
-  background-position: -250px 0;
-}
+  & .c_email {
+    width: 27px;
+    background-position: -250px 0;
+  }
 
-.editbar .justifyleft {
-  width: 26px;
-  background-position: -277px 0;
-}
+  & .justifyleft {
+    width: 26px;
+    background-position: -277px 0;
+  }
 
-.editbar .justifycenter {
-  width: 27px;
-  background-position: -303px 0;
-}
+  & .justifycenter {
+    width: 27px;
+    background-position: -303px 0;
+  }
 
-.editbar .justifyright {
-  width: 26px;
-  background-position: -330px 0;
-}
+  & .justifyright {
+    width: 26px;
+    background-position: -330px 0;
+  }
 
-.editbar .c_youtube {
-  width: 28px;
-  background-position: -356px 0;
-}
+  & .c_youtube {
+    width: 28px;
+    background-position: -356px 0;
+  }
 
-.editbar .c_code {
-  width: 26px;
-  background-position: -384px 0;
-}
+  & .c_code {
+    width: 26px;
+    background-position: -384px 0;
+  }
 
-.editbar .c_quote {
-  width: 25px;
-  background-position: -410px 0;
-}
+  & .c_quote {
+    width: 25px;
+    background-position: -410px 0;
+  }
 
-.editbar .c_spoiler {
-  width: 29px;
-  background-position: -435px 0;
-}
+  & .c_spoiler {
+    width: 29px;
+    background-position: -435px 0;
+  }
 
-.editbar .insertorderedlist {
-  width: 28px;
-  background-position: -464px 0;
-}
+  & .insertorderedlist {
+    width: 28px;
+    background-position: -464px 0;
+  }
 
-.editbar .insertunorderedlist {
-  width: 28px;
-  background-position: -492px 0;
-}
+  & .insertunorderedlist {
+    width: 28px;
+    background-position: -492px 0;
+  }
 
-.editbar .c_smileys {
-  width: 29px;
-  background-position: -520px 0;
-}
+  & .c_smileys {
+    width: 29px;
+    background-position: -520px 0;
+  }
 
-.editbar .c_switcheditmode {
-  width: 29px;
-  background-position: -549px 0;
+  & .c_switcheditmode {
+    width: 29px;
+    background-position: -549px 0;
+  }
 }
 
 .emotewin {
@@ -136,23 +137,23 @@ body {
   overflow-x: auto;
   background: #eef;
   border: 1px solid #000;
-}
-/* stylelint-disable no-descending-specificity */
-.emotewin a {
-  border-bottom: 1px solid #ccf;
-  display: block;
-  text-decoration: none;
-  padding: 10px;
-}
 
-.emotewin a:hover {
-  background: #ccf;
-}
-/* stylelint-enable no-descending-specificity */
+  & a {
+    border-bottom: 1px solid #ccf;
+    display: block;
+    text-decoration: none;
+    padding: 10px;
+  }
 
-.emotewin a img {
-  border: 0;
-  margin-right: 10px;
+  & a:hover {
+    background: #ccf;
+  }
+
+
+  & a img {
+    border: 0;
+    margin-right: 10px;
+  }
 }
 
 /* datepicker */
@@ -162,36 +163,72 @@ body {
   width: 200px;
   border: 1px solid #000;
   background: #fff;
+
+  & td {
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  & .control {
+    cursor: pointer;
+  }
+
+  & .year {
+    font-weight: bold;
+  }
+
+  & .month {
+    font-weight: bold;
+  }
+
+  & .weekdays td {
+    width: 50px;
+    font-weight: bold;
+    font-size: smaller;
+  }
+
+  & .day:hover {
+    background: #eee;
+    cursor: pointer;
+  }
+
+  & .day.selected {
+    background: #ccc;
+  }
 }
 
-#datepicker td {
-  vertical-align: middle;
-  text-align: center;
-}
+.chess {
 
-#datepicker .control {
-  cursor: pointer;
-}
+  & th,
+  & td {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    vertical-align: center;
+    line-height: 30px;
+  }
 
-#datepicker .year {
-  font-weight: bold;
-}
+  & td {
+    font-size: 30px;
+  }
 
-#datepicker .month {
-  font-weight: bold;
-}
+  & tr:nth-child(2n) {
+    td:nth-child(2n) {
+      background-color: tan;
+    }
 
-#datepicker .weekdays td {
-  width: 50px;
-  font-weight: bold;
-  font-size: smaller;
-}
+    td:nth-child(2n+1) {
+      background-color: brown;
+    }
+  }
 
-#datepicker .day:hover {
-  background: #eee;
-  cursor: pointer;
-}
+  & tr:nth-child(2n+1) {
+    td:nth-child(2n) {
+      background-color: brown;
+    }
 
-#datepicker .day.selected {
-  background: #ccc;
+    td:nth-child(2n+1) {
+      background-color: tan;
+    }
+  }
 }
