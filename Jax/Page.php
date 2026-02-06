@@ -214,7 +214,7 @@ final class Page
                         rel="preload"
                         as="style"
                         type="text/css"
-                        href="/Service/wysiwyg.css"
+                        href="/Service/Themes/global.css"
                         onload="this.onload=null;this.rel='stylesheet'"
                     >
                     <link rel="stylesheet" type="text/css" href="{$themeUrl}">
