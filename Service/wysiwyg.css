@@ -149,7 +149,6 @@ body {
     background: #ccf;
   }
 
-
   & a img {
     border: 0;
     margin-right: 10px;
@@ -198,7 +197,6 @@ body {
 }
 
 .chess {
-
   & th,
   & td {
     width: 30px;
@@ -217,17 +215,17 @@ body {
       background-color: tan;
     }
 
-    td:nth-child(2n+1) {
+    td:nth-child(2n + 1) {
       background-color: brown;
     }
   }
 
-  & tr:nth-child(2n+1) {
+  & tr:nth-child(2n + 1) {
     td:nth-child(2n) {
       background-color: brown;
     }
 
-    td:nth-child(2n+1) {
+    td:nth-child(2n + 1) {
       background-color: tan;
     }
   }
