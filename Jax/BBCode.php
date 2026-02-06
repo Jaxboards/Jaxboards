@@ -145,7 +145,7 @@ final class BBCode
     }
 
     /**
-     * @param mixed $codeBlocks
+     * @param array<array<string>> $codeBlocks
      */
     public function toHTML(string $text, $codeBlocks = []): string
     {
