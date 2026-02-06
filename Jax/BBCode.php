@@ -510,7 +510,9 @@ final class BBCode
         [, $fen] = $match;
 
         // If it's empty, start a new game
-        $fen = !trim($fen) ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR' : $fen;
+        $fen = trim((string) $fen) === '' || trim(
+            (string) $fen,
+        ) === '0' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR' : $fen;
 
         // replace numbers with empty squares
         $fen = preg_replace_callback(
