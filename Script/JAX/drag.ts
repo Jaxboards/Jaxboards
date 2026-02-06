@@ -18,6 +18,7 @@ export type DragSession = {
   left?: number;
   top?: number;
   droptarget?: HTMLElement;
+  reset: () => void;
 };
 class Drag {
   sess: DragSession;
@@ -122,6 +123,7 @@ class Drag {
       dx: mx - (sessInfo?.mx || mx),
       dy: my - (sessInfo?.my || my),
       droptarget: this.testDrops(tx, ty),
+      reset: () => this.reset(),
     };
     this.sess.info = sess;
     this.ondrag?.(sess);

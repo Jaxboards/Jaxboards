@@ -197,6 +197,7 @@ body {
 }
 
 .chess {
+
   & th,
   & td {
     width: 30px;
@@ -228,5 +229,9 @@ body {
     td:nth-child(2n + 1) {
       background-color: tan;
     }
+  }
+
+  .piece {
+    cursor: pointer;
   }
 }

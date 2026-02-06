@@ -564,11 +564,11 @@ final class BBCode
                 $color = array_key_exists($piece, $white)
                     ? 'color:white;-webkit-text-stroke: 1px #222;'
                     : (array_key_exists($piece, $black) ? 'color:black;' : '');
-                $piece = array_key_exists(
+                $character = array_key_exists(
                     $piece,
                     $chessUnicode,
                 ) ? $chessUnicode[$piece] : '';
-                $cells .= "<td style='{$color}'>" . ($piece ?? '-') . '</td>';
+                $cells .= "<td>" . ($piece ?  "<div class='piece' data-piece='{$piece}' style='{$color}'>$character</div>" : '') . '</td>';
             }
 
             $board .= "<tr><th scope='row'>" . (8 - $rows) . "</th>{$cells}</tr>";

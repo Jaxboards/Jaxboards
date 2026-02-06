@@ -1,4 +1,5 @@
 import AutoComplete from "../components/auto-complete";
+import Chess from "../components/chess";
 import CodeBlock from "../components/code-block";
 import CollapseBox from "../components/collapse-box";
 import DatePicker from "../components/date-picker";
@@ -20,6 +21,7 @@ export default function gracefulDegrade(container: HTMLElement) {
   // Hydrate all components
   [
     AutoComplete,
+    Chess,
     CodeBlock,
     CollapseBox,
     DatePicker,

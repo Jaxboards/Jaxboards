@@ -17,7 +17,7 @@ function parsetree(tree: HTMLElement, prefix: string) {
   return gotsomethin ? order : 1;
 }
 
-function dropOnSeparator(sess: DragSession, drag: Drag) {
+function dropOnSeparator(sess: DragSession) {
   if (!sess.droptarget) {
     return;
   }
@@ -26,21 +26,21 @@ function dropOnSeparator(sess: DragSession, drag: Drag) {
   const nofirstlevel = sess.el.classList.contains("nofirstlevel");
 
   if (parentlock && sess.droptarget.parentNode !== sess.el.parentNode) {
-    drag.reset(sess.el);
+    sess.reset();
     return;
   }
   if (
     nofirstlevel &&
     (sess.droptarget.parentNode as HTMLElement)?.className === "tree"
   ) {
-    drag.reset(sess.el);
+    sess.reset();
     return;
   }
   if (
     isChildOf(sess.droptarget, sess.el) ||
     sess.el === sess.droptarget.nextSibling
   ) {
-    drag.reset(sess.el);
+    sess.reset();
     return;
   }
   const next = sess.droptarget.nextSibling as HTMLElement;
@@ -90,7 +90,7 @@ export default function sortableTree(
       }
       sess.droptarget.style.border = "none";
       if (sess.droptarget.className === "seperator") {
-        dropOnSeparator(sess, drag);
+        dropOnSeparator(sess);
       } else if (!parentlock && sess.droptarget.tagName === "LI") {
         [tmp] = sess.droptarget.getElementsByTagName("ul");
         if (!tmp) {
@@ -108,5 +108,5 @@ export default function sortableTree(
     },
   });
 
-  items.forEach((item) => drag.apply(item));
+  drag.apply(items);
 }
