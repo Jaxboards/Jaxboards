@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use Jax\Models\File;
+use PHP_CodeSniffer\Generators\HTML;
 
 use function array_filter;
 use function array_key_exists;
@@ -68,6 +69,7 @@ final class BBCode
     private array $callbackBBCodes = [
         'attachment' => '/\[attachment\](\d+)\[\/attachment\]/',
         'code' => '/\[code(=\w+)?\](.*?)\[\/code\]/is',
+        'chess' => '/\[chess\](.*?)\[\/chess\]/is',
         'list' => '/\[(ul|ol)\](.*)\[\/\1\]/Usi',
         'quote' => '/\[quote(?>=([^\]]+))?\](.*?)\[\/quote\]\r?\n?/is',
         'size' => '/\[size=([0-4]?\d)(px|pt|em|)\](.*)\[\/size\]/Usi',
@@ -161,6 +163,13 @@ final class BBCode
             $text,
             $this->callbackBBCodes['table'],
             $this->bbcodeTableCallback(...),
+        );
+
+        // [chess]
+        $text = $this->replaceWithCallback(
+            $text,
+            $this->callbackBBCodes['chess'],
+            $this->bbcodeChessCallback(...),
         );
 
         // [ul] and [ol]
@@ -493,6 +502,72 @@ final class BBCode
         ));
 
         return $html . ($tag === 'ol' ? '</ol>' : '</ul>');
+    }
+
+    private function bbcodeChessCallback(array $match): string
+    {
+        [, $fen] = $match;
+
+        // replace numbers with empty squares
+        $fen = preg_replace_callback('/[0-8]/', fn($match) => str_repeat(' ', (int) $match[0]), $fen);
+        $fen = explode('/', $fen);
+
+        $board = <<<HTML
+            <tr>
+                <th style="height:30px;width:30px"></th>
+                <th style="width:30px;text-align:center;">A</th>
+                <th style="width:30px;text-align:center;">B</th>
+                <th style="width:30px;text-align:center;">C</th>
+                <th style="width:30px;text-align:center;">D</th>
+                <th style="width:30px;text-align:center;">E</th>
+                <th style="width:30px;text-align:center;">F</th>
+                <th style="width:30px;text-align:center;">G</th>
+                <th style="width:30px;text-align:center;">H</th>
+            </tr>
+            HTML;
+
+        $white = [
+            // 'R' => '♖',
+            // 'N' => '♘',
+            // 'B' => '♗',
+            // 'Q' => '♕',
+            // 'K' => '♔',
+            // 'P' => '♙'
+            // Decided to use filled (black) unicode pieces instead for visibility
+            'R' => '♜',
+            'N' => '♞',
+            'B' => '♝',
+            'Q' => '♛',
+            'K' => '♚',
+            'P' => '♟'
+        ];
+        $black = [
+            'r' => '♜',
+            'n' => '♞',
+            'b' => '♝',
+            'q' => '♛',
+            'k' => '♚',
+            'p' => '♟'
+        ];
+
+        $chessUnicode = [...$white, ...$black];
+
+        for ($rows = 0; $rows < 8; $rows++) {
+            $cells = '';
+            for ($columns = 0; $columns < 8; $columns++) {
+                $piece = $fen[$rows][$columns] ?? '';
+                $color = array_key_exists($piece, $white)
+                    ? 'color:white;-webkit-text-stroke: 1px #222;'
+                    : (array_key_exists($piece, $black) ? 'color:black;' : '');
+                $bgColor = ($columns + $rows) % 2 ? 'brown' : 'tan';
+                $piece = array_key_exists($piece, $chessUnicode) ? $chessUnicode[$piece] : '';
+                $cells .= "<td style='text-align:center;font-size:30px;line-height:30px;background-color:{$bgColor};$color'>" . ($piece ?? '-') . "</td>";
+            }
+            $board .= "<tr><th style='height:30px'>" . (8 - $rows) . "</th>$cells</tr>";
+        }
+
+        $table = 'table';
+        return "<$table>$board</table>";
     }
 
     private function youtubeEmbedHTML(
