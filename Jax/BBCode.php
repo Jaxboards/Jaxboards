@@ -519,15 +519,15 @@ final class BBCode
 
         $board = <<<'HTML'
             <tr>
-                <th style="height:30px;width:30px"></th>
-                <th style="width:30px;text-align:center;">A</th>
-                <th style="width:30px;text-align:center;">B</th>
-                <th style="width:30px;text-align:center;">C</th>
-                <th style="width:30px;text-align:center;">D</th>
-                <th style="width:30px;text-align:center;">E</th>
-                <th style="width:30px;text-align:center;">F</th>
-                <th style="width:30px;text-align:center;">G</th>
-                <th style="width:30px;text-align:center;">H</th>
+                <th scope="col" style="height:30px;width:30px"></th>
+                <th scope="col" style="width:30px;text-align:center;">A</th>
+                <th scope="col" style="width:30px;text-align:center;">B</th>
+                <th scope="col" style="width:30px;text-align:center;">C</th>
+                <th scope="col" style="width:30px;text-align:center;">D</th>
+                <th scope="col" style="width:30px;text-align:center;">E</th>
+                <th scope="col" style="width:30px;text-align:center;">F</th>
+                <th scope="col" style="width:30px;text-align:center;">G</th>
+                <th scope="col" style="width:30px;text-align:center;">H</th>
             </tr>
             HTML;
 
@@ -572,7 +572,7 @@ final class BBCode
                 $cells .= "<td style='text-align:center;font-size:30px;line-height:30px;background-color:{$bgColor};{$color}'>" . ($piece ?? '-') . '</td>';
             }
 
-            $board .= "<tr><th style='height:30px'>" . (8 - $rows) . "</th>{$cells}</tr>";
+            $board .= "<tr><th scope='row' style='height:30px'>" . (8 - $rows) . "</th>{$cells}</tr>";
         }
 
         $table = 'table';
