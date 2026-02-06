@@ -49,7 +49,7 @@ class Drag {
   constructor() {
     this.droppables = [];
     // This session line is only here to make typescript happy
-    this.sess = { el: document.body, mx: 0, my: 0 };
+    this.sess = { el: document.body, mx: 0, my: 0, reset: () => void 0 };
     this.boundEvents = {
       drag: (event2: MouseEvent) => this.drag(event2),
       drop: () => this.drop(),
@@ -74,7 +74,8 @@ class Drag {
       my: event.pageY,
       ex: Number.parseInt(style.left, 10) || 0,
       ey: Number.parseInt(style.top, 10) || 0,
-      info: { el, mx: 0, my: 0 },
+      info: { el, mx: 0, my: 0, reset: () => void 0 },
+      reset: () => this.reset(),
       zIndex: el.style.zIndex,
     };
     if (!this.sess.zIndex || Number(this.sess.zIndex) < highz - 1) {
@@ -115,15 +116,14 @@ class Drag {
     const sessInfo = this.sess.info;
     const dropTarget = sessInfo?.droptarget;
     const sess = {
+      ...this.sess,
       left,
       top,
-      el: this.sess.el,
       mx,
       my,
       dx: mx - (sessInfo?.mx || mx),
       dy: my - (sessInfo?.my || my),
       droptarget: this.testDrops(tx, ty),
-      reset: () => this.reset(),
     };
     this.sess.info = sess;
     this.ondrag?.(sess);
