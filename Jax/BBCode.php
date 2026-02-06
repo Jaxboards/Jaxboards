@@ -144,6 +144,9 @@ final class BBCode
         return array_unique($urls);
     }
 
+    /**
+     * @param array<array<string>> $codes $codeBlocks
+     */
     public function toHTML(string $text, $codeBlocks = []): string
     {
         $text = $this->toInlineHTML($text);
@@ -246,7 +249,7 @@ final class BBCode
         );
 
         // Code blocks have to come last since they may include bbcode that should be unparsed
-        $text = preg_replace_callback(
+        $text = (string) preg_replace_callback(
             $this->callbackBBCodes['code'],
             static fn($match): string => "```{$codes[$match[2]][2]}```",
             $text,
@@ -505,14 +508,15 @@ final class BBCode
         return $html . ($tag === 'ol' ? '</ol>' : '</ul>');
     }
 
+    /**
+     * @param array<string> $match
+     */
     private function bbcodeChessCallback(array $match): string
     {
         [, $fen] = $match;
 
         // If it's empty, start a new game
-        $fen = trim((string) $fen) === '' || trim(
-            (string) $fen,
-        ) === '0' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR' : $fen;
+        $fen = trim($fen) === '' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR' : $fen;
 
         // replace numbers with empty squares
         $fen = preg_replace_callback(
