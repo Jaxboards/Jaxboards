@@ -509,6 +509,9 @@ final class BBCode
     {
         [, $fen] = $match;
 
+        // If it's empty, start a new game
+        $fen = !trim($fen) ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR' : $fen;
+
         // replace numbers with empty squares
         $fen = preg_replace_callback(
             '/[0-8]/',
