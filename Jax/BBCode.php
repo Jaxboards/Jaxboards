@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax;
 
 use Jax\Models\File;
-use PHP_CodeSniffer\Generators\HTML;
 
 use function array_filter;
 use function array_key_exists;
@@ -14,6 +13,7 @@ use function array_map;
 use function array_merge;
 use function array_unique;
 use function array_values;
+use function explode;
 use function highlight_string;
 use function htmlspecialchars;
 use function implode;
@@ -25,6 +25,7 @@ use function preg_replace;
 use function preg_replace_callback;
 use function preg_split;
 use function str_contains;
+use function str_repeat;
 use function str_replace;
 use function trim;
 
@@ -509,7 +510,11 @@ final class BBCode
         [, $fen] = $match;
 
         // replace numbers with empty squares
-        $fen = preg_replace_callback('/[0-8]/', fn($match) => str_repeat(' ', (int) $match[0]), $fen);
+        $fen = preg_replace_callback(
+            '/[0-8]/',
+            static fn($match) => str_repeat(' ', (int) $match[0]),
+            (string) $fen,
+        );
         $fen = explode('/', $fen);
 
         $board = <<<'HTML'
@@ -539,7 +544,7 @@ final class BBCode
             'B' => '♝',
             'Q' => '♛',
             'K' => '♚',
-            'P' => '♟'
+            'P' => '♟',
         ];
         $black = [
             'r' => '♜',
@@ -547,27 +552,32 @@ final class BBCode
             'b' => '♝',
             'q' => '♛',
             'k' => '♚',
-            'p' => '♟'
+            'p' => '♟',
         ];
 
         $chessUnicode = [...$white, ...$black];
 
-        for ($rows = 0; $rows < 8; $rows++) {
+        for ($rows = 0; $rows < 8; ++$rows) {
             $cells = '';
-            for ($columns = 0; $columns < 8; $columns++) {
+            for ($columns = 0; $columns < 8; ++$columns) {
                 $piece = $fen[$rows][$columns] ?? '';
                 $color = array_key_exists($piece, $white)
                     ? 'color:white;-webkit-text-stroke: 1px #222;'
                     : (array_key_exists($piece, $black) ? 'color:black;' : '');
-                $bgColor = ($columns + $rows) % 2 ? 'brown' : 'tan';
-                $piece = array_key_exists($piece, $chessUnicode) ? $chessUnicode[$piece] : '';
-                $cells .= "<td style='text-align:center;font-size:30px;line-height:30px;background-color:{$bgColor};$color'>" . ($piece ?? '-') . "</td>";
+                $bgColor = ($columns + $rows) % 2 !== 0 ? 'brown' : 'tan';
+                $piece = array_key_exists(
+                    $piece,
+                    $chessUnicode,
+                ) ? $chessUnicode[$piece] : '';
+                $cells .= "<td style='text-align:center;font-size:30px;line-height:30px;background-color:{$bgColor};{$color}'>" . ($piece ?? '-') . '</td>';
             }
-            $board .= "<tr><th style='height:30px'>" . (8 - $rows) . "</th>$cells</tr>";
+
+            $board .= "<tr><th style='height:30px'>" . (8 - $rows) . "</th>{$cells}</tr>";
         }
 
         $table = 'table';
-        return "<$table>$board</table>";
+
+        return "<{$table}>{$board}</table>";
     }
 
     private function youtubeEmbedHTML(
