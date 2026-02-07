@@ -166,7 +166,7 @@ class Drag {
   drop() {
     if (this.boundEvents) {
       document.removeEventListener(
-        isMobile() ? "touchstart" : "mouseup",
+        isMobile() ? "touchend" : "mouseup",
         this.boundEvents.drop,
       );
       document.removeEventListener(
