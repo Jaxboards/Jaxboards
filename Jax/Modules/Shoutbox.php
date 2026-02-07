@@ -314,7 +314,7 @@ final class Shoutbox implements Module
             !$this->user->getGroup()?->canShout => 'You do not have permission to shout!',
             mb_strlen(
                 $shoutBody,
-            ) > 300 => 'Shout must be less than 300 characters.',
+            ) > 255 => 'Shout must be less than 255 characters.',
             default => null,
         };
 
