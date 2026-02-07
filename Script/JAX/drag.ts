@@ -1,3 +1,4 @@
+import { isMobile } from "./browser";
 import {
   getComputedStyle,
   getCoordinates,
@@ -24,8 +25,8 @@ class Drag {
   sess: DragSession;
 
   boundEvents: {
-    drag: (event: MouseEvent) => void;
-    drop: (event: MouseEvent) => boolean;
+    drag: (event: MouseEvent | TouchEvent) => void;
+    drop: (event: MouseEvent | TouchEvent) => boolean;
   };
 
   droppables: HTMLElement[];
@@ -51,12 +52,16 @@ class Drag {
     // This session line is only here to make typescript happy
     this.sess = { el: document.body, mx: 0, my: 0, reset: () => void 0 };
     this.boundEvents = {
-      drag: (event2: MouseEvent) => this.drag(event2),
+      drag: (event2: MouseEvent | TouchEvent) => this.drag(event2),
       drop: () => this.drop(),
     };
   }
 
-  start(event: MouseEvent, target?: HTMLElement, handle?: HTMLElement) {
+  start(
+    event: MouseEvent | TouchEvent,
+    target?: HTMLElement,
+    handle?: HTMLElement,
+  ) {
     event.preventDefault();
     event.stopPropagation();
     const el = target || (event.target as HTMLElement);
@@ -70,8 +75,14 @@ class Drag {
     }
     this.sess = {
       el,
-      mx: event.pageX,
-      my: event.pageY,
+      mx:
+        event instanceof MouseEvent
+          ? event.pageX
+          : event.targetTouches[0].pageX,
+      my:
+        event instanceof MouseEvent
+          ? event.pageY
+          : event.targetTouches[0].pageY,
       ex: Number.parseInt(style.left, 10) || 0,
       ey: Number.parseInt(style.top, 10) || 0,
       info: { el, mx: 0, my: 0, reset: () => void 0 },
@@ -85,22 +96,34 @@ class Drag {
       ...this.sess,
       droptarget: this.testDrops(this.sess.mx, this.sess.my),
     });
-    document.addEventListener("mousemove", this.boundEvents.drag);
-    document.addEventListener("mouseup", this.boundEvents.drop);
+    document.addEventListener(
+      isMobile() ? "touchmove" : "mousemove",
+      this.boundEvents.drag,
+    );
+    document.addEventListener(
+      isMobile() ? "touchend" : "mouseup",
+      this.boundEvents.drop,
+    );
     this.drag(event);
   }
 
-  drag(event: MouseEvent) {
+  drag(event: MouseEvent | TouchEvent) {
+    // Ignore events from unrelated targets
+    if (event.target != this.sess.el) return;
+
     event.stopPropagation();
     const s = this.sess.el.style;
-    const tx = event.pageX;
-    const ty = event.pageY;
+    const tx =
+      event instanceof MouseEvent ? event.pageX : event.targetTouches[0].pageX;
+    const ty =
+      event instanceof MouseEvent ? event.pageY : event.targetTouches[0].pageY;
     let mx = tx;
     let my = ty;
     let tmp2;
     let left = (this.sess.ex ?? 0) + mx - this.sess.mx;
     let top = (this.sess.ey ?? 0) + my - this.sess.my;
     const b = this.bounds;
+
     if (b) {
       if (left < b[0]) {
         mx = mx - left + b[0];
@@ -211,9 +234,10 @@ class Drag {
     if (!pos || pos === "static") {
       el.style.position = "relative";
     }
-    (target || el).onmousedown = target
-      ? (e) => this.start(e, el, target)
-      : (e) => this.start(e, el);
+    (target || el).addEventListener(
+      isMobile() ? "touchstart" : "mousedown",
+      target ? (e) => this.start(e, el, target) : (e) => this.start(e, el),
+    );
     return this;
   }
 

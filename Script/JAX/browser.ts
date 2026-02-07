@@ -1,5 +1,9 @@
 const { userAgent } = navigator;
 
+export function isMobile() {
+  return "ontouchstart" in window;
+}
+
 export default {
   chrome: /chrome/i.test(userAgent),
   ie: /msie/i.test(userAgent),
