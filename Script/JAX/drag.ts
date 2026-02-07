@@ -108,9 +108,6 @@ class Drag {
   }
 
   drag(event: MouseEvent | TouchEvent) {
-    // Ignore events from unrelated targets
-    if (event.target != this.sess.el) return;
-
     event.stopPropagation();
     const s = this.sess.el.style;
     const tx =
@@ -168,8 +165,14 @@ class Drag {
 
   drop() {
     if (this.boundEvents) {
-      document.removeEventListener("mouseup", this.boundEvents.drop);
-      document.removeEventListener("mousemove", this.boundEvents.drag);
+      document.removeEventListener(
+        isMobile() ? "touchstart" : "mouseup",
+        this.boundEvents.drop,
+      );
+      document.removeEventListener(
+        isMobile() ? "touchmove" : "mousemove",
+        this.boundEvents.drag,
+      );
     }
     this.ondrop?.(this.sess.info ?? {});
     if (this.autoZIndex) {
