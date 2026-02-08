@@ -38,10 +38,7 @@ export default class Checkers extends Component<HTMLTableElement> {
         }
 
         // handle "king" promotion
-        if (
-          cell.parentElement instanceof HTMLTableRowElement &&
-          [1, 8].includes(cell.parentElement.rowIndex)
-        ) {
+        if ([1, 8].includes(toCoords[0])) {
           pieceEl.dataset.piece = piece.toUpperCase();
           pieceEl.innerHTML = "♛";
         }
