@@ -575,6 +575,11 @@ final class BBCode
         return $this->renderCheckerBoard($pieces);
     }
 
+    /**
+     * Renders a checkerboard
+     *
+     * @param array<array<string>> $pieces
+     */
     private function renderCheckerBoard(array $pieces, $game = 'chess')
     {
         $board = <<<'HTML'
