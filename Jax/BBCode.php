@@ -643,7 +643,6 @@ final class BBCode
      * Renders a checkerboard.
      *
      * @param array<array<string>> $pieces
-     * @param string               $game
      */
     private function renderCheckerBoard(array $pieces, string $game = 'chess'): string
     {
