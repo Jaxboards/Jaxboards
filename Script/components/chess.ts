@@ -61,12 +61,11 @@ export default class Chess extends Component<HTMLTableElement> {
     const movedDiagonally =
       Math.abs(from[0] - to[0]) === Math.abs(from[1] - to[1]);
 
-    console.log(piece, capturedPiece);
     // can't capture own pieces
     if (
       capturedPiece !== "" &&
-      (piece.toLowerCase() === piece) ==
-        (capturedPiece.toLowerCase() == capturedPiece)
+      (piece.toLowerCase() === piece) ===
+        (capturedPiece.toLowerCase() === capturedPiece)
     ) {
       return false;
     }
