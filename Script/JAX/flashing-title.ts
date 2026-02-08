@@ -1,4 +1,4 @@
-let flashInterval: NodeJS.Timeout;
+let flashInterval: number;
 let originalTitle = "";
 let lastTitle = "";
 

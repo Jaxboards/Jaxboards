@@ -16,15 +16,17 @@ export default class Checkers extends Component<HTMLTableElement> {
 
     const drag = new Drag();
     drag.addListener({
-      ondrop: (dropEvent: DragSession) => {
+      ondrop: (
+        dropEvent: DragSession<HTMLDivElement, HTMLTableCellElement>,
+      ) => {
         dropEvent.reset();
 
-        if (!(dropEvent.droptarget instanceof HTMLTableCellElement)) {
+        if (!dropEvent.droptarget) {
           return;
         }
 
         const cell = dropEvent.droptarget;
-        const piece: HTMLDivElement = dropEvent.el as HTMLDivElement;
+        const piece = dropEvent.el;
 
         // handle "king" promotion
         if (

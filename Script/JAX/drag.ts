@@ -6,8 +6,11 @@ import {
   isChildOf,
 } from "./el";
 
-export type DragSession = {
-  el: HTMLElement;
+export type DragSession<
+  DraggableElement extends HTMLElement = HTMLElement,
+  DroppableElement extends HTMLElement = HTMLElement,
+> = {
+  el: DraggableElement;
   mx: number;
   my: number;
   ex?: number;
@@ -18,9 +21,10 @@ export type DragSession = {
   zIndex?: string;
   left?: number;
   top?: number;
-  droptarget?: HTMLElement;
+  droptarget?: DroppableElement;
   reset: () => void;
 };
+
 class Drag {
   sess: DragSession;
 

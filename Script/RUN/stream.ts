@@ -8,7 +8,7 @@ export default class Stream {
 
   private lastURL: string;
 
-  private timeout?: NodeJS.Timeout;
+  private timeout?: number;
 
   constructor() {
     this.lastURL = `${document.location.pathname}${document.location.search}`;
