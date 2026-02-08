@@ -112,9 +112,9 @@ abstract class Model
      * @method ?static selectOne(int|string $primaryKey)
      * @method ?static selectOne(mixed ...$args)
      *
-     * @param array<mixed> ...$args
+     * @param mixed ...$args
      */
-    public static function selectOne(...$args): ?static
+    public static function selectOne(mixed ...$args): ?static
     {
         if ($args === []) {
             $where = null;
