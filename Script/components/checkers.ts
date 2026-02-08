@@ -17,15 +17,31 @@ export default class Checkers extends Component<HTMLTableElement> {
     const drag = new Drag();
     drag.addListener({
       ondrop: (dropEvent: DragSession) => {
-        if (dropEvent.droptarget) {
-          dropEvent.droptarget.querySelector(".piece")?.remove();
-          dropEvent.droptarget.append(dropEvent.el);
-          navigator.clipboard.writeText(
-            "[checkers]" + this.getGameState() + "[/checkers]",
-          );
-          toast.success("BBCode copied to clipboard");
-        }
         dropEvent.reset();
+
+        if (!(dropEvent.droptarget instanceof HTMLTableCellElement)) {
+          return;
+        }
+
+        const cell = dropEvent.droptarget;
+        const piece: HTMLDivElement = dropEvent.el as HTMLDivElement;
+
+        // handle "king" promotion
+        if (
+          cell.parentElement instanceof HTMLTableRowElement &&
+          [1, 8].includes(cell.parentElement.rowIndex)
+        ) {
+          piece.dataset.piece = (piece.dataset.piece ?? "").toUpperCase();
+          piece.innerHTML = "♛";
+        }
+
+        cell.querySelector(".piece")?.remove();
+        cell.append(piece);
+
+        navigator.clipboard.writeText(
+          "[checkers]" + this.getGameState() + "[/checkers]",
+        );
+        toast.success("BBCode copied to clipboard");
       },
     });
     drag.drops(Array.from(element.querySelectorAll("td")));
