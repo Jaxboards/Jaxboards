@@ -576,11 +576,12 @@ final class BBCode
     }
 
     /**
-     * Renders a checkerboard
+     * Renders a checkerboard.
      *
      * @param array<array<string>> $pieces
+     * @param mixed                $game
      */
-    private function renderCheckerBoard(array $pieces, $game = 'chess')
+    private function renderCheckerBoard(array $pieces, $game = 'chess'): string
     {
         $board = <<<'HTML'
             <tr>
