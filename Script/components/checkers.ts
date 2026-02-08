@@ -27,12 +27,13 @@ export default class Checkers extends Component<HTMLTableElement> {
         }
 
         const cell = dropEvent.droptarget;
-        const piece = dropEvent.el;
+        const pieceEl = dropEvent.el;
+        const piece = pieceEl.dataset.piece ?? "";
 
-        const fromCoords = getCellCoordinates(piece.closest("td"));
+        const fromCoords = getCellCoordinates(pieceEl.closest("td"));
         const toCoords = getCellCoordinates(cell);
 
-        if (!this.isValidMove(fromCoords, toCoords)) {
+        if (!this.isValidMove(piece, fromCoords, toCoords)) {
           return;
         }
 
@@ -41,12 +42,12 @@ export default class Checkers extends Component<HTMLTableElement> {
           cell.parentElement instanceof HTMLTableRowElement &&
           [1, 8].includes(cell.parentElement.rowIndex)
         ) {
-          piece.dataset.piece = (piece.dataset.piece ?? "").toUpperCase();
-          piece.innerHTML = "♛";
+          pieceEl.dataset.piece = piece.toUpperCase();
+          pieceEl.innerHTML = "♛";
         }
 
         cell.querySelector(".piece")?.remove();
-        cell.append(piece);
+        cell.append(pieceEl);
 
         navigator.clipboard.writeText(
           "[checkers]" + this.getGameState() + "[/checkers]",
@@ -58,7 +59,7 @@ export default class Checkers extends Component<HTMLTableElement> {
     drag.apply(Array.from(element.querySelectorAll(".piece")));
   }
 
-  isValidMove(from: [number, number], to: [number, number]) {
+  isValidMove(piece = "", from: [number, number], to: [number, number]) {
     // prevent landing on white squares
     if (to[0] % 2 === to[1] % 2) {
       return false;
@@ -66,6 +67,16 @@ export default class Checkers extends Component<HTMLTableElement> {
 
     // prevent moving in anything but diagonal
     if (Math.abs(to[0] - from[0]) !== Math.abs(to[1] - from[1])) {
+      return false;
+    }
+
+    // black pieces must move down
+    if (piece === "b" && to[0] <= from[0]) {
+      return false;
+    }
+
+    // red pieces must move up
+    if (piece === "r" && to[0] >= from[0]) {
       return false;
     }
 
