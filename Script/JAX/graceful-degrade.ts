@@ -1,4 +1,5 @@
 import AutoComplete from "../components/auto-complete";
+import Checkers from "../components/checkers";
 import Chess from "../components/chess";
 import CodeBlock from "../components/code-block";
 import CollapseBox from "../components/collapse-box";
@@ -22,6 +23,7 @@ export default function gracefulDegrade(container: HTMLElement) {
   [
     AutoComplete,
     Chess,
+    Checkers,
     CodeBlock,
     CollapseBox,
     DatePicker,
