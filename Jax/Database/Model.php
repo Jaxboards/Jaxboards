@@ -110,9 +110,9 @@ abstract class Model
 
     /**
      * @method ?static selectOne(int|string $primaryKey)
-     * @method ?static selectOne(mixed $args)
+     * @method ?static selectOne(mixed ...$args)
      *
-     * @param array<mixed> $args
+     * @param array<mixed> ...$args
      */
     public static function selectOne(...$args): ?static
     {

@@ -42,6 +42,6 @@ export default class Chess extends Component<HTMLTableElement> {
           (cell.querySelector<HTMLDivElement>(".piece")?.dataset.piece || " "),
       )
       .join("")
-      .replace(/ +/g, (rep) => `${rep.length}`);
+      .replaceAll(/ +/g, (rep) => `${rep.length}`);
   }
 }

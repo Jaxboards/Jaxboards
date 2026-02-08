@@ -72,6 +72,6 @@ export default class Checkers extends Component<HTMLTableElement> {
     return state
       .map((row) => row.join(""))
       .join("/")
-      .replace(/ +/g, (rep) => `${rep.length}`);
+      .replaceAll(/ +/g, (rep) => `${rep.length}`);
   }
 }
