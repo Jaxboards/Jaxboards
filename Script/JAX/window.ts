@@ -1,7 +1,6 @@
 import { animate } from "./animation";
-import { toDOM } from "./dom";
+import { getHighestZIndex, toDOM } from "./dom";
 import Drag, { DragSession } from "./drag";
-import { getHighestZIndex } from "./el";
 import { onImagesLoaded } from "./util";
 
 export type WindowOptions = Partial<{

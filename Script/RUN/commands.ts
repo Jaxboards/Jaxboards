@@ -3,7 +3,7 @@
 import { addIdleClock } from "../components/idle-clock";
 import createSnow from "../eggs/snow";
 import { animate, dehighlight } from "../JAX/animation";
-import { getCoordinates } from "../JAX/el";
+import { getCoordinates } from "../JAX/dom";
 import gracefulDegrade from "../JAX/graceful-degrade";
 import { messageReceived } from "../JAX/instant-messaging-window";
 import toast from "../JAX/toast";

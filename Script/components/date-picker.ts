@@ -1,6 +1,6 @@
 import register, { Component } from "../JAX/component";
 import { daysShort, months } from "../JAX/date";
-import { getCoordinates, getHighestZIndex } from "../JAX/el";
+import { getCoordinates, getHighestZIndex } from "../JAX/dom";
 import { supportsDateInput } from "../JAX/util";
 
 export default class DatePicker extends Component<HTMLInputElement> {

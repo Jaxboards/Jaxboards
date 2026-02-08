@@ -1,5 +1,4 @@
 import register, { Component } from "../JAX/component";
-import { insertAfter } from "../JAX/el";
 
 export default class Switch extends Component<HTMLInputElement> {
   static hydrate(container: HTMLElement): void {
@@ -31,6 +30,6 @@ export default class Switch extends Component<HTMLInputElement> {
       toggle();
       element.dispatchEvent(new Event("change"));
     });
-    insertAfter(button, element);
+    element.after(button);
   }
 }

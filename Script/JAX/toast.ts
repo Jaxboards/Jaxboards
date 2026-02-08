@@ -1,5 +1,5 @@
 import { animate } from "./animation";
-import { getHighestZIndex } from "./el";
+import { getHighestZIndex } from "./dom";
 
 const TOP_SPACING = "50px";
 

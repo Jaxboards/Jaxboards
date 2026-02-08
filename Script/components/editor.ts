@@ -3,8 +3,7 @@
 import { bbcodeToHTML, htmlToBBCode } from "../JAX/bbcode-utils";
 import Browser from "../JAX/browser";
 import register, { Component } from "../JAX/component";
-import { toDOM } from "../JAX/dom";
-import { getComputedStyle, getHighestZIndex, insertBefore } from "../JAX/el";
+import { getComputedStyle, getHighestZIndex, toDOM } from "../JAX/dom";
 import { replaceSelection } from "../JAX/selection";
 
 const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
@@ -102,7 +101,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     });
 
     // Update DOM
-    insertBefore(this.container, element);
+    element.before(this.container);
     this.container.appendChild(element);
     this.container.appendChild(this.iframe);
   }
@@ -171,7 +170,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
 
     iframe.style.height = `${element.clientHeight}px`;
 
-    insertBefore(this.editbar, element);
+    element.before(this.editbar);
 
     // Set the source and initialize the editor
     this.setSource("<div></div>");

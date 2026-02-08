@@ -1,5 +1,5 @@
 import register, { Component } from "../JAX/component";
-import { getComputedStyle, getCoordinates, insertBefore } from "../JAX/el";
+import { getComputedStyle, getCoordinates } from "../JAX/dom";
 import { onImagesLoaded } from "../JAX/util";
 
 const maxDimension = "999999px";
@@ -74,7 +74,7 @@ export default class ImageResizer extends Component<HTMLImageElement> {
     };
     link.addEventListener("mouseout", reset);
     reset();
-    insertBefore(link, img);
+    img.before(link);
     link.appendChild(img);
   }
 }

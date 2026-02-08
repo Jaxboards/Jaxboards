@@ -1,5 +1,5 @@
 import register, { Component } from "../JAX/component";
-import { getCoordinates, getHighestZIndex } from "../JAX/el";
+import { getCoordinates, getHighestZIndex } from "../JAX/dom";
 
 const VALID_CLASS = "valid";
 const INVALID_CLASS = "invalid";

@@ -1,5 +1,4 @@
 import Drag, { DragSession } from "./drag";
-import { insertAfter, insertBefore, isChildOf } from "./el";
 
 function parsetree(tree: HTMLElement, prefix: string) {
   const nodes = Array.from(tree.querySelectorAll("li"));
@@ -37,22 +36,22 @@ function dropOnSeparator(sess: DragSession) {
     return;
   }
   if (
-    isChildOf(sess.droptarget, sess.el) ||
+    sess.el.contains(sess.droptarget) ||
     sess.el === sess.droptarget.nextSibling
   ) {
     sess.reset();
     return;
   }
-  const next = sess.droptarget.nextSibling as HTMLElement;
-  if (next.className === "spacer") {
+  const next = sess.droptarget.nextElementSibling;
+  if (next?.className === "spacer") {
     next.remove();
   }
-  if (next.className === "spacer") {
+  if (next?.className === "spacer") {
     sess.el.previousSibling?.remove();
-  } else {
-    insertAfter(sess.el.previousSibling as HTMLLIElement, sess.droptarget);
+  } else if (sess.el.previousElementSibling) {
+    sess.droptarget.after(sess.el.previousElementSibling);
   }
-  insertAfter(sess.el, sess.droptarget);
+  sess.droptarget.after(sess.el);
 }
 
 export default function sortableTree(
@@ -70,7 +69,7 @@ export default function sortableTree(
     const tmp = document.createElement("li");
     tmp.className = "seperator";
     seperators.push(tmp);
-    insertBefore(tmp, item);
+    item.before(tmp);
   });
 
   const drag = new Drag().noChildActivation();

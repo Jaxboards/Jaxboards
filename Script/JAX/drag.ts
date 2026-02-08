@@ -1,10 +1,5 @@
 import { isMobile } from "./browser";
-import {
-  getComputedStyle,
-  getCoordinates,
-  getHighestZIndex,
-  isChildOf,
-} from "./el";
+import { getComputedStyle, getCoordinates, getHighestZIndex } from "./dom";
 
 export type DragSession<
   DraggableElement extends HTMLElement = HTMLElement,
@@ -193,7 +188,7 @@ class Drag {
       return undefined;
     }
     return droppables.findLast((droppable): HTMLElement | undefined => {
-      if (droppable === this.sess.el || isChildOf(droppable, this.sess.el)) {
+      if (droppable === this.sess.el || this.sess.el.contains(droppable)) {
         return undefined;
       }
       z = getCoordinates(droppable);

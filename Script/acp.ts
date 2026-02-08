@@ -1,4 +1,4 @@
-import { getCoordinates } from "./JAX/el";
+import { getCoordinates } from "./JAX/dom";
 import { replaceSelection } from "./JAX/selection";
 import sortableTree from "./JAX/sortable-tree";
 import { onDOMReady } from "./JAX/util";
