@@ -71,6 +71,7 @@ final class BBCode
         'attachment' => '/\[attachment\](\d+)\[\/attachment\]/',
         'code' => '/\[code(=\w+)?\](.*?)\[\/code\]/is',
         'chess' => '/\[chess\](.*?)\[\/chess\]/is',
+        'checkers' => '/\[checkers\](.*?)\[\/checkers\]/is',
         'list' => '/\[(ul|ol)\](.*)\[\/\1\]/Usi',
         'quote' => '/\[quote(?>=([^\]]+))?\](.*?)\[\/quote\]\r?\n?/is',
         'size' => '/\[size=([0-4]?\d)(px|pt|em|)\](.*)\[\/size\]/Usi',
@@ -174,6 +175,14 @@ final class BBCode
             $text,
             $this->callbackBBCodes['chess'],
             $this->bbcodeChessCallback(...),
+        );
+
+
+        // [checkers]
+        $text = $this->replaceWithCallback(
+            $text,
+            $this->callbackBBCodes['checkers'],
+            $this->bbcodeCheckersCallback(...),
         );
 
         // [ul] and [ol]
@@ -552,7 +561,7 @@ final class BBCode
             'p' => '♟',
         ];
 
-        $chessUnicode = [...$white, ...$black];
+        $characters = [...$white, ...$black];
         $pieces = [];
 
         for ($row = 0; $row < 8; ++$row) {
@@ -565,14 +574,69 @@ final class BBCode
                     : (array_key_exists($piece, $black) ? 'color:black;' : '');
                 $character = array_key_exists(
                     $piece,
-                    $chessUnicode,
-                ) ? $chessUnicode[$piece] : '';
+                    $characters,
+                ) ? $characters[$piece] : '';
 
                 $pieces[$row][$column] = ($piece !== '' ? "<div class='piece' data-piece='{$piece}' style='{$color}'>{$character}</div>" : '');
             }
         }
 
         return $this->renderCheckerBoard($pieces);
+    }
+
+    /**
+     * @param array<string> $match
+     */
+    private function bbcodeCheckersCallback(array $match): string
+    {
+        [, $state] = $match;
+
+        // If it's empty, start a new game
+        $state = trim(
+            $state,
+        ) === '' ? 'bbbb/bbbb/bbbb/4/4/rrrr/rrrr/rrrr' : $state;
+
+        // replace numbers with empty squares
+        $state = preg_replace_callback(
+            '/[0-8]/',
+            static fn($match) => str_repeat(' ', (int) $match[0]),
+            (string) $state,
+        );
+
+        $state = explode('/', (string) $state);
+
+        $red = [
+            'r' => '🔴',
+            'R' => '♛'
+        ];
+        $black = [
+            'b' => '⚫️',
+            'B' => '♛',
+        ];
+
+        $characters = [...$red, ...$black];
+        $pieces = [];
+
+        for ($row = 0; $row < 8; ++$row) {
+            $pieces[$row] = [];
+
+            for ($column = 0; $column <= 4; ++$column) {
+                $piece = $state[$row][$column] ?? '';
+                $color = array_key_exists($piece, $red)
+                    ? 'color:#ffbebe;'
+                    : (array_key_exists($piece, $black) ? 'color:black;' : '');
+                $character = array_key_exists(
+                    $piece,
+                    $characters,
+                ) ? $characters[$piece] : '';
+
+                $offset = -$row % 2;
+                $pieces[$row][($column * 2 - $offset + 8) % 8] = '';
+                $pieces[$row][$column * 2 + $offset + 1] = ($piece !== '' ? "<div class='piece' data-piece='{$piece}' style='{$color}'>{$character}</div>" : '');
+            }
+        }
+
+        return $this->renderCheckerBoard($pieces, 'checkers');
     }
 
     /**
@@ -608,7 +672,7 @@ final class BBCode
 
         $table = 'table';
 
-        return "<{$table} class='{$game}'>{$board}</table>";
+        return "<{$table} class='checkerboard {$game}'>{$board}</table>";
     }
 
     private function youtubeEmbedHTML(

@@ -196,7 +196,8 @@ body {
   }
 }
 
-.chess {
+.checkerboard {
+
   & th,
   & td {
     width: 30px;
@@ -233,4 +234,8 @@ body {
   .piece {
     cursor: pointer;
   }
+}
+
+.checkerboard.checkers .piece {
+  font-size: 20px;
 }
