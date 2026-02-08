@@ -607,7 +607,7 @@ final class BBCode
 
         $red = [
             'r' => '🔴',
-            'R' => '♛'
+            'R' => '♛',
         ];
         $black = [
             'b' => '⚫️',
@@ -645,7 +645,7 @@ final class BBCode
      * @param array<array<string>> $pieces
      * @param mixed                $game
      */
-    private function renderCheckerBoard(array $pieces, $game = 'chess'): string
+    private function renderCheckerBoard(array $pieces, string $game = 'chess'): string
     {
         $board = <<<'HTML'
             <tr>
