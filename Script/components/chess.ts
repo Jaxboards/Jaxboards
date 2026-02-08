@@ -27,14 +27,17 @@ export default class Chess extends Component<HTMLTableElement> {
         }
 
         const piece = dropEvent.el.dataset.piece;
+        const capturedPieceEl =
+          dropEvent.droptarget.querySelector<HTMLDivElement>(".piece");
+        const capturedPiece = capturedPieceEl?.dataset.piece?.trim() ?? "";
         const fromCoords = getCellCoordinates(dropEvent.el.closest("td"));
         const toCoords = getCellCoordinates(dropEvent.droptarget);
 
-        if (!this.isValidMove(piece, fromCoords, toCoords)) {
+        if (!this.isValidMove(piece, capturedPiece, fromCoords, toCoords)) {
           return;
         }
 
-        dropEvent.droptarget.querySelector(".piece")?.remove();
+        capturedPieceEl?.remove();
         dropEvent.droptarget.append(dropEvent.el);
 
         navigator.clipboard.writeText(
@@ -48,10 +51,25 @@ export default class Chess extends Component<HTMLTableElement> {
     drag.apply(Array.from(element.querySelectorAll(".piece")));
   }
 
-  isValidMove(piece = "", from: [number, number], to: [number, number]) {
+  isValidMove(
+    piece = "",
+    capturedPiece = "",
+    from: [number, number],
+    to: [number, number],
+  ) {
     const movedStraight = from[0] === to[0] || from[1] === to[1];
     const movedDiagonally =
       Math.abs(from[0] - to[0]) === Math.abs(from[1] - to[1]);
+
+    console.log(piece, capturedPiece);
+    // can't capture own pieces
+    if (
+      capturedPiece !== "" &&
+      (piece.toLowerCase() === piece) ==
+        (capturedPiece.toLowerCase() == capturedPiece)
+    ) {
+      return false;
+    }
 
     switch (piece) {
       case "p":

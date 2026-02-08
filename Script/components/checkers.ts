@@ -29,11 +29,13 @@ export default class Checkers extends Component<HTMLTableElement> {
         const cell = dropEvent.droptarget;
         const pieceEl = dropEvent.el;
         const piece = pieceEl.dataset.piece ?? "";
+        const capturedPieceEl = cell.querySelector<HTMLDivElement>(".piece");
+        const capturedPiece = capturedPieceEl?.dataset.piece ?? "";
 
         const fromCoords = getCellCoordinates(pieceEl.closest("td"));
         const toCoords = getCellCoordinates(cell);
 
-        if (!this.isValidMove(piece, fromCoords, toCoords)) {
+        if (!this.isValidMove(piece, capturedPiece, fromCoords, toCoords)) {
           return;
         }
 
@@ -43,7 +45,7 @@ export default class Checkers extends Component<HTMLTableElement> {
           pieceEl.innerHTML = "♛";
         }
 
-        cell.querySelector(".piece")?.remove();
+        capturedPieceEl?.remove();
         cell.append(pieceEl);
 
         navigator.clipboard.writeText(
@@ -56,7 +58,12 @@ export default class Checkers extends Component<HTMLTableElement> {
     drag.apply(Array.from(element.querySelectorAll(".piece")));
   }
 
-  isValidMove(piece = "", from: [number, number], to: [number, number]) {
+  isValidMove(
+    piece = "",
+    capturedPiece = "",
+    from: [number, number],
+    to: [number, number],
+  ) {
     // prevent landing on white squares
     if (to[0] % 2 === to[1] % 2) {
       return false;
@@ -74,6 +81,11 @@ export default class Checkers extends Component<HTMLTableElement> {
 
     // red pieces must move up
     if (piece === "r" && to[0] >= from[0]) {
+      return false;
+    }
+
+    // can't capture own pieces
+    if (capturedPiece.toLowerCase() === piece.toLowerCase()) {
       return false;
     }
 
