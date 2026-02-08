@@ -438,11 +438,11 @@ final class BBCode
         preg_match_all(
             '/\[tr\](.*)\[\/tr\]/Usi',
             $match[1],
-            $rows,
+            $row,
             PREG_SET_ORDER,
         );
 
-        foreach ($rows as $row) {
+        foreach ($row as $row) {
             $html .= '<tr>';
             preg_match_all(
                 '/\[(td|th)\](.*)\[\/\1\]/Usi',
@@ -528,20 +528,6 @@ final class BBCode
         );
         $fen = explode('/', (string) $fen);
 
-        $board = <<<'HTML'
-            <tr>
-                <th scope="col"></th>
-                <th scope="col">A</th>
-                <th scope="col">B</th>
-                <th scope="col">C</th>
-                <th scope="col">D</th>
-                <th scope="col">E</th>
-                <th scope="col">F</th>
-                <th scope="col">G</th>
-                <th scope="col">H</th>
-            </tr>
-            HTML;
-
         $white = [
             // 'R' => '♖',
             // 'N' => '♘',
@@ -567,11 +553,13 @@ final class BBCode
         ];
 
         $chessUnicode = [...$white, ...$black];
+        $pieces = [];
 
-        for ($rows = 0; $rows < 8; ++$rows) {
-            $cells = '';
-            for ($columns = 0; $columns < 8; ++$columns) {
-                $piece = $fen[$rows][$columns] ?? '';
+        for ($row = 0; $row < 8; ++$row) {
+            $pieces[$row] = [];
+
+            for ($column = 0; $column < 8; ++$column) {
+                $piece = $fen[$row][$column] ?? '';
                 $color = array_key_exists($piece, $white)
                     ? 'color:white;-webkit-text-stroke: 1px #222;'
                     : (array_key_exists($piece, $black) ? 'color:black;' : '');
@@ -579,15 +567,42 @@ final class BBCode
                     $piece,
                     $chessUnicode,
                 ) ? $chessUnicode[$piece] : '';
-                $cells .= '<td>' . ($piece !== '' && $piece !== '0' ? "<div class='piece' data-piece='{$piece}' style='{$color}'>{$character}</div>" : '') . '</td>';
+
+                $pieces[$row][$column] = ($piece !== '' ? "<div class='piece' data-piece='{$piece}' style='{$color}'>{$character}</div>" : '');
+            }
+        }
+
+        return $this->renderCheckerBoard($pieces);
+    }
+
+    private function renderCheckerBoard(array $pieces, $game = 'chess')
+    {
+        $board = <<<'HTML'
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">A</th>
+                <th scope="col">B</th>
+                <th scope="col">C</th>
+                <th scope="col">D</th>
+                <th scope="col">E</th>
+                <th scope="col">F</th>
+                <th scope="col">G</th>
+                <th scope="col">H</th>
+            </tr>
+            HTML;
+
+        for ($row = 0; $row < 8; ++$row) {
+            $cells = '';
+            for ($column = 0; $column < 8; ++$column) {
+                $cells .= '<td>' . $pieces[$row][$column] . '</td>';
             }
 
-            $board .= "<tr><th scope='row'>" . (8 - $rows) . "</th>{$cells}</tr>";
+            $board .= "<tr><th scope='row'>" . (8 - $row) . "</th>{$cells}</tr>";
         }
 
         $table = 'table';
 
-        return "<{$table} class='chess'>{$board}</table>";
+        return "<{$table} class='{$game}'>{$board}</table>";
     }
 
     private function youtubeEmbedHTML(
