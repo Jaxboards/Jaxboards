@@ -438,11 +438,11 @@ final class BBCode
         preg_match_all(
             '/\[tr\](.*)\[\/tr\]/Usi',
             $match[1],
-            $row,
+            $rows,
             PREG_SET_ORDER,
         );
 
-        foreach ($row as $row) {
+        foreach ($rows as $row) {
             $html .= '<tr>';
             preg_match_all(
                 '/\[(td|th)\](.*)\[\/\1\]/Usi',
