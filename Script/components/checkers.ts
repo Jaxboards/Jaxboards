@@ -31,48 +31,23 @@ export default class Checkers extends Component<HTMLTableElement> {
 
         const targetCell = dropEvent.droptarget;
         const pieceEl = dropEvent.el;
-        const checkerboard = pieceEl.closest("table");
 
         const fromCoords = getCellCoordinates(pieceEl.closest("td"));
         const toCoords = getCellCoordinates(targetCell);
 
-        const vector = [
-          toCoords[0] - fromCoords[0],
-          toCoords[1] - fromCoords[1],
-        ];
-        const distance = vector.map(Math.abs);
-
-        const capturedPieceEl =
-          distance.join(",") === "2,2"
-            ? checkerboard?.rows[fromCoords[0] + vector[0] / 2].cells[
-                fromCoords[1] + vector[1] / 2
-              ].querySelector<HTMLDivElement>(".piece")
-            : undefined;
-
-        const piece = pieceEl.dataset.piece ?? "";
-        const capturedPiece = capturedPieceEl?.dataset.piece ?? "";
-
-        if (
-          // can't land on other pieces
-          targetCell.querySelector(".piece") ||
-          !this.isValidMove(
-            piece,
-            capturedPiece,
-            fromCoords,
-            toCoords,
-            distance,
-          )
-        ) {
+        if (!this.isValidMove(fromCoords, toCoords)) {
           return;
         }
 
         // handle "king" promotion
         if ([1, 8].includes(toCoords[0])) {
-          pieceEl.dataset.piece = piece.toUpperCase();
-          pieceEl.innerHTML = "♛";
+          this.promote(pieceEl);
         }
 
-        capturedPieceEl?.remove();
+        // remove captured piece if any
+        this.getCapturedPiece(fromCoords, toCoords)?.remove();
+
+        // place the piece down
         targetCell.append(pieceEl);
         sound.play("chessdrop");
 
@@ -86,13 +61,36 @@ export default class Checkers extends Component<HTMLTableElement> {
     drag.apply(Array.from(element.querySelectorAll(".piece")));
   }
 
-  isValidMove(
-    piece = "",
-    capturedPiece = "",
-    from: number[],
-    to: number[],
-    distance: number[],
-  ) {
+  getCapturedPiece(from: number[], to: number[]) {
+    const vector = [to[0] - from[0], to[1] - from[1]];
+    const distance = vector.map(Math.abs);
+
+    if (distance.join(",") !== "2,2") {
+      return undefined;
+    }
+    return (
+      this.element.rows[from[0] + vector[0] / 2].cells[
+        from[1] + vector[1] / 2
+      ].querySelector<HTMLDivElement>(".piece") ?? undefined
+    );
+  }
+
+  promote(pieceEl: HTMLDivElement) {
+    pieceEl.dataset.piece = pieceEl.dataset.piece?.toUpperCase();
+    pieceEl.innerHTML = "♛";
+  }
+
+  isValidMove(from: number[], to: number[]) {
+    const checkerboard = this.element;
+
+    const distance = [to[0] - from[0], to[1] - from[1]].map(Math.abs);
+
+    const piece =
+      checkerboard.rows[from[0]].cells[from[1]].querySelector<HTMLDivElement>(
+        ".piece",
+      )?.dataset.piece ?? "";
+    const capturedPiece = this.getCapturedPiece(from, to)?.dataset.piece ?? "";
+
     // prevent landing on white squares
     if (to[0] % 2 === to[1] % 2) {
       return false;
@@ -115,6 +113,11 @@ export default class Checkers extends Component<HTMLTableElement> {
 
     // can't jump own pieces
     if (capturedPiece.toLowerCase() === piece.toLowerCase()) {
+      return false;
+    }
+
+    // can't land on other pieces
+    if (checkerboard.rows[to[0]].cells[to[1]].querySelector(".piece")) {
       return false;
     }
 
