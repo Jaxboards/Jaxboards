@@ -2,6 +2,7 @@ import register, { Component } from "../JAX/component";
 import { getCellCoordinates } from "../JAX/dom";
 import Drag, { DragSession } from "../JAX/drag";
 import toast from "../JAX/toast";
+import sound from "../sound";
 
 export default class Chess extends Component<HTMLTableElement> {
   static hydrate(container: HTMLElement): void {
@@ -14,6 +15,8 @@ export default class Chess extends Component<HTMLTableElement> {
 
   constructor(element: HTMLTableElement) {
     super(element);
+
+    sound.load("chessdrop", "/Sounds/chessdrop.mp3", false);
 
     const drag = new Drag();
     drag.addListener({
@@ -39,6 +42,7 @@ export default class Chess extends Component<HTMLTableElement> {
 
         capturedPieceEl?.remove();
         dropEvent.droptarget.append(dropEvent.el);
+        sound.play("chessdrop");
 
         navigator.clipboard.writeText(
           "[chess]" + this.getFENNotation() + "[/chess]",

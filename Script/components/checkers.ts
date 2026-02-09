@@ -2,11 +2,12 @@ import register, { Component } from "../JAX/component";
 import { getCellCoordinates } from "../JAX/dom";
 import Drag, { DragSession } from "../JAX/drag";
 import toast from "../JAX/toast";
+import sound from "../sound";
 
 export default class Checkers extends Component<HTMLTableElement> {
   static hydrate(container: HTMLElement): void {
     register(
-      "Chess",
+      "Checkers",
       container.querySelectorAll<HTMLTableElement>(".checkers"),
       this,
     );
@@ -14,6 +15,8 @@ export default class Checkers extends Component<HTMLTableElement> {
 
   constructor(element: HTMLTableElement) {
     super(element);
+
+    sound.load("chessdrop", "/Sounds/chessdrop.mp3", false);
 
     const drag = new Drag();
     drag.addListener({
@@ -47,6 +50,7 @@ export default class Checkers extends Component<HTMLTableElement> {
 
         capturedPieceEl?.remove();
         cell.append(pieceEl);
+        sound.play("chessdrop");
 
         navigator.clipboard.writeText(
           "[checkers]" + this.getGameState() + "[/checkers]",
