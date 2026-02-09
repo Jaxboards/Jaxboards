@@ -66,11 +66,6 @@ final class DomainDefinitions
         return 'Service/Themes/Default';
     }
 
-    public function getSoundsURL(): string
-    {
-        return $this->boardURL . '/Sounds';
-    }
-
     public function getServiceThemePath(): string
     {
         return 'Service/Themes';
