@@ -61,13 +61,9 @@ export default class Chess extends Component<HTMLTableElement> {
     from: [number, number],
     to: [number, number],
   ) {
-    const movedStraight = from[0] === to[0] || from[1] === to[1];
-    const movedDiagonally =
-      Math.abs(from[0] - to[0]) === Math.abs(from[1] - to[1]);
-    const distance = Math.max(
-      Math.abs(from[0] - to[0]),
-      Math.abs(from[1] - to[1]),
-    );
+    const distance = [from[0] - to[0], from[1] - to[1]].map(Math.abs);
+    const movedStraight = Math.min(...distance) === 0;
+    const movedDiagonally = distance[0] === distance[1];
 
     // can't capture own pieces
     if (
@@ -83,13 +79,13 @@ export default class Chess extends Component<HTMLTableElement> {
       case "p":
         return (
           from[0] < to[0] &&
-          distance <= (from[0] === 2 ? 2 : 1) &&
+          Math.max(...distance) <= (from[0] === 2 ? 2 : 1) &&
           (capturedPiece ? movedDiagonally : movedStraight)
         );
       case "P":
         return (
           from[0] > to[0] &&
-          distance <= (from[0] === 7 ? 2 : 1) &&
+          Math.max(...distance) <= (from[0] === 7 ? 2 : 1) &&
           (capturedPiece ? movedDiagonally : movedStraight)
         );
 
@@ -116,7 +112,7 @@ export default class Chess extends Component<HTMLTableElement> {
       case "k":
       case "K":
         // TODO: castling
-        return distance <= 2 && (movedDiagonally || movedStraight);
+        return Math.max(...distance) <= 2 && (movedDiagonally || movedStraight);
     }
     return true;
   }
