@@ -283,9 +283,8 @@ export default {
     });
     notification.innerHTML = message;
   },
-
-  playsound(name: string, url: string) {
-    Sound.loadAndPlay(name, url);
+  playsound(name: string) {
+    Sound.loadAndPlay(name);
   },
   listrating(postId: number, html: string) {
     let prdiv = document.querySelector<HTMLDivElement>(`#postrating_${postId}`);

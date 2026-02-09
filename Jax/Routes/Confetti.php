@@ -20,6 +20,7 @@ final readonly class Confetti implements Route
         $count = max(0, min(5000, $count));
 
         $this->page->command('confetti', $count);
+        $this->page->command('playsound', 'malo-mart');
         $this->page->command('preventNavigation');
     }
 }

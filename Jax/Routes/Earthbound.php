@@ -21,8 +21,7 @@ final readonly class Earthbound implements Route
         $this->page->command('loadscript', '/Script/eggs/earthbound.js');
         $this->page->command(
             'playsound',
-            'earthbound',
-            $this->domainDefinitions->getSoundsURL() . '/earthboundbattle.mp3',
+            'earthboundbattle',
         );
     }
 }

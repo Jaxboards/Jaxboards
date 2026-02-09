@@ -55,8 +55,7 @@ final readonly class Tardis implements Route
         $this->page->command('preventNavigation');
         $this->page->command(
             'playsound',
-            'drwho',
-            $this->domainDefinitions->getSoundsUrl() . '/doctorwhotheme.mp3',
+            'drwhotheme',
         );
     }
 }
