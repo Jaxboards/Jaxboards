@@ -64,13 +64,26 @@ export default class Chess extends Component<HTMLTableElement> {
     this.element.dataset.moveNumber = `${moveNumber}`;
   }
 
-  isValidMove(
-    piece = "",
-    capturedPiece = "",
-    from: [number, number],
-    to: [number, number],
-  ) {
-    const distance = [from[0] - to[0], from[1] - to[1]].map(Math.abs);
+  didJumpAPiece(from: number[], to: number[]) {
+    const vector = [to[0] - from[0], to[1] - from[1]];
+    const step = vector.map(Math.sign);
+    const distance = Math.max(...vector.map(Math.abs));
+
+    for (let i = 1; i < distance; i++) {
+      if (
+        this.element.rows[from[0] + step[0] * i].cells[
+          from[1] + step[1] * i
+        ].querySelector(".piece")
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isValidMove(piece = "", capturedPiece = "", from: number[], to: number[]) {
+    const vector = [from[0] - to[0], from[1] - to[1]];
+    const distance = vector.map(Math.abs);
     const movedStraight = Math.min(...distance) === 0;
     const movedDiagonally = distance[0] === distance[1];
 
@@ -100,11 +113,11 @@ export default class Chess extends Component<HTMLTableElement> {
 
       case "r":
       case "R":
-        return movedStraight;
+        return movedStraight && !this.didJumpAPiece(from, to);
 
       case "b":
       case "B":
-        return movedDiagonally;
+        return movedDiagonally && !this.didJumpAPiece(from, to);
 
       case "n":
       case "N":
@@ -112,7 +125,9 @@ export default class Chess extends Component<HTMLTableElement> {
 
       case "q":
       case "Q":
-        return movedStraight || movedDiagonally;
+        return (
+          (movedStraight || movedDiagonally) && !this.didJumpAPiece(from, to)
+        );
 
       case "k":
       case "K":

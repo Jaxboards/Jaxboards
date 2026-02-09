@@ -583,7 +583,7 @@ final class BBCode
                     $characters,
                 ) ? $characters[$piece] : '';
 
-                $pieces[$row][$column] = ($piece !== '' ? "<div class='piece' data-piece='{$piece}' style='{$color}'>{$character}</div>" : '');
+                $pieces[$row][$column] = (trim($piece) !== '' ? "<div class='piece' data-piece='{$piece}' style='{$color}'>{$character}</div>" : '');
             }
         }
 
