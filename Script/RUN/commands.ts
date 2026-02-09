@@ -230,8 +230,11 @@ export default {
       } else statusers.appendChild(link);
     });
   },
-  snow(snowFlakeCount: number) {
-    createSnow(snowFlakeCount);
+  snow(count: number) {
+    createSnow(count);
+  },
+  confetti(count: number) {
+    createSnow(count, true);
   },
   setoffline(userIds: string) {
     const statusers = document.querySelector("#statusers");

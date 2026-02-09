@@ -1,4 +1,12 @@
-const baseCSS = ``;
+const rainbow = [
+  "#F00",
+  "#FF7F00",
+  "#FF0",
+  "#0F0",
+  "#00F",
+  "#4B0082",
+  "#9400D3",
+];
 
 // Creating snowflakes
 function generateSnow(snowDensity = 200) {
@@ -13,20 +21,6 @@ function generateSnow(snowDensity = 200) {
       zIndex: 1,
     });
 
-    const css = document.createElement("style");
-    css.appendChild(
-      document.createTextNode(`
-            .snowflake {
-                position: absolute;
-                width: 10px;
-                height: 10px;
-                background: linear-gradient(white, white);
-                /* Workaround for Chromium's selective color inversion */
-                border-radius: 50%;
-                filter: drop-shadow(0 0 10px white);
-            }`),
-    );
-    document.body.prepend(css);
     document.body.prepend(snowWrapper);
   }
   snowWrapper.innerHTML = "";
@@ -70,12 +64,19 @@ function getRandomArbitrary(min: number, max: number) {
 }
 
 // Create style for snowflake
-function generateSnowCSS(snowDensity = 200) {
+function generateSnowCSS(snowDensity = 200, useColors = false) {
   const bodyHeightPx = document.body.offsetHeight;
   const pageHeightVh = (100 * bodyHeightPx) / window.innerHeight;
 
-  const snowflakeName = "snowflake";
-  let rule = baseCSS;
+  let rule = `
+    .snowflake {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        /* Workaround for Chromium's selective color inversion */
+        border-radius: 50%;
+    }
+  `;
 
   for (let i = 1; i <= snowDensity; i += 1) {
     const randomX = Math.random() * 100; // vw
@@ -89,9 +90,15 @@ function generateSnowCSS(snowDensity = 200) {
     const fallDelay = randomInt((pageHeightVh / 10) * 3) * -1; // s
     const opacity = Math.random();
 
+    const color = useColors
+      ? rainbow[Math.floor(Math.random() * rainbow.length)]
+      : "white";
+
     rule += `
-      .${snowflakeName}:nth-child(${i}) {
+      .snowflake:nth-child(${i}) {
         opacity: ${opacity};
+        background: linear-gradient(${color}, ${color});
+        filter: drop-shadow(0 0 10px ${color});
         transform: translate(${randomX}vw, -10px) scale(${randomScale});
         animation: fall-${i} ${fallDuration}s ${fallDelay}s linear infinite;
       }
@@ -109,7 +116,7 @@ function generateSnowCSS(snowDensity = 200) {
 }
 
 // Load the rules and execute after the DOM loads
-export default function createSnow(snowflakesCount = 200) {
-  generateSnowCSS(snowflakesCount);
+export default function createSnow(snowflakesCount = 200, useColors = false) {
+  generateSnowCSS(snowflakesCount, useColors);
   generateSnow(snowflakesCount);
 }

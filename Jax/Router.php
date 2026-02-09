@@ -12,6 +12,7 @@ use Jax\Routes\BoardIndex;
 use Jax\Routes\BoardOffline;
 use Jax\Routes\BuddyList;
 use Jax\Routes\Calendar;
+use Jax\Routes\Confetti;
 use Jax\Routes\CustomPage;
 use Jax\Routes\Download;
 use Jax\Routes\Earthbound;
@@ -91,6 +92,7 @@ final class Router
 
         // Easter eggs
         $this->get('asteroids', '/asteroids', Asteroids::class);
+        $this->get('confetti', '/confetti/{count}', Confetti::class);
         $this->get('earthbound', '/earthbound', Earthbound::class);
         $this->get('katamari', '/katamari', Katamari::class);
         $this->get('rainbow', '/rainbow', Rainbow::class);
