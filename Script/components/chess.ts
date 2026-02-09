@@ -175,6 +175,8 @@ export default class Chess extends Component<HTMLTableElement> {
 
         pieceEl.dataset.piece = promoteTo;
         pieceEl.innerHTML = pieceUnicode[promoteTo];
+        sound.loadAndPlay("zelda-item-get", "/Sounds/zelda-item-get.mp3");
+
         break;
       }
     }
