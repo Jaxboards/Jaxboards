@@ -2,5 +2,6 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": "always"
   },
-  "files.eol": "\n"
+  "files.eol": "\n",
+  "files.insertFinalNewline": true
 }
