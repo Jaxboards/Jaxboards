@@ -110,7 +110,7 @@ export default class Chess extends Component<HTMLTableElement> {
 
     // not your turn!
     if ((this.moveNumber % 2 === 0) !== isBlack) {
-      toast.error(`It's ${isBlack ? "white" : "black"}'s turn!`);
+      toast.error(`It's ${isBlack ? "white" : "black"}'s turn!`, 3000);
       return false;
     }
 

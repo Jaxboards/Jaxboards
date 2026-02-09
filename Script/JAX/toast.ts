@@ -4,12 +4,12 @@ import { getHighestZIndex } from "./dom";
 const TOP_SPACING = "50px";
 
 class Toast {
-  success(message: string) {
-    this.showToast(message, "success", 3000);
+  success(message: string, timeout = 3000) {
+    this.showToast(message, "success", timeout);
   }
 
-  error(message: string) {
-    this.showToast(message, "error");
+  error(message: string, timeout = 0) {
+    this.showToast(message, "error", timeout);
   }
 
   private async showToast(
