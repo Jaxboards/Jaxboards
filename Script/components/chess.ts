@@ -101,7 +101,7 @@ export default class Chess extends Component<HTMLTableElement> {
       case "N":
         return (
           [Math.abs(from[0] - to[0]), Math.abs(from[1] - to[1])]
-            .toSorted()
+            .toSorted((a, b) => a - b)
             .join(",") === "1,2"
         );
 
