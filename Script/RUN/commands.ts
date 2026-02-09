@@ -139,7 +139,7 @@ export default {
     }
     dehighlight(div);
     if (globalSettings.soundShout) {
-      Sound.play("sbblip");
+      Sound.play("blip");
     }
     gracefulDegrade(div);
   },

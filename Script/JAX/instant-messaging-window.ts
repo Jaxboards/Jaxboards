@@ -76,7 +76,7 @@ function createMessagingWindow({
   const test = getComputedStyle(messagesContainer);
   messagesContainer.style.width = test.width;
   messagesContainer.style.height = test.height;
-  if (message && globalSettings.soundIM) Sound.play("imnewwindow");
+  if (message && globalSettings.soundIM) Sound.play("receive");
 
   return messagesContainer;
 }
@@ -140,5 +140,5 @@ export function messageReceived({
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
 
-  if (globalSettings.soundIM) Sound.play("imbeep");
+  if (globalSettings.soundIM) Sound.play("receive");
 }

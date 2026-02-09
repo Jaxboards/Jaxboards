@@ -31,7 +31,7 @@ export default class Chess extends Component<HTMLTableElement> {
   constructor(element: HTMLTableElement) {
     super(element);
 
-    sound.load("chessdrop", "/Sounds/chessdrop.mp3", false);
+    sound.load("chessdrop", false);
 
     const drag = new Drag();
     drag.addListener({
@@ -175,7 +175,7 @@ export default class Chess extends Component<HTMLTableElement> {
 
         pieceEl.dataset.piece = promoteTo;
         pieceEl.innerHTML = pieceUnicode[promoteTo];
-        sound.loadAndPlay("zelda-item-get", "/Sounds/zelda-item-get.mp3");
+        sound.loadAndPlay("zelda-item-get");
 
         break;
       }

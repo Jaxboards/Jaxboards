@@ -16,7 +16,7 @@ export default class Checkers extends Component<HTMLTableElement> {
   constructor(element: HTMLTableElement) {
     super(element);
 
-    sound.load("chessdrop", "/Sounds/chessdrop.mp3", false);
+    sound.load("chessdrop", false);
 
     const drag = new Drag();
     drag.addListener({

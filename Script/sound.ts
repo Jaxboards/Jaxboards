@@ -1,7 +1,11 @@
 class Sound {
   private soundCache: Record<string, HTMLAudioElement> = {};
 
-  load(title: string, file: string, autoplay: boolean) {
+  getFilePath(title: string) {
+    return `/Sounds/${title}.mp3`;
+  }
+
+  load(title: string, autoplay: boolean) {
     let audio = this.soundCache[title];
 
     if (audio) {
@@ -16,15 +20,15 @@ class Sound {
     audio = new Audio();
     this.soundCache[title] = audio;
     audio.autoplay = !!autoplay;
-    audio.src = file;
+    audio.src = this.getFilePath(title);
+  }
+
+  loadAndPlay(title: string) {
+    this.load(title, true);
   }
 
   play(title: string) {
     void this.soundCache[title].play();
-  }
-
-  loadAndPlay(title: string, file: string) {
-    this.load(title, file, true);
   }
 }
 
