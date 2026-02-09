@@ -106,6 +106,13 @@ export default class Chess extends Component<HTMLTableElement> {
     const distance = vector.map(Math.abs);
     const movedStraight = Math.min(...distance) === 0;
     const movedDiagonally = distance[0] === distance[1];
+    const isBlack = piece.toLowerCase() === piece;
+
+    // not your turn!
+    if ((this.moveNumber % 2 === 0) !== isBlack) {
+      toast.error(`It's ${isBlack ? "white" : "black"}'s turn!`);
+      return false;
+    }
 
     // can't capture own pieces
     if (
