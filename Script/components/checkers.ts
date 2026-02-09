@@ -50,9 +50,10 @@ export default class Checkers extends Component<HTMLTableElement> {
         // place the piece down
         targetCell.append(pieceEl);
         sound.play("chessdrop");
+        this.moveNumber++;
 
         navigator.clipboard.writeText(
-          "[checkers]" + this.getGameState() + "[/checkers]",
+          "[checkers]" + this.gameState + "[/checkers]",
         );
         toast.success("BBCode copied to clipboard");
       },
@@ -125,7 +126,15 @@ export default class Checkers extends Component<HTMLTableElement> {
     return distance[0] === (capturedPiece ? 2 : 1);
   }
 
-  getGameState() {
+  get moveNumber() {
+    return Number(this.element.dataset.moveNumber ?? "1");
+  }
+
+  set moveNumber(moveNumber: number) {
+    this.element.dataset.moveNumber = `${moveNumber}`;
+  }
+
+  get gameState() {
     const cells = Array.from(this.element.querySelectorAll("td"));
 
     // Gotta map an 8x8 grid to a 8x4 grid
@@ -144,9 +153,11 @@ export default class Checkers extends Component<HTMLTableElement> {
       }
     }
 
-    return state
-      .map((row) => row.join(""))
-      .join("/")
-      .replaceAll(/ +/g, (rep) => `${rep.length}`);
+    return (
+      state
+        .map((row) => row.join(""))
+        .join("/")
+        .replaceAll(/ +/g, (rep) => `${rep.length}`) + ` ${this.moveNumber}`
+    );
   }
 }

@@ -524,6 +524,12 @@ final class BBCode
     {
         [, $fen] = $match;
 
+        $fen = trim($fen);
+
+        $parts = explode(' ', $fen);
+        $fen = $parts[0];
+        $moveNumber = (int) ($parts[1] ?? '1');
+
         // If it's empty, start a new game
         $fen = trim(
             $fen,
@@ -581,7 +587,7 @@ final class BBCode
             }
         }
 
-        return $this->renderCheckerBoard($pieces);
+        return $this->renderCheckerBoard($pieces, 'chess', $moveNumber);
     }
 
     /**
@@ -591,10 +597,14 @@ final class BBCode
     {
         [, $state] = $match;
 
+        $state = trim($state);
+
         // If it's empty, start a new game
-        $state = trim(
-            $state,
-        ) === '' ? 'bbbb/bbbb/bbbb/4/4/rrrr/rrrr/rrrr' : $state;
+        $state = $state === '' ? 'bbbb/bbbb/bbbb/4/4/rrrr/rrrr/rrrr 1' : $state;
+
+        $parts = explode(' ', $state);
+        $state = $parts[0];
+        $moveNumber = (int) ($parts[1] ?? '1');
 
         // replace numbers with empty squares
         $state = preg_replace_callback(
@@ -638,7 +648,7 @@ final class BBCode
             }
         }
 
-        return $this->renderCheckerBoard($pieces, 'checkers');
+        return $this->renderCheckerBoard($pieces, 'checkers', $moveNumber);
     }
 
     /**
@@ -646,7 +656,7 @@ final class BBCode
      *
      * @param array<array<string>> $pieces
      */
-    private function renderCheckerBoard(array $pieces, string $game = 'chess'): string
+    private function renderCheckerBoard(array $pieces, string $game = 'chess', $moveNumber = 1): string
     {
         $board = <<<'HTML'
             <tr>
@@ -673,7 +683,7 @@ final class BBCode
 
         $table = 'table';
 
-        return "<{$table} class='checkerboard {$game}'>{$board}</table>";
+        return "<{$table} data-move-number='{$moveNumber}' class='checkerboard {$game}'>{$board}</table>";
     }
 
     private function youtubeEmbedHTML(

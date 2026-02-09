@@ -43,6 +43,7 @@ export default class Chess extends Component<HTMLTableElement> {
         capturedPieceEl?.remove();
         dropEvent.droptarget.append(dropEvent.el);
         sound.play("chessdrop");
+        this.moveNumber++;
 
         navigator.clipboard.writeText(
           "[chess]" + this.getFENNotation() + "[/chess]",
@@ -53,6 +54,14 @@ export default class Chess extends Component<HTMLTableElement> {
     });
     drag.drops(Array.from(element.querySelectorAll("td")));
     drag.apply(Array.from(element.querySelectorAll(".piece")));
+  }
+
+  get moveNumber() {
+    return Number(this.element.dataset.moveNumber ?? "1");
+  }
+
+  set moveNumber(moveNumber: number) {
+    this.element.dataset.moveNumber = `${moveNumber}`;
   }
 
   isValidMove(
@@ -116,13 +125,16 @@ export default class Chess extends Component<HTMLTableElement> {
   getFENNotation() {
     const cells = Array.from(this.element.querySelectorAll("td"));
 
-    return cells
-      .map(
-        (cell, index) =>
-          (index && index % 8 === 0 ? "/" : "") +
-          (cell.querySelector<HTMLDivElement>(".piece")?.dataset.piece || " "),
-      )
-      .join("")
-      .replaceAll(/ +/g, (rep) => `${rep.length}`);
+    return (
+      cells
+        .map(
+          (cell, index) =>
+            (index && index % 8 === 0 ? "/" : "") +
+            (cell.querySelector<HTMLDivElement>(".piece")?.dataset.piece ||
+              " "),
+        )
+        .join("")
+        .replaceAll(/ +/g, (rep) => `${rep.length}`) + ` ${this.moveNumber}`
+    );
   }
 }
