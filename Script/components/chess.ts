@@ -60,6 +60,11 @@ export default class Chess extends Component<HTMLTableElement> {
           this.promotePawn(pieceEl);
         }
 
+        // GG!
+        if (capturedPiece?.toLowerCase() === "k") {
+          sound.loadAndPlay("malo-mart");
+        }
+
         capturedPieceEl?.remove();
         dropEvent.droptarget.append(pieceEl);
         sound.play("chessdrop");
