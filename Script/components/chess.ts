@@ -82,13 +82,15 @@ export default class Chess extends Component<HTMLTableElement> {
       // todo: en passant
       case "p":
         return (
+          from[0] < to[0] &&
           distance <= (from[0] === 2 ? 2 : 1) &&
-          (capturedPiece ? movedDiagonally : movedStraight && from[0] < to[0])
+          (capturedPiece ? movedDiagonally : movedStraight)
         );
       case "P":
         return (
+          from[0] > to[0] &&
           distance <= (from[0] === 7 ? 2 : 1) &&
-          (capturedPiece ? movedDiagonally : movedStraight && from[0] > to[0])
+          (capturedPiece ? movedDiagonally : movedStraight)
         );
 
       case "r":
