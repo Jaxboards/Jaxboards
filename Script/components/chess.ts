@@ -166,7 +166,7 @@ export default class Chess extends Component<HTMLTableElement> {
         ) ?? ""
       ).toLowerCase();
 
-      if (promoteTo in pieceUnicode) {
+      if (["q", "r", "b", "n"].includes(promoteTo)) {
         // ensure correct team
         promoteTo =
           pieceEl.dataset.piece === "p"
