@@ -29,16 +29,40 @@ export default class Checkers extends Component<HTMLTableElement> {
           return;
         }
 
-        const cell = dropEvent.droptarget;
+        const targetCell = dropEvent.droptarget;
         const pieceEl = dropEvent.el;
-        const piece = pieceEl.dataset.piece ?? "";
-        const capturedPieceEl = cell.querySelector<HTMLDivElement>(".piece");
-        const capturedPiece = capturedPieceEl?.dataset.piece ?? "";
+        const checkerboard = pieceEl.closest("table");
 
         const fromCoords = getCellCoordinates(pieceEl.closest("td"));
-        const toCoords = getCellCoordinates(cell);
+        const toCoords = getCellCoordinates(targetCell);
 
-        if (!this.isValidMove(piece, capturedPiece, fromCoords, toCoords)) {
+        const vector = [
+          toCoords[0] - fromCoords[0],
+          toCoords[1] - fromCoords[1],
+        ];
+        const distance = vector.map(Math.abs);
+
+        const capturedPieceEl =
+          distance.join(",") === "2,2"
+            ? checkerboard?.rows[fromCoords[0] + vector[0] / 2].cells[
+                fromCoords[1] + vector[1] / 2
+              ].querySelector<HTMLDivElement>(".piece")
+            : undefined;
+
+        const piece = pieceEl.dataset.piece ?? "";
+        const capturedPiece = capturedPieceEl?.dataset.piece ?? "";
+
+        if (
+          // can't land on other pieces
+          targetCell.querySelector(".piece") ||
+          !this.isValidMove(
+            piece,
+            capturedPiece,
+            fromCoords,
+            toCoords,
+            distance,
+          )
+        ) {
           return;
         }
 
@@ -49,7 +73,7 @@ export default class Checkers extends Component<HTMLTableElement> {
         }
 
         capturedPieceEl?.remove();
-        cell.append(pieceEl);
+        targetCell.append(pieceEl);
         sound.play("chessdrop");
 
         navigator.clipboard.writeText(
@@ -65,8 +89,9 @@ export default class Checkers extends Component<HTMLTableElement> {
   isValidMove(
     piece = "",
     capturedPiece = "",
-    from: [number, number],
-    to: [number, number],
+    from: number[],
+    to: number[],
+    distance: number[],
   ) {
     // prevent landing on white squares
     if (to[0] % 2 === to[1] % 2) {
@@ -74,7 +99,7 @@ export default class Checkers extends Component<HTMLTableElement> {
     }
 
     // prevent moving in anything but diagonal
-    if (Math.abs(to[0] - from[0]) !== Math.abs(to[1] - from[1])) {
+    if (distance[0] != distance[1]) {
       return false;
     }
 
@@ -88,12 +113,13 @@ export default class Checkers extends Component<HTMLTableElement> {
       return false;
     }
 
-    // can't capture own pieces
+    // can't jump own pieces
     if (capturedPiece.toLowerCase() === piece.toLowerCase()) {
       return false;
     }
 
-    return true;
+    // moved correct distance
+    return distance[0] === (capturedPiece ? 2 : 1);
   }
 
   getGameState() {
