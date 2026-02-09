@@ -91,13 +91,6 @@ export default class Checkers extends Component<HTMLTableElement> {
         ".piece",
       )?.dataset.piece ?? "";
     const capturedPiece = this.getCapturedPiece(from, to)?.dataset.piece ?? "";
-    const isBlack = piece.toLowerCase() === "b";
-
-    // not your turn!
-    if ((this.moveNumber % 2 === 0) !== isBlack) {
-      toast.error(`It's ${isBlack ? "red" : "black"}'s turn!`);
-      return false;
-    }
 
     // prevent landing on white squares
     if (to[0] % 2 === to[1] % 2) {
