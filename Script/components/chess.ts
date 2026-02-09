@@ -4,6 +4,21 @@ import Drag, { DragSession } from "../JAX/drag";
 import toast from "../JAX/toast";
 import sound from "../sound";
 
+const pieceUnicode: Record<string, string> = {
+  R: "♜",
+  N: "♞",
+  B: "♝",
+  Q: "♛",
+  K: "♚",
+  P: "♟",
+  r: "♜",
+  n: "♞",
+  b: "♝",
+  q: "♛",
+  k: "♚",
+  p: "♟",
+};
+
 export default class Chess extends Component<HTMLTableElement> {
   static hydrate(container: HTMLElement): void {
     register(
@@ -29,19 +44,24 @@ export default class Chess extends Component<HTMLTableElement> {
           return;
         }
 
-        const piece = dropEvent.el.dataset.piece;
+        const pieceEl = dropEvent.el;
+        const piece = pieceEl.dataset.piece;
         const capturedPieceEl =
           dropEvent.droptarget.querySelector<HTMLDivElement>(".piece");
         const capturedPiece = capturedPieceEl?.dataset.piece?.trim() ?? "";
-        const fromCoords = getCellCoordinates(dropEvent.el.closest("td"));
+        const fromCoords = getCellCoordinates(pieceEl.closest("td"));
         const toCoords = getCellCoordinates(dropEvent.droptarget);
 
         if (!this.isValidMove(piece, capturedPiece, fromCoords, toCoords)) {
           return;
         }
 
+        if (piece?.toLowerCase() === "p" && [1, 8].includes(toCoords[0])) {
+          this.promotePawn(pieceEl);
+        }
+
         capturedPieceEl?.remove();
-        dropEvent.droptarget.append(dropEvent.el);
+        dropEvent.droptarget.append(pieceEl);
         sound.play("chessdrop");
         this.moveNumber++;
 
@@ -135,6 +155,29 @@ export default class Chess extends Component<HTMLTableElement> {
         return Math.max(...distance) <= 2 && (movedDiagonally || movedStraight);
     }
     return true;
+  }
+
+  promotePawn(pieceEl: HTMLDivElement) {
+    while (true) {
+      let promoteTo = (
+        prompt(
+          "Congrats on your promotion, sir pawn! What rank would you like? (q: Queen, r: Rook, b: Bishop, n: Knight)",
+          "q",
+        ) ?? ""
+      ).toLowerCase();
+
+      if (promoteTo in pieceUnicode) {
+        // ensure correct team
+        promoteTo =
+          pieceEl.dataset.piece === "p"
+            ? promoteTo.toLowerCase()
+            : promoteTo.toUpperCase();
+
+        pieceEl.dataset.piece = promoteTo;
+        pieceEl.innerHTML = pieceUnicode[promoteTo];
+        break;
+      }
+    }
   }
 
   getFENNotation() {
