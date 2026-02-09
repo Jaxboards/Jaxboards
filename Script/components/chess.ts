@@ -99,11 +99,7 @@ export default class Chess extends Component<HTMLTableElement> {
 
       case "n":
       case "N":
-        return (
-          [Math.abs(from[0] - to[0]), Math.abs(from[1] - to[1])]
-            .toSorted((a, b) => a - b)
-            .join(",") === "1,2"
-        );
+        return distance.toSorted((a, b) => a - b).join(",") === "1,2";
 
       case "q":
       case "Q":
