@@ -539,7 +539,7 @@ final class BBCode
         $fen = preg_replace_callback(
             '/[0-8]/',
             static fn($match) => str_repeat(' ', (int) $match[0]),
-            (string) $fen,
+            $fen,
         );
         $fen = explode('/', (string) $fen);
 
@@ -610,7 +610,7 @@ final class BBCode
         $state = preg_replace_callback(
             '/[0-8]/',
             static fn($match) => str_repeat(' ', (int) $match[0]),
-            (string) $state,
+            $state,
         );
 
         $state = explode('/', (string) $state);
@@ -656,7 +656,7 @@ final class BBCode
      *
      * @param array<array<string>> $pieces
      */
-    private function renderCheckerBoard(array $pieces, string $game = 'chess', $moveNumber = 1): string
+    private function renderCheckerBoard(array $pieces, string $game = 'chess', int $moveNumber = 1): string
     {
         $board = <<<'HTML'
             <tr>
