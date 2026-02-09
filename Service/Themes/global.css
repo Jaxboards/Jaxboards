@@ -197,6 +197,8 @@ body {
 }
 
 .checkerboard {
+  user-select: none;
+
   & th,
   & td {
     width: 30px;
