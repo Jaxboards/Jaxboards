@@ -632,7 +632,9 @@ final class BBCode
 
                 $offset = -$row % 2;
                 $pieces[$row][($column * 2 - $offset + 8) % 8] = '';
-                $pieces[$row][$column * 2 + $offset + 1] = (trim($piece) !== '' ? "<div class='piece' data-piece='{$piece}' style='{$color}'>{$character}</div>" : '');
+                $pieces[$row][$column * 2 + $offset + 1] = (trim(
+                    $piece,
+                ) !== '' ? "<div class='piece' data-piece='{$piece}' style='{$color}'>{$character}</div>" : '');
             }
         }
 
