@@ -1,3 +1,4 @@
+import createSnow from "../eggs/snow";
 import register, { Component } from "../JAX/component";
 import { getCellCoordinates } from "../JAX/dom";
 import Drag, { DragSession } from "../JAX/drag";
@@ -63,6 +64,7 @@ export default class Chess extends Component<HTMLTableElement> {
         // GG!
         if (capturedPiece?.toLowerCase() === "k") {
           sound.loadAndPlay("malo-mart");
+          createSnow(2000, true);
         }
 
         capturedPieceEl?.remove();
