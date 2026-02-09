@@ -5,7 +5,7 @@ class Sound {
     return `/Sounds/${title}.mp3`;
   }
 
-  load(title: string, autoplay: boolean) {
+  load(title: string, autoplay = false) {
     let audio = this.soundCache[title];
 
     if (audio) {

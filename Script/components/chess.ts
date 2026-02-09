@@ -31,7 +31,7 @@ export default class Chess extends Component<HTMLTableElement> {
   constructor(element: HTMLTableElement) {
     super(element);
 
-    sound.load("chessdrop", false);
+    sound.load("chessdrop");
 
     const drag = new Drag();
     drag.addListener({

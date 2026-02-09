@@ -41,8 +41,8 @@ export class AppState {
     );
 
     // Load sounds
-    Sound.load("blip", false);
-    Sound.load("receive", false);
+    Sound.load("blip");
+    Sound.load("receive");
   }
 
   handleQuoting(link: HTMLAnchorElement) {
