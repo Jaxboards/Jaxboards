@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\BBCode\Games;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -51,6 +52,7 @@ use function json_decode;
  */
 #[CoversClass(App::class)]
 #[CoversClass(BBCode::class)]
+#[CoversClass(Games::class)]
 #[CoversClass(BoardIndex::class)]
 #[CoversClass(BotDetector::class)]
 #[CoversClass(Column::class)]

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use Jax\BBCode\Games;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
@@ -47,6 +48,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(App::class)]
 #[CoversClass(FileSystem::class)]
 #[CoversClass(BBCode::class)]
+#[CoversClass(Games::class)]
 #[CoversClass(BotDetector::class)]
 #[CoversClass(Column::class)]
 #[CoversClass(Config::class)]

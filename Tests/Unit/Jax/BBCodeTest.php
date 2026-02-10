@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jax;
 
+use Jax\BBCode\Games;
 use Jax\BBCode;
 use Jax\Database\Database;
 use Jax\Database\Model;
@@ -32,6 +33,7 @@ use const PHP_EOL;
  * @internal
  */
 #[CoversClass(BBCode::class)]
+#[CoversClass(Games::class)]
 #[CoversClass(Database::class)]
 #[CoversClass(DebugLog::class)]
 #[CoversClass(DomainDefinitions::class)]

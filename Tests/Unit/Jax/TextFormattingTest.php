@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jax;
 
+use Jax\BBCode\Games;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
@@ -42,6 +43,7 @@ use function DI\autowire;
 #[CoversClass(ForeignKey::class)]
 #[CoversClass(Key::class)]
 #[CoversClass(BBCode::class)]
+#[CoversClass(Games::class)]
 #[CoversClass(Config::class)]
 #[CoversClass(Database::class)]
 #[CoversClass(DatabaseUtils::class)]
