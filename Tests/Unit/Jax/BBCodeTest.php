@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jax;
 
-use Jax\BBCode\Games;
 use Jax\BBCode;
+use Jax\BBCode\Games;
 use Jax\Database\Database;
 use Jax\Database\Model;
 use Jax\DebugLog;

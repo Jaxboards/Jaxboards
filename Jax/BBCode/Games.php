@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace Jax\BBCode;
 
-class Games
+use function array_key_exists;
+use function explode;
+use function preg_replace_callback;
+use function str_repeat;
+use function trim;
+
+final class Games
 {
     /**
      * @param array<string> $match

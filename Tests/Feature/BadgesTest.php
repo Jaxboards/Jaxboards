@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Jax\BBCode\Games;
 use Jax\App;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
 use Jax\BBCode;
+use Jax\BBCode\Games;
 use Jax\BotDetector;
 use Jax\Config;
 use Jax\ContactDetails;

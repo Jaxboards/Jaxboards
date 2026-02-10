@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jax;
 
-use Jax\BBCode\Games;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
 use Jax\BBCode;
+use Jax\BBCode\Games;
 use Jax\Config;
 use Jax\Database\Adapters\SQLite;
 use Jax\Database\Database;
