@@ -100,43 +100,6 @@ final class BBCode
     }
 
     /**
-     * @return array<string,string|callable>
-     */
-    private function getHTMLReplacements(): array
-    {
-        static $htmlReplacements = null;
-        if ($htmlReplacements) {
-            return $htmlReplacements;
-        }
-        $htmlReplacements = [
-            'align' => '<p style="text-align:$1">$2</p>',
-            'background' => '<span style="background:$1">$2</span>',
-            'bold' => '<strong>$1</strong>',
-            'color' => '<span style="color:$1">$2</span>',
-            'font' => '<span style="font-family:$1">$2</span>',
-            'header' => '<h$1>$2</h$1>',
-            'image' => '<img src="$2" title="$1" alt="$1" class="bbcodeimg">',
-            'italic' => '<em>$1</em>',
-            'spoiler' => '<span class="spoilertext">$1</span>',
-            'strikethrough' => '<span style="text-decoration:line-through">$1</span>',
-            'underline' => '<span style="text-decoration:underline">$1</span>',
-            // Consider adding nofollow if admin approval of new accounts is not enabled
-            'url' => '<a href="$1">$1</a>',
-            'urlWithLink' => '<a href="$1">$2</a>',
-
-            'attachment' => $this->attachmentCallback(...),
-            'chess' => $this->bbcodeChessCallback(...),
-            'checkers' => $this->bbcodeCheckersCallback(...),
-            'list' => $this->bbcodeListCallback(...),
-            'quote' => $this->bbcodeQuoteCallback(...),
-            'size' => $this->bbcodeSizeCallback(...),
-            'table' => $this->bbcodeTableCallback(...),
-            'video' => $this->bbcodeVideoCallback(...),
-        ];
-        return $htmlReplacements;
-    }
-
-    /**
      * @param array<array<string>> $codeBlocks
      */
     public function toHTML(string $text, $codeBlocks = []): string
@@ -162,58 +125,6 @@ final class BBCode
 
         return $text;
     }
-
-    /**
-     * @return array<string,string|callable>
-     */
-    private function getMarkdownRules(): array
-    {
-        static $markdownReplacements = null;
-        if ($markdownReplacements) {
-            return $markdownReplacements;
-        }
-        $markdownReplacements = [
-            'align' => '$2',
-            'attachment' => '',
-            'background' => '$2',
-            'bold' => '**$1**',
-            'color' => '$2',
-            'font' => '$2',
-            'header' => "# $2\n",
-            'image' => '![$1]($2)',
-            'italic' => '*$1*',
-            'list' => '$2',
-            'quote' => static fn(array $match) => '> ' . str_replace(
-                "\n",
-                "\n> ",
-                $match[2],
-            ),
-            'size' => '$3',
-            'spoiler' => '||$1||',
-            'strikethrough' => '~~$1~~',
-            'underline' => '__$1__',
-            'url' => '[$1]($1)',
-            'urlWithLink' => '[$2]($1)',
-            'video' => '$1',
-        ];
-
-        $rules = [];
-        foreach (
-            array_merge(
-                $this->blockBBCodes,
-                $this->inlineBBCodes,
-            ) as $name => $regex
-        ) {
-            if (!array_key_exists($name, $markdownReplacements)) {
-                continue;
-            }
-
-            $rules[$regex] = $markdownReplacements[$name];
-        }
-
-        return $rules;
-    }
-
 
     public function toMarkdown(string $text): string
     {
@@ -306,6 +217,97 @@ final class BBCode
     }
 
     /**
+     * @return array<string,callable|string>
+     */
+    private function getHTMLReplacements(): array
+    {
+        static $htmlReplacements = null;
+        if ($htmlReplacements) {
+            return $htmlReplacements;
+        }
+
+        $htmlReplacements = [
+            'align' => '<p style="text-align:$1">$2</p>',
+            'background' => '<span style="background:$1">$2</span>',
+            'bold' => '<strong>$1</strong>',
+            'color' => '<span style="color:$1">$2</span>',
+            'font' => '<span style="font-family:$1">$2</span>',
+            'header' => '<h$1>$2</h$1>',
+            'image' => '<img src="$2" title="$1" alt="$1" class="bbcodeimg">',
+            'italic' => '<em>$1</em>',
+            'spoiler' => '<span class="spoilertext">$1</span>',
+            'strikethrough' => '<span style="text-decoration:line-through">$1</span>',
+            'underline' => '<span style="text-decoration:underline">$1</span>',
+            // Consider adding nofollow if admin approval of new accounts is not enabled
+            'url' => '<a href="$1">$1</a>',
+            'urlWithLink' => '<a href="$1">$2</a>',
+
+            'attachment' => $this->attachmentCallback(...),
+            'chess' => $this->bbcodeChessCallback(...),
+            'checkers' => $this->bbcodeCheckersCallback(...),
+            'list' => $this->bbcodeListCallback(...),
+            'quote' => $this->bbcodeQuoteCallback(...),
+            'size' => $this->bbcodeSizeCallback(...),
+            'table' => $this->bbcodeTableCallback(...),
+            'video' => $this->bbcodeVideoCallback(...),
+        ];
+
+        return $htmlReplacements;
+    }
+
+    /**
+     * @return array<string,callable|string>
+     */
+    private function getMarkdownRules(): array
+    {
+        static $markdownReplacements = null;
+        if ($markdownReplacements) {
+            return $markdownReplacements;
+        }
+
+        $markdownReplacements = [
+            'align' => '$2',
+            'attachment' => '',
+            'background' => '$2',
+            'bold' => '**$1**',
+            'color' => '$2',
+            'font' => '$2',
+            'header' => "# $2\n",
+            'image' => '![$1]($2)',
+            'italic' => '*$1*',
+            'list' => '$2',
+            'quote' => static fn(array $match) => '> ' . str_replace(
+                "\n",
+                "\n> ",
+                $match[2],
+            ),
+            'size' => '$3',
+            'spoiler' => '||$1||',
+            'strikethrough' => '~~$1~~',
+            'underline' => '__$1__',
+            'url' => '[$1]($1)',
+            'urlWithLink' => '[$2]($1)',
+            'video' => '$1',
+        ];
+
+        $rules = [];
+        foreach (
+            array_merge(
+                $this->blockBBCodes,
+                $this->inlineBBCodes,
+            ) as $name => $regex
+        ) {
+            if (!array_key_exists($name, $markdownReplacements)) {
+                continue;
+            }
+
+            $rules[$regex] = $markdownReplacements[$name];
+        }
+
+        return $rules;
+    }
+
+    /**
      * @param array<string,callable|string> $rules
      */
     private function replaceWithRules(string $text, array $rules): string
@@ -314,7 +316,6 @@ final class BBCode
             $tmp = $text;
 
             foreach ($rules as $pattern => $replacer) {
-
                 if (is_string($replacer)) {
                     $tmp = preg_replace(
                         $pattern,
@@ -339,9 +340,11 @@ final class BBCode
                 break;
             }
 
-            if (is_string($tmp)) {
-                $text = $tmp;
+            if (!is_string($tmp)) {
+                continue;
             }
+
+            $text = $tmp;
         }
 
         return $text;
