@@ -175,7 +175,7 @@ final class ShoutboxTest extends FeatureTestCase
         DOMAssert::assertSelectCount(
             '#shoutbox',
             1,
-            $page
+            $page,
         );
 
         DOMAssert::assertSelectEquals(

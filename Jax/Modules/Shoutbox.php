@@ -75,9 +75,11 @@ final class Shoutbox implements Module
             $this->addShout($shoutboxShout);
         }
 
-        if ($this->request->both(
-            'module',
-        ) === 'shoutbox') {
+        if (
+            $this->request->both(
+                'module',
+            ) === 'shoutbox'
+        ) {
             $this->showAllShouts();
         }
 
