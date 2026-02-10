@@ -189,7 +189,7 @@ final class BBCode
 
         $rules[$this->callbackBBCodes['attachment']] = '';
         $rules[$this->callbackBBCodes['list']] = '$2';
-        $rules[$this->callbackBBCodes['quote']] = '> $2';
+        $rules[$this->callbackBBCodes['quote']] = fn(array $match) => '> ' . str_replace("\n", "\n> ", $match[2]);
         $rules[$this->callbackBBCodes['size']] = '$3';
         $rules[$this->callbackBBCodes['video']] = '$1';
 

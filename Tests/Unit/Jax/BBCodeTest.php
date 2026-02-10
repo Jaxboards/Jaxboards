@@ -308,8 +308,16 @@ final class BBCodeTest extends UnitTestCase
                 "*item\n*item 2",
             ],
             [
-                '[quote]quoted text[/quote]',
-                '> quoted text',
+                <<<'BBCODE'
+                    [quote]multi
+                    line
+                    quote[/quote]
+                    BBCODE,
+                <<<'MARKDOWN'
+                    > multi
+                    > line
+                    > quote
+                    MARKDOWN,
             ],
             [
                 '[quote=Sean]quoted text[/quote]',
