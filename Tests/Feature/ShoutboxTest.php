@@ -172,6 +172,12 @@ final class ShoutboxTest extends FeatureTestCase
             post: ['shoutbox_shout' => 'Howdy partner!'],
         ));
 
+        DOMAssert::assertSelectCount(
+            '#shoutbox',
+            1,
+            $page
+        );
+
         DOMAssert::assertSelectEquals(
             '.sbhistory .shout',
             'Howdy partner!',

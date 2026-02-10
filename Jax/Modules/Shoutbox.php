@@ -75,11 +75,14 @@ final class Shoutbox implements Module
             $this->addShout($shoutboxShout);
         }
 
+        if ($this->request->both(
+            'module',
+        ) === 'shoutbox') {
+            $this->showAllShouts();
+        }
+
         match (true) {
             $shoutboxDelete !== 0 => $this->deleteShout($shoutboxDelete),
-            $this->request->both(
-                'module',
-            ) === 'shoutbox' => $this->showAllShouts(),
             $this->request->isJSAccess() => $this->updateShoutbox(),
             default => $this->displayShoutbox(),
         };

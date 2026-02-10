@@ -98,7 +98,6 @@ final class Template
             'LOGO',
             'USERBOX',
             'PATH',
-            'SHOUTBOX',
             'PAGE',
             'FOOTER',
         ];
