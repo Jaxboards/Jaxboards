@@ -59,62 +59,17 @@ final class BBCode
      */
     private array $blockBBCodes = [
         'align' => '/\[align=(center|left|right)\](.*)\[\/align\]/Usi',
-        'header' => '/\[h([1-6])\](.*)\[\/h\1\]/Usi',
-        'image' => '/\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[\/img\]/Ui',
-    ];
-
-    /**
-     * @var array<string,string>
-     */
-    private array $callbackBBCodes = [
         'attachment' => '/\[attachment\](\d+)\[\/attachment\]/',
         'code' => '/\[code(=\w+)?\](.*?)\[\/code\]/is',
-        'chess' => '/\[chess\](.*?)\[\/chess\]/is',
         'checkers' => '/\[checkers\](.*?)\[\/checkers\]/is',
+        'chess' => '/\[chess\](.*?)\[\/chess\]/is',
+        'header' => '/\[h([1-6])\](.*)\[\/h\1\]/Usi',
+        'image' => '/\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[\/img\]/Ui',
         'list' => '/\[(ul|ol)\](.*)\[\/\1\]/Usi',
         'quote' => '/\[quote(?>=([^\]]+))?\](.*?)\[\/quote\]\r?\n?/is',
         'size' => '/\[size=([0-4]?\d)(px|pt|em|)\](.*)\[\/size\]/Usi',
         'table' => '/\[table\](.*)\[\/table\]/Usi',
         'video' => '/\[video\](.*)\[\/video\]/Ui',
-    ];
-
-    /**
-     * @var array<string,string>
-     */
-    private array $htmlReplacements = [
-        'align' => '<p style="text-align:$1">$2</p>',
-        'background' => '<span style="background:$1">$2</span>',
-        'bold' => '<strong>$1</strong>',
-        'color' => '<span style="color:$1">$2</span>',
-        'font' => '<span style="font-family:$1">$2</span>',
-        'header' => '<h$1>$2</h$1>',
-        'image' => '<img src="$2" title="$1" alt="$1" class="bbcodeimg">',
-        'italic' => '<em>$1</em>',
-        'spoiler' => '<span class="spoilertext">$1</span>',
-        'strikethrough' => '<span style="text-decoration:line-through">$1</span>',
-        'underline' => '<span style="text-decoration:underline">$1</span>',
-        // Consider adding nofollow if admin approval of new accounts is not enabled
-        'url' => '<a href="$1">$1</a>',
-        'urlWithLink' => '<a href="$1">$2</a>',
-    ];
-
-    /**
-     * @var array<string,string>
-     */
-    private array $markdownReplacements = [
-        'align' => '$2',
-        'background' => '$2',
-        'bold' => '**$1**',
-        'color' => '$2',
-        'font' => '$2',
-        'header' => "# $2\n",
-        'image' => '![$1]($2)',
-        'italic' => '*$1*',
-        'spoiler' => '||$1||',
-        'strikethrough' => '~~$1~~',
-        'underline' => '__$1__',
-        'url' => '[$1]($1)',
-        'urlWithLink' => '[$2]($1)',
     ];
 
     public function __construct(
@@ -145,6 +100,43 @@ final class BBCode
     }
 
     /**
+     * @return array<string,string|callable>
+     */
+    private function getHTMLReplacements(): array
+    {
+        static $htmlReplacements = null;
+        if ($htmlReplacements) {
+            return $htmlReplacements;
+        }
+        $htmlReplacements = [
+            'align' => '<p style="text-align:$1">$2</p>',
+            'background' => '<span style="background:$1">$2</span>',
+            'bold' => '<strong>$1</strong>',
+            'color' => '<span style="color:$1">$2</span>',
+            'font' => '<span style="font-family:$1">$2</span>',
+            'header' => '<h$1>$2</h$1>',
+            'image' => '<img src="$2" title="$1" alt="$1" class="bbcodeimg">',
+            'italic' => '<em>$1</em>',
+            'spoiler' => '<span class="spoilertext">$1</span>',
+            'strikethrough' => '<span style="text-decoration:line-through">$1</span>',
+            'underline' => '<span style="text-decoration:underline">$1</span>',
+            // Consider adding nofollow if admin approval of new accounts is not enabled
+            'url' => '<a href="$1">$1</a>',
+            'urlWithLink' => '<a href="$1">$2</a>',
+
+            'attachment' => $this->attachmentCallback(...),
+            'chess' => $this->bbcodeChessCallback(...),
+            'checkers' => $this->bbcodeCheckersCallback(...),
+            'list' => $this->bbcodeListCallback(...),
+            'quote' => $this->bbcodeQuoteCallback(...),
+            'size' => $this->bbcodeSizeCallback(...),
+            'table' => $this->bbcodeTableCallback(...),
+            'video' => $this->bbcodeVideoCallback(...),
+        ];
+        return $htmlReplacements;
+    }
+
+    /**
      * @param array<array<string>> $codeBlocks
      */
     public function toHTML(string $text, $codeBlocks = []): string
@@ -152,33 +144,15 @@ final class BBCode
         $text = $this->toInlineHTML($text);
 
         $rules = [];
+        $htmlReplacements = $this->getHTMLReplacements();
+
         foreach ($this->blockBBCodes as $name => $regex) {
-            if (!array_key_exists($name, $this->htmlReplacements)) {
+            if (!array_key_exists($name, $htmlReplacements)) {
                 continue;
             }
 
-            $rules[$regex] = $this->htmlReplacements[$name];
+            $rules[$regex] = $htmlReplacements[$name];
         }
-
-        $rules = array_merge($rules, [
-            $this->callbackBBCodes['attachment'] => $this->attachmentCallback(...),
-
-            $this->callbackBBCodes['chess'] => $this->bbcodeChessCallback(...),
-
-            $this->callbackBBCodes['checkers'] => $this->bbcodeCheckersCallback(...),
-
-            $this->callbackBBCodes['list'] => $this->bbcodeListCallback(...),
-
-            $this->callbackBBCodes['quote'] => $this->bbcodeQuoteCallback(...),
-
-            $this->callbackBBCodes['size'] => $this->bbcodeSizeCallback(...),
-
-            $this->callbackBBCodes['table'] => $this->bbcodeTableCallback(...),
-
-
-            $this->callbackBBCodes['video'] => $this->bbcodeVideoCallback(...),
-
-        ]);
 
         $text = $this->replaceWithRules($text, $rules);
 
@@ -189,43 +163,71 @@ final class BBCode
         return $text;
     }
 
-    public function toMarkdown(string $text): string
+    /**
+     * @return array<string,string|callable>
+     */
+    private function getMarkdownRules(): array
     {
-        [$text, $codes] = $this->startCodeTags($text);
+        static $markdownReplacements = null;
+        if ($markdownReplacements) {
+            return $markdownReplacements;
+        }
+        $markdownReplacements = [
+            'align' => '$2',
+            'attachment' => '',
+            'background' => '$2',
+            'bold' => '**$1**',
+            'color' => '$2',
+            'font' => '$2',
+            'header' => "# $2\n",
+            'image' => '![$1]($2)',
+            'italic' => '*$1*',
+            'list' => '$2',
+            'quote' => static fn(array $match) => '> ' . str_replace(
+                "\n",
+                "\n> ",
+                $match[2],
+            ),
+            'size' => '$3',
+            'spoiler' => '||$1||',
+            'strikethrough' => '~~$1~~',
+            'underline' => '__$1__',
+            'url' => '[$1]($1)',
+            'urlWithLink' => '[$2]($1)',
+            'video' => '$1',
+        ];
 
         $rules = [];
-
-        $rules[$this->callbackBBCodes['attachment']] = '';
-        $rules[$this->callbackBBCodes['list']] = '$2';
-        $rules[$this->callbackBBCodes['quote']] = static fn(array $match) => '> ' . str_replace(
-            "\n",
-            "\n> ",
-            $match[2],
-        );
-        $rules[$this->callbackBBCodes['size']] = '$3';
-        $rules[$this->callbackBBCodes['video']] = '$1';
-
         foreach (
             array_merge(
                 $this->blockBBCodes,
                 $this->inlineBBCodes,
             ) as $name => $regex
         ) {
-            if (!array_key_exists($name, $this->markdownReplacements)) {
+            if (!array_key_exists($name, $markdownReplacements)) {
                 continue;
             }
 
-            $rules[$regex] = $this->markdownReplacements[$name];
+            $rules[$regex] = $markdownReplacements[$name];
         }
+
+        return $rules;
+    }
+
+
+    public function toMarkdown(string $text): string
+    {
+        [$text, $codes] = $this->startCodeTags($text);
+
 
         $text = $this->replaceWithRules(
             $text,
-            $rules,
+            $this->getMarkdownRules(),
         );
 
         // Code blocks have to come last since they may include bbcode that should be unparsed
         $text = (string) preg_replace_callback(
-            $this->callbackBBCodes['code'],
+            $this->blockBBCodes['code'],
             static fn($match): string => "```{$codes[$match[2]][2]}```",
             $text,
         );
@@ -236,12 +238,14 @@ final class BBCode
     public function toInlineHTML(string $text): string
     {
         $rules = [];
+        $htmlReplacements = $this->getHTMLReplacements();
+
         foreach ($this->inlineBBCodes as $name => $regex) {
-            if (!array_key_exists($name, $this->htmlReplacements)) {
+            if (!array_key_exists($name, $htmlReplacements)) {
                 continue;
             }
 
-            $rules[$regex] = $this->htmlReplacements[$name];
+            $rules[$regex] = $htmlReplacements[$name];
         }
 
         return $this->replaceWithRules(
@@ -261,7 +265,7 @@ final class BBCode
     public function startCodeTags(string $text): array
     {
         preg_match_all(
-            $this->callbackBBCodes['code'],
+            $this->blockBBCodes['code'],
             $text,
             $codes,
             PREG_SET_ORDER,
@@ -310,17 +314,18 @@ final class BBCode
             $tmp = $text;
 
             foreach ($rules as $pattern => $replacer) {
+
                 if (is_string($replacer)) {
                     $tmp = preg_replace(
                         $pattern,
                         $replacer,
-                        (string) $tmp,
+                        $tmp,
                     );
                 } elseif (is_callable($replacer)) {
                     $tmp = preg_replace_callback(
                         $pattern,
                         $replacer,
-                        (string) $tmp,
+                        $tmp,
                         20,
                     );
                 }
@@ -334,7 +339,9 @@ final class BBCode
                 break;
             }
 
-            $text = $tmp;
+            if (is_string($tmp)) {
+                $text = $tmp;
+            }
         }
 
         return $text;
