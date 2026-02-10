@@ -8,16 +8,15 @@ use Jax\Models\File;
 
 use function array_filter;
 use function array_key_exists;
-use function array_keys;
 use function array_map;
 use function array_merge;
 use function array_unique;
-use function array_values;
 use function explode;
 use function highlight_string;
 use function htmlspecialchars;
 use function implode;
 use function in_array;
+use function is_callable;
 use function is_string;
 use function preg_match;
 use function preg_match_all;
@@ -162,30 +161,22 @@ final class BBCode
         }
 
         $rules = array_merge($rules, [
-            $this->callbackBBCodes['attachment'] =>
-            $this->attachmentCallback(...),
+            $this->callbackBBCodes['attachment'] => $this->attachmentCallback(...),
 
-            $this->callbackBBCodes['chess'] =>
-            $this->bbcodeChessCallback(...),
+            $this->callbackBBCodes['chess'] => $this->bbcodeChessCallback(...),
 
-            $this->callbackBBCodes['checkers'] =>
-            $this->bbcodeCheckersCallback(...),
+            $this->callbackBBCodes['checkers'] => $this->bbcodeCheckersCallback(...),
 
-            $this->callbackBBCodes['list'] =>
-            $this->bbcodeListCallback(...),
+            $this->callbackBBCodes['list'] => $this->bbcodeListCallback(...),
 
-            $this->callbackBBCodes['quote'] =>
-            $this->bbcodeQuoteCallback(...),
+            $this->callbackBBCodes['quote'] => $this->bbcodeQuoteCallback(...),
 
-            $this->callbackBBCodes['size'] =>
-            $this->bbcodeSizeCallback(...),
+            $this->callbackBBCodes['size'] => $this->bbcodeSizeCallback(...),
 
-            $this->callbackBBCodes['table'] =>
-            $this->bbcodeTableCallback(...),
+            $this->callbackBBCodes['table'] => $this->bbcodeTableCallback(...),
 
 
-            $this->callbackBBCodes['video'] =>
-            $this->bbcodeVideoCallback(...),
+            $this->callbackBBCodes['video'] => $this->bbcodeVideoCallback(...),
 
         ]);
 
@@ -206,7 +197,11 @@ final class BBCode
 
         $rules[$this->callbackBBCodes['attachment']] = '';
         $rules[$this->callbackBBCodes['list']] = '$2';
-        $rules[$this->callbackBBCodes['quote']] = fn(array $match) => '> ' . str_replace("\n", "\n> ", $match[2]);
+        $rules[$this->callbackBBCodes['quote']] = static fn(array $match) => '> ' . str_replace(
+            "\n",
+            "\n> ",
+            $match[2],
+        );
         $rules[$this->callbackBBCodes['size']] = '$3';
         $rules[$this->callbackBBCodes['video']] = '$1';
 
@@ -307,7 +302,7 @@ final class BBCode
     }
 
     /**
-     * @param array<string,string|callable> $rules
+     * @param array<string,callable|string> $rules
      */
     private function replaceWithRules(string $text, array $rules): string
     {
@@ -319,14 +314,14 @@ final class BBCode
                     $tmp = preg_replace(
                         $pattern,
                         $replacer,
-                        $tmp,
+                        (string) $tmp,
                     );
-                } else if (is_callable($replacer)) {
+                } elseif (is_callable($replacer)) {
                     $tmp = preg_replace_callback(
                         $pattern,
                         $replacer,
-                        $tmp,
-                        20
+                        (string) $tmp,
+                        20,
                     );
                 }
 
