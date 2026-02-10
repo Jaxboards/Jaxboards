@@ -161,64 +161,18 @@ final class BBCode
             $rules[$regex] = $this->htmlReplacements[$name];
         }
 
+        $rules = array_merge($rules, [
+            $this->callbackBBCodes['table'] => $this->bbcodeTableCallback(...),
+            $this->callbackBBCodes['chess'] => $this->bbcodeChessCallback(...),
+            $this->callbackBBCodes['checkers'] => $this->bbcodeCheckersCallback(...),
+            $this->callbackBBCodes['list'] => $this->bbcodeListCallback(...),
+            $this->callbackBBCodes['size'] => $this->bbcodeSizeCallback(...),
+            $this->callbackBBCodes['quote'] => $this->bbcodeQuoteCallback(...),
+            $this->callbackBBCodes['attachment'] => $this->attachmentCallback(...),
+            $this->callbackBBCodes['video'] => $this->bbcodeVideoCallback(...),
+        ]);
+
         $text = $this->replaceWithRules($text, $rules);
-
-        // [table]
-        $text = $this->replaceWithCallback(
-            $text,
-            $this->callbackBBCodes['table'],
-            $this->bbcodeTableCallback(...),
-        );
-
-        // [chess]
-        $text = $this->replaceWithCallback(
-            $text,
-            $this->callbackBBCodes['chess'],
-            $this->bbcodeChessCallback(...),
-        );
-
-
-        // [checkers]
-        $text = $this->replaceWithCallback(
-            $text,
-            $this->callbackBBCodes['checkers'],
-            $this->bbcodeCheckersCallback(...),
-        );
-
-        // [ul] and [ol]
-        $text = $this->replaceWithCallback(
-            $text,
-            $this->callbackBBCodes['list'],
-            $this->bbcodeListCallback(...),
-        );
-
-        // [size]
-        $text = $this->replaceWithCallback(
-            $text,
-            $this->callbackBBCodes['size'],
-            $this->bbcodeSizeCallback(...),
-        );
-
-        // [quote]
-        $text = $this->replaceWithCallback(
-            $text,
-            $this->callbackBBCodes['quote'],
-            $this->bbcodeQuoteCallback(...),
-        );
-
-        // [attachment]
-        $text = $this->replaceWithCallback(
-            $text,
-            $this->callbackBBCodes['attachment'],
-            $this->attachmentCallback(...),
-        );
-
-        // [video]
-        $text = (string) preg_replace_callback(
-            $this->callbackBBCodes['video'],
-            $this->bbcodeVideoCallback(...),
-            $text,
-        );
 
         if ($codeBlocks !== []) {
             return $this->finishCodeTags($text, $codeBlocks);
@@ -336,34 +290,35 @@ final class BBCode
     }
 
     /**
-     * @param array<string,string> $rules
+     * @param array<string,string|callable> $rules
      */
     private function replaceWithRules(string $text, array $rules): string
     {
         for ($nestLimit = 0; $nestLimit < 10; ++$nestLimit) {
-            $tmp = preg_replace(
-                array_keys($rules),
-                array_values($rules),
-                $text,
-            );
-            if ($tmp === $text || !is_string($tmp)) {
-                break;
+            $tmp = $text;
+
+            foreach ($rules as $pattern => $replacer) {
+                if (is_string($replacer)) {
+                    $tmp = preg_replace(
+                        $pattern,
+                        $replacer,
+                        $tmp,
+                    );
+                } else if (is_callable($replacer)) {
+                    $tmp = preg_replace_callback(
+                        $pattern,
+                        $replacer,
+                        $tmp,
+                        20
+                    );
+                }
+
+                if (!is_string($tmp)) {
+                    break;
+                }
             }
 
-            $text = $tmp;
-        }
-
-        return $text;
-    }
-
-    private function replaceWithCallback(
-        string $text,
-        string $pattern,
-        callable $callback,
-    ): string {
-        for ($nestLimit = 0; $nestLimit < 10; ++$nestLimit) {
-            $tmp = preg_replace_callback($pattern, $callback, $text, 20);
-            if ($tmp === $text || !is_string($tmp)) {
+            if ($tmp === $text) {
                 break;
             }
 

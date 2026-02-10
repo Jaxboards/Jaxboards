@@ -299,7 +299,7 @@ final class Page
             $this->command('update', 'path', $this->buildpath());
         }
 
-        return json_encode($this->commands, JSON_THROW_ON_ERROR);
+        return json_encode($this->commands);
     }
 
     private function buildPath(): string

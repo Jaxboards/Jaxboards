@@ -201,8 +201,8 @@ export default class Chess extends Component<HTMLTableElement> {
       }
     }
 
+    // white castle (has delicious burgers)
     if (from[0] === 8 && from[1] === 5) {
-      // white castle (has delicious burgers)
       if (to[1] == 7) {
         return maybeSwapWithRook(from[0], 8, "R");
       }
