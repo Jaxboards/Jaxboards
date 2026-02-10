@@ -164,7 +164,8 @@ final class BBCode
         $rules = array_merge($rules, [
             $this->callbackBBCodes['table'] => $this->bbcodeTableCallback(...),
             $this->callbackBBCodes['chess'] => $this->bbcodeChessCallback(...),
-            $this->callbackBBCodes['checkers'] => $this->bbcodeCheckersCallback(...),
+            $this->callbackBBCodes['checkers'] =>
+            $this->bbcodeCheckersCallback(...),
             $this->callbackBBCodes['list'] => $this->bbcodeListCallback(...),
             $this->callbackBBCodes['size'] => $this->bbcodeSizeCallback(...),
             $this->callbackBBCodes['quote'] => $this->bbcodeQuoteCallback(...),
