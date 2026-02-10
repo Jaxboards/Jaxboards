@@ -68,6 +68,7 @@ final readonly class BotDetector
         'TikTokSpider' => 'TikTok',
         'Turnitin' => 'Turnitin',
         'Twitterbot' => 'Twitter',
+        'UptimeRobot' => 'UptimeRobot',
         'W3C_Validator' => 'W3C Validator',
         'WhatsApp' => 'WhatsApp',
         'Y!J-WSC' => 'Yahoo Japan',
