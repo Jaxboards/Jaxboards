@@ -97,11 +97,7 @@ export default class Chess extends Component<HTMLTableElement> {
     const distance = Math.max(...vector.map(Math.abs));
 
     for (let i = 1; i < distance; i++) {
-      if (
-        this.element.rows[from[0] + step[0] * i].cells[
-          from[1] + step[1] * i
-        ].querySelector(".piece")
-      ) {
+      if (this.getPieceAt(from[0] + step[0] * i, from[1] + step[1] * i)) {
         return true;
       }
     }
@@ -165,9 +161,57 @@ export default class Chess extends Component<HTMLTableElement> {
 
       case "k":
       case "K":
-        // TODO: castling
-        return Math.max(...distance) <= 2 && (movedDiagonally || movedStraight);
+        if (!(movedDiagonally || movedStraight)) {
+          return false;
+        }
+
+        if (Math.max(...distance) === 2) {
+          return this.doCastle(from, to);
+        }
+
+        return Math.max(...distance) === 1;
     }
+    return true;
+  }
+
+  doCastle(from: number[], to: number[]): boolean {
+    const maybeSwapWithRook = (row: number, column: number, rook: string) => {
+      const maybeRook = this.getPieceAt(row, column);
+      if (maybeRook?.dataset.piece !== rook) {
+        return false;
+      }
+
+      if (this.didJumpAPiece(from, [row, column])) {
+        return false;
+      }
+
+      // move the rook
+      this.element.rows[row].cells[column === 1 ? 4 : 6].append(maybeRook);
+      return true;
+    };
+
+    // black castle
+    if (from[0] === 1 && from[1] === 5) {
+      if (to[1] == 7) {
+        return maybeSwapWithRook(from[0], 8, "r");
+      }
+
+      if (to[1] === 3) {
+        return maybeSwapWithRook(from[0], 1, "r");
+      }
+    }
+
+    if (from[0] === 8 && from[1] === 5) {
+      // white castle (has delicious burgers)
+      if (to[1] == 7) {
+        return maybeSwapWithRook(from[0], 8, "R");
+      }
+
+      if (to[1] === 3) {
+        return maybeSwapWithRook(from[0], 1, "R");
+      }
+    }
+
     return true;
   }
 
@@ -209,6 +253,12 @@ export default class Chess extends Component<HTMLTableElement> {
         )
         .join("")
         .replaceAll(/ +/g, (rep) => `${rep.length}`) + ` ${this.moveNumber}`
+    );
+  }
+
+  getPieceAt(row: number, column: number) {
+    return this.element.rows[row].cells[column].querySelector<HTMLDivElement>(
+      ".piece",
     );
   }
 }
