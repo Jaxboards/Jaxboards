@@ -34,7 +34,6 @@ img {
 }
 
 a {
-
   &:active,
   &:visited,
   &:link {
@@ -153,7 +152,6 @@ textarea {
 }
 
 .im {
-
   /* IM windows */
   & .ims {
     padding: 5px;
@@ -240,7 +238,8 @@ textarea {
       margin: 10px;
       font-size: 1.2rem;
       padding: 2px 25px;
-      background: url("/Service/Themes/Default/icons/inboxicons.png") 0 0 no-repeat;
+      background: url("/Service/Themes/Default/icons/inboxicons.png") 0 0
+        no-repeat;
     }
 
     & h2 {
@@ -306,7 +305,7 @@ textarea {
 
 /* Mod CP */
 #modcp {
-  &>.content {
+  & > .content {
     display: flex;
     flex-wrap: wrap;
   }
@@ -534,7 +533,6 @@ textarea {
 }
 
 #buddylist {
-
   & .name,
   & .status {
     margin-left: 50px;
@@ -863,10 +861,12 @@ textarea {
     content: "";
     position: absolute;
     inset: 3px;
-    background-image: linear-gradient(#2d0537 5%,
-        #3a165c 50%,
-        #23022a 70%,
-        #1d0422 85%);
+    background-image: linear-gradient(
+      #2d0537 5%,
+      #3a165c 50%,
+      #23022a 70%,
+      #1d0422 85%
+    );
     filter: blur(1px);
   }
 
@@ -1027,7 +1027,8 @@ textarea {
     padding: 0;
 
     & li {
-      background: url("/Service/Themes/Default/icons/pathsplitter.png") no-repeat;
+      background: url("/Service/Themes/Default/icons/pathsplitter.png")
+        no-repeat;
       padding-left: 20px;
       margin-right: 10px;
       float: left;
@@ -1062,7 +1063,8 @@ textarea {
     border-right: none;
 
     &::first-letter {
-      background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
+      background: url("/Service/Themes/Default/icons/last.gif") center left
+        no-repeat;
       padding-left: 15px;
     }
 
@@ -1147,7 +1149,8 @@ textarea {
   }
 
   & .last_post::first-letter {
-    background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
+    background: url("/Service/Themes/Default/icons/last.gif") center left
+      no-repeat;
     padding-left: 15px;
   }
 
@@ -1170,11 +1173,11 @@ textarea {
   }
 }
 
-.locked .topic>a:first-child::before {
+.locked .topic > a:first-child::before {
   content: "🔒";
 }
 
-.pinned .topic>a:first-child {
+.pinned .topic > a:first-child {
   font-style: italic;
 
   &::before {
@@ -1213,7 +1216,8 @@ textarea {
     color: #e77700;
 
     &::first-letter {
-      background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
+      background: url("/Service/Themes/Default/icons/last.gif") center left
+        no-repeat;
       padding-left: 15px;
     }
   }
@@ -1297,7 +1301,8 @@ textarea {
   & .quotepost {
     padding-left: 18px;
     padding-bottom: 2px;
-    background: url("/Service/Themes/Default/icons/posticons.png") no-repeat top left;
+    background: url("/Service/Themes/Default/icons/posticons.png") no-repeat top
+      left;
   }
 
   & textarea {
@@ -1570,7 +1575,8 @@ textarea {
   & .addpoll {
     padding: 0 20px;
     margin: 10px;
-    background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat top left;
+    background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat
+      top left;
   }
 }
 
@@ -1702,7 +1708,7 @@ textarea {
     width: 14%;
     border: 1px solid var(--black);
 
-    &>div {
+    & > div {
       height: 100%;
       position: relative;
     }
@@ -1730,7 +1736,7 @@ textarea {
 .box {
   margin: 10px 0;
 
-  &>.title {
+  & > .title {
     position: relative;
     background: linear-gradient(45deg, var(--deep-purple), rgb(0 0 0 / 50%));
     padding: 7px;
@@ -1760,7 +1766,7 @@ textarea {
   & .content {
     background: var(--black-bg-transparent);
 
-    &>.error {
+    & > .error {
       margin: 0;
       padding: 10px;
     }
@@ -1788,7 +1794,8 @@ textarea {
 
 #notification.newmessage {
   padding-left: 60px;
-  background: url("/Service/Themes/Default/icons/newmessage.png") no-repeat 20px center var(--purple);
+  background: url("/Service/Themes/Default/icons/newmessage.png") no-repeat 20px
+    center var(--purple);
 }
 
 .pages .active {
@@ -1887,7 +1894,8 @@ textarea {
   & .stats {
     margin-top: 10px;
     padding: 10px 25px;
-    background: url("/Service/Themes/Default/icons/boardstats.png") left center no-repeat;
+    background: url("/Service/Themes/Default/icons/boardstats.png") left center
+      no-repeat;
     border-top: 1px solid var(--border-blue);
   }
 }
@@ -2073,7 +2081,6 @@ a.mgroup4 {
 }
 
 #validname {
-
   &.valid,
   &.invalid {
     display: inline-block;
