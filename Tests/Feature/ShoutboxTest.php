@@ -112,7 +112,7 @@ final class ShoutboxTest extends FeatureTestCase
         ));
 
         DOMAssert::assertSelectEquals(
-            '#shoutbox .error',
+            '.error',
             'You must be logged in to shout!',
             1,
             $page,
