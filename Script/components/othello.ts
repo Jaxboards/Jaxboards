@@ -114,7 +114,7 @@ export default class Othello extends Component<HTMLTableElement> {
   }
 
   getPieceAt(row: number, column: number) {
-    if (row < 0 || column < 0) return;
+    if (row < 0 || column < 0 || row >= 8 || column >= 8) return;
 
     return (
       this.element.rows[row].cells[column].querySelector<HTMLDivElement>(
