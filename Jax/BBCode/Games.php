@@ -6,6 +6,7 @@ namespace Jax\BBCode;
 
 use function array_key_exists;
 use function explode;
+use function mb_substr_count;
 use function preg_replace_callback;
 use function str_repeat;
 use function trim;
@@ -181,8 +182,8 @@ final class Games
 
         $table = 'table';
 
-        $whiteScore = substr_count($board, 'w');
-        $blackScore = substr_count($board, 'b');
+        $whiteScore = mb_substr_count($board, 'w');
+        $blackScore = mb_substr_count($board, 'b');
 
         return "<{$table} class=\"othello\">
             <tbody>{$board}</tbody>
