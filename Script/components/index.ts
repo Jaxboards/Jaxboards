@@ -1,20 +1,20 @@
-import AutoComplete from "../components/auto-complete";
-import Checkers from "../components/checkers";
-import Chess from "../components/chess";
-import CodeBlock from "../components/code-block";
-import CollapseBox from "../components/collapse-box";
-import DatePicker from "../components/date-picker";
-import Editor from "../components/editor";
-import Form from "../components/form";
-import IdleClock from "../components/idle-clock";
-import ImageGallery from "../components/image-gallery";
-import ImageResizer from "../components/image-resizer";
-import Link from "../components/link";
-import MediaPlayer from "../components/media-player";
-import PageList from "../components/page-list";
-import Switch from "../components/switch";
-import Tabs from "../components/tabs";
+import AutoComplete from "./auto-complete";
+import Checkers from "./checkers";
+import Chess from "./chess";
+import CodeBlock from "./code-block";
+import CollapseBox from "./collapse-box";
+import DatePicker from "./date-picker";
+import Editor from "./editor";
+import Form from "./form";
+import IdleClock from "./idle-clock";
+import ImageGallery from "./image-gallery";
+import ImageResizer from "./image-resizer";
+import Link from "./link";
+import MediaPlayer from "./media-player";
+import PageList from "./page-list";
 import Spoiler from "./spoiler";
+import Switch from "./switch";
+import Tabs from "./tabs";
 
 export default [
   AutoComplete,
