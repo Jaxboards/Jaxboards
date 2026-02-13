@@ -1,5 +1,6 @@
 import register, { Component } from "../JAX/component";
 import { getCellCoordinates, toDOM } from "../JAX/dom";
+import toast from "../JAX/toast";
 import sound from "../sound";
 
 const directions = [
@@ -30,20 +31,18 @@ export default class Othello extends Component<HTMLTableElement> {
         event.target instanceof HTMLTableCellElement &&
         !event.target.querySelector(".piece")
       ) {
-        this.placePiece(event.target);
-        this.moveNumber++;
+        if (this.placePiece(event.target)) {
+          this.moveNumber++;
+        }
       }
     });
 
     sound.load("chessdrop");
   }
 
-  placePiece(cell: HTMLTableCellElement) {
+  placePiece(cell: HTMLTableCellElement): boolean {
     const myColor = this.moveNumber % 2 ? "black" : "white";
     const oppositeColor = this.moveNumber % 2 ? "white" : "black";
-
-    const piece = toDOM(`<div class="piece ${myColor}"></div>`);
-    cell.append(piece);
 
     // traverse outwards in all 8 directions and record any pieces that need flipping
     const flippable: HTMLDivElement[][] = Array.from({ length: 8 }, () => []);
@@ -85,10 +84,21 @@ export default class Othello extends Component<HTMLTableElement> {
       }
     }
 
-    flippable.flat().forEach((piece) => {
+    const toFlip = flippable.flat();
+
+    // Invalid move! Placed pieces _must_ capture.
+    if (!toFlip.length) {
+      toast.error("Invalid move! You must capture opposing pieces.");
+      return false;
+    }
+
+    toFlip.forEach((piece) => {
       piece.classList.add(myColor);
       piece.classList.remove(oppositeColor);
     });
+
+    cell.append(toDOM(`<div class="piece ${myColor}"></div>`));
+    return true;
   }
 
   get moveNumber() {
