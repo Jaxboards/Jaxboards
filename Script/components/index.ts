@@ -18,8 +18,8 @@ import Tabs from "./tabs";
 
 export default [
   AutoComplete,
-  Chess,
   Checkers,
+  Chess,
   CodeBlock,
   CollapseBox,
   DatePicker,
@@ -31,7 +31,7 @@ export default [
   Link,
   MediaPlayer,
   PageList,
-  Switch,
   Spoiler,
+  Switch,
   Tabs,
 ];
