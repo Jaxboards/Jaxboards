@@ -266,7 +266,6 @@ body {
     position: relative;
     transform-style: preserve-3d;
     transition: all 1s;
-    cursor: pointer;
 
     &.white {
       transform: rotateY(180deg);
