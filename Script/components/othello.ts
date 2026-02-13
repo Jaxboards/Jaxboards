@@ -34,6 +34,7 @@ export default class Othello extends Component<HTMLTableElement> {
         if (this.placePiece(event.target)) {
           this.updateScore();
           this.moveNumber++;
+          sound.play("chessdrop");
 
           navigator.clipboard.writeText(
             `[othello]${this.getGameState()}[/othello]`,
