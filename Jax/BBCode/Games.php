@@ -148,6 +148,39 @@ final class Games
         return $this->renderCheckerBoard($pieces, 'checkers', $moveNumber);
     }
 
+    public function bbcodeOthelloCallback(array $match): string
+    {
+        $state = $match[1] ?: '8/8/8/3bw3/3wb3/8/8/8';
+
+        // replace numbers with empty squares
+        $state = preg_replace_callback(
+            '/[0-8]/',
+            static fn($match) => str_repeat(' ', (int) $match[0]),
+            $state,
+        );
+
+        $state = explode('/', $state);
+
+        $board = '';
+
+        for ($row = 0; $row < 8; $row++) {
+            $cells = '';
+            for ($col = 0; $col < 8; $col++) {
+                $piece = $state[$row][$col] ?? '';
+
+                if (trim($piece)) {
+                    $color = $piece === 'b' ? 'black' : 'white';
+                    $piece = "<div class=\"piece {$color}\"></div>";
+                }
+
+                $cells .= "<td>{$piece}</td>";
+            }
+            $board .= "<tr>{$cells}</tr>";
+        }
+        $table = 'table';
+        return "<{$table} class=\"othello\">{$board}</{$table}>";
+    }
+
     /**
      * Renders a checkerboard.
      *

@@ -65,10 +65,11 @@ final class BBCode
         'header' => '/\[h([1-6])\](.*)\[\/h\1\]/Usi',
         'image' => '/\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[\/img\]/Ui',
         'list' => '/\[(ul|ol)\](.*)\[\/\1\]/Usi',
+        'othello' => '/\[othello\](.*?)\[\/othello\]/is',
         'quote' => '/\[quote(?>=([^\]]+))?\](.*?)\[\/quote\]\r?\n?/is',
         'size' => '/\[size=([0-4]?\d)(px|pt|em|)\](.*)\[\/size\]/Usi',
         'table' => '/\[table\](.*)\[\/table\]/Usi',
-        'video' => '/\[video\](.*)\[\/video\]/Ui',
+        'video' => '/\[video\](.*)\[\/video\]/Usi',
     ];
 
     public function __construct(
@@ -246,6 +247,7 @@ final class BBCode
             'chess' => $this->games->bbcodeChessCallback(...),
             'checkers' => $this->games->bbcodeCheckersCallback(...),
             'list' => $this->bbcodeListCallback(...),
+            'othello' => $this->games->bbcodeOthelloCallback(...),
             'quote' => $this->bbcodeQuoteCallback(...),
             'size' => $this->bbcodeSizeCallback(...),
             'table' => $this->bbcodeTableCallback(...),

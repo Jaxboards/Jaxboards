@@ -248,3 +248,30 @@ body {
 .checkerboard.checkers .piece {
   font-size: 20px;
 }
+
+.othello {
+  background: #009045;
+  border-collapse: collapse;
+  border: 10px inset #000;
+
+  td {
+    border: 2px solid #00dc69 !important;
+    height: 30px;
+    width: 30px;
+  }
+
+  .piece {
+    border-radius: 100%;
+    height: 30px;
+    width: 30px;
+    background: #000;
+
+    &.black {
+      background: #000;
+    }
+
+    &.white {
+      background: #fff;
+    }
+  }
+}
