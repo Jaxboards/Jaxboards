@@ -34,6 +34,12 @@ export default class Othello extends Component<HTMLTableElement> {
         if (this.placePiece(event.target)) {
           this.updateScore();
           this.moveNumber++;
+
+          navigator.clipboard.writeText(
+            `[othello]${this.getGameState()}[/othello]`,
+          );
+
+          toast.success("BBCode copied to clipboard");
         }
       }
     });
@@ -136,6 +142,23 @@ export default class Othello extends Component<HTMLTableElement> {
   }
 
   getGameState() {
-    return "";
+    const state: string[] = [];
+
+    for (let row = 0; row < 8; row++) {
+      state.push("");
+
+      for (let col = 0; col < 8; col++) {
+        const piece = this.getPieceAt(row, col);
+        if (!piece) {
+          state[row] += " ";
+        } else if (piece.classList.contains("white")) {
+          state[row] += "w";
+        } else if (piece.classList.contains("black")) {
+          state[row] += "b";
+        }
+      }
+    }
+
+    return state.join("/").replaceAll(/ +/g, (match) => `${match.length}`);
   }
 }
