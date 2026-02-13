@@ -98,7 +98,7 @@ export default class Othello extends Component<HTMLTableElement> {
 
     // Invalid move! Placed pieces _must_ capture.
     if (!toFlip.length) {
-      toast.error("Invalid move! You must capture opposing pieces.");
+      toast.error("Invalid move! You must capture opposing pieces.", 3000);
       return false;
     }
 
