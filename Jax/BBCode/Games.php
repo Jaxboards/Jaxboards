@@ -159,7 +159,7 @@ final class Games
             (string) $state,
         );
 
-        $state = explode('/', $state);
+        $state = explode('/', (string) $state);
 
         $board = '';
 
