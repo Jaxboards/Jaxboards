@@ -261,17 +261,45 @@ body {
   }
 
   .piece {
-    border-radius: 100%;
-    height: 30px;
-    width: 30px;
-    background: #000;
-
-    &.black {
-      background: #000;
-    }
+    height: 100%;
+    width: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: all 1s;
+    cursor: pointer;
 
     &.white {
-      background: #fff;
+      transform: rotateY(180deg);
+    }
+
+    &,
+    &:before,
+    &:after {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 100%;
+    }
+
+    &:before,
+    &:after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      content: "";
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+    }
+
+    &:before {
+      background: black;
+    }
+
+    &:after {
+      background: white;
+      transform: rotateY(180deg);
     }
   }
 }
