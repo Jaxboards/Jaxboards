@@ -235,7 +235,7 @@ final class BBCode
             'header' => '<h$1>$2</h$1>',
             'image' => '<img src="$2" title="$1" alt="$1" class="bbcodeimg">',
             'italic' => '<em>$1</em>',
-            'spoiler' => '<span class="spoilertext">$1</span>',
+            'spoiler' => '<button class="spoilertext as-text">$1</button>',
             'strikethrough' => '<span style="text-decoration:line-through">$1</span>',
             'underline' => '<span style="text-decoration:underline">$1</span>',
             // Consider adding nofollow if admin approval of new accounts is not enabled

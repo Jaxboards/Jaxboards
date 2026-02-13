@@ -5,6 +5,14 @@ body {
   padding: 0;
 }
 
+.as-text {
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
 .editorframe {
   width: 100%;
   border: 1px solid #000;
