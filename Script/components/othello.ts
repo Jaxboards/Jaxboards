@@ -32,10 +32,13 @@ export default class Othello extends Component<HTMLTableElement> {
         !event.target.querySelector(".piece")
       ) {
         if (this.placePiece(event.target)) {
+          this.updateScore();
           this.moveNumber++;
         }
       }
     });
+
+    this.updateScore();
 
     sound.load("chessdrop");
   }
@@ -121,6 +124,15 @@ export default class Othello extends Component<HTMLTableElement> {
         ".piece",
       ) ?? undefined
     );
+  }
+
+  updateScore() {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.element.querySelector<HTMLSpanElement>(".score-white")!.innerHTML =
+      this.element.querySelectorAll(".piece.white").length + "";
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.element.querySelector<HTMLSpanElement>(".score-black")!.innerHTML =
+      this.element.querySelectorAll(".piece.black").length + "";
   }
 
   getGameState() {

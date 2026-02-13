@@ -181,7 +181,13 @@ final class Games
 
         $table = 'table';
 
-        return "<{$table} class=\"othello\">{$board}</{$table}>";
+        return "<{$table} class=\"othello\">
+            <tbody>{$board}</tbody>
+            <tfoot>
+                <td colspan=\"4\">White: <span class=\"score-white\">2</span></td>
+                <td colspan=\"4\">Black: <span class=\"score-black\">2</span></td>
+            </tfoot>
+        </{$table}>";
     }
 
     /**
