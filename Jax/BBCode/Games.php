@@ -156,28 +156,31 @@ final class Games
         $state = preg_replace_callback(
             '/[0-8]/',
             static fn($match) => str_repeat(' ', (int) $match[0]),
-            $state,
+            (string) $state,
         );
 
         $state = explode('/', $state);
 
         $board = '';
 
-        for ($row = 0; $row < 8; $row++) {
+        for ($row = 0; $row < 8; ++$row) {
             $cells = '';
-            for ($col = 0; $col < 8; $col++) {
+            for ($col = 0; $col < 8; ++$col) {
                 $piece = $state[$row][$col] ?? '';
 
-                if (trim($piece)) {
+                if (trim($piece) !== '' && trim($piece) !== '0') {
                     $color = $piece === 'b' ? 'black' : 'white';
                     $piece = "<div class=\"piece {$color}\"></div>";
                 }
 
                 $cells .= "<td>{$piece}</td>";
             }
+
             $board .= "<tr>{$cells}</tr>";
         }
+
         $table = 'table';
+
         return "<{$table} class=\"othello\">{$board}</{$table}>";
     }
 
