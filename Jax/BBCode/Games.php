@@ -181,11 +181,14 @@ final class Games
 
         $table = 'table';
 
+        $whiteScore = substr_count($board, 'w');
+        $blackScore = substr_count($board, 'b');
+
         return "<{$table} class=\"othello\">
             <tbody>{$board}</tbody>
             <tfoot>
-                <td colspan=\"4\">White: <span class=\"score-white\">2</span></td>
-                <td colspan=\"4\">Black: <span class=\"score-black\">2</span></td>
+                <td colspan=\"4\">White: <span class=\"score-white\">{$whiteScore}</span></td>
+                <td colspan=\"4\">Black: <span class=\"score-black\">{$blackScore}</span></td>
             </tfoot>
         </{$table}>";
     }
