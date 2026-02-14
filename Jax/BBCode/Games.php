@@ -151,7 +151,9 @@ final class Games
 
     public function bbcodeOthelloCallback(array $match): string
     {
-        $state = $match[1] ?: '8/8/8/3bw3/3wb3/8/8/8';
+        $parts = explode(' ', $match[1]);
+        $state = $parts[0] ?: '8/8/8/3bw3/3wb3/8/8/8';
+        $moveNumber = (int) ($parts[1] ?? '1');
 
         // replace numbers with empty squares
         $state = preg_replace_callback(
@@ -185,7 +187,7 @@ final class Games
         $whiteScore = mb_substr_count($board, 'w');
         $blackScore = mb_substr_count($board, 'b');
 
-        return "<{$table} class=\"othello\">
+        return "<{$table} class=\"othello\" data-move-number=\"{$moveNumber}\">
             <tbody>{$board}</tbody>
             <tfoot>
                 <td colspan=\"4\">White: <span class=\"score-white\">{$whiteScore}</span></td>

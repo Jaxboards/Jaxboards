@@ -126,10 +126,6 @@ export default class Othello extends Component<HTMLTableElement> {
     this.element.dataset.moveNumber = `${moveNumber}`;
   }
 
-  isValidMove() {
-    return true;
-  }
-
   getPieceAt(row: number, col: number) {
     // OOB check
     if (row < 0 || col < 0 || row >= 8 || col >= 8) return;
@@ -171,6 +167,9 @@ export default class Othello extends Component<HTMLTableElement> {
       }
     }
 
-    return state.join("/").replaceAll(/ +/g, (match) => `${match.length}`);
+    return [
+      state.join("/").replaceAll(/ +/g, (match) => `${match.length}`),
+      this.moveNumber,
+    ].join(" ");
   }
 }
