@@ -11,7 +11,6 @@ declare(strict_types=1);
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards on Github
  */
 
-// phpcs:disable SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable
 return json_decode(
     <<<'JSON'
         {
@@ -32,4 +31,3 @@ return json_decode(
         JSON,
     true,
 );
-// phpcs:enable

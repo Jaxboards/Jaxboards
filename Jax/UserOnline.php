@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-// phpcs:disable SlevomatCodingStandard.Classes.ForbiddenPublicProperty
 final class UserOnline
 {
     public bool $birthday;
@@ -40,5 +39,3 @@ final class UserOnline
         return $this->hide ? $this->readDate : $this->lastUpdate;
     }
 }
-
-// phpcs:enable

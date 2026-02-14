@@ -47,9 +47,6 @@ final class UserTest extends UnitTestCase
 {
     private string $encodedForumFlags;
 
-    // phpcs:disable SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder
-    // disable array order because we have to match the output order from the
-    // code we're testing
     /**
      * @var array<int,array<string,bool>>
      */
@@ -71,8 +68,6 @@ final class UserTest extends UnitTestCase
             'poll' => false,
         ],
     ];
-
-    // phpcs:enable
 
     #[Override]
     protected function setUp(): void

@@ -59,9 +59,6 @@ final class ForumTree
         }
     }
 
-    /**
-     * @psalm-suppress UnsupportedPropertyReferenceUsage
-     */
     private function addForum(Forum $forum): void
     {
         $path = array_filter(
@@ -69,7 +66,6 @@ final class ForumTree
             static fn($pathId): bool => (bool) $pathId,
         );
 
-        // phpcs:ignore SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference
         $node = &$this->tree;
 
         foreach ($path as $pathId) {
@@ -77,7 +73,6 @@ final class ForumTree
                 $node[$pathId] = [];
             }
 
-            // phpcs:ignore SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference
             $node = &$node[$pathId];
         }
 

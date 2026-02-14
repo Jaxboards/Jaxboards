@@ -188,8 +188,6 @@ final readonly class Forums
                 ]),
                 'content' => $subforums !== []
                     ? $this->printForumTree(
-                        // phpstan hates recursion
-                        // @phpstan-ignore argument.type
                         $subforums,
                         $forums,
                         $highlight,
@@ -397,8 +395,8 @@ final readonly class Forums
 
         $this->page->addContentBox(
             ($forum ? 'Edit' : 'Create')
-            . ' Forum'
-            . ($forum ? ' - ' . $this->textFormatting->blockhtml($forum->title) : ''),
+                . ' Forum'
+                . ($forum ? ' - ' . $this->textFormatting->blockhtml($forum->title) : ''),
             $page,
         );
         $this->page->addContentBox('Moderators', $moderators);

@@ -20,16 +20,21 @@ literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000 }
 
 [analyzer]
-plugins = []
+allow-possibly-undefined-array-keys = false
+analyze-dead-code = false
+check-arrow-function-missing-type-hints = true
+check-closure-missing-type-hints = true
+check-missing-override = true
+check-missing-type-hints = true
+check-throws = true
+enforce-class-finality = true
 find-unused-definitions = true
 find-unused-expressions = true
-analyze-dead-code = false
-memoize-properties = true
-allow-possibly-undefined-array-keys = false
-check-throws = true
-check-missing-override = true
 find-unused-parameters = true
-strict-list-index-checks = true
-no-boolean-literal-comparison = false
-check-missing-type-hints = false
+memoize-properties = true
+no-boolean-literal-comparison = true
+plugins = []
 register-super-globals = true
+require-api-or-internal = true
+strict-list-index-checks = true
+trust-existence-checks = false

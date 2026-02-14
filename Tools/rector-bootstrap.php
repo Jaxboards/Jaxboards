@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * Bootstrap file for phpstan and rector.
+ * Bootstrap file for rector.
  *
  * Ensures that custom autoloading and other mechanisms are in place to aid the
  * static analysis

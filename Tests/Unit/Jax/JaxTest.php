@@ -40,7 +40,6 @@ final class JaxTest extends UnitTestCase
 
     private Jax $jax;
 
-    // phpcs:disable SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder
     /**
      * @var array<int,array<string,bool>>
      */
@@ -87,8 +86,6 @@ final class JaxTest extends UnitTestCase
             'poll' => true,
         ],
     ];
-
-    // phpcs:enable SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder
 
     #[Override]
     protected function setUp(): void

@@ -99,22 +99,10 @@ use of some PHP tools. We're using
 run composer commands with `bun`, so composer packages should be installed after
 you run `bun install`.
 
-#### PHP_CodeSniffer
-
-[PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) is basically the
-equivalent of Stylelint for PHP. It also includes a tool to automatically fix
-fixable issues, which helps keep code looking great.
-
-Run on all files with the following command in the Jaxboards directory:
+#### PHP Lint
 
 ```bash
-bun run phpcs
-```
-
-And run this in the Jaxboards directory to run the fixer tool on all files:
-
-```bash
-bun run phpcbf
+bun run lint
 ```
 
 ### Tests

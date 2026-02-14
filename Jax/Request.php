@@ -10,7 +10,6 @@ use function setcookie;
 
 final class Request
 {
-    // phpcs:ignore SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty
     public RequestStringGetter $asString;
 
     /**
@@ -39,8 +38,6 @@ final class Request
     private array $server = [];
 
     /**
-     * @SuppressWarnings("PHPMD.Superglobals")
-     *
      * @param array<mixed> $get
      * @param array<mixed> $post
      * @param array<mixed> $cookie

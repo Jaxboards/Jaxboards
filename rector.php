@@ -24,7 +24,7 @@ use Rector\TypeDeclaration\Rector\While_\WhileNullableToInstanceofRector;
 return RectorConfig::configure()
     ->withAttributesSets()
     ->withBootstrapFiles([
-        __DIR__ . '/Tools/phpstan-bootstrap.php',
+        __DIR__ . '/Tools/rector-bootstrap.php',
     ])
     ->withCache(
         cacheDirectory: '/tmp/rector',

@@ -105,8 +105,8 @@ final class Session
             // Only exists to replace serialize with json_encode
             $this->vars = (
                 str_starts_with($session->vars, '{')
-                    ? json_decode($session->vars, true, flags: JSON_THROW_ON_ERROR)
-                    : unserialize($session->vars)
+                ? json_decode($session->vars, true, flags: JSON_THROW_ON_ERROR)
+                : unserialize($session->vars)
             ) ?: [];
 
             return;
@@ -120,17 +120,11 @@ final class Session
         return $this->modelsSession;
     }
 
-    /**
-     * @SuppressWarnings("PHPMD.Superglobals")
-     */
     public function getPHPSessionValue(string $field): mixed
     {
         return $this->session[$field] ?? $_SESSION[$field] ?? null;
     }
 
-    /**
-     * @SuppressWarnings("PHPMD.Superglobals")
-     */
     public function setPHPSessionValue(string $field, int|string $value): int|string
     {
         return $_SESSION[$field] = $value;

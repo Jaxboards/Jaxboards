@@ -1,3 +1,0 @@
-COMPOSER_VERSION="$(./Tools/composer_version.php)"
-php "./node_modules/node-composer-runner/bin/composer.$COMPOSER_VERSION.phar" \
-  run-script parallel-lint
