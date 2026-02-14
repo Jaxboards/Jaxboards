@@ -1,0 +1,2 @@
+# Perform syntax/semantic check to make sure PHP is compilable
+composer lint -- -s
