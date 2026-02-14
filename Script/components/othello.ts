@@ -62,7 +62,10 @@ export default class Othello extends Component<HTMLTableElement> {
     const flippable: HTMLDivElement[][] = Array.from({ length: 8 }, () => []);
     const done = Array.from({ length: 8 }, () => false);
 
-    const coords = getCellCoordinates(cell);
+    const [row, col] = getCellCoordinates(cell);
+
+    // OOB check
+    if (row < 0 || col < 0 || row >= 8 || col >= 8) return false;
 
     for (let i = 1; i <= 8; i++) {
       let piece: HTMLDivElement | undefined;
@@ -73,8 +76,8 @@ export default class Othello extends Component<HTMLTableElement> {
         }
 
         piece = this.getPieceAt(
-          coords[0] + i * directions[direction][0],
-          coords[1] + i * directions[direction][1],
+          row + i * directions[direction][0],
+          col + i * directions[direction][1],
         );
 
         // got to the edge of the board and did not find same color
@@ -127,11 +130,12 @@ export default class Othello extends Component<HTMLTableElement> {
     return true;
   }
 
-  getPieceAt(row: number, column: number) {
-    if (row < 0 || column < 0 || row >= 8 || column >= 8) return;
+  getPieceAt(row: number, col: number) {
+    // OOB check
+    if (row < 0 || col < 0 || row >= 8 || col >= 8) return;
 
     return (
-      this.element.rows[row].cells[column].querySelector<HTMLDivElement>(
+      this.element.rows[row].cells[col].querySelector<HTMLDivElement>(
         ".piece",
       ) ?? undefined
     );
