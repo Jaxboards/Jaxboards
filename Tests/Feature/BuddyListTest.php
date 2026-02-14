@@ -124,9 +124,9 @@ final class BuddyListTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('.contact .name', 'Admin', 1, $window[1]['content']);
 
         $activity = Activity::selectOne();
-        static::assertSame('buddy_add', $activity->type);
-        static::assertSame(1, $activity->uid);
-        static::assertSame(1, $activity->affectedUser);
+        static::assertSame('buddy_add', $activity?->type);
+        static::assertSame(1, $activity?->uid);
+        static::assertSame(1, $activity?->affectedUser);
     }
 
     public function testRemoveBuddy(): void
@@ -147,7 +147,7 @@ final class BuddyListTest extends FeatureTestCase
         DOMAssert::assertSelectEquals('.contact .name', 'Admin', 0, $window[1]['content']);
 
         $member = Member::selectOne(1);
-        static::assertSame('', $member->friends);
+        static::assertSame('', $member?->friends);
     }
 
     public function testBlock(): void
@@ -170,7 +170,7 @@ final class BuddyListTest extends FeatureTestCase
         DOMAssert::assertSelectCount('.contact.blocked', 1, $window[1]['content']);
 
         $member = Member::selectOne(1);
-        static::assertSame('1', $member->enemies);
+        static::assertSame('1', $member?->enemies);
     }
 
     public function testUnblock(): void
@@ -193,6 +193,6 @@ final class BuddyListTest extends FeatureTestCase
         DOMAssert::assertSelectCount('.contact.blocked', 0, $window[1]['content']);
 
         $member = Member::selectOne(1);
-        static::assertSame('', $member->enemies);
+        static::assertSame('', $member?->enemies);
     }
 }

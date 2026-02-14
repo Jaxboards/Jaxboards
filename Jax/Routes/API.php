@@ -43,6 +43,7 @@ final readonly class API implements Route
         private User $user,
     ) {}
 
+    #[\Override]
     public function route(array $params): void
     {
         $this->page->earlyFlush(match ($params['method']) {

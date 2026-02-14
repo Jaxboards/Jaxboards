@@ -31,6 +31,7 @@ final class Ticker implements Route
         private readonly User $user,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         if ($this->request->isJSNewLocation() || !$this->request->isJSAccess()) {

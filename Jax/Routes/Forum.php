@@ -66,6 +66,7 @@ final class Forum implements Route
         private readonly User $user,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         $page = (int) $this->request->asString->both('page');

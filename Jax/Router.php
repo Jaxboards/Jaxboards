@@ -251,6 +251,6 @@ final class Router
             return true;
         }
 
-        return $this->config->getSetting('boardoffline') && !$this->user->getGroup()->canViewOfflineBoard;
+        return $this->config->getSetting('boardoffline') && !$this->user->getGroup()?->canViewOfflineBoard;
     }
 }

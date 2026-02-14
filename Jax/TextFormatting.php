@@ -202,11 +202,11 @@ final readonly class TextFormatting
         ) {
             $inner = match (true) {
                 (bool) preg_match('/pid=(\d+)/', $parts['query'] ?? '', $postMatch) => "Post #{$postMatch[1]}",
-                (bool) preg_match('/^\/topic\/(\d+)/', $parts['path'] ?? '', $topicMatch) => "Topic #{$topicMatch[1]}",
+                (bool) preg_match('/^\/topic\/(\d+)/', $parts['path'], $topicMatch) => "Topic #{$topicMatch[1]}",
                 default => null,
             };
 
-            $stringURL = ($parts['path'] ?? '') . (array_key_exists('query', $parts) ? "?{$parts['query']}" : '');
+            $stringURL = $parts['path'] . (array_key_exists('query', $parts) ? "?{$parts['query']}" : '');
         }
 
         $inner ??= $stringURL;

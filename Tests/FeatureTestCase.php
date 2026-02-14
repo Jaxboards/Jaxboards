@@ -48,7 +48,7 @@ abstract class FeatureTestCase extends TestCase
         if (is_string($request)) {
             $parsed = parse_url($request);
             parse_str($parsed['query'] ?? '', $getParameters);
-            $getParameters['path'] = ltrim($parsed['path'] ?? '', '/');
+            $getParameters['path'] = ltrim($parsed['path'], '/');
             $request = new Request(get: $getParameters);
         }
 
@@ -82,7 +82,7 @@ abstract class FeatureTestCase extends TestCase
         $this->container->set(User::class, autowire()->constructorParameter('member', $member));
 
         $this->container->set(JaxSession::class, autowire()->constructorParameter('session', [
-            'uid' => $member->id ?? null,
+            'uid' => $member->id,
             ...$sessionOverrides,
         ]));
     }

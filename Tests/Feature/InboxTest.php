@@ -153,10 +153,10 @@ final class InboxTest extends FeatureTestCase
 
         DOMAssert::assertSelectEquals('#ucppage', 'Message successfully delivered.', 1, $page);
         $message = Message::selectOne(1);
-        static::assertSame('Hello there', $message->title);
-        static::assertSame('How have you been?', $message->message);
-        static::assertSame(1, $message->from);
-        static::assertSame(1, $message->to);
+        static::assertSame('Hello there', $message?->title);
+        static::assertSame('How have you been?', $message?->message);
+        static::assertSame(1, $message?->from);
+        static::assertSame(1, $message?->to);
     }
 
     public function testInboxFlagMessage(): void
@@ -170,7 +170,7 @@ final class InboxTest extends FeatureTestCase
         $this->assertRedirect('inbox', [], $page);
 
         $message = Message::selectOne(1);
-        static::assertSame(1, $message->flag);
+        static::assertSame(1, $message?->flag);
     }
 
     public function testInboxUnflagMessage(): void
@@ -184,7 +184,7 @@ final class InboxTest extends FeatureTestCase
         $this->assertRedirect('inbox', [], $page);
 
         $message = Message::selectOne(1);
-        static::assertSame(0, $message->flag);
+        static::assertSame(0, $message?->flag);
     }
 
     private function insertMessage(?array $messageProperties = []): void

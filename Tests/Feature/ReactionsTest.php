@@ -123,7 +123,7 @@ final class ReactionsTest extends FeatureTestCase
 
         $this->go('/topic/1?ratepost=1&niblet=1');
 
-        static::assertEquals(json_encode(['1' => [1]]), Post::selectOne(1)->rating);
+        static::assertEquals(json_encode(['1' => [1]]), Post::selectOne(1)?->rating);
     }
 
     public function testListReactions(): void

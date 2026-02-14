@@ -62,6 +62,7 @@ final readonly class Utils implements Adapter
         return $models;
     }
 
+    #[\Override]
     public function install(): void
     {
         $this->adapter->install();
@@ -79,6 +80,7 @@ final readonly class Utils implements Adapter
         $this->database->setPrefix($prefix);
     }
 
+    #[\Override]
     public function createTableQueryFromModel(Model $model): string
     {
         return $this->adapter->createTableQueryFromModel($model);

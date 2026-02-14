@@ -170,12 +170,12 @@ final class ServiceInstallTest extends TestCase
 
         // Do some spot checking to see if the installer
         // set up the tables based on form data
-        static::assertSame(1, Post::selectOne(1)->author);
+        static::assertSame(1, Post::selectOne(1)?->author);
 
         $member = Member::selectOne(1);
-        static::assertSame('Sean', $member->displayName);
-        static::assertSame('admin_email@jaxboards.com', $member->email);
-        static::assertTrue(password_verify('password', $member->pass));
+        static::assertSame('Sean', $member?->displayName);
+        static::assertSame('admin_email@jaxboards.com', $member?->email);
+        static::assertTrue(password_verify('password', $member?->pass));
 
         static::assertStringContainsString('Redirecting', $page);
     }
@@ -227,17 +227,17 @@ final class ServiceInstallTest extends TestCase
 
         // Do some spot checking to see if the installer
         // set up the tables based on form data
-        static::assertSame(1, Post::selectOne(1)->author);
+        static::assertSame(1, Post::selectOne(1)?->author);
 
         $member = Member::selectOne(1);
-        static::assertSame('Sean', $member->displayName);
-        static::assertSame('admin_email@jaxboards.com', $member->email);
-        static::assertTrue(password_verify('password', $member->pass));
+        static::assertSame('Sean', $member?->displayName);
+        static::assertSame('admin_email@jaxboards.com', $member?->email);
+        static::assertTrue(password_verify('password', $member?->pass));
 
         $this->container->get(Database::class)->setPrefix('');
         $directory = Directory::selectOne(1);
-        static::assertSame('admin_email@jaxboards.com', $directory->registrarEmail);
-        static::assertSame('support', $directory->boardname);
+        static::assertSame('admin_email@jaxboards.com', $directory?->registrarEmail);
+        static::assertSame('support', $directory?->boardname);
 
         static::assertStringContainsString('Redirecting', $page);
     }

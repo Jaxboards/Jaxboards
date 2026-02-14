@@ -120,9 +120,9 @@ final class PostTest extends FeatureTestCase
         $topic = Topic::selectOne(2);
         $post = ModelsPost::selectOne(2);
 
-        static::assertSame('Topic title', $topic->title);
-        static::assertSame('Topic description', $topic->subtitle);
-        static::assertSame('Post data', $post->post);
+        static::assertSame('Topic title', $topic?->title);
+        static::assertSame('Topic description', $topic?->subtitle);
+        static::assertSame('Post data', $post?->post);
     }
 
     public function testPostReply(): void
@@ -169,7 +169,7 @@ final class PostTest extends FeatureTestCase
         $post = ModelsPost::selectOne(2);
 
         static::assertNull($topic);
-        static::assertSame('Post data', $post->post);
+        static::assertSame('Post data', $post?->post);
         static::assertEquals($post->asArray(), hookStub()?->asArray());
     }
 
@@ -217,9 +217,9 @@ final class PostTest extends FeatureTestCase
         $topic = Topic::selectOne(1);
         $post = ModelsPost::selectOne(1);
 
-        static::assertSame('updated title', $topic->title);
-        static::assertSame('updated description', $topic->subtitle);
-        static::assertSame('updated post', $post->post);
+        static::assertSame('updated title', $topic?->title);
+        static::assertSame('updated description', $topic?->subtitle);
+        static::assertSame('updated post', $post?->post);
 
         $this->assertRedirect('topic', ['id' => '1', 'findpost' => '1'], $page);
     }

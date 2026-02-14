@@ -34,6 +34,7 @@ final readonly class BuddyList implements Route
         private UsersOnline $usersOnline,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         $this->page->command('preventNavigation');

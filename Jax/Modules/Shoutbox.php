@@ -52,6 +52,7 @@ final class Shoutbox implements Module
         $this->shoutlimit = (int) ($this->config->getSetting('shoutbox_num') ?? 5);
     }
 
+    #[\Override]
     public function init(): void
     {
         if (
@@ -121,7 +122,7 @@ final class Shoutbox implements Module
             $shoutHTML .= $this->formatShout($shout, $members[$shout->uid] ?? null);
         }
 
-        $this->session->addVar('sb_id', $shouts[0]->id ?? 0);
+        $this->session->addVar('sb_id', $shouts[0]->id);
 
         $soundShout = $this->user->get()->soundShout !== 0 ? 1 : 0;
 

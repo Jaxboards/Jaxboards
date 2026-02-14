@@ -52,6 +52,7 @@ final readonly class ModControls implements Route
         private User $user,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         if (!$this->user->isModerator() && !$this->user->get()->mod) {

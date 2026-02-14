@@ -37,6 +37,7 @@ final readonly class UserProfile implements Route
         private User $user,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         $userId = (int) $params['id'];

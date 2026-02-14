@@ -49,6 +49,7 @@ final readonly class UCP implements Route
         private User $user,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         if ($this->user->isGuest() || $this->user->get()->groupID === Groups::Banned->value) {

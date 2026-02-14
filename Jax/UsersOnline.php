@@ -114,7 +114,7 @@ final class UsersOnline
                 !$session->isBot
                 && $member?->birthdate
                 && $this->config->getSetting('birthdays')
-                && $this->date->dateAsCarbon($member->birthdate)?->format('n j') === $today;
+                && $this->date->dateAsCarbon($member?->birthdate)?->format('n j') === $today;
 
             $uid = $session->isBot ? $session->id : $session->uid;
             $name = $session->isBot ? $session->id : $member?->displayName;

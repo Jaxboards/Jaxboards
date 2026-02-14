@@ -28,6 +28,7 @@ final readonly class Calendar implements Route
         private Template $template,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         $this->page->setBreadCrumbs([

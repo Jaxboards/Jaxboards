@@ -16,6 +16,7 @@ final readonly class Snow implements Route
         private Page $page,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         $snowFlakeCount = (int) ($params['snowFlakeCount'] ?? 200);

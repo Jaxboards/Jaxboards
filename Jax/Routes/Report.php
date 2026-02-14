@@ -34,6 +34,7 @@ final readonly class Report implements Route
         private User $user,
     ) {}
 
+    #[\Override]
     public function route(array $params): void
     {
         $pid = (int) $this->request->both('pid');

@@ -59,6 +59,7 @@ final class Search implements Route
         private readonly User $user,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         $this->page->setBreadCrumbs([

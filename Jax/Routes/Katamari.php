@@ -13,6 +13,7 @@ final readonly class Katamari implements Route
         private Page $page,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         $this->page->command('loadscript', '/Script/eggs/katamari.js');

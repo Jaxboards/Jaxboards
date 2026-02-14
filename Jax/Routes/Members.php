@@ -38,6 +38,7 @@ final class Members implements Route
         private readonly Request $request,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         $page = (int) $this->request->asString->both('page');

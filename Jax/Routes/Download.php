@@ -25,6 +25,7 @@ final readonly class Download implements Route
         private Request $request,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         $this->downloadFile((int) $this->request->asString->both('id'));

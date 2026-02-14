@@ -13,6 +13,7 @@ final readonly class Earthbound implements Route
         private Page $page,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         $this->page->command('preventNavigation');

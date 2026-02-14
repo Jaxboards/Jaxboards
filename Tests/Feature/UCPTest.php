@@ -149,7 +149,7 @@ final class UCPTest extends FeatureTestCase
 
         static::assertStringContainsString('Email settings updated.', $page);
 
-        static::assertSame('jaxboards@jaxboards.com', Member::selectOne(2)->email);
+        static::assertSame('jaxboards@jaxboards.com', Member::selectOne(2)?->email);
     }
 
     public function testChangePassword(): void
@@ -166,7 +166,7 @@ final class UCPTest extends FeatureTestCase
         ]));
 
         static::assertStringContainsString('Password changed.', $page);
-        static::assertTrue(password_verify('newpass', Member::selectOne(2)->pass));
+        static::assertTrue(password_verify('newpass', Member::selectOne(2)?->pass));
     }
 
     public function testChangePasswordIncorrectCurrentPassword(): void
@@ -183,7 +183,7 @@ final class UCPTest extends FeatureTestCase
         ]));
 
         DOMAssert::assertSelectEquals('.error', 'The password you entered is incorrect.', 1, $page);
-        static::assertFalse(password_verify('newpass', Member::selectOne(2)->pass));
+        static::assertFalse(password_verify('newpass', Member::selectOne(2)?->pass));
     }
 
     public function testProfileForm(): void
@@ -222,26 +222,26 @@ final class UCPTest extends FeatureTestCase
         static::assertStringContainsString('Profile successfully updated.', $page);
 
         $member = Member::selectOne(2);
-        static::assertSame('DisplayName', $member->displayName);
-        static::assertSame('Full Name', $member->full_name);
-        static::assertSame('User Title', $member->usertitle);
-        static::assertSame('About me', $member->about);
-        static::assertSame('Location', $member->location);
-        static::assertSame('male', $member->gender);
-        static::assertSame('Skype', $member->contactSkype);
-        static::assertSame('Discord', $member->contactDiscord);
-        static::assertSame('YIM', $member->contactYIM);
-        static::assertSame('MSN', $member->contactMSN);
-        static::assertSame('GoogleChat', $member->contactGoogleChat);
-        static::assertSame('AIM', $member->contactAIM);
-        static::assertSame('Youtube', $member->contactYoutube);
-        static::assertSame('Steam', $member->contactSteam);
-        static::assertSame('Twitter', $member->contactTwitter);
-        static::assertSame('BlueSky', $member->contactBlueSky);
-        static::assertSame('http://google.com', $member->website);
+        static::assertSame('DisplayName', $member?->displayName);
+        static::assertSame('Full Name', $member?->full_name);
+        static::assertSame('User Title', $member?->usertitle);
+        static::assertSame('About me', $member?->about);
+        static::assertSame('Location', $member?->location);
+        static::assertSame('male', $member?->gender);
+        static::assertSame('Skype', $member?->contactSkype);
+        static::assertSame('Discord', $member?->contactDiscord);
+        static::assertSame('YIM', $member?->contactYIM);
+        static::assertSame('MSN', $member?->contactMSN);
+        static::assertSame('GoogleChat', $member?->contactGoogleChat);
+        static::assertSame('AIM', $member?->contactAIM);
+        static::assertSame('Youtube', $member?->contactYoutube);
+        static::assertSame('Steam', $member?->contactSteam);
+        static::assertSame('Twitter', $member?->contactTwitter);
+        static::assertSame('BlueSky', $member?->contactBlueSky);
+        static::assertSame('http://google.com', $member?->website);
 
         $date = $this->container->get(Date::class);
-        $birthdate = $date->datetimeAsCarbon($member->birthdate);
+        $birthdate = $date->datetimeAsCarbon($member?->birthdate);
 
         static::assertSame(1, $birthdate->month);
         static::assertSame(1, $birthdate->day);

@@ -33,6 +33,7 @@ final readonly class PrivateMessage implements Module
         private User $user,
     ) {}
 
+    #[\Override]
     public function init(): void
     {
         $instantMessage = $this->request->asString->post('im_im');

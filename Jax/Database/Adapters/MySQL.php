@@ -21,6 +21,7 @@ final readonly class MySQL implements Adapter
         private Database $database,
     ) {}
 
+    #[\Override]
     public function createTableQueryFromModel(Model $model): string
     {
         $table = $model::TABLE;
@@ -90,6 +91,7 @@ final readonly class MySQL implements Adapter
         ]);
     }
 
+    #[\Override]
     public function install(): void
     {
         $queries = [
@@ -127,7 +129,7 @@ final readonly class MySQL implements Adapter
         }
 
         $length = $column->length !== 0 ? "({$column->length})" : '';
-        $nullable = $column->nullable === false ? ' NOT NULL' : '';
+        $nullable = !$column->nullable ? ' NOT NULL' : '';
         $autoIncrement = $column->autoIncrement ? ' AUTO_INCREMENT' : '';
         $unsigned = $column->unsigned ? ' unsigned' : '';
         $default = $column->default !== null ? " DEFAULT '{$column->default}'" : '';

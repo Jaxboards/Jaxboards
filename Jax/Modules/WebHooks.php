@@ -44,6 +44,7 @@ final class WebHooks implements Module
         $this->webhooks = $this->config->get()['webhooks'] ?? [];
     }
 
+    #[\Override]
     public function init(): void
     {
         if ($this->webhooks === []) {
@@ -81,7 +82,7 @@ final class WebHooks implements Module
         $member = $this->user->get();
         $this->sendJSON($discord, [
             'username' => $member->displayName,
-            'avatar_url' => $member->avatar ?? $rootURL . '/Service/Themes/Default/avatars/default.gif',
+            'avatar_url' => $member->avatar,
             'content' => $content,
         ]);
     }

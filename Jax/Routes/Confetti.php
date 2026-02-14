@@ -16,6 +16,7 @@ final readonly class Confetti implements Route
         private Page $page,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         $count = (int) ($params['count'] ?? 1000);

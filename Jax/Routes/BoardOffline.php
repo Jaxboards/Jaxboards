@@ -21,6 +21,7 @@ final readonly class BoardOffline implements Route
         private Template $template,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         if ($this->request->isJSUpdate()) {

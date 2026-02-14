@@ -91,7 +91,7 @@ final readonly class Posting
             foreach (array_reverse($badWords, true) as $textRule) {
                 $table .= $this->page->render('posting/word-filter-row.html', [
                     'filter' => $textRule->needle,
-                    'filter_url_encoded' => rawurlencode((string) $textRule->needle),
+                    'filter_url_encoded' => rawurlencode($textRule->needle),
                     'result_code' => $this->textFormatting->blockhtml($textRule->replacement),
                 ]);
             }
@@ -164,7 +164,7 @@ final readonly class Posting
             foreach ($emoticons as $emoticon) {
                 $table .= $this->page->render('posting/emoticon-row.html', [
                     'emoticon' => $emoticon->needle,
-                    'emoticon_url_encoded' => rawurlencode((string) $emoticon->needle),
+                    'emoticon_url_encoded' => rawurlencode($emoticon->needle),
                     'smiley_url' => $emoticon->replacement,
                 ]);
             }

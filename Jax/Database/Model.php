@@ -190,8 +190,8 @@ abstract class Model
         $data = $this->asArray();
 
         // Don't insert empty id if it's autoincrement
-        if ($primaryKey?->autoIncrement && !$data[$primaryKey->name]) {
-            unset($data[$primaryKey->name]);
+        if ($primaryKey?->autoIncrement && !$data[$primaryKey?->name]) {
+            unset($data[$primaryKey?->name]);
         }
 
         $statement = $database->insert(static::TABLE, $data);

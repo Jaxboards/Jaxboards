@@ -26,7 +26,7 @@ abstract class TestCase extends PHPUnitTestCase
     /**
      * Set up for tests, runs before each test.
      */
-    #[Override]
+
     protected function setUp(): void
     {
         parent::setUp();

@@ -62,6 +62,7 @@ final class BoardIndex implements Route
         private readonly UsersOnline $usersOnline,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         match (true) {
@@ -220,7 +221,7 @@ final class BoardIndex implements Route
         }
 
         $stats = Stats::selectOne();
-        $lastRegisteredMember = $stats?->last_register !== null ? Member::selectOne($stats->last_register) : null;
+        $lastRegisteredMember = $stats?->last_register !== null ? Member::selectOne($stats?->last_register) : null;
 
         $usersOnline = $this->usersOnline->getUsersOnline();
         $usersOnlineCount = count(array_filter(

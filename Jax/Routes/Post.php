@@ -67,6 +67,7 @@ final class Post implements Route
         private readonly User $user,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         $this->tid = (int) $this->request->asString->both('tid');
@@ -170,7 +171,7 @@ final class Post implements Route
             $membersById = Member::joinedOn($posts, static fn(ModelsPost $modelsPost): int => $modelsPost->author);
 
             foreach ($posts as $post) {
-                $authorName = $membersById[$post->author]->name ?? '';
+                $authorName = $membersById[$post->author]->name;
                 $postData .= "[quote={$authorName}]{$post->post}[/quote]" . PHP_EOL;
             }
 
@@ -229,7 +230,7 @@ final class Post implements Route
         $this->page->command(
             'update',
             "#pid_{$modelsPost->id} .post_content",
-            $this->textFormatting->theWorks($modelsPost->post ?? ''),
+            $this->textFormatting->theWorks($modelsPost->post),
         );
         $this->page->command('preventNavigation');
     }

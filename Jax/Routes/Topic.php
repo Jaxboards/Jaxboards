@@ -75,6 +75,7 @@ final class Topic implements Route
         private readonly UsersOnline $usersOnline,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         $tid = (int) ($params['id'] ?? 0);

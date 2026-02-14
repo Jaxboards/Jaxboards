@@ -13,6 +13,7 @@ final readonly class Spin implements Route
         private Page $page,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         $this->page->command('script', <<<'JAVASCRIPT'

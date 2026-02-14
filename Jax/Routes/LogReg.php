@@ -65,6 +65,7 @@ final class LogReg implements Route
         private readonly User $user,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         match ($this->request->both('path')) {

@@ -23,6 +23,7 @@ final readonly class SQLite implements Adapter
         private Database $database,
     ) {}
 
+    #[\Override]
     public function createTableQueryFromModel(Model $model): string
     {
         $table = $model::TABLE;
@@ -89,6 +90,7 @@ final readonly class SQLite implements Adapter
         );
     }
 
+    #[\Override]
     public function install(): void {}
 
     private function fieldDefinition(Column $column): string
@@ -119,7 +121,7 @@ final readonly class SQLite implements Adapter
         }
 
         $length = $column->length !== 0 ? "({$column->length})" : '';
-        $nullable = !$column->autoIncrement && $column->nullable === false ? ' NOT NULL' : '';
+        $nullable = !$column->autoIncrement && !$column->nullable ? ' NOT NULL' : '';
         $autoIncrement = $column->autoIncrement ? ' PRIMARY KEY AUTOINCREMENT' : '';
         $default = $column->default !== null ? " DEFAULT '{$column->default}'" : '';
 

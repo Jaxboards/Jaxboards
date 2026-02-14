@@ -132,7 +132,7 @@ final readonly class App
         }
 
         foreach ($modules as $module) {
-            $fileInfo = $this->fileSystem->getFileInfo((string) $module);
+            $fileInfo = $this->fileSystem->getFileInfo($module);
             $moduleName = $fileInfo->getBasename('.' . $fileInfo->getExtension());
 
             $module = $this->container->get('Jax\Modules\\' . $moduleName);

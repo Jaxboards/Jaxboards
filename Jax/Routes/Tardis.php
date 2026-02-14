@@ -13,6 +13,7 @@ final readonly class Tardis implements Route
         private Page $page,
     ) {}
 
+    #[\Override]
     public function route($params): void
     {
         $this->page->command('script', <<<'JS'
