@@ -76,7 +76,7 @@ abstract class FeatureTestCase extends TestCase
         $members = $this->insertMembers($memberOverrides);
 
         if (!$member instanceof Member) {
-            $member = array_key_exists($member, $members) ? $members[$member] : null;
+            $member = $members[$member] ?? null;
         }
 
         if ($member) {
