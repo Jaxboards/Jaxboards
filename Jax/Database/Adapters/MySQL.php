@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Jax\Database\Adapters;
 
-use Override;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
 use Jax\Attributes\PrimaryKey;
 use Jax\Database\Database;
 use Jax\Database\Model;
+use Override;
 use ReflectionClass;
 
 use function array_merge;

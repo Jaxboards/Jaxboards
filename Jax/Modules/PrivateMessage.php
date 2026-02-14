@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Modules;
 
-use Override;
 use Carbon\Carbon;
 use Jax\Database\Database;
 use Jax\Interfaces\Module;
@@ -13,6 +12,7 @@ use Jax\Request;
 use Jax\Session;
 use Jax\TextFormatting;
 use Jax\User;
+use Override;
 
 use function explode;
 use function implode;

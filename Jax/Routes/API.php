@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
-use Override;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\Interfaces\Route;
@@ -17,6 +16,7 @@ use Jax\Request;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use Override;
 
 use function array_keys;
 use function array_values;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
-use Override;
 use Jax\Date;
 use Jax\Interfaces\Route;
 use Jax\Models\Forum;
@@ -17,6 +16,7 @@ use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 use Jax\User;
+use Override;
 
 final class Ticker implements Route
 {

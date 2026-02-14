@@ -95,7 +95,8 @@ final class IPAddress
             $this->ipBanCache,
             static fn($bannedIp): bool => (
                 $bannedIp === $ipAddress
-                || in_array(mb_substr((string) $bannedIp, -1), [':', '.'], true) && str_starts_with($ipAddress, (string) $bannedIp)
+                || in_array(mb_substr((string) $bannedIp, -1), [':', '.'], true)
+                && str_starts_with($ipAddress, (string) $bannedIp)
             ),
         );
     }

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
-use Override;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\Interfaces\Route;
 use Jax\Models\File;
 use Jax\Request;
+use Override;
 
 use function array_pop;
 use function count;

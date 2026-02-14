@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
-use Override;
 use Jax\Database\Database;
 use Jax\Interfaces\Route;
 use Jax\Models\Post;
@@ -13,6 +12,7 @@ use Jax\Page;
 use Jax\Request;
 use Jax\Template;
 use Jax\User;
+use Override;
 
 use function array_key_exists;
 use function mb_substr;

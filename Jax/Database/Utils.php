@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Database;
 
-use Override;
 use Jax\Database\Adapters\Adapter;
 use Jax\Database\Adapters\MySQL;
 use Jax\Database\Adapters\SQLite;
@@ -17,6 +16,7 @@ use Jax\Models\Shout;
 use Jax\Models\Skin;
 use Jax\Models\Stats;
 use Jax\Models\Topic;
+use Override;
 
 use function array_map;
 use function implode;

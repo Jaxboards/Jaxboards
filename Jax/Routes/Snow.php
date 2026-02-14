@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
-use Override;
 use Jax\Interfaces\Route;
 use Jax\Page;
+use Override;
 
 use function max;
 use function min;

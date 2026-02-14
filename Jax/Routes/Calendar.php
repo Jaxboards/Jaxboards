@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
-use Override;
 use Carbon\Carbon;
 use Jax\Date;
 use Jax\Interfaces\Route;
@@ -14,6 +13,7 @@ use Jax\Request;
 use Jax\Router;
 use Jax\Session;
 use Jax\Template;
+use Override;
 
 use function explode;
 use function gmdate;

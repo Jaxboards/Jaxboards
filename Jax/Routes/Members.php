@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
-use Override;
 use Jax\ContactDetails;
 use Jax\Database\Database;
 use Jax\Interfaces\Route;
@@ -16,6 +15,7 @@ use Jax\Page;
 use Jax\Request;
 use Jax\Router;
 use Jax\Template;
+use Override;
 
 use function array_filter;
 use function array_key_exists;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
-use Override;
 use Jax\ContactDetails;
 use Jax\Date;
 use Jax\Interfaces\Route;
@@ -18,6 +17,7 @@ use Jax\Routes\UserProfile\ProfileTabs;
 use Jax\Session;
 use Jax\Template;
 use Jax\User;
+use Override;
 
 use function array_map;
 use function explode;

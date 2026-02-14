@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
-use Override;
 use Jax\Config;
 use Jax\Interfaces\Route;
 use Jax\Page;
 use Jax\Request;
 use Jax\Template;
+use Override;
 
 use function nl2br;
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
-use Override;
 use Carbon\Carbon;
 use Jax\Config;
 use Jax\Database\Database;
@@ -23,6 +22,7 @@ use Jax\Template;
 use Jax\User;
 use Jax\UserOnline;
 use Jax\UsersOnline;
+use Override;
 
 use function array_filter;
 use function array_flip;

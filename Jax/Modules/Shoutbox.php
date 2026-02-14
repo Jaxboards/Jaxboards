@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Modules;
 
-use Override;
 use Jax\Config;
 use Jax\Database\Database;
 use Jax\Date;
@@ -21,6 +20,7 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use Override;
 
 use function ceil;
 use function mb_strlen;

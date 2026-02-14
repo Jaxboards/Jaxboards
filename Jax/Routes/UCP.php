@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
-use Override;
 use Carbon\Carbon;
 use Jax\Config;
 use Jax\Constants\Groups;
@@ -21,6 +20,7 @@ use Jax\Routes\UCP\Inbox;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use Override;
 
 use function filter_var;
 use function is_string;

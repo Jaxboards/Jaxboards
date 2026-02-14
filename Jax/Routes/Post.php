@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
-use Override;
 use Jax\Database\Database;
 use Jax\Hooks;
 use Jax\Interfaces\Route;
@@ -24,6 +23,7 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use Override;
 
 use function array_key_exists;
 use function explode;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Modules;
 
-use Override;
 use Curl\Curl;
 use Jax\BBCode;
 use Jax\Config;
@@ -14,6 +13,7 @@ use Jax\Models\Post;
 use Jax\Models\Topic;
 use Jax\Router;
 use Jax\User;
+use Override;
 
 use function json_encode;
 use function mb_strlen;
