@@ -331,7 +331,7 @@ final class Search implements Route
      */
     private function noResultsFound(array $terms): string
     {
-        $error = 'No results found. ' . 'Try refining your search, or using longer terms.';
+        $error = 'No results found. Try refining your search, or using longer terms.';
 
         $omitted = [];
         foreach ($terms as $term) {

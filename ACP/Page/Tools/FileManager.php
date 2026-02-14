@@ -80,7 +80,7 @@ final readonly class FileManager
             $page .= $this->page->success('Changes saved.');
         }
 
-        $posts = Post::selectMany("WHERE MATCH (`post`) AGAINST ('attachment') " . "AND post LIKE '%[attachment]%'");
+        $posts = Post::selectMany("WHERE MATCH (`post`) AGAINST ('attachment') AND post LIKE '%[attachment]%'");
         $linkedIn = [];
 
         foreach ($posts as $post) {

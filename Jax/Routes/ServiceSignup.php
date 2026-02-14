@@ -91,7 +91,7 @@ final readonly class ServiceSignup
         }
 
         if (preg_match('/\W/', $boardURL)) {
-            return 'board url needs to consist of letters, ' . 'numbers, and underscore only';
+            return 'board url needs to consist of letters, numbers, and underscore only';
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -103,7 +103,7 @@ final readonly class ServiceSignup
         }
 
         if (preg_match('/\W/', $username)) {
-            return 'username needs to consist of letters, ' . 'numbers, and underscore only';
+            return 'username needs to consist of letters, numbers, and underscore only';
         }
 
         $this->database->setPrefix('');

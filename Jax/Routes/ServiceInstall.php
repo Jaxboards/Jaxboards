@@ -170,7 +170,7 @@ final readonly class ServiceInstall
         if (mb_strlen((string) $adminUsername) > 50) {
             $errors[] = 'Admin username is too long';
         } elseif (preg_match('/\W/', (string) $adminUsername)) {
-            $errors[] = 'Admin username needs to consist of letters,' . 'numbers, and underscore only';
+            $errors[] = 'Admin username needs to consist of letters,numbers, and underscore only';
         }
 
         if (!$sqlHost || !$sqlUsername || !$sqlPassword || !$sqlDB) {

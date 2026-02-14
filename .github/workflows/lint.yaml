@@ -50,6 +50,7 @@ jobs:
           jq ".version = \"$VERSION\"" package.json > /tmp/package.json && \
           mv /tmp/package.json package.json
         shell: bash
+      - run: composer run-script --no-interaction format
       - run: composer run-script --no-interaction rector
       - run: bun run prettier
       - run: bun run eslint-fix

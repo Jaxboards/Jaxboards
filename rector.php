@@ -9,6 +9,7 @@
 declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\CodeQuality\Rector\Class_\ConvertStaticToSelfRector;
 use Rector\CodeQuality\Rector\ClassConstFetch\VariableConstFetchToClassConstFetchRector;
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\CodingStyle\Rector\Catch_\CatchExceptionNameMatchingTypeRector;
@@ -222,6 +223,9 @@ return RectorConfig::configure()
     )
     ->withRootFiles()
     ->withSkip([
+        // Conflicts with: https://mago.carthage.software/tools/linter/rules/consistency#assertion-style
+        ConvertStaticToSelfRector::class,
+
         // disable ! and empty rules which make the code noisy due to the
         // automated handling of it
         DisallowedEmptyRuleFixerRector::class,

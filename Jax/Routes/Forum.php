@@ -290,7 +290,7 @@ final class Forum implements Route
     private function renderSubforums(ModelsForum $forum): string
     {
         $subforums = ModelsForum::selectMany(
-            'WHERE path=? OR path LIKE ? ' . 'ORDER BY `order`',
+            'WHERE path=? OR path LIKE ? ORDER BY `order`',
             (string) $forum->id,
             "% {$forum->id}",
         );

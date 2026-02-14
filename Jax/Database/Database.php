@@ -13,6 +13,7 @@ use Pdo\Mysql;
 use Pdo\Pgsql;
 use Pdo\Sqlite;
 use PDOStatement;
+use SensitiveParameter;
 
 use function array_keys;
 use function array_map;
@@ -76,7 +77,7 @@ final class Database
     public function connect(
         string $host = '',
         string $user = '',
-        #[\SensitiveParameter] string $password = '',
+        #[SensitiveParameter] string $password = '',
         string $database = '',
         string $prefix = '',
         string $driver = '',

@@ -186,13 +186,7 @@ final readonly class Forums
                     'nofirstlevel',
                     $highlight && $forumId === $highlight ? 'highlight' : '',
                 ]),
-                'content' => $subforums !== []
-                    ? $this->printForumTree(
-                        $subforums,
-                        $forums,
-                        $highlight,
-                    )
-                    : '',
+                'content' => $subforums !== [] ? $this->printForumTree($subforums, $forums, $highlight) : '',
                 'id' => $forumId,
                 'mods' => $mods,
                 'title' => $forum->title,
@@ -395,8 +389,8 @@ final readonly class Forums
 
         $this->page->addContentBox(
             ($forum ? 'Edit' : 'Create')
-                . ' Forum'
-                . ($forum ? ' - ' . $this->textFormatting->blockhtml($forum->title) : ''),
+            . ' Forum'
+            . ($forum ? ' - ' . $this->textFormatting->blockhtml($forum->title) : ''),
             $page,
         );
         $this->page->addContentBox('Moderators', $moderators);

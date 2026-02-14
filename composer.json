@@ -53,9 +53,9 @@
     "twig/twig": "^3.23"
   },
   "scripts": {
-    "lint": [
-      "mago lint"
-    ],
+    "analyze": "mago analyze",
+    "lint": "mago lint",
+    "format": "mago format",
     "migrations": "php Tools/migrations.php",
     "rector": "rector",
     "test": [

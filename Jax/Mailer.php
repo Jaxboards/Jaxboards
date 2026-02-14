@@ -27,12 +27,12 @@ final readonly class Mailer
             $boardname . ' - ' . $topic,
             str_replace(['{BOARDNAME}', '{BOARDURL}', '{BOARDLINK}'], [$boardname, $boardurl, $boardlink], $message),
             'MIME-Version: 1.0'
-                . PHP_EOL
-                . 'Content-type:text/html;charset=iso-8859-1'
-                . PHP_EOL
-                . 'From: '
-                . $this->config->getSetting('mail_from')
-                . PHP_EOL,
+            . PHP_EOL
+            . 'Content-type:text/html;charset=iso-8859-1'
+            . PHP_EOL
+            . 'From: '
+            . $this->config->getSetting('mail_from')
+            . PHP_EOL,
         );
     }
 }

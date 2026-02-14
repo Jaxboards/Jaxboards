@@ -20,6 +20,7 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use SensitiveParameter;
 
 use function base64_encode;
 use function curl_exec;
@@ -198,7 +199,7 @@ final class LogReg implements Route
         $this->login($name, $pass1);
     }
 
-    private function login(?string $username = null, #[\SensitiveParameter] ?string $password = null): void
+    private function login(?string $username = null, #[SensitiveParameter] ?string $password = null): void
     {
         if ($username && $password) {
             if ($this->session->get()->isBot !== 0) {
@@ -390,8 +391,7 @@ final class LogReg implements Route
 
                     if (!$mailResult) {
                         $page .= $this->template->render('error', [
-                            'message' =>
-                                'There was a problem sending the email. ' . 'Please contact the administrator.',
+                            'message' => 'There was a problem sending the email. Please contact the administrator.',
                         ]);
                     } else {
                         $page .= $this->template->render('success', [
