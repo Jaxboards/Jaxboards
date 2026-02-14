@@ -27,14 +27,14 @@
   "prefer-stable": true,
   "require-dev": {
     "brianium/paratest": "^7.16",
+    "carthage-software/mago": "^1.8.0",
     "dg/bypass-finals": "^1.9",
     "joeymckenzie/nasastan": "^0.1.2",
     "phpunit/phpunit": "^12.5",
     "phpunit/phpunit-dom-assertions": "^3.7",
     "rector/rector": "^2.3",
     "seanjohnson08/mysqlite": "dev-main@dev",
-    "spatie/phpunit-snapshot-assertions": "^5.3",
-    "carthage-software/mago": "^1.8.0"
+    "spatie/phpunit-snapshot-assertions": "^5.3"
   },
   "require": {
     "composer": "2.9.5",
