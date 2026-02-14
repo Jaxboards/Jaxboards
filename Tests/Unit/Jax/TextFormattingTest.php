@@ -70,12 +70,9 @@ final class TextFormattingTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->container->set(
-            Request::class,
-            autowire()->constructorParameter('server', [
-                'HTTP_HOST' => 'jaxboards.com',
-            ]),
-        );
+        $this->container->set(Request::class, autowire()->constructorParameter('server', [
+            'HTTP_HOST' => 'jaxboards.com',
+        ]));
 
         // Router is used for URL generation, we don't care to test that here
         $this->container->set(Router::class, self::createStub(Router::class));
@@ -88,52 +85,39 @@ final class TextFormattingTest extends UnitTestCase
 
     public function testTheWorks(): void
     {
-        $result = $this->textFormatting->theWorks(
-            <<<'TEXT'
-                [code]hello[/code]
-                :)
-                world
-                TEXT,
-        );
+        $result = $this->textFormatting->theWorks(<<<'TEXT'
+            [code]hello[/code]
+            :)
+            world
+            TEXT);
 
-        static::assertSame(
-            <<<'HTML'
-                <div class="bbcode code ">hello</div><br>
-                <img src="/emoticons/keshaemotes/smile.gif" data-emoji=":)" alt=":)"><br>
-                world
-                HTML,
-            $result,
-        );
+        static::assertSame(<<<'HTML'
+            <div class="bbcode code ">hello</div><br>
+            <img src="/emoticons/keshaemotes/smile.gif" data-emoji=":)" alt=":)"><br>
+            world
+            HTML, $result);
     }
 
     #[DataProvider('linkifyDataProvider')]
     public function testLinkify(string $input, string $expectation): void
     {
-        static::assertEquals(
-            $expectation,
-            $this->textFormatting->linkify($input),
-        );
+        static::assertEquals($expectation, $this->textFormatting->linkify($input));
     }
 
     public static function linkifyDataProvider(): array
     {
         return [
-            ['http://google.com', '[url=http://google.com]http://google.com[/url]'],
-            ['http://jaxboards.com/topic/1', '[url=/topic/1]Topic #1[/url]'],
+            ['http://google.com',                               '[url=http://google.com]http://google.com[/url]'],
+            ['http://jaxboards.com/topic/1',                    '[url=/topic/1]Topic #1[/url]'],
             ['http://jaxboards.com/topic/3?findpost=33&pid=33', '[url=/topic/3?findpost=33&pid=33]Post #33[/url]'],
-            [
-                "nbsp\u{a0}http://google.com",
-                "nbsp\u{a0}[url=http://google.com]http://google.com[/url]",
-            ],
+            ["nbsp\u{a0}http://google.com",                     "nbsp\u{a0}[url=http://google.com]http://google.com[/url]"],
         ];
     }
 
     public function testTextOnly(): void
     {
         static::assertSame(
-            $this->textFormatting->textOnly(
-                '[b][i][u][quote=Sean]content[/quote][/u][/i][/b]',
-            ),
+            $this->textFormatting->textOnly('[b][i][u][quote=Sean]content[/quote][/u][/i][/b]'),
             'content',
         );
     }
@@ -141,9 +125,7 @@ final class TextFormattingTest extends UnitTestCase
     public function testVideoify(): void
     {
         static::assertSame(
-            $this->textFormatting->videoify(
-                'check out this video https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-            ),
+            $this->textFormatting->videoify('check out this video https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
             'check out this video [video]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/video]',
         );
     }

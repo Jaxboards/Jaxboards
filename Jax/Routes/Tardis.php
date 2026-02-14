@@ -9,7 +9,9 @@ use Jax\Page;
 
 final readonly class Tardis implements Route
 {
-    public function __construct(private Page $page) {}
+    public function __construct(
+        private Page $page,
+    ) {}
 
     public function route($params): void
     {
@@ -49,9 +51,6 @@ final readonly class Tardis implements Route
                 })()
             JS);
         $this->page->command('preventNavigation');
-        $this->page->command(
-            'playsound',
-            'drwhotheme',
-        );
+        $this->page->command('playsound', 'drwhotheme');
     }
 }

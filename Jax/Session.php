@@ -66,9 +66,7 @@ final class Session
 
     public function loginWithToken(): ?int
     {
-        $this->fetchSessionData(
-            session_id() ?: $this->request->asString->get('sessid'),
-        );
+        $this->fetchSessionData(session_id() ?: $this->request->asString->get('sessid'));
 
         if ($this->modelsSession->isBot !== 0) {
             return null;
@@ -96,9 +94,7 @@ final class Session
 
         $session = null;
         if ($sid) {
-            $params = $botName
-                ? [Database::WHERE_ID_EQUALS, $sid]
-                : ['WHERE `id`=?', $sid];
+            $params = $botName ? [Database::WHERE_ID_EQUALS, $sid] : ['WHERE `id`=?', $sid];
 
             $session = ModelsSession::selectOne(...$params);
         }
@@ -109,8 +105,8 @@ final class Session
             // Only exists to replace serialize with json_encode
             $this->vars = (
                 str_starts_with($session->vars, '{')
-                ? json_decode($session->vars, true, flags: JSON_THROW_ON_ERROR)
-                : unserialize($session->vars)
+                    ? json_decode($session->vars, true, flags: JSON_THROW_ON_ERROR)
+                    : unserialize($session->vars)
             ) ?: [];
 
             return;
@@ -135,10 +131,8 @@ final class Session
     /**
      * @SuppressWarnings("PHPMD.Superglobals")
      */
-    public function setPHPSessionValue(
-        string $field,
-        int|string $value,
-    ): int|string {
+    public function setPHPSessionValue(string $field, int|string $value): int|string
+    {
         return $_SESSION[$field] = $value;
     }
 
@@ -150,10 +144,7 @@ final class Session
 
     public function addVar(string $varName, mixed $value): void
     {
-        if (
-            array_key_exists($varName, $this->vars)
-            && $this->vars[$varName] === $value
-        ) {
+        if (array_key_exists($varName, $this->vars) && $this->vars[$varName] === $value) {
             return;
         }
 
@@ -173,17 +164,12 @@ final class Session
 
     public function getVar(string $varName): mixed
     {
-        return $this->vars[$varName] ?? $this->getPHPSessionValue(
-            $varName,
-        ) ?? null;
+        return $this->vars[$varName] ?? $this->getPHPSessionValue($varName) ?? null;
     }
 
     public function act(?string $location = null): void
     {
-        $this->set(
-            'lastAction',
-            $this->database->datetime(Carbon::now('UTC')->getTimestamp()),
-        );
+        $this->set('lastAction', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
         if (!$location) {
             return;
         }
@@ -198,18 +184,11 @@ final class Session
 
     public function clean(?int $uid): bool
     {
-        $timeago = Carbon::now('UTC')->subSeconds(
-            $this->config->getSetting('timetologout') ?? 900,
-        )->getTimestamp();
+        $timeago = Carbon::now('UTC')->subSeconds($this->config->getSetting('timetologout') ?? 900)->getTimestamp();
         if (!is_numeric($uid) || $uid < 1) {
             $uid = null;
         } else {
-            $result = $this->database->select(
-                'MAX(`lastAction`) AS `lastAction`',
-                'session',
-                'WHERE `uid`=?',
-                $uid,
-            );
+            $result = $this->database->select('MAX(`lastAction`) AS `lastAction`', 'session', 'WHERE `uid`=?', $uid);
             $lastAction = $this->database->arow($result);
             $this->database->disposeresult($result);
 
@@ -220,21 +199,14 @@ final class Session
                 $this->database->datetime($timeago),
             );
             // Delete all expired tokens as well while we're here...
-            $this->database->delete(
-                'tokens',
-                'WHERE `expires`<=?',
-                $this->database->datetime(),
-            );
+            $this->database->delete('tokens', 'WHERE `expires`<=?', $this->database->datetime());
             if ($lastAction) {
                 $this->set('readDate', $lastAction['lastAction']);
             }
         }
 
         $yesterday = mktime(0, 0, 0) ?: 0;
-        $sessions = ModelsSession::selectMany(
-            'WHERE `lastUpdate`<?',
-            $this->database->datetime($yesterday),
-        );
+        $sessions = ModelsSession::selectMany('WHERE `lastUpdate`<?', $this->database->datetime($yesterday));
 
         foreach ($sessions as $session) {
             if (!$session->uid) {
@@ -251,15 +223,10 @@ final class Session
             );
         }
 
-        $this->database->delete(
-            'session',
-            <<<'SQL'
-                WHERE `lastUpdate`<?
-                    OR (`uid` IS NULL AND `lastUpdate`<?)
-                SQL,
-            $this->database->datetime($yesterday),
-            $this->database->datetime($timeago),
-        );
+        $this->database->delete('session', <<<'SQL'
+            WHERE `lastUpdate`<?
+                OR (`uid` IS NULL AND `lastUpdate`<?)
+            SQL, $this->database->datetime($yesterday), $this->database->datetime($timeago));
 
         return true;
     }
@@ -276,18 +243,12 @@ final class Session
             $changedData['topicsread'] = '{}';
         }
 
-        if (
-            $this->modelsSession->lastAction === null
-        ) {
+        if ($this->modelsSession->lastAction === null) {
             $changedData['lastAction'] = $this->database->datetime();
         }
 
         if (mb_strlen($this->modelsSession->locationVerbose) > 100) {
-            $changedData['locationVerbose'] = mb_substr(
-                $this->modelsSession->locationVerbose,
-                0,
-                100,
-            );
+            $changedData['locationVerbose'] = mb_substr($this->modelsSession->locationVerbose, 0, 100);
         }
 
         // Only update if there's data to update.
@@ -295,12 +256,7 @@ final class Session
             return;
         }
 
-        $this->database->update(
-            'session',
-            $changedData,
-            Database::WHERE_ID_EQUALS,
-            $this->modelsSession->id,
-        );
+        $this->database->update('session', $changedData, Database::WHERE_ID_EQUALS, $this->modelsSession->id);
     }
 
     /**

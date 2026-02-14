@@ -45,9 +45,7 @@ $migrations = array_reduce(
     static function ($migrations, string $path) use ($fileSystem) {
         preg_match('/V(\d+)/', $path, $match);
         $fileInfo = $fileSystem->getFileInfo($path);
-        $migrations[(int) $match[1]] = $fileInfo->getBasename(
-            '.' . $fileInfo->getExtension(),
-        );
+        $migrations[(int) $match[1]] = $fileInfo->getBasename('.' . $fileInfo->getExtension());
 
         return $migrations;
     },
@@ -67,18 +65,14 @@ foreach ($migrations as $version => $migration) {
 
     echo "notice: migrating from v{$dbVersion} to v{$version}" . PHP_EOL;
 
-    $migrationClass = $container->get(
-        "Tools\\Migrations\\V{$version}\\{$migration}",
-    );
+    $migrationClass = $container->get("Tools\\Migrations\\V{$version}\\{$migration}");
 
     try {
         $migrationClass->execute($database);
     } catch (PDOException $e) {
-        echo error(
-            "Error updating to V{$version}: {$e->getMessage()}",
-        ) . PHP_EOL;
+        echo error("Error updating to V{$version}: {$e->getMessage()}") . PHP_EOL;
 
-        exit;
+        exit();
     }
 
     // Update DB version
@@ -88,6 +82,4 @@ foreach ($migrations as $version => $migration) {
 $debugLog = $container->get(DebugLog::class);
 echo implode(PHP_EOL, $debugLog->getLog());
 
-echo success(
-    'You are currently up to date! DB Version: ' . getDBVersion($database),
-) . PHP_EOL;
+echo success('You are currently up to date! DB Version: ' . getDBVersion($database)) . PHP_EOL;

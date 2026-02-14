@@ -43,17 +43,13 @@ abstract class FeatureTestCase extends TestCase
         $this->setupDB();
     }
 
-    public function go(
-        Request|string|null $request = null,
-        string $pageClass = App::class,
-    ): string {
+    public function go(Request|string|null $request = null, string $pageClass = App::class): string
+    {
         if (is_string($request)) {
             $parsed = parse_url($request);
             parse_str($parsed['query'] ?? '', $getParameters);
             $getParameters['path'] = ltrim($parsed['path'] ?? '', '/');
-            $request = new Request(
-                get: $getParameters,
-            );
+            $request = new Request(get: $getParameters);
         }
 
         if ($request instanceof Request) {
@@ -63,15 +59,9 @@ abstract class FeatureTestCase extends TestCase
         return $this->container->get($pageClass)->render() ?? '';
     }
 
-    public function assertRedirect(
-        string $name,
-        array $params = [],
-        ?string $page = null,
-    ): void {
-        $location = $this->container->get(Router::class)->url(
-            $name,
-            $params,
-        ) ?? $name;
+    public function assertRedirect(string $name, array $params = [], ?string $page = null): void
+    {
+        $location = $this->container->get(Router::class)->url($name, $params) ?? $name;
         self::assertStringContainsString("Location: {$location}", $page);
     }
 
@@ -81,29 +71,20 @@ abstract class FeatureTestCase extends TestCase
      * @param array<mixed> $memberOverrides  Overrides to properties of the Member model
      * @param array<mixed> $sessionOverrides Overrides to properties of the Session variables
      */
-    public function actingAs(
-        Member|string $member,
-        array $memberOverrides = [],
-        array $sessionOverrides = [],
-    ): void {
+    public function actingAs(Member|string $member, array $memberOverrides = [], array $sessionOverrides = []): void
+    {
         $members = $this->insertMembers($memberOverrides);
 
-        if (! $member instanceof Member) {
+        if (!$member instanceof Member) {
             $member = $members[$member];
         }
 
-        $this->container->set(
-            User::class,
-            autowire()->constructorParameter('member', $member),
-        );
+        $this->container->set(User::class, autowire()->constructorParameter('member', $member));
 
-        $this->container->set(
-            JaxSession::class,
-            autowire()->constructorParameter(
-                'session',
-                ['uid' => $member->id ?? null, ...$sessionOverrides],
-            ),
-        );
+        $this->container->set(JaxSession::class, autowire()->constructorParameter('session', [
+            'uid' => $member->id ?? null,
+            ...$sessionOverrides,
+        ]));
     }
 
     private function setupDB(): void

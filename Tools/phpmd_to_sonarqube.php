@@ -25,10 +25,7 @@ declare(strict_types=1);
 $phpmdReport = $argv[1] ?? '';
 
 if ($phpmdReport === '') {
-    fwrite(
-        STDERR,
-        'Please enter the path to your phpmd report json file',
-    );
+    fwrite(STDERR, 'Please enter the path to your phpmd report json file');
 
     exit(1);
 }
@@ -36,11 +33,7 @@ if ($phpmdReport === '') {
 $sonarQubeReport = $argv[2] ?? '';
 
 if ($sonarQubeReport === '') {
-    fwrite(
-        STDERR,
-        'Please enter the path to where to save your SonarQube report json '
-        . 'file',
-    );
+    fwrite(STDERR, 'Please enter the path to where to save your SonarQube report json ' . 'file');
 
     exit(1);
 }
@@ -59,22 +52,13 @@ if (!is_readable($phpmdReport)) {
 }
 
 if (file_exists($sonarQubeReport) && !is_writable($sonarQubeReport)) {
-    fwrite(
-        STDERR,
-        'SonarQube report file already exists and is not writable',
-    );
+    fwrite(STDERR, 'SonarQube report file already exists and is not writable');
 
     exit(1);
 }
 
-if (
-    !file_exists($sonarQubeReport)
-    && !is_writable(dirname($sonarQubeReport))
-) {
-    fwrite(
-        STDERR,
-        'SonarQube report file directory is not writable',
-    );
+if (!file_exists($sonarQubeReport) && !is_writable(dirname($sonarQubeReport))) {
+    fwrite(STDERR, 'SonarQube report file directory is not writable');
 
     exit(1);
 }
@@ -92,10 +76,7 @@ $data = json_decode(
 );
 
 if (!is_array($data['files'])) {
-    fwrite(
-        STDERR,
-        'Provided phpmd report json file does not have `files` array',
-    );
+    fwrite(STDERR, 'Provided phpmd report json file does not have `files` array');
 
     exit(1);
 }
@@ -130,6 +111,7 @@ const RULE_DESCRIPTION_REPLACEMENTS = [
     '/ short method names like \w+::\w+\(\)/' => ' short method names',
     '/ classes with short names like \w+/' => ' classes with short names',
 ];
+
 // phpcs:enable
 
 /**
@@ -144,11 +126,7 @@ function generify(string $input): string
     $output = $input;
 
     foreach (RULE_DESCRIPTION_REPLACEMENTS as $replace => $replacement) {
-        $output = preg_replace(
-            $replace,
-            $replacement,
-            $output ?? '',
-        );
+        $output = preg_replace($replace, $replacement, $output ?? '');
     }
 
     return $output ?? '';
@@ -165,15 +143,10 @@ $rules = array_reduce(
 
             $description = generify($violation['description'] ?? '');
 
-            $description .= PHP_EOL
-                . PHP_EOL
-                . 'Rule Set: '
-                . $violation['ruleSet'];
+            $description .= PHP_EOL . PHP_EOL . 'Rule Set: ' . $violation['ruleSet'];
 
             if ($violation['externalInfoUrl'] !== '#') {
-                $description .= PHP_EOL
-                    . PHP_EOL
-                    . $violation['externalInfoUrl'];
+                $description .= PHP_EOL . PHP_EOL . $violation['externalInfoUrl'];
             }
 
             $rules[$violation['rule']] = [
@@ -213,78 +186,45 @@ $rules = array_reduce(
     [],
 );
 
-define(
-    'REMOVE_JAXBOARDS_ROOT',
-    '/^' . preg_quote(dirname(__DIR__) . '/', '/') . '/',
-);
-$issues = array_merge(
-    [],
-    ...array_map(
-        static function (
-            array $file,
-        ): array {
-            $filename = preg_replace(
-                REMOVE_JAXBOARDS_ROOT,
-                '',
-                (string) $file['file'],
-            );
+define('REMOVE_JAXBOARDS_ROOT', '/^' . preg_quote(dirname(__DIR__) . '/', '/') . '/');
+$issues = array_merge([], ...array_map(static function (array $file): array {
+    $filename = preg_replace(REMOVE_JAXBOARDS_ROOT, '', (string) $file['file']);
 
-            return array_map(
-                static function (array $violation) use ($filename): array {
-                    $issue = [
-                        'engineId' => 'phpmd',
-                        'primaryLocation' => [
-                            'filePath' => $filename,
-                            'message' => $violation['description'],
-                            'textRange' => [
-                                'endLine' => (string) $violation['endLine'],
-                                'startLine' => (string) $violation['beginLine'],
-                            ],
-                        ],
-                        'ruleId' => $violation['rule'],
-                    ];
+    return array_map(static function (array $violation) use ($filename): array {
+        $issue = [
+            'engineId' => 'phpmd',
+            'primaryLocation' => [
+                'filePath' => $filename,
+                'message' => $violation['description'],
+                'textRange' => [
+                    'endLine' => (string) $violation['endLine'],
+                    'startLine' => (string) $violation['beginLine'],
+                ],
+            ],
+            'ruleId' => $violation['rule'],
+        ];
 
-                    if (
-                        $issue['primaryLocation']['textRange']['endLine']
-                        === $issue['primaryLocation']['textRange']['startLine']
-                    ) {
-                        unset($issue['primaryLocation']['textRange']['endLine']);
-                    }
+        if ($issue['primaryLocation']['textRange']['endLine'] === $issue['primaryLocation']['textRange']['startLine']) {
+            unset($issue['primaryLocation']['textRange']['endLine']);
+        }
 
-                    if ($issue['primaryLocation']['textRange']['startLine'] < 1) {
-                        $issue['primaryLocation']['textRange']['startLine']
-                            = '1';
-                    }
+        if ($issue['primaryLocation']['textRange']['startLine'] < 1) {
+            $issue['primaryLocation']['textRange']['startLine'] = '1';
+        }
 
-                    $matches = [];
-                    preg_match(
-                        '/ \(line \'\d+\', column \'(?P<column>\d+)\'\)/',
-                        (string) $violation['description'],
-                        $matches,
-                    );
-                    $column = $matches['column'] ?? '';
+        $matches = [];
+        preg_match('/ \(line \'\d+\', column \'(?P<column>\d+)\'\)/', (string) $violation['description'], $matches);
+        $column = $matches['column'] ?? '';
 
-                    if ($column !== '' && $column > 0) {
-                        $issue['primaryLocation']['textRange']['startColumn'] = $column;
-                    }
+        if ($column !== '' && $column > 0) {
+            $issue['primaryLocation']['textRange']['startColumn'] = $column;
+        }
 
-                    return $issue;
-                },
-                $file['violations'],
-            );
-        },
-        $data['files'],
-    ),
-);
+        return $issue;
+    }, $file['violations']);
+}, $data['files']));
 
-file_put_contents(
-    $sonarQubeReport,
-    json_encode(
-        [
-            'issues' => $issues,
-            'rules' => array_values($rules),
-        ],
-        JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT,
-    ),
-    LOCK_EX,
-);
+file_put_contents($sonarQubeReport, json_encode([
+    'issues' => $issues,
+    'rules' => array_values($rules),
+], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT), LOCK_EX);

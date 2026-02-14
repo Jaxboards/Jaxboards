@@ -52,12 +52,10 @@ final readonly class Download implements Route
 
         $filePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $filePath;
         if ($this->fileSystem->getFileInfo($filePath)->isFile()) {
-            header(
-                "Content-Disposition: attachment; filename=\"{$file->name}\";",
-            );
+            header("Content-Disposition: attachment; filename=\"{$file->name}\";");
             echo $this->fileSystem->getContents($filePath);
 
-            exit;
+            exit();
         }
     }
 }

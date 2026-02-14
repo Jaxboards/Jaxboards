@@ -79,18 +79,12 @@ final class BBCodeTest extends UnitTestCase
     public function testToHTML(string $input, string $output): void
     {
         if (str_starts_with($output, '/')) {
-            static::assertMatchesRegularExpression(
-                $output,
-                $this->bbCode->toHTML($input),
-            );
+            static::assertMatchesRegularExpression($output, $this->bbCode->toHTML($input));
 
             return;
         }
 
-        static::assertEquals(
-            $output,
-            $this->bbCode->toHTML($input),
-        );
+        static::assertEquals($output, $this->bbCode->toHTML($input));
     }
 
     /**
@@ -220,10 +214,7 @@ final class BBCodeTest extends UnitTestCase
     #[DataProvider('bbcodeToMarkdownDataProvider')]
     public function testToMarkdown(string $input, string $output): void
     {
-        static::assertEquals(
-            $output,
-            $this->bbCode->toMarkdown($input),
-        );
+        static::assertEquals($output, $this->bbCode->toMarkdown($input));
     }
 
     /**

@@ -12,7 +12,9 @@ use function min;
 
 final readonly class Snow implements Route
 {
-    public function __construct(private Page $page) {}
+    public function __construct(
+        private Page $page,
+    ) {}
 
     public function route($params): void
     {

@@ -95,10 +95,9 @@ final class EasterEggsTest extends FeatureTestCase
 {
     public function testAsteroids(): void
     {
-        $page = $this->go(new Request(
-            get: ['path' => '/asteroids'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/asteroids'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
 
@@ -107,10 +106,9 @@ final class EasterEggsTest extends FeatureTestCase
 
     public function testKatamari(): void
     {
-        $page = $this->go(new Request(
-            get: ['path' => '/katamari'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/katamari'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
 
@@ -119,10 +117,9 @@ final class EasterEggsTest extends FeatureTestCase
 
     public function testEarthbound(): void
     {
-        $page = $this->go(new Request(
-            get: ['path' => '/katamari'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/katamari'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
 
@@ -131,10 +128,9 @@ final class EasterEggsTest extends FeatureTestCase
 
     public function testRainbow(): void
     {
-        $page = $this->go(new Request(
-            get: ['path' => '/katamari'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/katamari'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
 
@@ -143,10 +139,9 @@ final class EasterEggsTest extends FeatureTestCase
 
     public function testSolitaire(): void
     {
-        $page = $this->go(new Request(
-            get: ['path' => '/solitaire'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/solitaire'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
 
@@ -155,10 +150,9 @@ final class EasterEggsTest extends FeatureTestCase
 
     public function testTardis(): void
     {
-        $page = $this->go(new Request(
-            get: ['path' => '/tardis'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/tardis'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
 
@@ -167,10 +161,9 @@ final class EasterEggsTest extends FeatureTestCase
 
     public function testSpin(): void
     {
-        $page = $this->go(new Request(
-            get: ['path' => '/spin'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/spin'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
 

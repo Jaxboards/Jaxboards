@@ -104,10 +104,7 @@ final class BoardOfflineTest extends FeatureTestCase
 
         $page = $this->go('/');
 
-        static::assertStringContainsString(
-            "You don't have permission to view the board.",
-            $page,
-        );
+        static::assertStringContainsString("You don't have permission to view the board.", $page);
         static::assertStringContainsString('pikachu', $page);
     }
 
@@ -117,9 +114,6 @@ final class BoardOfflineTest extends FeatureTestCase
 
         $page = $this->go('/');
 
-        static::assertStringNotContainsString(
-            "You don't have permission to view the board.",
-            $page,
-        );
+        static::assertStringNotContainsString("You don't have permission to view the board.", $page);
     }
 }

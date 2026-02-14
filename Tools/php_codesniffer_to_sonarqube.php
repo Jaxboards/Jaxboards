@@ -25,10 +25,7 @@ declare(strict_types=1);
 $phpCodeSnifferReport = $argv[1] ?? '';
 
 if ($phpCodeSnifferReport === '') {
-    fwrite(
-        STDERR,
-        'Please enter the path to your PHP_CodeSniffer report json file',
-    );
+    fwrite(STDERR, 'Please enter the path to your PHP_CodeSniffer report json file');
 
     exit(1);
 }
@@ -36,11 +33,7 @@ if ($phpCodeSnifferReport === '') {
 $sonarQubeReport = $argv[2] ?? '';
 
 if ($sonarQubeReport === '') {
-    fwrite(
-        STDERR,
-        'Please enter the path to where to save your SonarQube report json '
-            . 'file',
-    );
+    fwrite(STDERR, 'Please enter the path to where to save your SonarQube report json ' . 'file');
 
     exit(1);
 }
@@ -59,22 +52,13 @@ if (!is_readable($phpCodeSnifferReport)) {
 }
 
 if (file_exists($sonarQubeReport) && !is_writable($sonarQubeReport)) {
-    fwrite(
-        STDERR,
-        'SonarQube report file already exists and is not writable',
-    );
+    fwrite(STDERR, 'SonarQube report file already exists and is not writable');
 
     exit(1);
 }
 
-if (
-    !file_exists($sonarQubeReport)
-    && !is_writable(dirname($sonarQubeReport))
-) {
-    fwrite(
-        STDERR,
-        'SonarQube report file directory is not writable',
-    );
+if (!file_exists($sonarQubeReport) && !is_writable(dirname($sonarQubeReport))) {
+    fwrite(STDERR, 'SonarQube report file directory is not writable');
 
     exit(1);
 }
@@ -92,14 +76,10 @@ $data = json_decode(
 );
 
 if (!is_array($data['files'])) {
-    fwrite(
-        STDERR,
-        'Provided PHP_CodeSniffer report json file does not have `files` array',
-    );
+    fwrite(STDERR, 'Provided PHP_CodeSniffer report json file does not have `files` array');
 
     exit(1);
 }
-
 
 // phpcs:disable SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder,Generic.Files.LineLength.TooLong
 const RULE_DESCRIPTION_REPLACEMENTS = [
@@ -177,6 +157,7 @@ const RULE_DESCRIPTION_REPLACEMENTS = [
     // phpcs:enable
     '/Function \w+\(\)/' => 'Function',
 ];
+
 // phpcs:enable
 
 /**
@@ -191,11 +172,7 @@ function generify(string $input): string
     $output = $input;
 
     foreach (RULE_DESCRIPTION_REPLACEMENTS as $replace => $replacement) {
-        $output = preg_replace(
-            $replace,
-            $replacement,
-            $output,
-        ) ?? '';
+        $output = preg_replace($replace, $replacement, $output) ?? '';
     }
 
     return $output;
@@ -214,12 +191,8 @@ $rules = array_reduce(
 
             // We don't have a way to guage severity so we always set it to
             // low/minor for errors and info for warnings
-            $impactSeverity = $message['type'] === 'ERROR'
-                ? 'LOW'
-                : 'INFO';
-            $severity = $message['type'] === 'ERROR'
-                ? 'MINOR'
-                : 'INFO';
+            $impactSeverity = $message['type'] === 'ERROR' ? 'LOW' : 'INFO';
+            $severity = $message['type'] === 'ERROR' ? 'MINOR' : 'INFO';
 
             $rules[$message['source']] = [
                 'cleanCodeAttribute' => 'FORMATTED',
@@ -247,128 +220,95 @@ $rules = array_reduce(
 );
 
 const TAB_CHARACTER = "\t";
+
 const TAB_REPLACEMENT_CHARACTER = '🐛';
+
 const TAB_WIDTH = 4;
 
 // All issues from all files
-$issues = array_merge_recursive(
-    ...array_map(
-        static function (
-            string $filename,
-        ) use ($data): array {
-            $file = new SplFileObject($filename);
+$issues = array_merge_recursive(...array_map(
+    static function (string $filename) use ($data): array {
+        $file = new SplFileObject($filename);
 
-            return array_map(
-                static function (array $message) use (
-                    $file,
-                    $filename,
-                ): array {
-                    $column = (static function (
-                        int $column_input,
-                        SplFileObject $file,
-                        int $line,
-                    ): int {
-                        // PHP_CodeSniffer starts at 1 for columns, we
-                        // need to subtract 1 since SonarQube starts at
-                        // 0
-                        $column = $column_input - 1;
+        return array_map(
+            static function (array $message) use ($file, $filename): array {
+                $column = (static function (int $column_input, SplFileObject $file, int $line): int {
+                    // PHP_CodeSniffer starts at 1 for columns, we
+                    // need to subtract 1 since SonarQube starts at
+                    // 0
+                    $column = $column_input - 1;
 
-                        // Next we need to check if there are tabs in
-                        // the line up to the specified column -
-                        // PHP_CodeSniffer counts tabs as 4 characters
-                        // while SonarQube only counts them as one
-                        $file->seek(
-                            // Seek value should be one under the line
-                            // since lines are 0 indexed for seek but 1
-                            // indexed for the report
-                            $line - 1,
-                        );
-                        $original_line = $file->current();
-                        if (!$original_line) {
-                            // Empty line without line ending or end of
-                            // the file reached, no column to include
-                            return -1;
-                        }
-                        // SplFileObject::current may return an array if
-                        // configured to parse file as a CSV, we don't
-                        // do that so if we have anything other than a
-                        // string at this point we should error out
-                        assert(is_string($original_line));
-                        if (mb_strlen($original_line) === 1) {
-                            // Empty lines should not contain a column
-                            // lines usually have a line ending
-                            // character
-                            return -1;
-                        }
-                        $measurement_line = str_replace(
-                            TAB_CHARACTER,
-                            str_repeat(
-                                TAB_REPLACEMENT_CHARACTER,
-                                TAB_WIDTH,
-                            ),
-                            $original_line,
-                        );
-                        // The str_replace function may return an array
-                        // if the input is an array, but since we're
-                        // passing it strings we're sure it's a string
-                        // @phpstan-ignore-next-line
-                        assert(is_string($measurement_line));
-                        $up_to_column = mb_substr(
-                            $measurement_line,
-                            0,
-                            $column,
-                        );
-                        $tab_count = intdiv(
-                            mb_substr_count(
-                                $up_to_column,
-                                TAB_REPLACEMENT_CHARACTER,
-                            ),
-                            TAB_WIDTH,
-                        );
-
-                        return $column - ((TAB_WIDTH - 1) * $tab_count);
-                    })(
-                        (int) $message['column'],
-                        $file,
-                        (int) $message['line'],
+                    // Next we need to check if there are tabs in
+                    // the line up to the specified column -
+                    // PHP_CodeSniffer counts tabs as 4 characters
+                    // while SonarQube only counts them as one
+                    $file->seek(
+                        // Seek value should be one under the line
+                        // since lines are 0 indexed for seek but 1
+                        // indexed for the report
+                        $line - 1,
                     );
-
-                    $issue = [
-                        'engineId' => 'PHP_CodeSniffer',
-                        'primaryLocation' => [
-                            'filePath' => $filename,
-                            'message' => $message['message'],
-                            'textRange' => [
-                                'startColumn' => $column,
-                                'startLine' => $message['line'],
-                            ],
-                        ],
-                        'ruleId' => $message['source'],
-                    ];
-
-                    if ($column === -1) {
-                        // Remove column if we don't need it, which
-                        // we've marked by a -1
-                        unset($issue['primaryLocation']['textRange']['startColumn']);
+                    $original_line = $file->current();
+                    if (!$original_line) {
+                        // Empty line without line ending or end of
+                        // the file reached, no column to include
+                        return -1;
                     }
+                    // SplFileObject::current may return an array if
+                    // configured to parse file as a CSV, we don't
+                    // do that so if we have anything other than a
+                    // string at this point we should error out
+                    assert(is_string($original_line));
+                    if (mb_strlen($original_line) === 1) {
+                        // Empty lines should not contain a column
+                        // lines usually have a line ending
+                        // character
+                        return -1;
+                    }
+                    $measurement_line = str_replace(
+                        TAB_CHARACTER,
+                        str_repeat(TAB_REPLACEMENT_CHARACTER, TAB_WIDTH),
+                        $original_line,
+                    );
+                    // The str_replace function may return an array
+                    // if the input is an array, but since we're
+                    // passing it strings we're sure it's a string
+                    // @phpstan-ignore-next-line
+                    assert(is_string($measurement_line));
+                    $up_to_column = mb_substr($measurement_line, 0, $column);
+                    $tab_count = intdiv(mb_substr_count($up_to_column, TAB_REPLACEMENT_CHARACTER), TAB_WIDTH);
 
-                    return $issue;
-                },
-                $data['files'][$filename]['messages'],
-            );
-        },
-        array_keys($data['files']),
-    ),
-);
+                    return $column - ((TAB_WIDTH - 1) * $tab_count);
+                })((int) $message['column'], $file, (int) $message['line']);
 
-file_put_contents(
-    $sonarQubeReport,
-    json_encode(
-        [
-            'issues' => $issues,
-            'rules' => array_values($rules),
-        ],
-        JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT,
-    ),
-    LOCK_EX,
-);
+                $issue = [
+                    'engineId' => 'PHP_CodeSniffer',
+                    'primaryLocation' => [
+                        'filePath' => $filename,
+                        'message' => $message['message'],
+                        'textRange' => [
+                            'startColumn' => $column,
+                            'startLine' => $message['line'],
+                        ],
+                    ],
+                    'ruleId' => $message['source'],
+                ];
+
+                if ($column === -1) {
+                    // Remove column if we don't need it, which
+                    // we've marked by a -1
+                    unset($issue['primaryLocation']['textRange']['startColumn']);
+                }
+
+                return $issue;
+            },
+            $data['files'][$filename]['messages'],
+        );
+    },
+    array_keys($data['files']),
+));
+
+file_put_contents($sonarQubeReport, json_encode([
+    'issues' => $issues,
+    'rules' => array_values($rules),
+], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT), LOCK_EX);

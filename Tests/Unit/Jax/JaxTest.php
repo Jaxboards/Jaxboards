@@ -95,10 +95,7 @@ final class JaxTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->encodedForumFlags = base64_decode(
-            'AAEAPgADABgABAAYAAUAGAAGAD8=',
-            true,
-        );
+        $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=', true);
 
         $container = new Container();
 
@@ -110,36 +107,25 @@ final class JaxTest extends UnitTestCase
         $result = $this->jax->parseForumPerms($this->encodedForumFlags);
 
         foreach (array_keys($this->decoded) as $groupId) {
-            static::assertSame(
-                $this->decoded[$groupId],
-                $result[$groupId],
-            );
+            static::assertSame($this->decoded[$groupId], $result[$groupId]);
         }
     }
 
     public function testSerializeForumPermissions(): void
     {
-        static::assertSame(
-            $this->encodedForumFlags,
-            $this->jax->serializeForumPerms($this->decoded),
-        );
+        static::assertSame($this->encodedForumFlags, $this->jax->serializeForumPerms($this->decoded));
     }
 
     public function testPagesWorks(): void
     {
-        static::assertSame(
-            [1, 9, 10, 11, 12, 13, 14, 15, 16, 20],
-            $this->jax->pages(20, 13, 10),
-        );
+        static::assertSame([1, 9, 10, 11, 12, 13, 14, 15, 16, 20], $this->jax->pages(20, 13, 10));
     }
 
     public function testParseForumsSanity(): void
     {
         static::assertSame(
             $this->encodedForumFlags,
-            $this->jax->serializeForumPerms(
-                $this->jax->parseForumPerms($this->encodedForumFlags),
-            ),
+            $this->jax->serializeForumPerms($this->jax->parseForumPerms($this->encodedForumFlags)),
         );
     }
 }

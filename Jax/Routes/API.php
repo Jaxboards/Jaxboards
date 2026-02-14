@@ -45,14 +45,12 @@ final readonly class API implements Route
 
     public function route(array $params): void
     {
-        $this->page->earlyFlush(
-            match ($params['method']) {
-                'searchmembers' => $this->searchMembers(),
-                'emotes' => $this->emotes(),
-                'upload' => $this->upload(),
-                default => '',
-            },
-        );
+        $this->page->earlyFlush(match ($params['method']) {
+            'searchmembers' => $this->searchMembers(),
+            'emotes' => $this->emotes(),
+            'upload' => $this->upload(),
+            default => '',
+        });
     }
 
     /**
@@ -76,13 +74,9 @@ final readonly class API implements Route
         $hash = hash_file('sha1', $fileobj['tmp_name']) ?: 'hash_error';
         $uploadPath = $this->domainDefinitions->getBoardPath() . '/Uploads/';
 
-        $ext = $this->fileSystem->getFileInfo(
-            $fileobj['name'],
-        )->getExtension();
+        $ext = $this->fileSystem->getFileInfo($fileobj['name'])->getExtension();
 
-        $imageExtension = in_array($ext, Jax::IMAGE_EXTENSIONS, true)
-            ? ".{$ext}"
-            : null;
+        $imageExtension = in_array($ext, Jax::IMAGE_EXTENSIONS, true) ? ".{$ext}" : null;
 
         $filePath = $uploadPath . $hash . $imageExtension;
 
@@ -112,14 +106,7 @@ final readonly class API implements Route
     {
         $members = Member::selectMany(
             'WHERE `displayName` LIKE ? ORDER BY `displayName` LIMIT 10',
-            htmlspecialchars(
-                str_replace(
-                    '_',
-                    '\_',
-                    $this->request->asString->get('term') ?? '',
-                ),
-                ENT_QUOTES,
-            ) . '%',
+            htmlspecialchars(str_replace('_', '\_', $this->request->asString->get('term') ?? ''), ENT_QUOTES) . '%',
         );
 
         $list = [[], []];
@@ -141,9 +128,6 @@ final readonly class API implements Route
             ]);
         }
 
-        return json_encode(
-            [array_keys($rules), array_values($rules)],
-            JSON_THROW_ON_ERROR,
-        );
+        return json_encode([array_keys($rules), array_values($rules)], JSON_THROW_ON_ERROR);
     }
 }

@@ -9,7 +9,9 @@ use Jax\Page;
 
 final readonly class Solitaire implements Route
 {
-    public function __construct(private Page $page) {}
+    public function __construct(
+        private Page $page,
+    ) {}
 
     public function route($params): void
     {

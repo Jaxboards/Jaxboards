@@ -70,12 +70,7 @@ final class ServiceSignupTest extends FeatureTestCase
     {
         $this->setServiceConfig(['service' => false]);
 
-        $page = $this->go(
-            new Request(
-                server: ['SERVER_NAME' => 'www.jaxboards.com'],
-            ),
-            pageClass: ServiceSignup::class,
-        );
+        $page = $this->go(new Request(server: ['SERVER_NAME' => 'www.jaxboards.com']), pageClass: ServiceSignup::class);
 
         static::assertSame('Service mode not enabled', $page);
     }
@@ -84,12 +79,7 @@ final class ServiceSignupTest extends FeatureTestCase
     {
         $this->setServiceConfig(['service' => true]);
 
-        $page = $this->go(
-            new Request(
-                server: ['SERVER_NAME' => 'www.jaxboards.com'],
-            ),
-            pageClass: ServiceSignup::class,
-        );
+        $page = $this->go(new Request(server: ['SERVER_NAME' => 'www.jaxboards.com']), pageClass: ServiceSignup::class);
 
         DOMAssert::assertSelectCount('input[name=boardurl]', 1, $page);
         DOMAssert::assertSelectCount('input[name=username]', 1, $page);
@@ -108,25 +98,19 @@ final class ServiceSignupTest extends FeatureTestCase
         // Assert that the boards directory is set up
         $this->stubFileSystem('mock');
         $fileSystem = $this->container->get(FileSystem::class);
-        $fileSystem->expects($this->once())
-            ->method('copyDirectory')
-            ->with('Service/blueprint', 'boards/boardname')
-        ;
+        $fileSystem->expects($this->once())->method('copyDirectory')->with('Service/blueprint', 'boards/boardname');
 
         $page = $this->go(
-            new Request(
-                post: [
-                    'username' => 'username',
-                    'password' => 'password',
-                    'boardurl' => 'boardname',
-                    'email' => 'email@email.com',
-                    'submit' => 'Register a Forum!',
-                ],
-                server: [
-                    'SERVER_NAME' => 'www.jaxboards.com',
-                    'REMOTE_ADDR' => '::1',
-                ],
-            ),
+            new Request(post: [
+                'username' => 'username',
+                'password' => 'password',
+                'boardurl' => 'boardname',
+                'email' => 'email@email.com',
+                'submit' => 'Register a Forum!',
+            ], server: [
+                'SERVER_NAME' => 'www.jaxboards.com',
+                'REMOTE_ADDR' => '::1',
+            ]),
             pageClass: ServiceSignup::class,
         );
 
@@ -137,10 +121,7 @@ final class ServiceSignupTest extends FeatureTestCase
         $database->setPrefix('');
 
         $directoryEntry = Directory::selectOne(1);
-        static::assertSame(
-            'email@email.com',
-            $directoryEntry->registrarEmail,
-        );
+        static::assertSame('email@email.com', $directoryEntry->registrarEmail);
         static::assertSame('boardname', $directoryEntry->boardname);
     }
 }

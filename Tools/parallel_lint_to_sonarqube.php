@@ -25,10 +25,7 @@ declare(strict_types=1);
 $parallelLintReport = $argv[1] ?? '';
 
 if ($parallelLintReport === '') {
-    fwrite(
-        STDERR,
-        'Please enter the path to your parallel-lint report json file',
-    );
+    fwrite(STDERR, 'Please enter the path to your parallel-lint report json file');
 
     exit(1);
 }
@@ -36,11 +33,7 @@ if ($parallelLintReport === '') {
 $sonarQubeReport = $argv[2] ?? '';
 
 if ($sonarQubeReport === '') {
-    fwrite(
-        STDERR,
-        'Please enter the path to where to save your SonarQube report json '
-        . 'file',
-    );
+    fwrite(STDERR, 'Please enter the path to where to save your SonarQube report json ' . 'file');
 
     exit(1);
 }
@@ -59,22 +52,13 @@ if (!is_readable($parallelLintReport)) {
 }
 
 if (file_exists($sonarQubeReport) && !is_writable($sonarQubeReport)) {
-    fwrite(
-        STDERR,
-        'SonarQube report file already exists and is not writable',
-    );
+    fwrite(STDERR, 'SonarQube report file already exists and is not writable');
 
     exit(1);
 }
 
-if (
-    !file_exists($sonarQubeReport)
-    && !is_writable(dirname($sonarQubeReport))
-) {
-    fwrite(
-        STDERR,
-        'SonarQube report file directory is not writable',
-    );
+if (!file_exists($sonarQubeReport) && !is_writable(dirname($sonarQubeReport))) {
+    fwrite(STDERR, 'SonarQube report file directory is not writable');
 
     exit(1);
 }
@@ -92,11 +76,7 @@ $data = json_decode(
 );
 
 if (!is_array($data['results']['errors'] ?? null)) {
-    fwrite(
-        STDERR,
-        'Provided parallel-lint report json file does not have '
-        . '`results`.`errors` array',
-    );
+    fwrite(STDERR, 'Provided parallel-lint report json file does not have ' . '`results`.`errors` array');
 
     exit(1);
 }
@@ -129,27 +109,17 @@ $rules = array_reduce(
     [],
 );
 
-file_put_contents(
-    $sonarQubeReport,
-    json_encode(
-        [
-            'issues' => array_map(
-                static fn(array $error): array => [
-                    'engineId' => 'php',
-                    'primaryLocation' => [
-                        'filePath' => $error['file'],
-                        'message' => $error['message'],
-                        'textRange' => [
-                            'startLine' => (string) $error['line'],
-                        ],
-                    ],
-                    'ruleId' => $error['normalizeMessage'],
-                ],
-                $data['results']['errors'],
-            ),
-            'rules' => array_values($rules),
+file_put_contents($sonarQubeReport, json_encode([
+    'issues' => array_map(static fn(array $error): array => [
+        'engineId' => 'php',
+        'primaryLocation' => [
+            'filePath' => $error['file'],
+            'message' => $error['message'],
+            'textRange' => [
+                'startLine' => (string) $error['line'],
+            ],
         ],
-        JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT,
-    ),
-    LOCK_EX,
-);
+        'ruleId' => $error['normalizeMessage'],
+    ], $data['results']['errors']),
+    'rules' => array_values($rules),
+], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT), LOCK_EX);

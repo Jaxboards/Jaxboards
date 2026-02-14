@@ -72,10 +72,7 @@ final class Search implements Route
 
         $this->perpage = 10;
 
-        if (
-            $this->request->both('searchterm') !== null
-            || $this->request->asString->both('page') !== null
-        ) {
+        if ($this->request->both('searchterm') !== null || $this->request->asString->both('page') !== null) {
             $this->doSearch();
         } else {
             $this->form();
@@ -88,14 +85,11 @@ final class Search implements Route
             return;
         }
 
-        $page = $this->template->render(
-            'search/form',
-            [
-                'searchTerm' => $this->session->getVar('searcht') ?? '',
-                'forumSelect' => $this->getForumSelection(),
-                'searchResults' => $pageContents,
-            ],
-        );
+        $page = $this->template->render('search/form', [
+            'searchTerm' => $this->session->getVar('searcht') ?? '',
+            'forumSelect' => $this->getForumSelection(),
+            'searchResults' => $pageContents,
+        ]);
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
     }
@@ -106,10 +100,7 @@ final class Search implements Route
             return '--No forums--';
         }
 
-        $forums = Forum::selectMany(
-            'WHERE `id` IN ? ORDER BY `order` ASC,`title` DESC',
-            $this->fids,
-        );
+        $forums = Forum::selectMany('WHERE `id` IN ? ORDER BY `order` ASC,`title` DESC', $this->fids);
 
         $titles = array_reduce(
             $forums,
@@ -128,10 +119,8 @@ final class Search implements Route
     /**
      * @param array<string> $titles
      */
-    private function getForumSelect(
-        ForumTree $forumTree,
-        array $titles,
-    ): string {
+    private function getForumSelect(ForumTree $forumTree, array $titles): string
+    {
         $options = '';
         $generator = $forumTree->getIterator();
         foreach ($generator as $depth => $forumId) {
@@ -148,41 +137,27 @@ final class Search implements Route
             return;
         }
 
-        $searchTerm = $this->request->asString->both(
-            'searchterm',
-        ) ?: (string) $this->session->getVar(
-            'searcht',
-        );
+        $searchTerm = $this->request->asString->both('searchterm') ?: (string) $this->session->getVar('searcht');
 
         $postIDs = '';
 
-        if (
-            $this->request->both('searchterm') === null
-        ) {
+        if ($this->request->both('searchterm') === null) {
             $postIDs = (string) $this->session->getVar('search');
         } else {
             $this->getSearchableForums();
             $fidsInput = $this->request->both('fids');
             $fids = is_array($fidsInput)
-                ? array_filter(
-                    $fidsInput,
-                    fn($fid): bool => in_array((int) $fid, $this->fids, true),
-                )
+                ? array_filter($fidsInput, fn($fid): bool => in_array((int) $fid, $this->fids, true))
                 : $this->fids;
 
             $datestart = null;
             if ($this->request->asString->both('datestart')) {
-                $datestart = Carbon::parse(
-                    $this->request->asString->both('datestart'),
-                )->getTimestamp();
+                $datestart = Carbon::parse($this->request->asString->both('datestart'))->getTimestamp();
             }
-
 
             $dateend = null;
             if ($this->request->asString->both('dateend')) {
-                $dateend = Carbon::parse(
-                    $this->request->asString->both('dateend'),
-                )->getTimestamp();
+                $dateend = Carbon::parse($this->request->asString->both('dateend'))->getTimestamp();
             }
 
             $authorId = (int) $this->request->asString->both('mid');
@@ -221,19 +196,13 @@ final class Search implements Route
                 $topicValues[] = $this->database->datetime($datestart);
             }
 
-            $postWhere = implode(
-                ' ',
-                array_map(static fn($q): string => "AND {$q}", $postParams),
-            );
-            $topicWhere = implode(
-                ' ',
-                array_map(static fn($q): string => "AND {$q}", $topicParams),
-            );
+            $postWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $postParams));
+            $topicWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $topicParams));
 
             $sanitizedSearchTerm = $searchTerm;
 
             $searchResults = $this->database->arows($this->database->special(
-                <<<"SQL"
+                <<<SQL
                         SELECT
                             `id`,
                             SUM(`relevance`) AS `relevance`
@@ -267,16 +236,10 @@ final class Search implements Route
                 ...$topicValues,
             ));
 
-            $postIDs = implode(
-                ',',
-                array_filter(
-                    array_map(
-                        static fn(array $searchResult): mixed => $searchResult['id'],
-                        $searchResults,
-                    ),
-                    static fn($id): bool => !empty($id),
-                ),
-            );
+            $postIDs = implode(',', array_filter(
+                array_map(static fn(array $searchResult): mixed => $searchResult['id'], $searchResults),
+                static fn($id): bool => !empty($id),
+            ));
 
             $this->session->addVar('search', $postIDs);
             $this->session->addVar('searcht', $searchTerm);
@@ -292,17 +255,11 @@ final class Search implements Route
             $terms[] = preg_quote($v);
         }
 
-        $page = $postIDs === '' ? $this->noResultsFound(
-            $terms,
-        ) : $this->renderSearchResults(
-            $terms,
-            explode(',', $postIDs),
-        );
+        $page = $postIDs === ''
+            ? $this->noResultsFound($terms)
+            : $this->renderSearchResults($terms, explode(',', $postIDs));
 
-        if (
-            $this->request->isJSAccess()
-            && !$this->request->isJSDirectLink()
-        ) {
+        if ($this->request->isJSAccess() && !$this->request->isJSDirectLink()) {
             $this->page->command('update', 'searchresults', $page);
         } else {
             $this->form($page);
@@ -316,29 +273,21 @@ final class Search implements Route
     private function renderSearchResults(array $terms, array $postIDs): string
     {
         $numresults = count($postIDs);
-        $idarray = array_slice(
-            $postIDs,
-            $this->pageNum * $this->perpage,
-            $this->perpage,
-        );
+        $idarray = array_slice($postIDs, $this->pageNum * $this->perpage, $this->perpage);
         $ids = implode(',', $idarray);
 
-        $result = $this->database->special(
-            <<<SQL
-                SELECT
-                    p.`id` AS `id`,
-                    p.`tid` AS `tid`,
-                    p.`post` AS `post`,
-                    t.`title` AS `title`
-                FROM %t p
-                LEFT JOIN %t t
-                    ON p.`tid`=t.`id`
-                WHERE p.`id` IN ?
-                ORDER BY FIELD(p.`id`,{$ids})
-                SQL,
-            ['posts', 'topics'],
-            $idarray,
-        );
+        $result = $this->database->special(<<<SQL
+            SELECT
+                p.`id` AS `id`,
+                p.`tid` AS `tid`,
+                p.`post` AS `post`,
+                t.`title` AS `title`
+            FROM %t p
+            LEFT JOIN %t t
+                ON p.`tid`=t.`id`
+            WHERE p.`id` IN ?
+            ORDER BY FIELD(p.`id`,{$ids})
+            SQL, ['posts', 'topics'], $idarray);
 
         $page = '';
         $pages = '';
@@ -350,40 +299,24 @@ final class Search implements Route
             $post = nl2br($post, false);
             $termsOr = implode('|', $terms);
 
-            $page .= $this->template->render(
-                'search/result',
-                [
-                    'post' => $postRow,
-                    'titleHighlighted' => preg_replace(
-                        "/{$termsOr}/i",
-                        $this->template->render(
-                            'search/highlight',
-                            ['searchTerm' => '$0'],
-                        ),
-                        $title,
-                    ),
-                    'postHighlighted' => preg_replace(
-                        "/{$termsOr}/i",
-                        $this->template->render(
-                            'search/highlight',
-                            ['searchTerm' => '$0'],
-                        ),
-                        $post,
-                    ),
-                ],
-            );
+            $page .= $this->template->render('search/result', [
+                'post' => $postRow,
+                'titleHighlighted' => preg_replace(
+                    "/{$termsOr}/i",
+                    $this->template->render('search/highlight', ['searchTerm' => '$0']),
+                    $title,
+                ),
+                'postHighlighted' => preg_replace(
+                    "/{$termsOr}/i",
+                    $this->template->render('search/highlight', ['searchTerm' => '$0']),
+                    $post,
+                ),
+            ]);
         }
 
-        $resultsArray = $this->jax->pages(
-            (int) ceil($numresults / $this->perpage),
-            $this->pageNum,
-            10,
-        );
+        $resultsArray = $this->jax->pages((int) ceil($numresults / $this->perpage), $this->pageNum, 10);
         foreach ($resultsArray as $resultArray) {
-            $searchURL = $this->router->url(
-                'search',
-                ['page' => $resultArray],
-            );
+            $searchURL = $this->router->url('search', ['page' => $resultArray]);
             $pages .= "<a href='{$searchURL}'>{$resultArray}</a> ";
         }
 
@@ -398,8 +331,7 @@ final class Search implements Route
      */
     private function noResultsFound(array $terms): string
     {
-        $error = 'No results found. '
-            . 'Try refining your search, or using longer terms.';
+        $error = 'No results found. ' . 'Try refining your search, or using longer terms.';
 
         $omitted = [];
         foreach ($terms as $term) {
@@ -411,8 +343,7 @@ final class Search implements Route
         }
 
         if ($omitted !== []) {
-            $error .= 'The following terms were omitted due to length: '
-                . implode(', ', $omitted);
+            $error .= 'The following terms were omitted due to length: ' . implode(', ', $omitted);
         }
 
         return $this->template->render('global/box', [

@@ -23,18 +23,20 @@ final readonly class Manifest implements Route
 
     public function route($params): void
     {
-        $this->page->earlyFlush(json_encode(
-            [
-                'name' => $this->config->get()['boardname'] ?? 'Jaxboards',
-                'icons' => [[
-                    'src' => '/Service/img/jax.svg',
-                    'type' => 'image/svg+xml',
-                    'sizes' => 'any',
-                ]],
-                'start_url' => '/',
-                'display' => 'standalone',
-            ],
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
-        ) ?: '');
+        $this->page->earlyFlush(
+            json_encode(
+                [
+                    'name' => $this->config->get()['boardname'] ?? 'Jaxboards',
+                    'icons' => [[
+                        'src' => '/Service/img/jax.svg',
+                        'type' => 'image/svg+xml',
+                        'sizes' => 'any',
+                    ]],
+                    'start_url' => '/',
+                    'display' => 'standalone',
+                ],
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
+            ) ?: '',
+        );
     }
 }

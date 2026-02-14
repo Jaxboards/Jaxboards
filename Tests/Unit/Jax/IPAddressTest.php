@@ -37,10 +37,7 @@ final class IPAddressTest extends UnitTestCase
     {
         $ipAddress = $this->getIPAddress();
 
-        static::assertEquals(
-            self::TESTIP,
-            $ipAddress->asHumanReadable($ipAddress->asBinary()),
-        );
+        static::assertEquals(self::TESTIP, $ipAddress->asHumanReadable($ipAddress->asBinary()));
     }
 
     public function testBanUnban(): void
@@ -57,10 +54,8 @@ final class IPAddressTest extends UnitTestCase
     }
 
     #[DataProvider('localHostDataProvider')]
-    public function testIsLocalHost(
-        string $ipHumanReadable,
-        bool $isLocalHost,
-    ): void {
+    public function testIsLocalHost(string $ipHumanReadable, bool $isLocalHost): void
+    {
         $ipAddress = $this->getIPAddress($ipHumanReadable);
 
         static::assertEquals($isLocalHost, $ipAddress->isLocalHost());
@@ -80,9 +75,7 @@ final class IPAddressTest extends UnitTestCase
 
     private function getIPAddress(string $ipAddress = self::TESTIP): IPAddress
     {
-        $this->container->set(Request::class, new Request(
-            server: ['REMOTE_ADDR' => $ipAddress],
-        ));
+        $this->container->set(Request::class, new Request(server: ['REMOTE_ADDR' => $ipAddress]));
 
         return $this->container->get(IPAddress::class);
     }

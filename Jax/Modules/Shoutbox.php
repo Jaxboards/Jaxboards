@@ -48,12 +48,8 @@ final class Shoutbox implements Module
         private readonly Template $template,
         private readonly User $user,
     ) {
-        $this->avatarsEnabled = (bool) $this->config->getSetting(
-            'shoutboxava',
-        );
-        $this->shoutlimit = (int) ($this->config->getSetting(
-            'shoutbox_num',
-        ) ?? 5);
+        $this->avatarsEnabled = (bool) $this->config->getSetting('shoutboxava');
+        $this->shoutlimit = (int) ($this->config->getSetting('shoutbox_num') ?? 5);
     }
 
     public function init(): void
@@ -67,19 +63,13 @@ final class Shoutbox implements Module
         }
 
         $shoutboxDelete = (int) $this->request->both('shoutbox_delete');
-        $shoutboxShout = trim(
-            $this->request->asString->post('shoutbox_shout') ?? '',
-        );
+        $shoutboxShout = trim($this->request->asString->post('shoutbox_shout') ?? '');
 
         if ($shoutboxShout !== '') {
             $this->addShout($shoutboxShout);
         }
 
-        if (
-            $this->request->both(
-                'module',
-            ) === 'shoutbox'
-        ) {
+        if ($this->request->both('module') === 'shoutbox') {
             $this->showAllShouts();
         }
 
@@ -96,56 +86,39 @@ final class Shoutbox implements Module
         $canDeleteOwnShouts = $this->user->getGroup()?->canDeleteOwnShouts;
         $isOwnShout = $shout->uid === $this->user->get()->id;
 
-        return $canDeleteAllShouts || ($canDeleteOwnShouts && $isOwnShout);
+        return $canDeleteAllShouts || $canDeleteOwnShouts && $isOwnShout;
     }
 
     public function formatShout(Shout $shout, ?Member $member): string
     {
         if (str_starts_with($shout->shout, '/me ')) {
-            return $this->template->render(
-                'shoutbox/action',
-                [
-                    'avatarsEnabled' => $this->avatarsEnabled,
-                    'canDelete' => $this->canDelete($shout),
-                    'shout' => $shout,
-                    'timestamp' => $this->date->datetimeAsTimestamp(
-                        $shout->date,
-                    ),
-                    'user' => $member,
-                ],
-            );
-        }
-
-        return $this->template->render(
-            'shoutbox/shout',
-            [
+            return $this->template->render('shoutbox/action', [
                 'avatarsEnabled' => $this->avatarsEnabled,
                 'canDelete' => $this->canDelete($shout),
                 'shout' => $shout,
                 'timestamp' => $this->date->datetimeAsTimestamp($shout->date),
                 'user' => $member,
-            ],
-        );
+            ]);
+        }
+
+        return $this->template->render('shoutbox/shout', [
+            'avatarsEnabled' => $this->avatarsEnabled,
+            'canDelete' => $this->canDelete($shout),
+            'shout' => $shout,
+            'timestamp' => $this->date->datetimeAsTimestamp($shout->date),
+            'user' => $member,
+        ]);
     }
 
     public function displayShoutbox(): void
     {
-        $shouts = Shout::selectMany(
-            'ORDER BY `id` DESC LIMIT ?',
-            $this->shoutlimit,
-        );
+        $shouts = Shout::selectMany('ORDER BY `id` DESC LIMIT ?', $this->shoutlimit);
 
-        $members = Member::joinedOn(
-            $shouts,
-            static fn(Shout $shout): int => $shout->uid,
-        );
+        $members = Member::joinedOn($shouts, static fn(Shout $shout): int => $shout->uid);
 
         $shoutHTML = '';
         foreach ($shouts as $shout) {
-            $shoutHTML .= $this->formatShout(
-                $shout,
-                $members[$shout->uid] ?? null,
-            );
+            $shoutHTML .= $this->formatShout($shout, $members[$shout->uid] ?? null);
         }
 
         $this->session->addVar('sb_id', $shouts[0]->id ?? 0);
@@ -155,24 +128,20 @@ final class Shoutbox implements Module
         $this->page->append(
             'SHOUTBOX',
             $this->page->collapseBox(
-                $this->template->render(
-                    'shoutbox/title',
-                ),
-                $this->template->render(
-                    'shoutbox/shoutbox',
-                    [
-                        'shouts' => $shoutHTML,
-                    ],
-                ),
+                $this->template->render('shoutbox/title'),
+                $this->template->render('shoutbox/shoutbox', [
+                    'shouts' => $shoutHTML,
+                ]),
                 'shoutbox',
-            ) . <<<HTML
-                <script type='text/javascript'>
-                    Object.assign(globalSettings, {
-                        shoutLimit: {$this->shoutlimit},
-                        soundShout: {$soundShout},
-                    });
-                </script>
-                HTML,
+            )
+                . <<<HTML
+                    <script type='text/javascript'>
+                        Object.assign(globalSettings, {
+                            shoutLimit: {$this->shoutlimit},
+                            soundShout: {$soundShout},
+                        });
+                    </script>
+                    HTML,
         );
     }
 
@@ -187,22 +156,12 @@ final class Shoutbox implements Module
             return;
         }
 
-        $shouts = Shout::selectMany(
-            'WHERE `id`>? ORDER BY `id` ASC LIMIT ?',
-            $shoutboxId,
-            $this->shoutlimit,
-        );
+        $shouts = Shout::selectMany('WHERE `id`>? ORDER BY `id` ASC LIMIT ?', $shoutboxId, $this->shoutlimit);
 
-        $members = Member::joinedOn(
-            $shouts,
-            static fn(Shout $shout): int => $shout->uid,
-        );
+        $members = Member::joinedOn($shouts, static fn(Shout $shout): int => $shout->uid);
 
         foreach ($shouts as $shout) {
-            $this->page->command(
-                'addshout',
-                $this->formatShout($shout, $members[$shout->uid]),
-            );
+            $this->page->command('addshout', $this->formatShout($shout, $members[$shout->uid]));
             $last = (int) $shout->id;
         }
 
@@ -228,16 +187,16 @@ final class Shoutbox implements Module
 
         if ($numShouts > $perpage) {
             $pages .= " &middot; Pages: <span class='pages'>";
-            $pageArray = $this->jax->pages(
-                (int) ceil($numShouts / $perpage),
-                $pageNumber + 1,
-                10,
-            );
+            $pageArray = $this->jax->pages((int) ceil($numShouts / $perpage), $pageNumber + 1, 10);
             foreach ($pageArray as $v) {
-                $pages .= '<a href="?module=shoutbox&page='
-                    . $v . '"'
+                $pages .=
+                    '<a href="?module=shoutbox&page='
+                    . $v
+                    . '"'
                     . ($v === ($pageNumber + 1) ? ' class="active"' : '')
-                    . '>' . $v . '</a> ';
+                    . '>'
+                    . $v
+                    . '</a> ';
             }
 
             $pages .= '</span>';
@@ -250,32 +209,19 @@ final class Shoutbox implements Module
             return;
         }
 
-        $shouts = Shout::selectMany(
-            'ORDER BY `id` DESC LIMIT ?,?',
-            $pageNumber * $perpage,
-            $perpage,
-        );
+        $shouts = Shout::selectMany('ORDER BY `id` DESC LIMIT ?,?', $pageNumber * $perpage, $perpage);
 
-        $membersById = Member::joinedOn(
-            $shouts,
-            static fn(Shout $shout): int => $shout->uid,
-        );
+        $membersById = Member::joinedOn($shouts, static fn(Shout $shout): int => $shout->uid);
 
         $shoutHTML = '';
         foreach ($shouts as $shout) {
-            $shoutHTML .= $this->formatShout(
-                $shout,
-                $membersById[$shout->uid] ?? null,
-            );
+            $shoutHTML .= $this->formatShout($shout, $membersById[$shout->uid] ?? null);
         }
 
-        $page = $this->template->render(
-            'global/box',
-            [
-                'title' => 'Shoutbox' . $pages,
-                'content' => '<div class="sbhistory">' . $shoutHTML . '</div>',
-            ],
-        );
+        $page = $this->template->render('global/box', [
+            'title' => 'Shoutbox' . $pages,
+            'content' => '<div class="sbhistory">' . $shoutHTML . '</div>',
+        ]);
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
     }
@@ -283,16 +229,11 @@ final class Shoutbox implements Module
     public function deleteShout(int $delete): void
     {
         $shout = Shout::selectOne($delete);
-        $candelete = !$this->user->isGuest() && $shout !== null && $this->canDelete(
-            $shout,
-        );
+        $candelete = !$this->user->isGuest() && $shout !== null && $this->canDelete($shout);
 
         if (!$candelete) {
             if ($this->request->isJSAccess()) {
-                $this->page->command(
-                    'error',
-                    "You don't have permission to delete that shout",
-                );
+                $this->page->command('error', "You don't have permission to delete that shout");
 
                 return;
             }
@@ -303,11 +244,7 @@ final class Shoutbox implements Module
         }
 
         $this->page->command('preventNavigation');
-        $this->database->delete(
-            'shouts',
-            Database::WHERE_ID_EQUALS,
-            $delete,
-        );
+        $this->database->delete('shouts', Database::WHERE_ID_EQUALS, $delete);
     }
 
     public function addShout(string $shoutBody): void
@@ -317,9 +254,7 @@ final class Shoutbox implements Module
         $error = match (true) {
             $this->user->isGuest() => 'You must be logged in to shout!',
             !$this->user->getGroup()?->canShout => 'You do not have permission to shout!',
-            mb_strlen(
-                $shoutBody,
-            ) > 255 => 'Shout must be less than 255 characters.',
+            mb_strlen($shoutBody) > 255 => 'Shout must be less than 255 characters.',
             default => null,
         };
 

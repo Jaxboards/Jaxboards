@@ -51,20 +51,17 @@ final class ServiceConfig
             return $this->serviceConfig;
         }
 
-
-        $this->serviceConfig = require_once $this->installed
-            ? $this->fileSystem->pathFromRoot('config.php')
-            : $this->fileSystem->pathFromRoot('config.default.php');
-
+        $this->serviceConfig = require_once
+            $this->installed
+                ? $this->fileSystem->pathFromRoot('config.php')
+                : $this->fileSystem->pathFromRoot('config.default.php');
 
         return $this->serviceConfig;
     }
 
     public function hasInstalled(): bool
     {
-        return $this->installed || $this->fileSystem->getFileInfo(
-            'config.php',
-        )->isFile();
+        return $this->installed || $this->fileSystem->getFileInfo('config.php')->isFile();
     }
 
     public function getSetting(string $key): mixed
@@ -96,10 +93,7 @@ final class ServiceConfig
     public function writeServiceConfig(array $data): void
     {
         $this->serviceConfig = array_merge($this->serviceConfig, $data);
-        $this->fileSystem->putContents(
-            'config.php',
-            $this->configFileContents($data),
-        );
+        $this->fileSystem->putContents('config.php', $this->configFileContents($data));
     }
 
     /**

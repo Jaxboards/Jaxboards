@@ -93,19 +93,15 @@ final class BuddyListTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            get: ['path' => '/buddylist'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/buddylist'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
 
         static::assertContainsEquals(['preventNavigation'], $json);
 
-        $window = array_find(
-            $json,
-            static fn($cmd): bool => $cmd[0] === 'window',
-        );
+        $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         static::assertSame('buddylist', $window[1]['id']);
         static::assertSame('Buddies', $window[1]['title']);
     }
@@ -114,27 +110,18 @@ final class BuddyListTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            get: ['path' => '/buddylist', 'add' => '1'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/buddylist', 'add' => '1'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
 
         static::assertContainsEquals(['preventNavigation'], $json);
 
-        $window = array_find(
-            $json,
-            static fn($cmd): bool => $cmd[0] === 'window',
-        );
+        $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         static::assertSame('buddylist', $window[1]['id']);
         static::assertSame('Buddies', $window[1]['title']);
-        DOMAssert::assertSelectEquals(
-            '.contact .name',
-            'Admin',
-            1,
-            $window[1]['content'],
-        );
+        DOMAssert::assertSelectEquals('.contact .name', 'Admin', 1, $window[1]['content']);
 
         $activity = Activity::selectOne();
         static::assertSame('buddy_add', $activity->type);
@@ -146,27 +133,18 @@ final class BuddyListTest extends FeatureTestCase
     {
         $this->actingAs('admin', ['friends' => '1']);
 
-        $page = $this->go(new Request(
-            get: ['path' => '/buddylist', 'remove' => '1'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/buddylist', 'remove' => '1'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
 
         static::assertContainsEquals(['preventNavigation'], $json);
 
-        $window = array_find(
-            $json,
-            static fn($cmd): bool => $cmd[0] === 'window',
-        );
+        $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         static::assertSame('buddylist', $window[1]['id']);
         static::assertSame('Buddies', $window[1]['title']);
-        DOMAssert::assertSelectEquals(
-            '.contact .name',
-            'Admin',
-            0,
-            $window[1]['content'],
-        );
+        DOMAssert::assertSelectEquals('.contact .name', 'Admin', 0, $window[1]['content']);
 
         $member = Member::selectOne(1);
         static::assertSame('', $member->friends);
@@ -176,33 +154,20 @@ final class BuddyListTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            get: ['path' => '/buddylist', 'block' => '1'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/buddylist', 'block' => '1'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
 
         static::assertContainsEquals(['preventNavigation'], $json);
 
-        $window = array_find(
-            $json,
-            static fn($cmd): bool => $cmd[0] === 'window',
-        );
+        $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         static::assertSame('buddylist', $window[1]['id']);
         static::assertSame('Buddies', $window[1]['title']);
-        DOMAssert::assertSelectEquals(
-            '.contact .name',
-            'Admin',
-            1,
-            $window[1]['content'],
-        );
+        DOMAssert::assertSelectEquals('.contact .name', 'Admin', 1, $window[1]['content']);
 
-        DOMAssert::assertSelectCount(
-            '.contact.blocked',
-            1,
-            $window[1]['content'],
-        );
+        DOMAssert::assertSelectCount('.contact.blocked', 1, $window[1]['content']);
 
         $member = Member::selectOne(1);
         static::assertSame('1', $member->enemies);
@@ -212,28 +177,20 @@ final class BuddyListTest extends FeatureTestCase
     {
         $this->actingAs('admin', ['enemies' => '1']);
 
-        $page = $this->go(new Request(
-            get: ['path' => '/buddylist', 'unblock' => '1'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/buddylist', 'unblock' => '1'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
 
         static::assertContainsEquals(['preventNavigation'], $json);
 
-        $window = array_find(
-            $json,
-            static fn($cmd): bool => $cmd[0] === 'window',
-        );
+        $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         static::assertSame('buddylist', $window[1]['id']);
         static::assertSame('Buddies', $window[1]['title']);
         static::assertStringNotContainsString('Admin', $window[1]['content']);
 
-        DOMAssert::assertSelectCount(
-            '.contact.blocked',
-            0,
-            $window[1]['content'],
-        );
+        DOMAssert::assertSelectCount('.contact.blocked', 0, $window[1]['content']);
 
         $member = Member::selectOne(1);
         static::assertSame('', $member->enemies);

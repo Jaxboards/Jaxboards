@@ -129,21 +129,14 @@ final class Request
     /**
      * @param int $expires
      */
-    public function setCookie(
-        string $cookieName,
-        ?string $cookieValue,
-        $expires = 0,
-    ): void {
-        setcookie(
-            $cookieName,
-            $cookieValue ?? 'false',
-            [
-                'expires' => $expires,
-                'httponly' => true,
-                'samesite' => 'Strict',
-                'secure' => true,
-            ],
-        );
+    public function setCookie(string $cookieName, ?string $cookieValue, $expires = 0): void
+    {
+        setcookie($cookieName, $cookieValue ?? 'false', [
+            'expires' => $expires,
+            'httponly' => true,
+            'samesite' => 'Strict',
+            'secure' => true,
+        ]);
         $this->cookie[$cookieName] = $cookieValue;
     }
 

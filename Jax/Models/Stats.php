@@ -17,61 +17,25 @@ final class Stats extends Model
     #[PrimaryKey]
     public int $id = 0;
 
-    #[Column(
-        name: 'posts',
-        type: 'int',
-        default: 0,
-        nullable: false,
-        unsigned: true,
-    )]
+    #[Column(name: 'posts', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $posts = 0;
 
-    #[Column(
-        name: 'topics',
-        type: 'int',
-        default: 0,
-        nullable: false,
-        unsigned: true,
-    )]
+    #[Column(name: 'topics', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $topics = 0;
 
-    #[Column(
-        name: 'members',
-        type: 'int',
-        default: 0,
-        nullable: false,
-        unsigned: true,
-    )]
+    #[Column(name: 'members', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $members = 0;
 
-    #[Column(
-        name: 'most_members',
-        type: 'int',
-        default: 0,
-        nullable: false,
-        unsigned: true,
-    )]
+    #[Column(name: 'most_members', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $most_members = 0;
 
-    #[Column(
-        name: 'most_members_day',
-        type: 'int',
-        default: 0,
-        nullable: false,
-        unsigned: true,
-    )]
+    #[Column(name: 'most_members_day', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $most_members_day = 0;
 
     #[Column(name: 'last_register', type: 'int', unsigned: true)]
     #[ForeignKey(table: 'members', field: 'id', onDelete: 'null')]
     public int $last_register = 0;
 
-    #[Column(
-        name: 'dbVersion',
-        type: 'int',
-        default: 0,
-        nullable: false,
-        unsigned: true,
-    )]
+    #[Column(name: 'dbVersion', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $dbVersion = 0;
 }

@@ -12,13 +12,7 @@ final class TextRule extends Model
 {
     public const string TABLE = 'textrules';
 
-    #[Column(
-        name: 'id',
-        type: 'int',
-        nullable: false,
-        autoIncrement: true,
-        unsigned: true,
-    )]
+    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
     #[PrimaryKey]
     public int $id = 0;
 
@@ -28,12 +22,7 @@ final class TextRule extends Model
     #[Column(name: 'needle', type: 'string', length: 50, nullable: false)]
     public string $needle = '';
 
-    #[Column(
-        name: 'replacement',
-        type: 'string',
-        length: 500,
-        nullable: false,
-    )]
+    #[Column(name: 'replacement', type: 'string', length: 500, nullable: false)]
     public string $replacement = '';
 
     #[Column(name: 'enabled', type: 'bool', default: true)]

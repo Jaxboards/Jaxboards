@@ -9,7 +9,9 @@ use Jax\Page;
 
 final readonly class Rainbow implements Route
 {
-    public function __construct(private Page $page) {}
+    public function __construct(
+        private Page $page,
+    ) {}
 
     public function route($params): void
     {
@@ -88,9 +90,6 @@ final readonly class Rainbow implements Route
                 );
             }
         })()");
-        $this->page->command(
-            'playsound',
-            'always',
-        );
+        $this->page->command('playsound', 'always');
     }
 }

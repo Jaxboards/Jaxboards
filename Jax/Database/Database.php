@@ -81,19 +81,10 @@ final class Database
         string $prefix = '',
         string $driver = '',
     ): void {
-
         $this->pdo = match ($driver) {
             'sqliteMemory' => new Sqlite('sqlite::memory:'),
-            'postgres' => new Pgsql(
-                "postgres:host={$host};dbname={$database}",
-                $user,
-                $password,
-            ),
-            default => new Mysql(
-                "mysql:host={$host};dbname={$database};charset=utf8mb4",
-                $user,
-                $password,
-            ),
+            'postgres' => new Pgsql("postgres:host={$host};dbname={$database}", $user, $password),
+            default => new Mysql("mysql:host={$host};dbname={$database};charset=utf8mb4", $user, $password),
         };
 
         // All datetimes are GMT for jaxboards
@@ -133,19 +124,14 @@ final class Database
      * @param array<string>|string $fields list of fields to select, or SQL string
      * @param mixed                $vars
      */
-    public function select(
-        array|string $fields,
-        string $table,
-        ?string $where = null,
-        ...$vars,
-    ): ?PDOStatement {
+    public function select(array|string $fields, string $table, ?string $where = null, ...$vars): ?PDOStatement
+    {
         // set new variable to not impact debug_backtrace value for inspecting
         // input
         $fieldsString = is_array($fields) ? implode(', ', $fields) : $fields;
 
         // Where.
-        $query = "SELECT {$fieldsString} FROM "
-            . $this->ftable($table) . ($where !== null ? ' ' . $where : '');
+        $query = "SELECT {$fieldsString} FROM " . $this->ftable($table) . ($where !== null ? ' ' . $where : '');
 
         return $this->query($query, ...$vars);
     }
@@ -177,12 +163,9 @@ final class Database
 
         $keys = implode(',', $keys);
 
-        return $this->query(
-            <<<SQL
-                INSERT INTO {$this->ftable($table)} ({$keys}) VALUES ?;
-                SQL,
-            $values,
-        );
+        return $this->query(<<<SQL
+            INSERT INTO {$this->ftable($table)} ({$keys}) VALUES ?;
+            SQL, $values);
     }
 
     /**
@@ -202,9 +185,7 @@ final class Database
 
         $keysPrepared = $this->buildUpdate($keyValuePairs);
         $values = array_values($keyValuePairs);
-        $query = 'UPDATE ' . $this->ftable(
-            $table,
-        ) . ' SET ' . $keysPrepared . ' ' . $whereFormat;
+        $query = 'UPDATE ' . $this->ftable($table) . ' SET ' . $keysPrepared . ' ' . $whereFormat;
 
         return $this->query($query, ...$values, ...$whereParams);
     }
@@ -212,13 +193,9 @@ final class Database
     /**
      * @param mixed $vars
      */
-    public function delete(
-        string $table,
-        string $whereformat,
-        ...$vars,
-    ): ?PDOStatement {
-        $query = 'DELETE FROM ' . $this->ftable($table)
-            . ($whereformat !== '' ? ' ' . $whereformat : '');
+    public function delete(string $table, string $whereformat, ...$vars): ?PDOStatement
+    {
+        $query = 'DELETE FROM ' . $this->ftable($table) . ($whereformat !== '' ? ' ' . $whereformat : '');
 
         // Put the format string back.
         return $this->query($query, ...$vars);
@@ -266,7 +243,7 @@ final class Database
                 $valueCount = count($value);
                 $compiledQueryString = $this->querySubArray(
                     $compiledQueryString,
-                    ((int) $index) + $added_placeholders,
+                    (int) $index + $added_placeholders,
                     $valueCount,
                 );
 
@@ -288,11 +265,7 @@ final class Database
 
         if ($args !== []) {
             foreach ($outArgs as $index => $value) {
-                $pdoStmt->bindValue(
-                    $index + 1,
-                    $value,
-                    $this->queryTypeForPDOValue($value),
-                );
+                $pdoStmt->bindValue($index + 1, $value, $this->queryTypeForPDOValue($value));
             }
         }
 
@@ -314,9 +287,7 @@ final class Database
             return 'NULL';
         }
 
-        return is_int($value)
-            ? $value
-            : $this->escape((string) $value);
+        return is_int($value) ? $value : $this->escape((string) $value);
     }
 
     public function escape(string $string): string
@@ -345,21 +316,12 @@ final class Database
      * @param array<int,string> $tablenames
      * @param mixed             $args
      */
-    public function special(
-        string $format,
-        array $tablenames,
-        ...$args,
-    ): ?PDOStatement {
+    public function special(string $format, array $tablenames, ...$args): ?PDOStatement
+    {
         // Table names.
         $tempformat = str_replace('%t', '%s', $format);
 
-        $newformat = vsprintf(
-            $tempformat,
-            array_map(
-                $this->ftable(...),
-                $tablenames,
-            ),
-        );
+        $newformat = vsprintf($tempformat, array_map($this->ftable(...), $tablenames));
 
         // Put the format string back.
         return $this->query($newformat, ...$args);
@@ -375,23 +337,19 @@ final class Database
         }
 
         /*
-            E.G. if array is a => b; c => c; then result is a = ?, b = ?,
-            where the first " = ?," comes from the implode.
+         * E.G. if array is a => b; c => c; then result is a = ?, b = ?,
+         * where the first " = ?," comes from the implode.
          */
 
-        return implode(PHP_EOL . ', ', array_map(
-            static function (string $key): string {
-                $value = '?';
+        return implode(PHP_EOL . ', ', array_map(static function (string $key): string {
+            $value = '?';
 
-                return "`{$key}` = {$value}";
-            },
-            array_keys($keyValuePairs),
-        ));
+            return "`{$key}` = {$value}";
+        }, array_keys($keyValuePairs)));
     }
 
-    private function queryTypeForPDOValue(
-        bool|float|int|string|null $value,
-    ): int {
+    private function queryTypeForPDOValue(bool|float|int|string|null $value): int
+    {
         return match (true) {
             $value === null => PDO::PARAM_NULL,
             is_int($value) => PDO::PARAM_INT,
@@ -401,11 +359,8 @@ final class Database
     }
 
     // Blah ?1 blah ?2 blah ?3 blah
-    private function querySubArray(
-        string $queryString,
-        int $placeholderNumber,
-        int $arrlen,
-    ): string {
+    private function querySubArray(string $queryString, int $placeholderNumber, int $arrlen): string
+    {
         $arr = explode('?', $queryString, $placeholderNumber + 2);
         $last = array_pop($arr);
         $replacement = '';

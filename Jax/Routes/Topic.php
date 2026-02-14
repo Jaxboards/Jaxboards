@@ -87,9 +87,7 @@ final class Topic implements Route
         $quickReply = $this->request->both('qreply') !== null;
 
         $topic = ModelsTopic::selectOne($tid);
-        $forumPerms = $topic !== null
-            ? $this->fetchForumPermissions($topic)
-            : [];
+        $forumPerms = $topic !== null ? $this->fetchForumPermissions($topic) : [];
 
         if (!$topic || !$forumPerms['read']) {
             $this->router->redirect('index');
@@ -105,29 +103,15 @@ final class Topic implements Route
 
         match (true) {
             $quickReply && !$this->request->isJSUpdate() => match (true) {
-                $this->request->isJSAccess() && !$this->request->isJSDirectLink() => $this->quickReplyForm(
-                    $topic,
-                ),
-                default => $this->router->redirect(
-                    'post',
-                    ['tid' => $topic->id],
-                ),
+                $this->request->isJSAccess() && !$this->request->isJSDirectLink() => $this->quickReplyForm($topic),
+                default => $this->router->redirect('post', ['tid' => $topic->id]),
             },
-            $ratePost !== 0 => $this->reactions->toggleReaction(
-                $ratePost,
-                (int) $this->request->both('niblet'),
-            ),
+            $ratePost !== 0 => $this->reactions->toggleReaction($ratePost, (int) $this->request->both('niblet')),
             $findPost !== 0 => $this->findPost($topic, $findPost),
-            $this->request->both('getlast') !== null => $this->getLastPost(
-                $topic,
-            ),
+            $this->request->both('getlast') !== null => $this->getLastPost($topic),
             $edit !== 0 => $this->quickEditPost($topic, $edit),
-            $this->request->both('quote') !== null => $this->multiQuote(
-                $topic,
-            ),
-            $this->request->both('markread') !== null => $this->markRead(
-                $topic,
-            ),
+            $this->request->both('quote') !== null => $this->multiQuote($topic),
+            $this->request->both('markread') !== null => $this->markRead($topic),
             $listRating !== 0 => $this->reactions->listReactions($listRating),
             $this->request->isJSUpdate() => $this->update($topic),
             $this->request->both('fmt') === 'RSS' => $this->viewRSS($topic),
@@ -138,10 +122,8 @@ final class Topic implements Route
     /**
      * @return array<string,bool>
      */
-    private function fetchForumPermissions(
-        ModelsTopic $modelsTopic,
-        ?Forum $forum = null,
-    ): array {
+    private function fetchForumPermissions(ModelsTopic $modelsTopic, ?Forum $forum = null): array
+    {
         static $forumPerms = [];
 
         if ($forumPerms !== []) {
@@ -164,22 +146,21 @@ final class Topic implements Route
      */
     private function fetchMembersById(array $memberIds): array
     {
-        return $memberIds !== [] ? Lodash::keyBy(
-            Member::selectMany(
-                Database::WHERE_ID_IN,
-                array_unique($memberIds, SORT_REGULAR),
-            ),
-            static fn(Member $member): int => $member->id,
-        ) : [];
+        return (
+            $memberIds !== []
+                ? Lodash::keyBy(
+                    Member::selectMany(Database::WHERE_ID_IN, array_unique($memberIds, SORT_REGULAR)),
+                    static fn(Member $member): int => $member->id,
+                )
+                : []
+        );
     }
 
     private function viewTopic(ModelsTopic $modelsTopic): void
     {
         if (
             !$this->user->isGuest()
-            && $modelsTopic->lastPostDate > $this->date->datetimeAsTimestamp(
-                $this->user->get()->lastVisit,
-            )
+            && $modelsTopic->lastPostDate > $this->date->datetimeAsTimestamp($this->user->get()->lastVisit)
         ) {
             $this->markRead($modelsTopic);
         }
@@ -191,54 +172,32 @@ final class Topic implements Route
             'title' => $topicTitle,
             'description' => $modelsTopic->subtitle,
         ]);
-        $this->session->set(
-            'locationVerbose',
-            "In topic '" . $topicTitle . "'",
-        );
+        $this->session->set('locationVerbose', "In topic '" . $topicTitle . "'");
 
         $forum = Forum::selectOne($modelsTopic->fid);
-        $category = $forum !== null
-            ? Category::selectOne($forum->category)
-            : null;
+        $category = $forum !== null ? Category::selectOne($forum->category) : null;
         // Fix this to work with subforums.
-        $this->page->setBreadCrumbs(
-            [
-                $this->router->url(
-                    'category',
-                    ['id' => $category?->id],
-                ) => $category->title ?? '',
-                $this->router->url('forum', [
-                    'id' => $forum?->id,
-                    'slug' => $this->textFormatting->slugify($forum?->title),
-                ]) => $forum->title ?? '',
-                $this->router->url('topic', [
-                    'id' => $modelsTopic->id,
-                    'slug' => $this->textFormatting->slugify(
-                        $modelsTopic->title,
-                    ),
-                ]) => $this->textFormatting->wordFilter($modelsTopic->title),
-            ],
-        );
+        $this->page->setBreadCrumbs([
+            $this->router->url('category', ['id' => $category?->id]) => $category->title ?? '',
+            $this->router->url('forum', [
+                'id' => $forum?->id,
+                'slug' => $this->textFormatting->slugify($forum?->title),
+            ]) =>
+                $forum->title ?? '',
+            $this->router->url('topic', [
+                'id' => $modelsTopic->id,
+                'slug' => $this->textFormatting->slugify($modelsTopic->title),
+            ]) => $this->textFormatting->wordFilter($modelsTopic->title),
+        ]);
 
         // Generate pages.
         $postCount = Post::count('WHERE `tid`=?', $modelsTopic->id);
 
         $totalpages = (int) ceil($postCount / $this->numperpage);
         $pageLinks = [];
-        foreach (
-            $this->jax->pages(
-                $totalpages,
-                $this->pageNumber + 1,
-                10,
-            ) as $pageNumber
-        ) {
-            $pageURL = $this->router->url(
-                'topic',
-                ['id' => $modelsTopic->id, 'page' => $pageNumber],
-            );
-            $activeClass = $pageNumber === $this->pageNumber + 1
-                ? ' class="active"'
-                : '';
+        foreach ($this->jax->pages($totalpages, $this->pageNumber + 1, 10) as $pageNumber) {
+            $pageURL = $this->router->url('topic', ['id' => $modelsTopic->id, 'page' => $pageNumber]);
+            $activeClass = $pageNumber === ($this->pageNumber + 1) ? ' class="active"' : '';
             $pageLinks[] = <<<HTML
                 <a href="{$pageURL}"{$activeClass}>{$pageNumber}</a>
                 HTML;
@@ -247,15 +206,10 @@ final class Topic implements Route
         $pagelist = implode(' ', $pageLinks);
 
         // Are they on the last page? This stores a session variable.
-        $this->session->addVar(
-            'topic_lastpage',
-            ($this->pageNumber + 1) === $totalpages,
-        );
+        $this->session->addVar('topic_lastpage', ($this->pageNumber + 1) === $totalpages);
 
         // If it's a poll, put it in.
-        $poll = $modelsTopic->pollType !== ''
-            ? $this->poll->render($modelsTopic)
-            : '';
+        $poll = $modelsTopic->pollType !== '' ? $this->poll->render($modelsTopic) : '';
 
         $forumPerms = $this->fetchForumPermissions($modelsTopic, $forum);
 
@@ -266,20 +220,16 @@ final class Topic implements Route
         );
 
         // Generate post listing.
-        $page = $this->template->render(
-            'topic/index',
-            [
-                'topic' => $modelsTopic,
-                'content' => $this->postsIntoOutput($modelsTopic),
-                'canCreateTopic' => $forumPerms['start'],
-                'canReply' => $forumPerms['reply'] && (
-                    !$modelsTopic->locked || $this->user->getGroup()?->canOverrideLockedTopics
-                ),
-                'pages' => $pagelist,
-                'poll' => $poll,
-                'usersInTopic' => $usersInTopic,
-            ],
-        );
+        $page = $this->template->render('topic/index', [
+            'topic' => $modelsTopic,
+            'content' => $this->postsIntoOutput($modelsTopic),
+            'canCreateTopic' => $forumPerms['start'],
+            'canReply' =>
+                $forumPerms['reply'] && (!$modelsTopic->locked || $this->user->getGroup()?->canOverrideLockedTopics),
+            'pages' => $pagelist,
+            'poll' => $poll,
+            'usersInTopic' => $usersInTopic,
+        ]);
 
         // Update view count.
         ++$modelsTopic->views;
@@ -288,10 +238,7 @@ final class Topic implements Route
         if ($this->request->isJSAccess()) {
             $this->page->command('update', 'page', $page);
             if ($this->request->both('pid') !== null) {
-                $this->page->command(
-                    'scrollToPost',
-                    $this->request->both('pid'),
-                );
+                $this->page->command('scrollToPost', $this->request->both('pid'));
 
                 return;
             }
@@ -310,20 +257,13 @@ final class Topic implements Route
 
     private function update(ModelsTopic $modelsTopic): void
     {
-
         // Check for new posts and append them.
         if ($this->session->get()->location !== "vt{$modelsTopic->id}") {
             $this->session->deleteVar('topic_lastpid');
         }
 
-        if (
-            $this->session->getVar('topic_lastpid')
-            && $this->session->getVar('topic_lastpage')
-        ) {
-            $newposts = $this->postsIntoOutput(
-                $modelsTopic,
-                (int) $this->session->getVar('topic_lastpid'),
-            );
+        if ($this->session->getVar('topic_lastpid') && $this->session->getVar('topic_lastpage')) {
+            $newposts = $this->postsIntoOutput($modelsTopic, (int) $this->session->getVar('topic_lastpid'));
             if ($newposts !== '') {
                 $this->page->command('appendrows', '#intopic', $newposts);
             }
@@ -331,9 +271,7 @@ final class Topic implements Route
 
         // Update users online list.
         $list = [];
-        $oldcache = array_flip(
-            explode(',', $this->session->get()->usersOnlineCache),
-        );
+        $oldcache = array_flip(explode(',', $this->session->get()->usersOnlineCache));
         $newcache = [];
         foreach ($this->usersOnline->getUsersOnline() as $userOnline) {
             if (!$userOnline->uid) {
@@ -379,9 +317,7 @@ final class Topic implements Route
             return [];
         }
 
-        $badgesPerAuthor = $this->badges->fetchBadges(
-            array_map(static fn(Post $post): int => $post->author, $posts),
-        );
+        $badgesPerAuthor = $this->badges->fetchBadges(array_map(static fn(Post $post): int => $post->author, $posts));
         $badgesPerAuthorHTML = [];
 
         foreach ($badgesPerAuthor as $authorId => $badgeTuples) {
@@ -390,10 +326,7 @@ final class Topic implements Route
             }
 
             foreach ($badgeTuples as $badgeTuple) {
-                $profileBadgesURL = $this->router->url(
-                    'profile',
-                    ['id' => $authorId, 'page' => 'badges'],
-                );
+                $profileBadgesURL = $this->router->url('profile', ['id' => $authorId, 'page' => 'badges']);
                 $badgesPerAuthorHTML[$authorId] .= <<<HTML
                     <a href="{$profileBadgesURL}">
                         <img src="{$badgeTuple->badge->imagePath}" title="{$badgeTuple->badge->badgeTitle}">
@@ -408,83 +341,52 @@ final class Topic implements Route
     private function quickReplyForm(ModelsTopic $modelsTopic, string $prefilled = ''): void
     {
         $this->page->command('preventNavigation');
-        if (
-            $this->session->getVar('multiquote') && $prefilled === ''
-        ) {
-            $posts = Post::selectMany(
-                'WHERE `id` IN ?',
-                explode(',', (string) $this->session->getVar('multiquote')),
-            );
+        if ($this->session->getVar('multiquote') && $prefilled === '') {
+            $posts = Post::selectMany('WHERE `id` IN ?', explode(',', (string) $this->session->getVar('multiquote')));
 
-            $membersById = Member::joinedOn(
-                $posts,
-                static fn(Post $post): int => $post->author,
-            );
+            $membersById = Member::joinedOn($posts, static fn(Post $post): int => $post->author);
 
             foreach ($posts as $post) {
-                $prefilled .= '[quote=' . $membersById[$post->author]->displayName . ']'
-                    . $post->post
-                    . '[/quote]'
-                    . PHP_EOL;
+                $prefilled .=
+                    '[quote=' . $membersById[$post->author]->displayName . ']' . $post->post . '[/quote]' . PHP_EOL;
             }
 
             $this->session->deleteVar('multiquote');
         }
 
-        $this->page->command(
-            'window',
-            [
-                'content' => $this->template->render(
-                    'topic/reply-form',
-                    [
-                        'topic' => $modelsTopic,
-                        'text' => $prefilled,
-                    ],
-                ),
-                'id' => 'qreply',
-                'resize' => '.quickreply',
-                'title' => $this->textFormatting->wordFilter(
-                    $modelsTopic->title,
-                ),
-            ],
-        );
+        $this->page->command('window', [
+            'content' => $this->template->render('topic/reply-form', [
+                'topic' => $modelsTopic,
+                'text' => $prefilled,
+            ]),
+            'id' => 'qreply',
+            'resize' => '.quickreply',
+            'title' => $this->textFormatting->wordFilter($modelsTopic->title),
+        ]);
         $this->page->command('updateqreply', '');
     }
 
-    private function postsIntoOutput(
-        ModelsTopic $modelsTopic,
-        int $lastpid = 0,
-    ): string {
+    private function postsIntoOutput(ModelsTopic $modelsTopic, int $lastpid = 0): string
+    {
         $usersonline = $this->usersOnline->getUsersOnline();
 
         $topicPostCounter = $this->pageNumber * $this->numperpage;
-        $posts = Post::selectMany(
-            <<<'SQL'
-                WHERE tid = ? AND id > ?
-                ORDER BY `newtopic` DESC, `id`
-                LIMIT ?,?
-                SQL,
-            $modelsTopic->id,
-            $lastpid,
-            $lastpid !== 0 ? 0 : $topicPostCounter,
-            $this->numperpage,
-        );
+        $posts = Post::selectMany(<<<'SQL'
+            WHERE tid = ? AND id > ?
+            ORDER BY `newtopic` DESC, `id`
+            LIMIT ?,?
+            SQL, $modelsTopic->id, $lastpid, $lastpid !== 0 ? 0 : $topicPostCounter, $this->numperpage);
 
         if ($posts === []) {
             return '';
         }
 
-        $membersById = $this->fetchMembersById(
-            array_merge(
-                array_map(static fn($post): int => $post->author, $posts),
-                array_map(static fn($post): int => $post->editby ?? 0, $posts),
-            ),
-        );
+        $membersById = $this->fetchMembersById(array_merge(
+            array_map(static fn($post): int => $post->author, $posts),
+            array_map(static fn($post): int => $post->editby ?? 0, $posts),
+        ));
 
-        $groups = Group::joinedOn(
-            $membersById,
-            static fn(Member $member): int => $member->groupID,
-        );
+        $groups = Group::joinedOn($membersById, static fn(Member $member): int => $member->groupID);
 
         $forumPerms = $this->fetchForumPermissions($modelsTopic);
         $canModerateTopic = $this->user->isModeratorOfTopic($modelsTopic);
@@ -500,39 +402,28 @@ final class Topic implements Route
             $author = $post->author ? $membersById[$post->author] : null;
             $editor = $post->editby ? $membersById[$post->editby] : null;
 
-            $authorGroup = $author
-                ? $groups[$author->groupID]
-                : null;
+            $authorGroup = $author ? $groups[$author->groupID] : null;
 
-            $rows .= $this->template->render(
-                'topic/post-row',
-                [
-                    'author' => $author,
-                    'badges' => $author && array_key_exists(
-                        $author->id,
-                        $badgesPerAuthor,
-                    ) ? $badgesPerAuthor[$author->id] : '',
-                    'canEdit' => $this->canEdit($modelsTopic, $post),
-                    'canModerate' => $canModerateTopic,
-                    'canReport' => !$this->user->isGuest(),
-                    'canReply' => $forumPerms['reply'],
-                    'editor' => $editor,
-                    'group' => $authorGroup,
-                    'ip' => $this->ipAddress->asHumanReadable($post->ip),
-                    'isOnline' => array_key_exists(
-                        $post->author,
-                        $usersonline,
-                    ),
-                    'openGraphData' => $post->openGraphMetadata ? json_decode(
-                        $post->openGraphMetadata,
-                        true,
-                        flags: JSON_THROW_ON_ERROR,
-                    ) : null,
-                    'post' => $post,
-                    'postRating' => $this->reactions->render($post),
-                    'topic' => $modelsTopic,
-                ],
-            );
+            $rows .= $this->template->render('topic/post-row', [
+                'author' => $author,
+                'badges' => $author && array_key_exists($author->id, $badgesPerAuthor)
+                    ? $badgesPerAuthor[$author->id]
+                    : '',
+                'canEdit' => $this->canEdit($modelsTopic, $post),
+                'canModerate' => $canModerateTopic,
+                'canReport' => !$this->user->isGuest(),
+                'canReply' => $forumPerms['reply'],
+                'editor' => $editor,
+                'group' => $authorGroup,
+                'ip' => $this->ipAddress->asHumanReadable($post->ip),
+                'isOnline' => array_key_exists($post->author, $usersonline),
+                'openGraphData' => $post->openGraphMetadata
+                    ? json_decode($post->openGraphMetadata, true, flags: JSON_THROW_ON_ERROR)
+                    : null,
+                'post' => $post,
+                'postRating' => $this->reactions->render($post),
+                'topic' => $modelsTopic,
+            ]);
             $lastpid = $post->id;
         }
 
@@ -547,11 +438,13 @@ final class Topic implements Route
             return true;
         }
 
-        return $post->author
-            && ($post->newtopic !== 0
-                ? $this->user->getGroup()?->canEditTopics
-                : $this->user->getGroup()?->canEditPosts)
-            && $post->author === $this->user->get()->id;
+        return (
+            $post->author
+            && (
+                $post->newtopic !== 0 ? $this->user->getGroup()?->canEditTopics : $this->user->getGroup()?->canEditPosts
+            )
+            && $post->author === $this->user->get()->id
+        );
     }
 
     private function quickEditPost(ModelsTopic $modelsTopic, int $pid): void
@@ -580,26 +473,18 @@ final class Topic implements Route
         }
 
         if (!$this->canEdit($modelsTopic, $post)) {
-            $this->page->command(
-                'error',
-                "You don't have permission to edit this post.",
-            );
+            $this->page->command('error', "You don't have permission to edit this post.");
 
             return;
         }
 
-        $form = $post->newtopic !== 0 ? $this->template->render(
-            'topic/qedit-topic',
-            [
+        $form = $post->newtopic !== 0
+            ? $this->template->render('topic/qedit-topic', [
                 'topic' => $modelsTopic,
                 'post' => $post,
-            ],
-        ) : $this->template->render(
-            'topic/qedit-post',
-            [
+            ]) : $this->template->render('topic/qedit-post', [
                 'post' => $post,
-            ],
-        );
+            ]);
 
         $this->page->command('update', "#pid_{$pid} .post_content", $form);
     }
@@ -619,10 +504,7 @@ final class Topic implements Route
         if ($post === null) {
             $error = "That post doesn't exist!";
             $this->page->command('error', $error);
-            $this->page->append(
-                'PAGE',
-                $this->template->render('error', ['message' => $error]),
-            );
+            $this->page->append('PAGE', $this->template->render('error', ['message' => $error]));
 
             return;
         }
@@ -630,8 +512,7 @@ final class Topic implements Route
         $author = Member::selectOne($post->author);
         $quotedText = $quotedText ?: $post->post;
 
-        $prefilled = '[quote=' . $author?->displayName . ']' . $quotedText . '[/quote]'
-            . PHP_EOL . PHP_EOL;
+        $prefilled = '[quote=' . $author?->displayName . ']' . $quotedText . '[/quote]' . PHP_EOL . PHP_EOL;
 
         // Quick reply window is open so update it
         if ($qreplyOpen) {
@@ -650,16 +531,11 @@ final class Topic implements Route
 
         // They don't allow javascript, so store quoted post IDs in the session
         // and send them to full reply form
-        $multiquote = (string) ($this->session->getVar(
-            'multiquote',
-        ) ?: '');
+        $multiquote = (string) ($this->session->getVar('multiquote') ?: '');
         $multiquotes = explode(',', $multiquote);
         if (!in_array((string) $pid, $multiquotes, true)) {
             $multiquotes[] = (string) $pid;
-            $this->session->addVar(
-                'multiquote',
-                implode(',', $multiquotes),
-            );
+            $this->session->addVar('multiquote', implode(',', $multiquotes));
         }
 
         $this->router->redirect('post', ['tid' => $modelsTopic->id]);
@@ -708,12 +584,14 @@ final class Topic implements Route
 
         $posts = Post::selectMany('WHERE tid=?', $post->tid);
         foreach ($posts as $index => $post) {
-            if ($post->id !== $postId) { continue; }
+            if ($post->id !== $postId) {
+                continue;
+            }
 
-$postId = $post->id;
-                $postPosition = $index + 1;
+            $postId = $post->id;
+            $postPosition = $index + 1;
 
-                break;
+            break;
         }
 
         $this->page->command('preventNavigation');
@@ -738,62 +616,36 @@ $postId = $post->id;
 
     private function markRead(ModelsTopic $modelsTopic): void
     {
-        $topicsread = json_decode(
-            $this->session->get()->topicsread,
-            true,
-            flags: JSON_THROW_ON_ERROR,
-        );
+        $topicsread = json_decode($this->session->get()->topicsread, true, flags: JSON_THROW_ON_ERROR);
         $topicsread[$modelsTopic->id] = Carbon::now('UTC')->getTimestamp();
-        $this->session->set(
-            'topicsread',
-            json_encode($topicsread, JSON_THROW_ON_ERROR),
-        );
+        $this->session->set('topicsread', json_encode($topicsread, JSON_THROW_ON_ERROR));
     }
 
     private function viewRSS(ModelsTopic $modelsTopic): void
     {
         $rootURL = $this->router->getRootURL();
-        $rssFeed = new RSSFeed(
-            [
-                'description' => $this->textFormatting->wordFilter(
-                    $modelsTopic->subtitle,
-                ),
-                'link' => $rootURL . $this->router->url(
-                    'topic',
-                    ['id' => $modelsTopic->id],
-                ),
-                'title' => $this->textFormatting->wordFilter(
-                    $modelsTopic->title,
-                ),
-            ],
-        );
-        $posts = Post::selectMany(
-            'WHERE `tid` = ?',
-            $modelsTopic->id,
-        );
-        $authors = $this->fetchMembersById(
-            array_map(static fn(Post $post): int => $post->author, $posts),
-        );
+        $rssFeed = new RSSFeed([
+            'description' => $this->textFormatting->wordFilter($modelsTopic->subtitle),
+            'link' => $rootURL . $this->router->url('topic', ['id' => $modelsTopic->id]),
+            'title' => $this->textFormatting->wordFilter($modelsTopic->title),
+        ]);
+        $posts = Post::selectMany('WHERE `tid` = ?', $modelsTopic->id);
+        $authors = $this->fetchMembersById(array_map(static fn(Post $post): int => $post->author, $posts));
 
         foreach ($posts as $post) {
-            $link = $rootURL . $this->router->url('topic', [
-                'id' => $modelsTopic->id,
-                'findpost' => $post->id,
+            $link =
+                $rootURL
+                . $this->router->url('topic', [
+                    'id' => $modelsTopic->id,
+                    'findpost' => $post->id,
+                ]);
+            $rssFeed->additem([
+                'description' => $this->textFormatting->blockhtml($this->textFormatting->theWorks($post->post)),
+                'guid' => $link,
+                'link' => $link,
+                'pubDate' => gmdate('r', $this->date->datetimeAsTimestamp($post->date)),
+                'title' => $authors[$post->author]->displayName . ':',
             ]);
-            $rssFeed->additem(
-                [
-                    'description' => $this->textFormatting->blockhtml(
-                        $this->textFormatting->theWorks($post->post),
-                    ),
-                    'guid' => $link,
-                    'link' => $link,
-                    'pubDate' => gmdate(
-                        'r',
-                        $this->date->datetimeAsTimestamp($post->date),
-                    ),
-                    'title' => $authors[$post->author]->displayName . ':',
-                ],
-            );
         }
 
         $this->page->earlyFlush($rssFeed->publish());

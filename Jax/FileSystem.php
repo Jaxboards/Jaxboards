@@ -59,10 +59,7 @@ final readonly class FileSystem
      */
     public function copy(string $from, string $to): bool
     {
-        return copy(
-            $this->pathFromRoot($from),
-            $this->pathFromRoot($to),
-        );
+        return copy($this->pathFromRoot($from), $this->pathFromRoot($to));
     }
 
     /**
@@ -80,23 +77,13 @@ final readonly class FileSystem
         }
 
         // Make directories first
-        foreach (
-            $this->glob(
-                $this->pathJoin($src, '**'),
-                GLOB_ONLYDIR,
-            ) as $directory
-        ) {
+        foreach ($this->glob($this->pathJoin($src, '**'), GLOB_ONLYDIR) as $directory) {
             $destDir = str_replace($src, $dst, $directory);
             $this->mkdir($destDir, recursive: true);
         }
 
         // Then files
-        foreach (
-            $this->glob(
-                $this->pathJoin($src, '{**/,}*'),
-                GLOB_BRACE,
-            ) as $sourceFile
-        ) {
+        foreach ($this->glob($this->pathJoin($src, '{**/,}*'), GLOB_BRACE) as $sourceFile) {
             if ($this->getFileInfo($sourceFile)->isDir()) {
                 continue;
             }
@@ -115,12 +102,11 @@ final readonly class FileSystem
     {
         $magnitude = (int) log($sizeInBytes, 1 << 10);
 
-        return round($sizeInBytes / (1 << 10) ** $magnitude, 2)
-            . ($magnitude !== 0 ? mb_substr(
-                ' KMGTE',
-                $magnitude,
-                1,
-            ) : '') . 'B';
+        return (
+            round($sizeInBytes / ((1 << 10) ** $magnitude), 2)
+            . ($magnitude !== 0 ? mb_substr(' KMGTE', $magnitude, 1) : '')
+            . 'B'
+        );
     }
 
     public function getContents(string $filenameOrURL): string
@@ -144,27 +130,17 @@ final readonly class FileSystem
     /**
      * Get SplFileInfo for a file.
      */
-    public function getFileInfo(
-        string $filename,
-        bool $allowRootBypass = false,
-    ): SplFileInfo {
-        return new SplFileInfo(
-            $allowRootBypass ? $filename : $this->pathFromRoot($filename),
-        );
+    public function getFileInfo(string $filename, bool $allowRootBypass = false): SplFileInfo
+    {
+        return new SplFileInfo($allowRootBypass ? $filename : $this->pathFromRoot($filename));
     }
 
     /**
      * Get SplFileObject for a file.
      */
-    public function getFileObject(
-        string $filename,
-        string $mode = 'r',
-        bool $allowRootBypass = false,
-    ): SplFileObject {
-        return new SplFileObject(
-            $allowRootBypass ? $filename : $this->pathFromRoot($filename),
-            $mode,
-        );
+    public function getFileObject(string $filename, string $mode = 'r', bool $allowRootBypass = false): SplFileObject
+    {
+        return new SplFileObject($allowRootBypass ? $filename : $this->pathFromRoot($filename), $mode);
     }
 
     /**
@@ -189,19 +165,13 @@ final readonly class FileSystem
     public function glob(string $pattern, int $flags = 0): array
     {
         return array_map(
-            fn(string $path): string => mb_substr(
-                $path,
-                mb_strlen($this->root),
-            ),
+            fn(string $path): string => mb_substr($path, mb_strlen($this->root)),
             glob($this->pathFromRoot($pattern), $flags) ?: [],
         );
     }
 
-    public function mkdir(
-        string $directory,
-        int $mode = 0o777,
-        bool $recursive = false,
-    ): bool {
+    public function mkdir(string $directory, int $mode = 0o777, bool $recursive = false): bool
+    {
         return mkdir($this->pathFromRoot($directory), $mode, $recursive);
     }
 
@@ -236,10 +206,7 @@ final readonly class FileSystem
      */
     public function rename(string $from, string $to): bool
     {
-        return rename(
-            $this->pathFromRoot($from),
-            $this->pathFromRoot($to),
-        );
+        return rename($this->pathFromRoot($from), $this->pathFromRoot($to));
     }
 
     /**

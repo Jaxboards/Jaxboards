@@ -106,12 +106,7 @@ final class ModControlsTest extends FeatureTestCase
 
         $page = $this->go('/modcontrols');
 
-        DOMAssert::assertSelectEquals(
-            '.modcppage',
-            'Choose an option on the left.',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('.modcppage', 'Choose an option on the left.', 1, $page);
     }
 
     public function testModCPIndexMember(): void
@@ -137,49 +132,28 @@ final class ModControlsTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            get: ['path' => '/modcontrols/emem'],
-            post: ['mid' => '1', 'submit' => 'showform'],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/modcontrols/emem'], post: [
+            'mid' => '1',
+            'submit' => 'showform',
+        ]));
 
-        DOMAssert::assertSelectCount(
-            'input[name=displayName][value=Admin]',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectCount('input[name=displayName][value=Admin]', 1, $page);
     }
 
     public function testEditMemberMemberProvidedSave(): void
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            get: ['path' => '/modcontrols/emem'],
-            post: [
-                'mid' => '1',
-                'displayName' => 'New Name',
-                'signature' => 'New signature',
-                'submit' => 'save',
-            ],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/modcontrols/emem'], post: [
+            'mid' => '1',
+            'displayName' => 'New Name',
+            'signature' => 'New signature',
+            'submit' => 'save',
+        ]));
 
-        DOMAssert::assertSelectEquals(
-            '.success',
-            'Profile information saved.',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectCount(
-            'input[name=displayName][value="New Name"]',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            'textarea[name=signature]',
-            'New signature',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('.success', 'Profile information saved.', 1, $page);
+        DOMAssert::assertSelectCount('input[name=displayName][value="New Name"]', 1, $page);
+        DOMAssert::assertSelectEquals('textarea[name=signature]', 'New signature', 1, $page);
     }
 
     public function testIPTools(): void
@@ -195,40 +169,13 @@ final class ModControlsTest extends FeatureTestCase
     {
         $this->actingAs('admin', ['ip' => inet_pton('::1')]);
 
-        $page = $this->go(new Request(
-            get: ['path' => '/modcontrols/iptools'],
-            post: ['ip' => '::1'],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/modcontrols/iptools'], post: ['ip' => '::1']));
 
-        DOMAssert::assertSelectCount(
-            'input[type=text][name=ip][value="::1"]',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            'span[style="color:#090"]',
-            'not banned',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            '.modcppage .minibox .title',
-            'Users with this IP:',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            '.modcppage .minibox .title',
-            'Last 5 shouts:',
-            0,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            '.modcppage .minibox .title',
-            'Last 5 posts:',
-            0,
-            $page,
-        );
+        DOMAssert::assertSelectCount('input[type=text][name=ip][value="::1"]', 1, $page);
+        DOMAssert::assertSelectEquals('span[style="color:#090"]', 'not banned', 1, $page);
+        DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Users with this IP:', 1, $page);
+        DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Last 5 shouts:', 0, $page);
+        DOMAssert::assertSelectEquals('.modcppage .minibox .title', 'Last 5 posts:', 0, $page);
     }
 
     public function testOnlineSessions(): void
@@ -240,42 +187,26 @@ final class ModControlsTest extends FeatureTestCase
         $session->ip = inet_pton('64.233.160.0');
         $session->insert();
 
-        $page = $this->go(new Request(
-            get: ['path' => '/modcontrols/onlineSessions'],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/modcontrols/onlineSessions']));
 
-        DOMAssert::assertSelectEquals(
-            '.onlinesessions td',
-            'Firefox',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectRegExp(
-            '.onlinesessions td',
-            '/64.233.160.0/',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('.onlinesessions td', 'Firefox', 1, $page);
+        DOMAssert::assertSelectRegExp('.onlinesessions td', '/64.233.160.0/', 1, $page);
     }
 
     public function testAddOriginalPostToModerate(): void
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            get: ['path' => '/modcontrols/modp', 'pid' => '1'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/modcontrols/modp', 'pid' => '1'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
         $sessionData = ModelsSession::selectOne();
 
         static::assertContainsEquals(['preventNavigation'], $json);
         static::assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
-        static::assertEquals(
-            json_encode(['modtids' => '1']),
-            $sessionData->vars,
-        );
+        static::assertEquals(json_encode(['modtids' => '1']), $sessionData->vars);
     }
 
     public function testAddPostReplyToModerate(): void
@@ -284,40 +215,32 @@ final class ModControlsTest extends FeatureTestCase
 
         $pid = (string) $this->insertReply()->id;
 
-        $page = $this->go(new Request(
-            get: ['path' => '/modcontrols/modp', 'pid' => $pid],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/modcontrols/modp', 'pid' => $pid], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
         $sessionData = ModelsSession::selectOne();
 
         static::assertContainsEquals(['preventNavigation'], $json);
         static::assertContainsEquals(['modcontrols_postsync', $pid, ''], $json);
-        static::assertEquals(
-            json_encode(['modpids' => $pid]),
-            $sessionData->vars,
-        );
+        static::assertEquals(json_encode(['modpids' => $pid]), $sessionData->vars);
     }
 
     public function testAddTopicToModerate(): void
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            get: ['path' => '/modcontrols/modt', 'tid' => '1'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/modcontrols/modt', 'tid' => '1'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
         $sessionData = ModelsSession::selectOne();
 
         static::assertContainsEquals(['preventNavigation'], $json);
         static::assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
-        static::assertEquals(
-            json_encode(['modtids' => '1']),
-            $sessionData->vars,
-        );
+        static::assertEquals(json_encode(['modtids' => '1']), $sessionData->vars);
     }
 
     public function testDeletePostsWithTrashcan(): void
@@ -325,10 +248,7 @@ final class ModControlsTest extends FeatureTestCase
         $trashcanId = $this->insertForum(['trashcan' => 1])->id;
         $pid = $this->insertReply()->id;
 
-        $this->actingAs(
-            'admin',
-            sessionOverrides: ['modpids' => (string) $pid],
-        );
+        $this->actingAs('admin', sessionOverrides: ['modpids' => (string) $pid]);
 
         $page = $this->go(new Request(
             get: ['path' => '/modcontrols'],
@@ -341,35 +261,20 @@ final class ModControlsTest extends FeatureTestCase
 
         static::assertContainsEquals(['removeel', '#pid_2'], $json);
         static::assertContainsEquals(['modcontrols_clearbox'], $json);
-        static::assertContainsEquals(
-            ['location', '/topic/2'],
-            $json,
-            'Mod redirected to trashcan topic',
-        );
+        static::assertContainsEquals(['location', '/topic/2'], $json, 'Mod redirected to trashcan topic');
 
         $trashcanTopic = Topic::selectOne(2);
         $post = Post::selectOne($pid);
 
-        static::assertEquals(
-            $trashcanTopic->fid,
-            $trashcanId,
-            'New topic is created in trashcan',
-        );
-        static::assertEquals(
-            $post->tid,
-            $trashcanTopic->id,
-            'Post is moved to new trashcan topic',
-        );
+        static::assertEquals($trashcanTopic->fid, $trashcanId, 'New topic is created in trashcan');
+        static::assertEquals($post->tid, $trashcanTopic->id, 'Post is moved to new trashcan topic');
     }
 
     public function testDeletePostsWithoutTrashcan(): void
     {
         $pid = $this->insertReply()->id;
 
-        $this->actingAs(
-            'admin',
-            sessionOverrides: ['modpids' => (string) $pid],
-        );
+        $this->actingAs('admin', sessionOverrides: ['modpids' => (string) $pid]);
 
         $page = $this->go(new Request(
             get: ['path' => '/modcontrols'],
@@ -387,10 +292,7 @@ final class ModControlsTest extends FeatureTestCase
 
     public function testDeleteTopicWithoutTrashcan(): void
     {
-        $this->actingAs(
-            'admin',
-            sessionOverrides: ['modtids' => '1'],
-        );
+        $this->actingAs('admin', sessionOverrides: ['modtids' => '1']);
 
         $page = $this->go(new Request(
             get: ['path' => '/modcontrols'],
@@ -408,10 +310,7 @@ final class ModControlsTest extends FeatureTestCase
 
     public function testMovePostCommand(): void
     {
-        $this->actingAs(
-            'admin',
-            sessionOverrides: ['modpids' => '1'],
-        );
+        $this->actingAs('admin', sessionOverrides: ['modpids' => '1']);
 
         $page = $this->go(new Request(
             get: ['path' => '/modcontrols'],
@@ -444,10 +343,7 @@ final class ModControlsTest extends FeatureTestCase
         $pid = $this->insertReply()->id;
         $tid = $this->insertTopic()->id;
 
-        $this->actingAs(
-            'admin',
-            sessionOverrides: ['modpids' => (string) $pid],
-        );
+        $this->actingAs('admin', sessionOverrides: ['modpids' => (string) $pid]);
 
         $page = $this->go(new Request(
             get: ['path' => '/modcontrols'],
@@ -459,21 +355,14 @@ final class ModControlsTest extends FeatureTestCase
 
         static::assertContainsEquals(['modcontrols_clearbox'], $json);
 
-        static::assertEquals(
-            Post::selectOne($pid)->tid,
-            $tid,
-            'Post was moved',
-        );
+        static::assertEquals(Post::selectOne($pid)->tid, $tid, 'Post was moved');
     }
 
     public function testMoveTopics(): void
     {
         $fid = $this->insertForum()->id;
 
-        $this->actingAs(
-            'admin',
-            sessionOverrides: ['modtids' => '1'],
-        );
+        $this->actingAs('admin', sessionOverrides: ['modtids' => '1']);
 
         $page = $this->go(new Request(
             get: ['path' => '/modcontrols'],
@@ -491,10 +380,7 @@ final class ModControlsTest extends FeatureTestCase
     {
         $topic = $this->insertTopic();
 
-        $this->actingAs(
-            'admin',
-            sessionOverrides: ['modtids' => '1'],
-        );
+        $this->actingAs('admin', sessionOverrides: ['modtids' => '1']);
 
         $page = $this->go(new Request(
             get: ['path' => '/modcontrols'],
@@ -504,18 +390,9 @@ final class ModControlsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        $html = array_find(
-            $json,
-            static fn($record): bool => array_key_exists(
-                1,
-                $record,
-            ) && $record[1] === 'page',
-        )[2];
+        $html = array_find($json, static fn($record): bool => array_key_exists(1, $record) && $record[1] === 'page')[2];
 
-        static::assertStringContainsString(
-            'Which topic should the topics be merged into?',
-            $html,
-        );
+        static::assertStringContainsString('Which topic should the topics be merged into?', $html);
         DOMAssert::assertSelectCount('input[name="ot"][value="1"]', 1, $html);
     }
 
@@ -523,10 +400,7 @@ final class ModControlsTest extends FeatureTestCase
     {
         $topic = $this->insertTopic();
 
-        $this->actingAs(
-            'admin',
-            sessionOverrides: ['modtids' => implode(',', [1, $topic->id])],
-        );
+        $this->actingAs('admin', sessionOverrides: ['modtids' => implode(',', [1, $topic->id])]);
 
         $page = $this->go(new Request(
             get: ['path' => '/modcontrols'],
@@ -541,42 +415,21 @@ final class ModControlsTest extends FeatureTestCase
 
         static::assertContainsEquals(['modcontrols_clearbox'], $json);
 
-        $redirect = array_find(
-            $json,
-            static fn($cmd): bool => $cmd[0] === 'location',
-        );
+        $redirect = array_find($json, static fn($cmd): bool => $cmd[0] === 'location');
         static::assertStringContainsString(
-            $this->container->get(Router::class)->url(
-                'topic',
-                ['id' => $topic->id],
-            ),
+            $this->container->get(Router::class)->url('topic', ['id' => $topic->id]),
             $redirect[1],
         );
 
         static::assertNull(Topic::selectOne(1), 'Original topic is deleted');
-        static::assertEquals(
-            $topic->id,
-            Post::selectOne(1)->tid,
-            'OP moved to new topic',
-        );
-        static::assertSame(
-            1,
-            Post::selectOne(1)->newtopic,
-            'Older post becomes OP',
-        );
-        static::assertSame(
-            0,
-            Post::selectOne(2)->newtopic,
-            'Newer post gets demoted to reply',
-        );
+        static::assertEquals($topic->id, Post::selectOne(1)->tid, 'OP moved to new topic');
+        static::assertSame(1, Post::selectOne(1)->newtopic, 'Older post becomes OP');
+        static::assertSame(0, Post::selectOne(2)->newtopic, 'Newer post gets demoted to reply');
     }
 
     public function testLockTopic(): void
     {
-        $this->actingAs(
-            'admin',
-            sessionOverrides: ['modtids' => '1'],
-        );
+        $this->actingAs('admin', sessionOverrides: ['modtids' => '1']);
 
         $page = $this->go(new Request(
             get: ['path' => '/modcontrols'],
@@ -593,10 +446,7 @@ final class ModControlsTest extends FeatureTestCase
 
     public function testUnlockTopic(): void
     {
-        $this->actingAs(
-            'admin',
-            sessionOverrides: ['modtids' => '1'],
-        );
+        $this->actingAs('admin', sessionOverrides: ['modtids' => '1']);
 
         // lock the topic
         $topic = Topic::selectOne(1);
@@ -618,10 +468,7 @@ final class ModControlsTest extends FeatureTestCase
 
     public function testUnpinTopic(): void
     {
-        $this->actingAs(
-            'admin',
-            sessionOverrides: ['modtids' => '1'],
-        );
+        $this->actingAs('admin', sessionOverrides: ['modtids' => '1']);
 
         $topic = Topic::selectOne(1);
         $topic->pinned = 1;
@@ -642,10 +489,7 @@ final class ModControlsTest extends FeatureTestCase
 
     public function testPinTopic(): void
     {
-        $this->actingAs(
-            'admin',
-            sessionOverrides: ['modtids' => '1'],
-        );
+        $this->actingAs('admin', sessionOverrides: ['modtids' => '1']);
 
         $page = $this->go(new Request(
             get: ['path' => '/modcontrols'],
