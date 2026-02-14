@@ -102,7 +102,7 @@ you run `bun install`.
 #### PHP Lint
 
 ```bash
-bun run lint
+composer run lint
 ```
 
 ### Tests
