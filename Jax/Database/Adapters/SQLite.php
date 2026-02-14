@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Database\Adapters;
 
+use Override;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
@@ -23,7 +24,7 @@ final readonly class SQLite implements Adapter
         private Database $database,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function createTableQueryFromModel(Model $model): string
     {
         $table = $model::TABLE;
@@ -90,7 +91,7 @@ final readonly class SQLite implements Adapter
         );
     }
 
-    #[\Override]
+    #[Override]
     public function install(): void {}
 
     private function fieldDefinition(Column $column): string

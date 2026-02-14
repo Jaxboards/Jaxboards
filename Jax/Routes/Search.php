@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Carbon\Carbon;
 use Jax\Database\Database;
 use Jax\ForumTree;
@@ -59,7 +60,7 @@ final class Search implements Route
         private readonly User $user,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         $this->page->setBreadCrumbs([

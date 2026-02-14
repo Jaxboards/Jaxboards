@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Carbon\Carbon;
 use Jax\Database\Database;
 use Jax\Date;
@@ -66,7 +67,7 @@ final class Forum implements Route
         private readonly User $user,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         $page = (int) $this->request->asString->both('page');

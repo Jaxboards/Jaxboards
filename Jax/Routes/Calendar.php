@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Carbon\Carbon;
 use Jax\Date;
 use Jax\Interfaces\Route;
@@ -28,7 +29,7 @@ final readonly class Calendar implements Route
         private Template $template,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         $this->page->setBreadCrumbs([

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\Interfaces\Route;
@@ -25,7 +26,7 @@ final readonly class Download implements Route
         private Request $request,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         $this->downloadFile((int) $this->request->asString->both('id'));

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Jax\Config;
 use Jax\Interfaces\Route;
 use Jax\Models\Badge;
@@ -31,7 +32,7 @@ final readonly class Badges implements Route
         return (bool) $this->config->getSetting('badgesEnabled');
     }
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         $badgeId = (int) $this->request->asString->get('badgeId');

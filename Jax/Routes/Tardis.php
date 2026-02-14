@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Jax\Interfaces\Route;
 use Jax\Page;
 
@@ -13,7 +14,7 @@ final readonly class Tardis implements Route
         private Page $page,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         $this->page->command('script', <<<'JS'

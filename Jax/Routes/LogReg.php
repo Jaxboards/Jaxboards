@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Carbon\Carbon;
 use Jax\Config;
 use Jax\Database\Database;
@@ -65,7 +66,7 @@ final class LogReg implements Route
         private readonly User $user,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         match ($this->request->both('path')) {

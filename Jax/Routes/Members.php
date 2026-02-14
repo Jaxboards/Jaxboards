@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Jax\ContactDetails;
 use Jax\Database\Database;
 use Jax\Interfaces\Route;
@@ -38,7 +39,7 @@ final class Members implements Route
         private readonly Request $request,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         $page = (int) $this->request->asString->both('page');

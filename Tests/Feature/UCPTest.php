@@ -166,7 +166,7 @@ final class UCPTest extends FeatureTestCase
         ]));
 
         static::assertStringContainsString('Password changed.', $page);
-        static::assertTrue(password_verify('newpass', Member::selectOne(2)?->pass));
+        static::assertTrue(password_verify('newpass', (string) Member::selectOne(2)?->pass));
     }
 
     public function testChangePasswordIncorrectCurrentPassword(): void
@@ -183,7 +183,7 @@ final class UCPTest extends FeatureTestCase
         ]));
 
         DOMAssert::assertSelectEquals('.error', 'The password you entered is incorrect.', 1, $page);
-        static::assertFalse(password_verify('newpass', Member::selectOne(2)?->pass));
+        static::assertFalse(password_verify('newpass', (string) Member::selectOne(2)?->pass));
     }
 
     public function testProfileForm(): void

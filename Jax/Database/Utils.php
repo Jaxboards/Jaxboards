@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Database;
 
+use Override;
 use Jax\Database\Adapters\Adapter;
 use Jax\Database\Adapters\MySQL;
 use Jax\Database\Adapters\SQLite;
@@ -62,7 +63,7 @@ final readonly class Utils implements Adapter
         return $models;
     }
 
-    #[\Override]
+    #[Override]
     public function install(): void
     {
         $this->adapter->install();
@@ -80,7 +81,7 @@ final readonly class Utils implements Adapter
         $this->database->setPrefix($prefix);
     }
 
-    #[\Override]
+    #[Override]
     public function createTableQueryFromModel(Model $model): string
     {
         return $this->adapter->createTableQueryFromModel($model);

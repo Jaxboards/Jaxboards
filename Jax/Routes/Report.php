@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Jax\Database\Database;
 use Jax\Interfaces\Route;
 use Jax\Models\Post;
@@ -34,7 +35,7 @@ final readonly class Report implements Route
         private User $user,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route(array $params): void
     {
         $pid = (int) $this->request->both('pid');

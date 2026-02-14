@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Modules;
 
+use Override;
 use Curl\Curl;
 use Jax\BBCode;
 use Jax\Config;
@@ -44,7 +45,7 @@ final class WebHooks implements Module
         $this->webhooks = $this->config->get()['webhooks'] ?? [];
     }
 
-    #[\Override]
+    #[Override]
     public function init(): void
     {
         if ($this->webhooks === []) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Jax\Interfaces\Route;
 use Jax\Page;
 
@@ -16,7 +17,7 @@ final readonly class Snow implements Route
         private Page $page,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         $snowFlakeCount = (int) ($params['snowFlakeCount'] ?? 200);

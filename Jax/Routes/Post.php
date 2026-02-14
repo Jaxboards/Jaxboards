@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Jax\Database\Database;
 use Jax\Hooks;
 use Jax\Interfaces\Route;
@@ -67,7 +68,7 @@ final class Post implements Route
         private readonly User $user,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         $this->tid = (int) $this->request->asString->both('tid');

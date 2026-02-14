@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Jax\Config;
 use Jax\Interfaces\Route;
 use Jax\Page;
@@ -21,7 +22,7 @@ final readonly class BoardOffline implements Route
         private Template $template,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         if ($this->request->isJSUpdate()) {

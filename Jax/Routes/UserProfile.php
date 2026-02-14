@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Jax\ContactDetails;
 use Jax\Date;
 use Jax\Interfaces\Route;
@@ -37,7 +38,7 @@ final readonly class UserProfile implements Route
         private User $user,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         $userId = (int) $params['id'];

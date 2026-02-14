@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Database\Adapters;
 
+use Override;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
@@ -21,7 +22,7 @@ final readonly class MySQL implements Adapter
         private Database $database,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function createTableQueryFromModel(Model $model): string
     {
         $table = $model::TABLE;
@@ -91,7 +92,7 @@ final readonly class MySQL implements Adapter
         ]);
     }
 
-    #[\Override]
+    #[Override]
     public function install(): void
     {
         $queries = [
@@ -129,7 +130,7 @@ final readonly class MySQL implements Adapter
         }
 
         $length = $column->length !== 0 ? "({$column->length})" : '';
-        $nullable = !$column->nullable ? ' NOT NULL' : '';
+        $nullable = $column->nullable ? '' : ' NOT NULL';
         $autoIncrement = $column->autoIncrement ? ' AUTO_INCREMENT' : '';
         $unsigned = $column->unsigned ? ' unsigned' : '';
         $default = $column->default !== null ? " DEFAULT '{$column->default}'" : '';

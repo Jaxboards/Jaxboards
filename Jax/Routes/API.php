@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
 use Jax\Interfaces\Route;
@@ -43,7 +44,7 @@ final readonly class API implements Route
         private User $user,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route(array $params): void
     {
         $this->page->earlyFlush(match ($params['method']) {

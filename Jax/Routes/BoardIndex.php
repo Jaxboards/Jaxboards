@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Carbon\Carbon;
 use Jax\Config;
 use Jax\Database\Database;
@@ -62,7 +63,7 @@ final class BoardIndex implements Route
         private readonly UsersOnline $usersOnline,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         match (true) {

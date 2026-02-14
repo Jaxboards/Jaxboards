@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Carbon\Carbon;
 use Jax\Database\Database;
 use Jax\Date;
@@ -75,7 +76,7 @@ final class Topic implements Route
         private readonly UsersOnline $usersOnline,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         $tid = (int) ($params['id'] ?? 0);

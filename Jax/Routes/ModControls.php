@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Carbon\Carbon;
 use GeoIp2\Model\City;
 use Jax\Config;
@@ -52,7 +53,7 @@ final readonly class ModControls implements Route
         private User $user,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         if (!$this->user->isModerator() && !$this->user->get()->mod) {

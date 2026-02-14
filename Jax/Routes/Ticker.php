@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Jax\Date;
 use Jax\Interfaces\Route;
 use Jax\Models\Forum;
@@ -31,7 +32,7 @@ final class Ticker implements Route
         private readonly User $user,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         if ($this->request->isJSNewLocation() || !$this->request->isJSAccess()) {

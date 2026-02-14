@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Modules;
 
+use Override;
 use Jax\Config;
 use Jax\Database\Database;
 use Jax\Date;
@@ -52,7 +53,7 @@ final class Shoutbox implements Module
         $this->shoutlimit = (int) ($this->config->getSetting('shoutbox_num') ?? 5);
     }
 
-    #[\Override]
+    #[Override]
     public function init(): void
     {
         if (

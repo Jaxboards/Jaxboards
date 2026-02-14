@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Jax\Database\Database;
 use Jax\Interfaces\Route;
 use Jax\Models\Activity;
@@ -34,7 +35,7 @@ final readonly class BuddyList implements Route
         private UsersOnline $usersOnline,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         $this->page->command('preventNavigation');

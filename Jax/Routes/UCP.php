@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
+use Override;
 use Carbon\Carbon;
 use Jax\Config;
 use Jax\Constants\Groups;
@@ -49,7 +50,7 @@ final readonly class UCP implements Route
         private User $user,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route($params): void
     {
         if ($this->user->isGuest() || $this->user->get()->groupID === Groups::Banned->value) {

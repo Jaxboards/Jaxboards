@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Modules;
 
+use Override;
 use Carbon\Carbon;
 use Jax\Database\Database;
 use Jax\Interfaces\Module;
@@ -33,7 +34,7 @@ final readonly class PrivateMessage implements Module
         private User $user,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function init(): void
     {
         $instantMessage = $this->request->asString->post('im_im');
