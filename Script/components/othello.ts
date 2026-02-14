@@ -28,21 +28,25 @@ export default class Othello extends Component<HTMLTableElement> {
 
     element.addEventListener("click", (event) => {
       if (
-        event.target instanceof HTMLTableCellElement &&
-        !event.target.querySelector(".piece")
+        !(event.target instanceof HTMLTableCellElement) ||
+        event.target.querySelector(".piece")
       ) {
-        if (this.placePiece(event.target)) {
-          this.updateScore();
-          this.moveNumber++;
-          sound.play("chessdrop");
-
-          navigator.clipboard.writeText(
-            `[othello]${this.getGameState()}[/othello]`,
-          );
-
-          toast.success("BBCode copied to clipboard");
-        }
+        return;
       }
+
+      if (!this.placePiece(event.target)) {
+        return;
+      }
+
+      this.updateScore();
+      this.moveNumber++;
+      sound.play("chessdrop");
+
+      navigator.clipboard.writeText(
+        `[othello]${this.getGameState()}[/othello]`,
+      );
+
+      toast.success("BBCode copied to clipboard");
     });
 
     this.updateScore();
