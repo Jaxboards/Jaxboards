@@ -134,12 +134,15 @@ export default class Othello extends Component<HTMLTableElement> {
   }
 
   updateScore() {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.element.querySelector<HTMLSpanElement>(".score-white")!.innerHTML =
-      this.element.querySelectorAll(".piece.white").length + "";
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.element.querySelector<HTMLSpanElement>(".score-black")!.innerHTML =
-      this.element.querySelectorAll(".piece.black").length + "";
+    const scoreWhite = this.element.querySelector(".score-white");
+    const scoreBlack = this.element.querySelector(".score-black");
+
+    if (scoreWhite && scoreBlack) {
+      scoreWhite.innerHTML =
+        this.element.querySelectorAll(".piece.white").length + "";
+      scoreBlack.innerHTML =
+        this.element.querySelectorAll(".piece.black").length + "";
+    }
   }
 
   getGameState() {
