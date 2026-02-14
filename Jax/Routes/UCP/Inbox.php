@@ -382,7 +382,7 @@ final readonly class Inbox
                 function (int $pageNumber) use ($requestPage, $view): string {
                     $active = $pageNumber === $requestPage ? ' class="active"' : '';
                     $pageURL = $this->router->url('ucp', [
-                        'view' => $view,
+                        'what' => $view,
                         'page' => $pageNumber,
                     ]);
 
