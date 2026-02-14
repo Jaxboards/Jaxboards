@@ -168,7 +168,7 @@ final class BBCodeTest extends UnitTestCase
             ),
             [
                 '[spoiler]hidden text[/spoiler]',
-                '<span class="spoilertext">hidden text</span>',
+                '<button type="button" class="spoilertext as-text">hidden text</button>',
             ],
             [
                 implode(PHP_EOL, [
