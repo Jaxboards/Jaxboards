@@ -10,9 +10,6 @@ final class AddOpenGraphFields
 {
     public function execute(Database $database): void
     {
-        $database->special(
-            "ALTER TABLE %t ADD `openGraphMetadata` JSON NOT NULL DEFAULT ('{}')",
-            ['posts'],
-        );
+        $database->special("ALTER TABLE %t ADD `openGraphMetadata` JSON NOT NULL DEFAULT ('{}')", ['posts']);
     }
 }

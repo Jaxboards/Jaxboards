@@ -77,7 +77,9 @@ final readonly class BotDetector
         'YandexRenderResourcesBot' => 'YandexRenders',
     ];
 
-    public function __construct(private Request $request) {}
+    public function __construct(
+        private Request $request,
+    ) {}
 
     public function getBotName(): ?string
     {

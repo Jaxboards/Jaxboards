@@ -103,12 +103,7 @@ final class ProfileTest extends FeatureTestCase
     {
         $page = $this->go('/profile/5');
 
-        DOMAssert::assertSelectEquals(
-            '#page .error',
-            "Sorry, this user doesn't exist.",
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('#page .error', "Sorry, this user doesn't exist.", 1, $page);
     }
 
     public function testViewUserProfile(): void
@@ -118,33 +113,13 @@ final class ProfileTest extends FeatureTestCase
         $page = $this->go('/profile/1');
 
         // Breadcrumbs
-        DOMAssert::assertSelectEquals(
-            '#path li a',
-            'Example Forums',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            '#path li a',
-            "Admin's profile",
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('#path li a', 'Example Forums', 1, $page);
+        DOMAssert::assertSelectEquals('#path li a', "Admin's profile", 1, $page);
 
-        DOMAssert::assertSelectEquals(
-            '.leftbar .username .moderate',
-            'Edit',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('.leftbar .username .moderate', 'Edit', 1, $page);
         DOMAssert::assertSelectEquals('.leftbar .username', 'Admin', 1, $page);
 
-        DOMAssert::assertSelectEquals(
-            '#pfbox',
-            'This user has yet to do anything noteworthy!',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('#pfbox', 'This user has yet to do anything noteworthy!', 1, $page);
     }
 
     public function testViewProfileRSSFeed(): void
@@ -155,34 +130,13 @@ final class ProfileTest extends FeatureTestCase
 
         $page = $this->go('/profile/1/activity?fmt=RSS');
 
-        self::assertStringContainsString(
-            "<title>Admin's recent activity</title>",
-            $page,
-        );
-        self::assertStringContainsString(
-            '<link>https://jaxboards.com/profile/1</link>',
-            $page,
-        );
-        self::assertStringContainsString(
-            '<description>Admin made friends with Admin</description>',
-            $page,
-        );
-        self::assertStringContainsString(
-            '<description>Prince is now known as Admin</description>',
-            $page,
-        );
-        self::assertStringContainsString(
-            '<description>Admin posted in topic Post</description>',
-            $page,
-        );
-        self::assertStringContainsString(
-            '<description>Admin created new topic Topic</description>',
-            $page,
-        );
-        self::assertStringContainsString(
-            "<description>Admin commented on Admin's profile</description>",
-            $page,
-        );
+        static::assertStringContainsString("<title>Admin's recent activity</title>", $page);
+        static::assertStringContainsString('<link>https://jaxboards.com/profile/1</link>', $page);
+        static::assertStringContainsString('<description>Admin made friends with Admin</description>', $page);
+        static::assertStringContainsString('<description>Prince is now known as Admin</description>', $page);
+        static::assertStringContainsString('<description>Admin posted in topic Post</description>', $page);
+        static::assertStringContainsString('<description>Admin created new topic Topic</description>', $page);
+        static::assertStringContainsString("<description>Admin commented on Admin's profile</description>", $page);
     }
 
     public function testViewUserProfileActivityNoActivity(): void
@@ -191,12 +145,7 @@ final class ProfileTest extends FeatureTestCase
 
         $page = $this->go('/profile/1/activity');
 
-        DOMAssert::assertSelectEquals(
-            '#pfbox',
-            'This user has yet to do anything noteworthy!',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('#pfbox', 'This user has yet to do anything noteworthy!', 1, $page);
     }
 
     public function testViewUserProfileActivitySomeActivity(): void
@@ -207,36 +156,11 @@ final class ProfileTest extends FeatureTestCase
 
         $page = $this->go('/profile/1/activity');
 
-        DOMAssert::assertSelectRegExp(
-            '.buddy_add',
-            '/Admin.*made friends with.*Admin/',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectRegExp(
-            '.profile_name_change',
-            '/Prince.*is now known as.*Admin/',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectRegExp(
-            '.new_post',
-            '/Admin.*posted in topic.*Post/',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectRegExp(
-            '.new_topic',
-            '/Admin.*created new topic.*Topic/',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectRegExp(
-            '.profile_comment',
-            '/Admin.*commented on.*Admin/',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectRegExp('.buddy_add', '/Admin.*made friends with.*Admin/', 1, $page);
+        DOMAssert::assertSelectRegExp('.profile_name_change', '/Prince.*is now known as.*Admin/', 1, $page);
+        DOMAssert::assertSelectRegExp('.new_post', '/Admin.*posted in topic.*Post/', 1, $page);
+        DOMAssert::assertSelectRegExp('.new_topic', '/Admin.*created new topic.*Topic/', 1, $page);
+        DOMAssert::assertSelectRegExp('.profile_comment', '/Admin.*commented on.*Admin/', 1, $page);
     }
 
     public function testViewUserProfilePosts(): void
@@ -245,12 +169,7 @@ final class ProfileTest extends FeatureTestCase
 
         $page = $this->go('/profile/1/posts');
 
-        DOMAssert::assertSelectEquals(
-            '#pfbox .post a',
-            'Welcome to Jaxboards!',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('#pfbox .post a', 'Welcome to Jaxboards!', 1, $page);
     }
 
     public function testViewUserProfileTopics(): void
@@ -259,12 +178,7 @@ final class ProfileTest extends FeatureTestCase
 
         $page = $this->go('/profile/1/topics');
 
-        DOMAssert::assertSelectEquals(
-            '#pfbox a',
-            'Welcome to Jaxboards!',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('#pfbox a', 'Welcome to Jaxboards!', 1, $page);
     }
 
     public function testViewUserProfileComments(): void
@@ -281,35 +195,19 @@ final class ProfileTest extends FeatureTestCase
         $page = $this->go('/profile/1/comments');
 
         DOMAssert::assertSelectCount('textarea[name=comment]', 1, $page);
-        DOMAssert::assertSelectRegExp(
-            '.commenttext',
-            '/This is a profile comment./',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectRegExp('.commenttext', '/This is a profile comment./', 1, $page);
     }
 
     public function testViewUserProfileCommentsAddCommentAsAdmin(): void
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            get: ['path' => 'profile/1/comments'],
-            post: ['comment' => 'This is a profile comment.'],
-        ));
+        $page = $this->go(new Request(get: ['path' => 'profile/1/comments'], post: [
+            'comment' => 'This is a profile comment.',
+        ]));
 
-        DOMAssert::assertSelectRegExp(
-            '.comment .username',
-            '/Admin/',
-            2,
-            $page,
-        );
-        DOMAssert::assertSelectRegExp(
-            '.commenttext',
-            '/This is a profile comment./',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectRegExp('.comment .username', '/Admin/', 2, $page);
+        DOMAssert::assertSelectRegExp('.commenttext', '/This is a profile comment./', 1, $page);
     }
 
     public function testViewUserProfileFriends(): void
@@ -318,12 +216,7 @@ final class ProfileTest extends FeatureTestCase
 
         $page = $this->go('/profile/1/friends');
 
-        DOMAssert::assertSelectEquals(
-            '.contacts .contact .user1',
-            'Admin',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('.contacts .contact .user1', 'Admin', 1, $page);
     }
 
     public function testViewUserProfileAbout(): void
@@ -341,24 +234,17 @@ final class ProfileTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            get: ['path' => 'profile/1'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(get: ['path' => 'profile/1'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
 
-        self::assertContains(['preventNavigation'], $json);
+        static::assertContains(['preventNavigation'], $json);
 
-        $window = array_find(
-            $json,
-            static fn($cmd): bool => $cmd[0] === 'window',
-        );
-        self::assertEquals('Contact Card', $window[1]['title']);
-        self::assertStringContainsString(
-            'Add Contact',
-            $window[1]['content'],
-        );
+        $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
+        static::assertSame('Contact Card', $window[1]['title']);
+        static::assertStringContainsString('Add Contact', $window[1]['content']);
     }
 
     private function insertActivities(): void

@@ -116,35 +116,11 @@ final class BadgesTest extends FeatureTestCase
 
         $page = $this->go('/profile/1/badges');
 
-        DOMAssert::assertSelectCount(
-            '.badge .badge-image img[src=imagePath]',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            '.badge .badge-title',
-            'Badge Title',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            '.badge .description',
-            'Badge Description',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectRegExp(
-            '.badge .reason',
-            '/Award Reason/',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            '.badge .award-date .autodate',
-            'a minute ago',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectCount('.badge .badge-image img[src=imagePath]', 1, $page);
+        DOMAssert::assertSelectEquals('.badge .badge-title', 'Badge Title', 1, $page);
+        DOMAssert::assertSelectEquals('.badge .description', 'Badge Description', 1, $page);
+        DOMAssert::assertSelectRegExp('.badge .reason', '/Award Reason/', 1, $page);
+        DOMAssert::assertSelectEquals('.badge .award-date .autodate', 'a minute ago', 1, $page);
     }
 
     public function testBadgesInTopicView(): void
@@ -154,11 +130,7 @@ final class BadgesTest extends FeatureTestCase
 
         $page = $this->go('/topic/1');
 
-        DOMAssert::assertSelectCount(
-            '#pid_1 .badges img[src="imagePath"][title="Badge Title"]',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectCount('#pid_1 .badges img[src="imagePath"][title="Badge Title"]', 1, $page);
     }
 
     public function testBadgesListView(): void
@@ -168,31 +140,12 @@ final class BadgesTest extends FeatureTestCase
 
         $page = $this->go('/badges?badgeId=1');
 
-        DOMAssert::assertSelectCount(
-            '.badge-image img[src="imagePath"][title="Badge Title"]',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectCount('.badge-image img[src="imagePath"][title="Badge Title"]', 1, $page);
         DOMAssert::assertSelectEquals('.badge-title', 'Badge Title', 1, $page);
-        DOMAssert::assertSelectEquals(
-            '.badge .description',
-            'Badge Description',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('.badge .description', 'Badge Description', 1, $page);
         DOMAssert::assertSelectEquals('.badges .user1', 'Admin', 1, $page);
-        DOMAssert::assertSelectEquals(
-            '.badges .reason',
-            'Award Reason',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            '.badges .award-date .autodate',
-            'a minute ago',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('.badges .reason', 'Award Reason', 1, $page);
+        DOMAssert::assertSelectEquals('.badges .award-date .autodate', 'a minute ago', 1, $page);
     }
 
     private function awardBadgeToAdmin(): void

@@ -40,29 +40,17 @@ final readonly class FileManager
             if ($file !== null) {
                 $fileInfo = $this->fileSystem->getFileInfo($file->name);
                 $ext = mb_strtolower($fileInfo->getExtension());
-                if (
-                    in_array(
-                        $ext,
-                        ['jpg', 'jpeg', 'png', 'gif', 'bmp'],
-                        true,
-                    )
-                ) {
+                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'], true)) {
                     $file->hash .= '.' . $ext;
                 }
 
                 $uploadFilePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash;
 
-                if (
-                    $this->fileSystem->getFileInfo(
-                        $uploadFilePath,
-                    )->isWritable()
-                ) {
+                if ($this->fileSystem->getFileInfo($uploadFilePath)->isWritable()) {
                     $page .= $this->fileSystem->unlink($uploadFilePath)
                         ? $this->page->success('File deleted')
-                        : $this->page->error(
-                            "Error deleting file, maybe it's already been "
-                                . 'deleted? Removed from DB',
-                        );
+                        : $this->page->error("Error deleting file, maybe it's already been "
+                        . 'deleted? Removed from DB');
                 }
 
                 $file->delete();
@@ -92,68 +80,48 @@ final readonly class FileManager
             $page .= $this->page->success('Changes saved.');
         }
 
-        $posts = Post::selectMany(
-            "WHERE MATCH (`post`) AGAINST ('attachment') "
-                . "AND post LIKE '%[attachment]%'",
-        );
+        $posts = Post::selectMany("WHERE MATCH (`post`) AGAINST ('attachment') AND post LIKE '%[attachment]%'");
         $linkedIn = [];
 
         foreach ($posts as $post) {
-            preg_match_all(
-                '/\[attachment\](\d+)\[\/attachment\]/',
-                $post->post,
-                $matches,
-            );
+            preg_match_all('/\[attachment\](\d+)\[\/attachment\]/', $post->post, $matches);
             foreach ($matches[1] as $attachmentId) {
-                $linkedIn[(int) $attachmentId][] = $this->page->render(
-                    'tools/attachment-link.html',
-                    [
-                        'post_id' => $post->id,
-                        'topic_id' => $post->tid,
-                    ],
-                );
+                $linkedIn[(int) $attachmentId][] = $this->page->render('tools/attachment-link.html', [
+                    'post_id' => $post->id,
+                    'topic_id' => $post->tid,
+                ]);
             }
         }
 
         $files = File::selectMany('ORDER BY size');
 
-        $members = Member::joinedOn(
-            $files,
-            static fn($file): int => $file->uid,
-        );
+        $members = Member::joinedOn($files, static fn($file): int => $file->uid);
 
         $table = '';
         foreach ($files as $file) {
             $ext = $this->fileSystem->getFileInfo($file->name)->getExtension();
             $fileURL = in_array($ext, Jax::IMAGE_EXTENSIONS, true)
-                ? $this->domainDefinitions->getBoardPathUrl() . $this->fileSystem->pathJoin(
-                    '/Uploads',
-                    "{$file->hash}.{$ext}",
-                ) : "../download?id={$file->id}";
+                ? $this->domainDefinitions->getBoardPathUrl()
+                . $this->fileSystem->pathJoin('/Uploads', "{$file->hash}.{$ext}")
+                : "../download?id={$file->id}";
 
-            $table .= $this->page->render(
-                'tools/file-manager-row.html',
-                [
-                    'downloads' => $file->downloads,
-                    'filesize' => $this->fileSystem->fileSizeHumanReadable(
-                        $file->size,
-                    ),
-                    'id' => $file->id,
-                    'linked_in' => array_key_exists($file->id, $linkedIn)
-                        ? implode(', ', $linkedIn[$file->id]) : 'Not linked!',
-                    'title' => "<a href='{$fileURL}'>{$file->name}</a>",
-                    'username' => $members[$file->uid]->displayName,
-                    'user_id' => $file->uid,
-                ],
-            );
+            $table .= $this->page->render('tools/file-manager-row.html', [
+                'downloads' => $file->downloads,
+                'filesize' => $this->fileSystem->fileSizeHumanReadable($file->size),
+                'id' => $file->id,
+                'linked_in' => array_key_exists($file->id, $linkedIn)
+                    ? implode(', ', $linkedIn[$file->id])
+                    : 'Not linked!',
+                'title' => "<a href='{$fileURL}'>{$file->name}</a>",
+                'username' => $members[$file->uid]->displayName,
+                'user_id' => $file->uid,
+            ]);
         }
 
-        $page .= $table !== '' ? $this->page->render(
-            'tools/file-manager.html',
-            [
+        $page .= $table !== ''
+            ? $this->page->render('tools/file-manager.html', [
                 'content' => $table,
-            ],
-        ) : $this->page->error('No files to show.');
+            ]) : $this->page->error('No files to show.');
         $this->page->addContentBox('File Manager', $page);
     }
 }

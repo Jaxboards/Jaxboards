@@ -94,95 +94,46 @@ final class ShoutboxTest extends FeatureTestCase
         parent::setUp();
 
         // Configure shoutbox to be enabled
-        $this->container->set(
-            Config::class,
-            autowire()->constructorParameter(
-                'boardConfig',
-                ['shoutbox' => true],
-            ),
-        );
+        $this->container->set(Config::class, autowire()->constructorParameter('boardConfig', ['shoutbox' => true]));
     }
 
     public function testUnauthShout(): void
     {
         $this->actingAs('guest');
 
-        $page = $this->go(new Request(
-            post: ['shoutbox_shout' => 'test'],
-        ));
+        $page = $this->go(new Request(post: ['shoutbox_shout' => 'test']));
 
-        DOMAssert::assertSelectEquals(
-            '.error',
-            'You must be logged in to shout!',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('.error', 'You must be logged in to shout!', 1, $page);
     }
 
     public function testAuthShout(): void
     {
         $this->actingAs('member');
 
-        $page = $this->go(new Request(
-            post: ['shoutbox_shout' => 'hello world!'],
-        ));
+        $page = $this->go(new Request(post: ['shoutbox_shout' => 'hello world!']));
 
-        DOMAssert::assertSelectEquals(
-            '#shoutbox .shouts .shout .user2',
-            'Member',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            '#shoutbox .shouts .shout',
-            'hello world!',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('#shoutbox .shouts .shout .user2', 'Member', 1, $page);
+        DOMAssert::assertSelectEquals('#shoutbox .shouts .shout', 'hello world!', 1, $page);
     }
 
     public function testMeCommand(): void
     {
         $this->actingAs('member');
 
-        $page = $this->go(new Request(
-            post: ['shoutbox_shout' => '/me did some stuff just now'],
-        ));
+        $page = $this->go(new Request(post: ['shoutbox_shout' => '/me did some stuff just now']));
 
-        DOMAssert::assertSelectEquals(
-            '#shoutbox .shouts .shout .user2',
-            'Member',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectRegExp(
-            '#shoutbox .shouts .shout.action',
-            '/did some stuff just now/',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('#shoutbox .shouts .shout .user2', 'Member', 1, $page);
+        DOMAssert::assertSelectRegExp('#shoutbox .shouts .shout.action', '/did some stuff just now/', 1, $page);
     }
 
     public function testViewAllShouts(): void
     {
         $this->actingAs('member');
 
-        $page = $this->go(new Request(
-            get: ['module' => 'shoutbox'],
-            post: ['shoutbox_shout' => 'Howdy partner!'],
-        ));
+        $page = $this->go(new Request(get: ['module' => 'shoutbox'], post: ['shoutbox_shout' => 'Howdy partner!']));
 
-        DOMAssert::assertSelectCount(
-            '#shoutbox',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectCount('#shoutbox', 1, $page);
 
-        DOMAssert::assertSelectEquals(
-            '.sbhistory .shout',
-            'Howdy partner!',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('.sbhistory .shout', 'Howdy partner!', 1, $page);
     }
 }

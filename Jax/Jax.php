@@ -80,7 +80,7 @@ final readonly class Jax
         }
 
         $start = $active - (int) floor($tofill / 2);
-        if ($numpages - $start < $tofill) {
+        if (($numpages - $start) < $tofill) {
             $start -= $tofill - ($numpages - $start);
         }
 

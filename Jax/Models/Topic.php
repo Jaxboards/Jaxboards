@@ -14,13 +14,7 @@ final class Topic extends Model
 {
     public const string TABLE = 'topics';
 
-    #[Column(
-        name: 'id',
-        type: 'int',
-        nullable: false,
-        autoIncrement: true,
-        unsigned: true,
-    )]
+    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
     #[PrimaryKey]
     public int $id = 0;
 
@@ -56,47 +50,19 @@ final class Topic extends Model
     #[Column(name: 'pinned', type: 'bool')]
     public int $pinned = 0;
 
-    #[Column(
-        name: 'pollChoices',
-        type: 'mediumtext',
-        default: '',
-        nullable: false,
-    )]
+    #[Column(name: 'pollChoices', type: 'mediumtext', default: '', nullable: false)]
     public string $pollChoices = '';
 
-    #[Column(
-        name: 'pollResults',
-        type: 'mediumtext',
-        default: '',
-        nullable: false,
-    )]
+    #[Column(name: 'pollResults', type: 'mediumtext', default: '', nullable: false)]
     public string $pollResults = '';
 
-    #[Column(
-        name: 'pollQuestion',
-        type: 'string',
-        default: '',
-        length: 255,
-        nullable: false,
-    )]
+    #[Column(name: 'pollQuestion', type: 'string', default: '', length: 255, nullable: false)]
     public string $pollQuestion = '';
 
-    #[Column(
-        name: 'pollType',
-        type: 'string',
-        default: '',
-        length: 10,
-        nullable: false,
-    )]
+    #[Column(name: 'pollType', type: 'string', default: '', length: 10, nullable: false)]
     public string $pollType = '';
 
-    #[Column(
-        name: 'summary',
-        type: 'string',
-        default: '',
-        length: 50,
-        nullable: false,
-    )]
+    #[Column(name: 'summary', type: 'string', default: '', length: 50, nullable: false)]
     public string $summary = '';
 
     #[Column(name: 'locked', type: 'bool')]
@@ -109,13 +75,7 @@ final class Topic extends Model
     #[ForeignKey(table: 'posts', field: 'id', onDelete: 'null')]
     public ?int $op = null;
 
-    #[Column(
-        name: 'calendarEvent',
-        type: 'int',
-        default: 0,
-        nullable: false,
-        unsigned: true,
-    )]
+    #[Column(name: 'calendarEvent', type: 'int', default: 0, nullable: false, unsigned: true)]
     #[Key]
     public int $calendarEvent = 0;
 }

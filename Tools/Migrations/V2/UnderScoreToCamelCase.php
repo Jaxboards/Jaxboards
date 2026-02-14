@@ -20,36 +20,26 @@ final class UnderScoreToCamelCase
 
         $this->fixSession($database);
 
-        $database->special(
-            'ALTER TABLE %t
+        $database->special('ALTER TABLE %t
                 CHANGE `affected_uid` `affectedUser`
-                    INT(10) UNSIGNED NULL DEFAULT NULL',
-            ['activity'],
-        );
+                    INT(10) UNSIGNED NULL DEFAULT NULL', ['activity']);
 
-        $database->special(
-            "ALTER TABLE %t
+        $database->special("ALTER TABLE %t
                 CHANGE `del_recipient` `deletedRecipient`
                     TINYINT(1) NOT NULL DEFAULT '0',
                 CHANGE `del_sender` `deletedSender`
-                    TINYINT(1) NOT NULL DEFAULT '0'",
-            ['messages'],
-        );
+                    TINYINT(1) NOT NULL DEFAULT '0'", ['messages']);
 
-        $database->special(
-            'ALTER TABLE %t
+        $database->special('ALTER TABLE %t
                 CHANGE `auth_id` `author`
                     INT(10) UNSIGNED NULL DEFAULT NULL,
                 CHANGE `edit_date` `editDate`
-                    DATETIME NULL DEFAULT NULL',
-            ['posts'],
-        );
+                    DATETIME NULL DEFAULT NULL', ['posts']);
     }
 
     private function fixForums(Database $database): void
     {
-        $database->special(
-            "ALTER TABLE %t
+        $database->special("ALTER TABLE %t
                 CHANGE `cat_id` `category`
                     INT(10) UNSIGNED NULL DEFAULT NULL,
                 CHANGE `lp_uid` `lastPostUser`
@@ -63,15 +53,12 @@ final class UnderScoreToCamelCase
                 CHANGE `show_sub` `showSubForums`
                     TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
                 CHANGE `show_ledby` `showLedBy`
-                    TINYINT(3) UNSIGNED NOT NULL DEFAULT '0'",
-            ['forums'],
-        );
+                    TINYINT(3) UNSIGNED NOT NULL DEFAULT '0'", ['forums']);
     }
 
     private function fixMembers(Database $database): void
     {
-        $database->special(
-            "ALTER TABLE %t
+        $database->special("ALTER TABLE %t
                 CHANGE `group_id` `groupID`
                     INT(10) UNSIGNED NULL DEFAULT NULL,
                 CHANGE `join_date` `joinDate`
@@ -119,15 +106,12 @@ final class UnderScoreToCamelCase
                 CHANGE `contact_youtube` `contactYoutube` VARCHAR(50)
                     CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
                 CHANGE `contact_bluesky` `contactBlueSky` VARCHAR(50)
-                    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL",
-            ['members'],
-        );
+                    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL", ['members']);
     }
 
     private function fixMemberGroups(Database $database): void
     {
-        $database->special(
-            "ALTER TABLE %t
+        $database->special("ALTER TABLE %t
                 CHANGE `can_post` `canPost`
                     TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
                 CHANGE `can_edit_posts` `canEditPosts`
@@ -181,15 +165,12 @@ final class UnderScoreToCamelCase
                 CHANGE `can_view_stats` `canViewStats`
                     TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
                 CHANGE `can_view_fullprofile` `canViewFullProfile`
-                    TINYINT(3) UNSIGNED NOT NULL DEFAULT '1'",
-            ['member_groups'],
-        );
+                    TINYINT(3) UNSIGNED NOT NULL DEFAULT '1'", ['member_groups']);
     }
 
     private function fixTopics(Database $database): void
     {
-        $database->special(
-            "ALTER TABLE %t
+        $database->special("ALTER TABLE %t
                 CHANGE `lp_uid` `lastPostUser`
                     INT(10) UNSIGNED NULL DEFAULT NULL,
                 CHANGE `lp_date` `lastPostDate`
@@ -205,15 +186,12 @@ final class UnderScoreToCamelCase
                 CHANGE `poll_type` `pollType` ENUM('','single','multi')
                     CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
                 CHANGE `cal_event` `calendarEvent`
-                    INT(10) UNSIGNED NOT NULL DEFAULT '0'",
-            ['topics'],
-        );
+                    INT(10) UNSIGNED NOT NULL DEFAULT '0'", ['topics']);
     }
 
     private function fixSession(Database $database): void
     {
-        $database->special(
-            "ALTER TABLE %t
+        $database->special("ALTER TABLE %t
                 CHANGE `last_update` `lastUpdate`
                     DATETIME NULL DEFAULT NULL,
                 CHANGE `last_action` `lastAction`
@@ -227,8 +205,6 @@ final class UnderScoreToCamelCase
                 CHANGE `location_verbose` `locationVerbose` VARCHAR(128)
                     CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
                 CHANGE `read_date` `readDate`
-                    DATETIME NULL DEFAULT NULL",
-            ['session'],
-        );
+                    DATETIME NULL DEFAULT NULL", ['session']);
     }
 }

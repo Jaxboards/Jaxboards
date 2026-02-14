@@ -34,14 +34,11 @@ final readonly class Poll
 
     public function render(Topic $topic): string
     {
-        return $this->template->render(
-            'global/box',
-            [
-                'boxID' => 'poll',
-                'title' => $topic->pollQuestion,
-                'content' => $this->renderPollHTML($topic),
-            ],
-        );
+        return $this->template->render('global/box', [
+            'boxID' => 'poll',
+            'title' => $topic->pollQuestion,
+            'content' => $this->renderPollHTML($topic),
+        ]);
     }
 
     public function vote(Topic $topic): void
@@ -56,11 +53,7 @@ final readonly class Poll
         }
 
         $choice = $this->request->both('choice');
-        $choices = json_decode(
-            $topic->pollChoices,
-            true,
-            flags: JSON_THROW_ON_ERROR,
-        );
+        $choices = json_decode($topic->pollChoices, true, flags: JSON_THROW_ON_ERROR);
         $numchoices = count($choices);
 
         $results = $this->parsePollResults($topic->pollResults);
@@ -72,11 +65,13 @@ final readonly class Poll
         $voted = false;
         foreach ($results as $result) {
             foreach ($result as $voterId) {
-                if ($voterId === $this->user->get()->id) {
-                    $voted = true;
-
-                    break;
+                if ($voterId !== $this->user->get()->id) {
+                    continue;
                 }
+
+                $voted = true;
+
+                break;
             }
         }
 
@@ -96,11 +91,7 @@ final readonly class Poll
             } else {
                 $error = 'Invalid Choice';
             }
-        } elseif (
-            !is_numeric($choice)
-            || $choice >= $numchoices
-            || $choice < 0
-        ) {
+        } elseif (!is_numeric($choice) || $choice >= $numchoices || $choice < 0) {
             $error = 'Invalid choice';
         }
 
@@ -123,8 +114,7 @@ final readonly class Poll
 
         $presults = [];
         for ($x = 0; $x < $numchoices; ++$x) {
-            $presults[$x] = array_key_exists($x, $results) && $results[$x]
-                ? implode(',', $results[$x]) : '';
+            $presults[$x] = array_key_exists($x, $results) && $results[$x] ? implode(',', $results[$x]) : '';
         }
 
         $topic->pollResults = implode(';', $presults);
@@ -134,10 +124,7 @@ final readonly class Poll
     private function renderPollHTML(Topic $topic): string
     {
         $type = $topic->pollType;
-        $choices = json_decode(
-            $topic->pollChoices,
-            flags: JSON_THROW_ON_ERROR,
-        );
+        $choices = json_decode($topic->pollChoices, flags: JSON_THROW_ON_ERROR);
         if (!is_array($choices)) {
             $choices = [];
         }
@@ -145,11 +132,7 @@ final readonly class Poll
         $usersVoted = [];
         $numVotes = [];
 
-        foreach (
-            $this->parsePollResults(
-                $topic->pollResults,
-            ) as $optionIndex => $voters
-        ) {
+        foreach ($this->parsePollResults($topic->pollResults) as $optionIndex => $voters) {
             $numVotes[$optionIndex] = count($voters);
 
             foreach ($voters as $voter) {
@@ -157,10 +140,7 @@ final readonly class Poll
             }
         }
 
-        $voted = !$this->user->isGuest() && array_key_exists(
-            $this->user->get()->id,
-            $usersVoted,
-        );
+        $voted = !$this->user->isGuest() && array_key_exists($this->user->get()->id, $usersVoted);
 
         return $this->template->render('topic/poll', [
             'choices' => $choices,
@@ -182,10 +162,7 @@ final readonly class Poll
     {
         return array_map(
             static fn(string $voters): array => array_filter(
-                array_map(
-                    static fn($voterId): int => (int) $voterId,
-                    explode(',', $voters),
-                ),
+                array_map(static fn($voterId): int => (int) $voterId, explode(',', $voters)),
                 static fn($userId): bool => $userId !== 0,
             ),
             explode(';', $pollResults),

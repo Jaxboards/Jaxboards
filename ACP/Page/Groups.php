@@ -129,20 +129,10 @@ final class Groups
                 continue;
             }
 
-            $this->database->update(
-                'member_groups',
-                $groupPermissions,
-                Database::WHERE_ID_EQUALS,
-                $groupId,
-            );
+            $this->database->update('member_groups', $groupPermissions, Database::WHERE_ID_EQUALS, $groupId);
         }
 
-        $this->page->addContentBox(
-            'Success!',
-            $this->page->success(
-                'Changes Saved successfully.',
-            ),
-        );
+        $this->page->addContentBox('Success!', $this->page->success('Changes Saved successfully.'));
 
         $this->updatePermissions = false;
 
@@ -158,7 +148,7 @@ final class Groups
     {
         $groups = Group::selectMany(
             ($groupIds ? 'WHERE `id` IN ? ' : '') . 'ORDER BY `id` ASC',
-            ...($groupIds ? [$groupIds] : []),
+            ...$groupIds ? [$groupIds] : [],
         );
 
         return Lodash::keyBy($groups, static fn($group): int => $group->id);
@@ -171,21 +161,12 @@ final class Groups
         $permInput = $this->request->post('perm');
         $groupListInput = $this->request->post('grouplist');
         $groupList = is_string($groupListInput)
-            ? array_map(
-                static fn($gid): int => (int) $gid,
-                explode(',', $groupListInput),
-            )
+            ? array_map(static fn($gid): int => (int) $gid, explode(',', $groupListInput))
             : null;
 
-        if (
-            $this->updatePermissions
-            && is_array($permInput)
-            && is_array($groupList)
-        ) {
+        if ($this->updatePermissions && is_array($permInput) && is_array($groupList)) {
             foreach ($groupList as $groupId) {
-                if (
-                    array_key_exists($groupId, $permInput)
-                ) {
+                if (array_key_exists($groupId, $permInput)) {
                     continue;
                 }
 
@@ -201,25 +182,17 @@ final class Groups
         $numgroups = count($groups);
 
         if ($numgroups === 0) {
-            $this->page->addContentBox(
-                'Error',
-                $this->page->error(
-                    "Don't play with my variables!",
-                ),
-            );
+            $this->page->addContentBox('Error', $this->page->error("Don't play with my variables!"));
         }
 
-        $widthPercent = 1 / $numgroups * 100;
+        $widthPercent = (1 / $numgroups) * 100;
         $groupHeadings = '';
         foreach ($groups as $groupId => $group) {
-            $groupHeadings .= $this->page->render(
-                'groups/show-permissions-group-heading.html',
-                [
-                    'id' => $groupId,
-                    'title' => $group->title,
-                    'width_percent' => $widthPercent,
-                ],
-            );
+            $groupHeadings .= $this->page->render('groups/show-permissions-group-heading.html', [
+                'id' => $groupId,
+                'title' => $group->title,
+                'width_percent' => $widthPercent,
+            ]);
         }
 
         $permissionsChart = [
@@ -276,47 +249,33 @@ final class Groups
         ];
         $permissionsTable = '';
         foreach ($permissionsChart as $category => $permissions) {
-            $permissionsTable .= $this->page->render(
-                'groups/show-permissions-breaker-row.html',
-                [
-                    'column_count' => 1 + $numgroups,
-                    'title' => $category,
-                ],
-            );
+            $permissionsTable .= $this->page->render('groups/show-permissions-breaker-row.html', [
+                'column_count' => 1 + $numgroups,
+                'title' => $category,
+            ]);
 
             foreach ($permissions as $field => $title) {
                 $groupColumns = '';
                 foreach ($groups as $groupId => $group) {
-                    $groupColumns .= $this->page->render(
-                        'groups/show-permissions-permission-row-group-column.html',
-                        [
-                            'checked' => $this->page->checked(
-                                (bool) $group->{$field},
-                            ),
-                            'groupID' => $groupId,
-                            'permission' => $field,
-                        ],
-                    );
+                    $groupColumns .= $this->page->render('groups/show-permissions-permission-row-group-column.html', [
+                        'checked' => $this->page->checked((bool) $group->{$field}),
+                        'groupID' => $groupId,
+                        'permission' => $field,
+                    ]);
                 }
 
-                $permissionsTable .= $this->page->render(
-                    'groups/show-permissions-permission-row.html',
-                    [
-                        'group_columns' => $groupColumns,
-                        'title' => $title,
-                    ],
-                );
+                $permissionsTable .= $this->page->render('groups/show-permissions-permission-row.html', [
+                    'group_columns' => $groupColumns,
+                    'title' => $title,
+                ]);
             }
         }
 
-        $page .= $this->page->render(
-            'groups/show-permissions.html',
-            [
-                'group_headings' => $groupHeadings,
-                'group_list' => implode(',', array_keys($groups)),
-                'permissions_table' => $permissionsTable,
-            ],
-        );
+        $page .= $this->page->render('groups/show-permissions.html', [
+            'group_headings' => $groupHeadings,
+            'group_list' => implode(',', array_keys($groups)),
+            'permissions_table' => $permissionsTable,
+        ]);
 
         $this->page->addContentBox('Perms', $page);
     }
@@ -328,16 +287,9 @@ final class Groups
 
         $error = match (true) {
             !$groupName => 'Group name required!',
-            mb_strlen(
-                $groupName,
-            ) > 250 => 'Group name must not exceed 250 characters!',
-            $groupIcon && mb_strlen(
-                $groupIcon,
-            ) > 250 => 'Group icon must not exceed 250 characters!',
-            $groupIcon && !filter_var(
-                $groupIcon,
-                FILTER_VALIDATE_URL,
-            ) => 'Group icon must be a valid image url',
+            mb_strlen($groupName) > 250 => 'Group name must not exceed 250 characters!',
+            $groupIcon && mb_strlen($groupIcon) > 250 => 'Group icon must not exceed 250 characters!',
+            $groupIcon && !filter_var($groupIcon, FILTER_VALIDATE_URL) => 'Group icon must be a valid image url',
             default => null,
         };
 
@@ -345,9 +297,7 @@ final class Groups
             return $error;
         }
 
-        $group = $gid
-            ? Group::selectOne($gid)
-            : null;
+        $group = $gid ? Group::selectOne($gid) : null;
         $group ??= new Group();
 
         $group->icon = $groupIcon ?? '';
@@ -357,9 +307,7 @@ final class Groups
 
         $this->page->addContentBox(
             $group->title . ' ' . ($gid ? 'edited' : 'created'),
-            $this->page->success(
-                'Data saved.',
-            ),
+            $this->page->success('Data saved.'),
         );
 
         $this->showPerms();
@@ -383,22 +331,12 @@ final class Groups
             $group = Group::selectOne($gid);
         }
 
-        $page .= $this->page->render(
-            'groups/create.html',
-            [
-                'icon_url' => $group !== null ? $this->textFormatting->blockhtml(
-                    $group->icon,
-                ) : '',
-                'submit' => $group !== null ? 'Edit' : 'Create',
-                'title' => $group !== null ? $this->textFormatting->blockhtml(
-                    $group->title,
-                ) : '',
-            ],
-        );
-        $this->page->addContentBox(
-            $group !== null ? 'Editing group: ' . $group->title : 'Create a group!',
-            $page,
-        );
+        $page .= $this->page->render('groups/create.html', [
+            'icon_url' => $group !== null ? $this->textFormatting->blockhtml($group->icon) : '',
+            'submit' => $group !== null ? 'Edit' : 'Create',
+            'title' => $group !== null ? $this->textFormatting->blockhtml($group->title) : '',
+        ]);
+        $this->page->addContentBox($group !== null ? 'Editing group: ' . $group->title : 'Create a group!', $page);
     }
 
     private function delete(): void
@@ -406,11 +344,7 @@ final class Groups
         $page = '';
         $delete = (int) $this->request->asString->both('delete');
         if ($delete > 5) {
-            $this->database->delete(
-                'member_groups',
-                Database::WHERE_ID_EQUALS,
-                $delete,
-            );
+            $this->database->delete('member_groups', Database::WHERE_ID_EQUALS, $delete);
             $this->database->update(
                 'members',
                 [
@@ -425,20 +359,15 @@ final class Groups
         $found = false;
         foreach ($groups as $group) {
             $found = true;
-            $page .= $this->page->render(
-                'groups/delete.html',
-                [
-                    'id' => $group->id,
-                    'title' => $group->title,
-                ],
-            );
+            $page .= $this->page->render('groups/delete.html', [
+                'id' => $group->id,
+                'title' => $group->title,
+            ]);
         }
 
         if (!$found) {
-            $page .= $this->page->error(
-                "You haven't created any groups to delete. "
-                    . "(Hint: default groups can't be deleted)",
-            );
+            $page .= $this->page->error("You haven't created any groups to delete. "
+            . "(Hint: default groups can't be deleted)");
         }
 
         $this->page->addContentBox('Delete Groups', $page);

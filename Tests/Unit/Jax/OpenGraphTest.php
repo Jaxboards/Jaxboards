@@ -27,9 +27,7 @@ final class OpenGraphTest extends UnitTestCase
     public function testFetch(string $url, string $htmlInput): void
     {
         $fileSystemStub = self::createStub(FileSystem::class);
-        $fileSystemStub->method('getContents')
-            ->willReturn($htmlInput)
-        ;
+        $fileSystemStub->method('getContents')->willReturn($htmlInput);
 
         $this->container->set(FileSystem::class, $fileSystemStub);
         $this->container->set(BBCode::class, self::createStub(BBCode::class));
@@ -85,7 +83,6 @@ final class OpenGraphTest extends UnitTestCase
                     HTML,
             ],
             [
-
                 'https://bibbyteam.com/',
                 <<<'HTML'
                     <html>

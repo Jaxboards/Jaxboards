@@ -13,6 +13,7 @@ use Jax\Models\Post;
 use Jax\Models\Topic;
 use Jax\Router;
 use Jax\User;
+use Override;
 
 use function json_encode;
 use function mb_strlen;
@@ -44,6 +45,7 @@ final class WebHooks implements Module
         $this->webhooks = $this->config->get()['webhooks'] ?? [];
     }
 
+    #[Override]
     public function init(): void
     {
         if ($this->webhooks === []) {
@@ -62,7 +64,8 @@ final class WebHooks implements Module
         }
 
         $rootURL = $this->router->getRootURL();
-        $topicURL = $rootURL
+        $topicURL =
+            $rootURL
             . $this->router->url('topic', [
                 'id' => $topic->id,
                 'findpost' => $post->id,
@@ -71,20 +74,16 @@ final class WebHooks implements Module
         $postContent = $this->bbcode->toMarkdown($post->post);
 
         // Trim content to remain under discord's character limit
-        $content = mb_substr(
-            <<<MARKDOWN
-                [{$topic->title}](<{$topicURL}>)
+        $content = mb_substr(<<<MARKDOWN
+            [{$topic->title}](<{$topicURL}>)
 
-                {$postContent}
-                MARKDOWN,
-            0,
-            self::DISCORD_CHARACTER_LIMIT,
-        );
+            {$postContent}
+            MARKDOWN, 0, self::DISCORD_CHARACTER_LIMIT);
 
         $member = $this->user->get();
         $this->sendJSON($discord, [
             'username' => $member->displayName,
-            'avatar_url' => $member->avatar ?? $rootURL . '/Service/Themes/Default/avatars/default.gif',
+            'avatar_url' => $member->avatar,
             'content' => $content,
         ]);
     }
@@ -99,9 +98,7 @@ final class WebHooks implements Module
         $curl = $this->curl ?? new Curl();
         $curl->setUrl($url);
         $curl->setHeader('Content-Type', 'application/json');
-        $curl->setHeader('Content-Length', mb_strlen(
-            $json,
-        ));
+        $curl->setHeader('Content-Length', mb_strlen($json));
         $curl->setOpt(CURLOPT_CUSTOMREQUEST, 'POST');
         $curl->setOpt(CURLOPT_POSTFIELDS, $json);
         $curl->setOpt(CURLOPT_RETURNTRANSFER, true);

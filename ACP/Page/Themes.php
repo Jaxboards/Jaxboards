@@ -83,10 +83,7 @@ final readonly class Themes
     private function deleteWrapper(string $wrapper): string
     {
         $wrapperPath = $this->pathToWrapper($wrapper);
-        if (
-            $this->isValidFilename($wrapper)
-            && $this->fileSystem->getFileInfo($wrapperPath)->isFile()
-        ) {
+        if ($this->isValidFilename($wrapper) && $this->fileSystem->getFileInfo($wrapperPath)->isFile()) {
             $this->fileSystem->unlink($wrapperPath);
             $this->page->location('?act=Themes');
 
@@ -105,24 +102,18 @@ final readonly class Themes
         $newWrapperFileInfo = $this->fileSystem->getFileInfo($newWrapperPath);
 
         return match (true) {
-            !$this->isValidFilename(
-                $wrapper,
-            ) => 'Wrapper name must consist of letters, '
+            !$this->isValidFilename($wrapper) => 'Wrapper name must consist of letters, '
                 . 'numbers, spaces, and underscore.',
-            mb_strlen(
-                $wrapper,
-            ) > 50 => 'Wrapper name must be less than 50 characters.',
+            mb_strlen($wrapper) > 50 => 'Wrapper name must be less than 50 characters.',
             $newWrapperFileInfo->isFile() => 'That wrapper already exists.',
-
             $this->fileSystem->putContents(
                 $newWrapperPath,
-                $this->fileSystem->getContents(
-                    $this->fileSystem->pathJoin(
-                        $this->domainDefinitions->getDefaultThemePath(),
-                        'wrapper.html',
-                    ),
-                ),
-            ) === false => 'Wrapper could not be created.',
+                $this->fileSystem->getContents($this->fileSystem->pathJoin(
+                    $this->domainDefinitions->getDefaultThemePath(),
+                    'wrapper.html',
+                )),
+            ) === false
+                => 'Wrapper could not be created.',
             default => null,
         };
     }
@@ -137,10 +128,7 @@ final readonly class Themes
         $validWrappers = $this->getWrappers();
 
         foreach ($wrappers as $skinId => $wrapperName) {
-            if (
-                $wrapperName
-                && !in_array($wrapperName, $validWrappers, true)
-            ) {
+            if ($wrapperName && !in_array($wrapperName, $validWrappers, true)) {
                 continue;
             }
 
@@ -177,25 +165,16 @@ final readonly class Themes
 
             if (
                 !$this->isValidFilename($oldName)
-                || !$this->fileSystem->getFileInfo(
-                    $this->themesPath . $oldName,
-                )->isDir()
+                || !$this->fileSystem->getFileInfo($this->themesPath . $oldName)->isDir()
             ) {
                 return 'Invalid from skin name';
             }
 
-            if (
-                !$this->isValidFilename($newName)
-                || mb_strlen($newName) > 50
-            ) {
+            if (!$this->isValidFilename($newName) || mb_strlen($newName) > 50) {
                 return 'Skin name must consist of letters, numbers, spaces, and underscore, and be under 50 characters long.';
             }
 
-            if (
-                $this->fileSystem->getFileInfo(
-                    $this->themesPath . $newName,
-                )->isDir()
-            ) {
+            if ($this->fileSystem->getFileInfo($this->themesPath . $newName)->isDir()) {
                 return 'That skin name is already being used.';
             }
 
@@ -232,27 +211,16 @@ final readonly class Themes
                 continue;
             }
 
-            if (
-                !$this->fileSystem->getFileInfo(
-                    $this->pathToWrapper($wrapperName),
-                )->isFile()
-            ) {
+            if (!$this->fileSystem->getFileInfo($this->pathToWrapper($wrapperName))->isFile()) {
                 continue;
             }
 
-            if (
-                !$this->isValidFilename($wrapperNewName)
-                || mb_strlen($wrapperNewName) > 50
-            ) {
+            if (!$this->isValidFilename($wrapperNewName) || mb_strlen($wrapperNewName) > 50) {
                 return 'Wrapper name must consist of letters, numbers, spaces, and underscore, and be
                     under 50 characters long.';
             }
 
-            if (
-                $this->fileSystem->getFileInfo(
-                    $this->pathToWrapper($wrapperNewName),
-                )->isFile()
-            ) {
+            if ($this->fileSystem->getFileInfo($this->pathToWrapper($wrapperNewName))->isFile()) {
                 return "That wrapper name ({$wrapperNewName}) is already being used.";
             }
 
@@ -264,10 +232,7 @@ final readonly class Themes
                 'WHERE `wrapper`=? AND `custom`=1',
                 $wrapperName,
             );
-            $this->fileSystem->rename(
-                $this->pathToWrapper($wrapperName),
-                $this->pathToWrapper($wrapperNewName),
-            );
+            $this->fileSystem->rename($this->pathToWrapper($wrapperName), $this->pathToWrapper($wrapperNewName));
         }
 
         return null;
@@ -275,12 +240,9 @@ final readonly class Themes
 
     private function setDefaultSkin(int $skinID): void
     {
-        $this->database->update(
-            'skins',
-            [
-                'default' => 0,
-            ],
-        );
+        $this->database->update('skins', [
+            'default' => 0,
+        ]);
         $this->database->update(
             'skins',
             [
@@ -303,23 +265,13 @@ final readonly class Themes
 
         $wrapperError = match (true) {
             is_string($deleteWrapper) => $this->deleteWrapper($deleteWrapper),
-            is_string(
-                $newWrapper,
-            ) && $newWrapper !== '' => $this->createWrapper(
-                $newWrapper,
-            ),
-            is_array($updateWrappers) => $this->updateWrappers(
-                $updateWrappers,
-            ),
-            is_array($renameWrappers) => $this->renameWrappers(
-                $renameWrappers,
-            ),
+            is_string($newWrapper) && $newWrapper !== '' => $this->createWrapper($newWrapper),
+            is_array($updateWrappers) => $this->updateWrappers($updateWrappers),
+            is_array($renameWrappers) => $this->renameWrappers($renameWrappers),
             default => null,
         };
 
-        $skinError = is_array($renameSkins)
-            ? $this->renameSkin($renameSkins)
-            : null;
+        $skinError = is_array($renameSkins) ? $this->renameSkin($renameSkins) : null;
 
         $defaultSkin = (int) $this->request->asString->both('default');
         if ($defaultSkin !== 0) {
@@ -335,95 +287,60 @@ final readonly class Themes
         foreach ($skins as $skin) {
             $wrapperOptions = '';
             foreach ($wrappers as $wrapper) {
-                $wrapperOptions .= $this->page->render(
-                    'select-option.html',
-                    [
-                        'label' => $wrapper,
-                        'selected' => $wrapper === $skin->wrapper
-                            ? 'selected="selected"' : '',
-                        'value' => $wrapper,
-                    ],
-                );
+                $wrapperOptions .= $this->page->render('select-option.html', [
+                    'label' => $wrapper,
+                    'selected' => $wrapper === $skin->wrapper ? 'selected="selected"' : '',
+                    'value' => $wrapper,
+                ]);
             }
 
-            $skinsHTML .= $this->page->render(
-                'themes/show-skin-index-css-row.html',
-                [
-                    'custom' => $skin->custom
-                        ? $this->page->render(
-                            'themes/show-skin-index-css-row-custom.html',
-                        ) : '',
-                    'default_checked' => $this->page->checked(
-                        $skin->default === 1,
-                    ),
-                    'default_option' => $skin->custom ? '' : $this->page->render(
-                        'select-option.html',
-                        [
-                            'label' => 'Skin Default',
-                            'selected' => '',
-                            'value' => '',
-                        ],
-                    ),
-                    'delete' => $skin->custom ? $this->page->render(
-                        'themes/show-skin-index-css-row-delete.html',
-                        [
-                            'id' => $skin->id,
-                        ],
-                    ) : '',
-                    'hidden_checked' => $this->page->checked(
-                        $skin->hidden === 1,
-                    ),
-                    'id' => $skin->id,
-                    'title' => $skin->title,
-                    'view_or_edit' => $skin->custom ? 'Edit' : 'View',
-                    'wrapper_options' => $wrapperOptions,
-                ],
-            );
+            $skinsHTML .= $this->page->render('themes/show-skin-index-css-row.html', [
+                'custom' => $skin->custom ? $this->page->render('themes/show-skin-index-css-row-custom.html') : '',
+                'default_checked' => $this->page->checked($skin->default === 1),
+                'default_option' => $skin->custom
+                    ? ''
+                    : $this->page->render('select-option.html', [
+                        'label' => 'Skin Default',
+                        'selected' => '',
+                        'value' => '',
+                    ]),
+                'delete' => $skin->custom
+                    ? $this->page->render('themes/show-skin-index-css-row-delete.html', [
+                        'id' => $skin->id,
+                    ]) : '',
+                'hidden_checked' => $this->page->checked($skin->hidden === 1),
+                'id' => $skin->id,
+                'title' => $skin->title,
+                'view_or_edit' => $skin->custom ? 'Edit' : 'View',
+                'wrapper_options' => $wrapperOptions,
+            ]);
             $usedwrappers[] = $skin->wrapper;
         }
 
-        $skinsHTML = $this->page->render(
-            'themes/show-skin-index-css.html',
-            [
-                'content' => $skinsHTML,
-            ],
-        );
+        $skinsHTML = $this->page->render('themes/show-skin-index-css.html', [
+            'content' => $skinsHTML,
+        ]);
 
-        $this->page->addContentBox(
-            'Themes',
-            ($skinError !== null ? $this->page->error(
-                $skinError,
-            ) : '') . $skinsHTML,
-        );
+        $this->page->addContentBox('Themes', ($skinError !== null ? $this->page->error($skinError) : '') . $skinsHTML);
 
         $wrap = '';
         foreach ($wrappers as $wrapper) {
-            $wrap .= $this->page->render(
-                'themes/show-skin-index-wrapper-row.html',
-                [
-                    'delete' => in_array($wrapper, $usedwrappers) ? 'In use'
-                        : $this->page->render(
-                            'themes/show-skin-index-wrapper-row-delete.html',
-                            [
-                                'title' => $wrapper,
-                            ],
-                        ),
-                    'title' => $wrapper,
-                ],
-            );
+            $wrap .= $this->page->render('themes/show-skin-index-wrapper-row.html', [
+                'delete' => in_array($wrapper, $usedwrappers)
+                    ? 'In use'
+                    : $this->page->render('themes/show-skin-index-wrapper-row-delete.html', [
+                        'title' => $wrapper,
+                    ]),
+                'title' => $wrapper,
+            ]);
         }
 
-        $wrap = $this->page->render(
-            'themes/show-skin-index-wrapper.html',
-            [
-                'content' => $wrap,
-            ],
-        );
+        $wrap = $this->page->render('themes/show-skin-index-wrapper.html', [
+            'content' => $wrap,
+        ]);
         $this->page->addContentBox(
             'Wrappers',
-            ($wrapperError !== null ? $this->page->error(
-                $wrapperError,
-            ) : '') . $wrap,
+            ($wrapperError !== null ? $this->page->error($wrapperError) : '') . $wrap,
         );
     }
 
@@ -439,30 +356,20 @@ final readonly class Themes
 
         $newSkinData = $this->request->asString->post('newskindata');
         if ($skin->custom && $newSkinData) {
-            $this->fileSystem->putContents(
-                $this->themesPath . $skin->title . '/css.css',
-                $newSkinData,
-            );
+            $this->fileSystem->putContents($this->themesPath . $skin->title . '/css.css', $newSkinData);
         }
 
         $this->page->addContentBox(
             ($skin->custom !== 0 ? 'Editing' : 'Viewing') . ' Skin: ' . $skin->title,
-            $this->page->render(
-                'themes/edit-css.html',
-                [
-                    'content' => $this->textFormatting->blockhtml(
-                        $this->fileSystem->getContents(
-                            (
-                                $skin->custom !== 0
-                                ? $this->themesPath : $this->domainDefinitions->getServiceThemePath()
-                            ) . "/{$skin->title}/css.css",
-                        ) ?: '',
-                    ),
-                    'save' => $skin->custom !== 0 ? $this->page->render(
-                        'save-changes.html',
-                    ) : '',
-                ],
-            ),
+            $this->page->render('themes/edit-css.html', [
+                'content' => $this->textFormatting->blockhtml(
+                    $this->fileSystem->getContents(
+                        ($skin->custom !== 0 ? $this->themesPath : $this->domainDefinitions->getServiceThemePath())
+                        . "/{$skin->title}/css.css",
+                    ) ?: '',
+                ),
+                'save' => $skin->custom !== 0 ? $this->page->render('save-changes.html') : '',
+            ]),
         );
     }
 
@@ -470,14 +377,8 @@ final readonly class Themes
     {
         $saved = '';
         $wrapperPath = $this->pathToWrapper($wrapper);
-        if (
-            !$this->isValidFilename($wrapper)
-            || !$this->fileSystem->getFileInfo($wrapperPath)->isFile()
-        ) {
-            $this->page->addContentBox(
-                'Error',
-                "The theme you're trying to edit does not exist.",
-            );
+        if (!$this->isValidFilename($wrapper) || !$this->fileSystem->getFileInfo($wrapperPath)->isFile()) {
+            $this->page->addContentBox('Error', "The theme you're trying to edit does not exist.");
 
             return;
         }
@@ -485,24 +386,17 @@ final readonly class Themes
         $wrapperContents = $this->request->post('newwrapper');
         $saved = match (true) {
             !is_string($wrapperContents) => '',
-            default => $this->fileSystem->putContents(
-                $wrapperPath,
-                $wrapperContents,
-            )
+            default => $this->fileSystem->putContents($wrapperPath, $wrapperContents)
                 ? $this->page->success('Wrapper saved successfully.')
                 : $this->page->error('Error saving wrapper.'),
         };
 
         $this->page->addContentBox(
             "Editing Wrapper: {$wrapper}",
-            $saved . $this->page->render(
-                'themes/edit-wrapper.html',
-                [
-                    'content' => $this->textFormatting->blockhtml(
-                        $this->fileSystem->getContents($wrapperPath) ?: '',
-                    ),
-                ],
-            ),
+            $saved
+                . $this->page->render('themes/edit-wrapper.html', [
+                    'content' => $this->textFormatting->blockhtml($this->fileSystem->getContents($wrapperPath) ?: ''),
+                ]),
         );
     }
 
@@ -512,19 +406,11 @@ final readonly class Themes
         $wrapperName = $this->request->asString->post('wrapper') ?? '';
         $error = match (true) {
             $skinName === '' => 'No skin name supplied!',
-            !$this->isValidFilename(
-                $skinName,
-            ) => 'Skinname must only consist of letters, numbers, and spaces.',
-            mb_strlen(
-                $skinName,
-            ) > 50 => 'Skin name must be less than 50 characters.',
-            $this->fileSystem->getFileInfo(
-                $this->themesPath . $skinName,
-            )->isDir() => 'A skin with that name already exists.',
-            !in_array(
-                $wrapperName,
-                $this->getWrappers(),
-            ) => 'Invalid wrapper.',
+            !$this->isValidFilename($skinName) => 'Skinname must only consist of letters, numbers, and spaces.',
+            mb_strlen($skinName) > 50 => 'Skin name must be less than 50 characters.',
+            $this->fileSystem->getFileInfo($this->themesPath . $skinName)->isDir()
+                => 'A skin with that name already exists.',
+            !in_array($wrapperName, $this->getWrappers()) => 'Invalid wrapper.',
             default => null,
         };
 
@@ -532,17 +418,11 @@ final readonly class Themes
             return $error;
         }
 
-        $newThemePath = $this->fileSystem->pathJoin(
-            $this->themesPath,
-            $skinName,
-        );
+        $newThemePath = $this->fileSystem->pathJoin($this->themesPath, $skinName);
 
         $this->fileSystem->mkdir($newThemePath, 0o777, true);
         $this->fileSystem->copy(
-            $this->fileSystem->pathjoin(
-                $this->domainDefinitions->getDefaultThemePath(),
-                'css.css',
-            ),
+            $this->fileSystem->pathjoin($this->domainDefinitions->getDefaultThemePath(), 'css.css'),
             $this->fileSystem->pathjoin($newThemePath, 'css.css'),
         );
 
@@ -583,22 +463,16 @@ final readonly class Themes
 
         $wrapperOptions = '';
         foreach ($this->getWrappers() as $wrapper) {
-            $wrapperOptions .= $this->page->render(
-                'select-option.html',
-                [
-                    'label' => $wrapper,
-                    'selected' => '',
-                    'value' => $wrapper,
-                ],
-            );
+            $wrapperOptions .= $this->page->render('select-option.html', [
+                'label' => $wrapper,
+                'selected' => '',
+                'value' => $wrapper,
+            ]);
         }
 
-        $page .= $this->page->render(
-            'themes/create-skin.html',
-            [
-                'wrapper_options' => $wrapperOptions,
-            ],
-        );
+        $page .= $this->page->render('themes/create-skin.html', [
+            'wrapper_options' => $wrapperOptions,
+        ]);
         $this->page->addContentBox('Create New Skin', $page);
     }
 
@@ -612,10 +486,7 @@ final readonly class Themes
             return;
         }
 
-        $skindir = $this->fileSystem->pathJoin(
-            $this->themesPath,
-            $skin->title,
-        );
+        $skindir = $this->fileSystem->pathJoin($this->themesPath, $skin->title);
         if ($this->fileSystem->getFileInfo($skindir)->isDir()) {
             $this->fileSystem->removeDirectory($skindir);
         }
@@ -638,10 +509,7 @@ final readonly class Themes
 
     private function pathToWrapper(string $wrapperName): string
     {
-        return $this->fileSystem->pathJoin(
-            $this->wrappersPath,
-            $wrapperName . '.html',
-        );
+        return $this->fileSystem->pathJoin($this->wrappersPath, $wrapperName . '.html');
     }
 
     /**

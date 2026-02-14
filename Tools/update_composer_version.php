@@ -56,13 +56,7 @@ $composerData['require']['composer'] = $version;
 ksort($composerData['require']);
 ksort($composerData['require-dev']);
 
-file_put_contents(
-    COMPOSER_FILE,
-    json_encode(
-        $composerData,
-        JSON_PRETTY_PRINT,
-    ),
-);
+file_put_contents(COMPOSER_FILE, json_encode($composerData, JSON_PRETTY_PRINT));
 
 define('PACKAGE_FILE', dirname(__DIR__) . '/package.json');
 
@@ -85,10 +79,4 @@ $packageData = json_decode(
 $packageData['engines']['composer'] = $version;
 ksort($packageData['engines']);
 
-file_put_contents(
-    PACKAGE_FILE,
-    json_encode(
-        $packageData,
-        JSON_PRETTY_PRINT,
-    ),
-);
+file_put_contents(PACKAGE_FILE, json_encode($packageData, JSON_PRETTY_PRINT));

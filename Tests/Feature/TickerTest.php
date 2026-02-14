@@ -87,23 +87,8 @@ final class TickerTest extends FeatureTestCase
 
         $page = $this->go('/ticker');
 
-        DOMAssert::assertSelectRegExp(
-            '#ticker .tick .date',
-            '/\d+:\d+[ap]m, \d+\/\d+\/\d+/',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            '#ticker .tick .tick-title',
-            'Welcome to Jaxboards!',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            '#ticker .tick .by .user1',
-            'Admin',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectRegExp('#ticker .tick .date', '/\d+:\d+[ap]m, \d+\/\d+\/\d+/', 1, $page);
+        DOMAssert::assertSelectEquals('#ticker .tick .tick-title', 'Welcome to Jaxboards!', 1, $page);
+        DOMAssert::assertSelectEquals('#ticker .tick .by .user1', 'Admin', 1, $page);
     }
 }

@@ -10,6 +10,7 @@ use Jax\Attributes\Key;
 use Jax\Attributes\PrimaryKey;
 use Jax\Database\Database;
 use Jax\Database\Model;
+use Override;
 use ReflectionClass;
 
 use function array_merge;
@@ -19,8 +20,11 @@ use const PHP_EOL;
 
 final readonly class SQLite implements Adapter
 {
-    public function __construct(private Database $database) {}
+    public function __construct(
+        private Database $database,
+    ) {}
 
+    #[Override]
     public function createTableQueryFromModel(Model $model): string
     {
         $table = $model::TABLE;
@@ -32,33 +36,23 @@ final readonly class SQLite implements Adapter
         $constraints = [];
 
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-            $columnAttributes = $reflectionProperty->getAttributes(
-                Column::class,
-            );
+            $columnAttributes = $reflectionProperty->getAttributes(Column::class);
 
             if ($columnAttributes === []) {
                 continue;
             }
 
             $columnAttribute = $columnAttributes[0]->newInstance();
-            $fieldName = $this->database->quoteIdentifier(
-                $columnAttribute->name,
-            );
+            $fieldName = $this->database->quoteIdentifier($columnAttribute->name);
             $fields[] = $this->fieldDefinition($columnAttribute);
 
-            $primaryKeyAttributes = $reflectionProperty->getAttributes(
-                PrimaryKey::class,
-            );
-            $foreignKeyAttributes = $reflectionProperty->getAttributes(
-                ForeignKey::class,
-            );
+            $primaryKeyAttributes = $reflectionProperty->getAttributes(PrimaryKey::class);
+            $foreignKeyAttributes = $reflectionProperty->getAttributes(ForeignKey::class);
             $keyAttributes = $reflectionProperty->getAttributes(Key::class);
 
             if ($foreignKeyAttributes !== []) {
                 $foreignKey = $foreignKeyAttributes[0]->newInstance();
-                $foreignField = $this->database->quoteIdentifier(
-                    $foreignKey->field,
-                );
+                $foreignField = $this->database->quoteIdentifier($foreignKey->field);
                 $foreignTable = $this->database->ftable($foreignKey->table);
                 $onDelete = match ($foreignKey->onDelete) {
                     'cascade' => ' ON DELETE CASCADE',
@@ -83,15 +77,21 @@ final readonly class SQLite implements Adapter
             $keys[] = "{$fulltext}KEY {$fieldName} ({$fieldName})";
         }
 
-        return "CREATE TABLE {$tableQuoted} (" . PHP_EOL
-            . '  ' . implode(',' . PHP_EOL . '  ', array_merge(
+        return (
+            "CREATE TABLE {$tableQuoted} ("
+            . PHP_EOL
+            . '  '
+            . implode(',' . PHP_EOL . '  ', array_merge(
                 $fields,
                 // $keys,
                 $constraints,
-            )) . PHP_EOL
-        . ')';
+            ))
+            . PHP_EOL
+            . ')'
+        );
     }
 
+    #[Override]
     public function install(): void {}
 
     private function fieldDefinition(Column $column): string
@@ -116,21 +116,15 @@ final readonly class SQLite implements Adapter
             case 'string':
                 $type = 'varchar';
 
-                // no break
+            // no break
             default:
                 break;
         }
 
         $length = $column->length !== 0 ? "({$column->length})" : '';
-        $nullable = !$column->autoIncrement && $column->nullable === false
-            ? ' NOT NULL'
-            : '';
-        $autoIncrement = $column->autoIncrement
-            ? ' PRIMARY KEY AUTOINCREMENT'
-            : '';
-        $default = $column->default !== null
-            ? " DEFAULT '{$column->default}'"
-            : '';
+        $nullable = !$column->autoIncrement && !$column->nullable ? ' NOT NULL' : '';
+        $autoIncrement = $column->autoIncrement ? ' PRIMARY KEY AUTOINCREMENT' : '';
+        $default = $column->default !== null ? " DEFAULT '{$column->default}'" : '';
 
         return "{$fieldName} {$type}{$length}{$nullable}{$autoIncrement}{$default}";
     }

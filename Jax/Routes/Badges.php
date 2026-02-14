@@ -13,6 +13,7 @@ use Jax\Page;
 use Jax\Request;
 use Jax\Router;
 use Jax\Template;
+use Override;
 
 use function array_key_exists;
 
@@ -31,6 +32,7 @@ final readonly class Badges implements Route
         return (bool) $this->config->getSetting('badgesEnabled');
     }
 
+    #[Override]
     public function route($params): void
     {
         $badgeId = (int) $this->request->asString->get('badgeId');
@@ -48,10 +50,7 @@ final readonly class Badges implements Route
      */
     public function fetchBadges(array $userIds): array
     {
-        $badgeAssociations = BadgeAssociation::selectMany(
-            'WHERE user IN ?',
-            $userIds,
-        );
+        $badgeAssociations = BadgeAssociation::selectMany('WHERE user IN ?', $userIds);
 
         $badges = Badge::joinedOn(
             $badgeAssociations,
@@ -108,10 +107,7 @@ final readonly class Badges implements Route
             return;
         }
 
-        $badgeAssociations = BadgeAssociation::selectMany(
-            'WHERE `badge`=?',
-            $badgeId,
-        );
+        $badgeAssociations = BadgeAssociation::selectMany('WHERE `badge`=?', $badgeId);
 
         $membersWithBadges = Member::joinedOn(
             $badgeAssociations,
@@ -128,9 +124,7 @@ final readonly class Badges implements Route
             'badges_' . $badge->id,
         );
 
-        $this->page->setPageTitle(
-            "Viewing Recipients of {$badge->badgeTitle} badge",
-        );
+        $this->page->setPageTitle("Viewing Recipients of {$badge->badgeTitle} badge");
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
     }

@@ -98,53 +98,29 @@ final class BoardIndexTest extends FeatureTestCase
 
         DOMAssert::assertSelectEquals('#cat_1 .title', 'Category', 1, $page);
 
-        DOMAssert::assertSelectEquals(
-            '#fid_1 .description',
-            'Your very first forum!',
-            1,
-            $page,
-        );
-        DOMAssert::assertSelectEquals(
-            '#fid_1_lastpost',
-            'Welcome to Jaxboards!',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('#fid_1 .description', 'Your very first forum!', 1, $page);
+        DOMAssert::assertSelectEquals('#fid_1_lastpost', 'Welcome to Jaxboards!', 1, $page);
 
-        DOMAssert::assertSelectEquals(
-            '#stats .content',
-            '1 User Online:',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('#stats .content', '1 User Online:', 1, $page);
         DOMAssert::assertSelectEquals('#statusers .user1', 'Admin', 1, $page);
         DOMAssert::assertSelectCount('#statusers .user1.birthday', 1, $page);
-        DOMAssert::assertSelectEquals(
-            '#stats .userstoday',
-            '1 User Online Today:',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('#stats .userstoday', '1 User Online Today:', 1, $page);
     }
 
     public function testBoardIndexUpdate(): void
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            server: ['HTTP_X_JSACCESS' => JSAccess::UPDATING->value],
-        ));
+        $page = $this->go(new Request(server: ['HTTP_X_JSACCESS' => JSAccess::UPDATING->value]));
 
-        self::assertStringContainsString('onlinelist', $page);
+        static::assertStringContainsString('onlinelist', $page);
     }
 
     public function testDebugInfo(): void
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            server: ['REMOTE_ADDR' => '::1'],
-        ));
+        $page = $this->go(new Request(server: ['REMOTE_ADDR' => '::1']));
 
         DOMAssert::assertSelectCount('#debug', 1, $page);
     }
@@ -155,22 +131,14 @@ final class BoardIndexTest extends FeatureTestCase
 
         $page = $this->go('/');
 
-        DOMAssert::assertSelectRegExp(
-            '.error',
-            "/You don't have permission to view the board./",
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectRegExp('.error', "/You don't have permission to view the board./", 1, $page);
     }
 
     public function testViewForumIndexAsBannedIP(): void
     {
         // This test is a little weird.
         // We have to set the request up (to mock out the IP) before anything else gets initialized
-        $request = new Request(
-            get: ['path' => '/'],
-            server: ['REMOTE_ADDR' => '1.2.3.4'],
-        );
+        $request = new Request(get: ['path' => '/'], server: ['REMOTE_ADDR' => '1.2.3.4']);
         $this->container->set(Request::class, $request);
 
         $this->actingAs('guest');
@@ -178,11 +146,6 @@ final class BoardIndexTest extends FeatureTestCase
 
         $page = $this->go($request);
 
-        DOMAssert::assertSelectRegExp(
-            '.error',
-            "/You don't have permission to view the board./",
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectRegExp('.error', "/You don't have permission to view the board./", 1, $page);
     }
 }

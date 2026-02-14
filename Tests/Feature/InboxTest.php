@@ -92,7 +92,7 @@ final class InboxTest extends FeatureTestCase
 
         $page = $this->go('/ucp/inbox');
 
-        self::assertStringContainsString('No messages.', $page);
+        static::assertStringContainsString('No messages.', $page);
     }
 
     public function testInboxWithMessage(): void
@@ -102,17 +102,9 @@ final class InboxTest extends FeatureTestCase
         $this->actingAs('admin');
 
         $page = $this->go('/ucp/inbox');
-        $url = $this->container->get(Router::class)->url(
-            'inbox',
-            ['view' => '1'],
-        );
+        $url = $this->container->get(Router::class)->url('inbox', ['view' => '1']);
 
-        DOMAssert::assertSelectEquals(
-            ".unread a[href^='{$url}']",
-            'Test Message',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals(".unread a[href^='{$url}']", 'Test Message', 1, $page);
     }
 
     public function testInboxViewMessage(): void
@@ -123,12 +115,7 @@ final class InboxTest extends FeatureTestCase
 
         $page = $this->go('/ucp/inbox?view=1');
 
-        DOMAssert::assertSelectEquals(
-            '.message',
-            'This is a test message.',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('.message', 'This is a test message.', 1, $page);
     }
 
     public function testInboxReplyMessage(): void
@@ -139,12 +126,7 @@ final class InboxTest extends FeatureTestCase
 
         $page = $this->go('/ucp/inbox?page=Reply&messageid=1');
 
-        DOMAssert::assertSelectRegExp(
-            '#message',
-            '/\[quote=Admin\]This is a test message.\[\/quote\]/',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectRegExp('#message', '/\[quote=Admin\]This is a test message.\[\/quote\]/', 1, $page);
     }
 
     public function testInboxDeleteMessage(): void
@@ -153,39 +135,28 @@ final class InboxTest extends FeatureTestCase
 
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            get: ['path' => '/ucp/inbox'],
-            post: ['dmessage' => ['1']],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/ucp/inbox'], post: ['dmessage' => ['1']]));
 
-        self::assertStringContainsString('No messages.', $page);
+        static::assertStringContainsString('No messages.', $page);
     }
 
     public function testInboxComposeMessage(): void
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            get: ['path' => '/ucp/inbox', 'view' => 'compose'],
-            post: [
-                'submit' => '1',
-                'mid' => '1',
-                'title' => 'Hello there',
-                'message' => 'How have you been?',
-            ],
-        ));
+        $page = $this->go(new Request(get: ['path' => '/ucp/inbox', 'view' => 'compose'], post: [
+            'submit' => '1',
+            'mid' => '1',
+            'title' => 'Hello there',
+            'message' => 'How have you been?',
+        ]));
 
-        DOMAssert::assertSelectEquals(
-            '#ucppage',
-            'Message successfully delivered.',
-            1,
-            $page,
-        );
+        DOMAssert::assertSelectEquals('#ucppage', 'Message successfully delivered.', 1, $page);
         $message = Message::selectOne(1);
-        self::assertEquals('Hello there', $message->title);
-        self::assertEquals('How have you been?', $message->message);
-        self::assertEquals(1, $message->from);
-        self::assertEquals(1, $message->to);
+        static::assertSame('Hello there', $message?->title);
+        static::assertSame('How have you been?', $message?->message);
+        static::assertSame(1, $message?->from);
+        static::assertSame(1, $message?->to);
     }
 
     public function testInboxFlagMessage(): void
@@ -199,7 +170,7 @@ final class InboxTest extends FeatureTestCase
         $this->assertRedirect('inbox', [], $page);
 
         $message = Message::selectOne(1);
-        self::assertEquals(1, $message->flag);
+        static::assertSame(1, $message?->flag);
     }
 
     public function testInboxUnflagMessage(): void
@@ -213,7 +184,7 @@ final class InboxTest extends FeatureTestCase
         $this->assertRedirect('inbox', [], $page);
 
         $message = Message::selectOne(1);
-        self::assertEquals(0, $message->flag);
+        static::assertSame(0, $message?->flag);
     }
 
     private function insertMessage(?array $messageProperties = []): void

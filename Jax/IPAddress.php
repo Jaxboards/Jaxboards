@@ -64,9 +64,7 @@ final class IPAddress
 
         $length = mb_strlen($ipAddress);
 
-        return (inet_ntop($ipAddress) ?: inet_ntop(
-            pack('A' . $length, $ipAddress),
-        )) ?: '';
+        return inet_ntop($ipAddress) ?: inet_ntop(pack('A' . $length, $ipAddress)) ?: '';
     }
 
     public function ban(string $ipAddress): void
@@ -95,15 +93,11 @@ final class IPAddress
 
         return array_any(
             $this->ipBanCache,
-            static fn($bannedIp): bool => $bannedIp === $ipAddress
-                || in_array(
-                    mb_substr((string) $bannedIp, -1),
-                    [':', '.'],
-                    true,
-                ) && str_starts_with(
-                    $ipAddress,
-                    (string) $bannedIp,
-                ),
+            static fn($bannedIp): bool => (
+                $bannedIp === $ipAddress
+                || in_array(mb_substr((string) $bannedIp, -1), [':', '.'], true)
+                && str_starts_with($ipAddress, (string) $bannedIp)
+            ),
         );
     }
 
@@ -178,12 +172,14 @@ final class IPAddress
 
     private function getIp(): string
     {
-        return $this->request->server('HTTP_CF_CONNECTING_IP')
-// Cloudflare
+        return (
+            $this->request->server('HTTP_CF_CONNECTING_IP')
+            // Cloudflare
             ?: $this->request->server('HTTP_X_FORWARDED_FOR')
-// Most proxies
+            // Most proxies
             ?: $this->request->server('REMOTE_ADDR')
-// The OG
-            ?: '';
+            // The OG
+            ?: ''
+        );
     }
 }

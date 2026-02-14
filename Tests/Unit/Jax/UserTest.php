@@ -47,9 +47,6 @@ final class UserTest extends UnitTestCase
 {
     private string $encodedForumFlags;
 
-    // phpcs:disable SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder
-    // disable array order because we have to match the output order from the
-    // code we're testing
     /**
      * @var array<int,array<string,bool>>
      */
@@ -72,17 +69,12 @@ final class UserTest extends UnitTestCase
         ],
     ];
 
-    // phpcs:enable
-
     #[Override]
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->encodedForumFlags = base64_decode(
-            'AAEAPgADABgABAAYAAUAGAAGAD8=',
-            true,
-        );
+        $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=', true);
     }
 
     public function testGetForumPermissionAsAdmin(): void
@@ -95,20 +87,13 @@ final class UserTest extends UnitTestCase
                 'disposeresult',
                 'select',
             ])
-            ->getMock()
-        ;
+            ->getMock();
 
-        $database->expects($this->never())
-            ->method('select')
-        ;
+        $database->expects($this->never())->method('select');
 
-        $database->expects($this->never())
-            ->method('arow')
-        ;
+        $database->expects($this->never())->method('arow');
 
-        $database->expects($this->never())
-            ->method('disposeresult')
-        ;
+        $database->expects($this->never())->method('disposeresult');
 
         $container = new Container([
             Database::class => $database,
@@ -123,14 +108,9 @@ final class UserTest extends UnitTestCase
         $userMember = new Member();
         $userMember->groupID = Groups::Admin->value;
 
-        $user = new User(
-            $container->get(Jax::class),
-            $container->get(IPAddress::class),
-            $userMember,
-            $group,
-        );
+        $user = new User($container->get(Jax::class), $container->get(IPAddress::class), $userMember, $group);
 
-        self::assertSame(
+        static::assertSame(
             [
                 'poll' => true,
                 'read' => true,
@@ -153,20 +133,13 @@ final class UserTest extends UnitTestCase
                 'disposeresult',
                 'select',
             ])
-            ->getMock()
-        ;
+            ->getMock();
 
-        $database->expects($this->never())
-            ->method('select')
-        ;
+        $database->expects($this->never())->method('select');
 
-        $database->expects($this->never())
-            ->method('arow')
-        ;
+        $database->expects($this->never())->method('arow');
 
-        $database->expects($this->never())
-            ->method('disposeresult')
-        ;
+        $database->expects($this->never())->method('disposeresult');
 
         $container = new Container([
             Database::class => $database,
@@ -178,17 +151,9 @@ final class UserTest extends UnitTestCase
         $userMember = new Member();
         $userMember->groupID = Groups::Guest->value;
 
-        $user = new User(
-            $container->get(Jax::class),
-            $container->get(IPAddress::class),
-            $userMember,
-            $group,
-        );
+        $user = new User($container->get(Jax::class), $container->get(IPAddress::class), $userMember, $group);
 
-        self::assertSame(
-            $this->decoded[Groups::Guest->value],
-            $user->getForumPerms($this->encodedForumFlags),
-        );
+        static::assertSame($this->decoded[Groups::Guest->value], $user->getForumPerms($this->encodedForumFlags));
     }
 
     public function testGetForumPermissionAsBanned(): void
@@ -200,20 +165,13 @@ final class UserTest extends UnitTestCase
                 'disposeresult',
                 'select',
             ])
-            ->getMock()
-        ;
+            ->getMock();
 
-        $database->expects($this->never())
-            ->method('select')
-        ;
+        $database->expects($this->never())->method('select');
 
-        $database->expects($this->never())
-            ->method('arow')
-        ;
+        $database->expects($this->never())->method('arow');
 
-        $database->expects($this->never())
-            ->method('disposeresult')
-        ;
+        $database->expects($this->never())->method('disposeresult');
 
         $container = new Container([
             Database::class => $database,
@@ -225,15 +183,10 @@ final class UserTest extends UnitTestCase
         $userMember = new Member();
         $userMember->groupID = Groups::Banned->value;
 
-        $user = new User(
-            $container->get(Jax::class),
-            $container->get(IPAddress::class),
-            $userMember,
-            $group,
-        );
+        $user = new User($container->get(Jax::class), $container->get(IPAddress::class), $userMember, $group);
 
         $expected = $this->decoded[Groups::Banned->value];
         $result = $user->getForumPerms($this->encodedForumFlags);
-        self::assertSame($expected, $result);
+        static::assertSame($expected, $result);
     }
 }

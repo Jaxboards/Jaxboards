@@ -6,11 +6,15 @@ namespace Jax\Routes;
 
 use Jax\Interfaces\Route;
 use Jax\Page;
+use Override;
 
 final readonly class Solitaire implements Route
 {
-    public function __construct(private Page $page) {}
+    public function __construct(
+        private Page $page,
+    ) {}
 
+    #[Override]
     public function route($params): void
     {
         $this->page->command('loadscript', '/Script/eggs/solitaire.js');

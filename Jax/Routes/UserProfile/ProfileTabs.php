@@ -77,12 +77,9 @@ final class ProfileTabs
 
     private function showTabAbout(Member $member): string
     {
-        return $this->template->render(
-            'userprofile/about',
-            [
-                'member' => $member,
-            ],
-        );
+        return $this->template->render('userprofile/about', [
+            'member' => $member,
+        ]);
     }
 
     /**
@@ -94,10 +91,7 @@ final class ProfileTabs
             return [];
         }
 
-        return Member::selectMany(
-            Database::WHERE_ID_IN,
-            explode(',', $member->friends),
-        );
+        return Member::selectMany(Database::WHERE_ID_IN, explode(',', $member->friends));
     }
 
     private function showTabFriends(Member $member): string
@@ -111,22 +105,13 @@ final class ProfileTabs
     {
         $tabHTML = '';
 
-        $posts = Post::selectMany(
-            'WHERE `author`=? AND `newtopic`=1
+        $posts = Post::selectMany('WHERE `author`=? AND `newtopic`=1
             ORDER BY `id` DESC
-            LIMIT 10',
-            $member->id,
-        );
+            LIMIT 10', $member->id);
 
-        $topics = Topic::joinedOn(
-            $posts,
-            static fn(Post $post): int => $post->tid,
-        );
+        $topics = Topic::joinedOn($posts, static fn(Post $post): int => $post->tid);
 
-        $forums = Forum::joinedOn(
-            $topics,
-            static fn(Topic $topic): ?int => $topic->fid,
-        );
+        $forums = Forum::joinedOn($topics, static fn(Topic $topic): ?int => $topic->fid);
 
         foreach ($posts as $post) {
             $topic = $topics[$post->tid];
@@ -139,13 +124,10 @@ final class ProfileTabs
                 }
             }
 
-            $tabHTML .= $this->template->render(
-                'userprofile/topic',
-                [
-                    'post' => $post,
-                    'topic' => $topic,
-                ],
-            );
+            $tabHTML .= $this->template->render('userprofile/topic', [
+                'post' => $post,
+                'topic' => $topic,
+            ]);
         }
 
         if ($tabHTML === '') {
@@ -157,45 +139,30 @@ final class ProfileTabs
 
     private function showTabPosts(Member $member): string
     {
-        $posts = Post::selectMany(
-            'WHERE author = ?
+        $posts = Post::selectMany('WHERE author = ?
             ORDER BY id DESC
-            LIMIT 10',
-            $member->id,
-        );
+            LIMIT 10', $member->id);
 
-        $topics = Topic::joinedOn(
-            $posts,
-            static fn(Post $post): int => $post->tid,
-        );
+        $topics = Topic::joinedOn($posts, static fn(Post $post): int => $post->tid);
 
-        $forums = Forum::joinedOn(
-            $topics,
-            static fn(Topic $topic): ?int => $topic->fid,
-        );
+        $forums = Forum::joinedOn($topics, static fn(Topic $topic): ?int => $topic->fid);
 
-        return implode(
-            '',
-            array_map(function (Post $post) use ($topics, $forums): string {
-                $topic = $topics[$post->tid];
+        return implode('', array_map(function (Post $post) use ($topics, $forums): string {
+            $topic = $topics[$post->tid];
 
-                if ($topic->fid) {
-                    $forum = $forums[$topic->fid];
+            if ($topic->fid) {
+                $forum = $forums[$topic->fid];
 
-                    $perms = $this->user->getForumPerms($forum->perms);
-                    if (!$perms['read']) {
-                        return '';
-                    }
+                $perms = $this->user->getForumPerms($forum->perms);
+                if (!$perms['read']) {
+                    return '';
                 }
+            }
 
-                return $this->template->render(
-                    'userprofile/post',
-                    [
-                        'topic' => $topic,
-                        'post' => $post,
-                    ],
-                );
-            }, $posts),
-        );
+            return $this->template->render('userprofile/post', [
+                'topic' => $topic,
+                'post' => $post,
+            ]);
+        }, $posts));
     }
 }

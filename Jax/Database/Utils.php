@@ -16,6 +16,7 @@ use Jax\Models\Shout;
 use Jax\Models\Skin;
 use Jax\Models\Stats;
 use Jax\Models\Topic;
+use Override;
 
 use function array_map;
 use function implode;
@@ -56,18 +57,13 @@ final readonly class Utils implements Adapter
 
         foreach ($this->fileSystem->glob("{$directory}/*.php") as $model) {
             $fileInfo = $this->fileSystem->getFileInfo($model);
-            $models[] = str_replace(
-                '/',
-                '\\',
-                $directory,
-            ) . $fileInfo->getBasename(
-                '.php',
-            );
+            $models[] = str_replace('/', '\\', $directory) . $fileInfo->getBasename('.php');
         }
 
         return $models;
     }
 
+    #[Override]
     public function install(): void
     {
         $this->adapter->install();
@@ -81,12 +77,11 @@ final readonly class Utils implements Adapter
     {
         $prefix = $this->database->getPrefix();
         $this->database->setPrefix('');
-        $this->installTablesFromModels(
-            $this->getModels('Jax/Models/Service/'),
-        );
+        $this->installTablesFromModels($this->getModels('Jax/Models/Service/'));
         $this->database->setPrefix($prefix);
     }
 
+    #[Override]
     public function createTableQueryFromModel(Model $model): string
     {
         return $this->adapter->createTableQueryFromModel($model);
@@ -97,24 +92,15 @@ final readonly class Utils implements Adapter
      *
      * @param array<array<mixed>> $tableData - an array of rows, each row being an associative array of column => value pairs
      */
-    public function buildInsertQuery(
-        string $tableName,
-        array $tableData,
-    ): string {
+    public function buildInsertQuery(string $tableName, array $tableData): string
+    {
         $columnNames = [];
         $rows = [[]];
 
         foreach ($tableData as $rowIndex => $row) {
             foreach ($row as $columnName => $value) {
-                if (
-                    is_string($value)
-                    && !mb_check_encoding($value, 'UTF-8')
-                ) {
-                    $value = mb_convert_encoding(
-                        $value,
-                        'UTF-8',
-                        'ISO-8859-1',
-                    );
+                if (is_string($value) && !mb_check_encoding($value, 'UTF-8')) {
+                    $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1');
                 }
 
                 if ($rowIndex === 0) {
@@ -125,17 +111,12 @@ final readonly class Utils implements Adapter
             }
         }
 
-        $values = implode(', ', array_map(
-            static fn($strRow): string => "({$strRow})",
-            array_map(
-                static fn(array $row): string => implode(', ', $row),
-                $rows,
-            ),
-        ));
+        $values = implode(', ', array_map(static fn($strRow): string => "({$strRow})", array_map(
+            static fn(array $row): string => implode(', ', $row),
+            $rows,
+        )));
 
-        return "INSERT INTO `{$tableName}`"
-            . ' (' . implode(', ', $columnNames) . ')'
-            . " VALUES {$values};";
+        return "INSERT INTO `{$tableName}`" . ' (' . implode(', ', $columnNames) . ')' . " VALUES {$values};";
     }
 
     /**
@@ -148,9 +129,7 @@ final readonly class Utils implements Adapter
         foreach ($models as $modelClass) {
             /** @var Model */
             $model = new $modelClass();
-            $queries[] = 'DROP TABLE IF EXISTS ' . $this->database->ftable(
-                $model::TABLE,
-            );
+            $queries[] = 'DROP TABLE IF EXISTS ' . $this->database->ftable($model::TABLE);
             $queries[] = $this->adapter->createTableQueryFromModel($model);
         }
 

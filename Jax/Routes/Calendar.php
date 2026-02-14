@@ -13,6 +13,7 @@ use Jax\Request;
 use Jax\Router;
 use Jax\Session;
 use Jax\Template;
+use Override;
 
 use function explode;
 use function gmdate;
@@ -28,6 +29,7 @@ final readonly class Calendar implements Route
         private Template $template,
     ) {}
 
+    #[Override]
     public function route($params): void
     {
         $this->page->setBreadCrumbs([
@@ -50,26 +52,14 @@ final readonly class Calendar implements Route
             $monthName,
             $year,
             $month,
-        ] = explode(
-            ' ',
-            Carbon::today('UTC')
-                ->addMonthsNoOverflow($monthOffset)
-                ->format('w t F Y n'),
-        );
+        ] = explode(' ', Carbon::today('UTC')->addMonthsNoOverflow($monthOffset)->format('w t F Y n'));
         $offset = (int) $offset;
         $daysInMonth = (int) $daysInMonth;
         $year = (int) $year;
         $month = (int) $month;
 
-        $this->session->set(
-            'locationVerbose',
-            'Checking out the calendar for ' . $monthName . ' ' . $year,
-        );
-        $members = Member::selectMany(
-            'WHERE MONTH(`birthdate`)=? AND YEAR(`birthdate`)<=?',
-            $month,
-            $year,
-        );
+        $this->session->set('locationVerbose', 'Checking out the calendar for ' . $monthName . ' ' . $year);
+        $members = Member::selectMany('WHERE MONTH(`birthdate`)=? AND YEAR(`birthdate`)<=?', $month, $year);
         $birthdays = [];
         foreach ($members as $member) {
             if (!$member->birthdate) {
@@ -99,7 +89,7 @@ final readonly class Calendar implements Route
                 'birthdays' => $birthdays[$x] ?? [],
             ];
 
-            if (0 !== ($x + $offset) % 7 && $x !== $daysInMonth) {
+            if (0 !== (($x + $offset) % 7) && $x !== $daysInMonth) {
                 continue;
             }
 
@@ -113,10 +103,7 @@ final readonly class Calendar implements Route
             'weeks' => $weeks,
             'year' => $year,
         ]);
-        $page = $this->template->render(
-            'global/box',
-            ['title' => 'Calendar', 'content' => $page],
-        );
+        $page = $this->template->render('global/box', ['title' => 'Calendar', 'content' => $page]);
 
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);

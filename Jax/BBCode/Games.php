@@ -27,16 +27,10 @@ final class Games
         $moveNumber = (int) ($parts[1] ?? '1');
 
         // If it's empty, start a new game
-        $fen = trim(
-            $fen,
-        ) === '' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR' : $fen;
+        $fen = trim($fen) === '' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR' : $fen;
 
         // replace numbers with empty squares
-        $fen = preg_replace_callback(
-            '/[0-8]/',
-            static fn($match) => str_repeat(' ', (int) $match[0]),
-            $fen,
-        );
+        $fen = preg_replace_callback('/[0-8]/', static fn($match) => str_repeat(' ', (int) $match[0]), $fen);
         $fen = explode('/', (string) $fen);
 
         $white = [
@@ -74,14 +68,11 @@ final class Games
                 $color = array_key_exists($piece, $white)
                     ? 'color:white;-webkit-text-stroke: 1px #222;'
                     : (array_key_exists($piece, $black) ? 'color:black;' : '');
-                $character = array_key_exists(
-                    $piece,
-                    $characters,
-                ) ? $characters[$piece] : '';
+                $character = array_key_exists($piece, $characters) ? $characters[$piece] : '';
 
-                $pieces[$row][$column] = (trim(
-                    $piece,
-                ) !== '' ? "<div class='piece' data-piece='{$piece}' style='{$color}'>{$character}</div>" : '');
+                $pieces[$row][$column] = trim($piece) !== ''
+                    ? "<div class='piece' data-piece='{$piece}' style='{$color}'>{$character}</div>"
+                    : '';
             }
         }
 
@@ -105,11 +96,7 @@ final class Games
         $moveNumber = (int) ($parts[1] ?? '1');
 
         // replace numbers with empty squares
-        $state = preg_replace_callback(
-            '/[0-8]/',
-            static fn($match) => str_repeat(' ', (int) $match[0]),
-            $state,
-        );
+        $state = preg_replace_callback('/[0-8]/', static fn($match) => str_repeat(' ', (int) $match[0]), $state);
 
         $state = explode('/', (string) $state);
 
@@ -133,16 +120,13 @@ final class Games
                 $color = array_key_exists($piece, $red)
                     ? 'color:#ffbebe;'
                     : (array_key_exists($piece, $black) ? 'color:black;' : '');
-                $character = array_key_exists(
-                    $piece,
-                    $characters,
-                ) ? $characters[$piece] : '';
+                $character = array_key_exists($piece, $characters) ? $characters[$piece] : '';
 
                 $offset = -$row % 2;
-                $pieces[$row][($column * 2 - $offset + 8) % 8] = '';
-                $pieces[$row][$column * 2 + $offset + 1] = (trim(
-                    $piece,
-                ) !== '' ? "<div class='piece' data-piece='{$piece}' style='{$color}'>{$character}</div>" : '');
+                $pieces[$row][(($column * 2) - $offset + 8) % 8] = '';
+                $pieces[$row][($column * 2) + $offset + 1] = trim($piece) !== ''
+                    ? "<div class='piece' data-piece='{$piece}' style='{$color}'>{$character}</div>"
+                    : '';
             }
         }
 
@@ -156,11 +140,7 @@ final class Games
         $moveNumber = (int) ($parts[1] ?? '1');
 
         // replace numbers with empty squares
-        $state = preg_replace_callback(
-            '/[0-8]/',
-            static fn($match) => str_repeat(' ', (int) $match[0]),
-            $state,
-        );
+        $state = preg_replace_callback('/[0-8]/', static fn($match) => str_repeat(' ', (int) $match[0]), $state);
 
         $state = explode('/', (string) $state);
 

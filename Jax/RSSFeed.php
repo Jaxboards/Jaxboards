@@ -19,7 +19,9 @@ final class RSSFeed
     /**
      * @param array<string,int|string> $feed
      */
-    public function __construct(private array $feed) {}
+    public function __construct(
+        private array $feed,
+    ) {}
 
     /**
      * @param array<int|string> $item
@@ -58,7 +60,7 @@ final class RSSFeed
         $xml = '';
 
         foreach ($feed as $property => $value) {
-            $attributes = ($property === 'content' ? ' type="html"' : '');
+            $attributes = $property === 'content' ? ' type="html"' : '';
             $xml .= PHP_EOL . "<{$property}{$attributes}>{$value}</{$property}>";
         }
 

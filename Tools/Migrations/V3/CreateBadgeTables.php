@@ -10,19 +10,15 @@ final class CreateBadgeTables
 {
     public function execute(Database $database): void
     {
-        $database->special(
-            "CREATE TABLE %t (
+        $database->special("CREATE TABLE %t (
                 `id` INT unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 `imagePath` VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
                 `badgeTitle` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'No Badge Title',
                 `displayOrder` INT NOT NULL,
                 `description` VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL
-            )",
-            ['badges'],
-        );
+            )", ['badges']);
 
-        $database->special(
-            "CREATE TABLE %t (
+        $database->special("CREATE TABLE %t (
                 `id` INT unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 `user` INT unsigned NOT NULL,
                 `badge` INT unsigned NOT NULL,
@@ -33,8 +29,6 @@ final class CreateBadgeTables
                 KEY `badge` (`badge`),
                 CONSTRAINT `badge_associations_ibfk_1` FOREIGN KEY (`user`) REFERENCES %t (`id`) ON DELETE CASCADE,
                 CONSTRAINT `badge_associations_ibfk_2` FOREIGN KEY (`badge`) REFERENCES %t (`id`) ON DELETE CASCADE
-            )",
-            ['badge_associations', 'members', 'badges'],
-        );
+            )", ['badge_associations', 'members', 'badges']);
     }
 }
