@@ -151,7 +151,7 @@ final class Games
 
     public function bbcodeOthelloCallback(array $match): string
     {
-        $parts = explode(' ', $match[1]);
+        $parts = explode(' ', (string) $match[1]);
         $state = $parts[0] ?: '8/8/8/3bw3/3wb3/8/8/8';
         $moveNumber = (int) ($parts[1] ?? '1');
 
@@ -159,7 +159,7 @@ final class Games
         $state = preg_replace_callback(
             '/[0-8]/',
             static fn($match) => str_repeat(' ', (int) $match[0]),
-            (string) $state,
+            $state,
         );
 
         $state = explode('/', (string) $state);
