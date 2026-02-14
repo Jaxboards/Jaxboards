@@ -76,15 +76,16 @@ abstract class FeatureTestCase extends TestCase
         $members = $this->insertMembers($memberOverrides);
 
         if (!$member instanceof Member) {
-            $member = $members[$member];
+            $member = array_key_exists($member, $members) ? $members[$member] : null;
         }
 
-        $this->container->set(User::class, autowire()->constructorParameter('member', $member));
-
-        $this->container->set(JaxSession::class, autowire()->constructorParameter('session', [
-            'uid' => $member->id,
-            ...$sessionOverrides,
-        ]));
+        if ($member) {
+            $this->container->set(User::class, autowire()->constructorParameter('member', $member));
+            $this->container->set(JaxSession::class, autowire()->constructorParameter('session', [
+                'uid' => $member->id,
+                ...$sessionOverrides,
+            ]));
+        }
     }
 
     private function setupDB(): void
