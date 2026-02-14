@@ -61,14 +61,14 @@ class Drag {
     target?: HTMLElement,
     handle?: HTMLElement,
   ) {
-    event.preventDefault();
-    event.stopPropagation();
     const el = target || (event.target as HTMLElement);
-    const style = getComputedStyle(el);
-    const highz = getHighestZIndex();
     if (this.noChild && event.target !== (handle || el)) {
       return;
     }
+    event.preventDefault();
+    event.stopPropagation();
+    const style = getComputedStyle(el);
+    const highz = getHighestZIndex();
     if (el.getAttribute("draggable") === "false") {
       return;
     }
