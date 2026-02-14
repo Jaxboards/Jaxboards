@@ -77,7 +77,7 @@ final class ServiceSignupTest extends FeatureTestCase
             pageClass: ServiceSignup::class,
         );
 
-        self::assertEquals('Service mode not enabled', $page);
+        static::assertSame('Service mode not enabled', $page);
     }
 
     public function testSignupFormServiceModeEnabled(): void
@@ -137,10 +137,10 @@ final class ServiceSignupTest extends FeatureTestCase
         $database->setPrefix('');
 
         $directoryEntry = Directory::selectOne(1);
-        self::assertEquals(
+        static::assertSame(
             'email@email.com',
             $directoryEntry->registrarEmail,
         );
-        self::assertEquals('boardname', $directoryEntry->boardname);
+        static::assertSame('boardname', $directoryEntry->boardname);
     }
 }

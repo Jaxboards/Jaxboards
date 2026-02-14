@@ -138,13 +138,11 @@ final class BBCode
         );
 
         // Code blocks have to come last since they may include bbcode that should be unparsed
-        $text = (string) preg_replace_callback(
+        return (string) preg_replace_callback(
             $this->blockBBCodes['code'],
             static fn($match): string => "```{$codes[$match[2]][2]}```",
             $text,
         );
-
-        return $text;
     }
 
     public function toInlineHTML(string $text): string
@@ -227,7 +225,7 @@ final class BBCode
             return $htmlReplacements;
         }
 
-        $htmlReplacements = [
+        return [
             'align' => '<p style="text-align:$1">$2</p>',
             'background' => '<span style="background:$1">$2</span>',
             'bold' => '<strong>$1</strong>',
@@ -253,8 +251,6 @@ final class BBCode
             'table' => $this->bbcodeTableCallback(...),
             'video' => $this->bbcodeVideoCallback(...),
         ];
-
-        return $htmlReplacements;
     }
 
     /**

@@ -110,7 +110,7 @@ final class JaxTest extends UnitTestCase
         $result = $this->jax->parseForumPerms($this->encodedForumFlags);
 
         foreach (array_keys($this->decoded) as $groupId) {
-            self::assertSame(
+            static::assertSame(
                 $this->decoded[$groupId],
                 $result[$groupId],
             );
@@ -119,7 +119,7 @@ final class JaxTest extends UnitTestCase
 
     public function testSerializeForumPermissions(): void
     {
-        self::assertSame(
+        static::assertSame(
             $this->encodedForumFlags,
             $this->jax->serializeForumPerms($this->decoded),
         );
@@ -127,7 +127,7 @@ final class JaxTest extends UnitTestCase
 
     public function testPagesWorks(): void
     {
-        self::assertSame(
+        static::assertSame(
             [1, 9, 10, 11, 12, 13, 14, 15, 16, 20],
             $this->jax->pages(20, 13, 10),
         );
@@ -135,7 +135,7 @@ final class JaxTest extends UnitTestCase
 
     public function testParseForumsSanity(): void
     {
-        self::assertSame(
+        static::assertSame(
             $this->encodedForumFlags,
             $this->jax->serializeForumPerms(
                 $this->jax->parseForumPerms($this->encodedForumFlags),

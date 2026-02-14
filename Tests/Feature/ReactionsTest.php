@@ -134,7 +134,7 @@ final class ReactionsTest extends FeatureTestCase
 
         $this->go('/topic/1?ratepost=1&niblet=1');
 
-        self::assertEquals(
+        static::assertEquals(
             json_encode(['1' => [1]]),
             Post::selectOne(1)->rating,
         );
@@ -155,10 +155,10 @@ final class ReactionsTest extends FeatureTestCase
 
         $json = json_decode($page);
 
-        self::assertContainsEquals(['preventNavigation'], $json);
-        self::assertEquals('listrating', $json[1][0]);
-        self::assertEquals(1, $json[1][1]);
-        self::assertStringContainsString('Admin', $json[1][2]);
+        static::assertContainsEquals(['preventNavigation'], $json);
+        static::assertSame('listrating', $json[1][0]);
+        static::assertSame(1, $json[1][1]);
+        static::assertStringContainsString('Admin', $json[1][2]);
     }
 
     private function insertRatingNiblets(): void

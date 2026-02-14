@@ -245,8 +245,8 @@ final class TopicTest extends FeatureTestCase
         $json = json_decode($page, true);
 
         // TODO: Test that there are new posts
-        self::assertEquals('onlinelist', $json[0][0]);
-        self::assertEquals('GoogleBot', $json[0][1][0]['name']);
+        static::assertSame('onlinelist', $json[0][0]);
+        static::assertSame('GoogleBot', $json[0][1][0]['name']);
     }
 
     public function testQuickReplyWindow(): void
@@ -260,7 +260,7 @@ final class TopicTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['preventNavigation'], $json);
+        static::assertContainsEquals(['preventNavigation'], $json);
         $window = array_find(
             $json,
             static fn($item): bool => $item[0] === 'window',

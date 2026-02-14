@@ -60,7 +60,7 @@ final class BBCodeTest extends UnitTestCase
 
     public function testGetURLS(): void
     {
-        self::assertEqualsCanonicalizing(
+        static::assertEqualsCanonicalizing(
             [
                 'http://cnn.com',
                 'http://twitch.com',
@@ -79,7 +79,7 @@ final class BBCodeTest extends UnitTestCase
     public function testToHTML(string $input, string $output): void
     {
         if (str_starts_with($output, '/')) {
-            self::assertMatchesRegularExpression(
+            static::assertMatchesRegularExpression(
                 $output,
                 $this->bbCode->toHTML($input),
             );
@@ -87,7 +87,7 @@ final class BBCodeTest extends UnitTestCase
             return;
         }
 
-        self::assertEquals(
+        static::assertEquals(
             $output,
             $this->bbCode->toHTML($input),
         );
@@ -220,7 +220,7 @@ final class BBCodeTest extends UnitTestCase
     #[DataProvider('bbcodeToMarkdownDataProvider')]
     public function testToMarkdown(string $input, string $output): void
     {
-        self::assertEquals(
+        static::assertEquals(
             $output,
             $this->bbCode->toMarkdown($input),
         );

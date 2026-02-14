@@ -130,7 +130,7 @@ final class UserTest extends UnitTestCase
             $group,
         );
 
-        self::assertSame(
+        static::assertSame(
             [
                 'poll' => true,
                 'read' => true,
@@ -185,7 +185,7 @@ final class UserTest extends UnitTestCase
             $group,
         );
 
-        self::assertSame(
+        static::assertSame(
             $this->decoded[Groups::Guest->value],
             $user->getForumPerms($this->encodedForumFlags),
         );
@@ -234,6 +234,6 @@ final class UserTest extends UnitTestCase
 
         $expected = $this->decoded[Groups::Banned->value];
         $result = $user->getForumPerms($this->encodedForumFlags);
-        self::assertSame($expected, $result);
+        static::assertSame($expected, $result);
     }
 }

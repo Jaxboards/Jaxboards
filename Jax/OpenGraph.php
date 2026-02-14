@@ -72,7 +72,7 @@ final readonly class OpenGraph
                 // This incantation prevents loadHTML from assuming ISO-8859-1
                 $contents = mb_encode_numericentity(
                     $contents,
-                    [0x80, 0x10FFFF, 0, ~0],
+                    [0x80, 0x10_FFFF, 0, ~0],
                     'UTF-8',
                 );
 

@@ -42,7 +42,7 @@ final readonly class GeoLocate
         }
 
         $asciiA = 65;
-        $letterA = 127462;
+        $letterA = 127_462;
 
         $letters = array_map(
             static fn($letter): string => mb_chr(

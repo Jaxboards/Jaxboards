@@ -708,12 +708,12 @@ final class Topic implements Route
 
         $posts = Post::selectMany('WHERE tid=?', $post->tid);
         foreach ($posts as $index => $post) {
-            if ($post->id === $postId) {
-                $postId = $post->id;
+            if ($post->id !== $postId) { continue; }
+
+$postId = $post->id;
                 $postPosition = $index + 1;
 
                 break;
-            }
         }
 
         $this->page->command('preventNavigation');

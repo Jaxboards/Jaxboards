@@ -96,7 +96,7 @@ final class TextFormattingTest extends UnitTestCase
                 TEXT,
         );
 
-        self::assertEquals(
+        static::assertSame(
             <<<'HTML'
                 <div class="bbcode code ">hello</div><br>
                 <img src="/emoticons/keshaemotes/smile.gif" data-emoji=":)" alt=":)"><br>
@@ -109,7 +109,7 @@ final class TextFormattingTest extends UnitTestCase
     #[DataProvider('linkifyDataProvider')]
     public function testLinkify(string $input, string $expectation): void
     {
-        self::assertEquals(
+        static::assertEquals(
             $expectation,
             $this->textFormatting->linkify($input),
         );
@@ -130,7 +130,7 @@ final class TextFormattingTest extends UnitTestCase
 
     public function testTextOnly(): void
     {
-        self::assertEquals(
+        static::assertSame(
             $this->textFormatting->textOnly(
                 '[b][i][u][quote=Sean]content[/quote][/u][/i][/b]',
             ),
@@ -140,7 +140,7 @@ final class TextFormattingTest extends UnitTestCase
 
     public function testVideoify(): void
     {
-        self::assertEquals(
+        static::assertSame(
             $this->textFormatting->videoify(
                 'check out this video https://www.youtube.com/watch?v=dQw4w9WgXcQ',
             ),

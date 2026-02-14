@@ -20,7 +20,8 @@
       "php": "8.5"
     },
     "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "carthage-software/mago": true
     }
   },
   "minimum-stability": "stable",
@@ -41,7 +42,8 @@
     "slevomat/coding-standard": "^8.27",
     "spatie/phpunit-snapshot-assertions": "^5.3",
     "squizlabs/php_codesniffer": "^4.0",
-    "vimeo/psalm": "^6.14"
+    "vimeo/psalm": "^6.14",
+    "carthage-software/mago": "^1.8.0"
   },
   "require": {
     "composer": "2.9.5",

@@ -123,9 +123,9 @@ final class PostTest extends FeatureTestCase
         $topic = Topic::selectOne(2);
         $post = ModelsPost::selectOne(2);
 
-        self::assertEquals('Topic title', $topic->title);
-        self::assertEquals('Topic description', $topic->subtitle);
-        self::assertEquals('Post data', $post->post);
+        static::assertSame('Topic title', $topic->title);
+        static::assertSame('Topic description', $topic->subtitle);
+        static::assertSame('Post data', $post->post);
     }
 
     public function testPostReply(): void
@@ -182,9 +182,9 @@ final class PostTest extends FeatureTestCase
         $topic = Topic::selectOne(2);
         $post = ModelsPost::selectOne(2);
 
-        self::assertNull($topic);
-        self::assertEquals('Post data', $post->post);
-        self::assertEquals($post->asArray(), hookStub()?->asArray());
+        static::assertNull($topic);
+        static::assertSame('Post data', $post->post);
+        static::assertEquals($post->asArray(), hookStub()?->asArray());
     }
 
     public function testPostReplySubmitPreview(): void
@@ -252,9 +252,9 @@ final class PostTest extends FeatureTestCase
         $topic = Topic::selectOne(1);
         $post = ModelsPost::selectOne(1);
 
-        self::assertEquals('updated title', $topic->title);
-        self::assertEquals('updated description', $topic->subtitle);
-        self::assertEquals('updated post', $post->post);
+        static::assertSame('updated title', $topic->title);
+        static::assertSame('updated description', $topic->subtitle);
+        static::assertSame('updated post', $post->post);
 
         $this->assertRedirect(
             'topic',

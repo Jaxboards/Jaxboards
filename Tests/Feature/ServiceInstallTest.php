@@ -116,7 +116,7 @@ final class ServiceInstallTest extends TestCase
 
         $page = $this->goServiceInstall();
 
-        self::assertStringContainsString(
+        static::assertStringContainsString(
             'Detected config.php at root.',
             $page,
         );
@@ -175,30 +175,30 @@ final class ServiceInstallTest extends TestCase
 
         // Assert the config was written
         $serviceConfig = $this->container->get(ServiceConfig::class)->get();
-        self::assertEquals(false, $serviceConfig['service']);
-        self::assertEquals('Jaxboards', $serviceConfig['boardname']);
-        self::assertEquals('domain.com', $serviceConfig['domain']);
-        self::assertEquals(
+        static::assertEquals(false, $serviceConfig['service']);
+        static::assertSame('Jaxboards', $serviceConfig['boardname']);
+        static::assertSame('domain.com', $serviceConfig['domain']);
+        static::assertSame(
             'Sean <admin_email@jaxboards.com>',
             $serviceConfig['mail_from'],
         );
-        self::assertEquals('jaxboards', $serviceConfig['prefix']);
-        self::assertEquals('sql_db', $serviceConfig['sql_db']);
-        self::assertEquals('sql_host', $serviceConfig['sql_host']);
-        self::assertEquals('sql_username', $serviceConfig['sql_username']);
-        self::assertEquals('sql_password', $serviceConfig['sql_password']);
-        self::assertEquals('jaxboards_', $serviceConfig['sql_prefix']);
+        static::assertSame('jaxboards', $serviceConfig['prefix']);
+        static::assertSame('sql_db', $serviceConfig['sql_db']);
+        static::assertSame('sql_host', $serviceConfig['sql_host']);
+        static::assertSame('sql_username', $serviceConfig['sql_username']);
+        static::assertSame('sql_password', $serviceConfig['sql_password']);
+        static::assertSame('jaxboards_', $serviceConfig['sql_prefix']);
 
         // Do some spot checking to see if the installer
         // set up the tables based on form data
-        self::assertEquals(1, Post::selectOne(1)->author);
+        static::assertSame(1, Post::selectOne(1)->author);
 
         $member = Member::selectOne(1);
-        self::assertEquals('Sean', $member->displayName);
-        self::assertEquals('admin_email@jaxboards.com', $member->email);
-        self::assertTrue(password_verify('password', $member->pass));
+        static::assertSame('Sean', $member->displayName);
+        static::assertSame('admin_email@jaxboards.com', $member->email);
+        static::assertTrue(password_verify('password', $member->pass));
 
-        self::assertStringContainsString('Redirecting', $page);
+        static::assertStringContainsString('Redirecting', $page);
     }
 
     public function testInstallerFormSubmitServiceMode(): void
@@ -213,7 +213,7 @@ final class ServiceInstallTest extends TestCase
             ->method('copyDirectory')
             ->with(
                 'Service/blueprint',
-                self::callback(
+                static::callback(
                     static fn($path): bool => in_array($path, [
                         'boards/test',
                         'boards/support',
@@ -242,38 +242,38 @@ final class ServiceInstallTest extends TestCase
 
         // Assert the config was written
         $serviceConfig = $this->container->get(ServiceConfig::class)->get();
-        self::assertEquals(true, $serviceConfig['service']);
-        self::assertEquals('Jaxboards', $serviceConfig['boardname']);
-        self::assertEquals('domain.com', $serviceConfig['domain']);
-        self::assertEquals(
+        static::assertEquals(true, $serviceConfig['service']);
+        static::assertSame('Jaxboards', $serviceConfig['boardname']);
+        static::assertSame('domain.com', $serviceConfig['domain']);
+        static::assertSame(
             'Sean <admin_email@jaxboards.com>',
             $serviceConfig['mail_from'],
         );
-        self::assertEquals('', $serviceConfig['prefix']);
-        self::assertEquals('sql_db', $serviceConfig['sql_db']);
-        self::assertEquals('sql_host', $serviceConfig['sql_host']);
-        self::assertEquals('sql_username', $serviceConfig['sql_username']);
-        self::assertEquals('sql_password', $serviceConfig['sql_password']);
-        self::assertEquals('', $serviceConfig['sql_prefix']);
+        static::assertSame('', $serviceConfig['prefix']);
+        static::assertSame('sql_db', $serviceConfig['sql_db']);
+        static::assertSame('sql_host', $serviceConfig['sql_host']);
+        static::assertSame('sql_username', $serviceConfig['sql_username']);
+        static::assertSame('sql_password', $serviceConfig['sql_password']);
+        static::assertSame('', $serviceConfig['sql_prefix']);
 
         // Do some spot checking to see if the installer
         // set up the tables based on form data
-        self::assertEquals(1, Post::selectOne(1)->author);
+        static::assertSame(1, Post::selectOne(1)->author);
 
         $member = Member::selectOne(1);
-        self::assertEquals('Sean', $member->displayName);
-        self::assertEquals('admin_email@jaxboards.com', $member->email);
-        self::assertTrue(password_verify('password', $member->pass));
+        static::assertSame('Sean', $member->displayName);
+        static::assertSame('admin_email@jaxboards.com', $member->email);
+        static::assertTrue(password_verify('password', $member->pass));
 
         $this->container->get(Database::class)->setPrefix('');
         $directory = Directory::selectOne(1);
-        self::assertEquals(
+        static::assertSame(
             'admin_email@jaxboards.com',
             $directory->registrarEmail,
         );
-        self::assertEquals('support', $directory->boardname);
+        static::assertSame('support', $directory->boardname);
 
-        self::assertStringContainsString('Redirecting', $page);
+        static::assertStringContainsString('Redirecting', $page);
     }
 
     private function goServiceInstall(?Request $request = null): string

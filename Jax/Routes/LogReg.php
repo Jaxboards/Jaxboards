@@ -227,7 +227,7 @@ final class LogReg implements Route
 
     private function login(
         ?string $username = null,
-        ?string $password = null,
+        #[\SensitiveParameter] ?string $password = null,
     ): void {
         if ($username && $password) {
             if ($this->session->get()->isBot !== 0) {

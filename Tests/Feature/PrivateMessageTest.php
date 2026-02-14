@@ -103,9 +103,9 @@ final class PrivateMessageTest extends FeatureTestCase
             $json,
             static fn($cmd): bool => $cmd[0] === 'im',
         );
-        self::assertEquals(1, $command[1]);
-        self::assertEquals('Admin', $command[2]);
-        self::assertEquals('test', $command[3]);
-        self::assertEquals(1, $command[4]);
+        static::assertSame(1, $command[1]);
+        static::assertSame('Admin', $command[2]);
+        static::assertSame('test', $command[3]);
+        static::assertSame(1, $command[4]);
     }
 }

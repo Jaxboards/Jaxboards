@@ -250,11 +250,11 @@ final class Router
         }
 
         foreach ($this->paths as $regex => $className) {
-            if (preg_match($regex, $path, $match)) {
-                $this->container->get($className)->route($match);
+            if (!(preg_match($regex, $path, $match))) { continue; }
+
+$this->container->get($className)->route($match);
 
                 return true;
-            }
         }
 
         return false;

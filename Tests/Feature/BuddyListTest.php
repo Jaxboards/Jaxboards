@@ -100,14 +100,14 @@ final class BuddyListTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['preventNavigation'], $json);
+        static::assertContainsEquals(['preventNavigation'], $json);
 
         $window = array_find(
             $json,
             static fn($cmd): bool => $cmd[0] === 'window',
         );
-        self::assertEquals('buddylist', $window[1]['id']);
-        self::assertEquals('Buddies', $window[1]['title']);
+        static::assertSame('buddylist', $window[1]['id']);
+        static::assertSame('Buddies', $window[1]['title']);
     }
 
     public function testAddBuddy(): void
@@ -121,14 +121,14 @@ final class BuddyListTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['preventNavigation'], $json);
+        static::assertContainsEquals(['preventNavigation'], $json);
 
         $window = array_find(
             $json,
             static fn($cmd): bool => $cmd[0] === 'window',
         );
-        self::assertEquals('buddylist', $window[1]['id']);
-        self::assertEquals('Buddies', $window[1]['title']);
+        static::assertSame('buddylist', $window[1]['id']);
+        static::assertSame('Buddies', $window[1]['title']);
         DOMAssert::assertSelectEquals(
             '.contact .name',
             'Admin',
@@ -137,9 +137,9 @@ final class BuddyListTest extends FeatureTestCase
         );
 
         $activity = Activity::selectOne();
-        self::assertEquals('buddy_add', $activity->type);
-        self::assertEquals(1, $activity->uid);
-        self::assertEquals(1, $activity->affectedUser);
+        static::assertSame('buddy_add', $activity->type);
+        static::assertSame(1, $activity->uid);
+        static::assertSame(1, $activity->affectedUser);
     }
 
     public function testRemoveBuddy(): void
@@ -153,14 +153,14 @@ final class BuddyListTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['preventNavigation'], $json);
+        static::assertContainsEquals(['preventNavigation'], $json);
 
         $window = array_find(
             $json,
             static fn($cmd): bool => $cmd[0] === 'window',
         );
-        self::assertEquals('buddylist', $window[1]['id']);
-        self::assertEquals('Buddies', $window[1]['title']);
+        static::assertSame('buddylist', $window[1]['id']);
+        static::assertSame('Buddies', $window[1]['title']);
         DOMAssert::assertSelectEquals(
             '.contact .name',
             'Admin',
@@ -169,7 +169,7 @@ final class BuddyListTest extends FeatureTestCase
         );
 
         $member = Member::selectOne(1);
-        self::assertEquals('', $member->friends);
+        static::assertSame('', $member->friends);
     }
 
     public function testBlock(): void
@@ -183,14 +183,14 @@ final class BuddyListTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['preventNavigation'], $json);
+        static::assertContainsEquals(['preventNavigation'], $json);
 
         $window = array_find(
             $json,
             static fn($cmd): bool => $cmd[0] === 'window',
         );
-        self::assertEquals('buddylist', $window[1]['id']);
-        self::assertEquals('Buddies', $window[1]['title']);
+        static::assertSame('buddylist', $window[1]['id']);
+        static::assertSame('Buddies', $window[1]['title']);
         DOMAssert::assertSelectEquals(
             '.contact .name',
             'Admin',
@@ -205,7 +205,7 @@ final class BuddyListTest extends FeatureTestCase
         );
 
         $member = Member::selectOne(1);
-        self::assertEquals('1', $member->enemies);
+        static::assertSame('1', $member->enemies);
     }
 
     public function testUnblock(): void
@@ -219,15 +219,15 @@ final class BuddyListTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['preventNavigation'], $json);
+        static::assertContainsEquals(['preventNavigation'], $json);
 
         $window = array_find(
             $json,
             static fn($cmd): bool => $cmd[0] === 'window',
         );
-        self::assertEquals('buddylist', $window[1]['id']);
-        self::assertEquals('Buddies', $window[1]['title']);
-        self::assertStringNotContainsString('Admin', $window[1]['content']);
+        static::assertSame('buddylist', $window[1]['id']);
+        static::assertSame('Buddies', $window[1]['title']);
+        static::assertStringNotContainsString('Admin', $window[1]['content']);
 
         DOMAssert::assertSelectCount(
             '.contact.blocked',
@@ -236,6 +236,6 @@ final class BuddyListTest extends FeatureTestCase
         );
 
         $member = Member::selectOne(1);
-        self::assertEquals('', $member->enemies);
+        static::assertSame('', $member->enemies);
     }
 }

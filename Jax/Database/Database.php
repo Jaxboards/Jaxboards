@@ -76,7 +76,7 @@ final class Database
     public function connect(
         string $host = '',
         string $user = '',
-        string $password = '',
+        #[\SensitiveParameter] string $password = '',
         string $database = '',
         string $prefix = '',
         string $driver = '',

@@ -270,9 +270,9 @@ final class ModControlsTest extends FeatureTestCase
         $json = json_decode($page, true);
         $sessionData = ModelsSession::selectOne();
 
-        self::assertContainsEquals(['preventNavigation'], $json);
-        self::assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
-        self::assertEquals(
+        static::assertContainsEquals(['preventNavigation'], $json);
+        static::assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
+        static::assertEquals(
             json_encode(['modtids' => '1']),
             $sessionData->vars,
         );
@@ -292,9 +292,9 @@ final class ModControlsTest extends FeatureTestCase
         $json = json_decode($page, true);
         $sessionData = ModelsSession::selectOne();
 
-        self::assertContainsEquals(['preventNavigation'], $json);
-        self::assertContainsEquals(['modcontrols_postsync', $pid, ''], $json);
-        self::assertEquals(
+        static::assertContainsEquals(['preventNavigation'], $json);
+        static::assertContainsEquals(['modcontrols_postsync', $pid, ''], $json);
+        static::assertEquals(
             json_encode(['modpids' => $pid]),
             $sessionData->vars,
         );
@@ -312,9 +312,9 @@ final class ModControlsTest extends FeatureTestCase
         $json = json_decode($page, true);
         $sessionData = ModelsSession::selectOne();
 
-        self::assertContainsEquals(['preventNavigation'], $json);
-        self::assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
-        self::assertEquals(
+        static::assertContainsEquals(['preventNavigation'], $json);
+        static::assertContainsEquals(['modcontrols_postsync', '', '1'], $json);
+        static::assertEquals(
             json_encode(['modtids' => '1']),
             $sessionData->vars,
         );
@@ -339,9 +339,9 @@ final class ModControlsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['removeel', '#pid_2'], $json);
-        self::assertContainsEquals(['modcontrols_clearbox'], $json);
-        self::assertContainsEquals(
+        static::assertContainsEquals(['removeel', '#pid_2'], $json);
+        static::assertContainsEquals(['modcontrols_clearbox'], $json);
+        static::assertContainsEquals(
             ['location', '/topic/2'],
             $json,
             'Mod redirected to trashcan topic',
@@ -350,12 +350,12 @@ final class ModControlsTest extends FeatureTestCase
         $trashcanTopic = Topic::selectOne(2);
         $post = Post::selectOne($pid);
 
-        self::assertEquals(
+        static::assertEquals(
             $trashcanTopic->fid,
             $trashcanId,
             'New topic is created in trashcan',
         );
-        self::assertEquals(
+        static::assertEquals(
             $post->tid,
             $trashcanTopic->id,
             'Post is moved to new trashcan topic',
@@ -379,10 +379,10 @@ final class ModControlsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['removeel', '#pid_2'], $json);
-        self::assertContainsEquals(['modcontrols_clearbox'], $json);
+        static::assertContainsEquals(['removeel', '#pid_2'], $json);
+        static::assertContainsEquals(['modcontrols_clearbox'], $json);
 
-        self::assertNull(Post::selectOne($pid), 'Post is deleted');
+        static::assertNull(Post::selectOne($pid), 'Post is deleted');
     }
 
     public function testDeleteTopicWithoutTrashcan(): void
@@ -400,10 +400,10 @@ final class ModControlsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['modcontrols_clearbox'], $json);
+        static::assertContainsEquals(['modcontrols_clearbox'], $json);
 
-        self::assertNull(Topic::selectOne(1), 'Topic is deleted');
-        self::assertNull(Post::selectOne(1), 'Post is deleted');
+        static::assertNull(Topic::selectOne(1), 'Topic is deleted');
+        static::assertNull(Post::selectOne(1), 'Post is deleted');
     }
 
     public function testMovePostCommand(): void
@@ -421,7 +421,7 @@ final class ModControlsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['modcontrols_move', '1'], $json);
+        static::assertContainsEquals(['modcontrols_move', '1'], $json);
     }
 
     public function testMoveTopicCommand(): void
@@ -436,7 +436,7 @@ final class ModControlsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['modcontrols_move', '0'], $json);
+        static::assertContainsEquals(['modcontrols_move', '0'], $json);
     }
 
     public function testMovePosts(): void
@@ -457,9 +457,9 @@ final class ModControlsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['modcontrols_clearbox'], $json);
+        static::assertContainsEquals(['modcontrols_clearbox'], $json);
 
-        self::assertEquals(
+        static::assertEquals(
             Post::selectOne($pid)->tid,
             $tid,
             'Post was moved',
@@ -483,8 +483,8 @@ final class ModControlsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['modcontrols_clearbox'], $json);
-        self::assertEquals(Topic::selectOne(1)->fid, $fid, 'Topic was moved');
+        static::assertContainsEquals(['modcontrols_clearbox'], $json);
+        static::assertEquals(Topic::selectOne(1)->fid, $fid, 'Topic was moved');
     }
 
     public function testMergeTopicsForm(): void
@@ -512,7 +512,7 @@ final class ModControlsTest extends FeatureTestCase
             ) && $record[1] === 'page',
         )[2];
 
-        self::assertStringContainsString(
+        static::assertStringContainsString(
             'Which topic should the topics be merged into?',
             $html,
         );
@@ -539,13 +539,13 @@ final class ModControlsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['modcontrols_clearbox'], $json);
+        static::assertContainsEquals(['modcontrols_clearbox'], $json);
 
         $redirect = array_find(
             $json,
             static fn($cmd): bool => $cmd[0] === 'location',
         );
-        self::assertStringContainsString(
+        static::assertStringContainsString(
             $this->container->get(Router::class)->url(
                 'topic',
                 ['id' => $topic->id],
@@ -553,18 +553,18 @@ final class ModControlsTest extends FeatureTestCase
             $redirect[1],
         );
 
-        self::assertNull(Topic::selectOne(1), 'Original topic is deleted');
-        self::assertEquals(
+        static::assertNull(Topic::selectOne(1), 'Original topic is deleted');
+        static::assertEquals(
             $topic->id,
             Post::selectOne(1)->tid,
             'OP moved to new topic',
         );
-        self::assertEquals(
+        static::assertSame(
             1,
             Post::selectOne(1)->newtopic,
             'Older post becomes OP',
         );
-        self::assertEquals(
+        static::assertSame(
             0,
             Post::selectOne(2)->newtopic,
             'Newer post gets demoted to reply',
@@ -586,9 +586,9 @@ final class ModControlsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['modcontrols_clearbox'], $json);
+        static::assertContainsEquals(['modcontrols_clearbox'], $json);
 
-        self::assertEquals(1, Topic::selectOne(1)->locked);
+        static::assertSame(1, Topic::selectOne(1)->locked);
     }
 
     public function testUnlockTopic(): void
@@ -611,9 +611,9 @@ final class ModControlsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['modcontrols_clearbox'], $json);
+        static::assertContainsEquals(['modcontrols_clearbox'], $json);
 
-        self::assertEquals(0, Topic::selectOne(1)->locked);
+        static::assertSame(0, Topic::selectOne(1)->locked);
     }
 
     public function testUnpinTopic(): void
@@ -635,9 +635,9 @@ final class ModControlsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['modcontrols_clearbox'], $json);
+        static::assertContainsEquals(['modcontrols_clearbox'], $json);
 
-        self::assertEquals(0, Topic::selectOne(1)->pinned);
+        static::assertSame(0, Topic::selectOne(1)->pinned);
     }
 
     public function testPinTopic(): void
@@ -655,9 +655,9 @@ final class ModControlsTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContainsEquals(['modcontrols_clearbox'], $json);
+        static::assertContainsEquals(['modcontrols_clearbox'], $json);
 
-        self::assertEquals(1, Topic::selectOne(1)->pinned);
+        static::assertSame(1, Topic::selectOne(1)->pinned);
     }
 
     private function insertForum(array $forumProperties = []): Forum

@@ -161,9 +161,9 @@ final class UCPTest extends FeatureTestCase
             post: ['email' => 'jaxboards@jaxboards.com', 'submit' => 'true'],
         ));
 
-        self::assertStringContainsString('Email settings updated.', $page);
+        static::assertStringContainsString('Email settings updated.', $page);
 
-        self::assertEquals(
+        static::assertSame(
             'jaxboards@jaxboards.com',
             Member::selectOne(2)->email,
         );
@@ -185,8 +185,8 @@ final class UCPTest extends FeatureTestCase
             ],
         ));
 
-        self::assertStringContainsString('Password changed.', $page);
-        self::assertTrue(
+        static::assertStringContainsString('Password changed.', $page);
+        static::assertTrue(
             password_verify('newpass', Member::selectOne(2)->pass),
         );
     }
@@ -213,7 +213,7 @@ final class UCPTest extends FeatureTestCase
             1,
             $page,
         );
-        self::assertFalse(
+        static::assertFalse(
             password_verify('newpass', Member::selectOne(2)->pass),
         );
     }
@@ -264,36 +264,36 @@ final class UCPTest extends FeatureTestCase
             post: $formData,
         ));
 
-        self::assertStringContainsString(
+        static::assertStringContainsString(
             'Profile successfully updated.',
             $page,
         );
 
         $member = Member::selectOne(2);
-        self::assertEquals('DisplayName', $member->displayName);
-        self::assertEquals('Full Name', $member->full_name);
-        self::assertEquals('User Title', $member->usertitle);
-        self::assertEquals('About me', $member->about);
-        self::assertEquals('Location', $member->location);
-        self::assertEquals('male', $member->gender);
-        self::assertEquals('Skype', $member->contactSkype);
-        self::assertEquals('Discord', $member->contactDiscord);
-        self::assertEquals('YIM', $member->contactYIM);
-        self::assertEquals('MSN', $member->contactMSN);
-        self::assertEquals('GoogleChat', $member->contactGoogleChat);
-        self::assertEquals('AIM', $member->contactAIM);
-        self::assertEquals('Youtube', $member->contactYoutube);
-        self::assertEquals('Steam', $member->contactSteam);
-        self::assertEquals('Twitter', $member->contactTwitter);
-        self::assertEquals('BlueSky', $member->contactBlueSky);
-        self::assertEquals('http://google.com', $member->website);
+        static::assertSame('DisplayName', $member->displayName);
+        static::assertSame('Full Name', $member->full_name);
+        static::assertSame('User Title', $member->usertitle);
+        static::assertSame('About me', $member->about);
+        static::assertSame('Location', $member->location);
+        static::assertSame('male', $member->gender);
+        static::assertSame('Skype', $member->contactSkype);
+        static::assertSame('Discord', $member->contactDiscord);
+        static::assertSame('YIM', $member->contactYIM);
+        static::assertSame('MSN', $member->contactMSN);
+        static::assertSame('GoogleChat', $member->contactGoogleChat);
+        static::assertSame('AIM', $member->contactAIM);
+        static::assertSame('Youtube', $member->contactYoutube);
+        static::assertSame('Steam', $member->contactSteam);
+        static::assertSame('Twitter', $member->contactTwitter);
+        static::assertSame('BlueSky', $member->contactBlueSky);
+        static::assertSame('http://google.com', $member->website);
 
         $date = $this->container->get(Date::class);
         $birthdate = $date->datetimeAsCarbon($member->birthdate);
 
-        self::assertEquals(1, $birthdate->month);
-        self::assertEquals(1, $birthdate->day);
-        self::assertEquals(2_000, $birthdate->year);
+        static::assertSame(1, $birthdate->month);
+        static::assertSame(1, $birthdate->day);
+        static::assertSame(2_000, $birthdate->year);
     }
 
     public function testAvatarSettings(): void

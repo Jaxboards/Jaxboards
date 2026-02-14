@@ -155,31 +155,31 @@ final class ProfileTest extends FeatureTestCase
 
         $page = $this->go('/profile/1/activity?fmt=RSS');
 
-        self::assertStringContainsString(
+        static::assertStringContainsString(
             "<title>Admin's recent activity</title>",
             $page,
         );
-        self::assertStringContainsString(
+        static::assertStringContainsString(
             '<link>https://jaxboards.com/profile/1</link>',
             $page,
         );
-        self::assertStringContainsString(
+        static::assertStringContainsString(
             '<description>Admin made friends with Admin</description>',
             $page,
         );
-        self::assertStringContainsString(
+        static::assertStringContainsString(
             '<description>Prince is now known as Admin</description>',
             $page,
         );
-        self::assertStringContainsString(
+        static::assertStringContainsString(
             '<description>Admin posted in topic Post</description>',
             $page,
         );
-        self::assertStringContainsString(
+        static::assertStringContainsString(
             '<description>Admin created new topic Topic</description>',
             $page,
         );
-        self::assertStringContainsString(
+        static::assertStringContainsString(
             "<description>Admin commented on Admin's profile</description>",
             $page,
         );
@@ -348,14 +348,14 @@ final class ProfileTest extends FeatureTestCase
 
         $json = json_decode($page, true);
 
-        self::assertContains(['preventNavigation'], $json);
+        static::assertContains(['preventNavigation'], $json);
 
         $window = array_find(
             $json,
             static fn($cmd): bool => $cmd[0] === 'window',
         );
-        self::assertEquals('Contact Card', $window[1]['title']);
-        self::assertStringContainsString(
+        static::assertSame('Contact Card', $window[1]['title']);
+        static::assertStringContainsString(
             'Add Contact',
             $window[1]['content'],
         );

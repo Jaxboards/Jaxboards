@@ -104,11 +104,11 @@ final class BoardOfflineTest extends FeatureTestCase
 
         $page = $this->go('/');
 
-        self::assertStringContainsString(
+        static::assertStringContainsString(
             "You don't have permission to view the board.",
             $page,
         );
-        self::assertStringContainsString('pikachu', $page);
+        static::assertStringContainsString('pikachu', $page);
     }
 
     public function testViewBoardWhenBoardOfflineAsAdmin(): void
@@ -117,7 +117,7 @@ final class BoardOfflineTest extends FeatureTestCase
 
         $page = $this->go('/');
 
-        self::assertStringNotContainsString(
+        static::assertStringNotContainsString(
             "You don't have permission to view the board.",
             $page,
         );

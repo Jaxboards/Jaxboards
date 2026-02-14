@@ -72,11 +72,11 @@ final readonly class Poll
         $voted = false;
         foreach ($results as $result) {
             foreach ($result as $voterId) {
-                if ($voterId === $this->user->get()->id) {
-                    $voted = true;
+                if ($voterId !== $this->user->get()->id) { continue; }
+
+$voted = true;
 
                     break;
-                }
             }
         }
 
