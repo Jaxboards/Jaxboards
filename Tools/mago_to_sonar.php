@@ -23,6 +23,7 @@ function getMagoRulesForSonar(): array
         $sonarRule->id = $rule->code;
         $sonarRule->name = $rule->name;
         $sonarRule->description = $rule->description;
+        $sonarRule->cleanCodeAttribute = 'CONVENTIONAL';
         $sonarRule->engineId = 'mago';
         $sonarRule->type = 'CODE_SMELL';
 
