@@ -55,6 +55,7 @@
   "scripts": {
     "analyze": "mago analyze",
     "lint": "mago lint",
+    "ci-lint": "php Tools/mago_to_sonar.php",
     "format": "mago format",
     "migrations": "php Tools/migrations.php",
     "rector": "rector",

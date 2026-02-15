@@ -18,6 +18,7 @@ boards
 # Linters
 eslint-report.json
 stylelint-report.json
+mago-report-sonar.json
 
 # Test Reports
 /coverage

@@ -30,7 +30,7 @@
     "autofix": "bun run prettier && bun run eslint-fix && bun run stylelint-fix && bun run rector",
     "dev": "bun run build -- --watch",
     "build": "bun build --entrypoints Script/app.ts Script/acp.ts --outdir=dist/ --bundle --minify",
-    "ci-lint": "bun run eslint-report && bun run stylelint-report",
+    "ci-lint": "bun run eslint-report && bun run stylelint-report && composer-runner -- run-script ci-lint",
     "eslint": "eslint \"Script/**/*.ts\"",
     "eslint-fix": "eslint \"Script/**/*.ts\" --fix",
     "eslint-report": "eslint \"Script/**/*.ts\" --format json --output-file eslint-report.json",
