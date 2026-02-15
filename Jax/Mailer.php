@@ -22,7 +22,10 @@ final readonly class Mailer
         $boardurl = $this->router->getRootURL();
         $boardlink = "<a href='{$boardurl}'>{$boardname}</a>";
 
-        return mail(
+        // The mail function raises an E_WARNING or E_ERROR if it can't send mail
+        // I wish it would throw exceptions instead.
+        // @mago-ignore lint:no-error-control-operator
+        return @mail(
             $email,
             $boardname . ' - ' . $topic,
             str_replace(['{BOARDNAME}', '{BOARDURL}', '{BOARDLINK}'], [$boardname, $boardurl, $boardlink], $message),
