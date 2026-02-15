@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tools\Sonar;
 
-class TextRange
+final class TextRange
 {
     public int $startLine;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tools\Sonar;
 
-class Issue
+final class Issue
 {
     public string $ruleId;
 

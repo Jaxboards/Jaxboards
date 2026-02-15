@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tools\Mago;
 
-class File
+final class File
 {
     public string $name;
 

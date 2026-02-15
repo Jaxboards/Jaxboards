@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tools\Mago;
 
-class Lint
+final class Lint
 {
     public string $level;
 

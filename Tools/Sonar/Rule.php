@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tools\Sonar;
 
-class Rule
+final class Rule
 {
     public string $id;
 
@@ -21,7 +21,7 @@ class Rule
     public ?string $severity = 'MEDIUM';
 
     /**
-     * @var array<SonarImpact>
+     * @var array<Impact>
      */
     public array $impacts = [];
 }

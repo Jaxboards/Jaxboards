@@ -15,6 +15,7 @@ declare(strict_types=1);
 $input1 = file_get_contents($argv[1] ?? '');
 $version1 = '0';
 if ($input1 !== false) {
+    /** @var string $version1 */
     $version1 =
         json_decode(
             $input1,
@@ -29,6 +30,7 @@ if ($input1 !== false) {
 $input2 = file_get_contents($argv[2] ?? '');
 $version2 = '0';
 if ($input2 !== false) {
+    /** @var string $version2 */
     $version2 =
         json_decode(
             $input2,

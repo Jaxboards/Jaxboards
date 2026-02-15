@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Tools\Migrations\V6;
 
 use Jax\Database\Database;
+use Tools\Migrations\Migration;
 
-final class CreateReportsTable
+final class CreateReportsTable implements Migration
 {
+    #[\Override]
     public function execute(Database $database): void
     {
         // drop old reports table if it is still there

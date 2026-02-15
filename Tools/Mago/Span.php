@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tools\Mago;
 
-class Span
+final class Span
 {
     public File $file_id;
 

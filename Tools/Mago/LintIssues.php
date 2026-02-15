@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tools\Mago;
 
-class LintIssues
+final class LintIssues
 {
     /**
      * @var Array<Lint> $issues

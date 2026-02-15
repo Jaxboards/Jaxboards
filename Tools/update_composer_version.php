@@ -16,6 +16,7 @@ if ($versionJSON === false) {
     exit(1);
 }
 
+/** @var array{stable:array<array{version:string}>} */
 $versions = json_decode(
     $versionJSON,
     null,
@@ -41,7 +42,7 @@ if ($composerJSON === false) {
 
     exit(1);
 }
-
+/** @var array{require:array{composer:string},config:array{platform:array{composer:string}},require:array<string>,require-dev:array<string>} $composerData */
 $composerData = json_decode(
     $composerJSON,
     null,
@@ -68,6 +69,7 @@ if ($packageJSON === false) {
     exit(1);
 }
 
+/** @var array{engines:array{composer:?string}} $packageData */
 $packageData = json_decode(
     $packageJSON,
     null,

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tools\Mago;
 
-class Annotation
+final class Annotation
 {
     public string $message;
 

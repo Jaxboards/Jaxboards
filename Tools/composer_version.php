@@ -12,6 +12,7 @@ if ($packageJSON === false) {
     exit(1);
 }
 
+/** @var array{engines:array{composer:?string}} $packageData */
 $packageData = json_decode(
     $packageJSON,
     null,

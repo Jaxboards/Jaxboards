@@ -56,7 +56,7 @@
     "autofix": "mago lint --fix && rector",
     "analyze": "mago analyze",
     "lint": "mago lint",
-    "ci-lint": "php Tools/mago_to_sonar.php",
+    "ci-lint": "php Tools/MagoToSonar.php",
     "format": "mago format",
     "migrations": "php Tools/migrations.php",
     "rector": "rector",

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tools\Sonar;
 
-class Location
+final class Location
 {
     public string $message;
 

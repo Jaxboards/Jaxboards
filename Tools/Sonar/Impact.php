@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tools\Sonar;
 
-class Impact
+final class Impact
 {
     public string $softwareQuality;
 
