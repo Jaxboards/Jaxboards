@@ -254,7 +254,7 @@ final class Search implements Route
                 continue;
             }
 
-            $terms[] = preg_quote($v);
+            $terms[] = preg_quote($v, '/');
         }
 
         $page = $postIDs === ''

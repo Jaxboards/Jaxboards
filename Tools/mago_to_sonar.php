@@ -64,8 +64,8 @@ function getMagoIssuesForSonar(): array
         $primaryLocation->message = $magoAnnotation->message;
 
         $textRange = new TextRange();
-        $textRange->startLine = $magoAnnotation->span->start->line ?: 1;
-        $textRange->endLine = $magoAnnotation->span->end->line ?: 1;
+        $textRange->startLine = $magoAnnotation->span->start->line + 1;
+        $textRange->endLine = $magoAnnotation->span->end->line + 1;
         $primaryLocation->textRange = $textRange;
 
         $sonarIssue->primaryLocation = $primaryLocation;
