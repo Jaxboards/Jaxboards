@@ -80,6 +80,7 @@ final class MagoToSonar
             if (array_key_exists($issue->ruleId, $seenRules)) {
                 continue;
             }
+
             $seenRules[$issue->ruleId] = true;
 
             $sonarRule = new Rule();
@@ -149,12 +150,9 @@ final class MagoToSonar
         file_put_contents('mago-report-sonar.json', json_encode([
             'rules' => array_merge(
                 $this->get_mago_rules_for_sonar(),
-                $this->get_analyze_rules_for_sonar($analyzeIssues)
+                $this->get_analyze_rules_for_sonar($analyzeIssues),
             ),
-            'issues' => array_merge(
-                $this->get_mago_issues_for_sonar('lint'),
-                $analyzeIssues
-            ),
+            'issues' => array_merge($this->get_mago_issues_for_sonar('lint'), $analyzeIssues),
         ], JSON_PRETTY_PRINT));
     }
 }
