@@ -27,6 +27,9 @@ final class MagoToSonar
         $this->mago = $mago;
     }
 
+    /**
+     * @return Array<Rule>
+     */
     private function get_mago_rules_for_sonar(): array
     {
         /** @var array<string> $output */
@@ -62,6 +65,45 @@ final class MagoToSonar
         return $sonarRules;
     }
 
+    /**
+     * Mago does not currently have a --list-rules for analyze so we can fake them until they make them
+     *
+     * @param Array<Issue> $issues
+     * @return Array<Rule>
+     */
+    private function get_analyze_rules_for_sonar(array $issues): array
+    {
+        $seenRules = [];
+
+        $sonarRules = [];
+        foreach ($issues as $issue) {
+            if (array_key_exists($issue->ruleId, $seenRules)) {
+                continue;
+            }
+            $seenRules[$issue->ruleId] = true;
+
+            $sonarRule = new Rule();
+            $sonarRule->id = $issue->ruleId;
+            $sonarRule->name = $issue->ruleId;
+            $sonarRule->description = '';
+            $sonarRule->cleanCodeAttribute = 'CONVENTIONAL';
+            $sonarRule->engineId = 'mago';
+            $sonarRule->type = 'CODE_SMELL';
+
+            $impact = new Impact();
+            $impact->severity = 'MAJOR';
+            $impact->softwareQuality = 'RELIABILITY';
+
+            $sonarRule->impacts[] = $impact;
+            $sonarRules[] = $sonarRule;
+        }
+
+        return $sonarRules;
+    }
+
+    /**
+     * @return array<Issue>
+     */
     private function get_mago_issues_for_sonar(string $subCommand = 'lint'): array
     {
         /** @var array<string> $output */
@@ -102,11 +144,16 @@ final class MagoToSonar
 
     public function write_sonar_report(): void
     {
+        $analyzeIssues = $this->get_mago_issues_for_sonar('analyze');
+
         file_put_contents('mago-report-sonar.json', json_encode([
-            'rules' => $this->get_mago_rules_for_sonar(),
+            'rules' => array_merge(
+                $this->get_mago_rules_for_sonar(),
+                $this->get_analyze_rules_for_sonar($analyzeIssues)
+            ),
             'issues' => array_merge(
                 $this->get_mago_issues_for_sonar('lint'),
-                $this->get_mago_issues_for_sonar('analyze'),
+                $analyzeIssues
             ),
         ], JSON_PRETTY_PRINT));
     }
