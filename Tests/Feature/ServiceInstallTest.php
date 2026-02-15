@@ -130,6 +130,7 @@ final class ServiceInstallTest extends TestCase
         DOMAssert::assertSelectCount('input[name=sql_password]', 1, $page);
     }
 
+    // @mago-ignore lint:no-literal-password
     public function testInstallerFormSubmitNormalMode(): void
     {
         $this->mockedFiles['config.php'] = self::createConfiguredStub(SplFileInfo::class, ['isFile' => false]);
@@ -180,6 +181,7 @@ final class ServiceInstallTest extends TestCase
         static::assertStringContainsString('Redirecting', $page);
     }
 
+    // @mago-ignore lint:no-literal-password
     public function testInstallerFormSubmitServiceMode(): void
     {
         $this->mockedFiles['config.php'] = self::createConfiguredStub(SplFileInfo::class, ['isFile' => false]);

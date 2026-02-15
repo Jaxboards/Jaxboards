@@ -22,17 +22,20 @@ final readonly class Mailer
         $boardurl = $this->router->getRootURL();
         $boardlink = "<a href='{$boardurl}'>{$boardname}</a>";
 
-        return @mail(
+        return mail(
             $email,
             $boardname . ' - ' . $topic,
             str_replace(['{BOARDNAME}', '{BOARDURL}', '{BOARDLINK}'], [$boardname, $boardurl, $boardlink], $message),
-            'MIME-Version: 1.0'
-            . PHP_EOL
-            . 'Content-type:text/html;charset=iso-8859-1'
-            . PHP_EOL
-            . 'From: '
-            . $this->config->getSetting('mail_from')
-            . PHP_EOL,
+            implode(
+                PHP_EOL,
+                [
+
+                    'MIME-Version: 1.0',
+                    'Content-type:text/html;charset=iso-8859-1',
+                    'From:  ' . $this->config->getSetting('mail_from'),
+                    ''
+                ]
+            )
         );
     }
 }

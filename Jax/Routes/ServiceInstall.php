@@ -159,6 +159,7 @@ final readonly class ServiceInstall
             $domain = (string) preg_replace('/^www./', '', (string) parse_url((string) $domain, PHP_URL_HOST));
         }
 
+        // @mago-ignore lint:no-insecure-comparison
         if ($adminPassword !== $adminPassword2) {
             $errors[] = 'Admin passwords do not match';
         }

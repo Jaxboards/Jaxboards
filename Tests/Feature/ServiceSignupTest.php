@@ -89,6 +89,7 @@ final class ServiceSignupTest extends FeatureTestCase
         DOMAssert::assertSelectCount('input[name=post]', 1, $page);
     }
 
+    // @mago-ignore lint:no-literal-password
     public function testSignupFormServiceModeEnabledSubmit(): void
     {
         $this->setServiceConfig(['service' => true]);
