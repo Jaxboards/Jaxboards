@@ -32,7 +32,7 @@ function success(string $message): string
     return "\033[32m{$message}\033[0m";
 }
 
-function getDBVersion(Database $database): int
+function get_db_version(Database $database): int
 {
     $statsResult = $database->select('*', 'stats');
     $statsRow = $database->arow($statsResult);
@@ -41,7 +41,7 @@ function getDBVersion(Database $database): int
 }
 
 $migrations = array_reduce(
-    $fileSystem->glob('Tools/Migrations/**/*.php') ?: [],
+    $fileSystem->glob('Tools/Migrations/**/*.php'),
     static function ($migrations, string $path) use ($fileSystem) {
         preg_match('/V(\d+)/', $path, $match);
         $fileInfo = $fileSystem->getFileInfo($path);
@@ -56,7 +56,7 @@ $migrations = array_reduce(
 ksort($migrations);
 
 $database = $container->get(Database::class);
-$dbVersion = getDBVersion($database);
+$dbVersion = get_db_version($database);
 
 foreach ($migrations as $version => $migration) {
     if ($version <= $dbVersion) {
@@ -82,4 +82,4 @@ foreach ($migrations as $version => $migration) {
 $debugLog = $container->get(DebugLog::class);
 echo implode(PHP_EOL, $debugLog->getLog());
 
-echo success('You are currently up to date! DB Version: ' . getDBVersion($database)) . PHP_EOL;
+echo success('You are currently up to date! DB Version: ' . get_db_version($database)) . PHP_EOL;

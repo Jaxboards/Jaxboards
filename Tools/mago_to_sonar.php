@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Tools\Mago\LintIssues;
 use Tools\Sonar\Impact;
 use Tools\Sonar\Issue;
 use Tools\Sonar\Location;
@@ -12,12 +13,13 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 define('MAGO', realpath(dirname(__DIR__) . '/vendor/bin/mago'));
 
-function getMagoRulesForSonar(): array
+function get_mago_rules_for_sonar(): array
 {
     exec(MAGO . ' lint --list-rules --json', $output);
 
     $rules = json_decode(implode('', $output));
 
+    /** @var Array<Rule> $sonarRules */
     $sonarRules = [];
 
     foreach ($rules as $rule) {
@@ -44,15 +46,16 @@ function getMagoRulesForSonar(): array
     return $sonarRules;
 }
 
-function getMagoIssuesForSonar(): array
+function get_mago_issues_for_sonar(): array
 {
     exec(MAGO . ' lint --reporting-format json', $output);
 
-    $outputJSON = json_decode(implode('', $output));
+    /** @var LintIssues $lintIssues */
+    $lintIssues = json_decode(implode('', $output));
 
     /** @var array<Issue> */
     $sonarIssues = [];
-    foreach ($outputJSON->issues as $magoIssue) {
+    foreach ($lintIssues->issues as $magoIssue) {
         $magoAnnotation = $magoIssue->annotations[0];
 
         $sonarIssue = new Issue();
@@ -76,12 +79,12 @@ function getMagoIssuesForSonar(): array
     return $sonarIssues;
 }
 
-function getSonarPayload(): string
+function get_sonar_payload(): string
 {
     return json_encode([
-        'rules' => getMagoRulesForSonar(),
-        'issues' => getMagoIssuesForSonar(),
+        'rules' => get_mago_rules_for_sonar(),
+        'issues' => get_mago_issues_for_sonar(),
     ], JSON_PRETTY_PRINT);
 }
 
-file_put_contents('mago-report-sonar.json', getSonarPayload());
+file_put_contents('mago-report-sonar.json', get_sonar_payload());
