@@ -28,6 +28,7 @@ check-missing-override = true
 check-missing-type-hints = true
 check-throws = true
 enforce-class-finality = true
+excludes = ['Tests'] # don't care about type safety in tests really
 find-unused-definitions = true
 find-unused-expressions = true
 find-unused-parameters = true

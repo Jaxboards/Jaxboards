@@ -62,10 +62,10 @@ final class MagoToSonar
         return $sonarRules;
     }
 
-    private function get_mago_issues_for_sonar(): array
+    private function get_mago_issues_for_sonar($subCommand = 'lint'): array
     {
         /** @var array<string> $output */
-        exec($this->mago . ' lint --reporting-format json', $output);
+        exec("{$this->mago} {$subCommand} --reporting-format json", $output);
 
         /** @var LintIssues $lintIssues */
         $lintIssues = json_decode(implode('', $output));
@@ -104,7 +104,10 @@ final class MagoToSonar
     {
         file_put_contents('mago-report-sonar.json', json_encode([
             'rules' => $this->get_mago_rules_for_sonar(),
-            'issues' => $this->get_mago_issues_for_sonar(),
+            'issues' => array_merge(
+                $this->get_mago_issues_for_sonar('lint'),
+                $this->get_mago_issues_for_sonar('analyze'),
+            ),
         ], JSON_PRETTY_PRINT));
     }
 }
