@@ -50,11 +50,10 @@ jobs:
           jq ".version = \"$VERSION\"" package.json > /tmp/package.json && \
           mv /tmp/package.json package.json
         shell: bash
+      - run: composer run-script --no-interaction autofix
       - run: composer run-script --no-interaction format
-      - run: composer run-script --no-interaction rector
-      - run: bun run prettier
-      - run: bun run eslint-fix
-      - run: bun run stylelint-fix
+      - run: bun run autofix
+      - run: bun run format
       - run: bun run build
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
@@ -64,8 +63,9 @@ jobs:
           echo "[]" > stylelint-report.json
         shell: bash
       - run: bun run ci-lint
-      - run: composer run-script test
       - run: bun test --coverage
+      - run: composer run-script ci-lint
+      - run: composer run-script test
       - name: SonarQube Scan
         if: ${{ !cancelled() }}
         uses: SonarSource/sonarqube-scan-action@v6
