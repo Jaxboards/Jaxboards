@@ -12,24 +12,24 @@ define('MAGO', realpath(dirname(__DIR__) . '/vendor/bin/mago'));
 
 function getMagoRulesForSonar(): array
 {
-    exec(MAGO . " lint --list-rules --json", $output);
+    exec(MAGO . ' lint --list-rules --json', $output);
 
     $rules = json_decode(implode('', $output));
 
     $sonarRules = [];
 
-    foreach ($rules as $magoRule) {
+    foreach ($rules as $rule) {
         $sonarRule = new Rule();
-        $sonarRule->id = $magoRule->code;
-        $sonarRule->name = $magoRule->name;
-        $sonarRule->description = $magoRule->description;
+        $sonarRule->id = $rule->code;
+        $sonarRule->name = $rule->name;
+        $sonarRule->description = $rule->description;
         $sonarRule->engineId = 'mago';
         $sonarRule->type = 'CODE_SMELL';
 
         $impact = new Impact();
         $impact->severity = 'MEDIUM';
 
-        switch ($magoRule->category) {
+        switch ($rule->category) {
             case 'BestPractices':
             case 'Deprecation':
             case 'Safety':
@@ -54,7 +54,7 @@ function getMagoRulesForSonar(): array
 
 function getMagoIssuesForSonar(): array
 {
-    exec(MAGO . " lint --reporting-format json", $output);
+    exec(MAGO . ' lint --reporting-format json', $output);
 
     $outputJSON = json_decode(implode('', $output));
 
