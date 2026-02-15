@@ -26,16 +26,12 @@ final readonly class Mailer
             $email,
             $boardname . ' - ' . $topic,
             str_replace(['{BOARDNAME}', '{BOARDURL}', '{BOARDLINK}'], [$boardname, $boardurl, $boardlink], $message),
-            implode(
-                PHP_EOL,
-                [
-
-                    'MIME-Version: 1.0',
-                    'Content-type:text/html;charset=iso-8859-1',
-                    'From:  ' . $this->config->getSetting('mail_from'),
-                    ''
-                ]
-            )
+            implode(PHP_EOL, [
+                'MIME-Version: 1.0',
+                'Content-type:text/html;charset=iso-8859-1',
+                'From:  ' . $this->config->getSetting('mail_from'),
+                '',
+            ]),
         );
     }
 }

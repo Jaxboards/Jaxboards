@@ -106,8 +106,8 @@ final class Session
             // Only exists to replace serialize with json_encode
             $this->vars = (
                 str_starts_with($session->vars, '{')
-                ? json_decode($session->vars, true, flags: JSON_THROW_ON_ERROR)
-                : unserialize($session->vars)
+                    ? json_decode($session->vars, true, flags: JSON_THROW_ON_ERROR)
+                    : unserialize($session->vars)
             ) ?: [];
 
             return;
