@@ -62,7 +62,7 @@ final class MagoToSonar
         return $sonarRules;
     }
 
-    private function get_mago_issues_for_sonar($subCommand = 'lint'): array
+    private function get_mago_issues_for_sonar(string $subCommand = 'lint'): array
     {
         /** @var array<string> $output */
         exec("{$this->mago} {$subCommand} --reporting-format json", $output);
