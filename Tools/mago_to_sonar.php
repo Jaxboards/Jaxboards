@@ -65,7 +65,7 @@ function getMagoIssuesForSonar(): array
         $magoAnnotation = $magoIssue->annotations[0];
 
         $sonarIssue = new Issue();
-        $sonarIssue->ruleID = $magoIssue->code;
+        $sonarIssue->ruleId = $magoIssue->code;
         $sonarIssue->effortMinutes = 5;
 
         $primaryLocation = new Location();

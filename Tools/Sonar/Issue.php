@@ -6,7 +6,7 @@ namespace Tools\Sonar;
 
 class Issue
 {
-    public string $ruleID;
+    public string $ruleId;
 
     public int $effortMinutes;
 
