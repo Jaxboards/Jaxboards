@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Tools\Sonar\Impact;
 use Tools\Sonar\Issue;
 use Tools\Sonar\Location;
@@ -74,8 +76,8 @@ function getMagoIssuesForSonar(): array
         $primaryLocation->message = $magoIssue->message;
 
         $textRange = new TextRange();
-        $textRange->startLine = $magoAnnotation->span->start->line;
-        $textRange->endLine = $magoAnnotation->span->end->line;
+        $textRange->startLine = $magoAnnotation->span->start->line ?: 1;
+        $textRange->endLine = $magoAnnotation->span->end->line ?: 1;
         $primaryLocation->textRange = $textRange;
 
         $sonarIssue->primaryLocation = $primaryLocation;

@@ -53,6 +53,7 @@
     "twig/twig": "^3.23"
   },
   "scripts": {
+    "autofix": "mago lint --fix && rector",
     "analyze": "mago analyze",
     "lint": "mago lint",
     "ci-lint": "php Tools/mago_to_sonar.php",
