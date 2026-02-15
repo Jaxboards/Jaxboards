@@ -32,22 +32,10 @@ function getMagoRulesForSonar(): array
         $impact = new Impact();
         $impact->severity = 'MEDIUM';
 
-        switch ($rule->category) {
-            case 'BestPractices':
-            case 'Deprecation':
-            case 'Safety':
-            case 'Security':
-                $impact->softwareQuality = 'RELIABILITY';
-                break;
-            case 'Correctness':
-            case 'Clarity':
-            case 'Consistency':
-            case 'Maintainability':
-            case 'Redundancy':
-            default:
-                $impact->softwareQuality = 'MAINTAINABILITY';
-                break;
-        }
+        $impact->softwareQuality = match ($rule->category) {
+            'BestPractices', 'Deprecation', 'Safety', 'Security' => 'RELIABILITY',
+            default => 'MAINTAINABILITY',
+        };
 
         $sonarRule->impacts[] = $impact;
         $sonarRules[] = $sonarRule;
