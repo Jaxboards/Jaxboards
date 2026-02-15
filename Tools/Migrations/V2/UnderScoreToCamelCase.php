@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Tools\Migrations\V2;
 
 use Jax\Database\Database;
+use Override;
 use Tools\Migrations\Migration;
 
 final class UnderScoreToCamelCase implements Migration
 {
-    #[\Override]
+    #[Override]
     public function execute(Database $database): void
     {
         $this->fixForums($database);

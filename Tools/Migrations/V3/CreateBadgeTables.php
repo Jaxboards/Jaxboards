@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Tools\Migrations\V3;
 
 use Jax\Database\Database;
+use Override;
 use Tools\Migrations\Migration;
 
 final class CreateBadgeTables implements Migration
 {
-    #[\Override]
+    #[Override]
     public function execute(Database $database): void
     {
         $database->special("CREATE TABLE %t (

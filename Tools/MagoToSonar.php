@@ -23,10 +23,11 @@ final class MagoToSonar
             error_log('Mago not installed. Please run composer install first.');
             return;
         }
+
         $this->mago = $mago;
     }
 
-    function get_mago_rules_for_sonar(): array
+    public function get_mago_rules_for_sonar(): array
     {
         /** @var array<string> $output */
         exec($this->mago . ' lint --list-rules --json', $output);
@@ -61,8 +62,7 @@ final class MagoToSonar
         return $sonarRules;
     }
 
-
-    function get_mago_issues_for_sonar(): array
+    public function get_mago_issues_for_sonar(): array
     {
         /** @var array<string> $output */
         exec($this->mago . ' lint --reporting-format json', $output);
