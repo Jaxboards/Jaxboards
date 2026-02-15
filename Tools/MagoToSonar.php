@@ -92,7 +92,7 @@ final class MagoToSonar
             $sonarRule->type = 'CODE_SMELL';
 
             $impact = new Impact();
-            $impact->severity = 'MAJOR';
+            $impact->severity = 'MEDIUM';
             $impact->softwareQuality = 'RELIABILITY';
 
             $sonarRule->impacts[] = $impact;
