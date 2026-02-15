@@ -2,8 +2,8 @@
 
 If you want to contribute, great! We make use of some command line utilities,
 though there may be was to integrate these tools in your development environment
-in other ways. It is recommened you fix any errors given off by these tools
-before you commit anything, so we can keep our code clean and easy to manage.
+in other ways. PRs are required to fix any errors given off by these tools
+before committing anything, so we can keep our code clean and easy to manage.
 
 ## Frontend
 
