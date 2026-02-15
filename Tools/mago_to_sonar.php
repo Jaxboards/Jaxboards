@@ -44,6 +44,7 @@ function getMagoRulesForSonar(): array
             case 'Consistency':
             case 'Maintainability':
             case 'Redundancy':
+            default:
                 $impact->softwareQuality = 'MAINTAINABILITY';
                 break;
         }
@@ -72,8 +73,7 @@ function getMagoIssuesForSonar(): array
 
         $primaryLocation = new Location();
         $primaryLocation->filePath = $magoAnnotation->span->file_id->name;
-        // TODO: does it make sense to use the more detailed $magoAnnotation->message ?
-        $primaryLocation->message = $magoIssue->message;
+        $primaryLocation->message = $magoAnnotation->message;
 
         $textRange = new TextRange();
         $textRange->startLine = $magoAnnotation->span->start->line ?: 1;
