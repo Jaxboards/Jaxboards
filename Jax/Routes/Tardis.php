@@ -6,11 +6,15 @@ namespace Jax\Routes;
 
 use Jax\Interfaces\Route;
 use Jax\Page;
+use Override;
 
 final readonly class Tardis implements Route
 {
-    public function __construct(private Page $page) {}
+    public function __construct(
+        private Page $page,
+    ) {}
 
+    #[Override]
     public function route($params): void
     {
         $this->page->command('script', <<<'JS'
@@ -49,9 +53,6 @@ final readonly class Tardis implements Route
                 })()
             JS);
         $this->page->command('preventNavigation');
-        $this->page->command(
-            'playsound',
-            'drwhotheme',
-        );
+        $this->page->command('playsound', 'drwhotheme');
     }
 }

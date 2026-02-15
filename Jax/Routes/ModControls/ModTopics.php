@@ -55,9 +55,7 @@ final readonly class ModTopics
     {
         $this->page->command('preventNavigation');
 
-        $topic = $tid !== 0
-            ? Topic::selectOne($tid)
-            : null;
+        $topic = $tid !== 0 ? Topic::selectOne($tid) : null;
 
         if ($topic === null) {
             return;
@@ -70,16 +68,10 @@ final readonly class ModTopics
                 return;
             }
 
-            $mods = array_map(
-                static fn($modId): int => (int) $modId,
-                explode(',', $forum->mods),
-            );
+            $mods = array_map(static fn($modId): int => (int) $modId, explode(',', $forum->mods));
 
             if (!in_array($this->user->get()->id, $mods, true)) {
-                $this->page->command(
-                    'error',
-                    "You don't have permission to be moderating in this forum",
-                );
+                $this->page->command('error', "You don't have permission to be moderating in this forum");
 
                 return;
             }
@@ -120,10 +112,7 @@ final readonly class ModTopics
 
         $trashcan = $trashcan->id ?? false;
 
-        $topics = Topic::selectMany(
-            Database::WHERE_ID_IN,
-            $this->getModTids(),
-        );
+        $topics = Topic::selectMany(Database::WHERE_ID_IN, $this->getModTids());
         $delete = [];
         foreach ($topics as $topic) {
             if ($topic->fid && !in_array($topic->fid, $forumIds)) {
@@ -156,16 +145,8 @@ final readonly class ModTopics
         }
 
         if ($delete !== []) {
-            $this->database->delete(
-                'posts',
-                'WHERE `tid` IN ?',
-                $delete,
-            );
-            $this->database->delete(
-                'topics',
-                Database::WHERE_ID_IN,
-                $delete,
-            );
+            $this->database->delete('posts', 'WHERE `tid` IN ?', $delete);
+            $this->database->delete('topics', Database::WHERE_ID_IN, $delete);
         }
 
         foreach ($forumIds as $forumId) {
@@ -186,18 +167,13 @@ final readonly class ModTopics
         }
 
         $otherTopic = (int) $this->request->asString->post('ot');
-        if (
-            $otherTopic !== 0 && in_array($otherTopic, $topicIds)
-        ) {
+        if ($otherTopic !== 0 && in_array($otherTopic, $topicIds)) {
             $this->mergeTopicsSubmit($otherTopic);
 
             return;
         }
 
-        $topics = Topic::selectMany(
-            Database::WHERE_ID_IN,
-            $topicIds,
-        );
+        $topics = Topic::selectMany(Database::WHERE_ID_IN, $topicIds);
 
         $page = $this->template->render('modcontrols/merge-topics-form', [
             'topics' => $topics,
@@ -226,12 +202,7 @@ final readonly class ModTopics
 
         // Make the first post in the topic have newtopic=1.
         // Get the op.
-        $result = $this->database->select(
-            'MIN(`id`) `minId`',
-            'posts',
-            'WHERE `tid`=?',
-            $otherTopic,
-        );
+        $result = $this->database->select('MIN(`id`) `minId`', 'posts', 'WHERE `tid`=?', $otherTopic);
         $firstPost = $this->database->arow($result);
         $op = $firstPost ? (int) $firstPost['minId'] : 0;
         $this->database->disposeresult($result);
@@ -259,11 +230,7 @@ final readonly class ModTopics
 
         unset($topicIds[array_search($otherTopic, $topicIds, true)]);
         if ($topicIds !== []) {
-            $this->database->delete(
-                'topics',
-                Database::WHERE_ID_IN,
-                $topicIds,
-            );
+            $this->database->delete('topics', Database::WHERE_ID_IN, $topicIds);
         }
 
         $this->cancel();
@@ -278,14 +245,8 @@ final readonly class ModTopics
             return;
         }
 
-        $topics = Topic::selectMany(
-            Database::WHERE_ID_IN,
-            $this->getModTids(),
-        );
-        $fids = array_unique(array_map(
-            static fn(Topic $topic): int => (int) $topic->fid,
-            $topics,
-        ), SORT_REGULAR);
+        $topics = Topic::selectMany(Database::WHERE_ID_IN, $this->getModTids());
+        $fids = array_unique(array_map(static fn(Topic $topic): int => (int) $topic->fid, $topics), SORT_REGULAR);
 
         // Move all topics at once
         $this->database->update(
@@ -314,10 +275,7 @@ final readonly class ModTopics
     {
         $modtids = (string) $this->session->getVar('modtids');
 
-        return $modtids !== '' ? array_map(
-            static fn($tid): int => (int) $tid,
-            explode(',', $modtids),
-        ) : [];
+        return $modtids !== '' ? array_map(static fn($tid): int => (int) $tid, explode(',', $modtids)) : [];
     }
 
     private function lock(): void
@@ -330,10 +288,7 @@ final readonly class ModTopics
             Database::WHERE_ID_IN,
             $this->getModTids(),
         );
-        $this->page->command(
-            'success',
-            'topics locked!',
-        );
+        $this->page->command('success', 'topics locked!');
         $this->cancel();
     }
 
@@ -347,10 +302,7 @@ final readonly class ModTopics
             Database::WHERE_ID_IN,
             $this->getModTids(),
         );
-        $this->page->command(
-            'success',
-            'topics pinned!',
-        );
+        $this->page->command('success', 'topics pinned!');
         $this->cancel();
     }
 
@@ -378,10 +330,7 @@ final readonly class ModTopics
             Database::WHERE_ID_IN,
             $this->getModTids(),
         );
-        $this->page->command(
-            'success',
-            'topics unpinned!',
-        );
+        $this->page->command('success', 'topics unpinned!');
         $this->cancel();
     }
 

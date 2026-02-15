@@ -5,7 +5,6 @@ Desktop.ini
 
 
 # Cache files
-/.php-cs-fixer.cache
 /.phpunit.result.cache
 /.cache
 
@@ -18,15 +17,8 @@ boards
 
 # Linters
 eslint-report.json
-parallel-lint-report-sonarqube.json
-parallel-lint-report.json
-phpcs-report-sonarqube.json
-phpcs-report.json
-phpmd-report-sonarqube.json
-phpmd-report.json
-phpstan-report.json
-psalm-report.json
 stylelint-report.json
+mago-report-sonar.json
 
 # Test Reports
 /coverage

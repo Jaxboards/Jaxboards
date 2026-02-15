@@ -6,11 +6,15 @@ namespace Jax\Routes;
 
 use Jax\Interfaces\Route;
 use Jax\Page;
+use Override;
 
 final readonly class Rainbow implements Route
 {
-    public function __construct(private Page $page) {}
+    public function __construct(
+        private Page $page,
+    ) {}
 
+    #[Override]
     public function route($params): void
     {
         $this->page->command('preventNavigation');
@@ -88,9 +92,6 @@ final readonly class Rainbow implements Route
                 );
             }
         })()");
-        $this->page->command(
-            'playsound',
-            'always',
-        );
+        $this->page->command('playsound', 'always');
     }
 }

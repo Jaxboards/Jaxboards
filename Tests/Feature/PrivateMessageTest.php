@@ -92,20 +92,16 @@ final class PrivateMessageTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(
-            post: ['im_uid' => '1', 'im_im' => 'test'],
-            server: ['HTTP_X_JSACCESS' => JSAccess::ACTING->value],
-        ));
+        $page = $this->go(new Request(post: ['im_uid' => '1', 'im_im' => 'test'], server: [
+            'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
+        ]));
 
         $json = json_decode($page, true);
 
-        $command = array_find(
-            $json,
-            static fn($cmd): bool => $cmd[0] === 'im',
-        );
-        self::assertEquals(1, $command[1]);
-        self::assertEquals('Admin', $command[2]);
-        self::assertEquals('test', $command[3]);
-        self::assertEquals(1, $command[4]);
+        $command = array_find($json, static fn($cmd): bool => $cmd[0] === 'im');
+        static::assertSame(1, $command[1]);
+        static::assertSame('Admin', $command[2]);
+        static::assertSame('test', $command[3]);
+        static::assertSame(1, $command[4]);
     }
 }

@@ -20,28 +20,21 @@
       "php": "8.5"
     },
     "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true
+      "carthage-software/mago": true
     }
   },
   "minimum-stability": "stable",
   "prefer-stable": true,
   "require-dev": {
     "brianium/paratest": "^7.16",
-    "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
+    "carthage-software/mago": "^1.8.0",
     "dg/bypass-finals": "^1.9",
-    "friendsofphp/php-cs-fixer": "^3.93",
     "joeymckenzie/nasastan": "^0.1.2",
-    "php-parallel-lint/php-parallel-lint": "^1.4",
-    "phpmd/phpmd": "^2.15",
-    "phpstan/phpstan": "^2.1",
     "phpunit/phpunit": "^12.5",
     "phpunit/phpunit-dom-assertions": "^3.7",
     "rector/rector": "^2.3",
     "seanjohnson08/mysqlite": "dev-main@dev",
-    "slevomat/coding-standard": "^8.27",
-    "spatie/phpunit-snapshot-assertions": "^5.3",
-    "squizlabs/php_codesniffer": "^4.0",
-    "vimeo/psalm": "^6.14"
+    "spatie/phpunit-snapshot-assertions": "^5.3"
   },
   "require": {
     "composer": "2.9.5",
@@ -60,31 +53,12 @@
     "twig/twig": "^3.23"
   },
   "scripts": {
-    "lint": [
-      "@phpcs"
-    ],
+    "autofix": "mago lint --fix && rector",
+    "analyze": "mago analyze",
+    "lint": "mago lint",
+    "ci-lint": "php Tools/mago_to_sonar.php",
+    "format": "mago format",
     "migrations": "php Tools/migrations.php",
-    "parallel-lint": "parallel-lint --blame --exclude .git --exclude vendor --exclude node_modules --show-deprecated .",
-    "parallel-lint-report": [
-      "parallel-lint --exclude .git --exclude vendor --exclude node_modules --json --show-deprecated . > parallel-lint-report.json",
-      "php Tools/parallel_lint_to_sonarqube.php parallel-lint-report.json parallel-lint-report-sonarqube.json"
-    ],
-    "php-cs-fixer": "php-cs-fixer fix --allow-risky yes --verbose --verbose",
-    "phpcbf": "phpcbf",
-    "phpcs": "phpcs -s",
-    "phpcs-report": [
-      "phpcs -s --report-file=phpcs-report.json --report=json --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1",
-      "php Tools/php_codesniffer_to_sonarqube.php phpcs-report.json phpcs-report-sonarqube.json"
-    ],
-    "phpstan": "phpstan analyse --memory-limit=1G",
-    "phpstan-report": "phpstan analyse --memory-limit=1G --error-format=prettyJson > phpstan-report.json",
-    "phpmd": "phpmd . ansi phpmd.xml --exclude vendor,node_modules,Jax\\Models",
-    "phpmd-report": [
-      "phpmd . json phpmd.xml --exclude vendor,node_modules,Jax\\Models --ignore-violations-on-exit --report-file phpmd-report.json",
-      "php Tools/phpmd_to_sonarqube.php phpmd-report.json phpmd-report-sonarqube.json"
-    ],
-    "psalm": "psalm",
-    "psalm-report": "psalm --output-format=sonarqube > psalm-report.json",
     "rector": "rector",
     "test": [
       "@putenv XDEBUG_MODE=coverage",

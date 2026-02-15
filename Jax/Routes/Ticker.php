@@ -16,6 +16,7 @@ use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 use Jax\User;
+use Override;
 
 final class Ticker implements Route
 {
@@ -31,12 +32,10 @@ final class Ticker implements Route
         private readonly User $user,
     ) {}
 
+    #[Override]
     public function route($params): void
     {
-        if (
-            $this->request->isJSNewLocation()
-            || !$this->request->isJSAccess()
-        ) {
+        if ($this->request->isJSNewLocation() || !$this->request->isJSAccess()) {
             $this->index();
 
             return;
@@ -77,28 +76,15 @@ final class Ticker implements Route
      */
     private function fetchTicks(int $lastTickId = 0): array
     {
-        $posts = Post::selectMany(
-            'WHERE `id` > ?
+        $posts = Post::selectMany('WHERE `id` > ?
             ORDER BY `id` DESC
-            LIMIT ?',
-            $lastTickId,
-            $this->maxticks,
-        );
+            LIMIT ?', $lastTickId, $this->maxticks);
 
-        $topics = Topic::joinedOn(
-            $posts,
-            static fn(Post $post): int => $post->tid,
-        );
+        $topics = Topic::joinedOn($posts, static fn(Post $post): int => $post->tid);
 
-        $forums = Forum::joinedOn(
-            $topics,
-            static fn(Topic $topic): ?int => $topic->fid,
-        );
+        $forums = Forum::joinedOn($topics, static fn(Topic $topic): ?int => $topic->fid);
 
-        $members = Member::joinedOn(
-            $posts,
-            static fn(Post $post): int => $post->author,
-        );
+        $members = Member::joinedOn($posts, static fn(Post $post): int => $post->author);
 
         $ticks = [];
 
@@ -145,17 +131,11 @@ final class Ticker implements Route
     {
         [$post, $postAuthor, $topic] = $tick;
 
-        return $this->template->render(
-            'ticker/tick',
-            [
-                'date' => $post->date ? $this->date->smallDate(
-                    $post->date,
-                    ['autodate' => true],
-                ) : '',
-                'user' => $postAuthor,
-                'topic' => $topic,
-                'post' => $post,
-            ],
-        );
+        return $this->template->render('ticker/tick', [
+            'date' => $post->date ? $this->date->smallDate($post->date, ['autodate' => true]) : '',
+            'user' => $postAuthor,
+            'topic' => $topic,
+            'post' => $post,
+        ]);
     }
 }

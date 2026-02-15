@@ -8,7 +8,9 @@ use function is_string;
 
 final readonly class RequestStringGetter
 {
-    public function __construct(private Request $request) {}
+    public function __construct(
+        private Request $request,
+    ) {}
 
     /**
      * Access $_GET and $_POST together. Prioritizes $_POST.

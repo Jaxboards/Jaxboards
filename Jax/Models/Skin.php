@@ -12,23 +12,11 @@ final class Skin extends Model
 {
     public const string TABLE = 'skins';
 
-    #[Column(
-        name: 'id',
-        type: 'int',
-        nullable: false,
-        autoIncrement: true,
-        unsigned: true,
-    )]
+    #[Column(name: 'id', type: 'int', nullable: false, autoIncrement: true, unsigned: true)]
     #[PrimaryKey]
     public int $id = 0;
 
-    #[Column(
-        name: 'using',
-        type: 'int',
-        default: 0,
-        nullable: false,
-        unsigned: true,
-    )]
+    #[Column(name: 'using', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $using = 0;
 
     #[Column(name: 'title', type: 'string', length: 250, nullable: false)]

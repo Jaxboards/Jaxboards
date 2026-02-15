@@ -62,12 +62,7 @@ final readonly class Tools
             $this->createForumBackup();
         }
 
-        $this->page->addContentBox(
-            'Backup Forum',
-            $this->page->render(
-                'tools/backup.html',
-            ),
-        );
+        $this->page->addContentBox('Backup Forum', $this->page->render('tools/backup.html'));
     }
 
     private function createForumBackup(): void
@@ -94,17 +89,12 @@ final readonly class Tools
             $sqlFileLines[] = "DROP TABLE IF EXISTS {$ftable};";
             $modelInstance = new $model();
             assert($modelInstance instanceof Model);
-            $sqlFileLines[] = $this->databaseUtils->createTableQueryFromModel(
-                $modelInstance,
-            ) . ';';
+            $sqlFileLines[] = $this->databaseUtils->createTableQueryFromModel($modelInstance) . ';';
 
             // Generate INSERTS with all row data
             $select = $this->database->select('*', $tableName);
             foreach ($this->database->arows($select) as $row) {
-                $sqlFileLines[] = $this->databaseUtils->buildInsertQuery(
-                    $ftable,
-                    [$row],
-                );
+                $sqlFileLines[] = $this->databaseUtils->buildInsertQuery($ftable, [$row]);
             }
 
             $sqlFileLines[] = '';
@@ -115,27 +105,24 @@ final readonly class Tools
         if (class_exists(ZipArchive::class, false)) {
             $this->outputZipFile(implode(PHP_EOL, $sqlFileLines));
 
-            exit;
+            exit();
         }
 
         $this->outputTextFile(implode(PHP_EOL, $sqlFileLines));
 
-        exit;
+        exit();
     }
 
     private function outputZipFile(string $fileContents): void
     {
         header('Content-type: application/zip');
         header(
-            'Content-Disposition: attachment;filename="' . $this->database->getPrefix()
-                . gmdate('Y-m-d_His') . '.zip"',
+            'Content-Disposition: attachment;filename="' . $this->database->getPrefix() . gmdate('Y-m-d_His') . '.zip"',
         );
 
         $tempFile = tempnam(sys_get_temp_dir(), $this->database->getPrefix());
 
-        $boardPath = $this->fileSystem->pathFromRoot(
-            $this->domainDefinitions->getBoardPath(),
-        );
+        $boardPath = $this->fileSystem->pathFromRoot($this->domainDefinitions->getBoardPath());
 
         $zipArchive = new ZipArchive();
         $zipArchive->open($tempFile, ZipArchive::OVERWRITE);
@@ -150,11 +137,9 @@ final readonly class Tools
             '/*/*/*/*/*/*',
         ]);
 
-        $zipArchive->addGlob(
-            $boardPath . "{{$globStarStarIsNotSupportedWTF}}/*.*",
-            GLOB_BRACE,
-            ['remove_path' => $boardPath],
-        );
+        $zipArchive->addGlob($boardPath . "{{$globStarStarIsNotSupportedWTF}}/*.*", GLOB_BRACE, [
+            'remove_path' => $boardPath,
+        ]);
         $zipArchive->addFromString('backup.sql', $fileContents);
         $zipArchive->close();
 
@@ -166,8 +151,7 @@ final readonly class Tools
     {
         header('Content-type: text/plain');
         header(
-            'Content-Disposition: attachment;filename="' . $this->database->getPrefix()
-                . gmdate('Y-m-d_His') . '.sql"',
+            'Content-Disposition: attachment;filename="' . $this->database->getPrefix() . gmdate('Y-m-d_His') . '.sql"',
         );
 
         echo $fileContents;
@@ -182,12 +166,7 @@ final readonly class Tools
         if ($this->fileSystem->getFileInfo($logPath, true)->isReadable()) {
             $logFile = $this->fileSystem->getFileObject($logPath, 'r', true);
 
-            $last100Lines = htmlspecialchars(
-                implode(PHP_EOL, $this->fileSystem->tail(
-                    $logFile,
-                    100,
-                )),
-            );
+            $last100Lines = htmlspecialchars(implode(PHP_EOL, $this->fileSystem->tail($logFile, 100)));
             $contents = <<<HTML
                 <label for="errorlog">
                     Recent PHP error log output
@@ -201,9 +180,6 @@ final readonly class Tools
                 HTML;
         }
 
-        $this->page->addContentBox(
-            "PHP Error Log ({$logPath})",
-            $contents,
-        );
+        $this->page->addContentBox("PHP Error Log ({$logPath})", $contents);
     }
 }

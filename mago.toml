@@ -1,0 +1,40 @@
+# Welcome to Mago!
+# For full documentation, see https://mago.carthage.software/tools/overview
+php-version = "8.5.0"
+
+[source]
+workspace = "."
+paths = ["ACP", "Jax", "Service", "Tests", "Tools", "emoticons"]
+includes = ["vendor"]
+excludes = []
+
+[formatter]
+preset = "default"
+
+[linter]
+integrations = ["phpunit"]
+
+[linter.rules]
+ambiguous-function-call = { enabled = false }
+literal-named-argument = { enabled = false }
+halstead = { effort-threshold = 7000 }
+
+[analyzer]
+allow-possibly-undefined-array-keys = false
+analyze-dead-code = false
+check-arrow-function-missing-type-hints = true
+check-closure-missing-type-hints = true
+check-missing-override = true
+check-missing-type-hints = true
+check-throws = true
+enforce-class-finality = true
+find-unused-definitions = true
+find-unused-expressions = true
+find-unused-parameters = true
+memoize-properties = true
+no-boolean-literal-comparison = true
+plugins = []
+register-super-globals = true
+require-api-or-internal = true
+strict-list-index-checks = true
+trust-existence-checks = false

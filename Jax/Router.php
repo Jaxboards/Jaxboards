@@ -114,15 +114,9 @@ final class Router
      *
      * @param array<string,null|int|string> $params
      */
-    public function redirect(
-        string $newLocation,
-        array $params = [],
-        ?string $hash = null,
-    ): void {
-        $newLocation = ($this->url(
-            $newLocation,
-            $params,
-        ) ?: $newLocation) . ($hash ?? '');
+    public function redirect(string $newLocation, array $params = [], ?string $hash = null): void
+    {
+        $newLocation = ($this->url($newLocation, $params) ?: $newLocation) . ($hash ?? '');
 
         if (!$this->request->hasCookies() && $newLocation[0] === '/') {
             $newLocation .= '&sessid=' . $this->session->get()->id;
@@ -139,10 +133,7 @@ final class Router
         }
 
         header("Location: {$newLocation}");
-        $page->append(
-            'PAGE',
-            "Should've redirected to Location: {$newLocation}",
-        );
+        $page->append('PAGE', "Should've redirected to Location: {$newLocation}");
     }
 
     /**
@@ -162,9 +153,7 @@ final class Router
             return true;
         }
 
-        return (bool) $this->container->get(CustomPage::class)->route(
-            trim($path, '/'),
-        );
+        return (bool) $this->container->get(CustomPage::class)->route(trim($path, '/'));
     }
 
     /**
@@ -192,9 +181,7 @@ final class Router
 
                     $foundParams[] = $name;
 
-                    return array_key_exists($name, $params)
-                        ? "/{$params[$name]}"
-                        : '';
+                    return array_key_exists($name, $params) ? "/{$params[$name]}" : '';
                 },
                 $this->urls[$name],
             );
@@ -202,18 +189,18 @@ final class Router
             // Anything not a path param gets added on as a query parameter
             $queryParams = Lodash::without($params, $foundParams);
 
-            return $path . ($queryParams !== [] ? '?' . http_build_query(
-                $queryParams,
-            ) : '');
+            return $path . ($queryParams !== [] ? '?' . http_build_query($queryParams) : '');
         }
 
         // These are aliases
-        return match ($name) {
-            'shoutbox' => '?module=shoutbox',
-            'inbox' => '/ucp/inbox',
-            'acp' => '/ACP/',
-            default => '',
-        } . ($params !== [] ? '&' . http_build_query($params) : '');
+        return (
+            match ($name) {
+                'shoutbox' => '?module=shoutbox',
+                'inbox' => '/ucp/inbox',
+                'acp' => '/ACP/',
+                default => '',
+            } . ($params !== [] ? '&' . http_build_query($params) : '')
+        );
     }
 
     /**
@@ -232,11 +219,7 @@ final class Router
         $this->urls[$name] = $path;
 
         // Replaces {param} with a name-captured subgroup (?<param>.*) and makes a full regex
-        $regexedPath = '@^' . preg_replace(
-            '/\/\{(\w+)\}/',
-            '(?:\/(?<$1>[^/]+))?',
-            $path,
-        ) . '$@';
+        $regexedPath = '@^' . preg_replace('/\/\{(\w+)\}/', '(?:\/(?<$1>[^/]+))?', $path) . '$@';
         $this->paths[$regexedPath] = $classString;
     }
 
@@ -250,11 +233,13 @@ final class Router
         }
 
         foreach ($this->paths as $regex => $className) {
-            if (preg_match($regex, $path, $match)) {
-                $this->container->get($className)->route($match);
-
-                return true;
+            if (!preg_match($regex, $path, $match)) {
+                continue;
             }
+
+            $this->container->get($className)->route($match);
+
+            return true;
         }
 
         return false;
@@ -266,7 +251,6 @@ final class Router
             return true;
         }
 
-        return $this->config->getSetting('boardoffline')
-            && !$this->user->getGroup()->canViewOfflineBoard;
+        return $this->config->getSetting('boardoffline') && !$this->user->getGroup()?->canViewOfflineBoard;
     }
 }

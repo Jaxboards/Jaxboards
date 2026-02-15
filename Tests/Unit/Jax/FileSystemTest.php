@@ -36,81 +36,50 @@ final class FileSystemTest extends UnitTestCase
     {
         // mkdir
         $this->fileSystem->mkdir('jaxboards/deep', recursive: true);
-        self::assertTrue(
-            $this->fileSystem->getFileInfo('jaxboards/deep')->isDir(),
-        );
+        static::assertTrue($this->fileSystem->getFileInfo('jaxboards/deep')->isDir());
 
         // putContents
-        $this->fileSystem->putContents(
-            'jaxboards/test',
-            implode("\n", range(1, 100)),
-        );
+        $this->fileSystem->putContents('jaxboards/test', implode("\n", range(1, 100)));
 
         $fileInfo = $this->fileSystem->getFileInfo('jaxboards/test');
-        self::assertTrue($fileInfo->isFile());
+        static::assertTrue($fileInfo->isFile());
 
         // tail
-        self::assertEquals(
-            range(96, 100),
-            $this->fileSystem->tail('jaxboards/test', 5),
-        );
+        static::assertEquals(range(96, 100), $this->fileSystem->tail('jaxboards/test', 5));
 
         // rename
         $this->fileSystem->rename('jaxboards/test', 'jaxboards/renamed');
-        self::assertTrue(
-            $this->fileSystem->getFileInfo('jaxboards/renamed')->isFile(),
-        );
+        static::assertTrue($this->fileSystem->getFileInfo('jaxboards/renamed')->isFile());
 
         // Create test file again so we have multiple files
-        $this->fileSystem->putContents(
-            'jaxboards/test',
-            implode("\n", range(1, 5)),
-        );
+        $this->fileSystem->putContents('jaxboards/test', implode("\n", range(1, 5)));
 
         // copyDirectory
         $this->fileSystem->copyDirectory('jaxboards', 'jaxboards2');
-        self::assertTrue(
-            $this->fileSystem->getFileInfo('jaxboards2/renamed')->isFile(),
-        );
-        self::assertTrue(
-            $this->fileSystem->getFileInfo('jaxboards2/test')->isFile(),
-        );
+        static::assertTrue($this->fileSystem->getFileInfo('jaxboards2/renamed')->isFile());
+        static::assertTrue($this->fileSystem->getFileInfo('jaxboards2/test')->isFile());
 
         // glob
-        self::assertEqualsCanonicalizing(
+        static::assertEqualsCanonicalizing(
             $this->fileSystem->glob('jaxboards/*'),
             ['jaxboards/test', 'jaxboards/renamed', 'jaxboards/deep'],
         );
 
         // getLines
-        self::assertEquals(
-            $this->fileSystem->getLines('jaxboards/test'),
-            range(1, 5),
-        );
+        static::assertEquals($this->fileSystem->getLines('jaxboards/test'), range(1, 5));
 
         // Cleanup and assert on the way out
         $this->fileSystem->removeDirectory('jaxboards');
         $this->fileSystem->removeDirectory('jaxboards2');
-        self::assertFalse(
-            $this->fileSystem->getFileInfo('jaxboards/test')->isFile(),
-        );
-        self::assertFalse(
-            $this->fileSystem->getFileInfo('jaxboards/renamed')->isFile(),
-        );
-        self::assertFalse(
-            $this->fileSystem->getFileInfo('jaxboards2')->isDir(),
-        );
+        static::assertFalse($this->fileSystem->getFileInfo('jaxboards/test')->isFile());
+        static::assertFalse($this->fileSystem->getFileInfo('jaxboards/renamed')->isFile());
+        static::assertFalse($this->fileSystem->getFileInfo('jaxboards2')->isDir());
     }
 
     #[DataProvider('fileSizeHumanReadableDataProvider')]
-    public function testFileSizeHumanReadable(
-        int $fileSize,
-        string $readable,
-    ): void {
-        self::assertEquals(
-            $readable,
-            $this->fileSystem->fileSizeHumanReadable($fileSize),
-        );
+    public function testFileSizeHumanReadable(int $fileSize, string $readable): void
+    {
+        static::assertEquals($readable, $this->fileSystem->fileSizeHumanReadable($fileSize));
     }
 
     /**

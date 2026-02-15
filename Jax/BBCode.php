@@ -87,12 +87,10 @@ final class BBCode
     public function getURLs(string $text): array
     {
         $urls = [];
-        foreach (
-            [
-                $this->inlineBBCodes['url'],
-                $this->inlineBBCodes['urlWithLink'],
-            ] as $regex
-        ) {
+        foreach ([
+            $this->inlineBBCodes['url'],
+            $this->inlineBBCodes['urlWithLink'],
+        ] as $regex) {
             preg_match_all($regex, $text, $matches);
             $urls = array_merge($matches['url'], $urls);
         }
@@ -131,20 +129,14 @@ final class BBCode
     {
         [$text, $codes] = $this->startCodeTags($text);
 
-
-        $text = $this->replaceWithRules(
-            $text,
-            $this->getMarkdownRules(),
-        );
+        $text = $this->replaceWithRules($text, $this->getMarkdownRules());
 
         // Code blocks have to come last since they may include bbcode that should be unparsed
-        $text = (string) preg_replace_callback(
+        return (string) preg_replace_callback(
             $this->blockBBCodes['code'],
             static fn($match): string => "```{$codes[$match[2]][2]}```",
             $text,
         );
-
-        return $text;
     }
 
     public function toInlineHTML(string $text): string
@@ -160,10 +152,7 @@ final class BBCode
             $rules[$regex] = $htmlReplacements[$name];
         }
 
-        return $this->replaceWithRules(
-            $text,
-            $rules,
-        );
+        return $this->replaceWithRules($text, $rules);
     }
 
     /**
@@ -176,12 +165,7 @@ final class BBCode
      */
     public function startCodeTags(string $text): array
     {
-        preg_match_all(
-            $this->blockBBCodes['code'],
-            $text,
-            $codes,
-            PREG_SET_ORDER,
-        );
+        preg_match_all($this->blockBBCodes['code'], $text, $codes, PREG_SET_ORDER);
         foreach ($codes as $key => $match) {
             $text = str_replace($match[0], "[code]{$key}[/code]", $text);
         }
@@ -198,20 +182,11 @@ final class BBCode
     public function finishCodeTags(string $text, array $codes): string
     {
         foreach ($codes as $index => [, $language, $code]) {
-            $code = $language === '=php' ? highlight_string(
-                $code,
-                true,
-            ) : preg_replace(
-                "@([ \r\n]|^) @m",
-                '$1&nbsp;',
-                htmlspecialchars($code, ENT_QUOTES),
-            );
+            $code = $language === '=php'
+                ? highlight_string($code, true)
+                : preg_replace("@([ \r\n]|^) @m", '$1&nbsp;', htmlspecialchars($code, ENT_QUOTES));
 
-            $text = str_replace(
-                "[code]{$index}[/code]",
-                "<div class=\"bbcode code {$language}\">{$code}</div>",
-                $text,
-            );
+            $text = str_replace("[code]{$index}[/code]", "<div class=\"bbcode code {$language}\">{$code}</div>", $text);
         }
 
         return $text;
@@ -227,7 +202,7 @@ final class BBCode
             return $htmlReplacements;
         }
 
-        $htmlReplacements = [
+        return [
             'align' => '<p style="text-align:$1">$2</p>',
             'background' => '<span style="background:$1">$2</span>',
             'bold' => '<strong>$1</strong>',
@@ -253,8 +228,6 @@ final class BBCode
             'table' => $this->bbcodeTableCallback(...),
             'video' => $this->bbcodeVideoCallback(...),
         ];
-
-        return $htmlReplacements;
     }
 
     /**
@@ -278,11 +251,7 @@ final class BBCode
             'image' => '![$1]($2)',
             'italic' => '*$1*',
             'list' => '$2',
-            'quote' => static fn(array $match) => '> ' . str_replace(
-                "\n",
-                "\n> ",
-                $match[2],
-            ),
+            'quote' => static fn(array $match) => '> ' . str_replace("\n", "\n> ", $match[2]),
             'size' => '$3',
             'spoiler' => '||$1||',
             'strikethrough' => '~~$1~~',
@@ -293,12 +262,7 @@ final class BBCode
         ];
 
         $rules = [];
-        foreach (
-            array_merge(
-                $this->blockBBCodes,
-                $this->inlineBBCodes,
-            ) as $name => $regex
-        ) {
+        foreach (array_merge($this->blockBBCodes, $this->inlineBBCodes) as $name => $regex) {
             if (!array_key_exists($name, $markdownReplacements)) {
                 continue;
             }
@@ -319,18 +283,9 @@ final class BBCode
 
             foreach ($rules as $pattern => $replacer) {
                 if (is_string($replacer)) {
-                    $tmp = preg_replace(
-                        $pattern,
-                        $replacer,
-                        $tmp,
-                    );
+                    $tmp = preg_replace($pattern, $replacer, $tmp);
                 } elseif (is_callable($replacer)) {
-                    $tmp = preg_replace_callback(
-                        $pattern,
-                        $replacer,
-                        $tmp,
-                        20,
-                    );
+                    $tmp = preg_replace_callback($pattern, $replacer, $tmp, 20);
                 }
 
                 if (!is_string($tmp)) {
@@ -396,9 +351,7 @@ final class BBCode
      */
     private function bbcodeQuoteCallback(array $match): string
     {
-        $quotee = $match[1] !== ''
-            ? "<div class='quotee'>{$match[1]}</div>"
-            : '';
+        $quotee = $match[1] !== '' ? "<div class='quotee'>{$match[1]}</div>" : '';
 
         return "<div class='quote'>{$quotee}{$match[2]}</div>";
     }
@@ -423,21 +376,11 @@ final class BBCode
     {
         $html = '';
 
-        preg_match_all(
-            '/\[tr\](.*)\[\/tr\]/Usi',
-            $match[1],
-            $rows,
-            PREG_SET_ORDER,
-        );
+        preg_match_all('/\[tr\](.*)\[\/tr\]/Usi', $match[1], $rows, PREG_SET_ORDER);
 
         foreach ($rows as $row) {
             $html .= '<tr>';
-            preg_match_all(
-                '/\[(td|th)\](.*)\[\/\1\]/Usi',
-                $row[1],
-                $cells,
-                PREG_SET_ORDER,
-            );
+            preg_match_all('/\[(td|th)\](.*)\[\/\1\]/Usi', $row[1], $cells, PREG_SET_ORDER);
             foreach ($cells as $cell) {
                 $html .= "<{$cell[1]}>{$cell[2]}</{$cell[1]}>";
             }
@@ -456,7 +399,6 @@ final class BBCode
      */
     private function bbcodeVideoCallback(array $match): string
     {
-
         if (str_contains($match[1], 'youtube.com')) {
             preg_match('/v=([\w-]+)/', $match[1], $youtubeMatches);
             $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
@@ -487,19 +429,14 @@ final class BBCode
         $html = $tag === 'ol' ? '<ol>' : '<ul>';
         $html .= implode('', array_map(
             static fn(string $item): string => '<li>' . trim($item) . '</li>',
-            array_filter(
-                $items,
-                static fn(string $line): bool => (bool) trim($line),
-            ),
+            array_filter($items, static fn(string $line): bool => (bool) trim($line)),
         ));
 
         return $html . ($tag === 'ol' ? '</ol>' : '</ul>');
     }
 
-    private function youtubeEmbedHTML(
-        string $link,
-        string $embedURL,
-    ): string {
+    private function youtubeEmbedHTML(string $link, string $embedURL): string
+    {
         return $this->template->render('bbcode/youtube-embed', [
             'link' => $link,
             'embedURL' => $embedURL,

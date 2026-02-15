@@ -41,11 +41,7 @@ final readonly class TextFormatting
      */
     public function linkify(string $text): string
     {
-        return (string) preg_replace_callback(
-            '/(^|\s)(https?:\/\/[^\s\)\(<>]+)/u',
-            $this->linkifyCallback(...),
-            $text,
-        );
+        return (string) preg_replace_callback('/(^|\s)(https?:\/\/[^\s\)\(<>]+)/u', $this->linkifyCallback(...), $text);
     }
 
     /**
@@ -74,10 +70,10 @@ final readonly class TextFormatting
             return $text;
         }
 
-        $emotesEscaped = implode('|', array_map(
-            static fn(string $emote): string => preg_quote($emote, '/'),
-            array_keys($emotes),
-        ));
+        $emotesEscaped = implode('|', array_map(static fn(string $emote): string => preg_quote(
+            $emote,
+            '/',
+        ), array_keys($emotes)));
         $text = (string) preg_replace_callback(
             "/(\\s)({$emotesEscaped})/",
             $this->emoteCallback(...),
@@ -112,11 +108,7 @@ final readonly class TextFormatting
 
         $badwords = $this->rules->getBadwords();
 
-        return str_ireplace(
-            array_keys($badwords),
-            array_values($badwords),
-            (string) $text,
-        );
+        return str_ireplace(array_keys($badwords), array_values($badwords), (string) $text);
     }
 
     /**
@@ -134,16 +126,10 @@ final readonly class TextFormatting
      *
      * @param array<array<string>> $codes
      */
-    public function finishCodeTagsBB(
-        string $text,
-        array $codes,
-    ): string {
+    public function finishCodeTagsBB(string $text, array $codes): string
+    {
         foreach ($codes as $index => [, $language, $code]) {
-            $text = str_replace(
-                "[code]{$index}[/code]",
-                "[code{$language}]{$code}[/code]",
-                $text,
-            );
+            $text = str_replace("[code]{$index}[/code]", "[code{$language}]{$code}[/code]", $text);
         }
 
         return $text;
@@ -156,12 +142,7 @@ final readonly class TextFormatting
         }
 
         for ($i = 0; $i < 10; ++$i) {
-            $text = (string) preg_replace(
-                '/\[(\w+)[^\]]*\](.*)\[\/\1\]/Us',
-                '$2',
-                $text,
-                count: $count,
-            );
+            $text = (string) preg_replace('/\[(\w+)[^\]]*\](.*)\[\/\1\]/Us', '$2', $text, count: $count);
             if ($count === 0) {
                 break;
             }
@@ -220,24 +201,12 @@ final readonly class TextFormatting
             && $parts['host'] === $this->request->server('HTTP_HOST')
         ) {
             $inner = match (true) {
-                (bool) preg_match(
-                    '/pid=(\d+)/',
-                    $parts['query'] ?? '',
-                    $postMatch,
-                ) => "Post #{$postMatch[1]}",
-                (bool) preg_match(
-                    '/^\/topic\/(\d+)/',
-                    $parts['path'] ?? '',
-                    $topicMatch,
-                ) => "Topic #{$topicMatch[1]}",
+                (bool) preg_match('/pid=(\d+)/', $parts['query'] ?? '', $postMatch) => "Post #{$postMatch[1]}",
+                (bool) preg_match('/^\/topic\/(\d+)/', $parts['path'], $topicMatch) => "Topic #{$topicMatch[1]}",
                 default => null,
             };
 
-            $stringURL = ($parts['path'] ?? '')
-                . (array_key_exists(
-                    'query',
-                    $parts,
-                ) ? "?{$parts['query']}" : '');
+            $stringURL = $parts['path'] . (array_key_exists('query', $parts) ? "?{$parts['query']}" : '');
         }
 
         $inner ??= $stringURL;
@@ -273,7 +242,8 @@ final readonly class TextFormatting
     {
         [, $space, $emoteText] = $match;
 
-        return $space . $this->template->render('bbcode/emote', [
+        return $space
+        . $this->template->render('bbcode/emote', [
             'image' => $this->rules->getEmotes()[$emoteText],
             'text' => $emoteText,
         ]);

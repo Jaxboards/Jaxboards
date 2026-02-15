@@ -68,7 +68,6 @@ final class Page
             return;
         }
 
-
         $this->template->append($part, $content);
     }
 
@@ -157,11 +156,8 @@ final class Page
         return $this->session->addSessId($this->template->out());
     }
 
-    public function collapseBox(
-        string $title,
-        string $contents,
-        string $boxID,
-    ): string {
+    public function collapseBox(string $title, string $contents, string $boxID): string
+    {
         return $this->template->render('global/collapsebox', [
             'boxID' => $boxID,
             'title' => $title,
@@ -202,33 +198,26 @@ final class Page
         $this->template->setThemePath($themePath);
 
         // Add cache busting
-        $themeUrl .= '?' . $this->fileSystem->getFileInfo(
-            $cssFile,
-        )->getMTime();
+        $themeUrl .= '?' . $this->fileSystem->getFileInfo($cssFile)->getMTime();
 
         // Load CSS
-        $this->append(
-            'CSS',
-            <<<"HTML"
-                    <link
-                        rel="preload"
-                        as="style"
-                        type="text/css"
-                        href="/Service/Themes/global.css?1771012787"
-                        onload="this.onload=null;this.rel='stylesheet'"
-                    >
-                    <link rel="stylesheet" type="text/css" href="{$themeUrl}">
-                HTML,
-        );
+        $this->append('CSS', <<<HTML
+                <link
+                    rel="preload"
+                    as="style"
+                    type="text/css"
+                    href="/Service/Themes/global.css?1771012787"
+                    onload="this.onload=null;this.rel='stylesheet'"
+                >
+                <link rel="stylesheet" type="text/css" href="{$themeUrl}">
+            HTML);
 
         // Load Wrapper
         $skinWrapper = $skin->wrapper !== ''
             ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin->wrapper . '.html'
             : '';
         $this->template->load(
-            $skinWrapper && $this->fileSystem->getFileInfo(
-                $skinWrapper,
-            )->isFile()
+            $skinWrapper && $this->fileSystem->getFileInfo($skinWrapper)->isFile()
                 ? $skinWrapper
                 : $this->domainDefinitions->getDefaultThemePath() . '/wrapper.html',
         );
@@ -256,10 +245,7 @@ final class Page
     {
         $this->openGraphData = array_merge(
             $this->openGraphData,
-            array_filter(
-                $data,
-                static fn(?string $value): bool => (bool) $value,
-            ),
+            array_filter($data, static fn(?string $value): bool => (bool) $value),
         );
     }
 
@@ -270,9 +256,7 @@ final class Page
      */
     public function getSelectedSkin(?int $skinId): ?Skin
     {
-        $skin = $skinId
-            ? Skin::selectOne($skinId)
-            : null;
+        $skin = $skinId ? Skin::selectOne($skinId) : null;
 
         // Couldn't find custom skin, get the default
         $skin ??= Skin::selectOne('WHERE `default`=? LIMIT 1', 1);
@@ -282,9 +266,10 @@ final class Page
 
     private function getPageTitle(): string
     {
-        return ($this->config->getSetting(
-            'boardname',
-        ) ?: 'JaxBoards') . ($this->pageTitle !== '' ? ' -> ' . $this->pageTitle : '');
+        return (
+            ($this->config->getSetting('boardname') ?: 'JaxBoards')
+            . ($this->pageTitle !== '' ? ' -> ' . $this->pageTitle : '')
+        );
     }
 
     private function outputJavascriptCommands(): string

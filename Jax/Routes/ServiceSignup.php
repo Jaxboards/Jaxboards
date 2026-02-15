@@ -61,23 +61,16 @@ final readonly class ServiceSignup
             $error = $this->signup();
         }
 
-        return $this->template->render(
-            'signup',
-            [
-                'error' => $error,
-                'domain' => $this->serviceConfig->getSetting('domain'),
-            ],
-        );
+        return $this->template->render('signup', [
+            'error' => $error,
+            'domain' => $this->serviceConfig->getSetting('domain'),
+        ]);
     }
 
     private function signup(): string
     {
         if ($this->request->post('post') !== null) {
-            header(
-                'Location: https://test.' . $this->serviceConfig->getSetting(
-                    'domain',
-                ),
-            );
+            header('Location: https://test.' . $this->serviceConfig->getSetting('domain'));
         }
 
         $username = $this->request->asString->post('username');
@@ -85,12 +78,7 @@ final readonly class ServiceSignup
         $email = $this->request->asString->post('email');
         $boardURL = $this->request->asString->both('boardurl');
         $boardURLLowercase = mb_strtolower((string) $boardURL);
-        if (
-            !$boardURL
-            || !$username
-            || !$password
-            || !$email
-        ) {
+        if (!$boardURL || !$username || !$password || !$email) {
             return 'all fields required.';
         }
 
@@ -103,8 +91,7 @@ final readonly class ServiceSignup
         }
 
         if (preg_match('/\W/', $boardURL)) {
-            return 'board url needs to consist of letters, '
-                . 'numbers, and underscore only';
+            return 'board url needs to consist of letters, numbers, and underscore only';
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -116,8 +103,7 @@ final readonly class ServiceSignup
         }
 
         if (preg_match('/\W/', $username)) {
-            return 'username needs to consist of letters, '
-                . 'numbers, and underscore only';
+            return 'username needs to consist of letters, numbers, and underscore only';
         }
 
         $this->database->setPrefix('');
@@ -125,9 +111,7 @@ final readonly class ServiceSignup
         $directoryCount = Directory::count(
             'WHERE `registrarIP`=? AND `date`>?',
             $this->ipAddress->asBinary(),
-            $this->database->datetime(
-                Carbon::now('UTC')->subWeeks(1)->getTimestamp(),
-            ),
+            $this->database->datetime(Carbon::now('UTC')->subWeeks(1)->getTimestamp()),
         );
 
         if ($directoryCount > 3) {
@@ -162,14 +146,9 @@ final readonly class ServiceSignup
         $member->pass = password_hash($password, PASSWORD_DEFAULT);
         $member->insert();
 
-        $this->fileSystem->copyDirectory(
-            'Service/blueprint',
-            'boards/' . $boardURLLowercase,
-        );
+        $this->fileSystem->copyDirectory('Service/blueprint', 'boards/' . $boardURLLowercase);
 
-        $redirect = 'https://' . $boardURL . '.' . $this->serviceConfig->getSetting(
-            'domain',
-        );
+        $redirect = 'https://' . $boardURL . '.' . $this->serviceConfig->getSetting('domain');
         header("Location: {$redirect}");
 
         return "Error redirecting you to Location: {$redirect}";

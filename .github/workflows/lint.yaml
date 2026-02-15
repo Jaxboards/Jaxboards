@@ -50,30 +50,18 @@ jobs:
           jq ".version = \"$VERSION\"" package.json > /tmp/package.json && \
           mv /tmp/package.json package.json
         shell: bash
+      - run: composer run-script --no-interaction format
       - run: composer run-script --no-interaction rector
       - run: bun run prettier
       - run: bun run eslint-fix
       - run: bun run stylelint-fix
-      - run: |
-          set +e; \
-          composer run-script --no-interaction phpcbf; \
-          PHPCBF_RESULT=$?; \
-          if [ "$PHPCBF_RESULT" -eq 1 ]; then PHPCBF_RESULT=0; fi; \
-          exit $PHPCBF_RESULT;
-        shell: bash
-      - run: composer run-script --no-interaction php-cs-fixer
       - run: bun run build
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
       - run: |
           echo "[]" > eslint-report.json &&
-          echo "[]" > stylelint-report.json &&
-          echo '{"issues":[],"rules":[]}' > parallel-lint-report-sonarqube.json &&
-          echo '{"issues":[],"rules":[]}' > phpcs-report-sonarqube.json &&
-          echo '{"issues":[],"rules":[]}' > phpmd-report-sonarqube.json &&
-          echo '{"totals":{"errors":0,"file_errors":0},"files":{},"errors":[]}' > phpstan-report.json &&
-          echo "[]" > psalm-report.json
+          echo "[]" > stylelint-report.json
         shell: bash
       - run: bun run ci-lint
       - run: composer run-script test

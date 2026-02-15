@@ -22,6 +22,7 @@ use Jax\Template;
 use Jax\User;
 use Jax\UserOnline;
 use Jax\UsersOnline;
+use Override;
 
 use function array_filter;
 use function array_flip;
@@ -62,12 +63,11 @@ final class BoardIndex implements Route
         private readonly UsersOnline $usersOnline,
     ) {}
 
+    #[Override]
     public function route($params): void
     {
         match (true) {
-            $this->request->both(
-                'markread',
-            ) !== null => $this->markEverythingRead(),
+            $this->request->both('markread') !== null => $this->markEverythingRead(),
             $this->request->isJSUpdate() => $this->update(),
             default => $this->viewBoardIndex(),
         };
@@ -78,10 +78,7 @@ final class BoardIndex implements Route
         $this->page->command('preventNavigation');
         $this->session->set('forumsread', '{}');
         $this->session->set('topicsread', '{}');
-        $this->session->set(
-            'readDate',
-            $this->database->datetime(Carbon::now('UTC')->getTimestamp()),
-        );
+        $this->session->set('readDate', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
     }
 
     /**
@@ -98,9 +95,7 @@ final class BoardIndex implements Route
 
         return array_filter(
             $forums,
-            fn(Forum $forum): bool => !$forum->perms || $this->user->getForumPerms(
-                $forum->perms,
-            )['view'],
+            fn(Forum $forum): bool => !$forum->perms || $this->user->getForumPerms($forum->perms)['view'],
         );
     }
 
@@ -111,10 +106,7 @@ final class BoardIndex implements Route
      */
     private function fetchLastPostMembers(array $forums): array
     {
-        return Member::joinedOn(
-            $forums,
-            static fn(Forum $forum): ?int => $forum->lastPostUser,
-        );
+        return Member::joinedOn($forums, static fn(Forum $forum): ?int => $forum->lastPostUser);
     }
 
     private function viewBoardIndex(): void
@@ -123,10 +115,7 @@ final class BoardIndex implements Route
 
         $forums = $this->fetchIndexForums();
         $lastPostMembers = $this->fetchLastPostMembers($forums);
-        $forumsByCatID = Lodash::groupBy(
-            $forums,
-            static fn(Forum $forum): int => $forum->category ?? 0,
-        );
+        $forumsByCatID = Lodash::groupBy($forums, static fn(Forum $forum): int => $forum->category ?? 0);
 
         $this->setModsFromForums($forums);
 
@@ -140,18 +129,15 @@ final class BoardIndex implements Route
             $categoryHTML[] = $this->page->collapseBox(
                 $category->title,
                 $this->template->render('idx/table', [
-                    'rows' => array_map(
-                        fn(Forum $forum): array => [
-                            'forum' => $forum,
-                            'lastPostHTML' => $this->formatLastPost(
-                                $forum,
-                                $forum->lastPostUser ? $lastPostMembers[$forum->lastPostUser] : null,
-                            ),
-                            'isRead' => $this->isForumRead($forum),
-                            'mods' => $this->getMods($forum->mods),
-                        ],
-                        $forumsByCatID[$category->id],
-                    ),
+                    'rows' => array_map(fn(Forum $forum): array => [
+                        'forum' => $forum,
+                        'lastPostHTML' => $this->formatLastPost(
+                            $forum,
+                            $forum->lastPostUser ? $lastPostMembers[$forum->lastPostUser] : null,
+                        ),
+                        'isRead' => $this->isForumRead($forum),
+                        'mods' => $this->getMods($forum->mods),
+                    ], $forumsByCatID[$category->id]),
                 ]),
                 'cat_' . $category->id,
             );
@@ -195,10 +181,12 @@ final class BoardIndex implements Route
 
         $modIDs = array_unique($modIDs, SORT_REGULAR);
 
-        $this->mods = $modIDs === [] ? [] : Lodash::keyBy(
-            Member::selectMany(Database::WHERE_ID_IN, $modIDs),
-            static fn(Member $member): int => $member->id,
-        );
+        $this->mods = $modIDs === []
+            ? []
+            : Lodash::keyBy(
+                Member::selectMany(Database::WHERE_ID_IN, $modIDs),
+                static fn(Member $member): int => $member->id,
+            );
     }
 
     /**
@@ -234,9 +222,7 @@ final class BoardIndex implements Route
         }
 
         $stats = Stats::selectOne();
-        $lastRegisteredMember = $stats?->last_register !== null
-            ? Member::selectOne($stats->last_register)
-            : null;
+        $lastRegisteredMember = $stats?->last_register !== null ? Member::selectOne($stats?->last_register) : null;
 
         $usersOnline = $this->usersOnline->getUsersOnline();
         $usersOnlineCount = count(array_filter(
@@ -245,51 +231,39 @@ final class BoardIndex implements Route
         ));
         $legendGroups = Group::selectMany('WHERE `legend`=1 ORDER BY `title`');
 
-        return $this->template->render(
-            'idx/stats',
-            [
-                'canModerate' => $this->user->isModerator(),
-                'guestCount' => $this->usersOnline->getGuestCount(),
-                'lastRegisteredMember' => $lastRegisteredMember,
-                'legend' => $legendGroups,
-                'stats' => $stats,
-                'usersOnline' => $usersOnline,
-                'usersOnlineCount' => $usersOnlineCount,
-                'usersOnlineToday' => $this->usersOnline->getUsersOnlineToday(),
-            ],
-        );
+        return $this->template->render('idx/stats', [
+            'canModerate' => $this->user->isModerator(),
+            'guestCount' => $this->usersOnline->getGuestCount(),
+            'lastRegisteredMember' => $lastRegisteredMember,
+            'legend' => $legendGroups,
+            'stats' => $stats,
+            'usersOnline' => $usersOnline,
+            'usersOnlineCount' => $usersOnlineCount,
+            'usersOnlineToday' => $this->usersOnline->getUsersOnlineToday(),
+        ]);
     }
 
     private function updateStats(): void
     {
         $list = [];
         $oldcache = null;
-        if (
-            $this->session->get()->usersOnlineCache !== ''
-        ) {
-            $oldcache = array_flip(
-                explode(',', $this->session->get()->usersOnlineCache),
-            );
+        if ($this->session->get()->usersOnlineCache !== '') {
+            $oldcache = array_flip(explode(',', $this->session->get()->usersOnlineCache));
         }
 
         $useronlinecache = '';
         foreach ($this->usersOnline->getUsersOnline() as $userOnline) {
             $lastUpdateTS = $this->session->get()->lastUpdate !== null
-                ? $this->date->datetimeAsTimestamp(
-                    $this->session->get()->lastUpdate,
-                )
+                ? $this->date->datetimeAsTimestamp($this->session->get()->lastUpdate)
                 : 0;
-            $lastActionIdle = $lastUpdateTS - ($this->config->getSetting(
-                'timetoidle',
-            ) ?? 300) - 30;
+            $lastActionIdle = $lastUpdateTS - ($this->config->getSetting('timetoidle') ?? 300) - 30;
             if (!$userOnline->uid && !$userOnline->isBot) {
                 continue;
             }
 
             if (
                 $userOnline->lastAction >= $lastUpdateTS
-                || $userOnline->status === 'idle'
-                && $userOnline->lastAction > $lastActionIdle
+                || $userOnline->status === 'idle' && $userOnline->lastAction > $lastActionIdle
             ) {
                 $list[] = $userOnline;
             }
@@ -302,16 +276,10 @@ final class BoardIndex implements Route
         }
 
         if ($oldcache !== null && $oldcache !== []) {
-            $this->page->command(
-                'setoffline',
-                implode(',', array_flip($oldcache)),
-            );
+            $this->page->command('setoffline', implode(',', array_flip($oldcache)));
         }
 
-        $this->session->set(
-            'usersOnlineCache',
-            mb_substr($useronlinecache, 0, -1),
-        );
+        $this->session->set('usersOnlineCache', mb_substr($useronlinecache, 0, -1));
         if ($list === []) {
             return;
         }
@@ -323,12 +291,10 @@ final class BoardIndex implements Route
     {
         $unreadForums = array_filter(
             $this->fetchIndexForums(),
-            fn(Forum $forum): bool => !$this->isForumRead($forum)
-                && $this->date->datetimeAsTimestamp(
-                    $forum->lastPostDate,
-                ) > $this->date->datetimeAsTimestamp(
-                    $this->session->get()->lastUpdate,
-                ),
+            fn(Forum $forum): bool => (
+                !$this->isForumRead($forum)
+                && $this->date->datetimeAsTimestamp($forum->lastPostDate) > $this->date->datetimeAsTimestamp($this->session->get()->lastUpdate)
+            ),
         );
 
         $lastPostMembers = $this->fetchLastPostMembers($unreadForums);
@@ -336,14 +302,9 @@ final class BoardIndex implements Route
         foreach ($unreadForums as $unreadForum) {
             $forumSelector = "#fid_{$unreadForum->id}";
             $this->page->command('addclass', $forumSelector, 'unread');
-            $this->page->command(
-                'update',
-                "{$forumSelector}_icon",
-                $this->template->render(
-                    'idx/icon-unread',
-                    ['forum' => $unreadForum],
-                ),
-            );
+            $this->page->command('update', "{$forumSelector}_icon", $this->template->render('idx/icon-unread', [
+                'forum' => $unreadForum,
+            ]));
             $this->page->command(
                 'update',
                 "{$forumSelector}_lastpost",
@@ -353,54 +314,39 @@ final class BoardIndex implements Route
                 ),
                 '1',
             );
-            $this->page->command(
-                'update',
-                "{$forumSelector}_topics",
-                $this->template->render(
-                    'idx/topics-count',
-                    ['count' => $unreadForum->topics],
-                ),
-            );
-            $this->page->command(
-                'update',
-                "{$forumSelector}_replies",
-                $this->template->render(
-                    'idx/replies-count',
-                    ['count' => $unreadForum->posts],
-                ),
-            );
+            $this->page->command('update', "{$forumSelector}_topics", $this->template->render('idx/topics-count', [
+                'count' => $unreadForum->topics,
+            ]));
+            $this->page->command('update', "{$forumSelector}_replies", $this->template->render('idx/replies-count', [
+                'count' => $unreadForum->posts,
+            ]));
         }
     }
 
     private function formatLastPost(Forum $forum, ?Member $member): string
     {
-        return $this->template->render(
-            'idx/row-lastpost',
-            [
-                'forum' => $forum,
-                'lastPostUser' => $member,
-            ],
-        );
+        return $this->template->render('idx/row-lastpost', [
+            'forum' => $forum,
+            'lastPostUser' => $member,
+        ]);
     }
 
     private function isForumRead(Forum $forum): bool
     {
         if ($this->forumsread === null) {
-            $this->forumsread = json_decode(
-                $this->session->get()->forumsread,
-                true,
-                flags: JSON_THROW_ON_ERROR,
-            );
+            $this->forumsread = json_decode($this->session->get()->forumsread, true, flags: JSON_THROW_ON_ERROR);
         }
 
         if (!array_key_exists($forum->id, $this->forumsread ?? [])) {
             $this->forumsread[$forum->id] = 0;
         }
 
-        return $this->date->datetimeAsTimestamp($forum->lastPostDate) < max(
-            $this->forumsread[$forum->id],
-            $this->date->datetimeAsTimestamp($this->session->get()->readDate),
-            $this->date->datetimeAsTimestamp($this->user->get()->lastVisit),
+        return (
+            $this->date->datetimeAsTimestamp($forum->lastPostDate) < max(
+                $this->forumsread[$forum->id],
+                $this->date->datetimeAsTimestamp($this->session->get()->readDate),
+                $this->date->datetimeAsTimestamp($this->user->get()->lastVisit),
+            )
         );
     }
 }

@@ -6,14 +6,18 @@ namespace Jax\Routes;
 
 use Jax\Interfaces\Route;
 use Jax\Page;
+use Override;
 
 use function max;
 use function min;
 
 final readonly class Snow implements Route
 {
-    public function __construct(private Page $page) {}
+    public function __construct(
+        private Page $page,
+    ) {}
 
+    #[Override]
     public function route($params): void
     {
         $snowFlakeCount = (int) ($params['snowFlakeCount'] ?? 200);

@@ -20,6 +20,7 @@ use Jax\Routes\UCP\Inbox;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use Override;
 
 use function filter_var;
 use function is_string;
@@ -49,12 +50,10 @@ final readonly class UCP implements Route
         private User $user,
     ) {}
 
+    #[Override]
     public function route($params): void
     {
-        if (
-            $this->user->isGuest()
-            || $this->user->get()->groupID === Groups::Banned->value
-        ) {
+        if ($this->user->isGuest() || $this->user->get()->groupID === Groups::Banned->value) {
             $this->router->redirect('index');
 
             return;
@@ -82,7 +81,6 @@ final readonly class UCP implements Route
             default => $this->showMain(),
         };
 
-
         if (!$page) {
             return;
         }
@@ -108,16 +106,12 @@ final readonly class UCP implements Route
             }
         }
 
-        return ($error !== null ? $this->template->render(
-            'error',
-            ['message' => $error],
-        ) : '')
-            . $this->template->render(
-                'ucp/notepad',
-                [
-                    'user' => $this->user->get(),
-                ],
-            );
+        return (
+            ($error !== null ? $this->template->render('error', ['message' => $error]) : '')
+            . $this->template->render('ucp/notepad', [
+                'user' => $this->user->get(),
+            ])
+        );
     }
 
     private function showucp(string $page): void
@@ -145,9 +139,7 @@ final readonly class UCP implements Route
         if ($this->request->post('submit') !== null) {
             $update = [];
             foreach ($fields as $field) {
-                $update[$field] = $this->request->post(
-                    $field,
-                ) !== null ? 1 : 0;
+                $update[$field] = $this->request->post($field) !== null ? 1 : 0;
             }
 
             $this->user->setBulk($update);
@@ -155,8 +147,7 @@ final readonly class UCP implements Route
             foreach ($fields as $field) {
                 $this->page->command(
                     'script',
-                    "window.globalSettings.{$field}="
-                        . ($this->request->post($field) !== null ? 1 : 0),
+                    "window.globalSettings.{$field}=" . ($this->request->post($field) !== null ? 1 : 0),
                 );
             }
 
@@ -178,18 +169,12 @@ final readonly class UCP implements Route
     {
         $changeSig = $this->request->asString->post('changesig');
         if ($changeSig !== null) {
-            $this->user->set(
-                'sig',
-                $this->textFormatting->linkify($changeSig),
-            );
+            $this->user->set('sig', $this->textFormatting->linkify($changeSig));
         }
 
-        return $this->template->render(
-            'ucp/sig-settings',
-            [
-                'user' => $this->user->get(),
-            ],
-        );
+        return $this->template->render('ucp/sig-settings', [
+            'user' => $this->user->get(),
+        ]);
     }
 
     private function showPassSettings(): string
@@ -206,27 +191,17 @@ final readonly class UCP implements Route
                 $error = 'Those passwords do not match.';
             }
 
-            if (
-                !$newPass1
-                || (!$showPassword && !$newPass2)
-                || !$currentPassword
-            ) {
+            if (!$newPass1 || !$showPassword && !$newPass2 || !$currentPassword) {
                 $error = 'All form fields are required.';
             }
 
-            $verifiedPassword = password_verify(
-                (string) $currentPassword,
-                $this->user->get()->pass,
-            );
+            $verifiedPassword = password_verify((string) $currentPassword, $this->user->get()->pass);
             if (!$verifiedPassword) {
                 $error = 'The password you entered is incorrect.';
             }
 
             if ($error === null) {
-                $hashpass = password_hash(
-                    (string) $newPass1,
-                    PASSWORD_DEFAULT,
-                );
+                $hashpass = password_hash((string) $newPass1, PASSWORD_DEFAULT);
                 $this->user->set('pass', $hashpass);
                 $backURL = $this->router->url('ucp', ['what' => 'pass']);
 
@@ -279,23 +254,17 @@ final readonly class UCP implements Route
 
         $emailSettings = $this->user->get()->emailSettings;
 
-        return $this->template->render(
-            'ucp/email-settings',
-            [
-                'changeEmail' => $this->request->both('changeEmail'),
-                'user' => $this->user->get(),
-                'notificationsEnabled' => ($emailSettings & 2) !== 0,
-                'adminEmailsEnabled' => ($emailSettings & 1) !== 0,
-            ],
-        );
+        return $this->template->render('ucp/email-settings', [
+            'changeEmail' => $this->request->both('changeEmail'),
+            'user' => $this->user->get(),
+            'notificationsEnabled' => ($emailSettings & 2) !== 0,
+            'adminEmailsEnabled' => ($emailSettings & 1) !== 0,
+        ]);
     }
 
     private function saveAvatarSettings(string $newAvatar): ?string
     {
-        if (
-            $newAvatar
-            && !filter_var($newAvatar, FILTER_VALIDATE_URL)
-        ) {
+        if ($newAvatar && !filter_var($newAvatar, FILTER_VALIDATE_URL)) {
             return 'Please enter a valid image URL.';
         }
 
@@ -327,28 +296,16 @@ final readonly class UCP implements Route
         $data = [
             'about' => $this->request->asString->post('about'),
             'contactAIM' => $this->request->asString->post('contactAIM'),
-            'contactBlueSky' => $this->request->asString->post(
-                'contactBlueSky',
-            ),
-            'contactDiscord' => $this->request->asString->post(
-                'contactDiscord',
-            ),
-            'contactGoogleChat' => $this->request->asString->post(
-                'contactGoogleChat',
-            ),
+            'contactBlueSky' => $this->request->asString->post('contactBlueSky'),
+            'contactDiscord' => $this->request->asString->post('contactDiscord'),
+            'contactGoogleChat' => $this->request->asString->post('contactGoogleChat'),
             'contactMSN' => $this->request->asString->post('contactMSN'),
             'contactSkype' => $this->request->asString->post('contactSkype'),
             'contactSteam' => $this->request->asString->post('contactSteam'),
-            'contactTwitter' => $this->request->asString->post(
-                'contactTwitter',
-            ),
+            'contactTwitter' => $this->request->asString->post('contactTwitter'),
             'contactYIM' => $this->request->asString->post('contactYIM'),
-            'contactYoutube' => $this->request->asString->post(
-                'contactYoutube',
-            ),
-            'displayName' => trim(
-                (string) $this->request->asString->post('displayName'),
-            ),
+            'contactYoutube' => $this->request->asString->post('contactYoutube'),
+            'displayName' => trim((string) $this->request->asString->post('displayName')),
             'dob_day' => (int) $this->request->asString->post('dob_day'),
             'dob_month' => (int) $this->request->asString->post('dob_month'),
             'dob_year' => (int) $this->request->asString->post('dob_year'),
@@ -365,10 +322,7 @@ final readonly class UCP implements Route
         }
 
         $badNameChars = $this->config->getSetting('badnamechars');
-        if (
-            $badNameChars
-            && preg_match($badNameChars, $data['displayName'])
-        ) {
+        if ($badNameChars && preg_match($badNameChars, $data['displayName'])) {
             return 'Invalid characters in display name!';
         }
 
@@ -382,50 +336,35 @@ final readonly class UCP implements Route
         }
 
         $data['birthdate'] = $data['dob_year'] || $data['dob_month']
-            ? Carbon::create(
-                $data['dob_year'],
-                $data['dob_month'],
-                $data['dob_day'],
-                0,
-                0,
-                0,
-                'UTC',
-            )?->format(
+            ? Carbon::create($data['dob_year'], $data['dob_month'], $data['dob_day'], 0, 0, 0, 'UTC')?->format(
                 'Y-m-d H:i:s',
             )
             : null;
         unset($data['dob_day'], $data['dob_month'], $data['dob_year']);
 
-        foreach (
-            [
-                'contactAIM' => 'AIM username',
-                'contactBlueSky' => 'Bluesky username',
-                'contactDiscord' => 'Discord ID',
-                'contactGoogleChat' => 'Google Chat username',
-                'contactMSN' => 'MSN username',
-                'contactSkype' => 'Skype username',
-                'contactSteam' => 'Steam username',
-                'contactTwitter' => 'Twitter username',
-                'contactYIM' => 'YIM username',
-                'contactYoutube' => 'YouTube username',
-                'displayName' => 'Display name',
-                'full_name' => 'Full name',
-                'location' => 'Location',
-                'usertitle' => 'User Title',
-                'website' => 'Website URL',
-            ] as $field => $fieldLabel
-        ) {
-            if (
-                mb_strstr($field, 'contact') !== false
-                && preg_match('/[^\w.@]/', (string) $data[$field])
-            ) {
+        foreach ([
+            'contactAIM' => 'AIM username',
+            'contactBlueSky' => 'Bluesky username',
+            'contactDiscord' => 'Discord ID',
+            'contactGoogleChat' => 'Google Chat username',
+            'contactMSN' => 'MSN username',
+            'contactSkype' => 'Skype username',
+            'contactSteam' => 'Steam username',
+            'contactTwitter' => 'Twitter username',
+            'contactYIM' => 'YIM username',
+            'contactYoutube' => 'YouTube username',
+            'displayName' => 'Display name',
+            'full_name' => 'Full name',
+            'location' => 'Location',
+            'usertitle' => 'User Title',
+            'website' => 'Website URL',
+        ] as $field => $fieldLabel) {
+            if (mb_strstr($field, 'contact') !== false && preg_match('/[^\w.@]/', (string) $data[$field])) {
                 return "Invalid characters in {$fieldLabel}";
             }
 
             $data[$field] ??= '';
-            $length = $field === 'displayName'
-                ? 30
-                : ($field === 'location' ? 100 : 50);
+            $length = $field === 'displayName' ? 30 : ($field === 'location' ? 100 : 50);
             if (mb_strlen($data[$field]) <= $length) {
                 continue;
             }
@@ -456,10 +395,7 @@ final readonly class UCP implements Route
             if (is_string($updateResult)) {
                 $this->page->command('error', $updateResult);
 
-                return $this->template->render(
-                    'error',
-                    ['message' => $updateResult],
-                );
+                return $this->template->render('error', ['message' => $updateResult]);
             }
 
             $editProfileURL = $this->router->url('ucp', ['what' => 'profile']);
@@ -472,17 +408,12 @@ final readonly class UCP implements Route
         }
 
         $birthdate = $this->user->get()->birthdate;
-        $birthdate = $birthdate !== null
-            ? $this->date->dateAsCarbon($birthdate)
-            : null;
+        $birthdate = $birthdate !== null ? $this->date->dateAsCarbon($birthdate) : null;
 
-        return $this->template->render(
-            'ucp/profile-settings',
-            [
-                'user' => $this->user->get(),
-                'birthdate' => $birthdate,
-            ],
-        );
+        return $this->template->render('ucp/profile-settings', [
+            'user' => $this->user->get(),
+            'birthdate' => $birthdate,
+        ]);
     }
 
     private function saveBoardSettings(): ?string
@@ -523,13 +454,10 @@ final readonly class UCP implements Route
             ? Skin::selectMany('WHERE `hidden`!=1 ORDER BY `title` ASC')
             : Skin::selectMany('ORDER BY `title` ASC');
 
-        return $this->template->render(
-            'ucp/board-settings',
-            [
-                'error' => $error,
-                'skins' => $skins,
-                'user' => $this->user->get(),
-            ],
-        );
+        return $this->template->render('ucp/board-settings', [
+            'error' => $error,
+            'skins' => $skins,
+            'user' => $this->user->get(),
+        ]);
     }
 }

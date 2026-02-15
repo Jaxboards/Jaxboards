@@ -31,7 +31,6 @@ final readonly class Activity
 
     public function render(Member $member): string
     {
-
         if ($this->request->both('fmt') === 'RSS') {
             $this->renderRSSFeed($member);
 
@@ -44,37 +43,21 @@ final readonly class Activity
     public function renderRSSFeed(Member $member): void
     {
         $rootURL = $this->router->getRootURL();
-        $rssFeed = new RSSFeed(
-            [
-                'description' => $member->usertitle,
-                'link' => $rootURL . $this->router->url(
-                    'profile',
-                    ['id' => $member->id],
-                ),
-                'title' => $member->displayName . "'s recent activity",
-            ],
-        );
+        $rssFeed = new RSSFeed([
+            'description' => $member->usertitle,
+            'link' => $rootURL . $this->router->url('profile', ['id' => $member->id]),
+            'title' => $member->displayName . "'s recent activity",
+        ]);
         foreach ($this->fetchActivities($member->id) as $entry) {
-            $parsed = $this->parseActivityRSS(
-                $entry->activity,
-                $member,
-                $entry->affectedUser,
-            );
-            $link = $rootURL
-                . $this->textFormatting->blockhtml($parsed['link']);
-            $rssFeed->additem(
-                [
-                    'description' => $parsed['text'],
-                    'guid' => $link,
-                    'link' => $link,
-                    'pubDate' => $this->date->datetimeAsCarbon(
-                        $entry->activity->date,
-                    )?->format(
-                        'r',
-                    ) ?? '',
-                    'title' => $parsed['text'],
-                ],
-            );
+            $parsed = $this->parseActivityRSS($entry->activity, $member, $entry->affectedUser);
+            $link = $rootURL . $this->textFormatting->blockhtml($parsed['link']);
+            $rssFeed->additem([
+                'description' => $parsed['text'],
+                'guid' => $link,
+                'link' => $link,
+                'pubDate' => $this->date->datetimeAsCarbon($entry->activity->date)?->format('r') ?? '',
+                'title' => $parsed['text'],
+            ]);
         }
 
         $this->page->earlyFlush($rssFeed->publish());
@@ -83,11 +66,8 @@ final readonly class Activity
     /**
      * @return array{link:string,text:string}
      */
-    private function parseActivityRSS(
-        ModelsActivity $modelsActivity,
-        Member $user,
-        ?Member $affectedUser,
-    ): array {
+    private function parseActivityRSS(ModelsActivity $modelsActivity, Member $user, ?Member $affectedUser): array
+    {
         return match ($modelsActivity->type) {
             'profile_comment' => [
                 'link' => $this->router->url('profile', [
@@ -137,27 +117,20 @@ final readonly class Activity
      */
     private function fetchActivities(int $profileId): array
     {
-        $activities = ModelsActivity::selectMany(
-            <<<'SQL'
-                WHERE `uid`= ?
-                ORDER BY id DESC
-                LIMIT ?
-                SQL,
-            $profileId,
-            self::ACTIVITY_LIMIT,
-        );
+        $activities = ModelsActivity::selectMany(<<<'SQL'
+            WHERE `uid`= ?
+            ORDER BY id DESC
+            LIMIT ?
+            SQL, $profileId, self::ACTIVITY_LIMIT);
 
         $members = Member::joinedOn(
             $activities,
             static fn(ModelsActivity $modelsActivity): ?int => $modelsActivity->affectedUser,
         );
 
-        return array_map(
-            static fn(ModelsActivity $modelsActivity): object => (object) [
-                'activity' => $modelsActivity,
-                'affectedUser' => $members[$modelsActivity->affectedUser ?? ''] ?? null,
-            ],
-            $activities,
-        );
+        return array_map(static fn(ModelsActivity $modelsActivity): object => (object) [
+            'activity' => $modelsActivity,
+            'affectedUser' => $members[$modelsActivity->affectedUser ?? ''] ?? null,
+        ], $activities);
     }
 }

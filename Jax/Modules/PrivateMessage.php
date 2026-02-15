@@ -12,6 +12,7 @@ use Jax\Request;
 use Jax\Session;
 use Jax\TextFormatting;
 use Jax\User;
+use Override;
 
 use function explode;
 use function implode;
@@ -33,13 +34,12 @@ final readonly class PrivateMessage implements Module
         private User $user,
     ) {}
 
+    #[Override]
     public function init(): void
     {
         $instantMessage = $this->request->asString->post('im_im');
         $uid = (int) $this->request->asString->post('im_uid');
-        if (
-            $this->session->get()->runonce !== ''
-        ) {
+        if ($this->session->get()->runonce !== '') {
             $this->filter();
         }
 
@@ -83,10 +83,7 @@ final readonly class PrivateMessage implements Module
     public function message(int $uid, string $instantMessage): void
     {
         if ($this->user->isGuest()) {
-            $this->page->command(
-                'error',
-                'You must be logged in to instant message!',
-            );
+            $this->page->command('error', 'You must be logged in to instant message!');
 
             return;
         }
@@ -98,10 +95,7 @@ final readonly class PrivateMessage implements Module
         }
 
         if (!$this->user->getGroup()?->canIM) {
-            $this->page->command(
-                'error',
-                "You don't have permission to use this feature.",
-            );
+            $this->page->command('error', "You don't have permission to use this feature.");
 
             return;
         }
@@ -139,12 +133,12 @@ final readonly class PrivateMessage implements Module
                 SET `runonce`=CONCAT(`runonce`,?)
                 WHERE `uid`=? AND `lastUpdate`>?
                 SQL,
-            ['session'],
+            [
+                'session',
+            ],
             json_encode($cmd) . PHP_EOL,
             $uid,
-            $this->database->datetime(
-                Carbon::now()->subSeconds(10)->getTimestamp(),
-            ),
+            $this->database->datetime(Carbon::now()->subSeconds(10)->getTimestamp()),
         );
 
         return $this->database->affectedRows($result) !== 0;

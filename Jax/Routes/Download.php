@@ -9,6 +9,7 @@ use Jax\FileSystem;
 use Jax\Interfaces\Route;
 use Jax\Models\File;
 use Jax\Request;
+use Override;
 
 use function array_pop;
 use function count;
@@ -25,6 +26,7 @@ final readonly class Download implements Route
         private Request $request,
     ) {}
 
+    #[Override]
     public function route($params): void
     {
         $this->downloadFile((int) $this->request->asString->both('id'));
@@ -52,12 +54,10 @@ final readonly class Download implements Route
 
         $filePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $filePath;
         if ($this->fileSystem->getFileInfo($filePath)->isFile()) {
-            header(
-                "Content-Disposition: attachment; filename=\"{$file->name}\";",
-            );
+            header("Content-Disposition: attachment; filename=\"{$file->name}\";");
             echo $this->fileSystem->getContents($filePath);
 
-            exit;
+            exit();
         }
     }
 }

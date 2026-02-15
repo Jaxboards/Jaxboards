@@ -10,6 +10,7 @@ use Jax\Attributes\Key;
 use Jax\Attributes\PrimaryKey;
 use Jax\Database\Database;
 use Jax\Database\Model;
+use Override;
 use ReflectionClass;
 
 use function array_merge;
@@ -17,8 +18,11 @@ use function implode;
 
 final readonly class MySQL implements Adapter
 {
-    public function __construct(private Database $database) {}
+    public function __construct(
+        private Database $database,
+    ) {}
 
+    #[Override]
     public function createTableQueryFromModel(Model $model): string
     {
         $table = $model::TABLE;
@@ -30,33 +34,23 @@ final readonly class MySQL implements Adapter
         $constraints = [];
 
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-            $columnAttributes = $reflectionProperty->getAttributes(
-                Column::class,
-            );
+            $columnAttributes = $reflectionProperty->getAttributes(Column::class);
 
             if ($columnAttributes === []) {
                 continue;
             }
 
             $columnAttribute = $columnAttributes[0]->newInstance();
-            $fieldName = $this->database->quoteIdentifier(
-                $columnAttribute->name,
-            );
+            $fieldName = $this->database->quoteIdentifier($columnAttribute->name);
             $fields[] = $this->fieldDefinition($columnAttribute);
 
-            $primaryKeyAttributes = $reflectionProperty->getAttributes(
-                PrimaryKey::class,
-            );
-            $foreignKeyAttributes = $reflectionProperty->getAttributes(
-                ForeignKey::class,
-            );
+            $primaryKeyAttributes = $reflectionProperty->getAttributes(PrimaryKey::class);
+            $foreignKeyAttributes = $reflectionProperty->getAttributes(ForeignKey::class);
             $keyAttributes = $reflectionProperty->getAttributes(Key::class);
 
             if ($foreignKeyAttributes !== []) {
                 $foreignKey = $foreignKeyAttributes[0]->newInstance();
-                $foreignField = $this->database->quoteIdentifier(
-                    $foreignKey->field,
-                );
+                $foreignField = $this->database->quoteIdentifier($foreignKey->field);
                 $foreignTable = $this->database->ftable($foreignKey->table);
                 $onDelete = match ($foreignKey->onDelete) {
                     'cascade' => 'ON DELETE CASCADE',
@@ -64,9 +58,7 @@ final readonly class MySQL implements Adapter
                     default => '',
                 };
                 $keys[] = "KEY {$fieldName} ({$fieldName})";
-                $constraintName = $this->database->quoteIdentifier(
-                    "{$table}_fk_{$columnAttribute->name}",
-                );
+                $constraintName = $this->database->quoteIdentifier("{$table}_fk_{$columnAttribute->name}");
                 $constraints[] = <<<SQL
                     CONSTRAINT {$constraintName}
                             FOREIGN KEY ({$fieldName})
@@ -93,20 +85,14 @@ final readonly class MySQL implements Adapter
             $keys[] = "{$keyType}KEY {$fieldName} ({$fieldName})";
         }
 
-        return implode(
-            "\n",
-            [
-                "CREATE TABLE {$tableQuoted} (",
-                '    ' . implode(",\n    ", array_merge(
-                    $fields,
-                    $keys,
-                    $constraints,
-                )),
-                ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci',
-            ],
-        );
+        return implode("\n", [
+            "CREATE TABLE {$tableQuoted} (",
+            '    ' . implode(",\n    ", array_merge($fields, $keys, $constraints)),
+            ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci',
+        ]);
     }
 
+    #[Override]
     public function install(): void
     {
         $queries = [
@@ -138,18 +124,16 @@ final readonly class MySQL implements Adapter
             case 'string':
                 $type = 'varchar';
 
-                // no break
+            // no break
             default:
                 break;
         }
 
         $length = $column->length !== 0 ? "({$column->length})" : '';
-        $nullable = $column->nullable === false ? ' NOT NULL' : '';
+        $nullable = $column->nullable ? '' : ' NOT NULL';
         $autoIncrement = $column->autoIncrement ? ' AUTO_INCREMENT' : '';
         $unsigned = $column->unsigned ? ' unsigned' : '';
-        $default = $column->default !== null
-            ? " DEFAULT '{$column->default}'"
-            : '';
+        $default = $column->default !== null ? " DEFAULT '{$column->default}'" : '';
 
         return "{$fieldName} {$type}{$length}{$unsigned}{$nullable}{$autoIncrement}{$default}";
     }

@@ -47,10 +47,8 @@ final class ForumTree
     /**
      * @param array<mixed> $forums
      */
-    private function recurseInto(
-        array $forums,
-        int $depth = 0,
-    ): Generator {
+    private function recurseInto(array $forums, int $depth = 0): Generator
+    {
         foreach ($forums as $forumId => $subForums) {
             yield $depth => $forumId;
             if ($subForums === []) {
@@ -61,20 +59,13 @@ final class ForumTree
         }
     }
 
-    /**
-     * @psalm-suppress UnsupportedPropertyReferenceUsage
-     */
     private function addForum(Forum $forum): void
     {
         $path = array_filter(
-            array_map(
-                static fn($pathId): int => (int) $pathId,
-                explode(' ', $forum->path),
-            ),
+            array_map(static fn($pathId): int => (int) $pathId, explode(' ', $forum->path)),
             static fn($pathId): bool => (bool) $pathId,
         );
 
-        // phpcs:ignore SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference
         $node = &$this->tree;
 
         foreach ($path as $pathId) {
@@ -82,7 +73,6 @@ final class ForumTree
                 $node[$pathId] = [];
             }
 
-            // phpcs:ignore SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference
             $node = &$node[$pathId];
         }
 

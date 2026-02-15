@@ -12,6 +12,7 @@ use Jax\Page;
 use Jax\Request;
 use Jax\Template;
 use Jax\User;
+use Override;
 
 use function array_key_exists;
 use function mb_substr;
@@ -34,28 +35,20 @@ final readonly class Report implements Route
         private User $user,
     ) {}
 
+    #[Override]
     public function route(array $params): void
     {
         $pid = (int) $this->request->both('pid');
         $reason = $this->request->asString->post('reason') ?? '';
 
         if ($this->user->isGuest()) {
-            $this->page->command(
-                'error',
-                'You must be logged in to report posts',
-            );
+            $this->page->command('error', 'You must be logged in to report posts');
 
             return;
         }
 
         match (true) {
-            array_key_exists(
-                $reason,
-                self::REPORT_REASONS,
-            ) => $this->reportPost(
-                $pid,
-                $reason,
-            ),
+            array_key_exists($reason, self::REPORT_REASONS) => $this->reportPost($pid, $reason),
             default => $this->reportPostForm($pid),
         };
     }
@@ -66,21 +59,14 @@ final readonly class Report implements Route
         $report->pid = $pid;
         $report->reporter = $this->user->get()->id;
         $report->reason = $reason;
-        $report->note = mb_substr(
-            (string) $this->request->asString->post('note'),
-            0,
-            100,
-        );
+        $report->note = mb_substr((string) $this->request->asString->post('note'), 0, 100);
         $report->reportDate = $this->database->datetime();
         $report->insert();
 
         $this->page->command('closewindow', "#report{$pid}");
 
         if ($report->id === 0) {
-            $this->page->command(
-                'error',
-                'There was an error submitting your report',
-            );
+            $this->page->command('error', 'There was an error submitting your report');
 
             return;
         }

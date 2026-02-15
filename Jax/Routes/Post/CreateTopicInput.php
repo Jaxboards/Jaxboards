@@ -36,9 +36,11 @@ final class CreateTopicInput
         $this->topicTitle = $request->asString->post('ttitle');
 
         $pollChoices = $request->asString->post('pollchoices');
-        $this->pollChoices = $pollChoices !== null ? array_filter(
-            preg_split("@[\r\n]+@", $pollChoices) ?: [],
-            static fn(string $line): bool => trim($line) !== '',
-        ) : [];
+        $this->pollChoices = $pollChoices !== null
+            ? array_filter(
+                preg_split("@[\r\n]+@", $pollChoices) ?: [],
+                static fn(string $line): bool => trim($line) !== '',
+            )
+            : [];
     }
 }
