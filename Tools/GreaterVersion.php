@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tools;
 
+use Override;
+
 /*
  * Fetch the greater version property between two json files.
  *
@@ -12,10 +14,9 @@ namespace Tools;
  * <script.php> <first.json> <second.json>
  * ```
  */
-
 final class GreaterVersion implements CLIRoute
 {
-    #[\Override]
+    #[Override]
     public function route(array $params): void
     {
         $input1 = file_get_contents($params[0] ?? '');

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Tools;
 
+use Override;
+
 final class ComposerVersion implements CLIRoute
 {
     const string COMPOSER_VERSIONS_URL = 'https://getcomposer.org/versions';
 
-    #[\Override]
+    #[Override]
     public function route(array $params): void
     {
         match ($params[0] ?? '') {
@@ -78,6 +80,7 @@ final class ComposerVersion implements CLIRoute
 
             exit(1);
         }
+
         /** @var array{require:array{composer:string},config:array{platform:array{composer:string}},require:array<string>,require-dev:array<string>} $composerData */
         $composerData = json_decode(
             $composerJSON,
