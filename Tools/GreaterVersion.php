@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tools;
 
+use Jax\FileSystem;
 use Override;
 
 /*
@@ -14,40 +15,26 @@ use Override;
  * <script.php> <first.json> <second.json>
  * ```
  */
+
 final class GreaterVersion implements CLIRoute
 {
+    public function __construct(
+        private FileSystem $fileSystem,
+    ) {}
+
+    /**
+     * @param array<string> $params
+     */
     #[Override]
     public function route(array $params): void
     {
-        $input1 = file_get_contents($params[0] ?? '');
-        $version1 = '0';
-        if ($input1 !== false) {
-            /** @var string $version1 */
-            $version1 =
-                json_decode(
-                    $input1,
-                    null,
-                    // Default
-                    512,
-                    JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
-                )['version']
-                ?? '0';
+        if (count($params) < 2) {
+            error_log('Two files required to compare');
+            return;
         }
 
-        $input2 = file_get_contents($params[1] ?? '');
-        $version2 = '0';
-        if ($input2 !== false) {
-            /** @var string $version2 */
-            $version2 =
-                json_decode(
-                    $input2,
-                    null,
-                    // Default
-                    512,
-                    JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
-                )['version']
-                ?? '0';
-        }
+        $version1 = $this->get_version($params[0] ?? '');
+        $version2 = $this->get_version($params[1] ?? '');
 
         if (version_compare($version1, $version2, '>=')) {
             echo $version1;
@@ -56,5 +43,22 @@ final class GreaterVersion implements CLIRoute
         }
 
         echo $version2;
+    }
+
+    private function get_version(string $file): string
+    {
+        $input1 = $this->fileSystem->getContents($file);
+        if ($input1 !== '') {
+            /** @var string */
+            return json_decode(
+                $input1,
+                null,
+                // Default
+                512,
+                JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
+            )['version'] ?? '0';
+        }
+
+        return '0';
     }
 }

@@ -20,12 +20,7 @@ final readonly class MagoToSonar implements CLIRoute
     public function __construct()
     {
         $mago = realpath(dirname(__DIR__) . '/vendor/bin/mago');
-        if (!$mago) {
-            error_log('Mago not installed. Please run composer install first.');
-            return;
-        }
-
-        $this->mago = $mago;
+        $this->mago = $mago ? $mago : '';
     }
 
     private function get_mago_rules_for_sonar(): array

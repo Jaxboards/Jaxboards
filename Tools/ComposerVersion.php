@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Tools;
 
+use Jax\FileSystem;
 use Override;
 
 final class ComposerVersion implements CLIRoute
 {
     const string COMPOSER_VERSIONS_URL = 'https://getcomposer.org/versions';
+
+    public function __construct(
+        private FileSystem $fileSystem
+    ) {}
 
     #[Override]
     public function route(array $params): void
@@ -21,24 +26,29 @@ final class ComposerVersion implements CLIRoute
 
     private function get_current_version(): void
     {
-        // Fetch the composer version for use in our pre-commit hook.
-        define('PACKAGE_FILE', dirname(__DIR__) . '/package.json');
-        $packageJSON = file_get_contents(PACKAGE_FILE);
-        if ($packageJSON === false) {
-            fwrite(STDERR, 'Could not read ' . PACKAGE_FILE);
+        echo $this->get_package_json()['engines']['composer'] ?? null;
+    }
+
+    /**
+     * @return array{engines:array{composer:?string}}
+     */
+    private function get_package_json(): array
+    {
+        $packageJSON = $this->fileSystem->getContents('package.json');
+        if ($packageJSON === '') {
+            fwrite(STDERR, 'Could not read package.json');
 
             exit(1);
         }
 
-        /** @var array{engines:array{composer:?string}} $packageData */
-        $packageData = json_decode(
+        /** @var array{engines:array{composer:?string}} */
+        return json_decode(
             $packageJSON,
             null,
             // Default
             512,
             JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
         );
-        echo $packageData['engines']['composer'] ?? null;
     }
 
     /**
@@ -46,9 +56,9 @@ final class ComposerVersion implements CLIRoute
      */
     private function update(): void
     {
-        $versionJSON = file_get_contents(self::COMPOSER_VERSIONS_URL);
+        $versionJSON = $this->fileSystem->getContents(self::COMPOSER_VERSIONS_URL);
 
-        if ($versionJSON === false) {
+        if ($versionJSON === '') {
             fwrite(STDERR, 'Could not read ' . self::COMPOSER_VERSIONS_URL);
 
             exit(1);
@@ -66,17 +76,15 @@ final class ComposerVersion implements CLIRoute
         $version = $versions['stable'][0]['version'] ?? null;
 
         if ($version === null) {
-            fwrite(STDERR, 'Could not retrieve composer version' . PHP_EOL);
+            error_log('Could not retrieve composer version' . PHP_EOL);
 
             exit(1);
         }
 
-        define('COMPOSER_FILE', dirname(__DIR__) . '/composer.json');
+        $composerJSON = $this->fileSystem->getContents('composer.json');
 
-        $composerJSON = file_get_contents(COMPOSER_FILE);
-
-        if ($composerJSON === false) {
-            fwrite(STDERR, 'Could not read ' . COMPOSER_FILE);
+        if ($composerJSON === '') {
+            error_log('Could not read composer.json');
 
             exit(1);
         }
@@ -96,30 +104,13 @@ final class ComposerVersion implements CLIRoute
         ksort($composerData['require']);
         ksort($composerData['require-dev']);
 
-        file_put_contents(COMPOSER_FILE, json_encode($composerData, JSON_PRETTY_PRINT));
+        $this->fileSystem->putContents('composer.json', json_encode($composerData, JSON_PRETTY_PRINT));
 
-        define('PACKAGE_FILE', dirname(__DIR__) . '/package.json');
-
-        $packageJSON = file_get_contents(PACKAGE_FILE);
-
-        if ($packageJSON === false) {
-            fwrite(STDERR, 'Could not read ' . PACKAGE_FILE);
-
-            exit(1);
-        }
-
-        /** @var array{engines:array{composer:?string}} $packageData */
-        $packageData = json_decode(
-            $packageJSON,
-            null,
-            // Default
-            512,
-            JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
-        );
+        $packageData = $this->get_package_json();
 
         $packageData['engines']['composer'] = $version;
         ksort($packageData['engines']);
 
-        file_put_contents(PACKAGE_FILE, json_encode($packageData, JSON_PRETTY_PRINT));
+        $this->fileSystem->putContents('package.json', json_encode($packageData, JSON_PRETTY_PRINT));
     }
 }
