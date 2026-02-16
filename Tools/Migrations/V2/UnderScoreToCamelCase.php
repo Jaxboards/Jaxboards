@@ -4,45 +4,45 @@ declare(strict_types=1);
 
 namespace Tools\Migrations\V2;
 
-use Jax\Database\Database;
+
 use Override;
 use Tools\Migrations\Migration;
 
-final class UnderScoreToCamelCase implements Migration
+final class UnderScoreToCamelCase extends Migration
 {
     #[Override]
-    public function execute(Database $database): void
+    public function execute(): void
     {
-        $this->fixForums($database);
+        $this->fixForums();
 
-        $this->fixMembers($database);
+        $this->fixMembers();
 
-        $this->fixMemberGroups($database);
+        $this->fixMemberGroups();
 
-        $this->fixTopics($database);
+        $this->fixTopics();
 
-        $this->fixSession($database);
+        $this->fixSession();
 
-        $database->special('ALTER TABLE %t
+        $this->database->special('ALTER TABLE %t
                 CHANGE `affected_uid` `affectedUser`
                     INT(10) UNSIGNED NULL DEFAULT NULL', ['activity']);
 
-        $database->special("ALTER TABLE %t
+        $this->database->special("ALTER TABLE %t
                 CHANGE `del_recipient` `deletedRecipient`
                     TINYINT(1) NOT NULL DEFAULT '0',
                 CHANGE `del_sender` `deletedSender`
                     TINYINT(1) NOT NULL DEFAULT '0'", ['messages']);
 
-        $database->special('ALTER TABLE %t
+        $this->database->special('ALTER TABLE %t
                 CHANGE `auth_id` `author`
                     INT(10) UNSIGNED NULL DEFAULT NULL,
                 CHANGE `edit_date` `editDate`
                     DATETIME NULL DEFAULT NULL', ['posts']);
     }
 
-    private function fixForums(Database $database): void
+    private function fixForums(): void
     {
-        $database->special("ALTER TABLE %t
+        $this->database->special("ALTER TABLE %t
                 CHANGE `cat_id` `category`
                     INT(10) UNSIGNED NULL DEFAULT NULL,
                 CHANGE `lp_uid` `lastPostUser`
@@ -59,9 +59,9 @@ final class UnderScoreToCamelCase implements Migration
                     TINYINT(3) UNSIGNED NOT NULL DEFAULT '0'", ['forums']);
     }
 
-    private function fixMembers(Database $database): void
+    private function fixMembers(): void
     {
-        $database->special("ALTER TABLE %t
+        $this->database->special("ALTER TABLE %t
                 CHANGE `group_id` `groupID`
                     INT(10) UNSIGNED NULL DEFAULT NULL,
                 CHANGE `join_date` `joinDate`
@@ -112,9 +112,9 @@ final class UnderScoreToCamelCase implements Migration
                     CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL", ['members']);
     }
 
-    private function fixMemberGroups(Database $database): void
+    private function fixMemberGroups(): void
     {
-        $database->special("ALTER TABLE %t
+        $this->database->special("ALTER TABLE %t
                 CHANGE `can_post` `canPost`
                     TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
                 CHANGE `can_edit_posts` `canEditPosts`
@@ -171,9 +171,9 @@ final class UnderScoreToCamelCase implements Migration
                     TINYINT(3) UNSIGNED NOT NULL DEFAULT '1'", ['member_groups']);
     }
 
-    private function fixTopics(Database $database): void
+    private function fixTopics(): void
     {
-        $database->special("ALTER TABLE %t
+        $this->database->special("ALTER TABLE %t
                 CHANGE `lp_uid` `lastPostUser`
                     INT(10) UNSIGNED NULL DEFAULT NULL,
                 CHANGE `lp_date` `lastPostDate`
@@ -192,9 +192,9 @@ final class UnderScoreToCamelCase implements Migration
                     INT(10) UNSIGNED NOT NULL DEFAULT '0'", ['topics']);
     }
 
-    private function fixSession(Database $database): void
+    private function fixSession(): void
     {
-        $database->special("ALTER TABLE %t
+        $this->database->special("ALTER TABLE %t
                 CHANGE `last_update` `lastUpdate`
                     DATETIME NULL DEFAULT NULL,
                 CHANGE `last_action` `lastAction`

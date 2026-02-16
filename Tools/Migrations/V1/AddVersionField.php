@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Tools\Migrations\V1;
 
-use Jax\Database\Database;
+
 use Override;
 use Tools\Migrations\Migration;
 
-final class AddVersionField implements Migration
+final class AddVersionField extends Migration
 {
     #[Override]
-    public function execute(Database $database): void
+    public function execute(): void
     {
-        $database->special('ALTER TABLE %t ADD COLUMN dbVersion int', ['stats']);
+        $this->database->special('ALTER TABLE %t ADD COLUMN dbVersion int', ['stats']);
     }
 }

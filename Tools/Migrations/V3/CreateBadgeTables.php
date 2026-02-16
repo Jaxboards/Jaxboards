@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Tools\Migrations\V3;
 
-use Jax\Database\Database;
+
 use Override;
 use Tools\Migrations\Migration;
 
-final class CreateBadgeTables implements Migration
+final class CreateBadgeTables extends Migration
 {
     #[Override]
-    public function execute(Database $database): void
+    public function execute(): void
     {
-        $database->special("CREATE TABLE %t (
+        $this->database->special("CREATE TABLE %t (
                 `id` INT unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 `imagePath` VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
                 `badgeTitle` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'No Badge Title',
@@ -21,7 +21,7 @@ final class CreateBadgeTables implements Migration
                 `description` VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL
             )", ['badges']);
 
-        $database->special("CREATE TABLE %t (
+        $this->database->special("CREATE TABLE %t (
                 `id` INT unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 `user` INT unsigned NOT NULL,
                 `badge` INT unsigned NOT NULL,

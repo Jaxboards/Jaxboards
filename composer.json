@@ -56,9 +56,9 @@
     "autofix": "mago lint --fix && rector",
     "analyze": "mago analyze",
     "lint": "mago lint",
-    "ci-lint": "php Tools/MagoToSonar.php",
+    "ci-lint": "php ./cli mago-to-sonar",
     "format": "mago format",
-    "migrations": "php Tools/migrations.php",
+    "migrations": "php ./cli migrate",
     "rector": "rector",
     "test": [
       "@putenv XDEBUG_MODE=coverage",

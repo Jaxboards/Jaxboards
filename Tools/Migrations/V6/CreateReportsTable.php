@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Tools\Migrations\V6;
 
-use Jax\Database\Database;
+
 use Override;
 use Tools\Migrations\Migration;
 
-final class CreateReportsTable implements Migration
+final class CreateReportsTable extends Migration
 {
     #[Override]
-    public function execute(Database $database): void
+    public function execute(): void
     {
         // drop old reports table if it is still there
-        $database->special('DROP TABLE IF EXISTS %t', ['reports']);
-        $database->special(
+        $this->database->special('DROP TABLE IF EXISTS %t', ['reports']);
+        $this->database->special(
             <<<'SQL'
                     CREATE TABLE %t (
                         `id` int unsigned NOT NULL AUTO_INCREMENT,

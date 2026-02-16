@@ -39,7 +39,7 @@ jobs:
       # run install _again_ due to --package-lock-only above
       - run: bun install --frozen-lockfile
       - run: echo "BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
-      - run: echo "VERSION=$(./Tools/greater_version.php composer.json package.json)" >> $GITHUB_ENV
+      - run: echo "VERSION=$(./cli greater-version composer.json package.json)" >> $GITHUB_ENV
       - if: env.BRANCH == 'main'
         run: |
           jq ".version = \"$VERSION\"" composer.json > /tmp/composer.json && \

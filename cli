@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+
+use DI\Container;
+use Tools\ComposerVersion;
+use Tools\GreaterVersion;
+use Tools\MagoToSonar;
+use Tools\Migrations;
+
+// Load composer dependencies.
+require_once __DIR__ . '/vendor/autoload.php';
+
+$container = new Container();
+
+$commands = [
+  'migrate' => Migrations::class,
+  'mago-to-sonar' => MagoToSonar::class,
+  'greater-version' => GreaterVersion::class,
+  'composer-version' => ComposerVersion::class,
+];
+
+if (array_key_exists($argv[1] ?? '', $commands)) {
+  $container->get($commands[$argv[1]])->route(array_slice($argv, 2));
+  exit;
+}
+
+echo 'Invalid command. Available commands are: ' . implode(', ', array_keys($commands));

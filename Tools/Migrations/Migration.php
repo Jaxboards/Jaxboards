@@ -9,7 +9,14 @@ use Jax\Database\Database;
 /**
  * @internal
  */
-interface Migration
+abstract class Migration
 {
-    public function execute(Database $database): void;
+    public function __construct(
+        protected Database $database,
+    ) {}
+
+    public function execute(): void
+    {
+        error_log('Migration not implemented correctly');
+    }
 }

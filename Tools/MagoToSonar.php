@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+namespace Tools;
+
+use Override;
 use Tools\Mago\LintIssues;
 use Tools\Mago\LintRule;
 use Tools\Sonar\Impact;
@@ -12,7 +15,7 @@ use Tools\Sonar\TextRange;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-final class MagoToSonar
+final class MagoToSonar implements CLIRoute
 {
     private string $mago = '';
 
@@ -107,7 +110,10 @@ final class MagoToSonar
             'issues' => $this->get_mago_issues_for_sonar(),
         ], JSON_PRETTY_PRINT));
     }
-}
 
-$magoToSonar = new MagoToSonar();
-$magoToSonar->write_sonar_report();
+    #[Override]
+    public function route(array $params): void
+    {
+        $this->write_sonar_report();
+    }
+}
