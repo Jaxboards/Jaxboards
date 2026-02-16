@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tools\Migrations\V2;
 
-
 use Override;
 use Tools\Migrations\Migration;
 
@@ -61,7 +60,8 @@ final class UnderScoreToCamelCase extends Migration
 
     private function fixMembers(): void
     {
-        $this->database->special("ALTER TABLE %t
+        $this->database->special(
+            "ALTER TABLE %t
                 CHANGE `group_id` `groupID`
                     INT(10) UNSIGNED NULL DEFAULT NULL,
                 CHANGE `join_date` `joinDate`
@@ -109,7 +109,9 @@ final class UnderScoreToCamelCase extends Migration
                 CHANGE `contact_youtube` `contactYoutube` VARCHAR(50)
                     CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
                 CHANGE `contact_bluesky` `contactBlueSky` VARCHAR(50)
-                    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL", ['members']);
+                    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL",
+            ['members'],
+        );
     }
 
     private function fixMemberGroups(): void

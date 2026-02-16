@@ -32,7 +32,7 @@ jobs:
           bun-version: latest
       - uses: ramsey/composer-install@v3
       - run: bun install --frozen-lockfile
-      - run: ./Tools/update_composer_version.php
+      - run: ./cli composer-version update
       # get the package-lock.json and composer.lock files up to date
       - run: bun install --frozen-lockfile --ignore-scripts --package-lock-only
       - run: composer update --lock

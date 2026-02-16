@@ -13,7 +13,7 @@ namespace Tools;
  * ```
  */
 
-final class GreaterVersion  implements CLIRoute
+final class GreaterVersion implements CLIRoute
 {
     #[\Override]
     public function route(array $params): void

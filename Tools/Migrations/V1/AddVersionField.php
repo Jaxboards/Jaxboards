@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tools\Migrations\V1;
 
-
 use Override;
 use Tools\Migrations\Migration;
 

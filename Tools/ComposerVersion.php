@@ -13,7 +13,7 @@ final class ComposerVersion implements CLIRoute
     {
         match ($params[0] ?? '') {
             'update' => $this->update(),
-            default => $this->get_current_version()
+            default => $this->get_current_version(),
         };
     }
 

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tools;
 
-use Override;
+use DI\Container;
 use DI\DependencyException;
 use DI\NotFoundException;
-use DI\Container;
 use Jax\Database\Database;
 use Jax\DebugLog;
 use Jax\FileSystem;
+use Override;
 use PDOException;
 use Tools\Migrations\Migration;
 
