@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tools;
 
 use ReflectionClass;
+use ReflectionException;
 
 /**
  * Displays help text for a command.
@@ -12,19 +13,20 @@ use ReflectionClass;
  * Usage:
  * - help {command}
  */
-class Help implements CLIRoute
+final class Help implements CLIRoute
 {
     public function __construct(
         private readonly Index $index,
     ) {}
 
+    #[\Override]
     public function route(array $params): void
     {
         $commands = $this->index->get_all_commands();
         $command = $params[0] ?? '';
 
         if (!$command) {
-            $this->get_help_text(Help::class);
+            echo $this->get_help_text(Help::class);
             return;
         }
 
@@ -36,9 +38,22 @@ class Help implements CLIRoute
         echo $this->get_help_text($commands[$command]);
     }
 
-    private function get_help_text(string $classString): void
+    /**
+     * @param class-string $classString
+     */
+    private function get_help_text(string $classString): string
     {
-        $reflectionClass = new ReflectionClass($classString);
-        echo preg_replace('/^[\/* ]+/m', '', $reflectionClass->getDocComment());
+        try {
+            $reflectionClass = new ReflectionClass($classString);
+            $doc = $reflectionClass->getDocComment();
+            if (!$doc) {
+                return '';
+            }
+            $helpText = preg_replace('/^[\/* ]+/m', '', $doc);
+            return is_string($helpText) ? $helpText : '';
+        } catch (ReflectionException $e) {
+            error_log($e->getMessage());
+        }
+        return '';
     }
 }

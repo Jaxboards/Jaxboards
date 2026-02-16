@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Tools;
 
-class Index
+final class Index
 {
+    /**
+     * @return array<class-string>
+     */
     public function get_all_commands(): array
     {
         return [

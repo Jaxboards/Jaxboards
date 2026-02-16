@@ -25,7 +25,7 @@ final readonly class MagoToSonar implements CLIRoute
     public function __construct()
     {
         $mago = realpath(dirname(__DIR__) . '/vendor/bin/mago');
-        $this->mago = $mago ?: '';
+        $this->mago = is_string($mago) ? $mago : '';
     }
 
     private function get_mago_rules_for_sonar(): array
