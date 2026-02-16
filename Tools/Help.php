@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tools;
 
+use Override;
 use ReflectionClass;
 use ReflectionException;
 
@@ -13,13 +14,13 @@ use ReflectionException;
  * Usage:
  * - help {command}
  */
-final class Help implements CLIRoute
+final readonly class Help implements CLIRoute
 {
     public function __construct(
-        private readonly Index $index,
+        private Index $index,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function route(array $params): void
     {
         $commands = $this->index->get_all_commands();
@@ -49,11 +50,13 @@ final class Help implements CLIRoute
             if (!$doc) {
                 return '';
             }
+
             $helpText = preg_replace('/^[\/* ]+/m', '', $doc);
             return is_string($helpText) ? $helpText : '';
         } catch (ReflectionException $e) {
             error_log($e->getMessage());
         }
+
         return '';
     }
 }
