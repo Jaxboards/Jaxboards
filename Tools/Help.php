@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tools;
 
 use ReflectionClass;
@@ -13,7 +15,7 @@ use ReflectionClass;
 class Help implements CLIRoute
 {
     public function __construct(
-        private Index $index
+        private readonly Index $index,
     ) {}
 
     public function route(array $params): void
@@ -36,7 +38,7 @@ class Help implements CLIRoute
 
     private function get_help_text(string $classString): void
     {
-        $ref = new ReflectionClass($classString);
-        echo preg_replace('/^[\/* ]+/m', '', $ref->getDocComment());
+        $reflectionClass = new ReflectionClass($classString);
+        echo preg_replace('/^[\/* ]+/m', '', $reflectionClass->getDocComment());
     }
 }
