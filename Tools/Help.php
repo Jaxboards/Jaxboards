@@ -12,8 +12,6 @@ use ReflectionClass;
  */
 class Help implements CLIRoute
 {
-    /** @var Array<string> $commands */
-
     public function __construct(
         private Index $index
     ) {}
