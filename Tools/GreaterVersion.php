@@ -16,7 +16,7 @@ use Override;
  * ```
  */
 
-final class GreaterVersion implements CLIRoute
+final readonly class GreaterVersion implements CLIRoute
 {
     public function __construct(
         private FileSystem $fileSystem,
@@ -49,14 +49,16 @@ final class GreaterVersion implements CLIRoute
     {
         $input1 = $this->fileSystem->getContents($file);
         if ($input1 !== '') {
-            /** @var string */
-            return json_decode(
-                $input1,
-                null,
-                // Default
-                512,
-                JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
-            )['version'] ?? '0';
+            return (
+                json_decode(
+                    $input1,
+                    null,
+                    // Default
+                    512,
+                    JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
+                )['version']
+                ?? '0'
+            );
         }
 
         return '0';

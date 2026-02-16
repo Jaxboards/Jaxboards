@@ -7,12 +7,12 @@ namespace Tools;
 use Jax\FileSystem;
 use Override;
 
-final class ComposerVersion implements CLIRoute
+final readonly class ComposerVersion implements CLIRoute
 {
     const string COMPOSER_VERSIONS_URL = 'https://getcomposer.org/versions';
 
     public function __construct(
-        private FileSystem $fileSystem
+        private FileSystem $fileSystem,
     ) {}
 
     #[Override]
