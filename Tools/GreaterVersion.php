@@ -7,13 +7,11 @@ namespace Tools;
 use Jax\FileSystem;
 use Override;
 
-/*
+/**
  * Fetch the greater version property between two json files.
  *
- * USAGE:
- * ```sh
- * <script.php> <first.json> <second.json>
- * ```
+ * Usage:
+ * - greater-version <first.json> <second.json>
  */
 
 final readonly class GreaterVersion implements CLIRoute

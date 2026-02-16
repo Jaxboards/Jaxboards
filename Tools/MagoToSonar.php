@@ -13,6 +13,11 @@ use Tools\Sonar\Location;
 use Tools\Sonar\Rule;
 use Tools\Sonar\TextRange;
 
+/**
+ * Converts linter output from Mago to a JSON compatible with SonarQube.
+ *
+ * Outputs to mago-report-sonar.json
+ */
 final readonly class MagoToSonar implements CLIRoute
 {
     private string $mago;

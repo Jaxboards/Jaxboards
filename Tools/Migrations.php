@@ -21,6 +21,12 @@ use function preg_match;
 
 use const PHP_EOL;
 
+/**
+ * Updates a database from one version to another.
+ *
+ * Usage:
+ * - `migrate`: Attempts to the database schema to the latest version.
+ */
 final readonly class Migrations implements CLIRoute
 {
     public function __construct(

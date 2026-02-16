@@ -7,6 +7,13 @@ namespace Tools;
 use Jax\FileSystem;
 use Override;
 
+/**
+ * Tool for accessing and manipulating composer's version field.
+ *
+ * Usage:
+ * - `composer-version` - returns composer's current version
+ * - `composer-version update` - update's composer to latest version
+ */
 final readonly class ComposerVersion implements CLIRoute
 {
     const string COMPOSER_VERSIONS_URL = 'https://getcomposer.org/versions';
