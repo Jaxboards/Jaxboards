@@ -49,9 +49,8 @@ final readonly class GreaterVersion implements CLIRoute
     {
         $input1 = $this->fileSystem->getContents($file);
         if ($input1 !== '') {
-
             /** @var array{version:?string} $json */
-            $json =  json_decode(
+            $json = json_decode(
                 $input1,
                 null,
                 // Default
