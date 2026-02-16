@@ -15,9 +15,9 @@ use Tools\Sonar\TextRange;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-final class MagoToSonar implements CLIRoute
+final readonly class MagoToSonar implements CLIRoute
 {
-    private string $mago = '';
+    private string $mago;
 
     public function __construct()
     {
