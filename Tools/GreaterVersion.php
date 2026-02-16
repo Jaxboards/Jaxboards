@@ -49,16 +49,17 @@ final readonly class GreaterVersion implements CLIRoute
     {
         $input1 = $this->fileSystem->getContents($file);
         if ($input1 !== '') {
-            return (
-                json_decode(
-                    $input1,
-                    null,
-                    // Default
-                    512,
-                    JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
-                )['version']
-                ?? '0'
+
+            /** @var array{version:?string} $json */
+            $json =  json_decode(
+                $input1,
+                null,
+                // Default
+                512,
+                JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
             );
+
+            return $json['version'] ?? '0';
         }
 
         return '0';
