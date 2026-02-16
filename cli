@@ -2,12 +2,7 @@
 <?php
 
 use DI\Container;
-use Tools\ComposerVersion;
-use Tools\GreaterVersion;
-use Tools\Help;
 use Tools\Index;
-use Tools\MagoToSonar;
-use Tools\Migrations;
 
 // Load composer dependencies.
 require_once __DIR__ . '/vendor/autoload.php';

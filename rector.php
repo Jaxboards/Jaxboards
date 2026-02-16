@@ -200,6 +200,7 @@ return RectorConfig::configure()
     )
     ->withPaths([
         __DIR__,
+        __DIR__ . '/cli',
     ])
     ->withPhpSets()
     ->withPreparedSets(
