@@ -2,4 +2,4 @@
 linker = "isolated"
 
 [test]
-preload = ["./happydom.ts"]
+preload = ["./Script/happydom.ts"]

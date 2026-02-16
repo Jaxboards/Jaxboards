@@ -28,7 +28,7 @@ final readonly class Tardis implements Route
                             sh = document.documentElement.clientHeight;
                         if (!i) {
                             i = new Image;
-                            i.src = "tardis.gif";
+                            i.src = "/Script/eggs/tardis.gif";
                             i.id = "tardis";
                             document.body.appendChild(i);
                             i.style.position = "fixed";
@@ -53,6 +53,6 @@ final readonly class Tardis implements Route
                 })()
             JS);
         $this->page->command('preventNavigation');
-        $this->page->command('playsound', 'drwhotheme');
+        $this->page->command('playsound', 'doctorwhotheme');
     }
 }
