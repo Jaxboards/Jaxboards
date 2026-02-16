@@ -15,7 +15,6 @@ use PDOException;
 use Tools\Migrations\Migration;
 
 use function array_reduce;
-use function dirname;
 use function implode;
 use function ksort;
 use function preg_match;
