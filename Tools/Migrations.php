@@ -22,8 +22,6 @@ use function preg_match;
 
 use const PHP_EOL;
 
-require_once dirname(__DIR__) . '/vendor/autoload.php';
-
 final readonly class Migrations implements CLIRoute
 {
     public function __construct(

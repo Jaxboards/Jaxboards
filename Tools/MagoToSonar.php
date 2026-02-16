@@ -13,8 +13,6 @@ use Tools\Sonar\Location;
 use Tools\Sonar\Rule;
 use Tools\Sonar\TextRange;
 
-require_once dirname(__DIR__) . '/vendor/autoload.php';
-
 final readonly class MagoToSonar implements CLIRoute
 {
     private string $mago;
