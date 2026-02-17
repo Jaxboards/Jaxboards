@@ -200,13 +200,16 @@ final class Page
         // Add cache busting
         $themeUrl .= '?' . $this->fileSystem->getFileInfo($cssFile)->getMTime();
 
+        $globalCSS = '/Service/Themes/global.css';
+        $globalCSSMtime = $this->fileSystem->getFileInfo($globalCSS)->getMTime();
+
         // Load CSS
         $this->append('CSS', <<<HTML
                 <link
                     rel="preload"
                     as="style"
                     type="text/css"
-                    href="/Service/Themes/global.css?1771012787"
+                    href="{$globalCSS}?{$globalCSSMtime}"
                     onload="this.onload=null;this.rel='stylesheet'"
                 >
                 <link rel="stylesheet" type="text/css" href="{$themeUrl}">
