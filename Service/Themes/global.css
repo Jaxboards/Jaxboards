@@ -246,8 +246,8 @@ body {
 }
 
 .checkerboard.chess .piece {
-  &.danger:before {
-    content: '💧';
+  &.danger::before {
+    content: "💧";
     font-size: 10px;
     position: absolute;
     top: 0;
