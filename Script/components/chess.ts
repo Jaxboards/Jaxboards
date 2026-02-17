@@ -220,7 +220,8 @@ export default class Chess extends Component<HTMLTableElement> {
       }
     }
 
-    return true;
+    // castle not possible
+    return false;
   }
 
   promotePawn(pieceEl: HTMLDivElement) {
