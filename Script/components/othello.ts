@@ -1,9 +1,9 @@
 import register, { Component } from "../JAX/component";
-import { getCellCoordinates, toDOM } from "../JAX/dom";
+import { Coordinates, getCellCoordinates, toDOM } from "../JAX/dom";
 import toast from "../JAX/toast";
 import sound from "../sound";
 
-const directions = [
+const directions: Coordinates[] = [
   [-1, 0], // north
   [1, 0], // south
   [0, 1], // east
@@ -75,10 +75,10 @@ export default class Othello extends Component<HTMLTableElement> {
           continue;
         }
 
-        piece = this.getPieceAt(
+        piece = this.getPieceAt([
           row + i * directions[direction][0],
           col + i * directions[direction][1],
-        );
+        ]);
 
         // got to the edge of the board and did not find same color
         // clear pieces found in that direction
@@ -126,7 +126,7 @@ export default class Othello extends Component<HTMLTableElement> {
     this.element.dataset.moveNumber = `${moveNumber}`;
   }
 
-  getPieceAt(row: number, col: number) {
+  getPieceAt([row, col]: Coordinates) {
     // OOB check
     if (row < 0 || col < 0 || row >= 8 || col >= 8) return;
 
@@ -156,7 +156,7 @@ export default class Othello extends Component<HTMLTableElement> {
       state.push("");
 
       for (let col = 0; col < 8; col++) {
-        const piece = this.getPieceAt(row, col);
+        const piece = this.getPieceAt([row, col]);
         if (!piece) {
           state[row] += " ";
         } else if (piece.classList.contains("white")) {
