@@ -4,9 +4,11 @@ export function toDOM<T extends HTMLElement>(html: string) {
   return div.firstElementChild as T;
 }
 
+export type Coordinates = [number, number];
+
 export function getCellCoordinates(
   cell?: HTMLTableCellElement | null,
-): [number, number] {
+): Coordinates {
   const row = cell?.closest("tr");
 
   return [row?.rowIndex ?? 0, cell?.cellIndex ?? 0];

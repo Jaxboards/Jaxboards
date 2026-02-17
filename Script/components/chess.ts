@@ -1,6 +1,6 @@
 import createSnow from "../eggs/snow";
 import register, { Component } from "../JAX/component";
-import { getCellCoordinates } from "../JAX/dom";
+import { Coordinates, getCellCoordinates } from "../JAX/dom";
 import Drag, { DragSession } from "../JAX/drag";
 import toast from "../JAX/toast";
 import sound from "../sound";
@@ -102,7 +102,7 @@ export default class Chess extends Component<HTMLTableElement> {
     this.element.dataset.moveNumber = `${moveNumber}`;
   }
 
-  didJumpAPiece(from: number[], to: number[]) {
+  didJumpAPiece(from: Coordinates, to: Coordinates) {
     const vector = [to[0] - from[0], to[1] - from[1]];
     const step = vector.map(Math.sign);
     const distance = Math.max(...vector.map(Math.abs));
@@ -115,7 +115,7 @@ export default class Chess extends Component<HTMLTableElement> {
     return false;
   }
 
-  isValidMove(from: number[], to: number[]) {
+  isValidMove(from: Coordinates, to: Coordinates) {
     const piece = this.getPieceAt(from)?.dataset.piece ?? "";
     const capturedPiece = this.getPieceAt(to)?.dataset.piece ?? "";
     const vector = [from[0] - to[0], from[1] - to[1]];
@@ -182,8 +182,8 @@ export default class Chess extends Component<HTMLTableElement> {
     return true;
   }
 
-  doCastle(from: number[], to: number[]): boolean {
-    const maybeSwapWithRook = (row: number, column: number, rook: string) => {
+  doCastle(from: Coordinates, to: Coordinates): boolean {
+    const maybeSwapWithRook = ([row, column]: Coordinates, rook: string) => {
       const maybeRook = this.getPieceAt([row, column]);
       if (maybeRook?.dataset.piece !== rook) {
         return false;
@@ -201,22 +201,22 @@ export default class Chess extends Component<HTMLTableElement> {
     // black castle
     if (from[0] === 1 && from[1] === 5) {
       if (to[1] == 7) {
-        return maybeSwapWithRook(from[0], 8, "r");
+        return maybeSwapWithRook([from[0], 8], "r");
       }
 
       if (to[1] === 3) {
-        return maybeSwapWithRook(from[0], 1, "r");
+        return maybeSwapWithRook([from[0], 1], "r");
       }
     }
 
     // white castle (has delicious burgers)
     if (from[0] === 8 && from[1] === 5) {
       if (to[1] == 7) {
-        return maybeSwapWithRook(from[0], 8, "R");
+        return maybeSwapWithRook([from[0], 8], "R");
       }
 
       if (to[1] === 3) {
-        return maybeSwapWithRook(from[0], 1, "R");
+        return maybeSwapWithRook([from[0], 1], "R");
       }
     }
 
@@ -265,7 +265,7 @@ export default class Chess extends Component<HTMLTableElement> {
     );
   }
 
-  getPieceAt([row, column]: number[]) {
+  getPieceAt([row, column]: Coordinates) {
     return this.element.rows[row].cells[column].querySelector<HTMLDivElement>(
       ".piece",
     );
@@ -285,12 +285,9 @@ export default class Chess extends Component<HTMLTableElement> {
     whitePieces.forEach((whitePiece) => {
       blackPieces.forEach((blackPiece) => {
         if (this.isPieceInDanger(whitePiece, blackPiece)) {
-          console.log("white in danger", blackPiece, whitePiece);
-
           whitePiece.classList.add("danger");
         }
         if (this.isPieceInDanger(blackPiece, whitePiece)) {
-          console.log("black in danger", blackPiece, whitePiece);
           blackPiece.classList.add("danger");
         }
       });

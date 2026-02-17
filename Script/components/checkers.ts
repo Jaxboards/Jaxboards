@@ -1,5 +1,5 @@
 import register, { Component } from "../JAX/component";
-import { getCellCoordinates } from "../JAX/dom";
+import { Coordinates, getCellCoordinates } from "../JAX/dom";
 import Drag, { DragSession } from "../JAX/drag";
 import toast from "../JAX/toast";
 import sound from "../sound";
@@ -62,7 +62,7 @@ export default class Checkers extends Component<HTMLTableElement> {
     drag.apply(Array.from(element.querySelectorAll(".piece")));
   }
 
-  getCapturedPiece(from: number[], to: number[]) {
+  getCapturedPiece(from: Coordinates, to: Coordinates) {
     const vector = [to[0] - from[0], to[1] - from[1]];
     const distance = vector.map(Math.abs);
 
@@ -81,7 +81,7 @@ export default class Checkers extends Component<HTMLTableElement> {
     pieceEl.innerHTML = "♛";
   }
 
-  isValidMove(from: number[], to: number[]) {
+  isValidMove(from: Coordinates, to: Coordinates) {
     const checkerboard = this.element;
 
     const distance = [to[0] - from[0], to[1] - from[1]].map(Math.abs);
