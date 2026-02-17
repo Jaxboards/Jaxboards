@@ -246,6 +246,10 @@ body {
 }
 
 .checkerboard.chess .piece {
+  &.danger[data-piece="k" i] {
+    animation: shake-x 50ms alternate linear infinite;
+  }
+
   &.danger::before {
     content: "💧";
     font-size: 10px;
@@ -328,5 +332,15 @@ body {
       background: white;
       transform: rotateY(180deg);
     }
+  }
+}
+
+@keyframes shake-x {
+  from {
+    translate: -2px;
+  }
+
+  to {
+    translate: 2px;
   }
 }
