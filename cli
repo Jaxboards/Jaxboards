@@ -17,4 +17,4 @@ if (array_key_exists($command, $commands)) {
   exit;
 }
 
-echo 'Invalid command. Available commands are: ' . implode(', ', array_keys($commands));
+echo "Invalid command. Available commands are:\n- " . implode("\n- ", array_keys($commands));

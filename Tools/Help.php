@@ -28,6 +28,8 @@ final readonly class Help implements CLIRoute
 
         if (!$command) {
             echo $this->get_help_text(Help::class);
+
+            echo "\nAvailable commands are:\n- " . implode("\n- ", array_keys($commands));
             return;
         }
 
