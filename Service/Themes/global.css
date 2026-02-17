@@ -246,17 +246,23 @@ body {
 }
 
 .checkerboard.chess .piece {
-  &.danger[data-piece="k" i] {
-    animation: shake-x 50ms alternate linear infinite;
-  }
+  &.danger {
+    &::before {
+      content: "💧";
+      font-size: 10px;
+      position: absolute;
+      top: 0;
+      right: 0;
+      line-height: 10px;
+    }
 
-  &.danger::before {
-    content: "💧";
-    font-size: 10px;
-    position: absolute;
-    top: 0;
-    right: 0;
-    line-height: 10px;
+    &[data-piece="k" i] {
+      animation: shake-x 50ms alternate linear infinite;
+
+      &::before {
+        content: "‼️";
+      }
+    }
   }
 
   &.white {

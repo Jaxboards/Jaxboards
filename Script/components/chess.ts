@@ -77,8 +77,13 @@ export default class Chess extends Component<HTMLTableElement> {
         capturedPieceEl?.remove();
         dropEvent.droptarget.append(pieceEl);
         sound.play("chessdrop");
+
         this.moveNumber++;
         this.computeDanger();
+
+        if (this.element.querySelector('.piece.danger[data-piece="k" i]')) {
+          sound.loadAndPlay("metal-gear-alert");
+        }
 
         navigator.clipboard.writeText(
           "[chess]" + this.getFENNotation() + "[/chess]",
