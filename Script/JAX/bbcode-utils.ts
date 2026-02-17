@@ -10,7 +10,7 @@ const tagsToBBCode: Record<string, (inner: string, el: HTMLElement) => string> =
 
     br: () => "\n",
 
-    div: (inner) => `\n${inner}`,
+    div: (inner) => (inner.trim() ? `\n${inner}` : `${inner}`),
 
     em: (inner) => `[i]${inner}[/i]`,
 
