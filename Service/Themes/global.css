@@ -245,6 +245,17 @@ body {
   }
 }
 
+.checkerboard.chess .piece {
+  &.white {
+    color: white;
+    -webkit-text-stroke: 1px #222;
+  }
+
+  &.black {
+    color: black;
+  }
+}
+
 .checkerboard.checkers .piece {
   font-size: 20px;
 }

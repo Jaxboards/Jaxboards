@@ -65,13 +65,11 @@ final class Games
 
             for ($column = 0; $column < 8; ++$column) {
                 $piece = $fen[$row][$column] ?? '';
-                $color = array_key_exists($piece, $white)
-                    ? 'color:white;-webkit-text-stroke: 1px #222;'
-                    : (array_key_exists($piece, $black) ? 'color:black;' : '');
+                $color = array_key_exists($piece, $white) ? 'white' : 'black';
                 $character = array_key_exists($piece, $characters) ? $characters[$piece] : '';
 
                 $pieces[$row][$column] = trim($piece) !== ''
-                    ? "<div class='piece' data-piece='{$piece}' style='{$color}'>{$character}</div>"
+                    ? "<div class='piece {$color}' data-piece='{$piece}'>{$character}</div>"
                     : '';
             }
         }
