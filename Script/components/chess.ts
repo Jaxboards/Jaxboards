@@ -46,14 +46,21 @@ export default class Chess extends Component<HTMLTableElement> {
         }
 
         const pieceEl = dropEvent.el;
-        const piece = pieceEl.dataset.piece;
+        const piece = pieceEl.dataset.piece ?? "";
         const capturedPieceEl =
           dropEvent.droptarget.querySelector<HTMLDivElement>(".piece");
         const capturedPiece = capturedPieceEl?.dataset.piece?.trim() ?? "";
         const fromCoords = getCellCoordinates(pieceEl.closest("td"));
         const toCoords = getCellCoordinates(dropEvent.droptarget);
+        const isBlack = piece.toLowerCase() === piece;
 
-        if (!this.isValidMove(piece, capturedPiece, fromCoords, toCoords)) {
+        // not your turn!
+        if ((this.moveNumber % 2 === 0) !== isBlack) {
+          toast.error(`It's ${isBlack ? "white" : "black"}'s turn!`, 3000);
+          return;
+        }
+
+        if (!this.isValidMove(fromCoords, toCoords)) {
           return;
         }
 
@@ -71,6 +78,7 @@ export default class Chess extends Component<HTMLTableElement> {
         dropEvent.droptarget.append(pieceEl);
         sound.play("chessdrop");
         this.moveNumber++;
+        this.computeDanger();
 
         navigator.clipboard.writeText(
           "[chess]" + this.getFENNotation() + "[/chess]",
@@ -81,6 +89,9 @@ export default class Chess extends Component<HTMLTableElement> {
     });
     drag.drops(Array.from(element.querySelectorAll("td")));
     drag.apply(Array.from(element.querySelectorAll(".piece")));
+
+    // Compute initial danger state
+    this.computeDanger();
   }
 
   get moveNumber() {
@@ -97,25 +108,20 @@ export default class Chess extends Component<HTMLTableElement> {
     const distance = Math.max(...vector.map(Math.abs));
 
     for (let i = 1; i < distance; i++) {
-      if (this.getPieceAt(from[0] + step[0] * i, from[1] + step[1] * i)) {
+      if (this.getPieceAt([from[0] + step[0] * i, from[1] + step[1] * i])) {
         return true;
       }
     }
     return false;
   }
 
-  isValidMove(piece = "", capturedPiece = "", from: number[], to: number[]) {
+  isValidMove(from: number[], to: number[]) {
+    const piece = this.getPieceAt(from)?.dataset.piece ?? "";
+    const capturedPiece = this.getPieceAt(to)?.dataset.piece ?? "";
     const vector = [from[0] - to[0], from[1] - to[1]];
     const distance = vector.map(Math.abs);
     const movedStraight = Math.min(...distance) === 0;
     const movedDiagonally = distance[0] === distance[1];
-    const isBlack = piece.toLowerCase() === piece;
-
-    // not your turn!
-    if ((this.moveNumber % 2 === 0) !== isBlack) {
-      toast.error(`It's ${isBlack ? "white" : "black"}'s turn!`, 3000);
-      return false;
-    }
 
     // can't capture own pieces
     if (
@@ -131,14 +137,16 @@ export default class Chess extends Component<HTMLTableElement> {
       case "p":
         return (
           from[0] < to[0] &&
-          Math.max(...distance) <= (from[0] === 2 ? 2 : 1) &&
-          (capturedPiece ? movedDiagonally : movedStraight)
+          (capturedPiece
+            ? movedDiagonally && Math.max(...distance) == 1
+            : movedStraight && Math.max(...distance) <= (from[0] === 2 ? 2 : 1))
         );
       case "P":
         return (
           from[0] > to[0] &&
-          Math.max(...distance) <= (from[0] === 7 ? 2 : 1) &&
-          (capturedPiece ? movedDiagonally : movedStraight)
+          (capturedPiece
+            ? movedDiagonally && Math.max(...distance) == 1
+            : movedStraight && Math.max(...distance) <= (from[0] === 7 ? 2 : 1))
         );
 
       case "r":
@@ -176,7 +184,7 @@ export default class Chess extends Component<HTMLTableElement> {
 
   doCastle(from: number[], to: number[]): boolean {
     const maybeSwapWithRook = (row: number, column: number, rook: string) => {
-      const maybeRook = this.getPieceAt(row, column);
+      const maybeRook = this.getPieceAt([row, column]);
       if (maybeRook?.dataset.piece !== rook) {
         return false;
       }
@@ -256,9 +264,42 @@ export default class Chess extends Component<HTMLTableElement> {
     );
   }
 
-  getPieceAt(row: number, column: number) {
+  getPieceAt([row, column]: number[]) {
     return this.element.rows[row].cells[column].querySelector<HTMLDivElement>(
       ".piece",
     );
+  }
+
+  computeDanger() {
+    // clear existing danger
+    this.element
+      .querySelectorAll<HTMLDivElement>(".piece.danger")
+      .forEach((piece) => piece.classList.remove("danger"));
+
+    const whitePieces =
+      this.element.querySelectorAll<HTMLDivElement>(".piece.white");
+    const blackPieces =
+      this.element.querySelectorAll<HTMLDivElement>(".piece.black");
+
+    whitePieces.forEach((whitePiece) => {
+      blackPieces.forEach((blackPiece) => {
+        if (this.isPieceInDanger(whitePiece, blackPiece)) {
+          console.log("white in danger", blackPiece, whitePiece);
+
+          whitePiece.classList.add("danger");
+        }
+        if (this.isPieceInDanger(blackPiece, whitePiece)) {
+          console.log("black in danger", blackPiece, whitePiece);
+          blackPiece.classList.add("danger");
+        }
+      });
+    });
+  }
+
+  isPieceInDanger(piece: HTMLDivElement, otherPiece: HTMLDivElement) {
+    const pieceCoordinates = getCellCoordinates(piece.closest("td"));
+    const otherCoordinates = getCellCoordinates(otherPiece.closest("td"));
+
+    return this.isValidMove(otherCoordinates, pieceCoordinates);
   }
 }

@@ -246,6 +246,15 @@ body {
 }
 
 .checkerboard.chess .piece {
+  &.danger:before {
+    content: '💧';
+    font-size: 10px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    line-height: 10px;
+  }
+
   &.white {
     color: white;
     -webkit-text-stroke: 1px #222;
