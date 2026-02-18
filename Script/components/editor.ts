@@ -396,8 +396,12 @@ export default class Editor extends Component<HTMLTextAreaElement> {
       emotewin.appendChild(link);
     });
 
-    emotewin.style.position = "absolute";
-    emotewin.style.display = "none";
+    Object.assign(emotewin.style, {
+      position: "absolute",
+      display: "none",
+      zIndex: getHighestZIndex(),
+    });
+
     this.emoteWindow = emotewin;
     document.querySelector("#page")?.appendChild(emotewin);
     void this.showEmotes(position.x, position.y);
