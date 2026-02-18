@@ -47,7 +47,7 @@ final class BBCode
         'font' => '/\[font=([\s\w]+)](.*)\[\/font\]/Usi',
         'italic' => '/\[i\](.*)\[\/i\]/Usi',
         'spoiler' => '/\[spoiler\](.*)\[\/spoiler\]/Usi',
-        'strikethrough' => '/\[s\](.*)\[\/s\]/Usi',
+        'strikethrough' => '/\[(s|del|strike)\](.*)\[\/\1\]/Usi',
         'underline' => '/\[u\](.*)\[\/u\]/Usi',
         'url' => '/\[url\](?P<url>(?:[?\/]|https?|ftp|mailto:).*)\[\/url\]/Ui',
         'urlWithLink' => '/\[url=(?P<url>(?:[?\/]|https?|ftp|mailto:)[^\]]+)\](.+?)\[\/url\]/i',
@@ -87,10 +87,12 @@ final class BBCode
     public function getURLs(string $text): array
     {
         $urls = [];
-        foreach ([
-            $this->inlineBBCodes['url'],
-            $this->inlineBBCodes['urlWithLink'],
-        ] as $regex) {
+        foreach (
+            [
+                $this->inlineBBCodes['url'],
+                $this->inlineBBCodes['urlWithLink'],
+            ] as $regex
+        ) {
             preg_match_all($regex, $text, $matches);
             $urls = array_merge($matches['url'], $urls);
         }
@@ -212,7 +214,7 @@ final class BBCode
             'image' => '<img src="$2" title="$1" alt="$1" class="bbcodeimg">',
             'italic' => '<em>$1</em>',
             'spoiler' => '<button type="button" class="spoilertext as-text">$1</button>',
-            'strikethrough' => '<span style="text-decoration:line-through">$1</span>',
+            'strikethrough' => '<del>$1</del>',
             'underline' => '<span style="text-decoration:underline">$1</span>',
             // Consider adding nofollow if admin approval of new accounts is not enabled
             'url' => '<a href="$1">$1</a>',

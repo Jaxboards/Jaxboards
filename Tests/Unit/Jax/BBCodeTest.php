@@ -103,11 +103,19 @@ final class BBCodeTest extends UnitTestCase
             ],
             [
                 '[u]underline[/u]',
-                '<span style="text-decoration:underline">underline</span>',
+                '<del>underline</del>',
             ],
             [
                 '[s]strikethrough[/s]',
-                '<span style="text-decoration:line-through">strikethrough</span>',
+                '<del>strikethrough</del>',
+            ],
+            [
+                '[strike]strike[/strike]',
+                '<del>strike</del>',
+            ],
+            [
+                '[del]del[/del]',
+                '<del>del</del>',
             ],
             [
                 '[color=red]red text[/color]',

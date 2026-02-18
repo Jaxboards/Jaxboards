@@ -10,6 +10,8 @@ const tagsToBBCode: Record<string, (inner: string, el: HTMLElement) => string> =
 
     br: () => "\n",
 
+    del: (inner) => `[del]${inner}[/del]`,
+
     div: (inner) => (inner.trim() ? `\n${inner}` : `${inner}`),
 
     em: (inner) => `[i]${inner}[/i]`,
@@ -52,7 +54,12 @@ const tagsToBBCode: Record<string, (inner: string, el: HTMLElement) => string> =
 
     p: (inner) => `\n${inner === "&nbsp" ? "" : inner}\n`,
 
-    strike: (inner) => `[s]${inner}[/s]`,
+    s(...args) {
+      return this.del(...args);
+    },
+    strike(...args) {
+      return this.del(...args);
+    },
 
     strong: (inner) => `[b]${inner}[/b]`,
 
@@ -94,9 +101,7 @@ const styleToBBCode: Record<
   "text-align": (align, inner) => `[align=${align}]${inner}[/align]`,
 
   "text-decoration": function textDecoration(value, inner) {
-    return value === "line-through"
-      ? `[strike]${inner}[/strike]`
-      : `[u]${inner}[/u]`;
+    return value === "line-through" ? `[s]${inner}[/s]` : `[u]${inner}[/u]`;
   },
 };
 
@@ -164,7 +169,7 @@ export function bbcodeToHTML(bbcode: string) {
     .replaceAll(/\[b\]([^]*?)\[\/b\]/gi, "<b>$1</b>")
     .replaceAll(/\[i\]([^]*?)\[\/i\]/gi, "<i>$1</i>")
     .replaceAll(/\[u\]([^]*?)\[\/u\]/gi, "<u>$1</u>")
-    .replaceAll(/\[s\]([^]*?)\[\/s\]/gi, "<s>$1</s>")
+    .replaceAll(/\[(s|strike|del)\]([^]*?)\[\/\1\]/gi, "<del>$2</del>")
     .replaceAll(/\[img\]([^'"[]+)\[\/img\]/gi, '<img src="$1">')
     .replaceAll(
       /\[color=([^\]]+)\]([^]*?)\[\/color\]/gi,
