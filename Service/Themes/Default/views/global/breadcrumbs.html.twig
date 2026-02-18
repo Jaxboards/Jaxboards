@@ -1,7 +1,5 @@
 <ul>
-    {% for crumb in crumbs %}
-        <li>
-            <a href="{{ crumb.url }}">{{ crumb.text }}</a>
-        </li>
-    {% endfor %}
+  {%- for crumb in crumbs -%}
+    <li><a href="{{ crumb.url }}">{{ crumb.text }}</a></li>
+  {%- endfor -%}
 </ul>
