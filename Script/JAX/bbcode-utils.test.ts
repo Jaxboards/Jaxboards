@@ -5,7 +5,7 @@ test("bbcodeToHTML", function () {
   expect(bbcodeToHTML("[i]Italic Text[/i]")).toBe("<i>Italic Text</i>");
   expect(bbcodeToHTML("[u]Underlined Text[/u]")).toBe("<u>Underlined Text</u>");
   expect(bbcodeToHTML("[s]Strikethrough Text[/s]")).toBe(
-    "<s>Strikethrough Text</s>",
+    "<del>Strikethrough Text</del>",
   );
   expect(bbcodeToHTML("[img]http://example.com/image.jpg[/img]")).toBe(
     '<img src="http://example.com/image.jpg">',
