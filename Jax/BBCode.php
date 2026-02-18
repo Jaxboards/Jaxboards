@@ -87,12 +87,10 @@ final class BBCode
     public function getURLs(string $text): array
     {
         $urls = [];
-        foreach (
-            [
-                $this->inlineBBCodes['url'],
-                $this->inlineBBCodes['urlWithLink'],
-            ] as $regex
-        ) {
+        foreach ([
+            $this->inlineBBCodes['url'],
+            $this->inlineBBCodes['urlWithLink'],
+        ] as $regex) {
             preg_match_all($regex, $text, $matches);
             $urls = array_merge($matches['url'], $urls);
         }
