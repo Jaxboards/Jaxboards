@@ -87,10 +87,12 @@ final class BBCode
     public function getURLs(string $text): array
     {
         $urls = [];
-        foreach ([
-            $this->inlineBBCodes['url'],
-            $this->inlineBBCodes['urlWithLink'],
-        ] as $regex) {
+        foreach (
+            [
+                $this->inlineBBCodes['url'],
+                $this->inlineBBCodes['urlWithLink'],
+            ] as $regex
+        ) {
             preg_match_all($regex, $text, $matches);
             $urls = array_merge($matches['url'], $urls);
         }
@@ -212,7 +214,7 @@ final class BBCode
             'image' => '<img src="$2" title="$1" alt="$1" class="bbcodeimg">',
             'italic' => '<em>$1</em>',
             'spoiler' => '<button type="button" class="spoilertext as-text">$1</button>',
-            'strikethrough' => '<del>$1</del>',
+            'strikethrough' => '<del>$2</del>',
             'underline' => '<span style="text-decoration:underline">$1</span>',
             // Consider adding nofollow if admin approval of new accounts is not enabled
             'url' => '<a href="$1">$1</a>',
@@ -254,7 +256,7 @@ final class BBCode
             'quote' => static fn(array $match) => '> ' . str_replace("\n", "\n> ", $match[2]),
             'size' => '$3',
             'spoiler' => '||$1||',
-            'strikethrough' => '~~$1~~',
+            'strikethrough' => '~~$2~~',
             'underline' => '__$1__',
             'url' => '[$1]($1)',
             'urlWithLink' => '[$2]($1)',
