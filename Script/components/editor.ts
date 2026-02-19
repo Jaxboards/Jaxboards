@@ -395,16 +395,24 @@ export default class Editor extends Component<HTMLTextAreaElement> {
   ) {
     const emotewin = document.createElement("div");
     emotewin.className = "emotewin";
+    emotewin.addEventListener("click", (event) => {
+      if (event.target instanceof HTMLAnchorElement) {
+        const img = event.target.querySelector("img");
+        if (!img) return;
+        this.cmd(
+          "inserthtml",
+          this.htmlMode ? img.outerHTML : img.dataset.emoji,
+        );
+        this.hideEmotes();
+      }
+    });
 
     smileyText.forEach((smiley: string, i: number) => {
       const image = images[i];
-      const link = document.createElement("a");
-      link.href = "javascript:void(0)";
-      link.addEventListener("click", () => {
-        this.cmd("inserthtml", image);
-        this.hideEmotes();
+      const link = Object.assign(document.createElement("a"), {
+        href: "javascript:void(0)",
+        innerHTML: `${image} ${smiley}`,
       });
-      link.innerHTML = `${image} ${smiley}`;
       emotewin.append(link);
     });
 
