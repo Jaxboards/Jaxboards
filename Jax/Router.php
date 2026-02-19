@@ -22,6 +22,7 @@ use Jax\Routes\LogReg;
 use Jax\Routes\Manifest;
 use Jax\Routes\Members;
 use Jax\Routes\ModControls;
+use Jax\Routes\Nope;
 use Jax\Routes\Post;
 use Jax\Routes\Rainbow;
 use Jax\Routes\Report;
@@ -95,6 +96,7 @@ final class Router
         $this->get('confetti', '/confetti/{count}', Confetti::class);
         $this->get('earthbound', '/earthbound', Earthbound::class);
         $this->get('katamari', '/katamari', Katamari::class);
+        $this->get('nope', '/nope', Nope::class);
         $this->get('rainbow', '/rainbow', Rainbow::class);
         $this->get('snow', '/snow/{snowFlakeCount}', Snow::class);
         $this->get('solitaire', '/solitaire', Solitaire::class);

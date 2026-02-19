@@ -29,6 +29,7 @@ export default class Stream {
 
     if (requestType >= 2) {
       if (!preventNavigation) {
+        console.log("pushed state", { lastURL: url }, "", url);
         globalThis.history.pushState({ lastURL: url }, "", url);
         // pushstate is not a real browser event unfortunately, so I have to trigger it myself
         globalThis.dispatchEvent(new Event("pushstate"));
