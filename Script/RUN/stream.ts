@@ -11,8 +11,12 @@ export default class Stream {
   private timeout?: number;
 
   constructor() {
-    this.lastURL = `${document.location.pathname}${document.location.search}`;
+    this.lastURL = this.currentURL;
     this.commands = Commands;
+  }
+
+  get currentURL() {
+    return `${document.location.pathname}${document.location.search}`;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,7 +32,7 @@ export default class Stream {
     });
 
     if (requestType >= 2) {
-      if (!preventNavigation) {
+      if (!preventNavigation && url !== this.currentURL) {
         globalThis.history.pushState({ lastURL: url }, "", url);
         // pushstate is not a real browser event unfortunately, so I have to trigger it myself
         globalThis.dispatchEvent(new Event("pushstate"));
