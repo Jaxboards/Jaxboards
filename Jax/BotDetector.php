@@ -42,6 +42,7 @@ final readonly class BotDetector
         'Google-Read-Aloud' => 'Google-Read-Aloud',
         'GPTBot' => 'GPTBot',
         'ia_archiver' => 'Internet Archive Alexa',
+        'IbouBot' => 'IbouBot',
         'ImagesiftBot' => 'Imagesift',
         'linkdexbot' => 'Linkdex',
         'Mail.RU_Bot' => 'Mail.RU',
