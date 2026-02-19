@@ -35,6 +35,8 @@ final readonly class Nope implements Route
                     { duration: 5000, fill: 'forwards' }
                 );
 
+                setTimeout(() => img.remove(), 6000);
+
                 document.body.append(img);
 
             })();
