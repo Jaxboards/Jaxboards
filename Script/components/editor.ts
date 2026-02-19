@@ -334,14 +334,26 @@ export default class Editor extends Component<HTMLTextAreaElement> {
 
   editbarCommand(event: MouseEvent, cmd: string, cmdValue?: string) {
     event.preventDefault();
+    const target = event.target;
+
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
 
     switch (cmd) {
       case "forecolor":
       case "backcolor":
-        this.showColors(event.pageX, event.pageY, cmd);
+        this.showColors(
+          target.offsetLeft,
+          target.offsetTop + target.offsetHeight,
+          cmd,
+        );
         break;
       case "c_smileys":
-        void this.showEmotes(event.pageX, event.pageY);
+        void this.showEmotes(
+          target.offsetLeft,
+          target.offsetTop + target.offsetHeight,
+        );
         break;
       case "c_switcheditmode":
         this.switchMode(!this.htmlMode);
@@ -393,7 +405,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         this.hideEmotes();
       });
       link.innerHTML = `${image} ${smiley}`;
-      emotewin.appendChild(link);
+      emotewin.append(link);
     });
 
     Object.assign(emotewin.style, {
@@ -403,7 +415,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     });
 
     this.emoteWindow = emotewin;
-    document.querySelector("#page")?.appendChild(emotewin);
+    this.container.append(emotewin);
     void this.showEmotes(position.x, position.y);
   }
 
@@ -456,7 +468,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     });
 
     this.colorWindow = colorwin;
-    document.querySelector("#page")?.appendChild(colorwin);
+    this.container.append(colorwin);
     return null;
   }
 
