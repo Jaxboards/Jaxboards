@@ -6,12 +6,9 @@ const UPDATE_INTERVAL = 5000;
 export default class Stream {
   private readonly commands: typeof Commands;
 
-  private lastURL: string;
-
   private timeout?: number;
 
   constructor() {
-    this.lastURL = this.currentURL;
     this.commands = Commands;
   }
 
@@ -36,7 +33,6 @@ export default class Stream {
         globalThis.history.pushState({ lastURL: url }, "", url);
         // pushstate is not a real browser event unfortunately, so I have to trigger it myself
         globalThis.dispatchEvent(new Event("pushstate"));
-        this.lastURL = url;
       }
     }
     this.pollData();
@@ -88,19 +84,18 @@ export default class Stream {
 
   pollData(isEager = false) {
     if (isEager) {
-      void this.load(this.lastURL);
+      void this.load(this.currentURL);
     }
     clearTimeout(this.timeout);
     if (document.cookie.includes(`actw=${window.name}`)) {
-      this.timeout = setTimeout(() => this.load(this.lastURL), UPDATE_INTERVAL);
+      this.timeout = setTimeout(
+        () => this.load(this.currentURL),
+        UPDATE_INTERVAL,
+      );
     }
   }
 
-  updatePage(lastURL: string) {
-    // this function makes the back/forward buttons actually do something,
-    // using anchors
-    if (lastURL !== this.lastURL) {
-      this.location(lastURL, 3);
-    }
+  updatePage() {
+    this.location(this.currentURL, 3);
   }
 }

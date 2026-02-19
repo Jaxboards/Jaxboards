@@ -28,17 +28,9 @@ export class AppState {
     setInterval(updateDates, 1000 * 30);
 
     this.stream.pollData();
-    globalThis.addEventListener(
-      "popstate",
-      ({ state }: { state: { lastURL: string } }) => {
-        if (state) {
-          const { lastURL } = state;
-          this.stream.updatePage(lastURL);
-        } else {
-          this.stream.updatePage(document.location.toString());
-        }
-      },
-    );
+    globalThis.addEventListener("popstate", () => {
+      this.stream.updatePage();
+    });
 
     // Load sounds
     Sound.load("blip");
