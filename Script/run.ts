@@ -31,7 +31,6 @@ export class AppState {
     globalThis.addEventListener(
       "popstate",
       ({ state }: { state: { lastURL: string } }) => {
-        console.log("popstate", state);
         if (state) {
           const { lastURL } = state;
           this.stream.updatePage(lastURL);
