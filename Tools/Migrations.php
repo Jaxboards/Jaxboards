@@ -30,21 +30,12 @@ use const PHP_EOL;
 final readonly class Migrations implements CLIRoute
 {
     public function __construct(
+        private Console $console,
         private Container $container,
         private DebugLog $debugLog,
         private Database $database,
         private FileSystem $fileSystem,
     ) {}
-
-    public function error(string $message): string
-    {
-        return "\033[31m{$message}\033[0m";
-    }
-
-    public function success(string $message): string
-    {
-        return "\033[32m{$message}\033[0m";
-    }
 
     public function get_db_version(): int
     {
@@ -94,7 +85,7 @@ final readonly class Migrations implements CLIRoute
                 continue;
             }
 
-            echo "notice: migrating from v{$dbVersion} to v{$version}" . PHP_EOL;
+            $this->console->notice("migrating from v{$dbVersion} to v{$version}");
 
             /** @var Migration $migrationClass */
             $migrationClass = $this->container->get("Tools\\Migrations\\V{$version}\\{$migration}");
@@ -102,17 +93,16 @@ final readonly class Migrations implements CLIRoute
             try {
                 $migrationClass->execute();
             } catch (PDOException $e) {
-                echo $this->error("Error updating to V{$version}: {$e->getMessage()}") . PHP_EOL;
-
-                exit();
+                $this->console->error("Error updating to V{$version}: {$e->getMessage()}");
+                exit(1);
             }
 
             // Update DB version
             $this->database->update('stats', ['dbVersion' => $version]);
         }
 
-        echo implode(PHP_EOL, $this->debugLog->getLog());
+        $this->console->log(implode(PHP_EOL, $this->debugLog->getLog()));
 
-        echo $this->success('You are currently up to date! DB Version: ' . $this->get_db_version()) . PHP_EOL;
+        $this->console->success('You are currently up to date! DB Version: ' . $this->get_db_version());
     }
 }

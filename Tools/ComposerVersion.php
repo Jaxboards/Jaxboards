@@ -19,6 +19,7 @@ final readonly class ComposerVersion implements CLIRoute
     const string COMPOSER_VERSIONS_URL = 'https://getcomposer.org/versions';
 
     public function __construct(
+        private Console $console,
         private FileSystem $fileSystem,
     ) {}
 
@@ -33,7 +34,7 @@ final readonly class ComposerVersion implements CLIRoute
 
     private function get_current_version(): void
     {
-        echo $this->get_package_json()['engines']['composer'] ?? null;
+        echo $this->get_package_json()['engines']['composer'] ?? '';
     }
 
     /**
@@ -43,7 +44,7 @@ final readonly class ComposerVersion implements CLIRoute
     {
         $packageJSON = $this->fileSystem->getContents('package.json');
         if ($packageJSON === '') {
-            fwrite(STDERR, 'Could not read package.json');
+            $this->console->error('Could not read package.json');
 
             exit(1);
         }
@@ -66,7 +67,7 @@ final readonly class ComposerVersion implements CLIRoute
         $versionJSON = $this->fileSystem->getContents(self::COMPOSER_VERSIONS_URL);
 
         if ($versionJSON === '') {
-            fwrite(STDERR, 'Could not read ' . self::COMPOSER_VERSIONS_URL);
+            $this->console->error('Could not read ' . self::COMPOSER_VERSIONS_URL);
 
             exit(1);
         }
@@ -83,7 +84,7 @@ final readonly class ComposerVersion implements CLIRoute
         $version = $versions['stable'][0]['version'] ?? null;
 
         if ($version === null) {
-            error_log('Could not retrieve composer version' . PHP_EOL);
+            $this->console->error('Could not retrieve composer version');
 
             exit(1);
         }
@@ -91,7 +92,7 @@ final readonly class ComposerVersion implements CLIRoute
         $composerJSON = $this->fileSystem->getContents('composer.json');
 
         if ($composerJSON === '') {
-            error_log('Could not read composer.json');
+            $this->console->error('Could not read composer.json');
 
             exit(1);
         }

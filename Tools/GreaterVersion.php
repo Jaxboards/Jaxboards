@@ -17,6 +17,7 @@ use Override;
 final readonly class GreaterVersion implements CLIRoute
 {
     public function __construct(
+        private Console $console,
         private FileSystem $fileSystem,
     ) {}
 
@@ -27,8 +28,8 @@ final readonly class GreaterVersion implements CLIRoute
     public function route(array $params): void
     {
         if (count($params) < 2) {
-            error_log('Two files required to compare');
-            return;
+            $this->console->error('Two files required to compare');
+            exit(1);
         }
 
         $version1 = $this->get_version($params[0] ?? '');

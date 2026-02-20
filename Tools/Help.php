@@ -17,6 +17,7 @@ use ReflectionException;
 final readonly class Help implements CLIRoute
 {
     public function __construct(
+        private Console $console,
         private Index $index,
     ) {}
 
@@ -27,18 +28,18 @@ final readonly class Help implements CLIRoute
         $command = $params[0] ?? '';
 
         if (!$command) {
-            echo $this->get_help_text(Help::class);
+            $this->console->log($this->get_help_text(Help::class));
 
-            echo "\nAvailable commands are:\n- " . implode("\n- ", array_keys($commands));
+            $this->console->log("Available commands are:\n- " . implode("\n- ", array_keys($commands)));
             return;
         }
 
         if (!array_key_exists($command, $commands)) {
-            echo 'Help: command not found. Available commands are: ' . implode(', ', array_keys($commands));
+            $this->console->log('Help: command not found. Available commands are: ' . implode(', ', array_keys($commands)));
             return;
         }
 
-        echo $this->get_help_text($commands[$command]);
+        $this->console->log($this->get_help_text($commands[$command]));
     }
 
     /**
@@ -56,7 +57,7 @@ final readonly class Help implements CLIRoute
             $helpText = preg_replace('/^[\/* ]+/m', '', $doc);
             return is_string($helpText) ? $helpText : '';
         } catch (ReflectionException $e) {
-            error_log($e->getMessage());
+            $this->console->error($e->getMessage());
         }
 
         return '';
