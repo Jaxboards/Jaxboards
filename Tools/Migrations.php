@@ -66,12 +66,12 @@ final readonly class Migrations implements CLIRoute
         };
     }
 
-    private function generate($modelName)
+    private function generate(string $modelName): void
     {
         try {
             $model = $this->container->get("Jax\\Models\\{$modelName}");
             $this->console->log($this->utils->createTableQueryFromModel($model));
-        } catch (NotFoundException $e) {
+        } catch (NotFoundException) {
             $this->console->error('Cannot find model: ' . $modelName);
         }
     }
