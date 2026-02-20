@@ -146,20 +146,16 @@ body {
   background: #eef;
   border: 1px solid #000;
 
-  & a {
-    border-bottom: 1px solid #ccf;
+  & button {
     display: block;
     text-decoration: none;
     padding: 10px;
-  }
+    width: 100%;
 
-  & a:hover {
-    background: #ccf;
-  }
-
-  & a img {
-    border: 0;
-    margin-right: 10px;
+    & img {
+      border: 0;
+      float: left;
+    }
   }
 }
 
