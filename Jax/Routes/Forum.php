@@ -153,7 +153,7 @@ final class Forum implements Route
 
                     return "<a href='{$pageURL}' {$activeClass}>{$pageNumber}</a> ";
                 },
-                $this->jax->pages($numpages, $this->pageNumber + 1, 6),
+                $this->jax->pages($numpages, $this->pageNumber + 1),
             ));
         }
 
@@ -205,9 +205,9 @@ final class Forum implements Route
     private function renderTopicListing(ModelsForum $modelsForum, array $topics): string
     {
         $memberIds = $topics !== [] ? array_merge(...array_map(static fn(Topic $topic): array => [
-                $topic->author,
-                $topic->lastPostUser,
-            ], $topics)) : [];
+            $topic->author,
+            $topic->lastPostUser,
+        ], $topics)) : [];
 
         $membersById = $memberIds !== []
             ? Lodash::keyBy(
@@ -243,7 +243,7 @@ final class Forum implements Route
         }
 
         $pageArray = [];
-        foreach ($this->jax->pages((int) ceil(($topic->replies + 1) / 10), 1, 10) as $pageNumber) {
+        foreach ($this->jax->pages((int) ceil(($topic->replies + 1) / 10), 1) as $pageNumber) {
             $pageURL = $this->router->url('topic', [
                 'id' => $topic->id,
                 'page' => $pageNumber,
@@ -317,14 +317,14 @@ final class Forum implements Route
 
         return (
             $rows === []
-                ? ''
-                : $this->page->collapseBox(
-                    'Subforums',
-                    $this->template->render('forum/subforum-table', [
-                        'rows' => $rows,
-                    ]),
-                    'subforums_' . $forum->id,
-                )
+            ? ''
+            : $this->page->collapseBox(
+                'Subforums',
+                $this->template->render('forum/subforum-table', [
+                    'rows' => $rows,
+                ]),
+                'subforums_' . $forum->id,
+            )
         );
     }
 

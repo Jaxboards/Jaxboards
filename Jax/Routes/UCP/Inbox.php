@@ -322,7 +322,7 @@ final readonly class Inbox
         $numMessages = $this->fetchMessageCount($view);
 
         $pages = $numMessages !== 0 ? 'Pages: ' : '';
-        $pageNumbers = $this->jax->pages((int) ceil($numMessages / self::MESSAGES_PER_PAGE), $requestPage, 10);
+        $pageNumbers = $this->jax->pages((int) ceil($numMessages / self::MESSAGES_PER_PAGE), $requestPage);
 
         $pages .= implode(' &middot; ', array_map(function (int $pageNumber) use ($requestPage, $view): string {
             $active = $pageNumber === $requestPage ? ' class="active"' : '';
