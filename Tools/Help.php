@@ -35,7 +35,9 @@ final readonly class Help implements CLIRoute
         }
 
         if (!array_key_exists($command, $commands)) {
-            $this->console->log('Help: command not found. Available commands are: ' . implode(', ', array_keys($commands)));
+            $this->console->log(
+                'Help: command not found. Available commands are: ' . implode(', ', array_keys($commands)),
+            );
             return;
         }
 
