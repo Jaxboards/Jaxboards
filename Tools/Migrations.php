@@ -8,6 +8,7 @@ use DI\Container;
 use DI\DependencyException;
 use DI\NotFoundException;
 use Jax\Database\Database;
+use Jax\Database\Utils;
 use Jax\DebugLog;
 use Jax\FileSystem;
 use Override;
@@ -26,6 +27,7 @@ use const PHP_EOL;
  *
  * Usage:
  * - `migrate`: Attempts to the database schema to the latest version.
+ * - `migrate create $modelName`: Displays create table statement for model
  */
 final readonly class Migrations implements CLIRoute
 {
@@ -35,6 +37,7 @@ final readonly class Migrations implements CLIRoute
         private DebugLog $debugLog,
         private Database $database,
         private FileSystem $fileSystem,
+        private Utils $utils,
     ) {}
 
     public function get_db_version(): int
@@ -54,6 +57,26 @@ final readonly class Migrations implements CLIRoute
      */
     #[Override]
     public function route(array $params): void
+    {
+        $command = $params[0] ?? '';
+
+        match ($command) {
+            'create' => $this->generate($params[1] ?? ''),
+            default => $this->run_migrations(),
+        };
+    }
+
+    private function generate($modelName)
+    {
+        try {
+            $model = $this->container->get("Jax\\Models\\{$modelName}");
+            $this->console->log($this->utils->createTableQueryFromModel($model));
+        } catch (NotFoundException $e) {
+            $this->console->error('Cannot find model: ' . $modelName);
+        }
+    }
+
+    private function run_migrations(): void
     {
         /** @var array<int,string> $migrations */
         $migrations = array_reduce(
