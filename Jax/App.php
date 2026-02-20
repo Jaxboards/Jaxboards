@@ -185,7 +185,7 @@ final readonly class App
                     'user' => $this->user->get(),
                     'lastVisit' => $this->date->smallDate($this->user->get()->lastVisit),
                     'unreadMessages' => $unreadMessages,
-                    'notificationCount' => 0
+                    'notificationCount' => 0,
                 ]),
         );
     }
