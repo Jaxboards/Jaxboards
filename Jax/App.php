@@ -160,8 +160,10 @@ final readonly class App
         $timestamp = $this->fileSystem->getFileInfo('dist/app.js')->getMTime();
         $this->page->append(
             'SCRIPT',
-            '<script src="' . $this->router->getRootURL() . "/dist/app.js?{$timestamp}\" defer></script>" .
-                '<script src="https://kit.fontawesome.com/69affb3f61.js" crossorigin="anonymous"></script>'
+            '<script src="'
+            . $this->router->getRootURL()
+            . "/dist/app.js?{$timestamp}\" defer></script>"
+            . '<script src="https://kit.fontawesome.com/69affb3f61.js" crossorigin="anonymous"></script>',
         );
 
         $this->page->append('LOGO', $this->template->render('global/logo', [
@@ -223,11 +225,11 @@ final readonly class App
         $this->page->append(
             'FOOTER',
             '<div class="footer">'
-                . "<a href=\"https://jaxboards.upgraded.click\">Jaxboards</a> {$version}! "
-                // Removed the defunct URL
-                . '&copy; 2007-'
-                . gmdate('Y')
-                . '</div>',
+            . "<a href=\"https://jaxboards.upgraded.click\">Jaxboards</a> {$version}! "
+            // Removed the defunct URL
+            . '&copy; 2007-'
+            . gmdate('Y')
+            . '</div>',
         );
     }
 
