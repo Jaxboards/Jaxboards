@@ -71,7 +71,7 @@ final readonly class MagoToSonar implements CLIRoute
      */
     private function getAnalyzeRulesForSonar(): array
     {
-          /** @var array<string> $output */
+        /** @var array<string> $output */
         exec($this->mago . ' analyze --list-codes', $output);
 
         /** @var Array<string> */
@@ -145,14 +145,8 @@ final readonly class MagoToSonar implements CLIRoute
     public function writeSonarReport(): void
     {
         file_put_contents('mago-report-sonar.json', json_encode([
-            'rules' => array_merge(
-                $this->getMagoRulesForSonar(),
-                $this->getAnalyzeRulesForSonar(),
-            ),
-            'issues' => array_merge(
-                $this->getMagoIssuesForSonar('lint'),
-                $this->getMagoIssuesForSonar('analyze')
-            ),
+            'rules' => array_merge($this->getMagoRulesForSonar(), $this->getAnalyzeRulesForSonar()),
+            'issues' => array_merge($this->getMagoIssuesForSonar('lint'), $this->getMagoIssuesForSonar('analyze')),
         ], JSON_PRETTY_PRINT));
     }
 
