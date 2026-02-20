@@ -7,7 +7,7 @@ namespace Tools\Mago;
 final class LintIssues
 {
     /**
-     * @var Array<Lint> $issues
+     * @var Array<LintIssue> $issues
      */
     public array $issues = [];
 }

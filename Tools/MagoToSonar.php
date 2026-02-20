@@ -28,6 +28,9 @@ final readonly class MagoToSonar implements CLIRoute
         $this->mago = is_string($mago) ? $mago : '';
     }
 
+    /**
+     * @return Array<Rule>
+     */
     private function getMagoRulesForSonar(): array
     {
         /** @var array<string> $output */
@@ -63,10 +66,48 @@ final readonly class MagoToSonar implements CLIRoute
         return $sonarRules;
     }
 
-    private function getMagoIssuesForSonar(): array
+    /**
+     * @return Array<Rule>
+     */
+    private function getAnalyzeRulesForSonar(): array
     {
         /** @var array<string> $output */
-        exec($this->mago . ' lint --reporting-format json', $output);
+        exec($this->mago . ' analyze --list-codes', $output);
+
+        /** @var Array<string> */
+        $codes = json_decode(implode('', $output));
+
+        /** @var Array<Rule> $sonarRules */
+        $sonarRules = [];
+
+        foreach ($codes as $code) {
+            $sonarRule = new Rule();
+            $sonarRule->id = $code;
+            $sonarRule->name = $code;
+            $sonarRule->description = '';
+            $sonarRule->cleanCodeAttribute = 'CONVENTIONAL';
+            $sonarRule->engineId = 'mago';
+            $sonarRule->type = 'CODE_SMELL';
+
+            $impact = new Impact();
+            $impact->severity = 'MEDIUM';
+
+            $impact->softwareQuality = 'MAINTAINABILITY';
+
+            $sonarRule->impacts[] = $impact;
+            $sonarRules[] = $sonarRule;
+        }
+
+        return $sonarRules;
+    }
+
+    /**
+     * @return array<Issue>
+     */
+    private function getMagoIssuesForSonar(string $subCommand = 'lint'): array
+    {
+        /** @var array<string> $output */
+        exec("{$this->mago} {$subCommand} --reporting-format json", $output);
 
         /** @var LintIssues $lintIssues */
         $lintIssues = json_decode(implode('', $output));
@@ -104,8 +145,8 @@ final readonly class MagoToSonar implements CLIRoute
     public function writeSonarReport(): void
     {
         file_put_contents('mago-report-sonar.json', json_encode([
-            'rules' => $this->getMagoRulesForSonar(),
-            'issues' => $this->getMagoIssuesForSonar(),
+            'rules' => array_merge($this->getMagoRulesForSonar(), $this->getAnalyzeRulesForSonar()),
+            'issues' => array_merge($this->getMagoIssuesForSonar('lint'), $this->getMagoIssuesForSonar('analyze')),
         ], JSON_PRETTY_PRINT));
     }
 
