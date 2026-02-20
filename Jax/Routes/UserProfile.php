@@ -54,8 +54,7 @@ final readonly class UserProfile implements Route
         match (true) {
             !$profile => $this->showProfileError(),
             $this->didComeFromForum() && $page === '' => $this->showContactCard($profile),
-            (bool) $this->user->getGroup()?->canViewFullProfile => $this->showFullProfile($page, $profile),
-            default => $this->router->redirect('index'),
+            default => $this->showFullProfile($page, $profile),
         };
     }
 
@@ -80,6 +79,7 @@ final readonly class UserProfile implements Route
             'content' => $this->template->render('userprofile/contact-card', [
                 'member' => $member,
                 'contactLinks' => $this->contactDetails->getContactLinks($member),
+                'canViewProfile' => $this->user->getGroup()?->canViewFullProfile,
                 'isGuest' => $this->user->isGuest(),
                 'isFriend' => $this->isUserInList($member->id, $this->user->get()->friends),
                 'isEnemy' => $this->isUserInList($member->id, $this->user->get()->enemies),
@@ -99,26 +99,28 @@ final readonly class UserProfile implements Route
                 'page' => 'profile',
             ]) => "{$member->displayName}'s profile",
         ]);
+        $this->session->set('locationVerbose', "Viewing {$member->displayName}'s profile");
 
-        $birthdate = $member->birthdate !== null ? $this->date->dateAsCarbon($member->birthdate) : null;
+        if (!$this->user->getGroup()->canViewFullProfile) {
+        }
 
-        $profile = $this->template->render('userprofile/full-profile', [
-            'birthdate' => $birthdate,
-            'canModerate' => $this->user->isModerator(),
-            'contactLinks' => $this->contactDetails->getContactLinks($member),
-            'group' => Group::selectOne($member->groupID),
-            'ipAddress' => $member->ip !== '' ? $this->ipAddress->asHumanReadable($member->ip) : '',
-            'member' => $member,
-            'selectedTab' => $page ?: 'activity',
-            'skin' => $this->page->getSelectedSkin($member->skinID),
-            'tabHTML' => $tabHTML,
-            'tabs' => $this->profileTabs->getTabs(),
-        ]);
+        $profile = !$this->user->getGroup()->canViewFullProfile ?
+            $this->page->error("You do not have permissions to view this member's profile") :
+            $this->template->render('userprofile/full-profile', [
+                'birthdate' => $member->birthdate !== null ? $this->date->dateAsCarbon($member->birthdate) : null,
+                'canModerate' => $this->user->isModerator(),
+                'contactLinks' => $this->contactDetails->getContactLinks($member),
+                'group' => Group::selectOne($member->groupID),
+                'ipAddress' => $member->ip !== '' ? $this->ipAddress->asHumanReadable($member->ip) : '',
+                'member' => $member,
+                'selectedTab' => $page ?: 'activity',
+                'skin' => $this->page->getSelectedSkin($member->skinID),
+                'tabHTML' => $tabHTML,
+                'tabs' => $this->profileTabs->getTabs(),
+            ]);
 
         $this->page->command('update', 'page', $profile);
         $this->page->append('PAGE', $profile);
-
-        $this->session->set('locationVerbose', "Viewing {$member->displayName}'s profile");
     }
 
     private function showProfileError(): void

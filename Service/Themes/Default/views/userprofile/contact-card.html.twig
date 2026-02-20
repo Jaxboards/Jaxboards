@@ -39,9 +39,11 @@
         <br>
     {% endif %}
 
-    <a href="{{ url('profile', { id: member.id, page: 'activity' }) }}" data-action="close">
-        Full Profile
-    </a>
+    {% if canViewProfile %}
+      <a href="{{ url('profile', { id: member.id, page: 'activity' }) }}" data-action="close">
+          Full Profile
+      </a>
+    {% endif %}
     <div class="contact_details">
         {%- for type,link in contactLinks -%}
             <a class="{{ type }} contact" title="{{ type }} contact" href="{{ link[0] }}">&nbsp;</a>
