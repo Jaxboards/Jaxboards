@@ -1,17 +1,26 @@
 <div class="welcome">
-    Hi, {% include 'user-link.html.twig' with { user } only -%}!
-    <a href="{{ url('logout') }}" class="logout">Logout</a>
+  Hi, {% include 'user-link.html.twig' with { user } only -%}!
+  <a href="{{ url('logout') }}" class="logout">Logout</a>
 </div>
 <div class="lastvisit">Last Visit: {{ lastVisit }}</div>
-<div class="messages">
-    <u>I</u>nbox: <a
-        href="{{ url('inbox') }}"
-        id="num-messages"
-        class="num-messages"
-        title="View your inbox or send a new PM"
-        data-shortcut="i"
-    >{{ unreadMessages }}</a>
-</div>
-<div class="settings">
-    <a href="{{ url('ucp') }}" title="Update your profile and settings" data-shortcut="s"><u>S</u>ettings</a>
+<div class="controls">
+  <a
+      href="{{ url('inbox') }}"
+
+      class="num-messages"
+      title="View your inbox or send a new PM"
+      data-use-tooltip="true"
+      data-shortcut="i"
+  ><i class="fa-solid fa-envelope"></i><span id="num-messages">{{ unreadMessages }}</span></a>
+  <a
+    href="/buddylist"
+    title="View contacts"
+    data-use-tooltip="true"
+  ><i class="fa-solid fa-address-book"></i></a>
+  <a
+    href="{{ url('ucp') }}"
+    title="Update your profile and settings"
+    data-use-tooltip="true"
+    data-shortcut="s"
+  ><i class="fa-solid fa-wrench"></i></a>
 </div>
