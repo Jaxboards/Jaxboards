@@ -70,14 +70,15 @@ final readonly class UCP implements Route
         }
 
         $page = match ($what) {
-            'sounds' => $this->showSoundSettings(),
-            'signature' => $this->showSigSettings(),
-            'pass' => $this->showPassSettings(),
-            'email' => $this->showEmailSettings(),
             'avatar' => $this->showAvatarSettings(),
-            'profile' => $this->showProfileSettings(),
             'board' => $this->showBoardSettings(),
+            'email' => $this->showEmailSettings(),
             'inbox' => $this->inbox->render(),
+            'notifications' => $this->showNotifications(),
+            'pass' => $this->showPassSettings(),
+            'profile' => $this->showProfileSettings(),
+            'signature' => $this->showSigSettings(),
+            'sounds' => $this->showSoundSettings(),
             default => $this->showMain(),
         };
 
@@ -342,23 +343,25 @@ final readonly class UCP implements Route
             : null;
         unset($data['dob_day'], $data['dob_month'], $data['dob_year']);
 
-        foreach ([
-            'contactAIM' => 'AIM username',
-            'contactBlueSky' => 'Bluesky username',
-            'contactDiscord' => 'Discord ID',
-            'contactGoogleChat' => 'Google Chat username',
-            'contactMSN' => 'MSN username',
-            'contactSkype' => 'Skype username',
-            'contactSteam' => 'Steam username',
-            'contactTwitter' => 'Twitter username',
-            'contactYIM' => 'YIM username',
-            'contactYoutube' => 'YouTube username',
-            'displayName' => 'Display name',
-            'full_name' => 'Full name',
-            'location' => 'Location',
-            'usertitle' => 'User Title',
-            'website' => 'Website URL',
-        ] as $field => $fieldLabel) {
+        foreach (
+            [
+                'contactAIM' => 'AIM username',
+                'contactBlueSky' => 'Bluesky username',
+                'contactDiscord' => 'Discord ID',
+                'contactGoogleChat' => 'Google Chat username',
+                'contactMSN' => 'MSN username',
+                'contactSkype' => 'Skype username',
+                'contactSteam' => 'Steam username',
+                'contactTwitter' => 'Twitter username',
+                'contactYIM' => 'YIM username',
+                'contactYoutube' => 'YouTube username',
+                'displayName' => 'Display name',
+                'full_name' => 'Full name',
+                'location' => 'Location',
+                'usertitle' => 'User Title',
+                'website' => 'Website URL',
+            ] as $field => $fieldLabel
+        ) {
             if (mb_strstr($field, 'contact') !== false && preg_match('/[^\w.@]/', (string) $data[$field])) {
                 return "Invalid characters in {$fieldLabel}";
             }
@@ -458,6 +461,14 @@ final readonly class UCP implements Route
             'error' => $error,
             'skins' => $skins,
             'user' => $this->user->get(),
+        ]);
+    }
+
+
+    private function showNotifications(): string
+    {
+        return $this->template->render('ucp/notifications', [
+            'notifications' => [],
         ]);
     }
 }

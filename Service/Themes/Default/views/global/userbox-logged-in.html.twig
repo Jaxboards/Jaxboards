@@ -11,7 +11,7 @@
       data-shortcut="i"
   ><i class="fa-solid fa-envelope"></i><span id="num-messages">{{ unreadMessages }}</span></a>
     <a
-      href="{{ url('inbox') }}"
+      href="{{ url('ucp', { what: 'notifications' }) }}"
       title="View your notifications"
       data-use-tooltip="true"
   ><i class="fa-solid fa-bell"></i>{{ notificationCount }}</a>
