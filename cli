@@ -9,7 +9,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 $container = new Container();
 
-$commands = $container->get(Index::class)->get_all_commands();
+$commands = $container->get(Index::class)->getAllCommands();
 $command = $argv[1] ?? '';
 
 if (array_key_exists($command, $commands)) {
