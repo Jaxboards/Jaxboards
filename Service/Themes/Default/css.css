@@ -1031,10 +1031,6 @@ textarea {
     float: right;
     color: var(--white);
   }
-
-  & a.num-messages {
-    color: var(--white);
-  }
 }
 
 /* Breadcrumbs */

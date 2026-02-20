@@ -6,12 +6,15 @@
 <div class="controls">
   <a
       href="{{ url('inbox') }}"
-
-      class="num-messages"
       title="View your inbox or send a new PM"
       data-use-tooltip="true"
       data-shortcut="i"
   ><i class="fa-solid fa-envelope"></i><span id="num-messages">{{ unreadMessages }}</span></a>
+    <a
+      href="{{ url('inbox') }}"
+      title="View your notifications"
+      data-use-tooltip="true"
+  ><i class="fa-solid fa-bell"></i>{{ notificationCount }}</a>
   <a
     href="/buddylist"
     title="View contacts"

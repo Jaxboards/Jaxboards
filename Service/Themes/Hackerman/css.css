@@ -996,10 +996,6 @@ textarea {
     float: right;
     color: var(--text-color);
   }
-
-  & a.num-messages {
-    color: var(--text-color);
-  }
 }
 
 /* Breadcrumbs */
