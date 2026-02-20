@@ -59,9 +59,9 @@ final class UsersOnline
     {
         $sessions = Session::selectMany(
             'WHERE lastUpdate>=? ORDER BY lastAction',
-            $this->database->datetime(Carbon::now('UTC')->subSeconds(
-                $this->serviceConfig->getSetting('timetologout') ?? 900,
-            )->getTimestamp()),
+            $this->database->datetime(
+                Carbon::now('UTC')->subSeconds($this->serviceConfig->getSetting('timetologout') ?? 900)->getTimestamp(),
+            ),
         );
 
         $userSessions = array_filter($sessions, static fn(Session $session): bool => (bool) $session->uid);
