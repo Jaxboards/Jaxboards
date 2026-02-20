@@ -280,6 +280,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
       `<a class="strikethrough" title="Strike-Through"></a>`,
       `<a class="forecolor" title="Foreground Color"></a>`,
       `<a class="backcolor" title="Background Color"></a>`,
+      `<a class="c_smileys" title="Insert Emoticon"></a>`,
       `<a class="insertimage" title="Insert Image"></a>`,
       `<a class="createlink" title="Insert Link"></a>`,
       `<a class="c_email" title="Insert Email"></a>`,
@@ -292,7 +293,6 @@ export default class Editor extends Component<HTMLTextAreaElement> {
       `<a class="c_spoiler" title="Insert Spoiler"></a>`,
       `<a class="insertorderedlist" title="Create Ordered List"></a>`,
       `<a class="insertunorderedlist" title="Create Unordered List"></a>`,
-      `<a class="c_smileys" title="Insert Emoticon"></a>`,
       `<a class="c_switcheditmode" title="Switch editor mode"></a>`,
     ].join("");
 
