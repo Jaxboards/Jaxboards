@@ -104,9 +104,8 @@ final readonly class UserProfile implements Route
         if (!$this->user->getGroup()->canViewFullProfile) {
         }
 
-        $profile = !$this->user->getGroup()->canViewFullProfile ?
-            $this->page->error("You do not have permissions to view this member's profile") :
-            $this->template->render('userprofile/full-profile', [
+        $profile = $this->user->getGroup()->canViewFullProfile
+            ? $this->template->render('userprofile/full-profile', [
                 'birthdate' => $member->birthdate !== null ? $this->date->dateAsCarbon($member->birthdate) : null,
                 'canModerate' => $this->user->isModerator(),
                 'contactLinks' => $this->contactDetails->getContactLinks($member),
@@ -117,7 +116,8 @@ final readonly class UserProfile implements Route
                 'skin' => $this->page->getSelectedSkin($member->skinID),
                 'tabHTML' => $tabHTML,
                 'tabs' => $this->profileTabs->getTabs(),
-            ]);
+            ])
+            : $this->page->error("You do not have permissions to view this member's profile");
 
         $this->page->command('update', 'page', $profile);
         $this->page->append('PAGE', $profile);
