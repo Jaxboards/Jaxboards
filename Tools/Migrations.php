@@ -40,7 +40,7 @@ final readonly class Migrations implements CLIRoute
         private Utils $utils,
     ) {}
 
-    public function get_db_version(): int
+    public function getDBVersion(): int
     {
         $statsResult = $this->database->select('*', 'stats');
 
@@ -61,12 +61,12 @@ final readonly class Migrations implements CLIRoute
         $command = $params[0] ?? '';
 
         match ($command) {
-            'create' => $this->generate($params[1] ?? ''),
-            default => $this->run_migrations(),
+            'create' => $this->create($params[1] ?? ''),
+            default => $this->runMigrations(),
         };
     }
 
-    private function generate(string $modelName): void
+    private function create(string $modelName): void
     {
         try {
             $model = $this->container->get("Jax\\Models\\{$modelName}");
@@ -76,7 +76,7 @@ final readonly class Migrations implements CLIRoute
         }
     }
 
-    private function run_migrations(): void
+    private function runMigrations(): void
     {
         /** @var array<int,string> $migrations */
         $migrations = array_reduce(
@@ -101,7 +101,7 @@ final readonly class Migrations implements CLIRoute
         // Sort migrations to run them in order
         ksort($migrations);
 
-        $dbVersion = $this->get_db_version();
+        $dbVersion = $this->getDBVersion();
 
         foreach ($migrations as $version => $migration) {
             if ($version <= $dbVersion) {
@@ -126,6 +126,6 @@ final readonly class Migrations implements CLIRoute
 
         $this->console->log(implode(PHP_EOL, $this->debugLog->getLog()));
 
-        $this->console->success('You are currently up to date! DB Version: ' . $this->get_db_version());
+        $this->console->success('You are currently up to date! DB Version: ' . $this->getDBVersion());
     }
 }

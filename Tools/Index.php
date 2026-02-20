@@ -9,7 +9,7 @@ final class Index
     /**
      * @return array<class-string>
      */
-    public function get_all_commands(): array
+    public function getAllCommands(): array
     {
         return [
             'composer-version' => ComposerVersion::class,

@@ -28,7 +28,7 @@ final readonly class MagoToSonar implements CLIRoute
         $this->mago = is_string($mago) ? $mago : '';
     }
 
-    private function get_mago_rules_for_sonar(): array
+    private function getMagoRulesForSonar(): array
     {
         /** @var array<string> $output */
         exec($this->mago . ' lint --list-rules --json', $output);
@@ -63,7 +63,7 @@ final readonly class MagoToSonar implements CLIRoute
         return $sonarRules;
     }
 
-    private function get_mago_issues_for_sonar(): array
+    private function getMagoIssuesForSonar(): array
     {
         /** @var array<string> $output */
         exec($this->mago . ' lint --reporting-format json', $output);
@@ -101,17 +101,17 @@ final readonly class MagoToSonar implements CLIRoute
         return $sonarIssues;
     }
 
-    public function write_sonar_report(): void
+    public function writeSonarReport(): void
     {
         file_put_contents('mago-report-sonar.json', json_encode([
-            'rules' => $this->get_mago_rules_for_sonar(),
-            'issues' => $this->get_mago_issues_for_sonar(),
+            'rules' => $this->getMagoRulesForSonar(),
+            'issues' => $this->getMagoIssuesForSonar(),
         ], JSON_PRETTY_PRINT));
     }
 
     #[Override]
     public function route(array $params): void
     {
-        $this->write_sonar_report();
+        $this->writeSonarReport();
     }
 }

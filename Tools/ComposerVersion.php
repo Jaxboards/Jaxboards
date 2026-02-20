@@ -28,19 +28,19 @@ final readonly class ComposerVersion implements CLIRoute
     {
         match ($params[0] ?? '') {
             'update' => $this->update(),
-            default => $this->get_current_version(),
+            default => $this->getCurrentVersion(),
         };
     }
 
-    private function get_current_version(): void
+    private function getCurrentVersion(): void
     {
-        echo $this->get_package_json()['engines']['composer'] ?? '';
+        echo $this->getPackageJSON()['engines']['composer'] ?? '';
     }
 
     /**
      * @return array{engines:array{composer:?string}}
      */
-    private function get_package_json(): array
+    private function getPackageJSON(): array
     {
         $packageJSON = $this->fileSystem->getContents('package.json');
         if ($packageJSON === '') {
@@ -114,7 +114,7 @@ final readonly class ComposerVersion implements CLIRoute
 
         $this->fileSystem->putContents('composer.json', json_encode($composerData, JSON_PRETTY_PRINT));
 
-        $packageData = $this->get_package_json();
+        $packageData = $this->getPackageJSON();
 
         $packageData['engines']['composer'] = $version;
         ksort($packageData['engines']);

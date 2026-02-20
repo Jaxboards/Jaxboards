@@ -24,11 +24,11 @@ final readonly class Help implements CLIRoute
     #[Override]
     public function route(array $params): void
     {
-        $commands = $this->index->get_all_commands();
+        $commands = $this->index->getAllCommands();
         $command = $params[0] ?? '';
 
         if (!$command) {
-            $this->console->log($this->get_help_text(Help::class));
+            $this->console->log($this->getHelpText(Help::class));
 
             $this->console->log("Available commands are:\n- " . implode("\n- ", array_keys($commands)));
             return;
@@ -41,13 +41,13 @@ final readonly class Help implements CLIRoute
             return;
         }
 
-        $this->console->log($this->get_help_text($commands[$command]));
+        $this->console->log($this->getHelpText($commands[$command]));
     }
 
     /**
      * @param class-string $classString
      */
-    private function get_help_text(string $classString): string
+    private function getHelpText(string $classString): string
     {
         try {
             $reflectionClass = new ReflectionClass($classString);
