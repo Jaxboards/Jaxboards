@@ -10,7 +10,6 @@ use Jax\Routes\Asteroids;
 use Jax\Routes\Badges;
 use Jax\Routes\BoardIndex;
 use Jax\Routes\BoardOffline;
-use Jax\Routes\BuddyList;
 use Jax\Routes\Calendar;
 use Jax\Routes\Confetti;
 use Jax\Routes\Contacts;

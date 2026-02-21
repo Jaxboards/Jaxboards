@@ -34,7 +34,6 @@ use Jax\Page;
 use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
-use Jax\Routes\BuddyList;
 use Jax\Routes\Contacts;
 use Jax\ServiceConfig;
 use Jax\Session;
