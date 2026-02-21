@@ -1,5 +1,5 @@
 <div class="contacts">
-    <form action="{{ url('buddylist') }}" data-ajax-form="true">
+    <form action="{{ url('contacts') }}" data-ajax-form="true">
         <a href="{{ url('toggleInvisible') }}" id="status" class="{% if isInvisible %}invisible{% endif %}">
           Toggle Invisible
         </a>
@@ -8,10 +8,10 @@
             onblur="this.form.requestSubmit()" value="{{ user.usertitle }}"/>
     </form>
     {% for friend in friends %}
-        {% include "buddylist/contact.html.twig" with friend %}
+        {% include "contacts/contact.html.twig" with friend %}
     {% endfor %}
     {% for enemy in enemies %}
-        {% include "buddylist/contact.html.twig" with enemy %}
+        {% include "contacts/contact.html.twig" with enemy %}
     {% endfor %}
     {% if not friends and not enemies %}
         {% include "error.html.twig" with { message: "You don't have any contacts added to your buddy list!" } %}

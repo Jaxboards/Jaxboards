@@ -13,6 +13,7 @@ use Jax\Routes\BoardOffline;
 use Jax\Routes\BuddyList;
 use Jax\Routes\Calendar;
 use Jax\Routes\Confetti;
+use Jax\Routes\Contacts;
 use Jax\Routes\CustomPage;
 use Jax\Routes\Download;
 use Jax\Routes\Earthbound;
@@ -74,9 +75,9 @@ final class Router
         $this->get('', '/', BoardIndex::class);
         $this->get('api', '/api/{method}', API::class);
         $this->get('badges', '/badges', Badges::class);
-        $this->get('buddylist', '/buddylist', BuddyList::class);
         $this->get('calendar', '/calendar', Calendar::class);
         $this->get('category', '/', BoardIndex::class);
+        $this->get('contacts', '/contacts', Contacts::class);
         $this->get('download', '/download', Download::class);
         $this->get('index', '/', BoardIndex::class);
         $this->get('members', '/members', Members::class);

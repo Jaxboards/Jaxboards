@@ -35,6 +35,7 @@ use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\Router;
 use Jax\Routes\BuddyList;
+use Jax\Routes\Contacts;
 use Jax\ServiceConfig;
 use Jax\Session;
 use Jax\Template;
@@ -53,47 +54,47 @@ use function json_decode;
  * @internal
  */
 #[CoversClass(App::class)]
-#[CoversClass(FileSystem::class)]
-#[CoversClass(Column::class)]
-#[CoversClass(ForeignKey::class)]
-#[CoversClass(Key::class)]
 #[CoversClass(BBCode::class)]
-#[CoversClass(Games::class)]
 #[CoversClass(BotDetector::class)]
+#[CoversClass(Column::class)]
 #[CoversClass(Config::class)]
+#[CoversClass(Contacts::class)]
 #[CoversClass(Database::class)]
 #[CoversClass(DatabaseUtils::class)]
-#[CoversClass(SQLite::class)]
 #[CoversClass(Date::class)]
 #[CoversClass(DebugLog::class)]
 #[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FileSystem::class)]
+#[CoversClass(ForeignKey::class)]
+#[CoversClass(Games::class)]
+#[CoversClass(Hooks::class)]
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]
+#[CoversClass(Key::class)]
 #[CoversClass(Lodash::class)]
 #[CoversClass(Model::class)]
-#[CoversClass(PrivateMessage::class)]
-#[CoversClass(Shoutbox::class)]
-#[CoversClass(Hooks::class)]
-#[CoversClass(WebHooks::class)]
 #[CoversClass(Page::class)]
-#[CoversClass(BuddyList::class)]
-#[CoversClass(TextRules::class)]
+#[CoversClass(PrivateMessage::class)]
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(Router::class)]
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(Session::class)]
+#[CoversClass(Shoutbox::class)]
+#[CoversClass(SQLite::class)]
 #[CoversClass(Template::class)]
 #[CoversClass(TextFormatting::class)]
+#[CoversClass(TextRules::class)]
 #[CoversClass(User::class)]
 #[CoversClass(UsersOnline::class)]
+#[CoversClass(WebHooks::class)]
 final class BuddyListTest extends FeatureTestCase
 {
     public function testBuddyList(): void
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(get: ['path' => '/buddylist'], server: [
+        $page = $this->go(new Request(get: ['path' => '/contacts'], server: [
             'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
         ]));
 
@@ -102,7 +103,7 @@ final class BuddyListTest extends FeatureTestCase
         static::assertContainsEquals(['preventNavigation'], $json);
 
         $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
-        static::assertSame('buddylist', $window[1]['id']);
+        static::assertSame('contacts', $window[1]['id']);
         static::assertSame('Buddies', $window[1]['title']);
     }
 
@@ -110,7 +111,7 @@ final class BuddyListTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(get: ['path' => '/buddylist', 'add' => '1'], server: [
+        $page = $this->go(new Request(get: ['path' => '/contacts', 'add' => '1'], server: [
             'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
         ]));
 
@@ -119,7 +120,7 @@ final class BuddyListTest extends FeatureTestCase
         static::assertContainsEquals(['preventNavigation'], $json);
 
         $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
-        static::assertSame('buddylist', $window[1]['id']);
+        static::assertSame('contacts', $window[1]['id']);
         static::assertSame('Buddies', $window[1]['title']);
         DOMAssert::assertSelectEquals('.contact .name', 'Admin', 1, $window[1]['content']);
 
@@ -133,7 +134,7 @@ final class BuddyListTest extends FeatureTestCase
     {
         $this->actingAs('admin', ['friends' => '1']);
 
-        $page = $this->go(new Request(get: ['path' => '/buddylist', 'remove' => '1'], server: [
+        $page = $this->go(new Request(get: ['path' => '/contacts', 'remove' => '1'], server: [
             'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
         ]));
 
@@ -142,7 +143,7 @@ final class BuddyListTest extends FeatureTestCase
         static::assertContainsEquals(['preventNavigation'], $json);
 
         $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
-        static::assertSame('buddylist', $window[1]['id']);
+        static::assertSame('contacts', $window[1]['id']);
         static::assertSame('Buddies', $window[1]['title']);
         DOMAssert::assertSelectEquals('.contact .name', 'Admin', 0, $window[1]['content']);
 
@@ -154,7 +155,7 @@ final class BuddyListTest extends FeatureTestCase
     {
         $this->actingAs('admin');
 
-        $page = $this->go(new Request(get: ['path' => '/buddylist', 'block' => '1'], server: [
+        $page = $this->go(new Request(get: ['path' => '/contacts', 'block' => '1'], server: [
             'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
         ]));
 
@@ -163,7 +164,7 @@ final class BuddyListTest extends FeatureTestCase
         static::assertContainsEquals(['preventNavigation'], $json);
 
         $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
-        static::assertSame('buddylist', $window[1]['id']);
+        static::assertSame('contacts', $window[1]['id']);
         static::assertSame('Buddies', $window[1]['title']);
         DOMAssert::assertSelectEquals('.contact .name', 'Admin', 1, $window[1]['content']);
 
@@ -177,7 +178,7 @@ final class BuddyListTest extends FeatureTestCase
     {
         $this->actingAs('admin', ['enemies' => '1']);
 
-        $page = $this->go(new Request(get: ['path' => '/buddylist', 'unblock' => '1'], server: [
+        $page = $this->go(new Request(get: ['path' => '/contacts', 'unblock' => '1'], server: [
             'HTTP_X_JSACCESS' => JSAccess::ACTING->value,
         ]));
 
@@ -186,7 +187,7 @@ final class BuddyListTest extends FeatureTestCase
         static::assertContainsEquals(['preventNavigation'], $json);
 
         $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
-        static::assertSame('buddylist', $window[1]['id']);
+        static::assertSame('contacts', $window[1]['id']);
         static::assertSame('Buddies', $window[1]['title']);
         static::assertStringNotContainsString('Admin', $window[1]['content']);
 

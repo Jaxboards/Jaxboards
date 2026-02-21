@@ -24,7 +24,7 @@ use function explode;
 use function implode;
 use function in_array;
 
-final readonly class BuddyList implements Route
+final readonly class Contacts implements Route
 {
     public function __construct(
         private Page $page,
@@ -101,13 +101,13 @@ final readonly class BuddyList implements Route
         }
 
         $this->page->command('window', [
-            'content' => $this->template->render('buddylist/contacts', [
+            'content' => $this->template->render('contacts/index', [
                 'enemies' => $enemies,
                 'friends' => $friends,
                 'isInvisible' => $this->session->get()->hide !== 0,
                 'user' => $this->user->get(),
             ]),
-            'id' => 'buddylist',
+            'id' => 'contacts',
             'pos' => 'tr 20 20',
             'title' => 'Buddies',
         ]);

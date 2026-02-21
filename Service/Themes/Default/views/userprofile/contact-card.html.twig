@@ -25,15 +25,15 @@
         <br>
         <br>
         {% if isFriend %}
-            <a href="{{ url('buddylist', { remove: member.id }) }}">Remove Contact</a>
+            <a href="{{ url('contacts', { remove: member.id }) }}">Remove Contact</a>
         {% else %}
-            <a href="{{ url('buddylist', { add: member.id }) }}">Add Contact</a>
+            <a href="{{ url('contacts', { add: member.id }) }}">Add Contact</a>
         {% endif %}
         <br>
         {% if isEnemy %}
-            <a href="{{ url('buddylist', { unblock: member.id }) }}">Unblock Contact</a>
+            <a href="{{ url('contacts', { unblock: member.id }) }}">Unblock Contact</a>
         {% else %}
-            <a href="{{ url('buddylist', { block: member.id }) }}">Block Contact</a>
+            <a href="{{ url('contacts', { block: member.id }) }}">Block Contact</a>
         {% endif %}
         <br>
         <br>

@@ -532,7 +532,7 @@ textarea {
   padding: 10px;
 }
 
-#buddylist {
+#contacts {
   & .name,
   & .status {
     margin-left: 50px;
