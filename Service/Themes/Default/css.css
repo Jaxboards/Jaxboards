@@ -1872,13 +1872,12 @@ textarea {
 
 #status {
   display: block;
-  background: url("icons/status.png") top no-repeat;
+  background: url("/Service/Themes/Default/icons/status.png") top no-repeat;
   width: 16px;
   height: 16px;
-  position: absolute;
-  top: 3px;
-  left: 3px;
   text-indent: -9999px;
+  position: absolute;
+  overflow: hidden;
 
   &.invisible {
     background-position: bottom;

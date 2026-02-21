@@ -39,6 +39,7 @@ final readonly class Contacts implements Route
     public function route($params): void
     {
         $this->page->command('preventNavigation');
+
         if ($this->user->isGuest()) {
             $this->page->command('error', 'Sorry, you must be logged in to use this feature.');
 
@@ -52,8 +53,8 @@ final readonly class Contacts implements Route
         $unblock = (int) $this->request->asString->both('unblock');
 
         $displayBuddyList = match (true) {
-            $add !== 0 => $this->addBuddy($add),
-            $remove !== 0 => $this->dropBuddy($remove),
+            $add !== 0 => $this->addContact($add),
+            $remove !== 0 => $this->dropContact($remove),
             $status !== null => $this->setStatus($status),
             $block !== 0 => $this->block($block),
             $unblock !== 0 => $this->unBlock($unblock),
@@ -72,8 +73,6 @@ final readonly class Contacts implements Route
         if ($this->user->isGuest()) {
             return;
         }
-
-        $this->page->command('preventNavigation');
 
         $online = $this->usersOnline->getUsersOnline();
 
@@ -113,7 +112,7 @@ final readonly class Contacts implements Route
         ]);
     }
 
-    private function addBuddy(int $uid): bool
+    private function addContact(int $uid): bool
     {
         $friends = array_filter(explode(',', $this->user->get()->friends), static fn($friend): bool => (bool) $friend);
         $error = null;
@@ -161,7 +160,7 @@ final readonly class Contacts implements Route
         $isenemy = array_search((string) $uid, $enemies, true);
         $isfriend = array_search((string) $uid, $friends, true);
         if ($isfriend !== false) {
-            $this->dropBuddy($uid);
+            $this->dropContact($uid);
         }
 
         if ($isenemy !== false) {
@@ -196,7 +195,7 @@ final readonly class Contacts implements Route
         return true;
     }
 
-    private function dropBuddy(int $uid): bool
+    private function dropContact(int $uid): bool
     {
         $friends = explode(',', $this->user->get()->friends);
         $id = array_search((string) $uid, $friends, true);

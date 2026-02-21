@@ -169,11 +169,15 @@ export default {
     document.querySelector(`#im_${a}`)?.classList.add("offline");
   },
   window(options: WindowOptions) {
-    const existingWindow = options.id && document.getElementById(options.id);
+    const existingWindowContent = options.id
+      ? document.querySelector<HTMLDivElement>(`#${options.id} .content`)
+      : undefined;
 
-    if (existingWindow) {
+    if (existingWindowContent) {
+      existingWindowContent.innerHTML = options.content + '';
       return;
     }
+
     const win = new Window(options);
     gracefulDegrade(win.render());
   },
