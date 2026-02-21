@@ -54,7 +54,8 @@ final readonly class MagoToSonar implements CLIRoute
             $impact = new Impact();
             $impact->severity = match ($rule->level) {
                 'Error' => 'BLOCKER',
-                'Note', 'Help' => 'LOW',
+                'Note' => 'INFO',
+                'Help' => 'LOW',
                 'Warning' => 'MEDIUM',
                 default => 'MEDIUM',
             };
