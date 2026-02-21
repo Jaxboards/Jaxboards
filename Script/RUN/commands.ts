@@ -174,7 +174,7 @@ export default {
       : undefined;
 
     if (existingWindowContent) {
-      existingWindowContent.innerHTML = options.content + '';
+      existingWindowContent.innerHTML = options.content + "";
       return;
     }
 
