@@ -103,7 +103,7 @@ final class BuddyListTest extends FeatureTestCase
 
         $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         static::assertSame('contacts', $window[1]['id']);
-        static::assertSame('Buddies', $window[1]['title']);
+        static::assertSame('Contacts', $window[1]['title']);
     }
 
     public function testAddBuddy(): void
@@ -120,7 +120,7 @@ final class BuddyListTest extends FeatureTestCase
 
         $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         static::assertSame('contacts', $window[1]['id']);
-        static::assertSame('Buddies', $window[1]['title']);
+        static::assertSame('Contacts', $window[1]['title']);
         DOMAssert::assertSelectEquals('.contact .name', 'Admin', 1, $window[1]['content']);
 
         $activity = Activity::selectOne();
@@ -143,7 +143,7 @@ final class BuddyListTest extends FeatureTestCase
 
         $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         static::assertSame('contacts', $window[1]['id']);
-        static::assertSame('Buddies', $window[1]['title']);
+        static::assertSame('Contacts', $window[1]['title']);
         DOMAssert::assertSelectEquals('.contact .name', 'Admin', 0, $window[1]['content']);
 
         $member = Member::selectOne(1);
@@ -164,7 +164,7 @@ final class BuddyListTest extends FeatureTestCase
 
         $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         static::assertSame('contacts', $window[1]['id']);
-        static::assertSame('Buddies', $window[1]['title']);
+        static::assertSame('Contacts', $window[1]['title']);
         DOMAssert::assertSelectEquals('.contact .name', 'Admin', 1, $window[1]['content']);
 
         DOMAssert::assertSelectCount('.contact.blocked', 1, $window[1]['content']);
@@ -187,7 +187,7 @@ final class BuddyListTest extends FeatureTestCase
 
         $window = array_find($json, static fn($cmd): bool => $cmd[0] === 'window');
         static::assertSame('contacts', $window[1]['id']);
-        static::assertSame('Buddies', $window[1]['title']);
+        static::assertSame('Contacts', $window[1]['title']);
         static::assertStringNotContainsString('Admin', $window[1]['content']);
 
         DOMAssert::assertSelectCount('.contact.blocked', 0, $window[1]['content']);

@@ -108,7 +108,7 @@ final readonly class Contacts implements Route
             ]),
             'id' => 'contacts',
             'pos' => 'tr 20 20',
-            'title' => 'Buddies',
+            'title' => 'Contacts',
         ]);
     }
 
