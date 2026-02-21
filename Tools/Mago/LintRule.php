@@ -12,6 +12,8 @@ final class LintRule
 
     public string $description;
 
+    public string $level;
+
     public string $good_example;
 
     public string $bad_example;

@@ -71,7 +71,7 @@ final readonly class Migrations implements CLIRoute
         try {
             $model = $this->container->get("Jax\\Models\\{$modelName}");
             $this->console->log($this->utils->createTableQueryFromModel($model));
-        } catch (NotFoundException) {
+        } catch (NotFoundException | DependencyException) {
             $this->console->error('Cannot find model: ' . $modelName);
         }
     }

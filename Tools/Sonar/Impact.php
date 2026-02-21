@@ -8,5 +8,6 @@ final class Impact
 {
     public string $softwareQuality;
 
+    //  BLOCKER, HIGH, MEDIUM, LOW, INFO
     public string $severity;
 }

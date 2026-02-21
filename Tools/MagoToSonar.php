@@ -52,7 +52,12 @@ final readonly class MagoToSonar implements CLIRoute
             $sonarRule->type = 'CODE_SMELL';
 
             $impact = new Impact();
-            $impact->severity = 'MEDIUM';
+            $impact->severity = match($rule->level) {
+                'Error' => 'BLOCKER',
+                'Note', 'Help' => 'LOW',
+                'Warning' => 'MEDIUM',
+                default => 'MEDIUM'
+            };
 
             $impact->softwareQuality = match ($rule->category) {
                 'BestPractices', 'Deprecation', 'Safety', 'Security' => 'RELIABILITY',
