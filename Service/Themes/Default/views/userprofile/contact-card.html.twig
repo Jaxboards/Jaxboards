@@ -46,7 +46,7 @@
     {% endif %}
     <div class="contact_details">
         {%- for type,link in contactLinks -%}
-            <a class="{{ type }} contact" title="{{ type }} contact" href="{{ link[0] }}">&nbsp;</a>
+            <a class="{{ type }} contact" title="{{ type }} contact" href="{{ link.href }}">&nbsp;</a>
         {%- endfor -%}
     </div>
 </div>
