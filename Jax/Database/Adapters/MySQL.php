@@ -89,12 +89,7 @@ final readonly class MySQL implements Adapter
 
         return implode(PHP_EOL, [
             "CREATE TABLE {$tableQuoted} (",
-            '    ' . implode(
-                ','
-                . PHP_EOL
-                . '    ',
-                array_merge($fields, $keys, $constraints),
-            ),
+            '    ' . implode(',' . PHP_EOL . '    ', array_merge($fields, $keys, $constraints)),
             ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci',
         ]);
     }

@@ -28,8 +28,8 @@ use function str_replace;
 use function trim;
 
 use const ENT_QUOTES;
-use const PREG_SET_ORDER;
 use const PHP_EOL;
+use const PREG_SET_ORDER;
 
 final class BBCode
 {
@@ -252,8 +252,7 @@ final class BBCode
             'image' => '![$1]($2)',
             'italic' => '*$1*',
             'list' => '$2',
-            'quote' => static fn(array $match) => '> '
-                . str_replace(PHP_EOL, PHP_EOL . '> ', $match[2]),
+            'quote' => static fn(array $match) => '> ' . str_replace(PHP_EOL, PHP_EOL . '> ', $match[2]),
             'size' => '$3',
             'spoiler' => '||$1||',
             'strikethrough' => '~~$2~~',

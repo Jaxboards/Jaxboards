@@ -41,10 +41,7 @@ final class FileSystemTest extends UnitTestCase
         static::assertTrue($this->fileSystem->getFileInfo('jaxboards/deep')->isDir());
 
         // putContents
-        $this->fileSystem->putContents(
-            'jaxboards/test',
-            implode(PHP_EOL, range(1, 100)),
-        );
+        $this->fileSystem->putContents('jaxboards/test', implode(PHP_EOL, range(1, 100)));
 
         $fileInfo = $this->fileSystem->getFileInfo('jaxboards/test');
         static::assertTrue($fileInfo->isFile());
@@ -57,10 +54,7 @@ final class FileSystemTest extends UnitTestCase
         static::assertTrue($this->fileSystem->getFileInfo('jaxboards/renamed')->isFile());
 
         // Create test file again so we have multiple files
-        $this->fileSystem->putContents(
-            'jaxboards/test',
-            implode(PHP_EOL, range(1, 5)),
-        );
+        $this->fileSystem->putContents('jaxboards/test', implode(PHP_EOL, range(1, 5)));
 
         // copyDirectory
         $this->fileSystem->copyDirectory('jaxboards', 'jaxboards2');
