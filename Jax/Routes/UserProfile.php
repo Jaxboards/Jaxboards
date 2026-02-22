@@ -79,7 +79,7 @@ final readonly class UserProfile implements Route
             'content' => $this->template->render('userprofile/contact-card', [
                 'member' => $member,
                 'contactLinks' => $this->contactDetails->getContactLinks($member),
-                'canViewProfile' => $this->user->getGroup()?->canViewFullProfile,
+                'perms' => $this->user->getGroup(),
                 'isGuest' => $this->user->isGuest(),
                 'isFriend' => $this->isUserInList($member->id, $this->user->get()->friends),
                 'isEnemy' => $this->isUserInList($member->id, $this->user->get()->enemies),

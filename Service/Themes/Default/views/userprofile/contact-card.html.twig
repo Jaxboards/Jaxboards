@@ -18,10 +18,12 @@
         >
             IM {{ member.displayName }}
         </button>
-        <br>
-        <a href="{{ url('inbox', { view: 'compose', mid: member.id }) }}" data-action="close">
-            PM {{ member.displayName }}
-        </a>
+        {% if perms.canPM %}
+          <br>
+          <a href="{{ url('inbox', { view: 'compose', mid: member.id }) }}" data-action="close">
+              PM {{ member.displayName }}
+          </a>
+        {% endif %}
         <br>
         <br>
         {% if isFriend %}
@@ -39,7 +41,7 @@
         <br>
     {% endif %}
 
-    {% if canViewProfile %}
+    {% if perms.canViewProfile %}
       <a href="{{ url('profile', { id: member.id, page: 'activity' }) }}" data-action="close">
           Full Profile
       </a>
