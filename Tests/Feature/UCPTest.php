@@ -131,11 +131,11 @@ final class UCPTest extends FeatureTestCase
 
     public function testEmail(): void
     {
-        $this->actingAs('member', ['email' => 'jaxboards@jaxboards.com']);
+        $this->actingAs('member', ['email' => 'example@example.com']);
 
         $page = $this->go('/ucp/email');
 
-        DOMAssert::assertSelectEquals('strong', 'jaxboards@jaxboards.com', 1, $page);
+        DOMAssert::assertSelectEquals('strong', 'example@example.com', 1, $page);
     }
 
     public function testEmailChange(): void
@@ -143,13 +143,13 @@ final class UCPTest extends FeatureTestCase
         $this->actingAs('member');
 
         $page = $this->go(new Request(get: ['path' => '/ucp', 'what' => 'email'], post: [
-            'email' => 'jaxboards@jaxboards.com',
+            'email' => 'example@example.com',
             'submit' => 'true',
         ]));
 
         static::assertStringContainsString('Email settings updated.', $page);
 
-        static::assertSame('jaxboards@jaxboards.com', Member::selectOne(2)?->email);
+        static::assertSame('example@example.com', Member::selectOne(2)?->email);
     }
 
     public function testChangePassword(): void
@@ -262,10 +262,10 @@ final class UCPTest extends FeatureTestCase
         $this->actingAs('member');
 
         $page = $this->go(new Request(get: ['path' => '/ucp', 'what' => 'avatar'], post: [
-            'changedava' => 'https://jaxboards.com',
+            'changedava' => 'https://example.com',
         ]));
 
-        DOMAssert::assertSelectCount('.avatar img[src="https://jaxboards.com"]', 1, $page);
+        DOMAssert::assertSelectCount('.avatar img[src="https://example.com"]', 1, $page);
     }
 
     public function testSoundSettings(): void

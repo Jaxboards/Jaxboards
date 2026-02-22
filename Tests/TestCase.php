@@ -64,8 +64,8 @@ abstract class TestCase extends PHPUnitTestCase
         $this->container->set(ServiceConfig::class, autowire()->constructorParameter('config', [
             'badnamechars' => "@[^\\w' ?]@",
             'boardname' => 'Example Forums',
-            'domain' => 'jaxboards.com',
-            'mail_from' => 'Example Forums <no-reply@jaxboards.com>',
+            'domain' => 'example.com',
+            'mail_from' => 'Example Forums <no-reply@example.com>',
             'prefix' => 'jaxboards',
             'service' => false,
             'sql_driver' => 'sqliteMemory',

@@ -71,7 +71,7 @@ final class TextFormattingTest extends UnitTestCase
         parent::setUp();
 
         $this->container->set(Request::class, autowire()->constructorParameter('server', [
-            'HTTP_HOST' => 'jaxboards.com',
+            'HTTP_HOST' => 'example.com',
         ]));
 
         // Router is used for URL generation, we don't care to test that here
@@ -108,8 +108,8 @@ final class TextFormattingTest extends UnitTestCase
     {
         return [
             ['https://google.com',                               '[url=https://google.com]https://google.com[/url]'],
-            ['https://jaxboards.com/topic/1',                    '[url=/topic/1]Topic #1[/url]'],
-            ['https://jaxboards.com/topic/3?findpost=33&pid=33', '[url=/topic/3?findpost=33&pid=33]Post #33[/url]'],
+            ['https://example.com/topic/1',                      '[url=/topic/1]Topic #1[/url]'],
+            ['https://example.com/topic/3?findpost=33&pid=33',   '[url=/topic/3?findpost=33&pid=33]Post #33[/url]'],
             ["nbsp\u{a0}https://google.com",                     "nbsp\u{a0}[url=https://google.com]https://google.com[/url]"],
         ];
     }
