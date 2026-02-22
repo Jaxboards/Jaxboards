@@ -215,8 +215,8 @@ final readonly class Tools
             </style>
             HTML, $phpinfo);
 
-        $phpinfo = preg_replace("/<\/body>.*/s", "", $phpinfo);
+        $phpinfo = preg_replace("/<\/body>.*/s", '', (string) $phpinfo);
 
-        $this->page->addContentBox('PHPInfo', "<div id=\"phpinfo\">$phpinfo</div>");
+        $this->page->addContentBox('PHPInfo', "<div id=\"phpinfo\">{$phpinfo}</div>");
     }
 }
