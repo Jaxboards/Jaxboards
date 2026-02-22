@@ -572,7 +572,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
       case "createlink": {
         let link = prompt("Link:") || "";
         if (!link) return;
-        if (!/^(https?|ftp|mailto):/.test(link)) link = `https://${arg1}`;
+        if (!/^(https?|ftp|mailto):/.test(link)) link = `https://${arg}`;
 
         bbcode = `[url=${link}]${selection}[/url]`;
         execCommandArgs[2] = link;
