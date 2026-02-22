@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Tools;
 
+use const PHP_EOL;
+
 class Console
 {
     public function success(string $message): void
     {
-        echo "\033[32m{$message}\033[0m" . PHP_EOL;
+        $this->log("\033[32m{$message}\033[0m");
     }
 
     public function error(string $message): void
@@ -18,7 +20,7 @@ class Console
 
     public function notice(string $message): void
     {
-        echo "\033[33m{$message}\033[0m" . PHP_EOL;
+        $this->log("\033[33m{$message}\033[0m");
     }
 
     public function log(string $message): void

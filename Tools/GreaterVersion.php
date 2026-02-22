@@ -36,12 +36,12 @@ final readonly class GreaterVersion implements CLIRoute
         $version2 = $this->getVersion($params[1] ?? '');
 
         if (version_compare($version1, $version2, '>=')) {
-            echo $version1;
+            $this->console->log($version1);
 
             exit(0);
         }
 
-        echo $version2;
+        $this->console->log($version2);
     }
 
     private function getVersion(string $file): string
