@@ -67,7 +67,7 @@ final class BBCode
         'image' => '/\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[\/img\]/Ui',
         'list' => '/\[(ul|ol)\](.*)\[\/\1\]/Usi',
         'othello' => '/\[othello\](.*?)\[\/othello\]/is',
-        'quote' => '/\[quote(?>=([^\]]+))?\](.*?)\[\/quote\]\r?\n?/is',
+        'quote' => '/\[quote(?>=([^\]]+))?\](.*?)\[\/quote\](?:\r\n|\n)?/is',
         'size' => '/\[size=([0-4]?\d)(px|pt|em|)\](.*)\[\/size\]/Usi',
         'table' => '/\[table\](.*)\[\/table\]/Usi',
         'video' => '/\[video\](.*)\[\/video\]/Usi',
@@ -185,7 +185,7 @@ final class BBCode
         foreach ($codes as $index => [, $language, $code]) {
             $code = $language === '=php'
                 ? highlight_string($code, true)
-                : preg_replace("@([ \r\n]|^) @m", '$1&nbsp;', htmlspecialchars($code, ENT_QUOTES));
+                : preg_replace("@((?: |\r\n|\n)|^) @m", '$1&nbsp;', htmlspecialchars($code, ENT_QUOTES));
 
             $text = str_replace("[code]{$index}[/code]", "<div class=\"bbcode code {$language}\">{$code}</div>", $text);
         }
@@ -252,7 +252,10 @@ final class BBCode
             'image' => '![$1]($2)',
             'italic' => '*$1*',
             'list' => '$2',
-            'quote' => static fn(array $match) => '> ' . str_replace(PHP_EOL, PHP_EOL . '> ', $match[2]),
+            'quote' => static fn(array $match) => '> ' . str_replace([
+                "\r\n",
+                "\n",
+            ], PHP_EOL . '> ', $match[2]),
             'size' => '$3',
             'spoiler' => '||$1||',
             'strikethrough' => '~~$2~~',
