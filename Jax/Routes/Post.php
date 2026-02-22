@@ -224,10 +224,6 @@ final class Post implements Route
 
     private function updatePost(ModelsPost $modelsPost): void
     {
-        $modelsPost->editby = $this->user->get()->id;
-        $modelsPost->editDate = $this->database->datetime();
-        $modelsPost->update();
-
         $this->page->command(
             'update',
             "#pid_{$modelsPost->id} .post_content",
@@ -275,6 +271,11 @@ final class Post implements Route
             return 'The post you are trying to edit does not exist.';
         }
 
+        if ($this->request->post('submit') === 'Cancel') {
+            $this->updatePost($post);
+            return null;
+        }
+
         if (!$this->canEdit($topic, $post)) {
             return "You don't have permission to edit that post!";
         }
@@ -285,6 +286,9 @@ final class Post implements Route
             if (array_key_exists($removeEmbed, $openGraphMetadata)) {
                 unset($openGraphMetadata[$removeEmbed]);
                 $post->openGraphMetadata = json_encode($openGraphMetadata, JSON_THROW_ON_ERROR);
+                $post->editby = $this->user->get()->id;
+                $post->editDate = $this->database->datetime();
+                $post->update();
                 $this->updatePost($post);
             }
 
@@ -299,6 +303,9 @@ final class Post implements Route
             }
 
             $post->post = $postData ?? '';
+            $post->editby = $this->user->get()->id;
+            $post->editDate = $this->database->datetime();
+            $post->update();
             $this->updatePost($post);
 
             if ($isTopicPost) {
