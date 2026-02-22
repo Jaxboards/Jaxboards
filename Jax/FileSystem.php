@@ -35,7 +35,6 @@ use function unlink;
 use const FILTER_VALIDATE_URL;
 use const GLOB_BRACE;
 use const GLOB_ONLYDIR;
-use const PHP_EOL;
 use const SEEK_END;
 
 /**
@@ -252,11 +251,15 @@ final readonly class FileSystem
             $file->fseek($pos);
             $character = $file->fgetc();
 
-            if ($pos === 0 || $character !== PHP_EOL) {
+            // \n will match the ending of the most common line breaks (
+            // \r\n for windows and \n for everything standard) but files from
+            // stranger platforms may have issues here
+            // @see https://en.wikipedia.org/wiki/Newline#Representation
+            if ($pos === 0 || $character !== "\n") {
                 $lastLine = $character . $lastLine;
             }
 
-            if ($pos !== 0 && $character !== PHP_EOL) {
+            if ($pos !== 0 && $character !== "\n") {
                 continue;
             }
 
