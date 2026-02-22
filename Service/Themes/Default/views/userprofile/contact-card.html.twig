@@ -11,13 +11,15 @@
 </div>
 <div class="right">
     {% if not isGuest %}
-        <button
-            data-action="close"
-            onclick="IMWindow('{{ member.id }}',this.innerHTML.match(/IM (.+)/)[1]);"
-            type="button"
-        >
-            IM {{ member.displayName }}
-        </button>
+        {% if perms.canIM %}
+          <button
+              data-action="close"
+              onclick="IMWindow('{{ member.id }}',this.innerHTML.match(/IM (.+)/)[1]);"
+              type="button"
+          >
+              IM {{ member.displayName }}
+          </button>
+        {% endif %}
         {% if perms.canPM %}
           <br>
           <a href="{{ url('inbox', { view: 'compose', mid: member.id }) }}" data-action="close">

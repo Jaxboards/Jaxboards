@@ -101,9 +101,6 @@ final readonly class UserProfile implements Route
         ]);
         $this->session->set('locationVerbose', "Viewing {$member->displayName}'s profile");
 
-        if (!$this->user->getGroup()->canViewFullProfile) {
-        }
-
         $profile = $this->user->getGroup()->canViewFullProfile
             ? $this->template->render('userprofile/full-profile', [
                 'birthdate' => $member->birthdate !== null ? $this->date->dateAsCarbon($member->birthdate) : null,
@@ -112,6 +109,7 @@ final readonly class UserProfile implements Route
                 'group' => Group::selectOne($member->groupID),
                 'ipAddress' => $member->ip !== '' ? $this->ipAddress->asHumanReadable($member->ip) : '',
                 'member' => $member,
+                'perms' => $this->user->getGroup(),
                 'selectedTab' => $page ?: 'activity',
                 'skin' => $this->page->getSelectedSkin($member->skinID),
                 'tabHTML' => $tabHTML,
