@@ -1384,13 +1384,14 @@ textarea {
   }
 
   & .post_buttons {
-    flex: 1;
-    flex-wrap: wrap;
     display: flex;
-    gap: 5px;
+    flex-wrap: wrap;
+    flex: 1;
     font-size: smaller;
-    text-align: left;
+    gap: 5px;
+    min-width: 200px;
     padding: 4px;
+    text-align: left;
   }
 
   & .post_info {
