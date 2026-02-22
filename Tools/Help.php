@@ -33,18 +33,14 @@ final readonly class Help implements CLIRoute
             $this->console->log($this->getHelpText(Help::class));
 
             $this->console->log(
-                'Available commands are:'
-                . PHP_EOL
-                . '- '
-                . implode(PHP_EOL . '- ', array_keys($commands)),
+                'Available commands are:' . PHP_EOL . '- ' . implode(PHP_EOL . '- ', array_keys($commands)),
             );
             return;
         }
 
         if (!array_key_exists($command, $commands)) {
             $this->console->log(
-                'Help: command not found. Available commands are: '
-                . implode(', ', array_keys($commands)),
+                'Help: command not found. Available commands are: ' . implode(', ', array_keys($commands)),
             );
             return;
         }

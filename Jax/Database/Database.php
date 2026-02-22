@@ -66,9 +66,7 @@ final class Database
                 );
             }
         } catch (Exception $e) {
-            echo 'Failed to connect to database. '
-                . "The following error was collected: <pre>{$e}</pre>"
-                . PHP_EOL;
+            echo 'Failed to connect to database. ' . "The following error was collected: <pre>{$e}</pre>" . PHP_EOL;
 
             exit(1);
         }
