@@ -46,7 +46,7 @@ final class OpenGraphTest extends UnitTestCase
 
         return [
             [
-                'http://dev.null',
+                'https://dev.null',
                 <<<'HTML'
                     <html>
                     	<head>

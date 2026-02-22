@@ -238,7 +238,7 @@ final class UCPTest extends FeatureTestCase
         static::assertSame('Steam', $member?->contactSteam);
         static::assertSame('Twitter', $member?->contactTwitter);
         static::assertSame('BlueSky', $member?->contactBlueSky);
-        static::assertSame('http://google.com', $member?->website);
+        static::assertSame('https://google.com', $member?->website);
 
         $date = $this->container->get(Date::class);
         $birthdate = $date->datetimeAsCarbon($member?->birthdate);
@@ -262,10 +262,10 @@ final class UCPTest extends FeatureTestCase
         $this->actingAs('member');
 
         $page = $this->go(new Request(get: ['path' => '/ucp', 'what' => 'avatar'], post: [
-            'changedava' => 'http://jaxboards.com',
+            'changedava' => 'https://jaxboards.com',
         ]));
 
-        DOMAssert::assertSelectCount('.avatar img[src="http://jaxboards.com"]', 1, $page);
+        DOMAssert::assertSelectCount('.avatar img[src="https://jaxboards.com"]', 1, $page);
     }
 
     public function testSoundSettings(): void
@@ -340,7 +340,7 @@ final class UCPTest extends FeatureTestCase
             'contactSteam' => 'Steam',
             'contactTwitter' => 'Twitter',
             'contactBlueSky' => 'BlueSky',
-            'website' => 'http://google.com',
+            'website' => 'https://google.com',
             'submit' => 'Save Profile Settings',
         ];
     }

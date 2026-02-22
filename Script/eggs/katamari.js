@@ -2,14 +2,14 @@
 
 /*!
  * jQuery JavaScript Library v1.5.1
- * http://jquery.com/
+ * https://jquery.com/
  *
  * Copyright 2011, John Resig
  * Dual licensed under the MIT or GPL Version 2 licenses.
- * http://jquery.org/license
+ * https://jquery.org/license
  *
  * Includes Sizzle.js
- * http://sizzlejs.com/
+ * https://sizzlejs.com/
  * Copyright 2011, The Dojo Foundation
  * Released under the MIT, BSD, and GPL Licenses.
  *
@@ -4716,7 +4716,7 @@
 /*
 Copyright Alex Leone, David Nufer, David Truong, 2011-03-11. kathack.com
 
-javascript:var i,s,ss=['http://kathack.com/js/kh.js','http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js'];for(i=0;i!=ss.length;i++){s=document.createElement('script');s.src=ss[i];document.body.appendChild(s);}void(0);
+javascript:var i,s,ss=['https://kathack.com/js/kh.js','https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js'];for(i=0;i!=ss.length;i++){s=document.createElement('script');s.src=ss[i];document.body.appendChild(s);}void(0);
 
 */
 var BORDER_STYLE = "1px solid #bbb",
@@ -5604,7 +5604,7 @@ text-align:left;\
 z-index:501;";
   d.innerHTML =
     '<h1 style="font-size:16pt">\
-<a href="http://kathack.com/" style="color:blue;text-decoration:none;">\
+<a href="https://kathack.com/" style="color:blue;text-decoration:none;">\
 Katamari!</a></h1>\
 <button style="position:absolute;top:0;right:0;">X</button>\
 <p>Controls: Hold down <b><select id="mouseb">\

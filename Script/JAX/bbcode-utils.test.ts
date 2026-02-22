@@ -7,8 +7,8 @@ test("bbcodeToHTML", function () {
   expect(bbcodeToHTML("[s]Strikethrough Text[/s]")).toBe(
     "<del>Strikethrough Text</del>",
   );
-  expect(bbcodeToHTML("[img]http://example.com/image.jpg[/img]")).toBe(
-    '<img src="http://example.com/image.jpg">',
+  expect(bbcodeToHTML("[img]https://example.com/image.jpg[/img]")).toBe(
+    '<img src="https://example.com/image.jpg">',
   );
   expect(bbcodeToHTML("[color=red]Red Text[/color]")).toBe(
     '<span style="color:red">Red Text</span>',
@@ -19,7 +19,7 @@ test("bbcodeToHTML", function () {
   expect(bbcodeToHTML("[font='Arial']Arial Text[/font]")).toBe(
     '<span style="font-family:Arial">Arial Text</span>',
   );
-  expect(bbcodeToHTML("[url=http://example.com]Example Link[/url]")).toBe(
-    '<a href="http://example.com">Example Link</a>',
+  expect(bbcodeToHTML("[url=https://example.com]Example Link[/url]")).toBe(
+    '<a href="https://example.com">Example Link</a>',
   );
 });
