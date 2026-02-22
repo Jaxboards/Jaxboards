@@ -552,6 +552,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         element.alt = alt;
         element.src = src;
 
+        bbcode = `[img=${alt}]${src}[/img]`;
         execCommandArgs[0] = "insertHTML";
         execCommandArgs[2] = element.outerHTML;
         break;
@@ -584,8 +585,8 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         if (!email) return;
 
         email = `mailto:${email}`;
-        bbcode = `[url=${email}]${selection}[/url]`;
 
+        bbcode = `[url=${email}]${selection}[/url]`;
         execCommandArgs[0] = "createlink";
         execCommandArgs[2] = email;
         break;
@@ -596,7 +597,6 @@ export default class Editor extends Component<HTMLTextAreaElement> {
           execCommandArgs[0] = "hilitecolor";
         }
         bbcode = `[bgcolor=${arg}]${selection}[/bgcolor]`;
-
         break;
       }
 
@@ -619,6 +619,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
 
       case "c_quote": {
         const quotee = prompt("Who said this?") || "";
+
         bbcode = `[quote${quotee ? `=${quotee}` : ""}]${selection}[/quote]`;
         execCommandArgs[0] = "inserthtml";
         execCommandArgs[2] = bbcode;
@@ -637,6 +638,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         if (!url) {
           return;
         }
+
         bbcode = `[video]${url}[/video]`;
         execCommandArgs[0] = "inserthtml";
         execCommandArgs[2] = bbcode;
