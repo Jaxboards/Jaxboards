@@ -5,6 +5,11 @@ body {
   padding: 0;
 }
 
+* {
+  box-sizing: border-box;
+  word-break: break-word;
+}
+
 .as-text {
   background: none;
   border: none;
