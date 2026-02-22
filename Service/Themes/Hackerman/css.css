@@ -600,18 +600,18 @@ textarea {
   }
 
   & .right {
-    padding: 10px;
+    margin: 10px;
     width: 150px;
   }
 
   & .left {
-    padding: 10px 30px;
+    margin: 10px 30px;
     max-width: 150px;
   }
 
   & .username {
     font-weight: bold;
-    padding: 10px 0;
+    margin: 10px 0;
   }
 
   & .contact_details {
