@@ -15,7 +15,7 @@ final class Index implements CLIRoute
 
     public function route(array $params): void
     {
-        $command = $params[1] ?? '';
+        $command = $params[0] ?? '';
         $commands = $this->getAllCommands();
 
         if (array_key_exists($command, $commands)) {
