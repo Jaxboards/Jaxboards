@@ -47,11 +47,13 @@ final readonly class Tools
             'backup' => 'Backup',
             'files' => 'File Manager',
             'viewErrorLog' => 'View Error Log',
+            'phpinfo' => 'View PHPInfo',
         ]);
 
         match ($this->request->both('do')) {
             'backup' => $this->backup(),
             'viewErrorLog' => $this->viewErrorLog(),
+            'phpinfo' => $this->viewPHPInfo(),
             default => $this->fileManager->render(),
         };
     }
@@ -181,5 +183,40 @@ final readonly class Tools
         }
 
         $this->page->addContentBox("PHP Error Log ({$logPath})", $contents);
+    }
+
+    private function viewPHPInfo(): void
+    {
+        ob_start();
+        phpinfo();
+        $phpinfo = ob_get_clean();
+
+        // I reject your CSS and substitute my own!
+        $phpinfo = preg_replace('/<!DOCTYPE[^>]+>.*<body>/s', <<<'HTML'
+            <style type="text/css">
+                #phpinfo table {border-collapse: collapse; border: 0; width: 100%; box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.2);}
+                .center th {text-align: center !important;}
+                #phpinfo td, #phpinfo th {border: 1px solid #666; font-size: 75%; vertical-align: baseline; padding: 4px 5px;}
+                #phpinfo th {position: sticky; top: 0; background: inherit;}
+                .p {text-align: left;}
+                .e {background-color: #ccf; width: 300px; font-weight: bold;}
+                .h {background-color: #99c; font-weight: bold;}
+                .v {background-color: #ddd; max-width: 300px; overflow-x: auto; word-wrap: break-word;}
+                .v i {color: #999;}
+                #phpinfo img {float: right; border: 0;}
+                #phpinfo hr {background-color: #ccc; border: 0; height: 1px;}
+                :root {--php-dark-grey: #333; --php-dark-blue: #4F5B93; --php-medium-blue: #8892BF; --php-light-blue: #E2E4EF; --php-accent-purple: #793862}@media (prefers-color-scheme: dark) {
+                #phpinfo {background: var(--php-dark-grey); color: var(--php-light-blue)}
+                .h td, td.e, th {border-color: #606A90}
+                .e {background-color: #404A77}
+                .h {background-color: var(--php-dark-blue)}
+                .v {background-color: var(--php-dark-grey)}
+                hr {background-color: #505153}
+            </style>
+            HTML, $phpinfo);
+
+        $phpinfo = preg_replace("/<\/body>.*/s", "", $phpinfo);
+
+        $this->page->addContentBox('PHPInfo', "<div id=\"phpinfo\">$phpinfo</div>");
     }
 }

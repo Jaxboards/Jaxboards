@@ -154,6 +154,7 @@ final class App
             'backup' => 'Backup Forum',
             'files' => 'File Manager',
             'viewErrorLog' => 'View Error Log',
+            'phpinfo' => 'View PHPInfo',
         ]);
 
         $this->page->append('nav', $this->page->render('nav.html', $this->nav));
