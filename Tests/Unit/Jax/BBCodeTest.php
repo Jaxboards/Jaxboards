@@ -293,7 +293,7 @@ final class BBCodeTest extends UnitTestCase
             ],
             [
                 '[h2]Header 2[/h2]',
-                "# Header 2\n",
+                "# Header 2" . PHP_EOL,
             ],
             [
                 '[spoiler]hidden text[/spoiler]',
@@ -305,8 +305,12 @@ final class BBCodeTest extends UnitTestCase
                 '',
             ],
             [
-                "[ul]*item\n*item 2[/ul]",
-                "*item\n*item 2",
+                '[ul]*item'
+                . PHP_EOL
+                . '*item 2[/ul]',
+                '*item'
+                . PHP_EOL
+                . '*item 2',
             ],
             [
                 <<<'BBCODE'

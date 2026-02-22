@@ -35,6 +35,7 @@ use function unlink;
 use const FILTER_VALIDATE_URL;
 use const GLOB_BRACE;
 use const GLOB_ONLYDIR;
+use const PHP_EOL;
 use const SEEK_END;
 
 /**
@@ -251,11 +252,11 @@ final readonly class FileSystem
             $file->fseek($pos);
             $character = $file->fgetc();
 
-            if ($pos === 0 || $character !== "\n") {
+            if ($pos === 0 || $character !== PHP_EOL) {
                 $lastLine = $character . $lastLine;
             }
 
-            if ($pos !== 0 && $character !== "\n") {
+            if ($pos !== 0 && $character !== PHP_EOL) {
                 continue;
             }
 

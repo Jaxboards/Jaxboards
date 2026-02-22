@@ -14,6 +14,8 @@ use Tests\UnitTestCase;
 
 use function implode;
 
+use const PHP_EOL;
+
 /**
  * @internal
  */
@@ -42,7 +44,7 @@ final class OpenGraphTest extends UnitTestCase
      */
     public static function fetchDataProvider(): array
     {
-        $newlineDescription = implode("\n", ['this', 'has', 'newlines']);
+        $newlineDescription = implode(PHP_EOL, ['this', 'has', 'newlines']);
 
         return [
             [

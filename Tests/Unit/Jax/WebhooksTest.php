@@ -23,6 +23,7 @@ use function PHPUnit\Framework\once;
 use const CURLOPT_CUSTOMREQUEST;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
+use const PHP_EOL;
 
 /**
  * @internal
@@ -60,7 +61,7 @@ final class WebhooksTest extends UnitTestCase
                     CURLOPT_POSTFIELDS => $this->assertEquals($value, json_encode([
                         'username' => 'Sean',
                         'avatar_url' => 'avatar url',
-                        'content' => implode("\n", [
+                        'content' => implode(PHP_EOL, [
                             '[topic title](<https://example.com/topic/0?findpost=0>)',
                             '',
                             'post content',

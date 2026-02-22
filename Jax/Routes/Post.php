@@ -94,7 +94,9 @@ final class Post implements Route
         if ($this->request->file('Filedata') !== null) {
             $attachmentId = $this->api->upload();
             if ($attachmentId !== '') {
-                $this->postData .= "\n\n[attachment]{$attachmentId}[/attachment]";
+                $this->postData .= PHP_EOL
+                    . PHP_EOL
+                    . "[attachment]{$attachmentId}[/attachment]";
             }
         }
 
