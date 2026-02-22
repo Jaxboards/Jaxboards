@@ -314,7 +314,7 @@ final class BBCodeTest extends UnitTestCase
                     line
                     quote[/quote]
                     BBCODE,
-                implode(PHP_EOL, ['> multi','> line', '> quote'])
+                implode(PHP_EOL, ['> multi', '> line', '> quote']),
             ],
             [
                 '[quote=Sean]quoted text[/quote]',
