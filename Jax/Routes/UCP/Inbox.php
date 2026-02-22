@@ -134,6 +134,10 @@ final readonly class Inbox
         $error = null;
         $recipient = null;
 
+        if (!$this->user->getGroup()->canPM) {
+            return $this->page->error('Sorry, you do not have permission to send private messages');
+        }
+
         $mid = (int) $this->request->asString->both('mid');
         $to = $this->request->asString->both('to');
 

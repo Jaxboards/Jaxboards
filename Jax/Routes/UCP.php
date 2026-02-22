@@ -119,6 +119,7 @@ final readonly class UCP implements Route
     {
         $page = $this->template->render('ucp/index', [
             'page' => $page,
+            'perms' => $this->user->getGroup(),
         ]);
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
