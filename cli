@@ -13,12 +13,13 @@ $commands = $container->get(Index::class)->getAllCommands();
 $command = $argv[1] ?? '';
 
 if (array_key_exists($command, $commands)) {
-  $container->get($commands[$command])->route(array_slice($argv, 2));
-  exit;
+    $container->get($commands[$command])->route(array_slice($argv ?? [], 2));
+
+    exit(0);
 }
 
 echo 'Invalid command. Available commands are:'
-  . PHP_EOL
-  . '- '
-  . implode(PHP_EOL . '- ', array_keys($commands))
-  . PHP_EOL;
+    . PHP_EOL
+    . '- '
+    . implode(PHP_EOL . '- ', array_keys($commands))
+    . PHP_EOL;
