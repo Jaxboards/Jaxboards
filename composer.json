@@ -58,6 +58,7 @@
     "analyze": "mago analyze",
     "lint": "mago lint",
     "ci-lint": "php ./cli mago-to-sonar",
+    "clean": "rm -rf .cache",
     "format": "mago format",
     "migrations": "php ./cli migrate",
     "rector": "rector",
