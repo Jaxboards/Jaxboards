@@ -252,10 +252,15 @@ final class BBCode
             'image' => '![$1]($2)',
             'italic' => '*$1*',
             'list' => '$2',
-            'quote' => static fn(array $match) => '> ' . str_replace([
-                "\r\n",
-                "\n",
-            ], PHP_EOL . '> ', $match[2]),
+            'quote' => static fn(array $match) => '> '
+            . str_replace(
+                [
+                    "\r\n",
+                    "\n",
+                ],
+                PHP_EOL . '> ',
+                $match[2],
+            ),
             'size' => '$3',
             'spoiler' => '||$1||',
             'strikethrough' => '~~$2~~',
