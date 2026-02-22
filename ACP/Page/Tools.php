@@ -188,6 +188,7 @@ final readonly class Tools
     private function viewPHPInfo(): void
     {
         ob_start();
+        // @mago-expect lint:no-debug-symbols
         phpinfo();
         $phpinfo = ob_get_clean();
 
