@@ -20,4 +20,5 @@ if (array_key_exists($command, $commands)) {
 echo 'Invalid command. Available commands are:'
   . PHP_EOL
   . '- '
-  . implode(PHP_EOL . '- ', array_keys($commands));
+  . implode(PHP_EOL . '- ', array_keys($commands))
+  . PHP_EOL;
