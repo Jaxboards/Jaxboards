@@ -78,9 +78,10 @@ final readonly class Calendar implements Route
         }
 
         $weeks = [];
-        $days = [
-            ['offset' => $offset],
-        ];
+        $days = [];
+        if ($offset > 0) {
+            $days[] = ['offset' => $offset];
+        }
 
         for ($x = 1; $x <= $daysInMonth; ++$x) {
             $days[] = [
