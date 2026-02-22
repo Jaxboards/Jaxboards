@@ -532,7 +532,12 @@ export default class Editor extends Component<HTMLTextAreaElement> {
           return;
         }
         bbcode = `[img=${attributes.alt}]${attributes.src}[/img]`;
-        arg1 = `<img alt="${attributes.alt}" src="${attributes.src}"/>`;
+        arg1 = ((alt: string, src: string): string => {
+          const element = new Image();
+          element.alt = alt;
+          element.src = src;
+          return element.outerHTML;
+        })(attributes.alt, attributes.src);
         break;
       case "insertorderedlist":
         if (!this.htmlMode) {
