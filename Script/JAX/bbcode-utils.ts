@@ -40,6 +40,9 @@ const tagsToBBCode: Record<string, (inner: string, el: HTMLElement) => string> =
       if (img.dataset.emoji) {
         return ` ${img.dataset.emoji}`;
       }
+      if (src && alt) {
+        return `[img=${alt}]${src}[/img]`;
+      }
       if (src) {
         return `[img]${src}[/img]`;
       }
