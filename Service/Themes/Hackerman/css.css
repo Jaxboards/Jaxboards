@@ -1143,8 +1143,7 @@ textarea {
 
   & .item_1,
   & .item_2 {
-    width: 10vw;
-    max-width: 75px;
+    min-width: 80px;
     text-align: center;
   }
 
