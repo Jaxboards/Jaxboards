@@ -11,8 +11,8 @@ use Override;
  * Tool for accessing and manipulating composer's version field.
  *
  * Usage:
- * - `composer-version` - returns composer's current version
- * - `composer-version update` - update's composer to latest version
+ * - composer-version - returns composer's current version
+ * - composer-version update - updates composer to latest version
  */
 final readonly class ComposerVersion implements CLIRoute
 {

@@ -26,8 +26,8 @@ use const PHP_EOL;
  * Updates a database from one version to another.
  *
  * Usage:
- * - `migrate`: Attempts to the database schema to the latest version.
- * - `migrate create $modelName`: Displays create table statement for model
+ * - migrate: Attempts to the database schema to the latest version.
+ * - migrate create $modelName: Displays create table statement for model
  */
 final readonly class Migrations implements CLIRoute
 {
