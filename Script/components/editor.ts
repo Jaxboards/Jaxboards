@@ -490,7 +490,6 @@ export default class Editor extends Component<HTMLTextAreaElement> {
   cmd(command: string, arg?: string) {
     const selection = this.getSelection();
     let bbcode = "";
-    let realCommand = command;
 
     const execCommandArgs: Parameters<Document["execCommand"]> = [
       command,
@@ -619,9 +618,9 @@ export default class Editor extends Component<HTMLTextAreaElement> {
       }
 
       case "c_quote": {
-        realCommand = "inserthtml";
         const quotee = prompt("Who said this?") || "";
         bbcode = `[quote${quotee ? `=${quotee}` : ""}]${selection}[/quote]`;
+        execCommandArgs[0] = "inserthtml";
         execCommandArgs[2] = bbcode;
         break;
       }
@@ -634,7 +633,6 @@ export default class Editor extends Component<HTMLTextAreaElement> {
       }
 
       case "c_youtube": {
-        realCommand = "inserthtml";
         const url = prompt("Video URL?") || "";
         if (!url) {
           return;
@@ -666,7 +664,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     }
 
     if (this.htmlMode) {
-      this.doc?.execCommand(realCommand, false, arg);
+      this.doc?.execCommand(...execCommandArgs);
       this.doc?.dispatchEvent(new Event("input"));
       this.window?.focus();
     } else {
