@@ -146,7 +146,7 @@ final class ServiceInstallTest extends TestCase
             'admin_username' => 'Sean',
             'admin_password' => 'password',
             'admin_password_2' => 'password',
-            'admin_email' => 'admin_email@jaxboards.com',
+            'admin_email' => 'admin_email@example.com',
             'domain' => 'domain.com',
             'sql_db' => 'sql_db',
             'sql_host' => 'sql_host',
@@ -161,7 +161,7 @@ final class ServiceInstallTest extends TestCase
         static::assertEquals(false, $serviceConfig['service']);
         static::assertSame('Jaxboards', $serviceConfig['boardname']);
         static::assertSame('domain.com', $serviceConfig['domain']);
-        static::assertSame('Sean <admin_email@jaxboards.com>', $serviceConfig['mail_from']);
+        static::assertSame('Sean <admin_email@example.com>', $serviceConfig['mail_from']);
         static::assertSame('jaxboards', $serviceConfig['prefix']);
         static::assertSame('sql_db', $serviceConfig['sql_db']);
         static::assertSame('sql_host', $serviceConfig['sql_host']);
@@ -175,7 +175,7 @@ final class ServiceInstallTest extends TestCase
 
         $member = Member::selectOne(1);
         static::assertSame('Sean', $member?->displayName);
-        static::assertSame('admin_email@jaxboards.com', $member?->email);
+        static::assertSame('admin_email@example.com', $member?->email);
         static::assertTrue(password_verify('password', $member?->pass));
 
         static::assertStringContainsString('Redirecting', $page);
@@ -204,7 +204,7 @@ final class ServiceInstallTest extends TestCase
             'admin_username' => 'Sean',
             'admin_password' => 'password',
             'admin_password_2' => 'password',
-            'admin_email' => 'admin_email@jaxboards.com',
+            'admin_email' => 'admin_email@example.com',
             'domain' => 'domain.com',
             'sql_db' => 'sql_db',
             'sql_host' => 'sql_host',
@@ -219,7 +219,7 @@ final class ServiceInstallTest extends TestCase
         static::assertEquals(true, $serviceConfig['service']);
         static::assertSame('Jaxboards', $serviceConfig['boardname']);
         static::assertSame('domain.com', $serviceConfig['domain']);
-        static::assertSame('Sean <admin_email@jaxboards.com>', $serviceConfig['mail_from']);
+        static::assertSame('Sean <admin_email@example.com>', $serviceConfig['mail_from']);
         static::assertSame('', $serviceConfig['prefix']);
         static::assertSame('sql_db', $serviceConfig['sql_db']);
         static::assertSame('sql_host', $serviceConfig['sql_host']);
@@ -233,12 +233,12 @@ final class ServiceInstallTest extends TestCase
 
         $member = Member::selectOne(1);
         static::assertSame('Sean', $member?->displayName);
-        static::assertSame('admin_email@jaxboards.com', $member?->email);
+        static::assertSame('admin_email@example.com', $member?->email);
         static::assertTrue(password_verify('password', $member?->pass));
 
         $this->container->get(Database::class)->setPrefix('');
         $directory = Directory::selectOne(1);
-        static::assertSame('admin_email@jaxboards.com', $directory?->registrarEmail);
+        static::assertSame('admin_email@example.com', $directory?->registrarEmail);
         static::assertSame('support', $directory?->boardname);
 
         static::assertStringContainsString('Redirecting', $page);

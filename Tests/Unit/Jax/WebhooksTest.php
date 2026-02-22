@@ -61,7 +61,7 @@ final class WebhooksTest extends UnitTestCase
                         'username' => 'Sean',
                         'avatar_url' => 'avatar url',
                         'content' => implode("\n", [
-                            '[topic title](<https://jaxboards.com/topic/0?findpost=0>)',
+                            '[topic title](<https://example.com/topic/0?findpost=0>)',
                             '',
                             'post content',
                         ]),

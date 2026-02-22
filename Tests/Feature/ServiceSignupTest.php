@@ -70,7 +70,9 @@ final class ServiceSignupTest extends FeatureTestCase
     {
         $this->setServiceConfig(['service' => false]);
 
-        $page = $this->go(new Request(server: ['SERVER_NAME' => 'www.jaxboards.com']), pageClass: ServiceSignup::class);
+        $page = $this->go(new Request(server: [
+            'SERVER_NAME' => 'www.example.com',
+        ]), pageClass: ServiceSignup::class);
 
         static::assertSame('Service mode not enabled', $page);
     }
@@ -79,7 +81,9 @@ final class ServiceSignupTest extends FeatureTestCase
     {
         $this->setServiceConfig(['service' => true]);
 
-        $page = $this->go(new Request(server: ['SERVER_NAME' => 'www.jaxboards.com']), pageClass: ServiceSignup::class);
+        $page = $this->go(new Request(server: [
+            'SERVER_NAME' => 'www.example.com',
+        ]), pageClass: ServiceSignup::class);
 
         DOMAssert::assertSelectCount('input[name=boardurl]', 1, $page);
         DOMAssert::assertSelectCount('input[name=username]', 1, $page);
@@ -109,13 +113,13 @@ final class ServiceSignupTest extends FeatureTestCase
                 'email' => 'email@email.com',
                 'submit' => 'Register a Forum!',
             ], server: [
-                'SERVER_NAME' => 'www.jaxboards.com',
+                'SERVER_NAME' => 'www.example.com',
                 'REMOTE_ADDR' => '::1',
             ]),
             pageClass: ServiceSignup::class,
         );
 
-        $this->assertRedirect('https://boardname.jaxboards.com', [], $page);
+        $this->assertRedirect('https://boardname.example.com', [], $page);
 
         // Check board directory was added
         $database = $this->container->get(Database::class);

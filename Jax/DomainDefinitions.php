@@ -77,7 +77,7 @@ final class DomainDefinitions
      * Attempts to retrieve the board's slug/prefix from the hostname
      * when in service mode.
      *
-     * Given: "test.jaxboards.com" returns "test"
+     * Given: "test.example.com" returns "test"
      */
     private function getPrefix(string $host): string
     {
