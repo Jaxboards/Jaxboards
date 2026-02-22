@@ -29,16 +29,9 @@ final class DomainDefinitions
     ) {
         // Figure out url.
         $host = $request->server('SERVER_NAME') ?? (string) $this->serviceConfig->getSetting('domain');
-        $port = $request->server('SERVER_PORT') ?? '443';
-        $scheme = $request->server('REQUEST_SCHEME') ?? 'https';
 
         // Build the url.
-        $boardURL = $scheme . '://' . $host;
-        if (!($port === '443' && $scheme === 'https') && !($port === '80' && $scheme === 'http')) {
-            $boardURL .= $port !== '' && $port !== '0' ? ':' . $port : '';
-        }
-
-        $this->boardURL = $boardURL;
+        $this->boardURL = 'https://' . $host;
 
         $this->prefix = $this->getPrefix($host);
     }
