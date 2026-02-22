@@ -107,10 +107,10 @@ final class TextFormattingTest extends UnitTestCase
     public static function linkifyDataProvider(): array
     {
         return [
-            ['http://google.com',                               '[url=http://google.com]http://google.com[/url]'],
-            ['http://jaxboards.com/topic/1',                    '[url=/topic/1]Topic #1[/url]'],
-            ['http://jaxboards.com/topic/3?findpost=33&pid=33', '[url=/topic/3?findpost=33&pid=33]Post #33[/url]'],
-            ["nbsp\u{a0}http://google.com",                     "nbsp\u{a0}[url=http://google.com]http://google.com[/url]"],
+            ['https://google.com',                               '[url=https://google.com]https://google.com[/url]'],
+            ['https://jaxboards.com/topic/1',                    '[url=/topic/1]Topic #1[/url]'],
+            ['https://jaxboards.com/topic/3?findpost=33&pid=33', '[url=/topic/3?findpost=33&pid=33]Post #33[/url]'],
+            ["nbsp\u{a0}https://google.com",                     "nbsp\u{a0}[url=https://google.com]https://google.com[/url]"],
         ];
     }
 

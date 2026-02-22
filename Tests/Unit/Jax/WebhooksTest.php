@@ -34,7 +34,7 @@ final class WebhooksTest extends UnitTestCase
     {
         $this->setBoardConfig([
             'webhooks' => [
-                'discord' => 'http://localhost',
+                'discord' => 'https://localhost',
             ],
         ]);
 

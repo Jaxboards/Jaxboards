@@ -3924,7 +3924,7 @@
 
             var $TypeError = GetIntrinsic("%TypeError%");
 
-            // http://www.ecma-international.org/ecma-262/5.1/#sec-9.10
+            // https://www.ecma-international.org/ecma-262/5.1/#sec-9.10
 
             module.exports = function CheckObjectCoercible(value, optMessage) {
               if (value == null) {
@@ -3968,7 +3968,7 @@
             var $floor = $Math.floor;
             var $abs = $Math.abs;
 
-            // http://www.ecma-international.org/ecma-262/5.1/#sec-9.4
+            // https://www.ecma-international.org/ecma-262/5.1/#sec-9.4
 
             module.exports = function ToInteger(value) {
               var number = ToNumber(value);
@@ -3992,7 +3992,7 @@
           /***/ function (module, exports, __webpack_require__) {
             "use strict";
 
-            // http://www.ecma-international.org/ecma-262/5.1/#sec-9.3
+            // https://www.ecma-international.org/ecma-262/5.1/#sec-9.3
 
             module.exports = function ToNumber(value) {
               return +value;
@@ -4611,7 +4611,7 @@
               return void 0;
             };
 
-            // http://www.ecma-international.org/ecma-262/6.0/#sec-toprimitive
+            // https://www.ecma-international.org/ecma-262/6.0/#sec-toprimitive
             module.exports = function ToPrimitive(input) {
               if (isPrimitive(input)) {
                 return input;
@@ -5693,7 +5693,7 @@
                         var g = ((clr16 >> 5) & 31) * 8;
                         var r = (clr16 & 31) * 8;
                         // convert RGB to color int
-                        // this code is straight out of Android: http://git.io/F1lZtw
+                        // this code is straight out of Android: https://git.io/F1lZtw
                         this.colors[palette][i] =
                           (0xff << 24) | (r << 16) | (g << 8) | b;
                       }

@@ -62,15 +62,15 @@ final class BBCodeTest extends UnitTestCase
     {
         static::assertEqualsCanonicalizing(
             [
-                'http://cnn.com',
-                'http://twitch.com',
+                'https://cnn.com',
+                'https://twitch.com',
             ],
             $this->bbCode->getURLs(<<<'BBCODE'
-                [url]http://cnn.com[/url]
+                [url]https://cnn.com[/url]
 
-                http://foxnews.com
+                https://foxnews.com
 
-                [url=http://twitch.com]http://google.com[/url]
+                [url=https://twitch.com]https://google.com[/url]
                 BBCODE),
         );
     }
@@ -134,16 +134,16 @@ final class BBCodeTest extends UnitTestCase
                 '<p style="text-align:center">centered text</p>',
             ],
             [
-                '[url]http://example.com[/url]',
-                '<a href="http://example.com">http://example.com</a>',
+                '[url]https://example.com[/url]',
+                '<a href="https://example.com">https://example.com</a>',
             ],
             [
                 '[url]https://example.com[/url]',
                 '<a href="https://example.com">https://example.com</a>',
             ],
             [
-                '[url=http://example.com]Example[/url]',
-                '<a href="http://example.com">Example</a>',
+                '[url=https://example.com]Example[/url]',
+                '<a href="https://example.com">Example</a>',
             ],
             [
                 '[url=https://example.com]Example[/url]',
@@ -154,12 +154,12 @@ final class BBCodeTest extends UnitTestCase
                 '<a href="/katamari">Katamari</a>',
             ],
             [
-                '[img]http://example.com/image.jpg[/img]',
-                '<img src="http://example.com/image.jpg" title="" alt="" class="bbcodeimg">',
+                '[img]https://example.com/image.jpg[/img]',
+                '<img src="https://example.com/image.jpg" title="" alt="" class="bbcodeimg">',
             ],
             [
-                '[img=An image]http://example.com/image.jpg[/img]',
-                '<img src="http://example.com/image.jpg" title="An image" alt="An image" class="bbcodeimg">',
+                '[img=An image]https://example.com/image.jpg[/img]',
+                '<img src="https://example.com/image.jpg" title="An image" alt="An image" class="bbcodeimg">',
             ],
             ...array_map(
                 static fn(int $num): array => [
@@ -264,16 +264,16 @@ final class BBCodeTest extends UnitTestCase
                 'centered text',
             ],
             [
-                '[url]http://example.com[/url]',
-                '[http://example.com](http://example.com)',
+                '[url]https://example.com[/url]',
+                '[https://example.com](https://example.com)',
             ],
             [
                 '[url]https://example.com[/url]',
                 '[https://example.com](https://example.com)',
             ],
             [
-                '[url=http://example.com]Example[/url]',
-                '[Example](http://example.com)',
+                '[url=https://example.com]Example[/url]',
+                '[Example](https://example.com)',
             ],
             [
                 '[url=https://example.com]Example[/url]',
@@ -284,12 +284,12 @@ final class BBCodeTest extends UnitTestCase
                 '[Katamari](/katamari)',
             ],
             [
-                '[img]http://example.com/image.jpg[/img]',
-                '![](http://example.com/image.jpg)',
+                '[img]https://example.com/image.jpg[/img]',
+                '![](https://example.com/image.jpg)',
             ],
             [
-                '[img=An image]http://example.com/image.jpg[/img]',
-                '![An image](http://example.com/image.jpg)',
+                '[img=An image]https://example.com/image.jpg[/img]',
+                '![An image](https://example.com/image.jpg)',
             ],
             [
                 '[h2]Header 2[/h2]',
@@ -330,8 +330,8 @@ final class BBCodeTest extends UnitTestCase
                 'text',
             ],
             [
-                '[video]http://youtube.com[/video]',
-                'http://youtube.com',
+                '[video]https://youtube.com[/video]',
+                'https://youtube.com',
             ],
             [
                 '[code][b]this should not be bold[/b][/code]',
