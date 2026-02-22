@@ -23,7 +23,7 @@
         {% if perms.canPM %}
           <br>
           <a href="{{ url('inbox', { view: 'compose', mid: member.id }) }}" data-action="close">
-              PM {{ member.displayName }}
+              Message {{ member.displayName }}
           </a>
         {% endif %}
         <br>

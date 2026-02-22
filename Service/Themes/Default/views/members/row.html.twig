@@ -23,7 +23,7 @@
         <a class="{{ service }} contact" href="{{ contact.href }}" title="{{ service }} contact">&nbsp;</a>
     {% endfor %}
     <a
-        title="PM this member"
+        title="Message this member"
         class="pm contact"
         href="{{ url('inbox', { view: 'compose', mid: member.id }) }}"
     ></a>

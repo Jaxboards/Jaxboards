@@ -15,7 +15,7 @@
       <a href="{{ url('ucp', { what: 'signature' }) }}">Signature</a>
       <a href="{{ url('ucp', { what: 'sounds' }) }}">Sounds/Notifications</a>
 
-      <h2>Private Messaging</h2>
+      <h2>Messaging</h2>
       {% if perms.canPM %}
         <a
           href="{{ url('inbox', { view: 'compose' }) }}"

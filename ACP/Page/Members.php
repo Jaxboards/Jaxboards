@@ -268,7 +268,7 @@ final readonly class Members
             'WHERE `uid`=?',
             $mid1,
         );
-        // PMs.
+        // Messages.
         $this->database->update(
             'messages',
             [
