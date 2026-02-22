@@ -28,7 +28,7 @@ local machine for development purposes.
 ### Prerequisites
 
 - PHP 8.4.16 or higher
-- MySQL >= 8.0.41 < 8.1
+- MySQL >= 8.0.41 < 8.1 or MariaDB 11.7+
 - TLS certificate (for security and protection of user data)
 
 You'll want a dedicated database just for Jaxboards just to avoid any kind of
