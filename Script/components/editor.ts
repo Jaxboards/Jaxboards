@@ -492,8 +492,6 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     let bbcode = "";
     let realCommand = command;
     let arg1 = arg;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/consistent-indexed-object-style
-    const attributes: { [key: string]: any } = Object.create(null);
     switch (command.toLowerCase()) {
       case "bold":
         bbcode = `[b]${selection}[/b]`;
@@ -516,29 +514,27 @@ export default class Editor extends Component<HTMLTextAreaElement> {
       case "justifyleft":
         bbcode = `[align=left]${selection}[/align]`;
         break;
-      case "insertimage":
+      case "insertimage": {
         realCommand = "insertHTML";
-        attributes.src = prompt("Image URL:") || "";
-        if (!attributes.src) {
+        const src = prompt("Image URL:") || "";
+        if (!src) {
           return;
         }
-        if (!isURL(attributes.src)) {
+        if (!isURL(src)) {
           alert("Please enter a valid URL.");
           return;
         }
-        attributes.alt = prompt("How would you describe this image?") || "";
-        if (!attributes.alt) {
+        const alt = prompt("How would you describe this image?") || "";
+        if (!alt) {
           alert("Please enter description for image.");
           return;
         }
-        bbcode = `[img=${attributes.alt}]${attributes.src}[/img]`;
-        arg1 = ((alt: string, src: string): string => {
-          const element = new Image();
-          element.alt = alt;
-          element.src = src;
-          return element.outerHTML;
-        })(attributes.alt, attributes.src);
+        const element = new Image();
+        element.alt = alt;
+        element.src = src;
+        arg1 = element.outerHTML;
         break;
+      }
       case "insertorderedlist":
         if (!this.htmlMode) {
           bbcode = `[ol]${selection.replaceAll(/(.+([\r\n]+|$))/i, "* $1")}[/ol]`;
