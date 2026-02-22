@@ -181,7 +181,7 @@ final class Page
         }
 
         $themePath = $this->fileSystem->pathJoin(
-            $skin->custom !== 0 ? $this->domainDefinitions->getBoardPath() : '',
+            $skin->custom !== 0 ? $this->domainDefinitions->getBoardPath() : 'Service',
             'Themes',
             $skin->title,
         );

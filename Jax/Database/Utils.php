@@ -352,6 +352,15 @@ final readonly class Utils implements Adapter
         $skin->default = 1;
         $skin->insert();
 
+        $skin = new Skin();
+        $skin->id = 2;
+        $skin->using = 1;
+        $skin->title = 'Hackerman';
+        $skin->custom = 0;
+        $skin->wrapper = 'Default';
+        $skin->default = 0;
+        $skin->insert();
+
         $stats = new Stats();
         $stats->id = 1;
         $stats->posts = 1;
