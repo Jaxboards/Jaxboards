@@ -492,7 +492,8 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     let bbcode = "";
     let realCommand = command;
     let arg1 = arg;
-    const attributes: {[key: string]: any} = Object.create(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/consistent-indexed-object-style
+    const attributes: { [key: string]: any } = Object.create(null);
     switch (command.toLowerCase()) {
       case "bold":
         bbcode = `[b]${selection}[/b]`;
