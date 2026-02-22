@@ -23,8 +23,13 @@ class Console
         $this->log("\033[33m{$message}\033[0m");
     }
 
-    public function log(string $message): void
+    /**
+     * @param string ...$lines
+     */
+    public function log(string ...$lines): void
     {
-        echo $message . PHP_EOL;
+        foreach ($lines as $line) {
+            echo $line . PHP_EOL;
+        }
     }
 }
