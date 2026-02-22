@@ -23,9 +23,6 @@ class Console
         $this->log("\033[33m{$message}\033[0m");
     }
 
-    /**
-     * @param string ...$lines
-     */
     public function log(string ...$lines): void
     {
         foreach ($lines as $line) {

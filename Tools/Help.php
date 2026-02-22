@@ -32,10 +32,7 @@ final readonly class Help implements CLIRoute
         if (!$command) {
             $this->console->log($this->getHelpText(Help::class));
 
-            $this->console->log(
-                'Available commands are:',
-                '- ' . implode(PHP_EOL . '- ', array_keys($commands)),
-            );
+            $this->console->log('Available commands are:', '- ' . implode(PHP_EOL . '- ', array_keys($commands)));
             return;
         }
 
