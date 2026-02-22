@@ -8,6 +8,8 @@ use Override;
 use ReflectionClass;
 use ReflectionException;
 
+use const PHP_EOL;
+
 /**
  * Displays help text for a command.
  *
@@ -30,13 +32,19 @@ final readonly class Help implements CLIRoute
         if (!$command) {
             $this->console->log($this->getHelpText(Help::class));
 
-            $this->console->log("Available commands are:\n- " . implode("\n- ", array_keys($commands)));
+            $this->console->log(
+                'Available commands are:'
+                . PHP_EOL
+                . '- '
+                . implode(PHP_EOL . '- ', array_keys($commands)),
+            );
             return;
         }
 
         if (!array_key_exists($command, $commands)) {
             $this->console->log(
-                'Help: command not found. Available commands are: ' . implode(', ', array_keys($commands)),
+                'Help: command not found. Available commands are: '
+                . implode(', ', array_keys($commands)),
             );
             return;
         }

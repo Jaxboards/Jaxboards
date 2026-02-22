@@ -16,6 +16,8 @@ use ReflectionClass;
 use function array_merge;
 use function implode;
 
+use const PHP_EOL;
+
 final readonly class MySQL implements Adapter
 {
     public function __construct(
@@ -85,9 +87,14 @@ final readonly class MySQL implements Adapter
             $keys[] = "{$keyType}KEY {$fieldName} ({$fieldName})";
         }
 
-        return implode("\n", [
+        return implode(PHP_EOL, [
             "CREATE TABLE {$tableQuoted} (",
-            '    ' . implode(",\n    ", array_merge($fields, $keys, $constraints)),
+            '    ' . implode(
+                ','
+                . PHP_EOL
+                . '    ',
+                array_merge($fields, $keys, $constraints),
+            ),
             ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci',
         ]);
     }

@@ -29,6 +29,7 @@ use function trim;
 
 use const ENT_QUOTES;
 use const PREG_SET_ORDER;
+use const PHP_EOL;
 
 final class BBCode
 {
@@ -247,11 +248,12 @@ final class BBCode
             'bold' => '**$1**',
             'color' => '$2',
             'font' => '$2',
-            'header' => "# $2\n",
+            'header' => '# $2' . PHP_EOL,
             'image' => '![$1]($2)',
             'italic' => '*$1*',
             'list' => '$2',
-            'quote' => static fn(array $match) => '> ' . str_replace("\n", "\n> ", $match[2]),
+            'quote' => static fn(array $match) => '> '
+                . str_replace(PHP_EOL, PHP_EOL . '> ', $match[2]),
             'size' => '$3',
             'spoiler' => '||$1||',
             'strikethrough' => '~~$2~~',
