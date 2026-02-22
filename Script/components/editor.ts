@@ -491,31 +491,50 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     const selection = this.getSelection();
     let bbcode = "";
     let realCommand = command;
-    let arg1 = arg;
+
+    const execCommandArgs: Parameters<Document["execCommand"]> = [
+      command,
+      false,
+      arg,
+    ];
+
     switch (command.toLowerCase()) {
-      case "bold":
+      case "bold": {
         bbcode = `[b]${selection}[/b]`;
         break;
-      case "italic":
+      }
+
+      case "italic": {
         bbcode = `[i]${selection}[/i]`;
         break;
-      case "underline":
+      }
+
+      case "underline": {
         bbcode = `[u]${selection}[/u]`;
         break;
-      case "strikethrough":
+      }
+
+      case "strikethrough": {
         bbcode = `[s]${selection}[/s]`;
         break;
-      case "justifyright":
+      }
+
+      case "justifyright": {
         bbcode = `[align=right]${selection}[/align]`;
         break;
-      case "justifycenter":
+      }
+
+      case "justifycenter": {
         bbcode = `[align=center]${selection}[/align]`;
         break;
-      case "justifyleft":
+      }
+
+      case "justifyleft": {
         bbcode = `[align=left]${selection}[/align]`;
         break;
+      }
+
       case "insertimage": {
-        realCommand = "insertHTML";
         const src = prompt("Image URL:") || "";
         if (!src) {
           return;
@@ -529,90 +548,125 @@ export default class Editor extends Component<HTMLTextAreaElement> {
           alert("Please enter description for image.");
           return;
         }
+
         const element = new Image();
         element.alt = alt;
         element.src = src;
-        arg1 = element.outerHTML;
+
+        execCommandArgs[0] = "insertHTML";
+        execCommandArgs[2] = element.outerHTML;
         break;
       }
+
       case "insertorderedlist":
         if (!this.htmlMode) {
           bbcode = `[ol]${selection.replaceAll(/(.+([\r\n]+|$))/i, "* $1")}[/ol]`;
         }
         break;
+
       case "insertunorderedlist":
         if (!this.htmlMode) {
           bbcode = `[ul]${selection.replaceAll(/(.+([\r\n]+|$))/i, "* $1")}[/ul]`;
         }
         break;
-      case "createlink":
-        arg1 = prompt("Link:") || "";
-        if (!arg1) return;
-        if (!/^(https?|ftp|mailto):/.test(arg1)) arg1 = `https://${arg1}`;
-        bbcode = `[url=${arg1}]${selection}[/url]`;
+
+      case "createlink": {
+        let link = prompt("Link:") || "";
+        if (!link) return;
+        if (!/^(https?|ftp|mailto):/.test(link)) link = `https://${arg1}`;
+
+        bbcode = `[url=${link}]${selection}[/url]`;
+        execCommandArgs[2] = link;
         break;
-      case "c_email":
-        arg1 = prompt("Email:") || "";
-        if (!arg1) return;
-        realCommand = "createlink";
-        arg1 = `mailto:${arg1}`;
-        bbcode = `[url=${arg1}]${selection}[/url]`;
+      }
+
+      case "c_email": {
+        let email = prompt("Email:") || "";
+        if (!email) return;
+
+        email = `mailto:${email}`;
+        bbcode = `[url=${email}]${selection}[/url]`;
+
+        execCommandArgs[0] = "createlink";
+        execCommandArgs[2] = email;
         break;
-      case "backcolor":
+      }
+
+      case "backcolor": {
         if (Browser.firefox || Browser.safari) {
-          realCommand = "hilitecolor";
+          execCommandArgs[0] = "hilitecolor";
         }
-        bbcode = `[bgcolor=${arg1}]${selection}[/bgcolor]`;
+        bbcode = `[bgcolor=${arg}]${selection}[/bgcolor]`;
+
         break;
-      case "forecolor":
-        bbcode = `[color=${arg1}]${selection}[/color]`;
+      }
+
+      case "forecolor": {
+        bbcode = `[color=${arg}]${selection}[/color]`;
         break;
-      case "fontname":
-        bbcode = `[font=${arg1}]${selection}[/font]`;
+      }
+
+      case "fontname": {
+        bbcode = `[font=${arg}]${selection}[/font]`;
         break;
-      case "c_code":
+      }
+
+      case "c_code": {
+        bbcode = `[code]${selection}[/code]`;
+        execCommandArgs[0] = "inserthtml";
+        execCommandArgs[2] = bbcode;
+        break;
+      }
+
+      case "c_quote": {
         realCommand = "inserthtml";
-        arg1 = `[code]${selection}[/code]`;
-        bbcode = arg1;
+        const quotee = prompt("Who said this?") || "";
+        bbcode = `[quote${quotee ? `=${quotee}` : ""}]${selection}[/quote]`;
+        execCommandArgs[2] = bbcode;
         break;
-      case "c_quote":
-        realCommand = "inserthtml";
-        arg1 = prompt("Who said this?") || "";
-        arg1 = arg1 ? `=${arg1}` : "";
-        arg1 = `[quote${arg1}]${selection}[/quote]`;
-        bbcode = arg1;
+      }
+
+      case "c_spoiler": {
+        bbcode = `[spoiler]${selection}[/spoiler]`;
+        execCommandArgs[0] = "inserthtml";
+        execCommandArgs[2] = bbcode;
         break;
-      case "c_spoiler":
+      }
+
+      case "c_youtube": {
         realCommand = "inserthtml";
-        arg1 = `[spoiler]${selection}[/spoiler]`;
-        bbcode = arg1;
-        break;
-      case "c_youtube":
-        realCommand = "inserthtml";
-        arg1 = prompt("Video URL?") || "";
-        if (!arg1) {
+        const url = prompt("Video URL?") || "";
+        if (!url) {
           return;
         }
-        arg1 = `[video]${arg1}[/video]`;
-        bbcode = arg1;
+        bbcode = `[video]${url}[/video]`;
+        execCommandArgs[0] = "inserthtml";
+        execCommandArgs[2] = bbcode;
         break;
-      case "inserthtml":
-        bbcode = arg1 || "";
+      }
+
+      case "inserthtml": {
+        bbcode = arg || "";
         break;
-      case "heading":
-        bbcode = `[${arg1}]${selection}[/${arg1}]`;
+      }
+
+      case "heading": {
+        bbcode = `[${arg}]${selection}[/${arg}]`;
 
         // Chrome doesn't support 'heading' so switch to formatBlock
         if (Browser.chrome) {
-          realCommand = "formatBlock";
-          arg1 = `<${arg1}>`;
+          execCommandArgs[0] = "formatBlock";
+          execCommandArgs[2] = `<${arg}>`;
         }
         break;
+      }
+
       default:
         throw new Error(`Unsupported editor command ${command}`);
     }
+
     if (this.htmlMode) {
-      this.doc?.execCommand(realCommand, false, arg1);
+      this.doc?.execCommand(realCommand, false, arg);
       this.doc?.dispatchEvent(new Event("input"));
       this.window?.focus();
     } else {
