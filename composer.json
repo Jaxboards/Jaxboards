@@ -17,7 +17,7 @@
     "optimize-autoloader": true,
     "platform": {
       "composer": "2.9.5",
-      "php": "8.5"
+      "php": "8.4.16"
     },
     "allow-plugins": {
       "carthage-software/mago": true
@@ -47,9 +47,10 @@
     "lib-openssl": "*",
     "lib-zip-libzip": "*",
     "nesbot/carbon": "^3.11",
-    "php": "8.5",
+    "php": "^8.4",
     "php-curl-class/php-curl-class": "^12.0",
     "php-di/php-di": "^7.1",
+    "symfony/polyfill-php85": "^1.33",
     "twig/twig": "^3.23"
   },
   "scripts": {
