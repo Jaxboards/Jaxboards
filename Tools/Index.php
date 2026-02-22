@@ -6,7 +6,7 @@ namespace Tools;
 
 use DI\Container;
 
-final class Index implements CLIRoute
+final readonly class Index implements CLIRoute
 {
     public function __construct(
         private Container $container,
