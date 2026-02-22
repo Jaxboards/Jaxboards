@@ -34,7 +34,7 @@ final readonly class ComposerVersion implements CLIRoute
 
     private function getCurrentVersion(): void
     {
-        echo $this->getPackageJSON()['engines']['composer'] ?? '';
+        $this->console->log($this->getPackageJSON()['engines']['composer'] ?? '');
     }
 
     /**
