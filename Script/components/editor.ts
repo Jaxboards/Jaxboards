@@ -492,6 +492,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     let bbcode = "";
     let realCommand = command;
     let arg1 = arg;
+    const attributes: {[key: string]: any} = Object.create(null);
     switch (command.toLowerCase()) {
       case "bold":
         bbcode = `[b]${selection}[/b]`;
@@ -523,7 +524,8 @@ export default class Editor extends Component<HTMLTextAreaElement> {
           alert("Please enter a valid URL.");
           return;
         }
-        bbcode = `[img]${arg1}[/img]`;
+        attributes.alt = prompt("Alt text:") || "user posted image";
+        bbcode = `[img=${attributes.alt}]${arg1}[/img]`;
         break;
       case "insertorderedlist":
         if (!this.htmlMode) {
