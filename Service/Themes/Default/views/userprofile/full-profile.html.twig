@@ -27,7 +27,7 @@
                 {% endif %}
                 {% if perms.canPM %}
                   <div class="contact pm">
-                      <a href="{{ url('inbox', { view: 'compose', mid: member.id }) }}">PM</a>
+                      <a href="{{ url('inbox', { view: 'compose', mid: member.id }) }}">Message</a>
                   </div>
                 {% endif %}
                 {% if canModerate %}
