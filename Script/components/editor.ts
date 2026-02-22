@@ -526,9 +526,9 @@ export default class Editor extends Component<HTMLTextAreaElement> {
           alert("Please enter a valid URL.");
           return;
         }
-        attributes.alt = prompt("Alt text:") || "";
+        attributes.alt = prompt("How would you describe this image?") || "";
         if (!attributes.alt) {
-          alert("Please enter alt text.");
+          alert("Please enter description for image.");
           return;
         }
         bbcode = `[img=${attributes.alt}]${attributes.src}[/img]`;
