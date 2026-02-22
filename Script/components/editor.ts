@@ -517,11 +517,12 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         bbcode = `[align=left]${selection}[/align]`;
         break;
       case "insertimage":
-        arg1 = prompt("Image URL:") || "";
-        if (!arg1) {
+        realCommand = "insertHTML";
+        attributes.src = prompt("Image URL:") || "";
+        if (!attributes.src) {
           return;
         }
-        if (!isURL(arg1)) {
+        if (!isURL(attributes.src)) {
           alert("Please enter a valid URL.");
           return;
         }
@@ -530,7 +531,8 @@ export default class Editor extends Component<HTMLTextAreaElement> {
           alert("Please enter alt text.");
           return;
         }
-        bbcode = `[img=${attributes.alt}]${arg1}[/img]`;
+        bbcode = `[img=${attributes.alt}]${attributes.src}[/img]`;
+        arg1 = `<img alt="${attributes.alt}" src="${attributes.src}"/>`;
         break;
       case "insertorderedlist":
         if (!this.htmlMode) {
