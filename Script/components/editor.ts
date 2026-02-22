@@ -524,7 +524,11 @@ export default class Editor extends Component<HTMLTextAreaElement> {
           alert("Please enter a valid URL.");
           return;
         }
-        attributes.alt = prompt("Alt text:") || "user posted image";
+        attributes.alt = prompt("Alt text:") || "";
+        if (!attributes.alt) {
+          alert("Please enter alt text.");
+          return;
+        }
         bbcode = `[img=${attributes.alt}]${arg1}[/img]`;
         break;
       case "insertorderedlist":
