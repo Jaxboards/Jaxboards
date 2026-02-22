@@ -41,7 +41,7 @@ final readonly class TextFormatting
      */
     public function linkify(string $text): string
     {
-        return (string) preg_replace_callback('/(^|\s)(https?:\/\/[^\s\)\(<>]+)/u', $this->linkifyCallback(...), $text);
+        return (string) preg_replace_callback('/(^|\s)(https?:\/\/[^\s\)\(<>\[\]]+)/u', $this->linkifyCallback(...), $text);
     }
 
     /**
@@ -196,7 +196,8 @@ final readonly class TextFormatting
         $inner = null;
 
         if (
-            is_array($parts)
+            is_array($parts) &&
+            array_key_exists('path', $parts)
             && array_key_exists('host', $parts)
             && $parts['host'] === $this->request->server('HTTP_HOST')
         ) {
