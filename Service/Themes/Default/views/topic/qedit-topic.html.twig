@@ -9,12 +9,19 @@
       name="ttitle"
       title="Topic Title"
       value="{{ topic.title }}"
+      maxlength="255"
       autofocus
     >
     <br>
     <label for="tdesc">Topic Description:</label>
-    <input type="text" id="tdesc" name="tdesc" title="Topic Description (extra information about your topic)"
-        value="{{ topic.subtitle }}">
+    <input
+      type="text"
+      id="tdesc"
+      name="tdesc"
+      title="Topic Description (extra information about your topic)"
+      value="{{ topic.subtitle }}"
+      maxlength="255"
+    >
     <br>
     <textarea
         id="postdata"
