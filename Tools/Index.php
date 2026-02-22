@@ -19,7 +19,7 @@ final readonly class Index implements CLIRoute
         $commands = $this->getAllCommands();
 
         if (array_key_exists($command, $commands)) {
-            $this->container->get($commands[$command])->route(array_slice($params, 2));
+            $this->container->get($commands[$command])->route(array_slice($params, 1));
 
             exit(0);
         }
