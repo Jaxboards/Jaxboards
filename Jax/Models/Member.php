@@ -28,7 +28,6 @@ final class Member extends Model
     #[Column(name: 'pass', type: 'string', default: '', length: 255, nullable: false)]
     public string $pass = '';
 
-
     /**
      * Auto-generated
      */
