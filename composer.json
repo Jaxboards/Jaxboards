@@ -62,6 +62,10 @@
     "format": "mago format",
     "migrations": "php ./cli migrate",
     "rector": "rector",
+    "test:update-snapshots": [
+      "@putenv UPDATE_SNAPSHOTS=true",
+      "composer test"
+    ],
     "test": [
       "@putenv XDEBUG_MODE=coverage",
       "paratest"

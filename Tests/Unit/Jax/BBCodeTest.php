@@ -314,11 +314,7 @@ final class BBCodeTest extends UnitTestCase
                     line
                     quote[/quote]
                     BBCODE,
-                <<<'MARKDOWN'
-                    > multi
-                    > line
-                    > quote
-                    MARKDOWN,
+                implode(PHP_EOL, ['> multi','> line', '> quote'])
             ],
             [
                 '[quote=Sean]quoted text[/quote]',
