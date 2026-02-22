@@ -41,7 +41,7 @@
         <br>
     {% endif %}
 
-    {% if perms.canViewProfile %}
+    {% if perms.canViewFullProfile %}
       <a href="{{ url('profile', { id: member.id, page: 'activity' }) }}" data-action="close">
           Full Profile
       </a>
