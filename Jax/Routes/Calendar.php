@@ -16,7 +16,6 @@ use Jax\Session;
 use Jax\Template;
 use Override;
 
-use function explode;
 use function gmdate;
 
 final readonly class Calendar implements Route
