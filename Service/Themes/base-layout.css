@@ -163,7 +163,8 @@ img {
       margin: 10px;
       font-size: 1.2rem;
       padding: 2px 25px;
-      background: url("/Service/Themes/Default/icons/inboxicons.png") 0 0 no-repeat;
+      background: url("/Service/Themes/Default/icons/inboxicons.png") 0 0
+        no-repeat;
     }
 
     & h2 {
@@ -222,10 +223,9 @@ img {
   }
 }
 
-
 /* Mod CP */
 #modcp {
-  &>.content {
+  & > .content {
     display: flex;
     flex-wrap: wrap;
   }
@@ -423,7 +423,6 @@ img {
 
 /* Contacts List */
 #contacts {
-
   & .name,
   & .status {
     margin-left: 50px;
@@ -787,7 +786,8 @@ img {
 
     & li {
       display: inline-block;
-      background: url("/Service/Themes/Default/icons/pathsplitter.png") no-repeat;
+      background: url("/Service/Themes/Default/icons/pathsplitter.png")
+        no-repeat;
       padding-left: 20px;
       margin-right: 10px;
 
@@ -815,7 +815,8 @@ img {
     border-right: none;
 
     &::first-letter {
-      background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
+      background: url("/Service/Themes/Default/icons/last.gif") center left
+        no-repeat;
       padding-left: 15px;
     }
   }
