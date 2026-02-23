@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Routes;
 
 use Carbon\Carbon;
+use Carbon\WeekDay;
 use Jax\Date;
 use Jax\Interfaces\Route;
 use Jax\Models\Member;
@@ -46,17 +47,12 @@ final readonly class Calendar implements Route
         }
 
         $today = gmdate('n j Y');
-        [
-            $offset,
-            $daysInMonth,
-            $monthName,
-            $year,
-            $month,
-        ] = explode(' ', Carbon::today('UTC')->addMonthsNoOverflow($monthOffset)->format('w t F Y n'));
-        $offset = (int) $offset;
-        $daysInMonth = (int) $daysInMonth;
-        $year = (int) $year;
-        $month = (int) $month;
+        $firstDayOfMonth = Carbon::today('UTC')->setDay(1)->addMonthsNoOverflow($monthOffset);
+        $offset = $firstDayOfMonth->getDaysFromStartOfWeek(WeekDay::Sunday);
+        $daysInMonth = $firstDayOfMonth->daysInMonth;
+        $year = $firstDayOfMonth->year;
+        $month = $firstDayOfMonth->month;
+        $monthName = $firstDayOfMonth->monthName;
 
         $this->session->set('locationVerbose', 'Checking out the calendar for ' . $monthName . ' ' . $year);
         $members = Member::selectMany('WHERE MONTH(`birthdate`)=? AND YEAR(`birthdate`)<=?', $month, $year);
