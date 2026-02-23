@@ -1,3 +1,5 @@
+@import '../base-layout.css';
+
 :root {
   --black: #000;
   --white: #fff;
@@ -9,30 +11,16 @@
   --heading: linear-gradient(0deg, var(--deep-purple), #560b53);
 }
 
-html {
-  /* set 1rem to 10px */
-  font-size: 62.5%;
-  text-size-adjust: none;
-}
 
 body {
   background: url("./img/background.jpg") black center / cover no-repeat fixed;
   font-family: Arial, sans-serif;
   font-size: 1.6rem;
   color: var(--text-color);
-  overflow-y: scroll;
-}
-
-img {
-  border: 0;
-  max-width: 100%;
-
-  &.avatar {
-    max-width: 150px;
-  }
 }
 
 a {
+
   &:active,
   &:visited,
   &:link {
@@ -55,92 +43,19 @@ textarea {
 .error {
   background: #a00;
   border: 1px solid #f33;
-  margin: 5px;
-  padding: 5px;
 }
 
 .success {
   background: #0a0;
   border: 1px solid #3f3;
-  margin: 5px;
-  padding: 5px;
-}
-
-/* Utility classes */
-.clear {
-  clear: both;
-}
-
-.center {
-  text-align: center;
-}
-
-.display-none {
-  display: none;
 }
 
 /* All windows */
-.windows {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-}
-
 .window {
-  position: fixed;
   box-shadow: 0 0 5px white;
 
   & .title {
-    padding: 5px 20px;
-    cursor: move;
-    text-align: center;
     color: var(--text-color);
-    border-radius: 10px 10px 0 0;
-  }
-
-  & .title .controls {
-    cursor: pointer;
-    position: absolute;
-    top: 4px;
-    right: 2px;
-    font-size: smaller;
-
-    & div {
-      display: inline-block;
-      padding: 0 5px;
-    }
-  }
-
-  &.minimized {
-    position: relative;
-    float: left;
-
-    & .content {
-      top: 0;
-      left: 0;
-      display: none;
-    }
-
-    & .title {
-      top: 0;
-      left: 0;
-      padding-right: 70px;
-    }
-  }
-
-  & .resize {
-    cursor: nw-resize;
-    width: 10px;
-    height: 10px;
-    background: url("/Service/Themes/Default/icons/cornerdrag.png");
-    position: absolute;
-  }
-
-  & .content {
-    text-align: left;
-    overflow: hidden;
-    border-radius: 0 0 10px 10px;
-    padding-bottom: 5px;
   }
 
   & .content,
@@ -150,30 +65,10 @@ textarea {
   }
 }
 
+/* IM windows */
 .im {
-  /* IM windows */
-  & .ims {
-    padding: 5px;
-    width: 200px;
-    height: 100px;
-    overflow: auto;
-  }
-
-  & .content {
-    border-radius: 0;
-    padding: 0;
-  }
-
   & form {
-    display: block;
-    width: 100%;
     border-top: 1px solid #555;
-  }
-
-  & input[type="text"] {
-    padding: 5px;
-    width: 95%;
-    border: none;
   }
 
   & .you .name {
@@ -186,24 +81,12 @@ textarea {
 
   & .action {
     color: #522994;
-
-    & .you,
-    & .them {
-      font-style: italic;
-    }
-  }
-
-  & .offline {
-    display: none;
   }
 
   &.offline .offline {
-    display: block;
     color: #600;
     background: #ecc;
     font-style: italic;
-    padding: 5px;
-    font-size: 1rem;
   }
 }
 
@@ -219,156 +102,45 @@ textarea {
     background: var(--black-bg-transparent);
   }
 
-  & textarea {
-    width: 100%;
-    height: 100px;
-  }
-
-  & .profile-settings label {
-    display: inline-block;
-    width: 120px;
-  }
-
   & .leftbar {
-    float: left;
-    width: 170px;
-
-    & .icon {
-      margin: 10px;
-      font-size: 1.2rem;
-      padding: 2px 25px;
-      background: url("/Service/Themes/Default/icons/inboxicons.png") 0 0
-        no-repeat;
-    }
-
     & h2 {
-      margin: 0;
       background: var(--heading);
-      font-size: 1.6rem;
       border: 1px solid var(--border-blue);
-      padding: 3px;
     }
-  }
-
-  & .icon.inbox {
-    background-position: 0 -32px;
-  }
-
-  & .icon.sent {
-    background-position: 0 -64px;
-  }
-
-  & .icon.flagged {
-    background-position: 0 -96px;
-  }
-
-  & .icon.compose {
-    background-position: 0 -128px;
-  }
-
-  & .leftbar a {
-    display: block;
-    margin: 5px 10px;
-  }
-
-  & .error {
-    margin: 5px;
-    margin-bottom: 15px;
-    padding: 8px;
-    text-align: left;
   }
 }
 
 #ucppage {
   background: var(--black-bg-transparent);
   border-left: 1px solid var(--black);
-  margin-left: 170px;
-  padding: 20px;
-  min-height: 400px;
 
   & h2 {
     border-bottom: 1px solid var(--border-blue);
-    font-size: 2rem;
-  }
-
-  & .tooltip {
-    font-size: 1.4rem;
-    background: url("/Service/Themes/Default/icons/help.png") no-repeat;
-    text-indent: -1000px;
-    display: inline-block;
-    width: 20px;
-    border: none;
-    cursor: help;
   }
 }
 
 /* Mod CP */
 #modcp {
-  & > .content {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
   & .minibox {
     border: 1px solid var(--black);
-    margin: 10px;
 
     & .title {
-      padding: 5px;
       background: var(--heading);
       border: 1px solid var(--border-blue);
     }
 
-    & .content {
-      padding: 5px;
-    }
-
     & .post {
       border-bottom: 1px solid var(--border-blue);
-      padding: 10px;
     }
-  }
-
-  & .leftbar {
-    padding: 10px;
-    width: 150px;
   }
 
   & .modcppage {
-    flex: 1;
     border-left: 1px solid var(--black);
-    padding: 10px;
-    min-height: 200px;
-
-    & .error {
-      margin: 5px;
-      padding: 5px;
-    }
-  }
-
-  & td {
-    vertical-align: top;
-  }
-
-  & textarea {
-    width: 500px;
-    height: 100px;
   }
 
   & .onlinesessions {
-    border-collapse: collapse;
-
     & td {
       border: 1px solid var(--border-blue);
-      padding: 5px;
-    }
-
-    & td:nth-child(2) {
-      text-align: center;
-    }
-
-    & td:nth-child(3) {
-      width: 25%;
     }
   }
 }
@@ -376,16 +148,8 @@ textarea {
 .inbox {
   & .listing {
     border: 1px solid var(--border-blue);
-    font-size: 1.4rem;
-    width: 100%;
-    border-collapse: collapse;
-
-    & .unread {
-      font-weight: bold;
-    }
 
     & td {
-      padding: 2px;
       border: 1px solid var(--border-blue);
       border-style: solid none;
     }
@@ -393,128 +157,35 @@ textarea {
     & tr:hover td {
       background: #111;
     }
-
-    & th {
-      padding: 8px 2px;
-      text-align: left;
-      font-weight: normal;
-    }
-
-    & .center {
-      text-align: center;
-    }
-  }
-
-  & .compose {
-    font-weight: bold;
-    background-position: 0 -128px;
   }
 
   & .composeform {
     background: var(--deep-purple);
-    padding: 10px;
     border: 1px solid #669;
-
-    & label {
-      margin-bottom: 10px;
-      display: inline-block;
-      width: 100px;
-    }
-
-    & textarea {
-      width: 100%;
-      height: 300px;
-    }
-  }
-
-  & .switch.flag {
-    border: none;
-    height: 16px;
-    background: url("/Service/Themes/Default/icons/flags.png") no-repeat;
-    background-position: center 0;
   }
 
   & .messageview {
     border: 1px solid var(--black);
-    padding: 10px;
   }
 
   & .message {
-    margin-top: 10px;
     border: 1px solid #669;
-    padding: 10px;
-  }
-
-  & .messageinfo {
-    font-size: 1.4rem;
-  }
-
-  & .messageinfo .title {
-    font-weight: bold;
-  }
-
-  & .messagebuttons {
-    margin-top: 10px;
-    text-align: left;
   }
 }
 
 /* Shoutbox */
-#shoutbox {
-  background: none;
-}
-
-.shoutbox {
-  display: flex;
-  flex-wrap: wrap;
-}
-
 .shouts {
-  padding: 3px;
   border-right: 1px solid var(--border-blue);
-  font:
-    1.4rem Arial,
-    sans-serif;
-  flex: 1;
-  min-width: 200px;
 }
 
 .shout {
   &.highlight {
     background: #ff0;
   }
-
-  & img {
-    max-height: 150px;
-    max-width: 150px;
-  }
-
-  & .delete {
-    margin-right: 10px;
-    display: none;
-  }
-
-  &:hover .delete {
-    display: inline;
-  }
-
-  & .avatar {
-    max-height: 20px;
-    max-width: 20px;
-    vertical-align: middle;
-  }
-}
-
-.shoutform {
-  align-content: center;
-  margin: 10px 20px;
 }
 
 #shoutbox .action,
-#shoutbox .action a,
-.sbhistory .action,
-.sbhistory .action a {
-  font-style: italic;
+.sbhistory .action {
   color: #f00;
 }
 
@@ -523,19 +194,7 @@ textarea {
   color: #a00;
 }
 
-.sbhistory .shout .delete {
-  margin-right: 10px;
-}
-
-.sbhistory {
-  padding: 10px;
-}
-
 #contacts {
-  & .name,
-  & .status {
-    margin-left: 50px;
-  }
 
   /* Buddy/Contacts List */
   & .online .name {
@@ -550,17 +209,7 @@ textarea {
     color: #f00;
   }
 
-  & .content {
-    height: 300px;
-    width: 200px;
-    overflow-y: auto;
-  }
-
   & .contact {
-    position: relative;
-    cursor: pointer;
-    min-height: 32px;
-    padding: 5px;
     border-bottom: 1px solid var(--border-blue);
     background: none;
   }
@@ -569,147 +218,52 @@ textarea {
     background: #111;
   }
 
-  & .avatar img {
-    max-width: 32px;
-    max-height: 32px;
-  }
-
-  & .avatar {
-    position: absolute;
-  }
-
   & .status {
-    white-space: nowrap;
-    overflow: hidden;
-    font-size: 1.2rem;
     color: #555;
-  }
-
-  & .contact:hover .status {
-    white-space: normal;
-  }
-}
-
-.contact-card {
-  & .content {
-    display: flex;
-  }
-
-  & .content a {
-    font-size: 1.4rem;
-  }
-
-  & .right {
-    margin: 10px;
-    width: 150px;
-  }
-
-  & .left {
-    margin: 10px 30px;
-    max-width: 150px;
-  }
-
-  & .username {
-    font-weight: bold;
-    margin: 10px 0;
-  }
-
-  & .contact_details {
-    font-size: 1.2rem;
-    margin-top: 20px;
-  }
-
-  & .contact_details a:hover {
-    text-decoration: none;
   }
 }
 
 /* User profiles */
 .userprofile {
-  margin: 30px 5px;
-
   & .leftbar {
-    float: left;
-    width: 200px;
     border: 1px solid var(--black);
     background: var(--black);
   }
 
   & .leftbar .username {
-    padding: 0.5em;
-    font-weight: bold;
     background: var(--heading);
-    font-size: 1.6rem;
     border: 1px solid var(--border-blue);
-  }
-
-  & .username .moderate {
-    visibility: visible;
-  }
-
-  & .leftbar .avatar {
-    margin-top: 20px;
-    text-align: center;
   }
 
   & .leftbar .avatar img {
     border: 1px solid var(--black);
   }
 
-  & .leftbar .usertitle {
-    font-size: 1rem;
-    margin: 1px;
-    text-align: center;
-  }
-
   & .infobox {
     background: var(--deep-purple);
     border: 1px solid var(--border-blue);
-    margin: 20px 5px 10px;
-    padding: 5px;
-
-    & .content {
-      font-size: 1rem;
-    }
-
-    & div {
-      font-size: 1rem;
-      margin: 5px;
-    }
   }
 
   & .rightbar {
-    margin-left: 210px;
-
     & .post {
       border-bottom: 1px solid var(--border-blue);
-      padding: 10px;
     }
 
     & .postdate {
-      font-size: 1rem;
-      margin: 10px;
       border: 1px solid #339;
-      padding: 5px;
     }
 
     & .signature {
       border-top: 1px dashed #ccc;
-      margin: 10px 0;
-      padding-top: 10px;
     }
   }
 
   & #pfbox {
     border: 1px solid var(--black);
-    padding: 10px;
     background: var(--black-bg-transparent);
   }
 
   & .pftabs a {
-    margin-left: 5px;
-    display: inline-block;
-    padding: 0.5em;
     border: 1px solid var(--black);
     border-bottom: none;
     background: var(--heading);
@@ -722,130 +276,37 @@ textarea {
   }
 
   & .comment {
-    position: relative;
-    min-height: 80px;
     border-bottom: 1px solid #35485e;
-    padding: 10px;
-
-    & img {
-      max-height: 50px;
-      max-width: 50px;
-    }
-
-    & .userdata {
-      position: absolute;
-    }
-
-    & .commenttext {
-      margin-left: 100px;
-      padding: 10px;
-    }
 
     & .date {
-      position: absolute;
-      top: 0;
-      right: 0;
-      padding: 0;
-      font-size: smaller;
       color: var(--border-blue);
     }
   }
 
   & .contacts {
-    display: inline-block;
-
     & .contact {
       background: none;
       border: 1px solid var(--border-blue);
-      cursor: pointer;
-      padding: 30px 10px;
-      min-height: 80px;
-      width: 120px;
-      float: left;
-      text-align: center;
     }
 
     & .contact:hover {
       background: var(--deep-purple);
     }
-
-    & .contact .avatar img {
-      max-width: 50px;
-      max-height: 50px;
-    }
   }
 }
 
-.badges .badge {
-  display: grid;
-  grid-template-columns: 50px 1fr 1fr;
-  grid-template-areas:
-    "badgeImage title awardDate"
-    "badgeImage description description"
-    "badgeImage reason reason";
-  border-bottom: 1px solid var(--black);
-  padding: 10px 5px;
-
-  & .badge-title {
-    grid-area: title;
-    margin: 0;
-  }
-
-  & .badge-image {
-    grid-area: badgeImage;
-
-    & img {
-      position: relative;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-  }
-
-  & .description {
-    grid-area: description;
-  }
-
-  & .award-date {
-    grid-area: awardDate;
-    text-align: right;
-  }
-
-  & .reason {
-    grid-area: reason;
-  }
-}
-
-/* Activity (global) */
-.activity {
-  padding: 10px 10px 10px 36px;
-  background: url("/Service/Themes/Default/icons/activity.png") no-repeat;
-
-  &.new_post {
-    background-position: 0 -64px;
-  }
-
-  &.profile_name_change {
-    background-position: 0 -128px;
-  }
-
-  &.profile_comment {
-    background-position: 0 -194px;
-  }
-
-  &.buddy_add {
-    background-position: 0 -258px;
+.badges {
+  & .badge {
+    border-bottom: 1px solid var(--black);
   }
 }
 
 /* Surrounding Container/Template for Board */
 #container {
-  margin: 5px auto;
   max-width: 1280px;
-  text-align: left;
-  border-radius: 0 0 15px 15px;
 }
 
+/* Header */
 .head {
   display: flex;
   flex-wrap: wrap;
@@ -860,12 +321,10 @@ textarea {
     content: "";
     position: absolute;
     inset: 3px;
-    background-image: linear-gradient(
-      #2d0537 5%,
-      #3a165c 50%,
-      #23022a 70%,
-      #1d0422 85%
-    );
+    background-image: linear-gradient(#2d0537 5%,
+        #3a165c 50%,
+        #23022a 70%,
+        #1d0422 85%);
     filter: blur(1px);
   }
 
@@ -880,59 +339,21 @@ textarea {
 
 .navigation {
   & ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-
     & li {
-      margin-right: 1px;
-      padding: 11px 20px;
-      white-space: nowrap;
       background: linear-gradient(#2f2f2f, black);
       border-width: 1px;
       border-style: solid;
       border-image: linear-gradient(white, #393939) 1;
       border-bottom: 0;
+
+      &.active {
+        background: linear-gradient(#384b61, #22354b);
+      }
     }
-  }
-
-  & .spacer {
-    flex: 1;
-    padding: 0;
-  }
-
-  & ul li.active {
-    background: linear-gradient(#384b61, #22354b);
   }
 
   & a {
     color: var(--text-color);
-  }
-}
-
-.footer {
-  text-align: center;
-  margin: 10px;
-}
-
-#body {
-  padding-bottom: 20px;
-}
-
-/* Logo */
-#logo {
-  z-index: 1;
-  flex: 1;
-  margin: 20px 40px;
-  align-self: center;
-
-  & img {
-    max-width: initial;
-
-    /* don't let logo shrink */
   }
 }
 
@@ -945,22 +366,6 @@ textarea {
   box-shadow: 2px 2px 5px rgb(0 0 0 / 40%);
   box-sizing: border-box;
   color: var(--text-color);
-  padding: 20px;
-  position: relative;
-  z-index: 1;
-
-  & form {
-    margin: 0;
-    font-size: 1.6rem;
-
-    & input {
-      width: 200px;
-    }
-
-    & input[type="submit"] {
-      width: auto;
-    }
-  }
 
   & .logout,
   & .register {
@@ -971,134 +376,38 @@ textarea {
     color: var(--text-color);
   }
 
-  & .welcome {
-    text-align: center;
-  }
-
   & .lastvisit {
-    margin: 15px 0;
     color: #cfc;
-    text-align: center;
   }
 
   & .controls {
-    display: flex;
-    justify-content: space-evenly;
-
     & a {
       color: var(--text-color);
     }
   }
 
   & .forgot {
-    font-size: smaller;
-    float: right;
     color: var(--text-color);
   }
 }
 
 /* Breadcrumbs */
 #path {
-  font:
-    1.4rem Arial,
-    sans-serif;
   background: var(--black-bg-transparent);
   border: 1px solid var(--border-blue);
   border-style: solid none;
-  margin-top: 10px;
-  padding: 0.5em 0 0.5em 1em;
-
-  & ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-
-    & li {
-      display: inline-block;
-      background: url("/Service/Themes/Default/icons/pathsplitter.png")
-        no-repeat;
-      padding-left: 20px;
-      margin-right: 10px;
-
-      &:first-child {
-        background: none;
-        padding-left: 0;
-      }
-    }
-  }
 }
 
 /* Board Index */
-.idxtools {
-  font-size: smaller;
-  margin: 10px;
-}
-
 .boardindex {
-  width: 100%;
-  border-collapse: collapse;
-  font:
-    1.2rem Arial,
-    sans-serif;
-
   & td {
     border: 1px solid var(--border-blue);
   }
 
   & .last_post {
-    padding: 10px;
-    border-right: none;
-
-    &::first-letter {
-      background: url("/Service/Themes/Default/icons/last.gif") center left
-        no-repeat;
-      padding-left: 15px;
-    }
-
     & a {
       color: #e77700;
     }
-  }
-
-  & .f_icon {
-    border-style: solid none;
-    width: 40px;
-    vertical-align: middle;
-    text-align: center;
-  }
-
-  & .unread .forum a {
-    font-weight: bold;
-  }
-
-  & .forum {
-    border-left: none;
-    padding: 20px;
-    padding-left: 10px;
-
-    & a {
-      font:
-        1.4rem Arial,
-        sans-serif;
-    }
-  }
-
-  & .subforums,
-  & .ledby,
-  & .subforums a,
-  & .ledby a {
-    font-style: italic;
-    font-size: 1rem;
-  }
-
-  & .item_1,
-  & .item_2 {
-    font-size: 1.2rem;
-    width: 20vw;
-    max-width: 165px;
-    text-align: center;
-    padding: 5px 2px;
-    border-right: none;
   }
 }
 
@@ -1106,9 +415,7 @@ textarea {
 .forumindex {
   width: 100%;
   border-collapse: collapse;
-  font:
-    1.2rem Arial,
-    sans-serif;
+  font-size: 1.2rem;
 
   & td {
     padding: 10px;
@@ -1136,8 +443,7 @@ textarea {
   }
 
   & .last_post::first-letter {
-    background: url("/Service/Themes/Default/icons/last.gif") center left
-      no-repeat;
+    background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
     padding-left: 15px;
   }
 
@@ -1159,11 +465,11 @@ textarea {
   }
 }
 
-.locked .topic > a:first-child::before {
+.locked .topic>a:first-child::before {
   content: "🔒";
 }
 
-.pinned .topic > a:first-child {
+.pinned .topic>a:first-child {
   font-style: italic;
 
   &::before {
@@ -1185,9 +491,7 @@ textarea {
 .subindex {
   width: 100%;
   border-collapse: collapse;
-  font:
-    1.2rem Arial,
-    sans-serif;
+  font-size: 1.2rem;
 
   & td {
     border: 1px solid var(--border-blue);
@@ -1202,8 +506,7 @@ textarea {
     color: #e77700;
 
     &::first-letter {
-      background: url("/Service/Themes/Default/icons/last.gif") center left
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
       padding-left: 15px;
     }
   }
@@ -1221,9 +524,7 @@ textarea {
     padding-left: 10px;
 
     & a {
-      font:
-        1.4rem Arial,
-        sans-serif;
+      font-size: 1.4rem;
     }
   }
 
@@ -1287,8 +588,7 @@ textarea {
   & .quotepost {
     padding-left: 18px;
     padding-bottom: 2px;
-    background: url("/Service/Themes/Default/icons/posticons.png") no-repeat top
-      left;
+    background: url("/Service/Themes/Default/icons/posticons.png") no-repeat top left;
   }
 
   & textarea {
@@ -1561,8 +861,7 @@ textarea {
   & .addpoll {
     padding: 0 20px;
     margin: 10px;
-    background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat
-      top left;
+    background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat top left;
   }
 }
 
@@ -1694,7 +993,7 @@ textarea {
     width: 14%;
     border: 1px solid var(--black);
 
-    & > div {
+    &>div {
       height: 100%;
       position: relative;
     }
@@ -1722,7 +1021,7 @@ textarea {
 .box {
   margin: 10px 0;
 
-  & > .title {
+  &>.title {
     position: relative;
     background: linear-gradient(45deg, var(--deep-purple), rgb(0 0 0 / 50%));
     padding: 7px;
@@ -1752,7 +1051,7 @@ textarea {
   & .content {
     background: var(--black-bg-transparent);
 
-    & > .error {
+    &>.error {
       margin: 0;
       padding: 10px;
     }
@@ -1780,8 +1079,7 @@ textarea {
 
 #notification.newmessage {
   padding-left: 60px;
-  background: url("/Service/Themes/Default/icons/newmessage.png") no-repeat 20px
-    center var(--purple);
+  background: url("/Service/Themes/Default/icons/newmessage.png") no-repeat 20px center var(--purple);
 }
 
 .pages .active {
@@ -1880,8 +1178,7 @@ textarea {
   & .stats {
     margin-top: 10px;
     padding: 10px 25px;
-    background: url("/Service/Themes/Default/icons/boardstats.png") left center
-      no-repeat;
+    background: url("/Service/Themes/Default/icons/boardstats.png") left center no-repeat;
     border-top: 1px solid var(--border-blue);
   }
 }
@@ -2068,6 +1365,7 @@ a.mgroup4 {
 }
 
 #validname {
+
   &.valid,
   &.invalid {
     display: inline-block;

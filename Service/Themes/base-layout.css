@@ -1,0 +1,863 @@
+html {
+  /* set 1rem to 10px */
+  font-size: 62.5%;
+  text-size-adjust: none;
+}
+
+body {
+  overflow-y: scroll;
+}
+
+img {
+  border: 0;
+  max-width: 100%;
+
+  &.avatar {
+    max-width: 150px;
+  }
+}
+
+/* Misc (Global) */
+.error,
+.success {
+  margin: 5px;
+  padding: 5px;
+}
+
+/* utility classes */
+.clear {
+  clear: both;
+}
+
+.center {
+  text-align: center;
+}
+
+.display-none {
+  display: none;
+}
+
+/* All windows */
+.windows {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
+
+.window {
+  position: fixed;
+
+  & .title {
+    padding: 5px 20px;
+    cursor: move;
+    text-align: center;
+    border-radius: 10px 10px 0 0;
+  }
+
+  & .title .controls {
+    cursor: pointer;
+    position: absolute;
+    top: 4px;
+    right: 2px;
+    font-size: smaller;
+
+    & div {
+      display: inline-block;
+      padding: 0 5px;
+    }
+  }
+
+  &.minimized {
+    position: relative;
+    float: left;
+
+    & .content {
+      top: 0;
+      left: 0;
+      display: none;
+    }
+
+    & .title {
+      top: 0;
+      left: 0;
+      padding-right: 70px;
+    }
+  }
+
+  & .resize {
+    cursor: nw-resize;
+    width: 10px;
+    height: 10px;
+    background: url("/Service/Themes/Default/icons/cornerdrag.png");
+    position: absolute;
+  }
+
+  & .content {
+    text-align: left;
+    overflow: hidden;
+    border-radius: 0 0 10px 10px;
+    padding-bottom: 5px;
+  }
+}
+
+/* IM windows */
+.im {
+  & .ims {
+    padding: 5px;
+    width: 200px;
+    height: 100px;
+    overflow: auto;
+  }
+
+  & .content {
+    border-radius: 0;
+    padding: 0;
+  }
+
+  & form {
+    display: block;
+    width: 100%;
+  }
+
+  & input[type="text"] {
+    padding: 5px;
+    width: 95%;
+    border: none;
+  }
+
+  & .action,
+  & .action .you,
+  & .action .them {
+    font-style: italic;
+  }
+
+  & .offline {
+    display: none;
+  }
+
+  &.offline .offline {
+    display: block;
+    font-style: italic;
+    padding: 5px;
+    font-size: 1rem;
+  }
+}
+
+/* User Control Panel */
+#ucp {
+  & textarea {
+    width: 100%;
+    height: 100px;
+  }
+
+  & .profile-settings label {
+    display: inline-block;
+    width: 120px;
+  }
+
+  & .leftbar {
+    float: left;
+    width: 170px;
+
+    & .icon {
+      margin: 10px;
+      font-size: 1.2rem;
+      padding: 2px 25px;
+      background: url("/Service/Themes/Default/icons/inboxicons.png") 0 0 no-repeat;
+    }
+
+    & h2 {
+      margin: 0;
+      font-size: 1.6rem;
+      padding: 3px;
+    }
+  }
+
+  & .icon.inbox {
+    background-position: 0 -32px;
+  }
+
+  & .icon.sent {
+    background-position: 0 -64px;
+  }
+
+  & .icon.flagged {
+    background-position: 0 -96px;
+  }
+
+  & .icon.compose {
+    background-position: 0 -128px;
+  }
+
+  & .leftbar a {
+    display: block;
+    margin: 5px 10px;
+  }
+
+  & .error {
+    margin: 5px;
+    margin-bottom: 15px;
+    padding: 8px;
+    text-align: left;
+  }
+}
+
+#ucppage {
+  margin-left: 170px;
+  padding: 20px;
+  min-height: 400px;
+
+  & h2 {
+    font-size: 2rem;
+  }
+
+  & .tooltip {
+    font-size: 1.4rem;
+    background: url("/Service/Themes/Default/icons/help.png") no-repeat;
+    text-indent: -1000px;
+    display: inline-block;
+    width: 20px;
+    border: none;
+    cursor: help;
+  }
+}
+
+
+/* Mod CP */
+#modcp {
+  &>.content {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  & .minibox {
+    margin: 10px;
+
+    & .title {
+      padding: 5px;
+    }
+
+    & .content {
+      padding: 5px;
+    }
+
+    & .post {
+      padding: 10px;
+    }
+  }
+
+  & .leftbar {
+    padding: 10px;
+    width: 150px;
+  }
+
+  & .modcppage {
+    flex: 1;
+    padding: 10px;
+    min-height: 200px;
+
+    & .error {
+      margin: 5px;
+      padding: 5px;
+    }
+  }
+
+  & td {
+    vertical-align: top;
+  }
+
+  & textarea {
+    width: 500px;
+    height: 100px;
+  }
+
+  & .onlinesessions {
+    border-collapse: collapse;
+
+    & td {
+      padding: 5px;
+
+      &:nth-child(2) {
+        text-align: center;
+      }
+
+      &:nth-child(3) {
+        width: 25%;
+      }
+    }
+  }
+}
+
+/* Inbox */
+.inbox {
+  & .listing {
+    font-size: 1.4rem;
+    width: 100%;
+    border-collapse: collapse;
+
+    & .unread {
+      font-weight: bold;
+    }
+
+    & td {
+      padding: 2px;
+      border-style: solid none;
+      background: #eef;
+    }
+
+    & th {
+      padding: 8px 2px;
+      text-align: left;
+      font-weight: normal;
+    }
+  }
+
+  & .compose {
+    font-weight: bold;
+    background-position: 0 -128px;
+  }
+
+  & .composeform {
+    padding: 10px;
+
+    & label {
+      margin-bottom: 10px;
+      display: inline-block;
+      width: 100px;
+    }
+
+    & textarea {
+      width: 100%;
+      height: 300px;
+    }
+  }
+
+  & .switch.flag {
+    border: none;
+    height: 16px;
+    background: url("/Service/Themes/Default/icons/flags.png") no-repeat;
+    background-position: center 0;
+  }
+
+  & .messageview {
+    padding: 10px;
+  }
+
+  & .message {
+    margin-top: 10px;
+    padding: 10px;
+  }
+
+  & .messageinfo {
+    font-size: 1.4rem;
+
+    & .title {
+      font-weight: bold;
+    }
+  }
+
+  & .messagebuttons {
+    margin-top: 10px;
+    text-align: left;
+  }
+}
+
+/* Shoutbox */
+#shoutbox {
+  background: none;
+}
+
+.shoutbox {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.shouts {
+  padding: 3px;
+  font-size: 1.4rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.shout {
+  & img {
+    max-height: 150px;
+    max-width: 150px;
+  }
+
+  & .delete {
+    margin-right: 10px;
+    display: none;
+  }
+
+  &:hover .delete {
+    display: inline;
+  }
+
+  & .avatar {
+    max-height: 20px;
+    max-width: 20px;
+    vertical-align: middle;
+  }
+}
+
+.shoutform {
+  align-content: center;
+  margin: 10px 20px;
+}
+
+#shoutbox .action,
+#shoutbox .action a,
+.sbhistory .action,
+.sbhistory .action a {
+  font-style: italic;
+}
+
+.sbhistory .shout .delete {
+  margin-right: 10px;
+}
+
+.sbhistory {
+  padding: 10px;
+}
+
+/* Contacts List */
+#contacts {
+
+  & .name,
+  & .status {
+    margin-left: 50px;
+  }
+
+  /* Buddy/Contacts List */
+  & .content {
+    height: 300px;
+    width: 200px;
+    overflow-y: auto;
+  }
+
+  & .contact {
+    position: relative;
+    cursor: pointer;
+    min-height: 32px;
+    padding: 5px;
+  }
+
+  & .avatar img {
+    max-width: 32px;
+    max-height: 32px;
+  }
+
+  & .avatar {
+    position: absolute;
+  }
+
+  & .status {
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 1.2rem;
+  }
+
+  & .contact:hover .status {
+    white-space: normal;
+  }
+}
+
+/* Contact Cards */
+.contact-card {
+  & .content {
+    display: flex;
+  }
+
+  & .content a {
+    font-size: 1.4rem;
+  }
+
+  & .right {
+    padding: 10px;
+    width: 150px;
+  }
+
+  & .left {
+    margin: 10px 30px;
+    max-width: 150px;
+  }
+
+  & .username {
+    font-weight: bold;
+    margin: 10px 0;
+  }
+
+  & .contact_details {
+    font-size: 1.2rem;
+    margin-top: 20px;
+  }
+
+  & .contact_details a:hover {
+    text-decoration: none;
+  }
+}
+
+/* User profiles */
+.userprofile {
+  margin: 30px 5px;
+
+  & .leftbar {
+    float: left;
+    width: 200px;
+  }
+
+  & .leftbar .username {
+    padding: 0.5em;
+    font-weight: bold;
+  }
+
+  & .username .moderate {
+    visibility: visible;
+  }
+
+  & .leftbar .avatar {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  & .leftbar .usertitle {
+    font-size: 1rem;
+    margin: 1px;
+    text-align: center;
+  }
+
+  & .infobox {
+    margin: 20px 5px 10px;
+    padding: 5px;
+
+    & .content {
+      font-size: 1rem;
+    }
+
+    & div {
+      font-size: 1rem;
+      margin: 5px;
+    }
+  }
+
+  & .rightbar {
+    margin-left: 210px;
+
+    & .post {
+      padding: 10px;
+    }
+
+    & .postdate {
+      font-size: 1rem;
+      margin: 10px;
+      padding: 5px;
+    }
+
+    & .signature {
+      margin: 10px 0;
+      padding-top: 10px;
+    }
+  }
+
+  & #pfbox {
+    padding: 10px;
+  }
+
+  & .pftabs a {
+    margin-left: 5px;
+    display: inline-block;
+    padding: 0.5em;
+  }
+
+  & .comment {
+    min-height: 80px;
+
+    & img {
+      max-height: 50px;
+      max-width: 50px;
+    }
+
+    & .userdata {
+      position: absolute;
+    }
+
+    & .commenttext {
+      margin-left: 100px;
+      padding: 10px;
+    }
+
+    & .date {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 0;
+      font-size: smaller;
+    }
+  }
+
+  & .contacts {
+    display: inline-block;
+
+    & .contact {
+      cursor: pointer;
+      padding: 30px 10px;
+      min-height: 80px;
+      width: 120px;
+      float: left;
+      text-align: center;
+    }
+
+    & .contact .avatar img {
+      max-width: 50px;
+      max-height: 50px;
+    }
+  }
+}
+
+/* Badges */
+.badges {
+  & .badge {
+    display: grid;
+    grid-template-columns: 50px 1fr 1fr;
+    grid-template-areas:
+      "badgeImage title awardDate"
+      "badgeImage description description"
+      "badgeImage reason reason";
+    padding: 10px 5px;
+
+    & .badge-title {
+      grid-area: title;
+      margin: 0;
+    }
+
+    & .badge-image {
+      grid-area: badgeImage;
+
+      & img {
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    & .description {
+      grid-area: description;
+    }
+
+    & .award-date {
+      grid-area: awardDate;
+      text-align: right;
+    }
+
+    & .reason {
+      grid-area: reason;
+    }
+  }
+}
+
+/* Activity (global) */
+.activity {
+  padding: 10px 10px 10px 36px;
+  background: url("/Service/Themes/Default/icons/activity.png") no-repeat;
+
+  &.new_post {
+    background-position: 0 -64px;
+  }
+
+  &.profile_name_change {
+    background-position: 0 -128px;
+  }
+
+  &.profile_comment {
+    background-position: 0 -194px;
+  }
+
+  &.buddy_add {
+    background-position: 0 -258px;
+  }
+}
+
+/* Surrounding Container/Template for Board */
+#container {
+  margin: 5px auto;
+  max-width: 1280px;
+  box-shadow:
+    rgb(0 0 0 / 20%) -5px 0 2px,
+    rgb(0 0 0 / 20%) 5px 0 2px;
+  border-radius: 0 0 15px 15px;
+}
+
+/* Navigation */
+.navigation {
+  & ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+
+    & li {
+      margin-right: 1px;
+      padding: 11px 20px;
+      white-space: nowrap;
+    }
+  }
+
+  & .spacer {
+    flex: 1;
+    padding: 0;
+  }
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  margin: 10px;
+}
+
+#body {
+  padding-bottom: 20px;
+}
+
+/* Logo */
+#logo {
+  z-index: 1;
+  flex: 1;
+  margin: 20px 40px;
+  align-self: center;
+
+  & img {
+    /* don't let logo shrink */
+    max-width: initial;
+  }
+}
+
+/* UserBox */
+#userbox {
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+
+  & form {
+    margin: 0;
+    font-size: 1.6rem;
+
+    & input {
+      width: 200px;
+    }
+
+    & input[type="submit"] {
+      width: auto;
+    }
+  }
+
+  & .welcome {
+    text-align: center;
+  }
+
+  & .lastvisit {
+    margin: 15px 0;
+    text-align: center;
+  }
+
+  & .controls {
+    display: flex;
+    justify-content: space-evenly;
+  }
+
+  & .forgot {
+    font-size: smaller;
+    float: right;
+  }
+}
+
+/* Breadcrumbs */
+#path {
+  font-size: 1.4rem;
+  margin-top: 10px;
+  padding: 0.5em 0 0.5em 1em;
+
+  & ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    & li {
+      display: inline-block;
+      background: url("/Service/Themes/Default/icons/pathsplitter.png") no-repeat;
+      padding-left: 20px;
+      margin-right: 10px;
+
+      &:first-child {
+        background: none;
+        padding-left: 0;
+      }
+    }
+  }
+}
+
+/* Board Index */
+.idxtools {
+  font-size: smaller;
+  margin: 10px;
+}
+
+.boardindex {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.2rem;
+
+  & .last_post {
+    padding: 10px;
+    border-right: none;
+
+    &::first-letter {
+      background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
+      padding-left: 15px;
+    }
+  }
+
+  & .f_icon {
+    border-style: solid none;
+    width: 40px;
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  & .unread .forum a {
+    font-weight: bold;
+  }
+
+  & .forum {
+    border-left: none;
+    padding: 20px;
+    padding-left: 10px;
+
+    & a {
+      font-size: 1.4rem;
+    }
+  }
+
+  & .subforums,
+  & .ledby,
+  & .subforums a,
+  & .ledby a {
+    font-style: italic;
+    font-size: 1rem;
+  }
+
+  & .item_1,
+  & .item_2 {
+    font-size: 1.2rem;
+    width: 20vw;
+    max-width: 165px;
+    text-align: center;
+    padding: 5px 2px;
+    border-right: none;
+  }
+}
+
+/* STOPPED AT: .forumindex */
