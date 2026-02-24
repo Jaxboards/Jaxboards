@@ -682,9 +682,6 @@ img {
 #container {
   margin: 5px auto;
   max-width: 1280px;
-  box-shadow:
-    rgb(0 0 0 / 20%) -5px 0 2px,
-    rgb(0 0 0 / 20%) 5px 0 2px;
   border-radius: 0 0 15px 15px;
 }
 
@@ -822,7 +819,6 @@ img {
   }
 
   & .f_icon {
-    border-style: solid none;
     width: 40px;
     vertical-align: middle;
     text-align: center;
@@ -861,4 +857,541 @@ img {
   }
 }
 
-/* STOPPED AT: .forumindex */
+/* Forum Listings */
+.forumindex {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.2rem;
+
+  & td {
+    padding: 10px;
+  }
+
+  & .f_icon {
+    width: 12px;
+    padding: 0;
+    background: var(--white);
+    display: none;
+  }
+
+  & .unread .topic {
+    font-weight: bold;
+  }
+
+  & .topic {
+    border-left: none;
+  }
+
+  & .last_post {
+    width: 20vw;
+    max-width: 250px;
+
+    &::first-letter {
+      background: url("/Service/Themes/Default/icons/last.gif") center left
+        no-repeat;
+      padding-left: 15px;
+    }
+  }
+
+  & .item_1,
+  & .item_2 {
+    min-width: 80px;
+    text-align: center;
+  }
+
+  & .error {
+    margin: 0;
+    text-align: center;
+    padding: 20px;
+  }
+
+  & .moderate.selected,
+  & tr:hover .moderate {
+    visibility: visible;
+  }
+}
+
+.moderate {
+  background: url("/Service/Themes/Default/icons/posticons.png");
+  text-indent: -1000px;
+  display: block;
+  visibility: hidden;
+  width: 16px;
+  height: 16px;
+  float: right;
+}
+
+/* Subforums (in forum listings) */
+.subindex {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.2rem;
+
+  & .last_post {
+    padding: 10px;
+    border-right: none;
+
+    & a {
+      color: #e77700;
+    }
+
+    &::first-letter {
+      background: url("/Service/Themes/Default/icons/last.gif") center left
+        no-repeat;
+      padding-left: 15px;
+    }
+  }
+
+  & .f_icon {
+    border-style: solid none;
+    width: 40px;
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  & .forum {
+    border-left: none;
+    padding: 20px;
+    padding-left: 10px;
+
+    & a {
+      font-size: 1.4rem;
+    }
+  }
+
+  & .unread .forum a {
+    font-weight: bold;
+  }
+
+  & .item_1,
+  & .item_2 {
+    font-size: 1.2rem;
+    width: 20vw;
+    max-width: 165px;
+    text-align: center;
+    padding: 5px 2px;
+    border-right: none;
+  }
+}
+
+/* Topic View */
+#intopic {
+  width: 100%;
+  margin: auto;
+  border-collapse: collapse;
+
+  & .topic-post-row {
+    clear: both;
+  }
+
+  & td {
+    vertical-align: top;
+  }
+
+  & .userdata {
+    text-align: center;
+    width: 150px;
+  }
+
+  & .avatar {
+    margin-top: 10px;
+  }
+
+  & .username {
+    padding: 3px;
+
+    & a {
+      font-weight: bold;
+    }
+  }
+
+  & .signature {
+    font-size: smaller;
+    display: inline-block;
+    margin: 20px;
+  }
+
+  & .edit,
+  & .quotepost {
+    padding-left: 18px;
+    padding-bottom: 2px;
+    background: url("/Service/Themes/Default/icons/posticons.png") no-repeat top
+      left;
+  }
+
+  & textarea {
+    width: 100%;
+    height: 200px;
+  }
+
+  & .quotepost {
+    background-position: 0 -32px;
+  }
+
+  & .post {
+    line-height: 140%;
+    max-width: 700px;
+  }
+
+  & .attachment {
+    font-size: smaller;
+  }
+
+  & .post_content {
+    padding: 20px;
+    hyphens: auto;
+  }
+
+  & .posttop {
+    margin-left: 10px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  & .post_buttons {
+    display: flex;
+    flex-wrap: wrap;
+    flex: 1;
+    font-size: smaller;
+    gap: 5px;
+    min-width: 200px;
+    padding: 4px;
+    text-align: left;
+  }
+
+  & .post_info {
+    padding: 4px;
+    text-align: right;
+    font-size: smaller;
+  }
+
+  & .postbottom {
+    height: 1em;
+    text-align: right;
+    border-top: hidden;
+    padding: 5px;
+  }
+
+  /* Post Ratings */
+  & .postrating {
+    min-height: 1.4em;
+    padding-left: 20px;
+
+    & .form {
+      display: none;
+    }
+
+    & .form img {
+      opacity: 0.5;
+    }
+
+    & a:hover img {
+      opacity: 1;
+    }
+  }
+
+  & .topic-post-row:hover .postrating .showrating {
+    display: none;
+  }
+
+  & .topic-post-row:hover .postrating .form {
+    display: block;
+  }
+
+  & .opengraph {
+    border-left-width: 5px;
+    max-width: 80%;
+    margin: 10px 0;
+    padding: 10px;
+
+    & img {
+      max-width: 100%;
+      max-height: 160px;
+    }
+
+    & h4 {
+      margin: 1em 0;
+      font-size: 1.2rem;
+    }
+
+    & p {
+      font-size: 1.2rem;
+    }
+
+    & .remove {
+      float: right;
+    }
+  }
+
+  & .userstats {
+    font-size: smaller;
+    text-align: left;
+    padding: 10px;
+    margin: 10px;
+  }
+
+  & .usertitle {
+    font-size: 0.6em;
+  }
+}
+
+#topic-users-online .content {
+  padding: 5px;
+}
+
+.postrating_list {
+  position: absolute;
+  overflow: hidden;
+  font-size: smaller;
+
+  & .column {
+    width: 90px;
+    float: left;
+  }
+
+  & ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+}
+
+/* New topic, reply, quick reply buttons */
+.topic-buttons-top,
+.topic-buttons-bottom {
+  margin: 10px;
+  text-align: right;
+}
+
+.topic-tools {
+  float: right;
+}
+
+.topic-reply-form textarea {
+  width: 100%;
+  height: 200px;
+}
+
+/* Polls */
+#poll {
+  margin-bottom: 10px;
+
+  & .content {
+    padding: 10px;
+  }
+
+  & .title,
+  & .buttons {
+    text-align: center;
+  }
+
+  & .choice {
+    padding: 5px;
+    margin-bottom: 10px;
+  }
+
+  & table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  & td {
+    padding: 5px;
+  }
+
+  & .bar {
+    height: 16px;
+    display: inline-block;
+  }
+
+  & .numvotes {
+    width: 100px;
+    text-align: center;
+  }
+
+  & .totalvotes {
+    text-align: center;
+    font-weight: bold;
+  }
+}
+
+/* New Topic Form */
+.topicform {
+  padding: 20px;
+
+  & input[type="text"] {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  & label {
+    display: inline-block;
+    width: 100px;
+  }
+
+  & textarea {
+    height: 300px;
+    width: 100%;
+  }
+
+  & .buttons {
+    text-align: center;
+    margin-top: 20px;
+  }
+}
+
+.postoptions {
+  margin-bottom: 10px;
+
+  & .addpoll {
+    padding: 0 20px;
+    margin: 10px;
+    background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat
+      top left;
+  }
+}
+
+#polloptions {
+  padding: 10px;
+
+  & textarea {
+    height: 200px;
+    width: 100%;
+  }
+}
+
+/* New Post Form */
+.postform {
+  padding: 10px;
+
+  & textarea {
+    height: 300px;
+    width: 100%;
+  }
+
+  & .buttons {
+    text-align: center;
+  }
+}
+
+/* Quick Reply */
+#qreply {
+  & .editorframe,
+  & textarea {
+    flex: 1;
+  }
+
+  & .editor {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  & .editorframe {
+    flex: 1;
+  }
+}
+
+/* Hide normal file input in favor of WYSIWYG attachments */
+.js-enabled #attachfiles {
+  display: none;
+}
+
+/* Search */
+#searchresults .content {
+  padding: 10px;
+}
+
+.searchresult {
+  padding: 10px;
+}
+
+#searchadvanced {
+  width: 100%;
+  margin: 10px;
+  border-collapse: collapse;
+  border-style: hidden;
+
+  & label {
+    display: inline-block;
+    width: 50px;
+  }
+
+  & td {
+    text-align: center;
+    vertical-align: top;
+    padding: 10px;
+  }
+
+  & th {
+    text-align: center;
+    padding-left: 10px;
+  }
+}
+
+/* Ticker */
+#ticker {
+  & .tick {
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    padding: 10px 5px;
+  }
+
+  & .tick-title {
+    flex: 1;
+    margin: 0 5px;
+  }
+
+  & .date {
+    min-width: 100px;
+    font-size: 1rem;
+    padding-top: 3px;
+  }
+
+  & .by {
+    overflow: hidden;
+    text-align: right;
+  }
+}
+
+/* Calendar */
+.calendar {
+  width: 100%;
+  empty-cells: hide;
+
+  & .month {
+    font-size: 2.5rem;
+    padding: 20px;
+  }
+
+  & th {
+    text-align: center;
+  }
+
+  & td {
+    height: 100px;
+    width: 14%;
+
+    & > div {
+      height: 100%;
+      position: relative;
+    }
+  }
+
+  & .birthdays {
+    font-size: smaller;
+
+    &::before {
+      content: "🎂";
+    }
+  }
+
+  .no-emoji & .birthdays::before {
+    content: "Birthdays: ";
+  }
+}
+
+/* Stopped at: .box */

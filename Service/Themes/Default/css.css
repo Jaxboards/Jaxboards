@@ -1,4 +1,4 @@
-@import url('/Service/Themes/base-layout.css');
+@import url("/Service/Themes/base-layout.css");
 
 :root {
   --black: #000;
@@ -22,7 +22,6 @@ body {
 }
 
 a {
-
   &:active,
   &:visited,
   &:link {
@@ -128,7 +127,7 @@ textarea {
 
 /* Mod CP */
 #modcp {
-  &>.content {
+  & > .content {
     background: var(--medium-blue);
   }
 
@@ -369,10 +368,12 @@ textarea {
     content: "";
     position: absolute;
     inset: 3px;
-    background-image: linear-gradient(#75a7e0 5%,
-        #3f5677 50%,
-        #275690 70%,
-        #1d72d0 85%);
+    background-image: linear-gradient(
+      #75a7e0 5%,
+      #3f5677 50%,
+      #275690 70%,
+      #1d72d0 85%
+    );
     filter: blur(1px);
   }
 
@@ -459,6 +460,7 @@ textarea {
   }
 
   & .f_icon {
+    border-style: solid none;
     background-color: var(--barely-blue);
   }
 
@@ -482,81 +484,39 @@ textarea {
 
 /* Forum Listings */
 .forumindex {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 1.2rem;
-
   & td {
-    padding: 10px;
     background: var(--shade);
     border: 1px solid var(--blue-border);
   }
 
   & .f_icon {
-    width: 12px;
-    padding: 0;
     background: var(--white);
-    display: none;
-  }
-
-  & .unread .topic {
-    font-weight: bold;
   }
 
   & .topic {
     background-color: var(--white);
-    border-left: none;
   }
 
   & .last_post {
-    width: 20vw;
-    max-width: 250px;
     background-color: var(--medium-blue);
-
-    &::first-letter {
-      background: url("icons/last.gif") center left no-repeat;
-      padding-left: 15px;
-    }
   }
 
   & .item_1,
   & .item_2 {
-    min-width: 80px;
-    text-align: center;
     background-color: #ececff;
-  }
-
-  & .locked .topic>a:first-child {
-    background: url("icons/lock.png") left no-repeat;
-    padding-left: 14px;
-  }
-
-  & .pinned .topic>a:first-child {
-    font-style: italic;
-    background: url("icons/pin.gif") center left no-repeat;
-    padding-left: 14px;
-  }
-
-  & .error {
-    margin: 0;
-    text-align: center;
-    padding: 20px;
-  }
-
-  & .moderate.selected,
-  & tr:hover .moderate {
-    visibility: visible;
   }
 }
 
-.moderate {
-  background: url("icons/posticons.png");
-  text-indent: -1000px;
-  display: block;
-  visibility: hidden;
-  width: 16px;
-  height: 16px;
-  float: right;
+.locked .topic > a:first-child::before {
+  content: "🔒";
+}
+
+.pinned .topic > a:first-child {
+  font-style: italic;
+
+  &::before {
+    content: "📌";
+  }
 }
 
 .forum-buttons-top {
@@ -566,10 +526,6 @@ textarea {
 
 /* Subforums (in forum listings) */
 .subindex {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 1.2rem;
-
   & td {
     background: var(--shade);
     border: 1px solid var(--blue-border);
@@ -577,78 +533,37 @@ textarea {
 
   & .last_post {
     background-color: var(--medium-blue);
-    padding: 10px;
-    border-right: none;
 
     & a {
       color: #e77700;
     }
-
-    &::first-letter {
-      background: url("icons/last.gif") center left no-repeat;
-      padding-left: 15px;
-    }
   }
 
   & .f_icon {
-    border-style: solid none;
     background-color: var(--barely-blue);
-    width: 40px;
-    vertical-align: middle;
-    text-align: center;
   }
 
   & .forum {
-    border-left: none;
     background-color: var(--barely-blue);
-    padding: 20px;
-    padding-left: 10px;
-
-    & a {
-      font-size: 1.4rem;
-    }
-  }
-
-  & .unread .forum a {
-    font-weight: bold;
   }
 
   & .item_1,
   & .item_2 {
-    font-size: 1.2rem;
-    width: 20vw;
-    max-width: 165px;
     background: var(--white);
-    text-align: center;
-    padding: 5px 2px;
-    border-right: none;
   }
 }
 
 /* Topic View */
 #intopic {
-  width: 100%;
-  margin: auto;
-  border-collapse: collapse;
-
-  & .topic-post-row {
-    clear: both;
-  }
-
   & td {
-    vertical-align: top;
     border: 1px solid var(--black);
   }
 
   & .userdata {
     background: var(--light-blue) var(--shade);
-    text-align: center;
-    width: 150px;
   }
 
   & .avatar {
-    margin-top: 10px;
-
     & img {
       border: 1px solid var(--black);
     }
@@ -656,212 +571,55 @@ textarea {
 
   & .username {
     background: #eef;
-    padding: 3px;
     border-bottom: 1px solid var(--blue-border);
-
-    & a {
-      font-weight: bold;
-    }
   }
 
   & .signature {
-    font-size: smaller;
-    display: inline-block;
-    margin: 20px;
     border-top: 1px dashed #ccc;
-  }
-
-  & .edit,
-  & .quotepost {
-    padding-left: 18px;
-    padding-bottom: 2px;
-    background: url("icons/posticons.png") no-repeat top left;
-  }
-
-  & textarea {
-    width: 100%;
-    height: 200px;
   }
 
   & .modpost.selected {
     color: #090;
   }
 
-  & .quotepost {
-    background-position: 0 -32px;
-  }
-
   & .post {
-    line-height: 140%;
     background: var(--white);
-    max-width: 700px;
-  }
-
-  & .attachment {
-    font-size: smaller;
-  }
-
-  & .post_content {
-    padding: 20px;
-    hyphens: auto;
-  }
-
-  & .posttop {
-    margin-left: 10px;
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  & .post_buttons {
-    display: flex;
-    flex-wrap: wrap;
-    flex: 1;
-    font-size: smaller;
-    gap: 5px;
-    min-width: 200px;
-    padding: 4px;
-    text-align: left;
   }
 
   & .post_info {
-    padding: 4px;
-    text-align: right;
     color: #55c;
-    font-size: smaller;
   }
 
   & .postbottom {
-    height: 1em;
-    text-align: right;
-    border-top: hidden;
-    padding: 5px;
     background: var(--white);
-  }
-
-  /* Post Ratings */
-  & .postrating {
-    min-height: 1.4em;
-    padding-left: 20px;
-
-    & .form {
-      display: none;
-    }
-
-    & .form img {
-      opacity: 0.5;
-    }
-
-    & a:hover img {
-      opacity: 1;
-    }
-  }
-
-  & .topic-post-row:hover .postrating .showrating {
-    display: none;
-  }
-
-  & .topic-post-row:hover .postrating .form {
-    display: block;
   }
 
   & .opengraph {
     border: 1px solid #192c44;
-    border-left-width: 5px;
     background: #eef;
-    max-width: 80%;
-    margin: 10px 0;
-    padding: 10px;
-
-    & img {
-      max-width: 100%;
-      max-height: 160px;
-    }
-
-    & h4 {
-      margin: 1em 0;
-      font-size: 1.2rem;
-    }
-
-    & p {
-      font-size: 1.2rem;
-    }
-
-    & .remove {
-      float: right;
-    }
   }
 
   & .userstats {
-    font-size: smaller;
-    text-align: left;
-    padding: 10px;
     background: var(--medium-blue);
     border: 1px solid var(--blue-border);
-    margin: 10px;
   }
-
-  & .usertitle {
-    font-size: 0.6em;
-  }
-}
-
-#topic-users-online .content {
-  padding: 5px;
 }
 
 .postrating_list {
-  position: absolute;
-  overflow: hidden;
   background: #eef;
   border: 1px solid var(--blue-border);
-  font-size: smaller;
-
-  & .column {
-    width: 90px;
-    float: left;
-  }
 
   & ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    max-height: 200px;
-    overflow-y: auto;
     border: 1px dashed var(--blue-border);
   }
 }
 
-.topic-buttons-top,
-.topic-buttons-bottom {
-  margin: 10px;
-  text-align: right;
-}
-
-.topic-tools {
-  float: right;
-}
-
-.topic-reply-form textarea {
-  width: 100%;
-  height: 200px;
-}
-
 #poll {
-  margin-bottom: 10px;
-
   & .content {
     background: #eef;
-    padding: 10px;
-  }
-
-  & .title,
-  & .buttons {
-    text-align: center;
   }
 
   & .choice {
-    padding: 5px;
-    margin-bottom: 10px;
     background: var(--white);
     border: 1px solid var(--blue-border);
   }
@@ -872,135 +630,38 @@ textarea {
   }
 
   & table {
-    border-collapse: collapse;
     background: var(--white);
-    width: 100%;
   }
 
   & td {
     border: 1px solid var(--blue-border);
-    padding: 5px;
   }
 
   & .bar {
     background: url("img/pollbar1.png");
-    height: 16px;
-    display: inline-block;
     border: 1px solid #1234b4;
-  }
-
-  & .numvotes {
-    width: 100px;
-    text-align: center;
-  }
-
-  & .totalvotes {
-    text-align: center;
-    font-weight: bold;
   }
 }
 
 /* New Topic Form */
 .topicform {
   border: 1px solid var(--black);
-  padding: 20px;
   background: #eef;
-
-  & input[type="text"] {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-
-  & label {
-    display: inline-block;
-    width: 100px;
-  }
-
-  & textarea {
-    height: 300px;
-    width: 100%;
-  }
-
-  & .buttons {
-    text-align: center;
-    margin-top: 20px;
-  }
-}
-
-.postoptions {
-  margin-bottom: 10px;
-
-  & .addpoll {
-    padding: 0 20px;
-    margin: 10px;
-    background: url("icons/postoptions.png") no-repeat top left;
-  }
 }
 
 #polloptions {
-  padding: 10px;
   background: #ddf;
   border: 1px solid var(--blue-border);
-
-  & textarea {
-    height: 200px;
-    width: 100%;
-  }
-}
-
-#qreply {
-
-  & .editorframe,
-  & textarea {
-    flex: 1;
-  }
-
-  & .editor {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  & .editorframe {
-    flex: 1;
-  }
 }
 
 /* New Post Form */
 .postform {
-  padding: 10px;
   background: #eef;
-
-  & textarea {
-    height: 300px;
-    width: 100%;
-  }
-
-  & .uploadbutton {
-    background: url("icons/postoptions.png") no-repeat 0 -32px;
-    padding-left: 16px;
-    width: 100px;
-    height: 1em;
-  }
-
-  & .buttons {
-    text-align: center;
-  }
-}
-
-/* Hide normal file input in favor of WYSIWYG attachments */
-.js-enabled #attachfiles {
-  display: none;
 }
 
 /* Search */
-#searchresults .content {
-  padding: 10px;
-}
-
 .searchresult {
   border-bottom: 1px solid var(--blue-border);
-  padding: 10px;
 
   & .highlight {
     background: #ffa;
@@ -1009,112 +670,37 @@ textarea {
 }
 
 #searchadvanced {
-  width: 100%;
-  margin: 10px;
-  border-collapse: collapse;
-  border-style: hidden;
-
-  & label {
-    display: inline-block;
-    width: 50px;
-  }
-
   & td {
-    text-align: center;
-    vertical-align: top;
-    padding: 10px;
     border-right: 1px solid var(--black);
-  }
-
-  & th {
-    text-align: center;
-    padding-left: 10px;
   }
 }
 
+/* Ticker */
 #ticker {
-
-  /* Ticker */
   & .tick {
-    font-size: 1.4rem;
-    display: flex;
-    align-items: center;
-    padding: 10px 5px;
     border-bottom: 1px solid #ccc;
-  }
-
-  & .tick-title {
-    flex: 1;
-    margin: 0 5px;
-  }
-
-  & .date {
-    min-width: 100px;
-    font-size: 1rem;
-    padding-top: 3px;
-  }
-
-  & .by {
-    overflow: hidden;
-    text-align: right;
   }
 }
 
 /* Calendar */
 .calendar {
-  width: 100%;
-  empty-cells: hide;
-
-  & .month {
-    font-size: 2.5rem;
-    padding: 20px;
-  }
-
-  & th {
-    text-align: center;
-  }
-
   & td {
-    height: 100px;
-    width: 14%;
     border: 1px solid var(--black);
-  }
-
-  & td>div {
-    height: 100%;
-    position: relative;
   }
 
   & .today {
     background: #cdf;
   }
-
-  & .birthdays {
-    font-size: smaller;
-
-    &::before {
-      content: "🎂";
-    }
-  }
-
-  .no-emoji & .birthdays::before {
-    content: "Birthdays: ";
-  }
 }
 
 /* Boxes/Collapse Boxes (Global) */
-
-/* DISCLAIMER: the borders around the title are actually not borders,
- * but an image behind it (in .box)
- * if you want to remove that border, just remove the background from .box
- * and remove the margin on .box>.title */
 .box {
   margin: 10px 5px;
   background: linear-gradient(to bottom, var(--white), #333);
   background-size: 100% 50px;
   border: 1px solid var(--black);
 
-  &>.title {
+  & > .title {
     position: relative;
     margin: 1px 1px 0;
     background: var(--header);
@@ -1145,7 +731,7 @@ textarea {
   & .content {
     background: var(--white);
 
-    &>.error {
+    & > .error {
       margin: 0;
       padding: 10px;
     }
@@ -1468,7 +1054,6 @@ a.mgroup4 {
 }
 
 #validname {
-
   &.valid,
   &.invalid {
     display: inline-block;
