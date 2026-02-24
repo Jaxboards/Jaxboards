@@ -63,7 +63,7 @@ jobs:
           echo "[]" > stylelint-report.json
         shell: bash
       - run: bun run ci-lint
-      - run: bun test --coverage
+      - run: bun run test
       - run: composer run-script ci-lint
       - run: composer run-script test
       - name: SonarQube Scan
