@@ -58,10 +58,6 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
-      - run: |
-          echo "[]" > eslint-report.json &&
-          echo "[]" > stylelint-report.json
-        shell: bash
       - run: bun run ci-lint
       - run: bun run test
       - run: composer run-script ci-lint

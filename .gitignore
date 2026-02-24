@@ -15,10 +15,6 @@ boards
 # Log files
 *.log
 
-# Linters
-eslint-report.json
-stylelint-report.json
-
 # Automated Reports
 /reports
 
