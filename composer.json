@@ -5,7 +5,7 @@
   "autoload": {
     "psr-4": {
       "ACP\\": "src/ACP",
-      "emoticons\\": "emoticons",
+      "Emoticons\\": "public/assets/emoticons",
       "Jax\\": "src/Jax",
       "Tools\\": "src/Tools",
       "Tests\\": "Tests"

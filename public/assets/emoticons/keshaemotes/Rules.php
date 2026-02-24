@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace emoticons\keshaemotes;
+namespace Emoticons\keshaemotes;
 
 final class Rules
 {

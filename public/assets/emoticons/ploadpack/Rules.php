@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace emoticons\ploadpack;
+namespace Emoticons\ploadpack;
 
 final class Rules
 {
