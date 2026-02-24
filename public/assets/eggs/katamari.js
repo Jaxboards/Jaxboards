@@ -5566,7 +5566,7 @@ function whenAllLoaded(gameDiv, popup, stickyNodes) {
           bgmusic = document.createElement("audio");
           bgmusic.id = "khbgmusic";
           bgmusic.loop = "loop";
-          bgmusic.src = "/assets/Sounds/katamari.mp3";
+          bgmusic.src = "/assets/sounds/katamari.mp3";
           gameDiv.appendChild(bgmusic);
         }
         bgmusic.play();
