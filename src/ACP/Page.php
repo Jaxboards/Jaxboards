@@ -140,7 +140,7 @@ final class Page
 
     private function initializeTwig(): void
     {
-        $this->filesystemLoader = new FilesystemLoader($this->fileSystem->pathFromRoot('ACP/views/'));
+        $this->filesystemLoader = new FilesystemLoader($this->fileSystem->pathFromRoot('src/ACP/views/'));
         $this->twigEnvironment = new Environment($this->filesystemLoader, [
             'cache' => $this->fileSystem->pathFromRoot('.cache/.twig.cache'),
             // TODO: autoescaping should be turned on, but we previously did it manually
