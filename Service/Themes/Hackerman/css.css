@@ -1,4 +1,4 @@
-@import url("/Service/Themes/base-layout.css?2");
+@import url("/Service/Themes/base-layout.css?4");
 
 :root {
   --black: #000;
@@ -17,6 +17,7 @@ body {
 }
 
 a {
+
   &:active,
   &:visited,
   &:link {
@@ -26,6 +27,16 @@ a {
 
   &:hover {
     text-decoration: underline;
+  }
+
+  /* Member/Group Specific */
+  &.mgroup2 {
+    color: #0f0;
+  }
+
+  &.mgroup4 {
+    color: #a00;
+    text-decoration: line-through;
   }
 }
 
@@ -191,6 +202,7 @@ textarea {
 }
 
 #contacts {
+
   /* Buddy/Contacts List */
   & .online .name {
     color: #1d71cf;
@@ -316,12 +328,10 @@ textarea {
     content: "";
     position: absolute;
     inset: 3px;
-    background-image: linear-gradient(
-      #2d0537 5%,
-      #3a165c 50%,
-      #23022a 70%,
-      #1d0422 85%
-    );
+    background-image: linear-gradient(#2d0537 5%,
+        #3a165c 50%,
+        #23022a 70%,
+        #1d0422 85%);
     filter: blur(1px);
   }
 
@@ -588,46 +598,13 @@ textarea {
 /* Boxes/Collapse Boxes (Global) */
 
 .box {
-  margin: 10px 0;
-
-  & > .title {
-    position: relative;
+  &>.title {
     background: linear-gradient(45deg, var(--deep-purple), rgb(0 0 0 / 50%));
-    padding: 7px;
     color: var(--text-color);
-
-    & .x {
-      background: url("/Service/Themes/Default/icons/collapse.png");
-      position: absolute;
-      top: 0.75em;
-      right: 10px;
-      width: 9px;
-      height: 9px;
-      text-indent: 10px;
-      overflow: hidden;
-      cursor: pointer;
-    }
-  }
-
-  &.collapsed .title .x {
-    background-position: 0 -9px;
-  }
-
-  & .content_top {
-    display: none;
   }
 
   & .content {
     background: var(--black-bg-transparent);
-
-    & > .error {
-      margin: 0;
-      padding: 10px;
-    }
-  }
-
-  & .content_bottom {
-    height: 5px;
   }
 }
 
@@ -636,102 +613,14 @@ textarea {
 #modbox {
   background: var(--purple);
   border: 1px solid var(--border-blue);
-  bottom: 10px;
-  cursor: pointer;
-  font-size: 1.4rem;
-  padding: 20px;
-  position: fixed;
-  right: 10px;
-  text-align: left;
-  width: 280px;
 }
 
 #notification.newmessage {
-  padding-left: 60px;
-  background: url("/Service/Themes/Default/icons/newmessage.png") no-repeat 20px
-    center var(--purple);
+  background-color: var(--purple);
 }
 
 .pages .active {
   color: #f55;
-  text-decoration: underline;
-}
-
-.pages-top,
-.pages-bottom {
-  position: absolute;
-  margin-left: 10px;
-}
-
-.sort {
-  background: url("/Service/Themes/Default/icons/collapse.png") no-repeat;
-  padding-right: 18px;
-  display: inline-block;
-  background-position: right -56px;
-
-  &.desc {
-    background-position: right -30px;
-  }
-}
-
-#status {
-  display: block;
-  background: url("/Service/Themes/Default/icons/status.png") top no-repeat;
-  width: 16px;
-  height: 16px;
-  text-indent: -9999px;
-  position: absolute;
-  overflow: hidden;
-
-  &.invisible {
-    background-position: bottom;
-  }
-}
-
-/* Login Form (Full) */
-.login {
-  & .content {
-    padding: 10px;
-  }
-
-  & label {
-    display: inline-block;
-    width: 100px;
-  }
-}
-
-/* Register Form */
-.register {
-  & .content {
-    padding: 10px;
-  }
-
-  & .content label {
-    display: inline-block;
-    width: 100px;
-  }
-}
-
-/* Users Online */
-#statusers {
-  display: inline;
-
-  & a {
-    margin-right: 5px;
-    white-space: nowrap;
-
-    &::after {
-      content: ",";
-    }
-
-    &:last-child::after {
-      content: "";
-    }
-  }
-
-  & .idle {
-    font-style: italic;
-  }
 }
 
 #stats {
@@ -740,67 +629,25 @@ textarea {
   }
 
   & .userstoday {
-    margin-top: 10px;
-    padding-top: 10px;
     border-top: 1px solid var(--border-blue);
   }
 
   & .stats {
-    margin-top: 10px;
-    padding: 10px 25px;
-    background: url("/Service/Themes/Default/icons/boardstats.png") left center
-      no-repeat;
     border-top: 1px solid var(--border-blue);
   }
 }
 
 /* Member List */
 #memberlist {
-  clear: both;
-
-  & table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  & th {
-    padding: 10px;
-  }
-
-  & .avatar {
-    width: 50px;
-
-    & img {
-      max-width: 50px;
-      max-height: 50px;
-    }
-  }
-
   & td {
-    padding: 10px;
     border-top: 1px solid var(--border-blue);
   }
-}
-
-/* Member/Group Specific */
-a.birthday::before {
-  content: "🎂";
-}
-
-a.mgroup2 {
-  color: #0f0;
-}
-
-a.mgroup4 {
-  color: #a00;
-  text-decoration: line-through;
 }
 
 /* BBcodes */
 .quote {
   border: 1px solid var(--border-blue);
-  background: var(--purple);
-  padding: 10px;
+  background-color: var(--purple);
 
   & .quotee {
     margin: -10px 0 10px -5px;
@@ -811,84 +658,18 @@ a.mgroup4 {
 .code {
   border: 1px solid var(--border-blue);
   background: var(--deep-purple);
-  padding: 10px;
-  font-family: Consolas, Fixedsys, monospace;
-  font-size: 1.2rem;
-  line-height: 1.5rem;
-  white-space: preserve;
 }
 
 .spoilertext {
-  display: inline-block;
   background: var(--deep-purple);
   color: var(--deep-purple);
   border: 1px solid var(--border-blue);
-
-  & * {
-    visibility: hidden;
-  }
 
   &:hover,
   &.spoiled {
     background: none;
     color: inherit;
-
-    & * {
-      visibility: visible;
-    }
   }
-}
-
-/* Contact icons */
-.contact {
-  background: url("/Service/Themes/Default/icons/contact.png") no-repeat;
-  padding-left: 20px;
-  min-height: 16px;
-
-  &:hover {
-    text-decoration: none;
-  }
-
-  &.im,
-  &.pm {
-    background-position: 0 -224px;
-  }
-}
-
-.skype {
-  background-position: 0 -32px;
-}
-
-.googlechat {
-  background-position: 0 -64px;
-}
-
-.aim {
-  background-position: 0 -96px;
-}
-
-.yim {
-  background-position: 0 -128px;
-}
-
-.steam {
-  background-position: 0 -160px;
-}
-
-.twitter {
-  background-position: 0 -192px;
-}
-
-.discord {
-  background-position: 0 -256px;
-}
-
-.youtube {
-  background-position: 0 -298px;
-}
-
-.bluesky {
-  background-position: 0 -320px;
 }
 
 /* Social icons */
@@ -905,58 +686,15 @@ a.mgroup4 {
   background-position: 0 0;
 }
 
-/* Tooltip */
-.tooltip {
-  position: absolute;
-  border-width: 10px 10px 15px;
-  border-style: solid;
-  border-image: url("/Service/Themes/Default/img/tooltip.png") 20 fill;
-  color: var(--text-color);
-  max-width: 550px;
-}
-
 /* AutoComplete */
 #autocomplete {
-  position: absolute;
   border: 1px solid var(--black);
   background: var(--purple);
-  text-align: left;
-
-  & div {
-    padding: 5px;
-    cursor: pointer;
-  }
 
   & div:hover,
   & div.selected {
     background: var(--deep-purple);
     border: 1px solid var(--border-blue);
-    border-style: solid none;
-  }
-}
-
-#validname {
-  &.valid,
-  &.invalid {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    background: url("/Service/Themes/Default/icons/check_x.png") top center;
-  }
-
-  &.valid {
-    background-position: bottom center;
-  }
-}
-
-#searchform {
-  & .content {
-    padding: 10px;
-  }
-
-  & label {
-    margin: 10px;
-    display: inline-block;
   }
 }
 

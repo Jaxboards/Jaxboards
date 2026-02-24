@@ -19,6 +19,13 @@ img {
   }
 }
 
+/* Member/Group Specific */
+a {
+  &.birthday::before {
+    content: "🎂";
+  }
+}
+
 /* Misc (Global) */
 .error,
 .success {
@@ -165,8 +172,7 @@ img {
       margin: 10px;
       font-size: 1.2rem;
       padding: 2px 25px;
-      background: url("/Service/Themes/Default/icons/inboxicons.png") 0 0
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/inboxicons.png") 0 0 no-repeat;
     }
 
     & h2 {
@@ -227,7 +233,7 @@ img {
 
 /* Mod CP */
 #modcp {
-  & > .content {
+  &>.content {
     display: flex;
     flex-wrap: wrap;
   }
@@ -425,6 +431,7 @@ img {
 
 /* Contacts List */
 #contacts {
+
   & .name,
   & .status {
     margin-left: 50px;
@@ -785,8 +792,7 @@ img {
 
     & li {
       display: inline-block;
-      background: url("/Service/Themes/Default/icons/pathsplitter.png")
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/pathsplitter.png") no-repeat;
       padding-left: 20px;
       margin-right: 10px;
 
@@ -814,8 +820,7 @@ img {
     border-right: none;
 
     &::first-letter {
-      background: url("/Service/Themes/Default/icons/last.gif") center left
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
       padding-left: 15px;
     }
   }
@@ -872,7 +877,6 @@ img {
   & .f_icon {
     width: 12px;
     padding: 0;
-    background: var(--white);
     display: none;
   }
 
@@ -889,8 +893,7 @@ img {
     max-width: 250px;
 
     &::first-letter {
-      background: url("/Service/Themes/Default/icons/last.gif") center left
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
       padding-left: 15px;
     }
   }
@@ -923,11 +926,11 @@ img {
   float: right;
 }
 
-.locked .topic > a:first-child::before {
+.locked .topic>a:first-child::before {
   content: "🔒";
 }
 
-.pinned .topic > a:first-child {
+.pinned .topic>a:first-child {
   font-style: italic;
 
   &::before {
@@ -950,13 +953,8 @@ img {
     padding: 10px;
     border-right: none;
 
-    & a {
-      color: #e77700;
-    }
-
     &::first-letter {
-      background: url("/Service/Themes/Default/icons/last.gif") center left
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
       padding-left: 15px;
     }
   }
@@ -1034,8 +1032,7 @@ img {
   & .quotepost {
     padding-left: 18px;
     padding-bottom: 2px;
-    background: url("/Service/Themes/Default/icons/posticons.png") no-repeat top
-      left;
+    background: url("/Service/Themes/Default/icons/posticons.png") no-repeat top left;
   }
 
   & textarea {
@@ -1267,8 +1264,7 @@ img {
   & .addpoll {
     padding: 0 20px;
     margin: 10px;
-    background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat
-      top left;
+    background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat top left;
   }
 }
 
@@ -1297,6 +1293,7 @@ img {
 
 /* Quick Reply */
 #qreply {
+
   & .editorframe,
   & textarea {
     flex: 1;
@@ -1394,7 +1391,7 @@ img {
     height: 100px;
     width: 14%;
 
-    & > div {
+    &>div {
       height: 100%;
       position: relative;
     }
@@ -1413,4 +1410,336 @@ img {
   }
 }
 
-/* Stopped at: .box */
+/* Boxes/Collapse Boxes (Global) */
+.box {
+  margin: 10px 0;
+
+  &>.title {
+    position: relative;
+    padding: 7px;
+
+    & .x {
+      background: url("icons/collapse.png");
+      position: absolute;
+      top: 0.75em;
+      right: 10px;
+      width: 9px;
+      height: 9px;
+      text-indent: 10px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+  }
+
+  &.collapsed .title .x {
+    background-position: 0 -9px;
+  }
+
+  & .content_top {
+    display: none;
+  }
+
+  & .content {
+    &>.error {
+      margin: 0;
+      padding: 10px;
+    }
+  }
+}
+
+/* Function-Specific */
+#notification,
+#modbox {
+  bottom: 10px;
+  cursor: pointer;
+  font-size: 1.4rem;
+  padding: 20px;
+  position: fixed;
+  right: 10px;
+  text-align: left;
+  width: 280px;
+}
+
+#notification.newmessage {
+  padding-left: 60px;
+  background: url("/Service/Themes/Default/icons/newmessage.png") no-repeat 20px center;
+}
+
+.pages .active {
+  text-decoration: underline;
+}
+
+.pages-top,
+.pages-bottom {
+  position: absolute;
+  margin-left: 10px;
+}
+
+.sort {
+  background: url("/Service/Themes/Default/icons/collapse.png") no-repeat;
+  padding-right: 18px;
+  display: inline-block;
+  background-position: right -56px;
+
+  &.desc {
+    background-position: right -30px;
+  }
+}
+
+#status {
+  display: block;
+  background: url("/Service/Themes/Default/icons/status.png") top no-repeat;
+  width: 16px;
+  height: 16px;
+  text-indent: -9999px;
+  position: absolute;
+  overflow: hidden;
+
+  &.invisible {
+    background-position: bottom;
+  }
+}
+
+
+/* Login Form (Full) */
+.login {
+  & .content {
+    padding: 10px;
+  }
+
+  & label {
+    display: inline-block;
+    width: 100px;
+  }
+}
+
+/* Register Form */
+.register {
+  & .content {
+    padding: 10px;
+  }
+
+  & .content label {
+    display: inline-block;
+    width: 100px;
+  }
+}
+
+/* Users Online */
+#statusers {
+  display: inline;
+
+  & a {
+    margin-right: 5px;
+    white-space: nowrap;
+
+    &::after {
+      content: ",";
+    }
+
+    &:last-child::after {
+      content: "";
+    }
+  }
+
+  & .idle {
+    font-style: italic;
+  }
+}
+
+#stats {
+  & .content {
+    padding: 20px;
+  }
+
+  & .userstoday {
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+
+  & .stats {
+    margin-top: 10px;
+    padding: 10px 25px;
+    background: url("/Service/Themes/Default/icons/boardstats.png") left center no-repeat;
+  }
+}
+
+/* Member List */
+#memberlist {
+  clear: both;
+
+  & table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  & th {
+    padding: 10px;
+  }
+
+  & .avatar {
+    width: 50px;
+
+    & img {
+      max-width: 50px;
+      max-height: 50px;
+    }
+  }
+
+  & td {
+    padding: 10px;
+    border-top: 1px solid #ccc;
+  }
+}
+
+/* BBcodes */
+.quote {
+  background: url("/Service/Themes/Default/icons/quote.png") top right no-repeat;
+  padding: 10px;
+
+  & .quotee {
+    margin: -10px 0 10px -5px;
+    font-weight: bold;
+  }
+}
+
+.code {
+  padding: 10px;
+  font-family: Consolas, Fixedsys, monospace;
+  font-size: 1.2rem;
+  line-height: 1.5rem;
+  white-space: preserve;
+}
+
+.spoilertext {
+  display: inline-block;
+
+  & * {
+    visibility: hidden;
+  }
+
+  &:hover,
+  &.spoiled {
+    & * {
+      visibility: visible;
+    }
+  }
+}
+
+/* Contact icons */
+.contact {
+  background: url("/Service/Themes/Default/icons/contact.png") no-repeat;
+  padding-left: 20px;
+  min-height: 16px;
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &.im,
+  &.pm {
+    background-position: 0 -224px;
+  }
+}
+
+.skype {
+  background-position: 0 -32px;
+}
+
+.googlechat {
+  background-position: 0 -64px;
+}
+
+.aim {
+  background-position: 0 -96px;
+}
+
+.yim {
+  background-position: 0 -128px;
+}
+
+.steam {
+  background-position: 0 -160px;
+}
+
+.twitter {
+  background-position: 0 -192px;
+}
+
+.discord {
+  background-position: 0 -256px;
+}
+
+.youtube {
+  background-position: 0 -298px;
+}
+
+.bluesky {
+  background-position: 0 -320px;
+}
+
+/* Social icons */
+.social {
+  display: inline-block;
+  background: url("/Service/Themes/Default/icons/social.png") no-repeat;
+  width: 16px;
+  height: 16px;
+  overflow: hidden;
+  text-indent: -1000px;
+}
+
+.rss {
+  background-position: 0 0;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  border-width: 10px 10px 15px;
+  border-style: solid;
+  border-image: url("/Service/Themes/Default/img/tooltip.png") 20 fill;
+  color: var(#fff);
+  max-width: 550px;
+}
+
+/* AutoComplete */
+#autocomplete {
+  position: absolute;
+  text-align: left;
+
+  & div {
+    padding: 5px;
+    cursor: pointer;
+  }
+
+  & div:hover,
+  & div.selected {
+    border-style: solid none;
+  }
+}
+
+#validname {
+
+  &.valid,
+  &.invalid {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: url("/Service/Themes/Default/icons/check_x.png") top center;
+  }
+
+  &.valid {
+    background-position: bottom center;
+  }
+}
+
+#searchform {
+  & .content {
+    padding: 10px;
+  }
+
+  & label {
+    margin: 10px;
+    display: inline-block;
+  }
+}
