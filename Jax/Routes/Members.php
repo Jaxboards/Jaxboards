@@ -28,7 +28,7 @@ final class Members implements Route
 {
     private int $pageNumber = 0;
 
-    private int $perpage;
+    private readonly int $perpage;
 
     public function __construct(
         private readonly ContactDetails $contactDetails,
@@ -38,7 +38,7 @@ final class Members implements Route
         private readonly Router $router,
         private readonly Template $template,
         private readonly Request $request,
-        private readonly User $user,
+        User $user,
     ) {
         $this->perpage = $user->get()->itemsPerPage ?? 20;
     }
@@ -96,7 +96,7 @@ final class Members implements Route
 
         $members = Member::selectMany(
             $where
-                . "ORDER BY {$sortby} {$sorthow}
+            . "ORDER BY {$sortby} {$sorthow}
             LIMIT ?, ?",
             $this->pageNumber * $this->perpage,
             $this->perpage,

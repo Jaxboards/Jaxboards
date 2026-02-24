@@ -87,7 +87,7 @@ final readonly class ModControls implements Route
             'modt' => $this->modTopics->addTopic((int) $this->request->both('tid')),
             'emem' => $this->showModCP(match (true) {
                 $this->request->post('submit') === 'showform' || $this->request->both('mid') !== null
-                => $this->editMember(),
+                    => $this->editMember(),
                 default => $this->selectMemberToEdit(),
             }),
             'iptools' => $this->showModCP($this->ipTools()),
@@ -197,9 +197,9 @@ final readonly class ModControls implements Route
         }
 
         return $page
-            . $this->template->render('modcontrols/edit-member', [
-                'member' => $member,
-            ]);
+        . $this->template->render('modcontrols/edit-member', [
+            'member' => $member,
+        ]);
     }
 
     private function selectMemberToEdit(): string

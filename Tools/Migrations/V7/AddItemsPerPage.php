@@ -12,19 +12,13 @@ final class AddItemsPerPage extends Migration
     #[Override]
     public function execute(): void
     {
-        $this->database->special(
-            <<<'SQL'
+        $this->database->special(<<<'SQL'
             ALTER TABLE %t ADD `itemsPerPage` INT NULL DEFAULT NULL
-            SQL,
-            ['members']
-        );
+            SQL, ['members']);
 
         // Fix this naming while we're here
-        $this->database->special(
-            <<<'SQL'
+        $this->database->special(<<<'SQL'
             ALTER TABLE %t CHANGE `full_name` `fullName` varchar(50) NOT NULL DEFAULT ''
-            SQL,
-            ['members']
-        );
+            SQL, ['members']);
     }
 }

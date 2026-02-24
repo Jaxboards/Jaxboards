@@ -204,7 +204,7 @@ final class UCPTest extends FeatureTestCase
                     ],
                     true,
                 )
-                => DOMAssert::assertSelectCount("select[name={$field}]", 1, $page),
+                    => DOMAssert::assertSelectCount("select[name={$field}]", 1, $page),
                 $field === 'about' => DOMAssert::assertSelectCount("textarea[name={$field}]", 1, $page),
                 default => DOMAssert::assertSelectCount("input[name={$field}]", 1, $page),
             };

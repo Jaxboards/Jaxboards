@@ -50,7 +50,7 @@ final class Forum implements Route
      */
     private ?array $forumsRead = null;
 
-    private int $numperpage;
+    private readonly int $numperpage;
 
     private int $pageNumber = 0;
 
@@ -207,9 +207,9 @@ final class Forum implements Route
     private function renderTopicListing(ModelsForum $modelsForum, array $topics): string
     {
         $memberIds = $topics !== [] ? array_merge(...array_map(static fn(Topic $topic): array => [
-            $topic->author,
-            $topic->lastPostUser,
-        ], $topics)) : [];
+                $topic->author,
+                $topic->lastPostUser,
+            ], $topics)) : [];
 
         $membersById = $memberIds !== []
             ? Lodash::keyBy(
@@ -319,14 +319,14 @@ final class Forum implements Route
 
         return (
             $rows === []
-            ? ''
-            : $this->page->collapseBox(
-                'Subforums',
-                $this->template->render('forum/subforum-table', [
-                    'rows' => $rows,
-                ]),
-                'subforums_' . $forum->id,
-            )
+                ? ''
+                : $this->page->collapseBox(
+                    'Subforums',
+                    $this->template->render('forum/subforum-table', [
+                        'rows' => $rows,
+                    ]),
+                    'subforums_' . $forum->id,
+                )
         );
     }
 
