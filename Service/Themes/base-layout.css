@@ -1698,7 +1698,7 @@ a {
   border-width: 10px 10px 15px;
   border-style: solid;
   border-image: url("/Service/Themes/Default/img/tooltip.png") 20 fill;
-  color: var(#fff);
+  color: white;
   max-width: 550px;
 }
 
