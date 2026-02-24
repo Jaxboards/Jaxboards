@@ -17,7 +17,6 @@ body {
 }
 
 a {
-
   &:active,
   &:visited,
   &:link {
@@ -202,7 +201,6 @@ textarea {
 }
 
 #contacts {
-
   /* Buddy/Contacts List */
   & .online .name {
     color: #1d71cf;
@@ -323,10 +321,12 @@ textarea {
     content: "";
     position: absolute;
     inset: 3px;
-    background-image: linear-gradient(#2d0537 5%,
-        #3a165c 50%,
-        #23022a 70%,
-        #1d0422 85%);
+    background-image: linear-gradient(
+      #2d0537 5%,
+      #3a165c 50%,
+      #23022a 70%,
+      #1d0422 85%
+    );
     filter: blur(1px);
   }
 
@@ -588,7 +588,7 @@ textarea {
 /* Boxes/Collapse Boxes (Global) */
 
 .box {
-  &>.title {
+  & > .title {
     background: linear-gradient(45deg, var(--deep-purple), rgb(0 0 0 / 50%));
     color: var(--text-color);
   }
