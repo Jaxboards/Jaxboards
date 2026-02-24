@@ -1419,7 +1419,7 @@ a {
     padding: 7px;
 
     & .x {
-      background: url("Service/Themes/Default/icons/collapse.png");
+      background: url("/Service/Themes/Default/icons/collapse.png");
       position: absolute;
       top: 0.75em;
       right: 10px;
