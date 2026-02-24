@@ -172,8 +172,7 @@ a {
       margin: 10px;
       font-size: 1.2rem;
       padding: 2px 25px;
-      background: url("/Service/Themes/Default/icons/inboxicons.png") 0 0
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/inboxicons.png") 0 0 no-repeat;
     }
 
     & h2 {
@@ -234,7 +233,7 @@ a {
 
 /* Mod CP */
 #modcp {
-  & > .content {
+  &>.content {
     display: flex;
     flex-wrap: wrap;
   }
@@ -311,7 +310,6 @@ a {
     & td {
       padding: 2px;
       border-style: solid none;
-      background: #eef;
     }
 
     & th {
@@ -432,6 +430,7 @@ a {
 
 /* Contacts List */
 #contacts {
+
   & .name,
   & .status {
     margin-left: 50px;
@@ -792,8 +791,7 @@ a {
 
     & li {
       display: inline-block;
-      background: url("/Service/Themes/Default/icons/pathsplitter.png")
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/pathsplitter.png") no-repeat;
       padding-left: 20px;
       margin-right: 10px;
 
@@ -821,8 +819,7 @@ a {
     border-right: none;
 
     &::first-letter {
-      background: url("/Service/Themes/Default/icons/last.gif") center left
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
       padding-left: 15px;
     }
   }
@@ -895,8 +892,7 @@ a {
     max-width: 250px;
 
     &::first-letter {
-      background: url("/Service/Themes/Default/icons/last.gif") center left
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
       padding-left: 15px;
     }
   }
@@ -929,11 +925,11 @@ a {
   float: right;
 }
 
-.locked .topic > a:first-child::before {
+.locked .topic>a:first-child::before {
   content: "🔒";
 }
 
-.pinned .topic > a:first-child {
+.pinned .topic>a:first-child {
   font-style: italic;
 
   &::before {
@@ -957,8 +953,7 @@ a {
     border-right: none;
 
     &::first-letter {
-      background: url("/Service/Themes/Default/icons/last.gif") center left
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
       padding-left: 15px;
     }
   }
@@ -1036,8 +1031,7 @@ a {
   & .quotepost {
     padding-left: 18px;
     padding-bottom: 2px;
-    background: url("/Service/Themes/Default/icons/posticons.png") no-repeat top
-      left;
+    background: url("/Service/Themes/Default/icons/posticons.png") no-repeat top left;
   }
 
   & textarea {
@@ -1269,8 +1263,7 @@ a {
   & .addpoll {
     padding: 0 20px;
     margin: 10px;
-    background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat
-      top left;
+    background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat top left;
   }
 }
 
@@ -1299,6 +1292,7 @@ a {
 
 /* Quick Reply */
 #qreply {
+
   & .editorframe,
   & textarea {
     flex: 1;
@@ -1396,7 +1390,7 @@ a {
     height: 100px;
     width: 14%;
 
-    & > div {
+    &>div {
       height: 100%;
       position: relative;
     }
@@ -1419,7 +1413,7 @@ a {
 .box {
   margin: 10px 0;
 
-  & > .title {
+  &>.title {
     position: relative;
     padding: 7px;
 
@@ -1445,7 +1439,7 @@ a {
   }
 
   & .content {
-    & > .error {
+    &>.error {
       margin: 0;
       padding: 10px;
     }
@@ -1467,8 +1461,7 @@ a {
 
 #notification.newmessage {
   padding-left: 60px;
-  background: url("/Service/Themes/Default/icons/newmessage.png") no-repeat 20px
-    center;
+  background: url("/Service/Themes/Default/icons/newmessage.png") no-repeat 20px center;
 }
 
 .pages .active {
@@ -1565,8 +1558,7 @@ a {
   & .stats {
     margin-top: 10px;
     padding: 10px 25px;
-    background: url("/Service/Themes/Default/icons/boardstats.png") left center
-      no-repeat;
+    background: url("/Service/Themes/Default/icons/boardstats.png") left center no-repeat;
   }
 }
 
@@ -1725,6 +1717,7 @@ a {
 }
 
 #validname {
+
   &.valid,
   &.invalid {
     display: inline-block;
