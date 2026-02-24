@@ -19,9 +19,7 @@ final readonly class GeoLocate
 
     public function __construct(FileSystem $fileSystem)
     {
-        $this->cityReader = new Reader($fileSystem->pathFromRoot(
-            'maxmind/GeoLite2-City_20251223/GeoLite2-City.mmdb',
-        ));
+        $this->cityReader = new Reader($fileSystem->pathFromRoot('maxmind/GeoLite2-City_20251223/GeoLite2-City.mmdb'));
     }
 
     public function lookup(string $ip): ?City

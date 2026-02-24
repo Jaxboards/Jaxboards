@@ -181,7 +181,9 @@ final class Page
         }
 
         $themePath = $this->fileSystem->pathJoin(
-            $skin->custom !== 0 ? $this->domainDefinitions->getBoardPath() . '/Themes' : $this->domainDefinitions->getServiceThemePath(),
+            $skin->custom !== 0
+                ? $this->domainDefinitions->getBoardPath() . '/Themes'
+                : $this->domainDefinitions->getServiceThemePath(),
             $skin->title,
         );
         $cssFile = $this->fileSystem->pathJoin($themePath, 'css.css');

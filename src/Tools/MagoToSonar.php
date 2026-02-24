@@ -152,7 +152,6 @@ final readonly class MagoToSonar implements CLIRoute
 
     public function writeSonarReport(): void
     {
-
         if (!$this->fileSystem->getFileInfo('/reports/php')->isDir()) {
             $this->fileSystem->mkdir('/reports/php', recursive: true);
         }
