@@ -163,8 +163,7 @@ img {
       margin: 10px;
       font-size: 1.2rem;
       padding: 2px 25px;
-      background: url("/Service/Themes/Default/icons/inboxicons.png") 0 0
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/inboxicons.png") 0 0 no-repeat;
     }
 
     & h2 {
@@ -225,7 +224,7 @@ img {
 
 /* Mod CP */
 #modcp {
-  & > .content {
+  &>.content {
     display: flex;
     flex-wrap: wrap;
   }
@@ -423,6 +422,7 @@ img {
 
 /* Contacts List */
 #contacts {
+
   & .name,
   & .status {
     margin-left: 50px;
@@ -783,8 +783,7 @@ img {
 
     & li {
       display: inline-block;
-      background: url("/Service/Themes/Default/icons/pathsplitter.png")
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/pathsplitter.png") no-repeat;
       padding-left: 20px;
       margin-right: 10px;
 
@@ -812,8 +811,7 @@ img {
     border-right: none;
 
     &::first-letter {
-      background: url("/Service/Themes/Default/icons/last.gif") center left
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
       padding-left: 15px;
     }
   }
@@ -887,8 +885,7 @@ img {
     max-width: 250px;
 
     &::first-letter {
-      background: url("/Service/Themes/Default/icons/last.gif") center left
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
       padding-left: 15px;
     }
   }
@@ -921,6 +918,23 @@ img {
   float: right;
 }
 
+.locked .topic>a:first-child::before {
+  content: "🔒";
+}
+
+.pinned .topic>a:first-child {
+  font-style: italic;
+
+  &::before {
+    content: "📌";
+  }
+}
+
+.forum-buttons-top {
+  text-align: right;
+  margin: 10px;
+}
+
 /* Subforums (in forum listings) */
 .subindex {
   width: 100%;
@@ -936,8 +950,7 @@ img {
     }
 
     &::first-letter {
-      background: url("/Service/Themes/Default/icons/last.gif") center left
-        no-repeat;
+      background: url("/Service/Themes/Default/icons/last.gif") center left no-repeat;
       padding-left: 15px;
     }
   }
@@ -1015,8 +1028,7 @@ img {
   & .quotepost {
     padding-left: 18px;
     padding-bottom: 2px;
-    background: url("/Service/Themes/Default/icons/posticons.png") no-repeat top
-      left;
+    background: url("/Service/Themes/Default/icons/posticons.png") no-repeat top left;
   }
 
   & textarea {
@@ -1248,8 +1260,7 @@ img {
   & .addpoll {
     padding: 0 20px;
     margin: 10px;
-    background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat
-      top left;
+    background: url("/Service/Themes/Default/icons/postoptions.png") no-repeat top left;
   }
 }
 
@@ -1278,6 +1289,7 @@ img {
 
 /* Quick Reply */
 #qreply {
+
   & .editorframe,
   & textarea {
     flex: 1;
@@ -1375,7 +1387,7 @@ img {
     height: 100px;
     width: 14%;
 
-    & > div {
+    &>div {
       height: 100%;
       position: relative;
     }

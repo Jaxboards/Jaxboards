@@ -22,6 +22,7 @@ body {
 }
 
 a {
+
   &:active,
   &:visited,
   &:link {
@@ -127,7 +128,7 @@ textarea {
 
 /* Mod CP */
 #modcp {
-  & > .content {
+  &>.content {
     background: var(--medium-blue);
   }
 
@@ -368,12 +369,10 @@ textarea {
     content: "";
     position: absolute;
     inset: 3px;
-    background-image: linear-gradient(
-      #75a7e0 5%,
-      #3f5677 50%,
-      #275690 70%,
-      #1d72d0 85%
-    );
+    background-image: linear-gradient(#75a7e0 5%,
+        #3f5677 50%,
+        #275690 70%,
+        #1d72d0 85%);
     filter: blur(1px);
   }
 
@@ -505,23 +504,6 @@ textarea {
   & .item_2 {
     background-color: #ececff;
   }
-}
-
-.locked .topic > a:first-child::before {
-  content: "🔒";
-}
-
-.pinned .topic > a:first-child {
-  font-style: italic;
-
-  &::before {
-    content: "📌";
-  }
-}
-
-.forum-buttons-top {
-  text-align: right;
-  margin: 10px;
 }
 
 /* Subforums (in forum listings) */
@@ -700,7 +682,7 @@ textarea {
   background-size: 100% 50px;
   border: 1px solid var(--black);
 
-  & > .title {
+  &>.title {
     position: relative;
     margin: 1px 1px 0;
     background: var(--header);
@@ -731,7 +713,7 @@ textarea {
   & .content {
     background: var(--white);
 
-    & > .error {
+    &>.error {
       margin: 0;
       padding: 10px;
     }
@@ -1054,6 +1036,7 @@ a.mgroup4 {
 }
 
 #validname {
+
   &.valid,
   &.invalid {
     display: inline-block;
