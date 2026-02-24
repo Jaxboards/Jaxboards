@@ -157,12 +157,12 @@ final readonly class App
 
     private function renderBaseHTML(): void
     {
-        $timestamp = $this->fileSystem->getFileInfo('dist/app.js')->getMTime();
+        $timestamp = $this->fileSystem->getFileInfo('public/assets/app.js')->getMTime();
         $this->page->append(
             'SCRIPT',
             '<script src="'
                 . $this->router->getRootURL()
-                . "/dist/app.js?{$timestamp}\" defer></script>"
+                . "/assets/app.js?{$timestamp}\" defer></script>"
                 . '<script src="https://kit.fontawesome.com/69affb3f61.js" crossorigin="anonymous"></script>',
         );
 

@@ -733,7 +733,7 @@ function loadSolitaireCSS() {
     const cssLink = document.createElement("link");
     cssLink.addEventListener("load", resolve);
     Object.assign(cssLink, {
-      href: "/Script/eggs/solitaire.css",
+      href: "/assets/eggs/solitaire.css",
       type: "text/css",
       rel: "stylesheet",
     });

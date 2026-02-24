@@ -28,7 +28,7 @@ final readonly class Tardis implements Route
                             sh = document.documentElement.clientHeight;
                         if (!i) {
                             i = new Image;
-                            i.src = "/Script/eggs/tardis.gif";
+                            i.src = "/public/assets/tardis.gif";
                             i.id = "tardis";
                             document.body.appendChild(i);
                             i.style.position = "fixed";

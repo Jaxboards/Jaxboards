@@ -2,7 +2,7 @@ class Sound {
   private soundCache: Record<string, HTMLAudioElement> = {};
 
   getFilePath(title: string) {
-    return `/Sounds/${title}.mp3`;
+    return `/assets/Sounds/${title}.mp3`;
   }
 
   load(title: string, autoplay = false) {

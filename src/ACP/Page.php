@@ -88,7 +88,7 @@ final class Page
         $data['css_url'] = $rootURL . '/ACP/css/css.css';
         $data['bbcode_css_url'] = $rootURL . '/Service/Themes/Default/bbcode.css';
         $data['themes_css_url'] = $rootURL . '/ACP/css/themes.css';
-        $data['admin_js_url'] = $rootURL . '/dist/acp.js';
+        $data['admin_js_url'] = $rootURL . '/assets/acp.js';
 
         echo $this->render('admin.html', $data);
     }

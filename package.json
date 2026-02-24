@@ -29,7 +29,7 @@
   "scripts": {
     "autofix": "bun run eslint-fix && bun run stylelint-fix",
     "dev": "bun run build -- --watch",
-    "build": "bun build --entrypoints Script/app.ts Script/acp.ts --outdir=dist/ --bundle --minify",
+    "build": "bun build src/Script/app.ts src/Script/acp.ts --root src/Script/ --outdir=public/assets --bundle --minify",
     "ci-lint": "bun run eslint-report && bun run stylelint-report",
     "eslint": "eslint \"Script/**/*.ts\"",
     "eslint-fix": "eslint \"Script/**/*.ts\" --fix",

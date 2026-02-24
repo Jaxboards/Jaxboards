@@ -8,7 +8,7 @@
       "emoticons\\": "emoticons",
       "Jax\\": "src/Jax",
       "Tools\\": "src/Tools",
-      "Tests\\": "src/Tests"
+      "Tests\\": "Tests"
     }
   },
   "config": {

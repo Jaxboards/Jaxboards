@@ -17,7 +17,7 @@ final readonly class Asteroids implements Route
     #[Override]
     public function route($params): void
     {
-        $this->page->command('loadscript', '/Script/eggs/asteroids.min.js');
+        $this->page->command('loadscript', '/assets/eggs/asteroids.min.js');
         $this->page->command('preventNavigation');
     }
 }
