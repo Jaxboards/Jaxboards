@@ -1,4 +1,4 @@
-@import url("/Service/Themes/base-layout.css?4");
+@import url("/Service/Themes/base-layout.css?5");
 
 :root {
   --black: #000;
@@ -694,39 +694,13 @@ textarea {
     margin: 1px 1px 0;
     background: var(--header);
     color: var(--white);
-
-    & .x {
-      background: url("icons/collapse.png");
-      position: absolute;
-      top: 0.75em;
-      right: 10px;
-      width: 9px;
-      height: 9px;
-      text-indent: 10px;
-      overflow: hidden;
-      cursor: pointer;
-    }
-  }
-
-  &.collapsed .title .x {
-    background-position: 0 -9px;
-  }
-
-  & .content_top {
-    display: none;
   }
 
   & .content {
     background: var(--white);
-
-    &>.error {
-      margin: 0;
-      padding: 10px;
-    }
   }
 
   .content_bottom {
-    content: "";
     display: block;
     height: 5px;
     background: #bbd;
