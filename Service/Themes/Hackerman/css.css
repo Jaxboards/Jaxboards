@@ -306,11 +306,6 @@ textarea {
   }
 }
 
-/* Surrounding Container/Template for Board */
-#container {
-  max-width: 1280px;
-}
-
 /* Header */
 .head {
   display: flex;
@@ -539,11 +534,6 @@ textarea {
 
   & table {
     background: var(--purple);
-    width: 100%;
-  }
-
-  & td {
-    padding: 5px;
   }
 
   & .bar {
@@ -624,10 +614,6 @@ textarea {
 }
 
 #stats {
-  & .content {
-    padding: 20px;
-  }
-
   & .userstoday {
     border-top: 1px solid var(--border-blue);
   }
@@ -648,11 +634,6 @@ textarea {
 .quote {
   border: 1px solid var(--border-blue);
   background-color: var(--purple);
-
-  & .quotee {
-    margin: -10px 0 10px -5px;
-    font-weight: bold;
-  }
 }
 
 .code {
@@ -670,20 +651,6 @@ textarea {
     background: none;
     color: inherit;
   }
-}
-
-/* Social icons */
-.social {
-  display: inline-block;
-  background: url("/Service/Themes/Default/icons/social.png") no-repeat;
-  width: 16px;
-  height: 16px;
-  overflow: hidden;
-  text-indent: -1000px;
-}
-
-.rss {
-  background-position: 0 0;
 }
 
 /* AutoComplete */
