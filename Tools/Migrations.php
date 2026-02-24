@@ -10,15 +10,11 @@ use DI\NotFoundException;
 use Jax\Database\Database;
 use Jax\Database\Utils;
 use Jax\DebugLog;
-use Jax\FileSystem;
 use Override;
 use PDOException;
 use Tools\Migrations\Migration;
 
-use function array_reduce;
 use function implode;
-use function ksort;
-use function preg_match;
 
 use const PHP_EOL;
 
@@ -36,7 +32,6 @@ final readonly class Migrations implements CLIRoute
         private Container $container,
         private DebugLog $debugLog,
         private Database $database,
-        private FileSystem $fileSystem,
         private Utils $utils,
     ) {}
 
@@ -71,7 +66,7 @@ final readonly class Migrations implements CLIRoute
         try {
             $model = $this->container->get("Jax\\Models\\{$modelName}");
             $this->console->log($this->utils->createTableQueryFromModel($model));
-        } catch (NotFoundException | DependencyException) {
+        } catch (NotFoundException|DependencyException) {
             $this->console->error('Cannot find model: ' . $modelName);
         }
     }

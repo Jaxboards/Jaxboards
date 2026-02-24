@@ -62,7 +62,8 @@ final readonly class Utils implements Adapter
                 if (array_key_exists(1, $match)) {
                     $version = $match[1];
                     $fileInfo = $this->fileSystem->getFileInfo($path);
-                    $migrations[(int) $match[1]] = "Tools\\Migrations\\V{$version}\\" . $fileInfo->getBasename('.' . $fileInfo->getExtension());
+                    $migrations[(int) $match[1]] =
+                        "Tools\\Migrations\\V{$version}\\" . $fileInfo->getBasename('.' . $fileInfo->getExtension());
                 }
 
                 return $migrations;
