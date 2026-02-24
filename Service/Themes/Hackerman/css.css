@@ -510,6 +510,7 @@ textarea {
 .topic-buttons-bottom a,
 .pages-top a,
 .pages-bottom a {
+  display: inline-block;
   font-family: Consolas, monospace;
   background: black;
   padding: 5px;
