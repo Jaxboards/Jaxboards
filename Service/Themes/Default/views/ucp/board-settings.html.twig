@@ -3,9 +3,9 @@
 {% endif %}
 <form method="post" data-ajax-form="true">
     <input type="hidden" name="submit" value="1">
-    Board Skin:
+    <label for="skin">Board Skin:</label>
     {% if skins %}
-        <select name="skin" title="Board Skin">
+        <select name="skin" id="skin" title="Board Skin">
             {% for skin in skins %}
                 <option
                     value="{{ skin.id }}"
@@ -21,26 +21,28 @@
     {% endif %}
     <br>
     <br>
-    Use word filter:
+    <label for="usewordfilter">Use word filter:</label>
     <input
         type="checkbox"
         name="usewordfilter"
+        id="usewordfilter"
         title="Use Word Filter"
         {% if user.nowordfilter == 0 %}checked{% endif %}
     >
     <br>
     <br>
-    WYSIWYG Enabled by Default:
+    <label for="wysiwyg">WYSIWYG Enabled by Default:</label>
     <input
         type="checkbox"
         name="wysiwyg"
+        id="wysiwyg"
         title="WYSIWYG Enabled"
         {% if user.wysiwyg > 0 %}checked{% endif %}
     >
     <br>
     <br>
-    Items per page:
-    <select name="itemsPerPage">
+    <label for="itemsPerPage">Items per page:</label>
+    <select name="itemsPerPage" id="itemsPerPage">
       <option value="">Default</option>
       {% for value in [10, 20, 50] %}
         <option value="{{ value }}" {% if user.itemsPerPage == value %}selected{% endif %}>{{ value }}</option>
