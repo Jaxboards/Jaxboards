@@ -43,12 +43,14 @@
     <br>
     <label for="itemsPerPage">Items per page:</label>
     <input
-        max="50"
-        min="10"
-        name="itemsPerPage"
-        id="itemsPerPage"
-        placeholder="20"
-        type="number"
+      type="number"
+      name="itemsPerPage"
+      id="itemsPerPage"
+      max="50"
+      min="10"
+      step="5"
+      placeholder="20"
+      value="{{ user.itemsPerPage }}"
     >
     <br>
     <br>
