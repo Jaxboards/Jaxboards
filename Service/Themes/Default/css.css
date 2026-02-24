@@ -16,8 +16,6 @@
 
 body {
   background: url("img/bg.jpg");
-  font-family: Arial, sans-serif;
-  font-size: 1.6rem;
   color: var(--text-color);
 }
 

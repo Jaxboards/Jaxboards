@@ -13,8 +13,6 @@
 
 body {
   background: url("./img/background.jpg") black center / cover no-repeat fixed;
-  font-family: Arial, sans-serif;
-  font-size: 1.6rem;
   color: var(--text-color);
 }
 
