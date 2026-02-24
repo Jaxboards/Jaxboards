@@ -1,9 +1,2 @@
 RewriteEngine on
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^assets/(.*)$ ./public/assets/$1 [L,QSA]
-
-RewriteEngine on
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ index.php?path=$1 [L,QSA]
+RewriteRule ^(.*)$ /public/$1 [L,QSA]

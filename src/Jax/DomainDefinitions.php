@@ -48,7 +48,7 @@ final class DomainDefinitions
 
     public function getDefaultThemePath(): string
     {
-        return 'Service/Themes/Default';
+        return '/public/' . $this->getServiceThemePath() . '/Default';
     }
 
     public function getServiceThemePath(): string

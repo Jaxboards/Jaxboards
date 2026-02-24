@@ -181,15 +181,16 @@ final class Page
         }
 
         $themePath = $this->fileSystem->pathJoin(
-            $skin->custom !== 0 ? $this->domainDefinitions->getBoardPath() : 'Service',
-            'Themes',
+            $skin->custom !== 0 ? $this->domainDefinitions->getBoardPath() . '/Themes' : $this->domainDefinitions->getServiceThemePath(),
             $skin->title,
         );
         $cssFile = $this->fileSystem->pathJoin($themePath, 'css.css');
+        $cssFilePath = '/public/' . $cssFile;
+
         $themeUrl = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardURL() : '') . '/' . $cssFile;
 
         // Custom theme found but files not there, also fallback to default
-        if (!$this->fileSystem->getFileInfo($cssFile)->isFile()) {
+        if (!$this->fileSystem->getFileInfo($cssFilePath)->isFile()) {
             $themePath = $this->domainDefinitions->getDefaultThemePath();
             $cssFile = $this->fileSystem->pathJoin($themePath, 'css.css');
             $themeUrl = $this->router->getRootURL() . '/' . $cssFile;
@@ -198,10 +199,10 @@ final class Page
         $this->template->setThemePath($themePath);
 
         // Add cache busting
-        $themeUrl .= '?' . $this->fileSystem->getFileInfo($cssFile)->getMTime();
+        $themeUrl .= '?' . $this->fileSystem->getFileInfo($cssFilePath)->getMTime();
 
         $globalCSS = '/Service/Themes/global.css';
-        $globalCSSMtime = $this->fileSystem->getFileInfo($globalCSS)->getMTime();
+        $globalCSSMtime = $this->fileSystem->getFileInfo('/public/' . $globalCSS)->getMTime();
 
         // Load CSS
         $this->append('CSS', <<<HTML

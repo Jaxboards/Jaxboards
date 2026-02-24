@@ -19,7 +19,7 @@ final readonly class Nope implements Route
     {
         $this->page->command('script', <<<'JS'
             (function() {
-                const img = Object.assign(new Image(), { src: '/public/assets/nope.png'});
+                const img = Object.assign(new Image(), { src: '/assets/eggs/nope.png'});
                 Object.assign(img.style, {
                     position: 'fixed',
                 });
