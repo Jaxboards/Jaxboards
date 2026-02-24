@@ -48,7 +48,7 @@ final readonly class FileSystem
 
     public function __construct(?string $root = null)
     {
-        $root ??= dirname(__DIR__);
+        $root ??= dirname(dirname(__DIR__));
 
         // ensure trailing slash
         $this->root = str_ends_with($root, '/') ? $root : $root . '/';

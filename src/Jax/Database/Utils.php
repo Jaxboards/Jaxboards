@@ -51,7 +51,7 @@ final readonly class Utils implements Adapter
     public function getMigrations(): array
     {
         $migrations = array_reduce(
-            $this->fileSystem->glob('Tools/Migrations/**/*.php'),
+            $this->fileSystem->glob('src/Tools/Migrations/**/*.php'),
             /**
              * @param array<string> $migrations
              * @return array<string>
@@ -90,7 +90,7 @@ final readonly class Utils implements Adapter
     {
         $models = [];
 
-        foreach ($this->fileSystem->glob("{$directory}/*.php") as $model) {
+        foreach ($this->fileSystem->glob("src/{$directory}/*.php") as $model) {
             $fileInfo = $this->fileSystem->getFileInfo($model);
             $models[] = str_replace('/', '\\', $directory) . $fileInfo->getBasename('.php');
         }

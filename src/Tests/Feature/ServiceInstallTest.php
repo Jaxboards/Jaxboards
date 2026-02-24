@@ -139,7 +139,7 @@ final class ServiceInstallTest extends TestCase
         $this->fileSystemMock
             ->expects($this->once())
             ->method('copyDirectory')
-            ->with('Service/blueprint', 'boards/jaxboards');
+            ->with('src/Service/blueprint', 'boards/jaxboards');
 
         $page = $this->goServiceInstall(new Request(post: [
             // 'service' =>
@@ -190,7 +190,7 @@ final class ServiceInstallTest extends TestCase
         $this->fileSystemMock
             ->expects($this->exactly(2))
             ->method('copyDirectory')
-            ->with('Service/blueprint', static::callback(static fn($path): bool => in_array(
+            ->with('src/Service/blueprint', static::callback(static fn($path): bool => in_array(
                 $path,
                 [
                     'boards/test',

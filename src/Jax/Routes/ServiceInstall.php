@@ -84,7 +84,7 @@ final readonly class ServiceInstall
         private ServiceConfig $serviceConfig,
         private Template $template,
     ) {
-        $this->template->setThemePath('Service');
+        $this->template->setThemePath('src/Service');
     }
 
     public function render(): string
@@ -250,7 +250,7 @@ final readonly class ServiceInstall
             $member->pass = password_hash((string) $adminPassword, PASSWORD_DEFAULT);
             $member->insert();
 
-            $this->fileSystem->copyDirectory('Service/blueprint', 'boards/' . $board);
+            $this->fileSystem->copyDirectory('src/Service/blueprint', 'boards/' . $board);
         }
 
         if ($serviceMode) {

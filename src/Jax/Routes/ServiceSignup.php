@@ -43,7 +43,7 @@ final readonly class ServiceSignup
         private ServiceConfig $serviceConfig,
         private Template $template,
     ) {
-        $this->template->setThemePath('Service');
+        $this->template->setThemePath('src/Service');
     }
 
     public function render(): string
@@ -146,7 +146,7 @@ final readonly class ServiceSignup
         $member->pass = password_hash($password, PASSWORD_DEFAULT);
         $member->insert();
 
-        $this->fileSystem->copyDirectory('Service/blueprint', 'boards/' . $boardURLLowercase);
+        $this->fileSystem->copyDirectory('src/Service/blueprint', 'boards/' . $boardURLLowercase);
 
         $redirect = 'https://' . $boardURL . '.' . $this->serviceConfig->getSetting('domain');
         header("Location: {$redirect}");
