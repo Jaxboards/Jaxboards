@@ -421,8 +421,10 @@ final readonly class UCP implements Route
     private function saveBoardSettings(): ?string
     {
         $skinId = (int) $this->request->asString->both('skin');
-        $itemsPerPage = (int) $this->request->post('itemsPerPage');
-        $itemsPerPage = max(10, min(50, $itemsPerPage));
+        $itemsPerPage = (int) $this->request->asString->both('itemsPerPage');
+        if (!in_array($itemsPerPage, [10, 20, 50])) {
+            $itemsPerPage = null;
+        }
 
         $skin = Skin::selectOne($skinId);
 

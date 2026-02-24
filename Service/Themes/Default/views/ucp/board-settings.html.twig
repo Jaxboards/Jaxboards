@@ -41,6 +41,7 @@
     <br>
     Items per page:
     <select name="itemsPerPage">
+      <option value="">Default</option>
       {% for value in [10, 20, 50] %}
         <option value="{{ value }}" {% if user.itemsPerPage == value %}selected{% endif %}>{{ value }}</option>
       {% endfor %}
