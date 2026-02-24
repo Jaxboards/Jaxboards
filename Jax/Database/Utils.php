@@ -43,6 +43,41 @@ final readonly class Utils implements Adapter
     }
 
     /**
+     * Returns an array of Migration class-strings
+     * with the array key being the version number
+     *
+     * @return array<int,string>
+     */
+    public function getMigrations(): array
+    {
+        $migrations = array_reduce(
+            $this->fileSystem->glob('Tools/Migrations/**/*.php'),
+            /**
+             * @param array<string> $migrations
+             * @return array<string>
+             */
+            function (array $migrations, string $path): array {
+                $match = [];
+                preg_match('/V(\d+)/', $path, $match);
+                if (array_key_exists(1, $match)) {
+                    $version = $match[1];
+                    $fileInfo = $this->fileSystem->getFileInfo($path);
+                    $migrations[(int) $match[1]] =
+                        "Tools\\Migrations\\V{$version}\\" . $fileInfo->getBasename('.' . $fileInfo->getExtension());
+                }
+
+                return $migrations;
+            },
+            [],
+        );
+
+        // Sort migrations to run them in order
+        ksort($migrations);
+
+        return $migrations;
+    }
+
+    /**
      * Discover model classes under the `Jax\\Models` directory.
      *
      * Returns fully-qualified class names like `Jax\\Models\\Post`.
@@ -369,7 +404,7 @@ final readonly class Utils implements Adapter
         $stats->most_members = 1;
         $stats->most_members_day = 1;
         $stats->last_register = 1;
-        $stats->dbVersion = 4;
+        $stats->dbVersion = array_key_last($this->getMigrations());
         $stats->insert();
 
         $topic = new Topic();

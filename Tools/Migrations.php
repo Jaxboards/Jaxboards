@@ -10,15 +10,11 @@ use DI\NotFoundException;
 use Jax\Database\Database;
 use Jax\Database\Utils;
 use Jax\DebugLog;
-use Jax\FileSystem;
 use Override;
 use PDOException;
 use Tools\Migrations\Migration;
 
-use function array_reduce;
 use function implode;
-use function ksort;
-use function preg_match;
 
 use const PHP_EOL;
 
@@ -36,7 +32,6 @@ final readonly class Migrations implements CLIRoute
         private Container $container,
         private DebugLog $debugLog,
         private Database $database,
-        private FileSystem $fileSystem,
         private Utils $utils,
     ) {}
 
@@ -78,32 +73,11 @@ final readonly class Migrations implements CLIRoute
 
     private function runMigrations(): void
     {
-        /** @var array<int,string> $migrations */
-        $migrations = array_reduce(
-            $this->fileSystem->glob('Tools/Migrations/**/*.php'),
-            /**
-             * @param array<string> $migrations
-             * @return array<string>
-             */
-            function (array $migrations, string $path): array {
-                $match = [];
-                preg_match('/V(\d+)/', $path, $match);
-                if (array_key_exists(1, $match)) {
-                    $fileInfo = $this->fileSystem->getFileInfo($path);
-                    $migrations[(int) $match[1]] = $fileInfo->getBasename('.' . $fileInfo->getExtension());
-                }
-
-                return $migrations;
-            },
-            [],
-        );
-
-        // Sort migrations to run them in order
-        ksort($migrations);
+        $migrations = $this->utils->getMigrations();
 
         $dbVersion = $this->getDBVersion();
 
-        foreach ($migrations as $version => $migration) {
+        foreach ($migrations as $version => $migrationClassString) {
             if ($version <= $dbVersion) {
                 continue;
             }
@@ -111,7 +85,7 @@ final readonly class Migrations implements CLIRoute
             $this->console->notice("migrating from v{$dbVersion} to v{$version}");
 
             /** @var Migration $migrationClass */
-            $migrationClass = $this->container->get("Tools\\Migrations\\V{$version}\\{$migration}");
+            $migrationClass = $this->container->get($migrationClassString);
 
             try {
                 $migrationClass->execute();
