@@ -369,7 +369,7 @@ final readonly class Utils implements Adapter
         $stats->most_members = 1;
         $stats->most_members_day = 1;
         $stats->last_register = 1;
-        $stats->dbVersion = 4;
+        $stats->dbVersion = 5;
         $stats->insert();
 
         $topic = new Topic();
