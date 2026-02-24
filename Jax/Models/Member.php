@@ -62,8 +62,8 @@ final class Member extends Model
     #[Column(name: 'enemies', type: 'text', default: '', nullable: false)]
     public string $enemies = '';
 
-    #[Column(name: 'full_name', type: 'string', default: '', length: 50, nullable: false)]
-    public string $full_name = '';
+    #[Column(name: 'fullName', type: 'string', default: '', length: 50, nullable: false)]
+    public string $fullName = '';
 
     #[Column(name: 'friends', type: 'text', default: '', nullable: false)]
     public string $friends = '';
@@ -94,6 +94,9 @@ final class Member extends Model
      */
     #[Column(name: 'emailSettings', type: 'tinyint', default: 0, nullable: false, unsigned: true)]
     public int $emailSettings = 0;
+
+    #[Column(name: 'itemsPerPage', type: 'int', unsigned: true)]
+    public ?int $itemsPerPage = 10;
 
     #[Column(name: 'mod', type: 'bool')]
     public int $mod = 0;

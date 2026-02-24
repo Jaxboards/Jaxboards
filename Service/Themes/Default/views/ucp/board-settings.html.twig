@@ -39,5 +39,13 @@
     >
     <br>
     <br>
+    Items per page:
+    <select name="itemsPerPage">
+      {% for value in [10, 20, 50] %}
+        <option value="{{ value }}" {% if user.itemsPerPage == value %}selected{% endif %}>{{ value }}</option>
+      {% endfor %}
+    </select>
+    <br>
+    <br>
     <input type="submit" value="Save">
 </form>

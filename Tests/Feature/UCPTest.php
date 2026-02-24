@@ -204,7 +204,7 @@ final class UCPTest extends FeatureTestCase
                     ],
                     true,
                 )
-                    => DOMAssert::assertSelectCount("select[name={$field}]", 1, $page),
+                => DOMAssert::assertSelectCount("select[name={$field}]", 1, $page),
                 $field === 'about' => DOMAssert::assertSelectCount("textarea[name={$field}]", 1, $page),
                 default => DOMAssert::assertSelectCount("input[name={$field}]", 1, $page),
             };
@@ -223,7 +223,7 @@ final class UCPTest extends FeatureTestCase
 
         $member = Member::selectOne(2);
         static::assertSame('DisplayName', $member?->displayName);
-        static::assertSame('Full Name', $member?->full_name);
+        static::assertSame('Full Name', $member?->fullName);
         static::assertSame('User Title', $member?->usertitle);
         static::assertSame('About me', $member?->about);
         static::assertSame('Location', $member?->location);
@@ -322,7 +322,7 @@ final class UCPTest extends FeatureTestCase
     {
         return [
             'displayName' => 'DisplayName',
-            'full_name' => 'Full Name',
+            'fullName' => 'Full Name',
             'usertitle' => 'User Title',
             'about' => 'About me',
             'location' => 'Location',

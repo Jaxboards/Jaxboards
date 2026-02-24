@@ -50,7 +50,7 @@ final class Forum implements Route
      */
     private ?array $forumsRead = null;
 
-    private int $numperpage = 20;
+    private int $numperpage;
 
     private int $pageNumber = 0;
 
@@ -65,7 +65,9 @@ final class Forum implements Route
         private readonly Template $template,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
-    ) {}
+    ) {
+        $this->numperpage = $user->get()->itemsPerPage ?? 20;
+    }
 
     #[Override]
     public function route($params): void
@@ -205,9 +207,9 @@ final class Forum implements Route
     private function renderTopicListing(ModelsForum $modelsForum, array $topics): string
     {
         $memberIds = $topics !== [] ? array_merge(...array_map(static fn(Topic $topic): array => [
-                $topic->author,
-                $topic->lastPostUser,
-            ], $topics)) : [];
+            $topic->author,
+            $topic->lastPostUser,
+        ], $topics)) : [];
 
         $membersById = $memberIds !== []
             ? Lodash::keyBy(
@@ -238,12 +240,12 @@ final class Forum implements Route
      */
     private function renderTopicPages(Topic $topic): string
     {
-        if ($topic->replies <= 10) {
+        if ($topic->replies <= $this->numperpage) {
             return '';
         }
 
         $pageArray = [];
-        foreach ($this->jax->pages((int) ceil(($topic->replies + 1) / 10), 1) as $pageNumber) {
+        foreach ($this->jax->pages((int) ceil(($topic->replies + 1) / $this->numperpage), 1) as $pageNumber) {
             $pageURL = $this->router->url('topic', [
                 'id' => $topic->id,
                 'page' => $pageNumber,
@@ -317,14 +319,14 @@ final class Forum implements Route
 
         return (
             $rows === []
-                ? ''
-                : $this->page->collapseBox(
-                    'Subforums',
-                    $this->template->render('forum/subforum-table', [
-                        'rows' => $rows,
-                    ]),
-                    'subforums_' . $forum->id,
-                )
+            ? ''
+            : $this->page->collapseBox(
+                'Subforums',
+                $this->template->render('forum/subforum-table', [
+                    'rows' => $rows,
+                ]),
+                'subforums_' . $forum->id,
+            )
         );
     }
 

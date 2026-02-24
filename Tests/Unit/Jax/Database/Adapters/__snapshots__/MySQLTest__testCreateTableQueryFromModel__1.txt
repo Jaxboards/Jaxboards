@@ -12,7 +12,7 @@ CREATE TABLE `jaxboards_members` (
     `displayName` varchar(30) NOT NULL DEFAULT '',
     `email` varchar(50) NOT NULL DEFAULT '',
     `enemies` text NOT NULL DEFAULT '',
-    `full_name` varchar(50) NOT NULL DEFAULT '',
+    `fullName` varchar(50) NOT NULL DEFAULT '',
     `friends` text NOT NULL DEFAULT '',
     `gender` varchar(50) NOT NULL DEFAULT '',
     `joinDate` datetime,

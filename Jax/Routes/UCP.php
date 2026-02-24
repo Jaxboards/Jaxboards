@@ -311,7 +311,7 @@ final readonly class UCP implements Route
             'dob_day' => (int) $this->request->asString->post('dob_day'),
             'dob_month' => (int) $this->request->asString->post('dob_month'),
             'dob_year' => (int) $this->request->asString->post('dob_year'),
-            'full_name' => $this->request->asString->post('full_name'),
+            'fullName' => $this->request->asString->post('fullName'),
             'gender' => $this->request->asString->post('gender') ?? '',
             'location' => $this->request->asString->post('location'),
             'usertitle' => $this->request->asString->post('usertitle'),
@@ -344,23 +344,25 @@ final readonly class UCP implements Route
             : null;
         unset($data['dob_day'], $data['dob_month'], $data['dob_year']);
 
-        foreach ([
-            'contactAIM' => 'AIM username',
-            'contactBlueSky' => 'Bluesky username',
-            'contactDiscord' => 'Discord ID',
-            'contactGoogleChat' => 'Google Chat username',
-            'contactMSN' => 'MSN username',
-            'contactSkype' => 'Skype username',
-            'contactSteam' => 'Steam username',
-            'contactTwitter' => 'Twitter username',
-            'contactYIM' => 'YIM username',
-            'contactYoutube' => 'YouTube username',
-            'displayName' => 'Display name',
-            'full_name' => 'Full name',
-            'location' => 'Location',
-            'usertitle' => 'User Title',
-            'website' => 'Website URL',
-        ] as $field => $fieldLabel) {
+        foreach (
+            [
+                'contactAIM' => 'AIM username',
+                'contactBlueSky' => 'Bluesky username',
+                'contactDiscord' => 'Discord ID',
+                'contactGoogleChat' => 'Google Chat username',
+                'contactMSN' => 'MSN username',
+                'contactSkype' => 'Skype username',
+                'contactSteam' => 'Steam username',
+                'contactTwitter' => 'Twitter username',
+                'contactYIM' => 'YIM username',
+                'contactYoutube' => 'YouTube username',
+                'displayName' => 'Display name',
+                'fullName' => 'Full name',
+                'location' => 'Location',
+                'usertitle' => 'User Title',
+                'website' => 'Website URL',
+            ] as $field => $fieldLabel
+        ) {
             if (mb_strstr($field, 'contact') !== false && preg_match('/[^\w.@]/', (string) $data[$field])) {
                 return "Invalid characters in {$fieldLabel}";
             }
@@ -421,6 +423,8 @@ final readonly class UCP implements Route
     private function saveBoardSettings(): ?string
     {
         $skinId = (int) $this->request->asString->both('skin');
+        $itemsPerPage = (int) $this->request->post('itemsPerPage');
+        $itemsPerPage = max(10, min(50, $itemsPerPage));
 
         $skin = Skin::selectOne($skinId);
 
@@ -428,10 +432,12 @@ final readonly class UCP implements Route
             return 'The skin chosen no longer exists.';
         }
 
+
         $this->user->setBulk([
             'nowordfilter' => $this->request->post('usewordfilter') ? 0 : 1,
             'skinID' => $skinId,
             'wysiwyg' => $this->request->post('wysiwyg') ? 1 : 0,
+            'itemsPerPage' => $itemsPerPage,
         ]);
 
         if ($this->request->isJSAccess()) {

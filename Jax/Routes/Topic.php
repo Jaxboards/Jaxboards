@@ -54,7 +54,7 @@ final class Topic implements Route
 {
     private int $pageNumber = 0;
 
-    private int $numperpage = 10;
+    private int $numperpage;
 
     private int $firstPostID = 0;
 
@@ -74,7 +74,9 @@ final class Topic implements Route
         private readonly Template $template,
         private readonly User $user,
         private readonly UsersOnline $usersOnline,
-    ) {}
+    ) {
+        $this->numperpage = $user->get()->itemsPerPage ?? 20;
+    }
 
     #[Override]
     public function route($params): void
@@ -150,11 +152,11 @@ final class Topic implements Route
     {
         return (
             $memberIds !== []
-                ? Lodash::keyBy(
-                    Member::selectMany(Database::WHERE_ID_IN, array_unique($memberIds, SORT_REGULAR)),
-                    static fn(Member $member): int => $member->id,
-                )
-                : []
+            ? Lodash::keyBy(
+                Member::selectMany(Database::WHERE_ID_IN, array_unique($memberIds, SORT_REGULAR)),
+                static fn(Member $member): int => $member->id,
+            )
+            : []
         );
     }
 
@@ -185,7 +187,7 @@ final class Topic implements Route
                 'id' => $forum?->id,
                 'slug' => $this->textFormatting->slugify($forum?->title),
             ]) =>
-                $forum->title ?? '',
+            $forum->title ?? '',
             $this->router->url('topic', [
                 'id' => $modelsTopic->id,
                 'slug' => $this->textFormatting->slugify($modelsTopic->title),
@@ -227,7 +229,7 @@ final class Topic implements Route
             'content' => $this->postsIntoOutput($modelsTopic),
             'canCreateTopic' => $forumPerms['start'],
             'canReply' =>
-                $forumPerms['reply'] && (!$modelsTopic->locked || $this->user->getGroup()?->canOverrideLockedTopics),
+            $forumPerms['reply'] && (!$modelsTopic->locked || $this->user->getGroup()?->canOverrideLockedTopics),
             'pages' => $pagelist,
             'poll' => $poll,
             'usersInTopic' => $usersInTopic,
