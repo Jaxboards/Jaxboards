@@ -4,11 +4,10 @@
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "ACP\\": "ACP",
-      "emoticons\\": "emoticons",
-      "Jax\\": "Jax",
-      "Service\\": "Service",
-      "Tools\\": "Tools",
+      "ACP\\": "src/ACP",
+      "Emoticons\\": "public/assets/emoticons",
+      "Jax\\": "src/Jax",
+      "Tools\\": "src/Tools",
       "Tests\\": "Tests"
     }
   },

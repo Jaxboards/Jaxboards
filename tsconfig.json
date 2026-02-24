@@ -3,7 +3,7 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "node",
-    "rootDir": "./Script/",
+    "rootDir": "src/Script",
     "allowJs": true,
     "checkJs": false,
     "removeComments": true,
@@ -11,5 +11,5 @@
     "strict": true,
     "esModuleInterop": false
   },
-  "include": ["./Script/**/*.ts"]
+  "include": ["src/Script/**/*.ts"]
 }

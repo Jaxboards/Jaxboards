@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use DG\BypassFinals;
 
+$root = dirname(__DIR__);
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 BypassFinals::enable();
 BypassFinals::allowPaths(['*/Jax/*']);
