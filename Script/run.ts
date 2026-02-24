@@ -13,7 +13,7 @@ export class AppState {
 
   onAppReady() {
     if (useJSLinks) {
-      gracefulDegrade(document.body);
+      gracefulDegrade(document.documentElement);
     }
 
     // Add snow for Christmas

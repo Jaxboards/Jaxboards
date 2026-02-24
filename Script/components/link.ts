@@ -38,7 +38,7 @@ export default class Link extends Component<HTMLAnchorElement> {
         // Some links have an onclick that returns true/false based on whether
         // or not the link should execute.
         if (!oldclick || oldclick.call(link, event) !== false) {
-          RUN.stream.location(href);
+          RUN.stream.location(link.getAttribute("href") ?? "");
         }
       });
 
