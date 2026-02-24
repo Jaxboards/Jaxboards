@@ -16,14 +16,12 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use Tests\UnitTestCase;
 
 use function DI\autowire;
-use function implode;
 use function json_encode;
 use function PHPUnit\Framework\once;
 
 use const CURLOPT_CUSTOMREQUEST;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
-use const PHP_EOL;
 
 /**
  * @internal
