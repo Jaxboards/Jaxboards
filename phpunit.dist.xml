@@ -44,8 +44,6 @@
 
   <source>
     <include>
-      <directory suffix="php">Service</directory>
-      <directory suffix="php">boards</directory>
       <directory suffix="php">src</directory>
       <file>index.php</file>
     </include>
