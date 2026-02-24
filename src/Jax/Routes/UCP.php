@@ -422,7 +422,7 @@ final readonly class UCP implements Route
     {
         $skinId = (int) $this->request->asString->both('skin');
         $itemsPerPage = (int) $this->request->asString->both('itemsPerPage');
-        if (!in_array($itemsPerPage, [10, 20, 50])) {
+        if ($itemsPerPage < 10 || $itemsPerPage > 50) {
             $itemsPerPage = null;
         }
 

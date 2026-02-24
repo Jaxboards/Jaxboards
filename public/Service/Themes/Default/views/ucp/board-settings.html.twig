@@ -42,12 +42,16 @@
     <br>
     <br>
     <label for="itemsPerPage">Items per page:</label>
-    <select name="itemsPerPage" id="itemsPerPage">
-      <option value="">Default</option>
-      {% for value in [10, 20, 50] %}
-        <option value="{{ value }}" {% if user.itemsPerPage == value %}selected{% endif %}>{{ value }}</option>
-      {% endfor %}
-    </select>
+    <input
+      type="number"
+      name="itemsPerPage"
+      id="itemsPerPage"
+      max="50"
+      min="10"
+      step="5"
+      placeholder="20"
+      value="{{ user.itemsPerPage }}"
+    >
     <br>
     <br>
     <input type="submit" value="Save">
