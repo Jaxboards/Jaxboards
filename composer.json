@@ -7,7 +7,6 @@
       "ACP\\": "src/ACP",
       "emoticons\\": "emoticons",
       "Jax\\": "src/Jax",
-      "Service\\": "Service",
       "Tools\\": "src/Tools",
       "Tests\\": "src/Tests"
     }
