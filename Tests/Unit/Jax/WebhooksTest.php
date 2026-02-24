@@ -61,11 +61,11 @@ final class WebhooksTest extends UnitTestCase
                     CURLOPT_POSTFIELDS => $this->assertEquals($value, json_encode([
                         'username' => 'Sean',
                         'avatar_url' => 'avatar url',
-                        'content' => implode(PHP_EOL, [
-                            '[topic title](<https://example.com/topic/0?findpost=0>)',
-                            '',
-                            'post content',
-                        ]),
+                        'content' => <<<'MARKDOWN'
+                            [topic title](<https://example.com/topic/0?findpost=0>)
+
+                            post content
+                            MARKDOWN,
                     ])),
                     CURLOPT_RETURNTRANSFER => $this->assertEquals($value, true),
                 };

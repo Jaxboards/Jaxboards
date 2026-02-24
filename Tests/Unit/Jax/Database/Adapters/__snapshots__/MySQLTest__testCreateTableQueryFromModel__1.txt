@@ -22,6 +22,7 @@ CREATE TABLE `jaxboards_members` (
     `usertitle` varchar(255) NOT NULL DEFAULT '',
     `website` varchar(255) NOT NULL DEFAULT '',
     `emailSettings` tinyint unsigned NOT NULL DEFAULT '0',
+    `itemsPerPage` int unsigned,
     `mod` tinyint(1) unsigned NOT NULL DEFAULT '0',
     `nowordfilter` tinyint(1) unsigned NOT NULL DEFAULT '0',
     `skinID` int unsigned,
