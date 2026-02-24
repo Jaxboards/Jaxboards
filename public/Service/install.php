@@ -13,7 +13,7 @@ use Jax\Routes\ServiceInstall;
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
 
-require_once dirname(__DIR__) . '/vendor/autoload.php';
+require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
 
 $container = new Container();
 

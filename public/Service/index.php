@@ -13,7 +13,7 @@ declare(strict_types=1);
 use DI\Container;
 use Jax\Routes\ServiceSignup;
 
-require_once dirname(__DIR__) . '/vendor/autoload.php';
+require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
 
 $container = new Container();
 echo $container->get(ServiceSignup::class)->render();
