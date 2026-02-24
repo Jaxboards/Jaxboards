@@ -71,39 +71,18 @@ final readonly class Migrations implements CLIRoute
         try {
             $model = $this->container->get("Jax\\Models\\{$modelName}");
             $this->console->log($this->utils->createTableQueryFromModel($model));
-        } catch (NotFoundException|DependencyException) {
+        } catch (NotFoundException | DependencyException) {
             $this->console->error('Cannot find model: ' . $modelName);
         }
     }
 
     private function runMigrations(): void
     {
-        /** @var array<int,string> $migrations */
-        $migrations = array_reduce(
-            $this->fileSystem->glob('Tools/Migrations/**/*.php'),
-            /**
-             * @param array<string> $migrations
-             * @return array<string>
-             */
-            function (array $migrations, string $path): array {
-                $match = [];
-                preg_match('/V(\d+)/', $path, $match);
-                if (array_key_exists(1, $match)) {
-                    $fileInfo = $this->fileSystem->getFileInfo($path);
-                    $migrations[(int) $match[1]] = $fileInfo->getBasename('.' . $fileInfo->getExtension());
-                }
-
-                return $migrations;
-            },
-            [],
-        );
-
-        // Sort migrations to run them in order
-        ksort($migrations);
+        $migrations = $this->utils->getMigrations();
 
         $dbVersion = $this->getDBVersion();
 
-        foreach ($migrations as $version => $migration) {
+        foreach ($migrations as $version => $migrationClassString) {
             if ($version <= $dbVersion) {
                 continue;
             }
@@ -111,7 +90,7 @@ final readonly class Migrations implements CLIRoute
             $this->console->notice("migrating from v{$dbVersion} to v{$version}");
 
             /** @var Migration $migrationClass */
-            $migrationClass = $this->container->get("Tools\\Migrations\\V{$version}\\{$migration}");
+            $migrationClass = $this->container->get($migrationClassString);
 
             try {
                 $migrationClass->execute();

@@ -49,4 +49,13 @@ final class UtilsTest extends UnitTestCase
             $query,
         );
     }
+
+    public function testGetMigrations(): void
+    {
+        $migrations = $this->databaseUtils->getMigrations();
+        $versions = array_keys($migrations);
+        sort(array_keys($versions));
+        static::assertEqualsCanonicalizing(array_keys($migrations), $versions);
+        static::assertGreaterThan(6, array_key_last($migrations));
+    }
 }
