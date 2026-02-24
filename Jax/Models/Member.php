@@ -96,7 +96,7 @@ final class Member extends Model
     public int $emailSettings = 0;
 
     #[Column(name: 'itemsPerPage', type: 'int', unsigned: true)]
-    public ?int $itemsPerPage = 10;
+    public ?int $itemsPerPage = 20;
 
     #[Column(name: 'mod', type: 'bool')]
     public int $mod = 0;
