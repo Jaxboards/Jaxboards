@@ -48,17 +48,17 @@ final class DomainDefinitions
 
     public function getDefaultThemePath(): string
     {
-        return '/public/' . $this->getServiceThemePath() . '/Default';
+        return  $this->getServiceThemePath() . '/Default';
     }
 
     public function getServiceThemePath(): string
     {
-        return 'Service/Themes';
+        return 'public/Service/Themes';
     }
 
     public function getBoardPath(): string
     {
-        return $this->fileSystem->pathJoin('boards', $this->prefix);
+        return $this->fileSystem->pathJoin('public/boards', $this->prefix);
     }
 
     public function getBoardPathUrl(): string

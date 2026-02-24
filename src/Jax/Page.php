@@ -185,12 +185,11 @@ final class Page
             $skin->title,
         );
         $cssFile = $this->fileSystem->pathJoin($themePath, 'css.css');
-        $cssFilePath = '/public/' . $cssFile;
 
         $themeUrl = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardURL() : '') . '/' . $cssFile;
 
         // Custom theme found but files not there, also fallback to default
-        if (!$this->fileSystem->getFileInfo($cssFilePath)->isFile()) {
+        if (!$this->fileSystem->getFileInfo($cssFile)->isFile()) {
             $themePath = $this->domainDefinitions->getDefaultThemePath();
             $cssFile = $this->fileSystem->pathJoin($themePath, 'css.css');
             $themeUrl = $this->router->getRootURL() . '/' . $cssFile;
@@ -199,7 +198,7 @@ final class Page
         $this->template->setThemePath($themePath);
 
         // Add cache busting
-        $themeUrl .= '?' . $this->fileSystem->getFileInfo($cssFilePath)->getMTime();
+        $themeUrl = str_replace('/public', '', $themeUrl) . '?' . $this->fileSystem->getFileInfo($cssFile)->getMTime();
 
         $globalCSS = '/Service/Themes/global.css';
         $globalCSSMtime = $this->fileSystem->getFileInfo('/public/' . $globalCSS)->getMTime();
