@@ -1,61 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <phpunit
-    backupGlobals="true"
-    backupStaticProperties="true"
-    beStrictAboutChangesToGlobalState="true"
-    beStrictAboutCoverageMetadata="true"
-    beStrictAboutOutputDuringTests="true"
-    beStrictAboutTestsThatDoNotTestAnything="true"
-    bootstrap="Tests/bootstrap.php"
-    colors="true"
-    columns="max"
-    cacheDirectory=".cache/.phpunit.cache"
-    defaultTestSuite="Jax"
-    displayDetailsOnAllIssues="true"
-    enforceTimeLimit="true"
-    failOnAllIssues="true"
-    failOnDeprecation="true"
-    failOnEmptyTestSuite="true"
-    failOnIncomplete="true"
-    failOnNotice="true"
-    failOnPhpunitDeprecation="true"
-    failOnRisky="true"
-    failOnSkipped="true"
-    failOnWarning="true"
-    processIsolation="true"
-    requireCoverageMetadata="false"
-    stderr="true"
-    >
-    <coverage
-        includeUncoveredFiles="true"
-        ignoreDeprecatedCodeUnits="true"
-        disableCodeCoverageIgnore="true"
-        >
-        <report>
-            <clover outputFile="clover.xml"/>
-        </report>
-    </coverage>
+  backupGlobals="true"
+  backupStaticProperties="true"
+  beStrictAboutChangesToGlobalState="true"
+  beStrictAboutCoverageMetadata="true"
+  beStrictAboutOutputDuringTests="true"
+  beStrictAboutTestsThatDoNotTestAnything="true"
+  bootstrap="Tests/bootstrap.php"
+  colors="true"
+  columns="max"
+  cacheDirectory=".cache/.phpunit.cache"
+  defaultTestSuite="Jax"
+  displayDetailsOnAllIssues="true"
+  enforceTimeLimit="true"
+  failOnAllIssues="true"
+  failOnDeprecation="true"
+  failOnEmptyTestSuite="true"
+  failOnIncomplete="true"
+  failOnNotice="true"
+  failOnPhpunitDeprecation="true"
+  failOnRisky="true"
+  failOnSkipped="true"
+  failOnWarning="true"
+  processIsolation="true"
+  requireCoverageMetadata="false"
+  stderr="true"
+>
+  <coverage
+    includeUncoveredFiles="true"
+    ignoreDeprecatedCodeUnits="true"
+    disableCodeCoverageIgnore="true"
+  >
+    <report>
+      <clover outputFile="clover.xml" />
+    </report>
 
-    <logging>
-        <junit outputFile="junit.xml"/>
-    </logging>
+  </coverage>
 
-    <source>
-        <include>
-            <directory suffix="php">ACP</directory>
-            <directory suffix="php">Jax</directory>
-            <directory suffix="php">Service</directory>
-            <directory suffix="php">api</directory>
-            <directory suffix="php">boards</directory>
-            <directory suffix="php">tools</directory>
-            <file>index.php</file>
-        </include>
-    </source>
+  <logging>
+    <junit outputFile="junit.xml" />
+  </logging>
 
-    <testsuites>
-        <testsuite name="Jax">
-            <directory>Tests</directory>
-        </testsuite>
-    </testsuites>
+  <source>
+    <include>
+      <directory suffix="php">Service</directory>
+      <directory suffix="php">boards</directory>
+      <directory suffix="php">src</directory>
+      <file>index.php</file>
+    </include>
+    <exclude>
+      <directory suffix=".php">Tests/</directory>
+    </exclude>
+  </source>
+
+  <testsuites>
+    <testsuite name="Jax">
+      <directory>Tests</directory>
+    </testsuite>
+  </testsuites>
 </phpunit>

@@ -93,7 +93,7 @@ final class TextFormattingTest extends UnitTestCase
 
         static::assertSame(<<<'HTML'
             <div class="bbcode code ">hello</div><br>
-            <img src="/emoticons/keshaemotes/smile.gif" data-emoji=":)" alt=":)" title=":)"><br>
+            <img src="/assets/emoticons/keshaemotes/smile.gif" data-emoji=":)" alt=":)" title=":)"><br>
             world
             HTML, $result);
     }
