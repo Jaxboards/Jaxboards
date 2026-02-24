@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tools;
 
+use Jax\FileSystem;
 use Override;
 use Tools\Mago\LintIssues;
 use Tools\Mago\LintRule;
@@ -16,15 +17,16 @@ use Tools\Sonar\TextRange;
 /**
  * Converts linter output from Mago to a JSON compatible with SonarQube.
  *
- * Outputs to mago-report-sonar.json
+ * Outputs to reports/php/mago-report-sonar.json
  */
 final readonly class MagoToSonar implements CLIRoute
 {
     private string $mago;
 
-    public function __construct()
-    {
-        $mago = realpath(dirname(__DIR__) . '/vendor/bin/mago');
+    public function __construct(
+        private FileSystem $fileSystem,
+    ) {
+        $mago = $fileSystem->pathFromRoot('/vendor/bin/mago');
         $this->mago = is_string($mago) ? $mago : '';
     }
 
@@ -150,7 +152,12 @@ final readonly class MagoToSonar implements CLIRoute
 
     public function writeSonarReport(): void
     {
-        file_put_contents('mago-report-sonar.json', json_encode([
+
+        if (!$this->fileSystem->getFileInfo('/reports/php')->isDir()) {
+            $this->fileSystem->mkdir('/reports/php', recursive: true);
+        }
+
+        $this->fileSystem->putContents('/reports/php/mago-report-sonar.json', json_encode([
             'rules' => array_merge($this->getMagoRulesForSonar(), $this->getAnalyzeRulesForSonar()),
             'issues' => array_merge($this->getMagoIssuesForSonar('lint'), $this->getMagoIssuesForSonar('analyze')),
         ], JSON_PRETTY_PRINT));

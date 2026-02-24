@@ -41,7 +41,7 @@
     "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\" --ignore-path .gitignore",
     "stylelint-report": "stylelint \"./**/*.{c,sa,sc,le}ss\" --formatter json --output-file stylelint-report.json --ignore-path .gitignore",
     "prepare": "husky",
-    "test": "bun test --coverage --coverage-reporter=lcov --coverage-dir=coverage/js",
+    "test": "bun test --coverage --coverage-reporter=lcov --coverage-dir=reports/js/coverage",
     "typecheck": "tsc --noEmit"
   },
   "type": "module"

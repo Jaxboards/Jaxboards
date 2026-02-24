@@ -33,13 +33,13 @@
     disableCodeCoverageIgnore="true"
   >
     <report>
-      <clover outputFile="clover.xml" />
+      <clover outputFile="reports/php/coverage/clover.xml" />
     </report>
 
   </coverage>
 
   <logging>
-    <junit outputFile="junit.xml" />
+    <junit outputFile="reports/php/junit.xml" />
   </logging>
 
   <source>

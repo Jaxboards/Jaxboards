@@ -18,12 +18,9 @@ boards
 # Linters
 eslint-report.json
 stylelint-report.json
-mago-report-sonar.json
 
-# Test Reports
-/coverage
-/clover.xml
-/junit.xml
+# Automated Reports
+/reports
 
 # Vendor files
 node_modules
