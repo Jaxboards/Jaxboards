@@ -511,7 +511,9 @@ textarea {
 .pages-top a,
 .pages-bottom a {
   display: inline-block;
-  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  font-family:
+    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
+    "DejaVu Sans Mono", monospace;
   background: black;
   padding: 5px;
   border: 1px solid #0f0;
