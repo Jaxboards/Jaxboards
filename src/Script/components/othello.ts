@@ -1,5 +1,5 @@
 import register, { Component } from "../component";
-import { Coordinates, getCellCoordinates, toDOM } from "../dom";
+import { type Coordinates, getCellCoordinates, toDOM } from "../dom";
 import sound from "../sound";
 import toast from "../toast";
 
@@ -12,7 +12,7 @@ const directions: Coordinates[] = [
   [-1, -1], // northwest
   [1, -1], // southwest
   [1, 1], // southeast
-];
+] as const;
 
 export default class Othello extends Component<HTMLTableElement> {
   static hydrate(container: HTMLElement): void {

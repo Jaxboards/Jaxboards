@@ -183,7 +183,7 @@ class Drag {
   testDrops(mouseX: number, mouseY: number): HTMLElement | undefined {
     const { droppables } = this;
     let z;
-    let max = [9999, 9999];
+    let max = [9999, 9999] as [number, number];
     if (!droppables.length) {
       return undefined;
     }

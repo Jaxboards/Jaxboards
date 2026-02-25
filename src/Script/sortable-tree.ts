@@ -1,4 +1,4 @@
-import Drag, { DragSession } from "./drag";
+import Drag, { type DragSession } from "./drag";
 
 function parsetree(tree: HTMLElement, prefix: string) {
   const nodes = Array.from(tree.querySelectorAll("li"));
@@ -7,7 +7,7 @@ function parsetree(tree: HTMLElement, prefix: string) {
   nodes.forEach((node) => {
     if (node.className !== "seperator" && node.parentNode === tree) {
       gotsomethin = 1;
-      const [sub] = node.getElementsByTagName("ul");
+      const sub = node.querySelector("ul");
       order[`_${node.id.slice(prefix.length)}`] = sub
         ? parsetree(sub, prefix)
         : 1;
@@ -81,7 +81,6 @@ export default function sortableTree(
       if (sess.droptarget) sess.droptarget.style.border = "none";
     },
     ondrop(sess: DragSession) {
-      let tmp;
       const parentlock = sess.el.classList.contains("parentlock");
       drag.reset(sess.el);
       if (!sess.droptarget) {
@@ -91,15 +90,15 @@ export default function sortableTree(
       if (sess.droptarget.className === "seperator") {
         dropOnSeparator(sess);
       } else if (!parentlock && sess.droptarget.tagName === "LI") {
-        [tmp] = sess.droptarget.getElementsByTagName("ul");
-        if (!tmp) {
-          tmp = document.createElement("ul");
-          sess.droptarget.appendChild(tmp);
+        let list = sess.droptarget.querySelector("ul");
+        if (!list) {
+          list = document.createElement("ul");
+          sess.droptarget.appendChild(list);
         }
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        tmp.appendChild(sess.el.previousSibling!);
-        tmp.appendChild(sess.el);
-        sess.droptarget.appendChild(tmp);
+        list.appendChild(sess.el.previousSibling!);
+        list.appendChild(sess.el);
+        sess.droptarget.appendChild(list);
       }
       if (formfield) {
         formfield.value = JSON.stringify(parsetree(tree, prefix));

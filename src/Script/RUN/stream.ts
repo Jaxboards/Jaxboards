@@ -6,7 +6,7 @@ const UPDATE_INTERVAL = 5000;
 export default class Stream {
   private readonly commands: typeof Commands;
 
-  private timeout?: number;
+  private timeout?: ReturnType<typeof setTimeout>;
 
   constructor() {
     this.commands = Commands;

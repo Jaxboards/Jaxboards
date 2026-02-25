@@ -1,4 +1,4 @@
-let flashInterval: number;
+let flashInterval: ReturnType<typeof setInterval>;
 let originalTitle = "";
 let lastTitle = "";
 

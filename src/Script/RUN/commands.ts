@@ -10,7 +10,7 @@ import Sound from "../sound";
 import toast from "../toast";
 import openTooltip from "../tooltip";
 import { onImagesLoaded } from "../util";
-import Window, { WindowOptions } from "../window";
+import Window, { type WindowOptions } from "../window";
 
 // Comes from UserOnline struct/class
 type UserOnline = {
@@ -107,10 +107,11 @@ export default {
     if (!table) return;
     const span = document.createElement("span");
     span.innerHTML = `<table>${rowHTML}</table>`;
-    const vtbody = span.getElementsByTagName("tbody")[0];
-    // table=table.getElementsByTagName('tbody')[0],
-    gracefulDegrade(vtbody);
-    table.appendChild(vtbody);
+    const vtbody = span.querySelector("tbody");
+    if (vtbody) {
+      gracefulDegrade(vtbody);
+      table.appendChild(vtbody);
+    }
   },
   location(path: string) {
     if (["?", "/"].includes(path.charAt(0))) {
@@ -133,7 +134,7 @@ export default {
     span.innerHTML = message;
     const div = span.firstElementChild as HTMLDivElement;
     if (!div) return;
-    shouts[0].parentNode?.insertBefore(div, shouts[0]);
+    shouts[0]?.parentNode?.insertBefore(div, shouts[0]);
     while (shouts.length > globalSettings.shoutLimit - 1) {
       shouts.pop()?.remove();
     }
@@ -153,7 +154,7 @@ export default {
     ticker.insertBefore(tick, ticker.firstChild);
     const ticks = Array.from(ticker.querySelectorAll<HTMLDivElement>(".tick"));
     for (let x = 100; x < ticks.length; x += 100) {
-      ticks[x].remove();
+      ticks[x]?.remove();
     }
   },
   im(

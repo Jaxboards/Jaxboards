@@ -28,7 +28,7 @@ class Sound {
   }
 
   play(title: string) {
-    void this.soundCache[title].play();
+    void this.soundCache[title]?.play();
   }
 }
 
