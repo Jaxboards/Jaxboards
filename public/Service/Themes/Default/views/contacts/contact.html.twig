@@ -1,12 +1,11 @@
-<div class="contact {{ class }}">
-    <a href="{{ url('profile', { id:  user.id }) }}">
-        <div class="avatar">
-            {% include "avatar.html.twig" with { avatar: user.avatar } %}
-        </div>
-        <div class="name">
-            {{ user.displayName }}
-        </div>
-        <div class="status">
-            {{ user.usertitle }}
-        </div>
-</div>
+<a href="{{ url('profile', { id:  user.id }) }}">
+  <div class="contact {{ class }}">
+    {% include "avatar.html.twig" with { avatar: user.avatar } %}
+    <div class="name">
+      {{ user.displayName }}
+    </div>
+    <div class="status">
+      {{ user.usertitle }}
+    </div>
+  </div>
+</a>
