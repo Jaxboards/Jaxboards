@@ -190,7 +190,7 @@ export default {
     }
   },
   onlinelist(users: UserOnline[]) {
-    const statusers = document.querySelector("#statusers");
+    const statusers = document.querySelector<HTMLSpanElement>("#statusers");
     if (!statusers) {
       return;
     }
@@ -241,10 +241,12 @@ export default {
     createSnow(count, true);
   },
   setoffline(userIds: string) {
-    const statusers = document.querySelector("#statusers");
+    const statusers = document.querySelector<HTMLSpanElement>("#statusers");
     const ids = userIds.split(",");
     ids.forEach((id) => {
-      const link = document.querySelector(`#statusers .user${id}`);
+      const link = document.querySelector<HTMLAnchorElement>(
+        `#statusers .user${id}`,
+      );
       if (link && statusers) {
         link.remove();
       }

@@ -10,7 +10,7 @@
         </div>
         <div class="content">
             {{ usersOnlineCount }} User{% if usersOnlineCount > 1 %}s{% endif %} Online:
-            <div id="statusers">
+            <span id="statusers">
                 {%- for user in usersOnline -%}
                     {%- if user.isBot -%}
                         <a
@@ -41,7 +41,7 @@
                         {{ guestCount }} guest{% if guestCount>1 %}s{% endif %}
                     {%- endif -%}
                 {%- endif -%}
-            </div>
+            </span>
             <div class="userstoday">
                 {{ usersOnlineToday|length }} User{% if usersOnlineToday|length != 1 %}s{% endif %} Online Today:
 

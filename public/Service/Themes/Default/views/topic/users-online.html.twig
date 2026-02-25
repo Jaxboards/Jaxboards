@@ -9,7 +9,7 @@
         <div class="content_top">
         </div>
         <div class="content">
-            <div id="statusers" class="topicstatusers">
+            <span id="statusers" class="topicstatusers">
                 {% for user in users %}
                     {% if user.isBot %}
                         <a class="user{{ user.uid }}">{{user.name}}</a>
@@ -28,7 +28,7 @@
                         } %}
                     {% endif %}
                 {% endfor %}
-            </div>
+            </span>
         </div>
         <div class="content_bottom">
         </div>
