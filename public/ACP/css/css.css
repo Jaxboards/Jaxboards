@@ -11,9 +11,28 @@ body {
   background: #152b49;
 }
 
+datalist {
+  display: flex;
+  justify-content: space-between;
+  width: 120px;
+  margin-left: 145px;
+}
+
+h2 {
+  font-size: 1.4rem;
+}
+
 textarea {
   width: 300px;
   height: 75px;
+}
+
+input[type="range"] {
+  width: 120px;
+}
+
+input[type="text"] {
+  width: 200px;
 }
 
 input[type="text"],
@@ -22,12 +41,23 @@ select {
   border: 1px solid #aad;
 }
 
-a {
-  color: #00f;
+label {
+  margin: 5px;
+  display: inline-block;
+  width: 130px;
 }
 
-a:visited {
+a {
   color: #00f;
+
+  &:visited {
+    color: #00f;
+  }
+}
+
+/* Utility classes */
+.center {
+  text-align: center;
 }
 
 #header {
@@ -43,11 +73,11 @@ a:visited {
   padding: 10px;
   color: #fff;
   font-size: 1.6rem;
-}
 
-#userbox a {
-  margin-left: 30px;
-  color: #69f;
+  & a {
+    margin-left: 30px;
+    color: #69f;
+  }
 }
 
 #page {
@@ -59,58 +89,58 @@ a:visited {
   background: url("../img/acp-nav-icons.png") 0 -33px;
   height: 33px;
   border: 1px solid #000;
-}
 
-#nav a {
-  margin: 0;
-  padding: 0;
-  display: block;
-  float: left;
-  text-indent: -1000px;
-  background: url("../img/acp-nav-icons.png");
-  height: 33px;
-}
+  & a {
+    margin: 0;
+    padding: 0;
+    display: block;
+    float: left;
+    text-indent: -1000px;
+    background: url("../img/acp-nav-icons.png");
+    height: 33px;
 
-#nav a:hover {
-  background: none;
-}
+    &:hover {
+      background: none;
+    }
 
-#nav a.active {
-  background: none;
-}
+    &.active {
+      background: none;
+    }
 
-#nav a.settings {
-  width: 87px;
-}
+    &.settings {
+      width: 87px;
+    }
 
-#nav a.members {
-  width: 92px;
-  background-position: -87px 0;
-}
+    &.members {
+      width: 92px;
+      background-position: -87px 0;
+    }
 
-#nav a.groups {
-  width: 84px;
-  background-position: -179px 0;
-}
+    &.groups {
+      width: 84px;
+      background-position: -179px 0;
+    }
 
-#nav a.themes {
-  width: 93px;
-  background-position: -263px 0;
-}
+    &.themes {
+      width: 93px;
+      background-position: -263px 0;
+    }
 
-#nav a.posting {
-  width: 86px;
-  background-position: -356px 0;
-}
+    &.posting {
+      width: 86px;
+      background-position: -356px 0;
+    }
 
-#nav a.forums {
-  width: 84px;
-  background-position: -442px 0;
-}
+    &.forums {
+      width: 84px;
+      background-position: -442px 0;
+    }
 
-#nav a.tools {
-  width: 81px;
-  background-position: -526px 0;
+    &.tools {
+      width: 81px;
+      background-position: -526px 0;
+    }
+  }
 }
 
 .sidebar {
@@ -130,10 +160,10 @@ a:visited {
   cursor: pointer;
   display: inline-block;
   border: none;
-}
 
-.switch.yn {
-  background: url("../img/yesno.png");
+  &.yn {
+    background: url("../img/yesno.png");
+  }
 }
 
 .skins,
@@ -157,56 +187,52 @@ a:visited {
 .badwords {
   border-collapse: collapse;
   min-width: 300px;
-}
 
-.badwords td {
-  padding: 10px;
-  text-align: center;
-  border-top: 1px solid #ccc;
+  & td {
+    padding: 10px;
+    text-align: center;
+    border-top: 1px solid #ccc;
+  }
 }
 
 .pages {
   min-width: 300px;
   border-collapse: collapse;
-}
 
-.pages td {
-  border-top: 1px solid #ccc;
-  padding: 10px;
-}
-
-.center {
-  text-align: center;
+  & td {
+    border-top: 1px solid #ccc;
+    padding: 10px;
+  }
 }
 
 .perms {
   width: 100%;
-}
 
-.perms th {
-  font-weight: bold;
-}
+  & th {
+    font-weight: bold;
+  }
 
-.perms .breaker {
-  background: url("../img/acp-box-header.png");
-  padding: 3px;
-  color: #fff;
-  border: 1px solid #000;
-  font-size: 1.4rem;
+  & .breaker {
+    background: url("../img/acp-box-header.png");
+    padding: 3px;
+    color: #fff;
+    border: 1px solid #000;
+    font-size: 1.4rem;
+  }
 }
 
 #perms {
   border-collapse: collapse;
   width: 100%;
-}
 
-#perms td {
-  border-top: 1px solid #ccc;
-  text-align: center;
-}
+  & td {
+    border-top: 1px solid #ccc;
+    text-align: center;
+  }
 
-#perms td:first-child {
-  text-align: left;
+  & td:first-child {
+    text-align: left;
+  }
 }
 
 .right {
@@ -217,21 +243,21 @@ a:visited {
   margin: 20px 10px 0 0;
   border: 1px solid #000;
   box-shadow: #124 -5px 5px 5px;
-}
 
-.box .header {
-  background: linear-gradient(#1b63b6, #192c44);
-  border-bottom: 1px solid #000;
-  line-height: 36px;
-  font-size: 1.6rem;
-  color: #fff;
-  padding-left: 10px;
-}
+  & .header {
+    background: linear-gradient(#1b63b6, #192c44);
+    border-bottom: 1px solid #000;
+    line-height: 36px;
+    font-size: 1.6rem;
+    color: #fff;
+    padding-left: 10px;
+  }
 
-.box .content {
-  padding: 10px;
-  line-height: 20px;
-  background: url("../img/acp-box-content.png") top repeat-x #e2e2e2;
+  & .content {
+    padding: 10px;
+    line-height: 20px;
+    background: url("../img/acp-box-content.png") top repeat-x #e2e2e2;
+  }
 }
 
 .dropdownMenu {
@@ -242,50 +268,46 @@ a:visited {
   position: absolute;
   border-top: none;
   z-index: 100;
-}
 
-/* stylelint-disable no-descending-specificity */
-.dropdownMenu a {
-  display: block;
-  color: #333;
-  padding: 10px;
-  text-decoration: none;
-  border: 1px solid #a3a3a3;
-  border-style: solid none;
-}
-/* stylelint-enable no-descending-specificity */
+  & a {
+    display: block;
+    color: #333;
+    padding: 10px;
+    text-decoration: none;
+    border: 1px solid #a3a3a3;
+    border-style: solid none;
 
-/* stylelint-disable no-descending-specificity */
-.dropdownMenu a:hover {
-  background: #bbb;
-  border: 1px solid #000;
-  border-style: solid none;
+    &:hover {
+      background: #bbb;
+      border: 1px solid #000;
+      border-style: solid none;
+    }
+  }
 }
-/* stylelint-enable no-descending-specificity */
 
 .tree {
   max-width: 500px;
   border: 1px solid #ccc;
   cursor: row-resize;
-}
 
-.tree .seperator {
-  list-style-type: none;
-  margin-left: -20px;
-  height: 10px;
-}
+  & .seperator {
+    list-style-type: none;
+    margin-left: -20px;
+    height: 10px;
+  }
 
-.tree .highlight {
-  background: #eef;
-  border: 1px solid #ccf;
-}
+  & .highlight {
+    background: #eef;
+    border: 1px solid #ccf;
+  }
 
-.tree a.icons {
-  visibility: hidden;
-}
+  & a.icons {
+    visibility: hidden;
+  }
 
-.tree li:hover > a.icons {
-  visibility: visible;
+  & li:hover > a.icons {
+    visibility: visible;
+  }
 }
 
 .success {
@@ -302,20 +324,6 @@ a:visited {
   padding: 5px;
 }
 
-label {
-  margin: 5px;
-  display: inline-block;
-  width: 130px;
-}
-
-input[type="text"] {
-  width: 200px;
-}
-
-h2 {
-  font-size: 1.4rem;
-}
-
 .editor {
   width: 100%;
   height: 800px;
@@ -327,19 +335,19 @@ h2 {
   border: 1px solid #000;
   background: #eef;
   text-align: left;
-}
 
-#autocomplete div {
-  padding: 5px;
-  cursor: pointer;
-}
+  & div {
+    padding: 5px;
+    cursor: pointer;
 
-#autocomplete div:hover,
-#autocomplete div.selected {
-  color: #00f;
-  background: #f5f5ff;
-  border: 1px solid #669;
-  border-style: solid none;
+    &:hover,
+    &.selected {
+      color: #00f;
+      background: #f5f5ff;
+      border: 1px solid #669;
+      border-style: solid none;
+    }
+  }
 }
 
 #validname.valid,
@@ -363,72 +371,57 @@ h2 {
   padding-left: 20px;
   display: inline-block;
   height: 16px;
-}
 
-.icons.edit {
-  background-position: 0 0;
-  border: 0;
-  cursor: pointer;
-}
+  &.edit {
+    background-position: 0 0;
+    border: 0;
+    cursor: pointer;
+  }
 
-.icons.delete {
-  background-position: 0 -32px;
-}
+  &.delete {
+    background-position: 0 -32px;
+  }
 
-.icons.home {
-  background-position: 0 -64px;
-}
+  &.home {
+    background-position: 0 -64px;
+  }
 
-.icons.trashcan {
-  background-position: 0 -96px;
-}
-
-input[type="range"] {
-  width: 120px;
-}
-
-datalist {
-  display: flex;
-  justify-content: space-between;
-  width: 120px;
-  margin-left: 145px;
+  &.trashcan {
+    background-position: 0 -96px;
+  }
 }
 
 .news p {
   text-indent: 20px;
-}
 
-.news .signature {
-  font-style: italic;
+  & .signature {
+    font-style: italic;
+  }
 }
 
 #files {
   min-width: 200px;
   border-collapse: collapse;
-}
 
-/* stylelint-disable no-descending-specificity */
-#files td {
-  padding: 5px 20px;
-  border-top: 1px solid #ccc;
+  & td {
+    padding: 5px 20px;
+    border-top: 1px solid #ccc;
+  }
 }
-/* stylelint-enable no-descending-specificity */
 
 table.settings {
   border-collapse: collapse;
   width: 100%;
-}
 
-/* stylelint-disable no-descending-specificity */
-table.settings td {
-  border: 1px solid #ccc;
-  padding: 10px;
-}
+  & td {
+    border: 1px solid #ccc;
+    padding: 10px;
+  }
 
-table.settings th[scope="row"] {
-  width: 200px;
+  & th[scope="row"] {
+    width: 200px;
+  }
 }
-/* stylelint-enable no-descending-specificity */
 
 .permcontainer .sticky-heading {
   padding-left: 150px;
