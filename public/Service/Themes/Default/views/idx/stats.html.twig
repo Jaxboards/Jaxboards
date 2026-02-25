@@ -9,8 +9,8 @@
         <div class="content_top">
         </div>
         <div class="content">
-            {{ usersOnlineCount }} User{% if usersOnlineCount > 1 %}s{% endif %} Online:
             <div id="statusers">
+                {{ usersOnlineCount }} User{% if usersOnlineCount > 1 %}s{% endif %} Online:
                 {%- for user in usersOnline -%}
                     {%- if user.isBot -%}
                         <a
