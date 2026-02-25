@@ -1,5 +1,2 @@
-.git
-node_modules
-vendor
-dist
-shrinkwrap.yaml
+public/assets/acp.js
+public/assets/app.js
