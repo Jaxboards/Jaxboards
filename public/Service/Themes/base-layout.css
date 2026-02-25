@@ -6,7 +6,7 @@ html {
 
 body {
   overflow-y: scroll;
-  font-family: Arial, sans-serif;
+  font-family: system-ui, sans-serif;
   font-size: 1.6rem;
 }
 

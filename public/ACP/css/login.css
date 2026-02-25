@@ -9,7 +9,7 @@ html {
 
 body {
   background: url("../img/loginglow.png") center no-repeat #274463;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: system-ui, sans-serif;
   height: 100%;
   margin: 0;
 }

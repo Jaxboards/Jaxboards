@@ -2,7 +2,7 @@ body {
   background: url("../Themes/Default/img/bg.jpg");
   margin: 0;
   padding: 0;
-  font-family: Tahoma, Verdana, Arial, sans-serif;
+  font-family: system-ui, sans-serif;
 }
 
 #container {

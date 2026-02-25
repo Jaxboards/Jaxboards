@@ -336,7 +336,7 @@
   margin: 20px auto;
   width: 671px;
   color: #000;
-  font-family: "Arial", sans-serif;
+  font-family: system-ui, sans-serif;
   background: #c0c0c0;
   border: 1px solid;
   border-top-color: #dfdfdf;
