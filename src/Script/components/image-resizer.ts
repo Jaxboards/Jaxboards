@@ -1,6 +1,6 @@
-import register, { Component } from "../JAX/component";
-import { getComputedStyle, getCoordinates } from "../JAX/dom";
-import { onImagesLoaded } from "../JAX/util";
+import register, { Component } from "../component";
+import { getComputedStyle, getCoordinates } from "../dom";
+import { onImagesLoaded } from "../util";
 
 const maxDimension = "999999px";
 

@@ -1,5 +1,5 @@
-import register, { Component } from "../JAX/component";
-import Window from "../JAX/window";
+import register, { Component } from "../component";
+import Window from "../window";
 
 export default class MediaPlayer extends Component<HTMLDivElement> {
   static hydrate(container: HTMLElement): void {

@@ -1,5 +1,5 @@
-import { Component } from "../JAX/component";
-import { fromUnixTimestamp } from "../JAX/date";
+import { Component } from "../component";
+import { fromUnixTimestamp } from "../date";
 
 /**
  * Fetch the emoji for a given timestamp in the client's local timezone

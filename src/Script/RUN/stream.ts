@@ -1,4 +1,4 @@
-import toast from "../JAX/toast";
+import toast from "../toast";
 import Commands from "./commands";
 
 const UPDATE_INTERVAL = 5000;

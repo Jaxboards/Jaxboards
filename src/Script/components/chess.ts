@@ -1,9 +1,9 @@
+import register, { Component } from "../component";
+import { Coordinates, getCellCoordinates } from "../dom";
+import Drag, { DragSession } from "../drag";
 import createSnow from "../eggs/snow";
-import register, { Component } from "../JAX/component";
-import { Coordinates, getCellCoordinates } from "../JAX/dom";
-import Drag, { DragSession } from "../JAX/drag";
-import toast from "../JAX/toast";
 import sound from "../sound";
+import toast from "../toast";
 
 const pieceUnicode: Record<string, string> = {
   R: "♜",

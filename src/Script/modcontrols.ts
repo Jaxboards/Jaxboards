@@ -1,4 +1,4 @@
-import gracefulDegrade from "./JAX/graceful-degrade";
+import gracefulDegrade from "./graceful-degrade";
 import Commands from "./RUN/commands";
 
 function postIDs(strPIDs: string) {

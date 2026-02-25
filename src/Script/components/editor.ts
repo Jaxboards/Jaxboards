@@ -1,10 +1,10 @@
 /* global globalSettings */
 
-import { bbcodeToHTML, htmlToBBCode } from "../JAX/bbcode-utils";
-import Browser from "../JAX/browser";
-import register, { Component } from "../JAX/component";
-import { getComputedStyle, getHighestZIndex, toDOM } from "../JAX/dom";
-import { replaceSelection } from "../JAX/selection";
+import { bbcodeToHTML, htmlToBBCode } from "../bbcode-utils";
+import Browser from "../browser";
+import register, { Component } from "../component";
+import { getComputedStyle, getHighestZIndex, toDOM } from "../dom";
+import { replaceSelection } from "../selection";
 
 const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
 const isURL = (text: string) => URL_REGEX.test(text);

@@ -1,7 +1,7 @@
-import register, { Component } from "../JAX/component";
-import { daysShort, months } from "../JAX/date";
-import { getCoordinates, getHighestZIndex } from "../JAX/dom";
-import { supportsDateInput } from "../JAX/util";
+import register, { Component } from "../component";
+import { daysShort, months } from "../date";
+import { getCoordinates, getHighestZIndex } from "../dom";
+import { supportsDateInput } from "../util";
 
 export default class DatePicker extends Component<HTMLInputElement> {
   picker: HTMLTableElement;

@@ -1,7 +1,7 @@
-import register, { Component } from "../JAX/component";
-import { Coordinates, getCellCoordinates, toDOM } from "../JAX/dom";
-import toast from "../JAX/toast";
+import register, { Component } from "../component";
+import { Coordinates, getCellCoordinates, toDOM } from "../dom";
 import sound from "../sound";
+import toast from "../toast";
 
 const directions: Coordinates[] = [
   [-1, 0], // north

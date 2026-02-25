@@ -1,4 +1,4 @@
-import register, { Component } from "../JAX/component";
+import register, { Component } from "../component";
 
 const ACTIVE_CLASS = "active";
 

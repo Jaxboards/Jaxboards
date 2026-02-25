@@ -1,10 +1,10 @@
 import createSnow from "./eggs/snow";
-import { stopTitleFlashing } from "./JAX/flashing-title";
-import gracefulDegrade from "./JAX/graceful-degrade";
-import { handleKeyboardShortcuts } from "./JAX/keyboard-shortcuts";
-import { onDOMReady, supportsEmoji, updateDates } from "./JAX/util";
+import { stopTitleFlashing } from "./flashing-title";
+import gracefulDegrade from "./graceful-degrade";
+import { handleKeyboardShortcuts } from "./keyboard-shortcuts";
 import Stream from "./RUN/stream";
 import Sound from "./sound";
+import { onDOMReady, supportsEmoji, updateDates } from "./util";
 
 const useJSLinks = 2;
 

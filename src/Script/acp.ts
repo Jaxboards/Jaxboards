@@ -1,55 +1,55 @@
-import { getCoordinates } from "./JAX/dom";
-import { replaceSelection } from "./JAX/selection";
-import sortableTree from "./JAX/sortable-tree";
-import { onDOMReady } from "./JAX/util";
 import AutoComplete from "./components/auto-complete";
 import BetterSelect from "./components/better-select";
 import type { HTMLFormWithSubmit } from "./components/form";
 import Switch from "./components/switch";
+import { getCoordinates } from "./dom";
+import { replaceSelection } from "./selection";
+import sortableTree from "./sortable-tree";
+import { onDOMReady } from "./util";
 
 function dropdownMenu(e: MouseEvent) {
   const el = e.target;
 
-  if (!(el instanceof HTMLElement)) {
+  if (!(el instanceof HTMLAnchorElement)) {
+    return;
+  }
+  const menu = document.querySelector<HTMLDivElement>(
+    `#menu_${el.classList[0]}`,
+  );
+  if (!menu) {
     return;
   }
 
-  if (el?.tagName.toLowerCase() === "a") {
-    const menu = document.querySelector<HTMLDivElement>(
-      `#menu_${el.classList[0]}`,
-    );
-    if (!menu) {
-      return;
-    }
+  el.classList.add("active");
+  const coordinates = getCoordinates(el);
+  Object.assign(menu.style, {
+    display: "block",
+    top: `${coordinates.y + el.clientHeight}px`,
+    left: `${coordinates.x}px`,
+  });
 
-    el.classList.add("active");
-    const s = menu.style;
-    s.display = "block";
-    const p = getCoordinates(el);
-    s.top = `${p.y + el.clientHeight}px`;
-    s.left = `${p.x}px`;
-    el.addEventListener("mouseout", (e2: MouseEvent) => {
-      if (
-        e2.relatedTarget instanceof HTMLElement &&
-        e2.relatedTarget !== menu &&
-        e2.relatedTarget.offsetParent !== menu
-      ) {
-        el.classList.remove("active");
-        menu.style.display = "none";
-      }
-    });
-    menu?.addEventListener("mouseout", (e2: MouseEvent) => {
-      if (
-        e2.relatedTarget instanceof HTMLElement &&
-        e2.relatedTarget !== el &&
-        e2.relatedTarget.offsetParent !== menu &&
-        e2.relatedTarget !== menu
-      ) {
-        el.classList.remove("active");
-        menu.style.display = "none";
-      }
-    });
-  }
+  el.addEventListener("mouseout", (e2: MouseEvent) => {
+    if (
+      e2.relatedTarget instanceof HTMLElement &&
+      e2.relatedTarget !== menu &&
+      e2.relatedTarget.offsetParent !== menu
+    ) {
+      el.classList.remove("active");
+      menu.style.display = "none";
+    }
+  });
+
+  menu.addEventListener("mouseout", (e2: MouseEvent) => {
+    if (
+      e2.relatedTarget instanceof HTMLElement &&
+      e2.relatedTarget !== el &&
+      e2.relatedTarget.offsetParent !== menu &&
+      e2.relatedTarget !== menu
+    ) {
+      el.classList.remove("active");
+      menu.style.display = "none";
+    }
+  });
 }
 
 async function submitForm(form: HTMLFormWithSubmit) {
@@ -115,4 +115,5 @@ function gracefulDegrade() {
     sortableTree(tree, "forum_", ordered);
   }
 }
+
 onDOMReady(gracefulDegrade);

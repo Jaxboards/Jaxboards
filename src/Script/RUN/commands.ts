@@ -1,16 +1,16 @@
 /* global RUN, globalSettings */
 
+import { animate, dehighlight } from "../animation";
 import { addIdleClock } from "../components/idle-clock";
+import { getCoordinates } from "../dom";
 import createSnow from "../eggs/snow";
-import { animate, dehighlight } from "../JAX/animation";
-import { getCoordinates } from "../JAX/dom";
-import gracefulDegrade from "../JAX/graceful-degrade";
-import { messageReceived } from "../JAX/instant-messaging-window";
-import toast from "../JAX/toast";
-import openTooltip from "../JAX/tooltip";
-import { onImagesLoaded } from "../JAX/util";
-import Window, { WindowOptions } from "../JAX/window";
+import gracefulDegrade from "../graceful-degrade";
+import { messageReceived } from "../instant-messaging-window";
 import Sound from "../sound";
+import toast from "../toast";
+import openTooltip from "../tooltip";
+import { onImagesLoaded } from "../util";
+import Window, { WindowOptions } from "../window";
 
 // Comes from UserOnline struct/class
 type UserOnline = {

@@ -1,10 +1,10 @@
 /* global globalSettings */
 
-import commands from "../RUN/commands";
-import Sound from "../sound";
 import { toDOM } from "./dom";
 import { flashTitle } from "./flashing-title";
 import gracefulDegrade from "./graceful-degrade";
+import commands from "./RUN/commands";
+import Sound from "./sound";
 import Window from "./window";
 
 function notification(fromName: string, message: string) {

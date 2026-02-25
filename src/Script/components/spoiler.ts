@@ -1,4 +1,4 @@
-import register, { Component } from "../JAX/component";
+import register, { Component } from "../component";
 
 export default class Spoiler extends Component<HTMLInputElement> {
   static hydrate(container: HTMLElement): void {

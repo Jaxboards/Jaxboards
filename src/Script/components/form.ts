@@ -1,6 +1,6 @@
 /* global RUN */
 
-import register, { Component } from "../JAX/component";
+import register, { Component } from "../component";
 
 export type HTMLFormWithSubmit = HTMLFormElement & {
   submitButton: HTMLButtonElement;

@@ -1,8 +1,8 @@
-import register, { Component } from "../JAX/component";
-import { Coordinates, getCellCoordinates } from "../JAX/dom";
-import Drag, { DragSession } from "../JAX/drag";
-import toast from "../JAX/toast";
+import register, { Component } from "../component";
+import { Coordinates, getCellCoordinates } from "../dom";
+import Drag, { DragSession } from "../drag";
 import sound from "../sound";
+import toast from "../toast";
 
 export default class Checkers extends Component<HTMLTableElement> {
   static hydrate(container: HTMLElement): void {

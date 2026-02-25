@@ -1,4 +1,4 @@
-import { emojiTime } from "../components/idle-clock";
+import { emojiTime } from "./components/idle-clock";
 import { date } from "./date";
 import { getCoordinates, getHighestZIndex, toDOM } from "./dom";
 

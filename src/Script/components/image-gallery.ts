@@ -1,4 +1,4 @@
-import register, { Component } from "../JAX/component";
+import register, { Component } from "../component";
 
 export default class ImageGallery extends Component<HTMLDivElement> {
   index: number;

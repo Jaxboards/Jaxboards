@@ -1,4 +1,4 @@
-import IMWindow from "./JAX/instant-messaging-window";
+import IMWindow from "./instant-messaging-window";
 import ModControls from "./modcontrols";
 import RUN from "./run";
 

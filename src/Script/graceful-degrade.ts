@@ -1,4 +1,4 @@
-import Components from "../components/index";
+import Components from "./components/index";
 import { updateDates } from "./util";
 
 export default function gracefulDegrade(container: HTMLElement) {

@@ -1,4 +1,4 @@
-import register, { Component } from "../JAX/component";
+import register, { Component } from "../component";
 
 export default class PageList extends Component<HTMLDivElement> {
   static hydrate(container: HTMLElement): void {

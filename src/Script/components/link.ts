@@ -1,5 +1,5 @@
-import register, { Component } from "../JAX/component";
-import toolTip from "../JAX/tooltip";
+import register, { Component } from "../component";
+import toolTip from "../tooltip";
 
 export default class Link extends Component<HTMLAnchorElement> {
   static hydrate(container: HTMLElement): void {
