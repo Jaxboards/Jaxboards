@@ -84,7 +84,7 @@ use const PASSWORD_DEFAULT;
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(Router::class)]
-#[CoversFunction('routes')]
+#[CoversFunction('Jax\routes')]
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(Session::class)]
 #[CoversClass(Template::class)]

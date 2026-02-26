@@ -73,7 +73,7 @@ use function json_decode;
 #[CoversClass(BotDetector::class)]
 #[CoversClass(Page::class)]
 #[CoversClass(Router::class)]
-#[CoversFunction('routes')]
+#[CoversFunction('Jax\routes')]
 #[CoversClass(Session::class)]
 #[CoversClass(Template::class)]
 #[CoversClass(App::class)]

@@ -1,5 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
+namespace Jax;
+
 use Jax\Router;
 use Jax\Routes\API;
 use Jax\Routes\Asteroids;

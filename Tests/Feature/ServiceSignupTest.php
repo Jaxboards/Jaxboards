@@ -62,7 +62,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(Jax::class)]
 #[CoversClass(Page::class)]
 #[CoversClass(Router::class)]
-#[CoversFunction('routes')]
+#[CoversFunction('Jax\routes')]
 #[CoversClass(Session::class)]
 #[CoversClass(Template::class)]
 #[CoversClass(User::class)]

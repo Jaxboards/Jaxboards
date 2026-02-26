@@ -75,7 +75,7 @@ use function json_decode;
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(Router::class)]
-#[CoversFunction('routes')]
+#[CoversFunction('Jax\routes')]
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(Session::class)]
 #[CoversClass(Shoutbox::class)]

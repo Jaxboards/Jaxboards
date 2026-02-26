@@ -1,5 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
+namespace ACP;
+
 use ACP\Routes\Forums;
 use ACP\Routes\Groups;
 use ACP\Routes\Index;
