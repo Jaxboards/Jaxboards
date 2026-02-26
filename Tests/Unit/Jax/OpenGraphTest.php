@@ -8,7 +8,6 @@ use Jax\BBCode;
 use Jax\FileSystem;
 use Jax\OpenGraph;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Snapshots\MatchesSnapshots;
 use Tests\UnitTestCase;

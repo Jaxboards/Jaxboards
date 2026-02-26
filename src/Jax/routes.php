@@ -30,7 +30,7 @@ use Jax\Routes\Topic;
 use Jax\Routes\UCP;
 use Jax\Routes\UserProfile;
 
-function routes(Router $router)
+function routes(Router $router): void
 {
     $router->get('', '/', BoardIndex::class);
     $router->get('api', '/api/{method}', API::class);
@@ -71,5 +71,3 @@ function routes(Router $router)
     $router->get('toggleInvisible', '/toggleInvisible', LogReg::class);
     $router->get('forgotPassword', '/forgotPassword', LogReg::class);
 }
-
-;

@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace ACP;
 
-use DI\Container;
 use Jax\Config;
 use Jax\DebugLog;
-use Jax\Interfaces\Route;
 use Jax\IPAddress;
 use Jax\Request;
 use Jax\Router;
@@ -15,7 +13,6 @@ use Jax\Session;
 use Jax\User;
 
 use function implode;
-use function is_string;
 
 /**
  * Admin control panel.

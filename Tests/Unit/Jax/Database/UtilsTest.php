@@ -12,7 +12,6 @@ use Jax\FileSystem;
 use Jax\ServiceConfig;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\UnitTestCase;
 

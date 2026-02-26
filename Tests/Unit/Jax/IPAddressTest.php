@@ -14,7 +14,6 @@ use Jax\Request;
 use Jax\RequestStringGetter;
 use Jax\ServiceConfig;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\UnitTestCase;
 

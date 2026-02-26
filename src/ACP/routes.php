@@ -10,7 +10,7 @@ use ACP\Routes\Themes;
 use ACP\Routes\Tools;
 use Jax\Router;
 
-function routes(Router $router)
+function routes(Router $router): void
 {
     $router->get('', '/', Index::class);
     $router->get('forums', '/Forums/{do}', Forums::class);
@@ -21,5 +21,3 @@ function routes(Router $router)
     $router->get('themes', '/Themes/{do}', Themes::class);
     $router->get('tools', '/Tools/{do}', Tools::class);
 }
-
-;

@@ -27,7 +27,6 @@ use Jax\Template;
 use Override;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
 use PHPUnit\Framework\MockObject\MockObject;
 use SplFileInfo;
