@@ -37,7 +37,6 @@ final readonly class Tools
         private DatabaseUtils $databaseUtils,
         private DomainDefinitions $domainDefinitions,
         private FileSystem $fileSystem,
-        private Nav $nav,
         private Page $page,
         private Request $request,
         private FileManager $fileManager,
@@ -45,8 +44,6 @@ final readonly class Tools
 
     public function render(): void
     {
-        $this->page->sidebar($this->nav->getMenu('Tools'));
-
         match ($this->request->both('do')) {
             'backup' => $this->backup(),
             'viewErrorLog' => $this->viewErrorLog(),

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ACP;
 
+use Jax\Request;
+
 final class Nav
 {
     /**
@@ -57,20 +59,21 @@ final class Nav
 
     public function __construct(
         private readonly Page $page,
+        private readonly Request $request,
     ) {}
-
-    /**
-     * @return array<string,string>
-     */
-    public function getMenu(string $category): array
-    {
-        return $this->categories[$category] ?? [];
-    }
 
     public function render(): void
     {
         $this->page->append('nav', $this->page->render('nav.html', [
             'categories' => $this->categories,
         ]));
+
+        $act = $this->request->asString->both('act');
+        if ($act !== null) {
+            $this->page->append('sidebar', $this->page->render('sidebar.html', [
+                'category' => $act,
+                'menu' => $this->categories[$act] ?? [],
+            ]));
+        }
     }
 }

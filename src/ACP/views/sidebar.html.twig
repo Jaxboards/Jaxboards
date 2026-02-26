@@ -1,4 +1,10 @@
 <div class="sidebar">
   <a href="?" class="icons home" title="ACP Home">ACP Home</a>
-  {{ content }}
+  <ul>
+    {% for do, title in menu %}
+      <li>
+        <a href="?act={{ act }}&amp;do={{ do }}">{{ title }}</a>
+      </li>
+    {% endfor %}
+  </ul>
 </div>

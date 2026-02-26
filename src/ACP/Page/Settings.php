@@ -31,7 +31,6 @@ final readonly class Settings
     public function __construct(
         private Config $config,
         private Database $database,
-        private Nav $nav,
         private Page $page,
         private Request $request,
         private TextFormatting $textFormatting,
@@ -39,8 +38,6 @@ final readonly class Settings
 
     public function render(): void
     {
-        $this->page->sidebar($this->nav->getMenu('Settings'));
-
         match ($this->request->both('do')) {
             'pages' => $this->pages(),
             'shoutbox' => $this->shoutbox(),

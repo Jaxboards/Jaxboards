@@ -24,7 +24,6 @@ final readonly class Posting
     public function __construct(
         private Config $config,
         private Database $database,
-        private Nav $nav,
         private Page $page,
         private Request $request,
         private TextFormatting $textFormatting,
@@ -32,8 +31,6 @@ final readonly class Posting
 
     public function render(): void
     {
-        $this->page->sidebar($this->nav->getMenu('Posting'));
-
         match ($this->request->both('do')) {
             'emoticons' => $this->emoticons(),
             'postRating' => $this->postRating(),
@@ -234,9 +231,8 @@ final readonly class Posting
 
         if ($this->request->post('rsubmit') !== null) {
             $this->config->write([
-                'reactions' =>
-                    ($this->request->post('renabled') !== null ? 1 : 0)
-                        + ($this->request->post('ranon') !== null ? 2 : 0),
+                'reactions' => ($this->request->post('renabled') !== null ? 1 : 0)
+                    + ($this->request->post('ranon') !== null ? 2 : 0),
             ]);
             $page2 .= $this->page->success('Settings saved!');
         }

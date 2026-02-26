@@ -43,7 +43,6 @@ final readonly class Forums
     public function __construct(
         private Database $database,
         private Jax $jax,
-        private Nav $nav,
         private Page $page,
         private RecountStats $recountStats,
         private Request $request,
@@ -52,8 +51,6 @@ final readonly class Forums
 
     public function render(): void
     {
-        $this->page->sidebar($this->nav->getMenu('Forums'));
-
         $edit = $this->request->both('edit');
         $categoryEdit = match (true) {
             is_string($edit) && str_starts_with($edit, 'c_') => (int) mb_substr($edit, 2),
@@ -386,8 +383,8 @@ final readonly class Forums
 
         $this->page->addContentBox(
             ($forum ? 'Edit' : 'Create')
-            . ' Forum'
-            . ($forum ? ' - ' . $this->textFormatting->blockhtml($forum->title) : ''),
+                . ' Forum'
+                . ($forum ? ' - ' . $this->textFormatting->blockhtml($forum->title) : ''),
             $page,
         );
         $this->page->addContentBox('Moderators', $moderators);

@@ -31,7 +31,6 @@ final class Page
 
     public function __construct(
         private readonly FileSystem $fileSystem,
-        private readonly Request $request,
         private readonly Router $router,
     ) {
         $this->initializeTwig();
@@ -49,27 +48,6 @@ final class Page
     public function checked(bool $checked): string
     {
         return $checked ? ' checked="checked"' : '';
-    }
-
-    /**
-     * @param array<string,string> $links
-     */
-    public function sidebar(array $links): void
-    {
-        $content = '';
-        $act = $this->request->asString->get('act') ?? '';
-        foreach ($links as $do => $title) {
-            $content .= $this->render('sidebar-list-link.html', [
-                'title' => $title,
-                'url' => "?act={$act}&do={$do}",
-            ]);
-        }
-
-        $this->parts['sidebar'] = $this->render('sidebar.html', [
-            'content' => $this->render('sidebar-list.html', [
-                'content' => $content,
-            ]),
-        ]);
     }
 
     public function addContentBox(string $title, string $content): void
