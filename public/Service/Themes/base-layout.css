@@ -16,6 +16,7 @@ img {
 
   &.avatar {
     max-width: 150px;
+    max-height: 150px;
   }
 }
 
@@ -134,10 +135,11 @@ a {
     border: none;
   }
 
-  & .action,
-  & .action .you,
-  & .action .them {
-    font-style: italic;
+  & .action {
+    & .you,
+    & .them {
+      font-style: italic;
+    }
   }
 
   & .offline {
@@ -616,11 +618,11 @@ a {
       width: 120px;
       float: left;
       text-align: center;
-    }
 
-    & .contact .avatar img {
-      max-width: 50px;
-      max-height: 50px;
+      & .avatar img {
+        max-width: 50px;
+        max-height: 50px;
+      }
     }
   }
 }
@@ -785,7 +787,7 @@ a {
 #path {
   font-size: 1.4rem;
   margin-top: 10px;
-  padding: 0.5em 0 0.5em 1em;
+  padding: 0.5rem 0 0.5rem 1rem;
 
   & ul {
     list-style: none;
@@ -1596,7 +1598,6 @@ a {
 
   & td {
     padding: 10px;
-    border-top: 1px solid #ccc;
   }
 }
 
