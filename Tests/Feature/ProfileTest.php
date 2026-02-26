@@ -48,6 +48,7 @@ use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
@@ -85,6 +86,7 @@ use function json_decode;
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(Router::class)]
+#[CoversFunction('routes')]
 #[CoversClass(RSSFeed::class)]
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(Session::class)]

@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
-namespace ACP\Page;
+namespace ACP\Routes;
 
 use ACP\Page;
 use Jax\Constants\Groups as ConstantsGroups;
 use Jax\Database\Database;
+use Jax\Interfaces\Route;
 use Jax\Lodash;
 use Jax\Models\Group;
 use Jax\Request;
 use Jax\TextFormatting;
+use Override;
 
 use function array_flip;
 use function array_key_exists;
@@ -26,7 +28,7 @@ use function mb_strlen;
 
 use const FILTER_VALIDATE_URL;
 
-final class Groups
+final class Groups implements Route
 {
     private bool $updatePermissions = true;
 
@@ -37,7 +39,8 @@ final class Groups
         private readonly TextFormatting $textFormatting,
     ) {}
 
-    public function render(): void
+    #[Override]
+    public function route(array $params): void
     {
         $edit = $this->request->get('edit');
         if (is_string($edit)) {
@@ -46,7 +49,7 @@ final class Groups
             return;
         }
 
-        match ($this->request->get('do')) {
+        match ($params['do'] ?? '') {
             'perms' => $this->showPerms(),
             'create' => $this->create(),
             'delete' => $this->delete(),

@@ -2,16 +2,18 @@
 
 declare(strict_types=1);
 
-namespace ACP\Page;
+namespace ACP\Routes;
 
 use ACP\Page;
-use ACP\Page\Tools\FileManager;
+use ACP\Routes\Tools\FileManager;
 use Jax\Database\Database;
 use Jax\Database\Model;
 use Jax\Database\Utils as DatabaseUtils;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
+use Jax\Interfaces\Route;
 use Jax\Request;
+use Override;
 use ZipArchive;
 
 use function assert;
@@ -29,7 +31,7 @@ use function unlink;
 use const GLOB_BRACE;
 use const PHP_EOL;
 
-final readonly class Tools
+final readonly class Tools implements Route
 {
     public function __construct(
         private Database $database,
@@ -41,9 +43,10 @@ final readonly class Tools
         private FileManager $fileManager,
     ) {}
 
-    public function render(): void
+    #[Override]
+    public function route(array $params): void
     {
-        match ($this->request->both('do')) {
+        match ($params['do'] ?? '') {
             'backup' => $this->backup(),
             'viewErrorLog' => $this->viewErrorLog(),
             'phpinfo' => $this->viewPHPInfo(),

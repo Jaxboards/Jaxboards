@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ACP\Page;
+namespace ACP\Routes;
 
 use ACP\Page;
 use Jax\Config;
 use Jax\Database\Database;
+use Jax\Interfaces\Route;
 use Jax\Lodash;
 use Jax\Models\Badge;
 use Jax\Models\BadgeAssociation;
@@ -15,6 +16,7 @@ use Jax\Models\Page as ModelsPage;
 use Jax\Request;
 use Jax\Template;
 use Jax\TextFormatting;
+use Override;
 
 use function array_merge;
 use function filter_var;
@@ -25,7 +27,7 @@ use function trim;
 
 use const FILTER_VALIDATE_URL;
 
-final readonly class Settings
+final readonly class Settings implements Route
 {
     public function __construct(
         private Config $config,
@@ -35,9 +37,10 @@ final readonly class Settings
         private TextFormatting $textFormatting,
     ) {}
 
-    public function render(): void
+    #[Override]
+    public function route(array $params): void
     {
-        match ($this->request->both('do')) {
+        match ($params['do'] ?? '') {
             'pages' => $this->pages(),
             'shoutbox' => $this->shoutbox(),
             'badges' => $this->badges(),
@@ -336,7 +339,7 @@ final readonly class Settings
                 . "<td>{$grantedBadge->reason}</td>"
                 . "<td>{$grantedBadge->badgeCount}</td>"
                 . "<td>{$member->displayName}</td>"
-                . "<td><a href='?act=Settings&do=badges&ungrant={$grantedBadge->id}' onclick='return confirm(\"Are you sure?\")'>Ungrant</a></td>"
+                . "<td><a href='/ACP/Settings/badges?ungrant={$grantedBadge->id}' onclick='return confirm(\"Are you sure?\")'>Ungrant</a></td>"
                 . '</tr>';
         }
 

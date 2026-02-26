@@ -2,23 +2,25 @@
 
 declare(strict_types=1);
 
-namespace ACP\Page;
+namespace ACP\Routes;
 
 use ACP\Page;
 use Jax\Config;
 use Jax\Database\Database;
+use Jax\Interfaces\Route;
 use Jax\Lodash;
 use Jax\Models\RatingNiblet;
 use Jax\Models\TextRule;
 use Jax\Request;
 use Jax\TextFormatting;
+use Override;
 
 use function array_key_exists;
 use function array_reverse;
 use function krsort;
 use function rawurlencode;
 
-final readonly class Posting
+final readonly class Posting implements Route
 {
     public function __construct(
         private Config $config,
@@ -28,9 +30,10 @@ final readonly class Posting
         private TextFormatting $textFormatting,
     ) {}
 
-    public function render(): void
+    #[Override]
+    public function route(array $params): void
     {
-        match ($this->request->both('do')) {
+        match ($params['do'] ?? '') {
             'emoticons' => $this->emoticons(),
             'postRating' => $this->postRating(),
             'wordfilter' => $this->wordfilter(),

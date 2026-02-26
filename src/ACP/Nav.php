@@ -68,8 +68,9 @@ final class Nav
             'categories' => $this->categories,
         ]));
 
-        $act = $this->request->asString->both('act');
-        if ($act !== null) {
+        $path = $this->request->asString->both('path');
+        if ($path !== null) {
+            $act = array_first(explode('/', $path));
             $this->page->append('sidebar', $this->page->render('sidebar.html', [
                 'category' => $act,
                 'menu' => $this->categories[$act] ?? [],

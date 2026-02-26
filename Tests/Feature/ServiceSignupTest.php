@@ -29,6 +29,7 @@ use Jax\Session;
 use Jax\Template;
 use Jax\User;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
@@ -61,6 +62,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(Jax::class)]
 #[CoversClass(Page::class)]
 #[CoversClass(Router::class)]
+#[CoversFunction('routes')]
 #[CoversClass(Session::class)]
 #[CoversClass(Template::class)]
 #[CoversClass(User::class)]

@@ -15,6 +15,7 @@ use Jax\Models\Member;
 use Jax\ServiceConfig;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\Small;
 use Spatie\Snapshots\MatchesSnapshots;
 use Tests\UnitTestCase;

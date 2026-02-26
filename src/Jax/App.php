@@ -7,6 +7,8 @@ namespace Jax;
 use DI\Container;
 use Jax\Models\Message;
 use Jax\Models\Report;
+use Jax\Routes\BoardOffline;
+use Jax\Routes\CustomPage;
 
 use function gmdate;
 use function header;
@@ -40,6 +42,9 @@ final readonly class App
         private User $user,
     ) {
         $this->microtime = microtime(true);
+
+        require_once __DIR__ . '/routes.php';
+        routes($router);
     }
 
     public function render(): string
@@ -141,14 +146,37 @@ final readonly class App
         }
     }
 
+    private function isBoardOffline(): bool
+    {
+        if (!$this->user->getGroup()?->canViewBoard) {
+            return true;
+        }
+
+        return $this->config->getSetting('boardoffline') && !$this->user->getGroup()?->canViewOfflineBoard;
+    }
+
     private function handleRouting(): void
     {
         if ($this->request->both('module') !== null) {
             return;
         }
 
+        $path = $this->request->asString->both('path') ?? '';
+
+        // Board offline
+        if ($this->isBoardOffline() && !str_contains($path, 'login')) {
+            $this->container->get(BoardOffline::class)->route([]);
+
+            return;
+        }
+
         // Redirect to index instead of 404
-        if ($this->router->route($this->request->asString->both('path') ?? '')) {
+        if ($this->router->route($path)) {
+            return;
+        }
+
+        // Custom page routing
+        if ($this->container->get(CustomPage::class)->route(trim($path, '/'))) {
             return;
         }
 

@@ -49,6 +49,7 @@ use Jax\TextRules;
 use Jax\User;
 use Jax\UsersOnline;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
 
@@ -85,6 +86,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(Router::class)]
+#[CoversFunction('routes')]
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(Session::class)]
 #[CoversClass(Shoutbox::class)]

@@ -40,6 +40,7 @@ use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\DOMAssert;
 use Tests\FeatureTestCase;
@@ -83,6 +84,7 @@ use const PASSWORD_DEFAULT;
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(Router::class)]
+#[CoversFunction('routes')]
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(Session::class)]
 #[CoversClass(Template::class)]
@@ -204,7 +206,7 @@ final class UCPTest extends FeatureTestCase
                     ],
                     true,
                 )
-                    => DOMAssert::assertSelectCount("select[name={$field}]", 1, $page),
+                => DOMAssert::assertSelectCount("select[name={$field}]", 1, $page),
                 $field === 'about' => DOMAssert::assertSelectCount("textarea[name={$field}]", 1, $page),
                 default => DOMAssert::assertSelectCount("input[name={$field}]", 1, $page),
             };

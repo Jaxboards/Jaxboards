@@ -18,6 +18,7 @@ use Jax\ServiceConfig;
 use Jax\Template;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Small;
 use Tests\UnitTestCase;

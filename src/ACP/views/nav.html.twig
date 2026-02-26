@@ -1,12 +1,12 @@
 <div id="nav">
   {% for title, menu in categories %}
-    <a href="{{ "?act=" ~ title }}" class="{{ title|lower }}">{{ title }}</a>
+    <a href="{{ "/ACP/" ~ title }}" class="{{ title|lower }}">{{ title }}</a>
   {% endfor %}
 </div>
 {% for categoryTitle, menu in categories %}
   <div class="dropdownMenu" id="menu_{{ categoryTitle|lower }}">
     {% for do, linkTitle in menu %}
-      <a href="?act={{ categoryTitle }}&amp;do={{ do }}">{{ linkTitle }}</a>
+      <a href="/ACP/{{ categoryTitle }}/{{ do }}">{{ linkTitle }}</a>
     {% endfor %}
   </div>
 {% endfor %}

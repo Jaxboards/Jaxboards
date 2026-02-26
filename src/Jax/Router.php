@@ -5,36 +5,6 @@ declare(strict_types=1);
 namespace Jax;
 
 use DI\Container;
-use Jax\Routes\API;
-use Jax\Routes\Asteroids;
-use Jax\Routes\Badges;
-use Jax\Routes\BoardIndex;
-use Jax\Routes\BoardOffline;
-use Jax\Routes\Calendar;
-use Jax\Routes\Confetti;
-use Jax\Routes\Contacts;
-use Jax\Routes\CustomPage;
-use Jax\Routes\Download;
-use Jax\Routes\Earthbound;
-use Jax\Routes\Forum;
-use Jax\Routes\Katamari;
-use Jax\Routes\LogReg;
-use Jax\Routes\Manifest;
-use Jax\Routes\Members;
-use Jax\Routes\ModControls;
-use Jax\Routes\Nope;
-use Jax\Routes\Post;
-use Jax\Routes\Rainbow;
-use Jax\Routes\Report;
-use Jax\Routes\Search;
-use Jax\Routes\Snow;
-use Jax\Routes\Solitaire;
-use Jax\Routes\Spin;
-use Jax\Routes\Tardis;
-use Jax\Routes\Ticker;
-use Jax\Routes\Topic;
-use Jax\Routes\UCP;
-use Jax\Routes\UserProfile;
 
 use function array_key_exists;
 use function header;
@@ -43,8 +13,6 @@ use function ksort;
 use function preg_match;
 use function preg_replace;
 use function preg_replace_callback;
-use function str_contains;
-use function trim;
 
 final class Router
 {
@@ -65,51 +33,10 @@ final class Router
 
     public function __construct(
         private readonly Request $request,
-        private readonly Config $config,
         private readonly Container $container,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly Session $session,
-        private readonly User $user,
-    ) {
-        $this->get('', '/', BoardIndex::class);
-        $this->get('api', '/api/{method}', API::class);
-        $this->get('badges', '/badges', Badges::class);
-        $this->get('calendar', '/calendar', Calendar::class);
-        $this->get('category', '/', BoardIndex::class);
-        $this->get('contacts', '/contacts', Contacts::class);
-        $this->get('download', '/download', Download::class);
-        $this->get('index', '/', BoardIndex::class);
-        $this->get('members', '/members', Members::class);
-        $this->get('modcontrols', '/modcontrols/{do}', ModControls::class);
-        $this->get('forum', '/forum/{id}/{slug}', Forum::class);
-        $this->get('manifest.json', '/manifest.json', Manifest::class);
-        $this->get('post', '/post', Post::class);
-        $this->get('profile', '/profile/{id}/{page}', UserProfile::class);
-        $this->get('report', '/report', Report::class);
-        $this->get('search', '/search', Search::class);
-        $this->get('ticker', '/ticker', Ticker::class);
-        $this->get('topic', '/topic/{id}/{slug}', Topic::class);
-        $this->get('ucp', '/ucp/{what}', UCP::class);
-
-        // Easter eggs
-        $this->get('asteroids', '/asteroids', Asteroids::class);
-        $this->get('confetti', '/confetti/{count}', Confetti::class);
-        $this->get('earthbound', '/earthbound', Earthbound::class);
-        $this->get('katamari', '/katamari', Katamari::class);
-        $this->get('nope', '/nope', Nope::class);
-        $this->get('rainbow', '/rainbow', Rainbow::class);
-        $this->get('snow', '/snow/{snowFlakeCount}', Snow::class);
-        $this->get('solitaire', '/solitaire', Solitaire::class);
-        $this->get('spin', '/spin', Spin::class);
-        $this->get('tardis', '/tardis', Tardis::class);
-
-        // Authentication
-        $this->get('register', '/register', LogReg::class);
-        $this->get('logout', '/logout', LogReg::class);
-        $this->get('login', '/login', LogReg::class);
-        $this->get('toggleInvisible', '/toggleInvisible', LogReg::class);
-        $this->get('forgotPassword', '/forgotPassword', LogReg::class);
-    }
+    ) {}
 
     /**
      * Redirect to a new URL.
@@ -143,19 +70,23 @@ final class Router
      *
      * @return bool True if route found, false if not
      */
-    public function route(string $path): bool
+    public function route(string $path = ''): bool
     {
-        if ($this->isBoardOffline() && !str_contains($path, 'login')) {
-            $this->container->get(BoardOffline::class)->route([]);
+        if ($path === '' || $path[0] !== '/') {
+            $path = "/{$path}";
+        }
+
+        foreach ($this->paths as $regex => $className) {
+            if (!preg_match($regex, $path, $match)) {
+                continue;
+            }
+
+            $this->container->get($className)->route($match);
 
             return true;
         }
 
-        if ($this->routeByPath($path)) {
-            return true;
-        }
-
-        return (bool) $this->container->get(CustomPage::class)->route(trim($path, '/'));
+        return false;
     }
 
     /**
@@ -216,43 +147,12 @@ final class Router
     /**
      * Add a new potential route.
      */
-    private function get(string $name, string $path, string $classString): void
+    public function get(string $name, string $path, string $classString): void
     {
         $this->urls[$name] = $path;
 
         // Replaces {param} with a name-captured subgroup (?<param>.*) and makes a full regex
         $regexedPath = '@^' . preg_replace('/\/\{(\w+)\}/', '(?:\/(?<$1>[^/]+))?', $path) . '$@';
         $this->paths[$regexedPath] = $classString;
-    }
-
-    /**
-     * Routes by `path` param (generated by .htaccess).
-     */
-    private function routeByPath(string $path = ''): bool
-    {
-        if ($path === '' || $path[0] !== '/') {
-            $path = "/{$path}";
-        }
-
-        foreach ($this->paths as $regex => $className) {
-            if (!preg_match($regex, $path, $match)) {
-                continue;
-            }
-
-            $this->container->get($className)->route($match);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    private function isBoardOffline(): bool
-    {
-        if (!$this->user->getGroup()?->canViewBoard) {
-            return true;
-        }
-
-        return $this->config->getSetting('boardoffline') && !$this->user->getGroup()?->canViewOfflineBoard;
     }
 }

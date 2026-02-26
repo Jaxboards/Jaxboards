@@ -35,7 +35,6 @@
     <report>
       <clover outputFile="reports/php/coverage/clover.xml" />
     </report>
-
   </coverage>
 
   <logging>

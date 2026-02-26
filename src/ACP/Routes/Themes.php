@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
-namespace ACP\Page;
+namespace ACP\Routes;
 
 use ACP\Page;
 use Jax\Database\Database;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
+use Jax\Interfaces\Route;
 use Jax\Models\Skin;
 use Jax\Request;
 use Jax\TextFormatting;
+use Override;
 
 use function array_key_exists;
 use function array_map;
@@ -20,7 +22,7 @@ use function is_string;
 use function mb_strlen;
 use function preg_match;
 
-final readonly class Themes
+final readonly class Themes implements Route
 {
     private string $wrappersPath;
 
@@ -41,12 +43,13 @@ final readonly class Themes
         $this->themesPath = $this->boardPath . '/Themes/';
     }
 
-    public function render(): void
+    #[Override]
+    public function route(array $params): void
     {
         $editCSS = (int) $this->request->asString->get('editcss');
         $editWrapper = $this->request->asString->get('editwrapper');
         $deleteSkin = (int) $this->request->asString->get('deleteskin');
-        $do = $this->request->asString->get('do');
+        $do = $params['do'] ?? '';
 
         match (true) {
             (bool) $editCSS => $this->editCSS($editCSS),
@@ -80,7 +83,7 @@ final readonly class Themes
         $wrapperPath = $this->pathToWrapper($wrapper);
         if ($this->isValidFilename($wrapper) && $this->fileSystem->getFileInfo($wrapperPath)->isFile()) {
             $this->fileSystem->unlink($wrapperPath);
-            $this->page->location('?act=Themes');
+            $this->page->location('/ACP/Themes');
 
             return '';
         }
@@ -440,7 +443,7 @@ final readonly class Themes
             );
         }
 
-        $this->page->location('?act=Themes');
+        $this->page->location('/ACP/Themes');
 
         return null;
     }
@@ -499,7 +502,7 @@ final readonly class Themes
             );
         }
 
-        $this->page->location('?act=Themes');
+        $this->page->location('/ACP/Themes');
     }
 
     private function pathToWrapper(string $wrapperName): string

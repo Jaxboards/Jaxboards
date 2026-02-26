@@ -7,8 +7,10 @@ namespace ACP;
 use DI\Container;
 use Jax\Config;
 use Jax\DebugLog;
+use Jax\Interfaces\Route;
 use Jax\IPAddress;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\User;
 
@@ -26,15 +28,18 @@ final readonly class App
 {
     public function __construct(
         private Config $config,
-        private Container $container,
         private DebugLog $debugLog,
         private IPAddress $ipAddress,
         private Nav $nav,
         private Page $page,
         private Request $request,
+        private Router $router,
         private User $user,
         private Session $session,
-    ) {}
+    ) {
+        require_once __DIR__ . '/routes.php';
+        routes($router);
+    }
 
     public function render(): void
     {
@@ -49,12 +54,7 @@ final readonly class App
 
         $this->nav->render();
 
-        $act = $this->request->get('act');
-
-        if (is_string($act) && $act !== '') {
-            $page = $this->container->get('ACP\Page\\' . $act);
-            $page->render();
-        }
+        $this->router->route($this->request->asString->both('path') ?? '');
 
         if ($this->ipAddress->isLocalHost()) {
             $this->page->addContentBox('Debug', implode('<br>', $this->debugLog->getLog()));

@@ -10,6 +10,7 @@ use Jax\Models\Member;
 use Jax\Models\Post;
 use Jax\Models\Topic;
 use Jax\Modules\WebHooks;
+use Jax\Router;
 use Jax\TextRules;
 use Jax\User;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -46,6 +47,7 @@ final class WebhooksTest extends UnitTestCase
         ]));
         $this->container->set(TextRules::class, self::createStub(TextRules::class));
         $this->container->set(WebHooks::class, autowire()->constructorParameter('curl', $curlMock));
+        $this->container->get(Router::class)->get('topic', '/topic/{id}/{slug}', Topic::class);
 
         $webhook = $this->container->get(WebHooks::class);
         $webhook->init();

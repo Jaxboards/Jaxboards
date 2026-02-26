@@ -42,6 +42,7 @@ use Jax\User;
 use Jax\UserOnline;
 use Jax\UsersOnline;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use Tests\FeatureTestCase;
 
 use function array_find;
@@ -74,6 +75,7 @@ use function json_decode;
 #[CoversClass(Request::class)]
 #[CoversClass(RequestStringGetter::class)]
 #[CoversClass(Router::class)]
+#[CoversFunction('routes')]
 #[CoversClass(ServiceConfig::class)]
 #[CoversClass(Session::class)]
 #[CoversClass(Shoutbox::class)]

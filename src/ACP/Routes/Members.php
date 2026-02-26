@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ACP\Page;
+namespace ACP\Routes;
 
 use ACP\Page;
 use Carbon\Carbon;
@@ -11,6 +11,7 @@ use Jax\Constants\Groups;
 use Jax\Database\Database;
 use Jax\DomainDefinitions;
 use Jax\FileSystem;
+use Jax\Interfaces\Route;
 use Jax\IPAddress;
 use Jax\Models\Forum;
 use Jax\Models\Group;
@@ -18,6 +19,7 @@ use Jax\Models\Member;
 use Jax\Models\Message;
 use Jax\Request;
 use Jax\User;
+use Override;
 
 use function array_map;
 use function count;
@@ -27,7 +29,7 @@ use function password_hash;
 
 use const PASSWORD_DEFAULT;
 
-final readonly class Members
+final readonly class Members implements Route
 {
     private const string DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
 
@@ -42,9 +44,10 @@ final readonly class Members
         private User $user,
     ) {}
 
-    public function render(): void
+    #[Override]
+    public function route(array $params): void
     {
-        match ($this->request->asString->both('do')) {
+        match ($params['do'] ?? '') {
             'merge' => $this->merge(),
             'edit' => $this->editMember(),
             'delete' => $this->deleteMember(),

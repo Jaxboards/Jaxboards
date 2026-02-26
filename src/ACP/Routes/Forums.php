@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ACP\Page;
+namespace ACP\Routes;
 
 use ACP\Page;
-use ACP\Page\Forums\RecountStats;
+use ACP\Routes\Forums\RecountStats;
 use Jax\Database\Database;
 use Jax\ForumTree;
+use Jax\Interfaces\Route;
 use Jax\Jax;
 use Jax\Lodash;
 use Jax\Models\Category;
@@ -16,6 +17,7 @@ use Jax\Models\Group;
 use Jax\Models\Member;
 use Jax\Request;
 use Jax\TextFormatting;
+use Override;
 
 use function array_first;
 use function array_key_exists;
@@ -37,18 +39,21 @@ use function sscanf;
 use function str_starts_with;
 use function trim;
 
-final readonly class Forums
+final class Forums implements Route
 {
+    private string $do;
+
     public function __construct(
-        private Database $database,
-        private Jax $jax,
-        private Page $page,
-        private RecountStats $recountStats,
-        private Request $request,
-        private TextFormatting $textFormatting,
+        private readonly Database $database,
+        private readonly Jax $jax,
+        private readonly Page $page,
+        private readonly RecountStats $recountStats,
+        private readonly Request $request,
+        private readonly TextFormatting $textFormatting,
     ) {}
 
-    public function render(): void
+    #[Override]
+    public function route(array $params): void
     {
         $edit = $this->request->both('edit');
         $categoryEdit = match (true) {
@@ -61,7 +66,8 @@ final readonly class Forums
             default => null,
         };
 
-        match ($this->request->get('do')) {
+        $this->do = $params['do'] ?? '';
+        match ($this->do) {
             'edit' => match (true) {
                 is_numeric($edit) => $this->createForum((int) $edit),
                 $categoryEdit !== null => $this->createCategory($categoryEdit),
@@ -209,7 +215,7 @@ final readonly class Forums
                 $this->mysqltree($decoded);
             }
 
-            if ($this->request->asString->get('do') === 'create') {
+            if ($this->do === 'create') {
                 return;
             }
 
@@ -277,7 +283,7 @@ final readonly class Forums
             $forum->update();
 
             $this->updatePerForumModFlag();
-            $this->page->location('?act=Forums&do=edit&edit=' . $fid);
+            $this->page->location('/ACP/Forums/edit?edit=' . $fid);
 
             return;
         }
@@ -362,7 +368,7 @@ final readonly class Forums
             $modList = '';
             foreach ($members as $member) {
                 $modList .= $this->page->render('forums/create-forum-moderators-mod.html', [
-                    'delete_link' => '?act=Forums&do=edit&edit=' . $fid . '&rmod=' . $member->id,
+                    'delete_link' => '/ACP/Forums/edit?edit=' . $fid . '&rmod=' . $member->id,
                     'username' => $member->displayName,
                 ]);
             }
@@ -468,7 +474,7 @@ final readonly class Forums
     private function deleteForum(int $forumId): void
     {
         if ($this->request->post('submit') === 'Cancel') {
-            $this->page->location('?act=Forums&do=order');
+            $this->page->location('/ACP/Forums/order');
 
             return;
         }

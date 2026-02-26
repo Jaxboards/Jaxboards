@@ -39,6 +39,7 @@ use Jax\TextFormatting;
 use Jax\TextRules;
 use Jax\User;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use Tests\FeatureTestCase;
 
 use function json_decode;
@@ -72,6 +73,7 @@ use function json_decode;
 #[CoversClass(BotDetector::class)]
 #[CoversClass(Page::class)]
 #[CoversClass(Router::class)]
+#[CoversFunction('routes')]
 #[CoversClass(Session::class)]
 #[CoversClass(Template::class)]
 #[CoversClass(App::class)]

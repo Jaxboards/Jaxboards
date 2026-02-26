@@ -2,19 +2,21 @@
 
 declare(strict_types=1);
 
-namespace ACP\Page;
+namespace ACP\Routes;
 
 use ACP\Page;
 use Jax\Config;
+use Jax\Interfaces\Route;
 use Jax\Models\Member;
 use Jax\Request;
 use Jax\Router;
 use Jax\Session;
 use Jax\User;
+use Override;
 
 use function header;
 
-final readonly class Login
+final readonly class Login implements Route
 {
     public function __construct(
         private Config $config,
@@ -25,7 +27,8 @@ final readonly class Login
         private Session $session,
     ) {}
 
-    public function render(): void
+    #[Override]
+    public function route(array $params): void
     {
         $rootUrl = $this->router->getRootURL();
         $pageElements = [

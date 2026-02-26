@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ACP\Page\Tools;
+namespace ACP\Routes\Tools;
 
 use ACP\Page;
 use Jax\Database\Database;

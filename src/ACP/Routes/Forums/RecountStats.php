@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ACP\Page\Forums;
+namespace ACP\Routes\Forums;
 
 use ACP\Page;
 use Jax\Database\Database;
