@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ACP;
 
-class Nav
+final class Nav
 {
     /**
      * Map of category titles to menu links
@@ -59,7 +59,10 @@ class Nav
         private readonly Page $page,
     ) {}
 
-    public function getMenu(string $category)
+    /**
+     * @return array<string,string>
+     */
+    public function getMenu(string $category): array
     {
         return $this->categories[$category] ?? [];
     }
