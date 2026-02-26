@@ -1540,6 +1540,7 @@ a {
 /* Users Online */
 #statusers {
   & a {
+    display: inline-block;
     margin-right: 5px;
     white-space: nowrap;
 
