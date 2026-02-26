@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
-use ACP\Nav;
 use ACP\Page;
 use ACP\Page\Forums\RecountStats;
 use Jax\Database\Database;
@@ -383,8 +382,8 @@ final readonly class Forums
 
         $this->page->addContentBox(
             ($forum ? 'Edit' : 'Create')
-                . ' Forum'
-                . ($forum ? ' - ' . $this->textFormatting->blockhtml($forum->title) : ''),
+            . ' Forum'
+            . ($forum ? ' - ' . $this->textFormatting->blockhtml($forum->title) : ''),
             $page,
         );
         $this->page->addContentBox('Moderators', $moderators);

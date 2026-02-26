@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ACP;
 
 use Jax\FileSystem;
-use Jax\Request;
 use Jax\Router;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;

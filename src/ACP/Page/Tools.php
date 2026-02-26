@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
-use ACP\Nav;
 use ACP\Page;
 use ACP\Page\Tools\FileManager;
 use Jax\Database\Database;

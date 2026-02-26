@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
-use ACP\Nav;
 use ACP\Page;
 use Jax\Config;
 use Jax\Database\Database;
@@ -231,8 +230,9 @@ final readonly class Posting
 
         if ($this->request->post('rsubmit') !== null) {
             $this->config->write([
-                'reactions' => ($this->request->post('renabled') !== null ? 1 : 0)
-                    + ($this->request->post('ranon') !== null ? 2 : 0),
+                'reactions' =>
+                    ($this->request->post('renabled') !== null ? 1 : 0)
+                        + ($this->request->post('ranon') !== null ? 2 : 0),
             ]);
             $page2 .= $this->page->success('Settings saved!');
         }
