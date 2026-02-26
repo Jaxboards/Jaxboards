@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ACP;
 
 class Nav
@@ -53,7 +55,9 @@ class Nav
         ],
     ];
 
-    public function __construct(private Page $page) {}
+    public function __construct(
+        private readonly Page $page,
+    ) {}
 
     public function getMenu(string $category)
     {
@@ -63,7 +67,7 @@ class Nav
     public function render(): void
     {
         $this->page->append('nav', $this->page->render('nav.html', [
-            'categories' => $this->categories
+            'categories' => $this->categories,
         ]));
     }
 }

@@ -386,8 +386,8 @@ final readonly class Forums
 
         $this->page->addContentBox(
             ($forum ? 'Edit' : 'Create')
-                . ' Forum'
-                . ($forum ? ' - ' . $this->textFormatting->blockhtml($forum->title) : ''),
+            . ' Forum'
+            . ($forum ? ' - ' . $this->textFormatting->blockhtml($forum->title) : ''),
             $page,
         );
         $this->page->addContentBox('Moderators', $moderators);

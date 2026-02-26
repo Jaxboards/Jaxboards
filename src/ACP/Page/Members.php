@@ -124,12 +124,12 @@ final readonly class Members
                 $member->groupID === Groups::Admin->value
                 && $this->user->get()->id !== 1
                 && $this->user->get()->id !== $member->id
-                ? $this->page->error('You do not have permission to edit this profile. ')
-                : $this->page->render('members/edit-form.html', [
-                    'content' => $page,
-                    'groups' => Group::selectMany('ORDER BY `title` DESC'),
-                    'member' => $member,
-                ]);
+                    ? $this->page->error('You do not have permission to edit this profile. ')
+                    : $this->page->render('members/edit-form.html', [
+                        'content' => $page,
+                        'groups' => Group::selectMany('ORDER BY `title` DESC'),
+                        'member' => $member,
+                    ]);
         } else {
             $page = $this->page->render('members/edit.html');
         }
@@ -442,7 +442,7 @@ final readonly class Members
                         `last_register` = (SELECT MAX(`id`) FROM %t)
                     SQL, ['stats', 'members']);
                 $page .= $this->page->success('Successfully deleted the member account. '
-                    . 'Board Stat Recount suggested.');
+                . 'Board Stat Recount suggested.');
             }
         }
 

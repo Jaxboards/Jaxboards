@@ -22,18 +22,18 @@ use function is_string;
  *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-final class App
+final readonly class App
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Container $container,
-        private readonly DebugLog $debugLog,
-        private readonly IPAddress $ipAddress,
-        private readonly Nav $nav,
-        private readonly Page $page,
-        private readonly Request $request,
-        private readonly User $user,
-        private readonly Session $session,
+        private Config $config,
+        private Container $container,
+        private DebugLog $debugLog,
+        private IPAddress $ipAddress,
+        private Nav $nav,
+        private Page $page,
+        private Request $request,
+        private User $user,
+        private Session $session,
     ) {}
 
     public function render(): void

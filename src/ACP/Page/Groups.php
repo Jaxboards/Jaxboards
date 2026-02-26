@@ -365,7 +365,7 @@ final class Groups
 
         if (!$found) {
             $page .= $this->page->error("You haven't created any groups to delete. "
-                . "(Hint: default groups can't be deleted)");
+            . "(Hint: default groups can't be deleted)");
         }
 
         $this->page->addContentBox('Delete Groups', $page);
