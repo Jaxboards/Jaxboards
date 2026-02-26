@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use ACP\Nav;
 use ACP\Page;
 use Jax\Constants\Groups as ConstantsGroups;
 use Jax\Database\Database;
@@ -32,6 +33,7 @@ final class Groups
 
     public function __construct(
         private readonly Database $database,
+        private readonly Nav $nav,
         private readonly Page $page,
         private readonly Request $request,
         private readonly TextFormatting $textFormatting,
@@ -39,11 +41,7 @@ final class Groups
 
     public function render(): void
     {
-        $this->page->sidebar([
-            'create' => 'Create Group',
-            'delete' => 'Delete Group',
-            'perms' => 'Edit Permissions',
-        ]);
+        $this->page->sidebar($this->nav->getMenu('Groups'));
 
         $edit = $this->request->get('edit');
         if (is_string($edit)) {
@@ -367,7 +365,7 @@ final class Groups
 
         if (!$found) {
             $page .= $this->page->error("You haven't created any groups to delete. "
-            . "(Hint: default groups can't be deleted)");
+                . "(Hint: default groups can't be deleted)");
         }
 
         $this->page->addContentBox('Delete Groups', $page);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use ACP\Nav;
 use ACP\Page;
 use Jax\Database\Database;
 use Jax\DomainDefinitions;
@@ -32,6 +33,7 @@ final readonly class Themes
         private Database $database,
         private DomainDefinitions $domainDefinitions,
         private FileSystem $fileSystem,
+        private Nav $nav,
         private Request $request,
         private Page $page,
         private TextFormatting $textFormatting,
@@ -43,10 +45,7 @@ final readonly class Themes
 
     public function render(): void
     {
-        $this->page->sidebar([
-            'create' => 'Create New Skin',
-            'manage' => 'Manage Skins',
-        ]);
+        $this->page->sidebar($this->nav->getMenu('Themes'));
 
         $editCSS = (int) $this->request->asString->get('editcss');
         $editWrapper = $this->request->asString->get('editwrapper');
@@ -113,7 +112,7 @@ final readonly class Themes
                     'wrapper.html',
                 )),
             ) === false
-                => 'Wrapper could not be created.',
+            => 'Wrapper could not be created.',
             default => null,
         };
     }
@@ -365,7 +364,7 @@ final readonly class Themes
                 'content' => $this->textFormatting->blockhtml(
                     $this->fileSystem->getContents(
                         ($skin->custom !== 0 ? $this->themesPath : $this->domainDefinitions->getServiceThemePath())
-                        . "/{$skin->title}/css.css",
+                            . "/{$skin->title}/css.css",
                     ) ?: '',
                 ),
                 'save' => $skin->custom !== 0 ? $this->page->render('save-changes.html') : '',
@@ -409,7 +408,7 @@ final readonly class Themes
             !$this->isValidFilename($skinName) => 'Skinname must only consist of letters, numbers, and spaces.',
             mb_strlen($skinName) > 50 => 'Skin name must be less than 50 characters.',
             $this->fileSystem->getFileInfo($this->themesPath . $skinName)->isDir()
-                => 'A skin with that name already exists.',
+            => 'A skin with that name already exists.',
             !in_array($wrapperName, $this->getWrappers()) => 'Invalid wrapper.',
             default => null,
         };

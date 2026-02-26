@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use ACP\Nav;
 use ACP\Page;
 use Jax\Config;
 use Jax\Database\Database;
@@ -30,6 +31,7 @@ final readonly class Settings
     public function __construct(
         private Config $config,
         private Database $database,
+        private Nav $nav,
         private Page $page,
         private Request $request,
         private TextFormatting $textFormatting,
@@ -37,13 +39,7 @@ final readonly class Settings
 
     public function render(): void
     {
-        $this->page->sidebar([
-            'global' => 'Global Settings',
-            'pages' => 'Custom Pages',
-            'shoutbox' => 'Shoutbox',
-            'badges' => 'Badges',
-            'webhooks' => 'Webhooks',
-        ]);
+        $this->page->sidebar($this->nav->getMenu('Settings'));
 
         match ($this->request->both('do')) {
             'pages' => $this->pages(),

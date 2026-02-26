@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use ACP\Nav;
 use ACP\Page;
 use Carbon\Carbon;
 use Jax\Config;
@@ -37,6 +38,7 @@ final readonly class Members
         private DomainDefinitions $domainDefinitions,
         private FileSystem $fileSystem,
         private IPAddress $ipAddress,
+        private Nav $nav,
         private Page $page,
         private Request $request,
         private User $user,
@@ -55,15 +57,7 @@ final readonly class Members
             default => $this->showMain(),
         };
 
-        $this->page->sidebar([
-            'delete' => 'Delete Account',
-            'edit' => 'Edit Members',
-            'ipbans' => 'IP Bans',
-            'massmessage' => 'Mass Message',
-            'merge' => 'Account Merge',
-            'prereg' => 'Pre-Register',
-            'validation' => 'Validation',
-        ]);
+        $this->page->sidebar($this->nav->getMenu('Members'));
     }
 
     private function showMain(): void
@@ -130,12 +124,12 @@ final readonly class Members
                 $member->groupID === Groups::Admin->value
                 && $this->user->get()->id !== 1
                 && $this->user->get()->id !== $member->id
-                    ? $this->page->error('You do not have permission to edit this profile. ')
-                    : $this->page->render('members/edit-form.html', [
-                        'content' => $page,
-                        'groups' => Group::selectMany('ORDER BY `title` DESC'),
-                        'member' => $member,
-                    ]);
+                ? $this->page->error('You do not have permission to edit this profile. ')
+                : $this->page->render('members/edit-form.html', [
+                    'content' => $page,
+                    'groups' => Group::selectMany('ORDER BY `title` DESC'),
+                    'member' => $member,
+                ]);
         } else {
             $page = $this->page->render('members/edit.html');
         }
@@ -448,7 +442,7 @@ final readonly class Members
                         `last_register` = (SELECT MAX(`id`) FROM %t)
                     SQL, ['stats', 'members']);
                 $page .= $this->page->success('Successfully deleted the member account. '
-                . 'Board Stat Recount suggested.');
+                    . 'Board Stat Recount suggested.');
             }
         }
 

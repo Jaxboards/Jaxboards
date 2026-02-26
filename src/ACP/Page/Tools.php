@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use ACP\Nav;
 use ACP\Page;
 use ACP\Page\Tools\FileManager;
 use Jax\Database\Database;
@@ -36,6 +37,7 @@ final readonly class Tools
         private DatabaseUtils $databaseUtils,
         private DomainDefinitions $domainDefinitions,
         private FileSystem $fileSystem,
+        private Nav $nav,
         private Page $page,
         private Request $request,
         private FileManager $fileManager,
@@ -43,12 +45,7 @@ final readonly class Tools
 
     public function render(): void
     {
-        $this->page->sidebar([
-            'backup' => 'Backup',
-            'files' => 'File Manager',
-            'viewErrorLog' => 'View Error Log',
-            'phpinfo' => 'View PHPInfo',
-        ]);
+        $this->page->sidebar($this->nav->getMenu('Tools'));
 
         match ($this->request->both('do')) {
             'backup' => $this->backup(),
