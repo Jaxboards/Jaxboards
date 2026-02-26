@@ -1613,7 +1613,9 @@ a {
 
 .code {
   padding: 10px;
-  font-family: Consolas, Fixedsys, monospace;
+  font-family:
+    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
+    "DejaVu Sans Mono", monospace;
   font-size: 1.2rem;
   line-height: 1.5rem;
   white-space: preserve;
