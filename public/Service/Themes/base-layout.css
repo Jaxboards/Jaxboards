@@ -8,6 +8,7 @@ body {
   overflow-y: scroll;
   font-family: system-ui, sans-serif;
   font-size: 1.6rem;
+  line-height: 1.2;
 }
 
 img {
