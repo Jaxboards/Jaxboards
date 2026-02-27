@@ -61,15 +61,20 @@ a {
 }
 
 #header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  background: url("../img/acp-header.png") no-repeat;
+}
+
+#logo {
   display: block;
-  background: url("../img/acp-header.png");
+  width: 360px;
   height: 96px;
 }
 
 #userbox {
-  position: absolute;
-  top: 30px;
-  right: 20px;
+  align-self: center;
   padding: 10px;
   color: #fff;
   font-size: 1.6rem;
@@ -86,25 +91,21 @@ a {
 }
 
 #nav {
-  background: url("../img/acp-nav-icons.png") 0 -33px;
-  height: 33px;
+  background: linear-gradient(to bottom, #f4f4f4, #bebebe 95%, #f4f4f4);
+  background-size: 1px 33px;
   border: 1px solid #000;
 
   & a {
     margin: 0;
     padding: 0;
-    display: block;
-    float: left;
+    display: inline-block;
     text-indent: -1000px;
-    background: url("../img/acp-nav-icons.png");
+    background: url("../img/acp-nav-icons.png") 0 0;
     height: 33px;
 
-    &:hover {
-      background: none;
-    }
-
+    &:hover,
     &.active {
-      background: none;
+      background-position-y: -33px;
     }
 
     &.settings {
@@ -113,32 +114,32 @@ a {
 
     &.members {
       width: 92px;
-      background-position: -87px 0;
+      background-position-x: -87px;
     }
 
     &.groups {
       width: 84px;
-      background-position: -179px 0;
+      background-position-x: -179px;
     }
 
     &.themes {
       width: 93px;
-      background-position: -263px 0;
+      background-position-x: -263px;
     }
 
     &.posting {
       width: 86px;
-      background-position: -356px 0;
+      background-position-x: -356px;
     }
 
     &.forums {
       width: 84px;
-      background-position: -442px 0;
+      background-position-x: -442px;
     }
 
     &.tools {
       width: 81px;
-      background-position: -526px 0;
+      background-position-x: -526px;
     }
   }
 }
