@@ -12,7 +12,6 @@ use Jax\Router;
 use Jax\Session;
 use Jax\User;
 
-use function ACP\routes;
 use function implode;
 
 /**

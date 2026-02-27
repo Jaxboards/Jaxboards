@@ -13,7 +13,6 @@ use Jax\Routes\CustomPage;
 use function gmdate;
 use function header;
 use function implode;
-use function Jax\routes;
 use function json_decode;
 use function json_encode;
 use function microtime;
