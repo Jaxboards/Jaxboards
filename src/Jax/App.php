@@ -13,6 +13,7 @@ use Jax\Routes\CustomPage;
 use function gmdate;
 use function header;
 use function implode;
+use function Jax\routes;
 use function json_decode;
 use function json_encode;
 use function microtime;
@@ -43,7 +44,6 @@ final readonly class App
     ) {
         $this->microtime = microtime(true);
 
-        require_once __DIR__ . '/routes.php';
         routes($router);
     }
 

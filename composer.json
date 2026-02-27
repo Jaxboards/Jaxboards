@@ -3,6 +3,10 @@
   "description": "Realtime forum",
   "license": "MIT",
   "autoload": {
+    "files": [
+      "src/ACP/routes.php",
+      "src/Jax/routes.php"
+    ],
     "psr-4": {
       "ACP\\": "src/ACP",
       "Emoticons\\": "public/assets/emoticons",

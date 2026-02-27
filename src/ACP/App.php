@@ -12,6 +12,7 @@ use Jax\Router;
 use Jax\Session;
 use Jax\User;
 
+use function ACP\routes;
 use function implode;
 
 /**
@@ -34,7 +35,6 @@ final readonly class App
         private User $user,
         private Session $session,
     ) {
-        require_once __DIR__ . '/routes.php';
         routes($router);
     }
 
