@@ -156,13 +156,31 @@ a {
 
 .sidebar {
   box-shadow: #124 -5px 5px 5px;
+  background-color: #eee;
+  margin: 20px 0;
   line-height: 20px;
   padding: 10px;
-  margin: 40px 10px;
-  width: 169px;
-  background: url("../img/acp-sidebar.png") right repeat-y #eee;
-  float: left;
   border: 1px solid #000;
+}
+
+@media only screen and (min-width: 600px) {
+  .sidebar {
+    box-shadow: #124 -5px 5px 5px;
+    line-height: 20px;
+    padding: 10px;
+    margin: 40px 10px;
+    width: 169px;
+    background: url("../img/acp-sidebar.png") right repeat-y #eee;
+    float: left;
+    border: 1px solid #000;
+  }
+  .right {
+    margin-left: 200px;
+  }
+  .box {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
 }
 
 .switch {
@@ -255,12 +273,8 @@ a {
   }
 }
 
-.right {
-  margin-left: 200px;
-}
-
 .box {
-  margin: 20px 10px 0 0;
+  margin: 20px 0 0 0;
   border: 1px solid #000;
   box-shadow: #124 -5px 5px 5px;
 
