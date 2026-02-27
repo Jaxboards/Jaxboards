@@ -628,7 +628,6 @@ a {
     & .contact {
       cursor: pointer;
       padding: 30px 10px;
-      width: 120px;
       text-align: center;
 
       & img.avatar {
