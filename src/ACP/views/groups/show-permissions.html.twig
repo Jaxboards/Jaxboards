@@ -2,12 +2,18 @@
   <input type="hidden" name="grouplist" value="{{ group_list }}">
   <div class="permcontainer">
     * Starred are permissions not functional yet.
-    <table class="sticky-heading">
-      <tr>
-        {{ group_headings }}
-      </tr>
-    </table>
     <table class="perms">
+      <tr class="sticky-heading">
+        <th></th>
+        {% for group in groups %}
+          <th>
+            <a class="icons edit" href="/ACP/Groups?edit={{ group.id }}">
+              {{ group.title }}
+            </a>
+            ({{ group.id }})
+          </th>
+        {% endfor %}
+      </tr>
       {{ permissions_table }}
     </table>
   </div>

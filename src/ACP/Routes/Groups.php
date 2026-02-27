@@ -182,16 +182,6 @@ final class Groups implements Route
             $this->page->addContentBox('Error', $this->page->error("Don't play with my variables!"));
         }
 
-        $widthPercent = (1 / $numgroups) * 100;
-        $groupHeadings = '';
-        foreach ($groups as $groupId => $group) {
-            $groupHeadings .= $this->page->render('groups/show-permissions-group-heading.html', [
-                'id' => $groupId,
-                'title' => $group->title,
-                'width_percent' => $widthPercent,
-            ]);
-        }
-
         $permissionsChart = [
             'Global' => [
                 'canAccessACP' => 'Access ACP',
@@ -269,7 +259,7 @@ final class Groups implements Route
         }
 
         $page .= $this->page->render('groups/show-permissions.html', [
-            'group_headings' => $groupHeadings,
+            'groups' => $groups,
             'group_list' => implode(',', array_keys($groups)),
             'permissions_table' => $permissionsTable,
         ]);
@@ -364,7 +354,7 @@ final class Groups implements Route
 
         if (!$found) {
             $page .= $this->page->error("You haven't created any groups to delete. "
-            . "(Hint: default groups can't be deleted)");
+                . "(Hint: default groups can't be deleted)");
         }
 
         $this->page->addContentBox('Delete Groups', $page);

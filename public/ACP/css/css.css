@@ -208,13 +208,22 @@ a {
 
 .perms {
   width: 100%;
+  border-collapse: collapse;
+
+  .sticky-heading {
+    padding-left: 150px;
+    width: 100%;
+    background: #fff;
+    position: sticky;
+    top: 0;
+  }
 
   & th {
     font-weight: bold;
   }
 
   & .breaker {
-    background: url("../img/acp-box-header.png");
+    background: url("../img/acp-box-header.png") repeat-x;
     padding: 3px;
     color: #fff;
     border: 1px solid #000;
@@ -422,12 +431,4 @@ table.settings {
   & th[scope="row"] {
     width: 200px;
   }
-}
-
-.permcontainer .sticky-heading {
-  padding-left: 150px;
-  width: 100%;
-  background: #fff;
-  position: sticky;
-  top: 0;
 }
