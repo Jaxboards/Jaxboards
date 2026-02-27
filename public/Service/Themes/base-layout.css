@@ -639,6 +639,20 @@ a {
   }
 }
 
+@media only screen and (width <= 600px) {
+  .userprofile {
+    & .leftbar {
+      width: auto;
+      float: none;
+      margin-bottom: 10px;
+    }
+
+    & .rightbar {
+      margin: 0;
+    }
+  }
+}
+
 /* Badges */
 .badges {
   & .badge {
