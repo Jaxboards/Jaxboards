@@ -1,3 +1,13 @@
+:root {
+  /* Taken from https://github.com/system-fonts/modern-font-stacks */
+  --neo-grotesque:
+    Inter, Roboto, "Helvetica Neue", "Arial Nova", "Nimbus Sans", Arial,
+    sans-serif;
+  --monospace-code:
+    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
+    "DejaVu Sans Mono", monospace;
+}
+
 html {
   font-size: 62.5%; /* set 1rem to 10px */
   text-size-adjust: none;
@@ -7,7 +17,7 @@ body {
   margin: 0;
   padding: 0;
   font-size: 1.2rem;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--neo-grotesque);
   background: #152b49;
 }
 
