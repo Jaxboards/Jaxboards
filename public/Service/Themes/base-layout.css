@@ -622,14 +622,13 @@ a {
   }
 
   & .contacts {
-    display: inline-block;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 120px);
 
     & .contact {
       cursor: pointer;
       padding: 30px 10px;
-      min-height: 80px;
       width: 120px;
-      float: left;
       text-align: center;
 
       & img.avatar {
