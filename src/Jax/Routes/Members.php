@@ -150,19 +150,12 @@ final class Members implements Route
             'contactDetails' => $this->contactDetails->getContactLinks($member),
         ], $members);
 
-        $page = $this->template->render('members/table', [
+        $page = $this->template->render('members/index', [
+            'pages' => $pages,
             'links' => $links,
             'rows' => $rows,
         ]);
-        $page =
-            "<div class='pages pages-top'>{$pages}</div><div class='forum-pages-top'>&nbsp;</div>"
-            . $this->template->render('global/box', [
-                'boxID' => 'memberlist',
-                'title' => 'Members',
-                'content' => $page,
-            ])
-            . "<div class='pages pages-bottom'>{$pages}</div>"
-            . "<div class='clear'></div>";
+
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
     }

@@ -1,0 +1,13 @@
+<div class='pages pages-top'>{{ pages|raw }}</div>
+<div class='forum-pages-top'>&nbsp;</div>
+{% set content = include('members/table.html.twig', {
+  'links': links,
+  'rows': rows,
+}) %}
+{% include "global/box.html.twig" with {
+    'boxID': 'memberlist',
+    'title': 'Members',
+    'content': content,
+} %}
+<div class='pages pages-bottom'>{{ pages|raw }}</div>
+<div class='clear'></div>
