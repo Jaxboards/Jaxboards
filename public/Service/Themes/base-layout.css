@@ -527,6 +527,12 @@ a {
 .userprofile {
   margin: 30px 5px;
 
+  &::after {
+    content: "";
+    clear: both;
+    display: block;
+  }
+
   & .leftbar {
     float: left;
     width: 200px;
