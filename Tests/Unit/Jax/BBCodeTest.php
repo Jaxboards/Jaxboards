@@ -126,6 +126,14 @@ final class BBCodeTest extends UnitTestCase
                 '<span style="background:#FFFF00">yellow background</span>',
             ],
             [
+                '[font=system-ui]text[/font]',
+                '<span style="font-family:system-ui">text</span>',
+            ],
+            [
+                '[font=Helvetica, Arial]text[/font]',
+                '<span style="font-family:Helvetica, Arial">text</span>',
+            ],
+            [
                 '[font=Arial]Arial font[/font]',
                 '<span style="font-family:Arial">Arial font</span>',
             ],
