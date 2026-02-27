@@ -626,7 +626,6 @@ a {
     grid-template-columns: repeat(auto-fill, 120px);
 
     & .contact {
-      cursor: pointer;
       padding: 30px 10px;
       text-align: center;
 
