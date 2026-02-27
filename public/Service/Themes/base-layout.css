@@ -177,16 +177,16 @@ a {
     width: 120px;
   }
 
-  & .leftbar {
-    float: left;
-    width: 170px;
+  .content {
+    display: flex;
+  }
 
-    & .icon {
-      margin: 10px;
-      font-size: 1.2rem;
-      padding: 2px 25px;
-      background: url("/Service/Themes/Default/icons/inboxicons.png") 0 0
-        no-repeat;
+  & .leftbar {
+    min-width: 170px;
+
+    & a {
+      display: block;
+      margin: 5px 10px;
     }
 
     & h2 {
@@ -196,25 +196,28 @@ a {
     }
   }
 
-  & .icon.inbox {
-    background-position: 0 -32px;
-  }
+  & .icon {
+    margin: 10px;
+    font-size: 1.2rem;
+    padding: 2px 25px;
+    background: url("/Service/Themes/Default/icons/inboxicons.png") 0 0
+      no-repeat;
 
-  & .icon.sent {
-    background-position: 0 -64px;
-  }
+    &.inbox {
+      background-position: 0 -32px;
+    }
 
-  & .icon.flagged {
-    background-position: 0 -96px;
-  }
+    &.sent {
+      background-position: 0 -64px;
+    }
 
-  & .icon.compose {
-    background-position: 0 -128px;
-  }
+    &.flagged {
+      background-position: 0 -96px;
+    }
 
-  & .leftbar a {
-    display: block;
-    margin: 5px 10px;
+    &.compose {
+      background-position: 0 -128px;
+    }
   }
 
   & .error {
@@ -226,9 +229,7 @@ a {
 }
 
 #ucppage {
-  margin-left: 170px;
   padding: 20px;
-  min-height: 400px;
 
   & h2 {
     font-size: 2rem;

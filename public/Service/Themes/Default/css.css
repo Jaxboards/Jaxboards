@@ -111,11 +111,9 @@ textarea {
 
 /* User Control Panel */
 #ucp {
-  & .content {
-    background: var(--medium-blue);
-  }
-
   & .leftbar {
+    background: var(--medium-blue);
+
     & h2 {
       background: #ddf;
       border: 1px solid var(--white);
