@@ -1,10 +1,10 @@
 :root {
   /* Taken from https://github.com/system-fonts/modern-font-stacks */
   --neo-grotesque:
-    Inter, Roboto, "Helvetica Neue", "Arial Nova", "Nimbus Sans", Arial,
+    inter, roboto, "Helvetica Neue", "Arial Nova", "Nimbus Sans", arial,
     sans-serif;
   --monospace-code:
-    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
+    ui-monospace, "Cascadia Code", "Source Code Pro", menlo, consolas,
     "DejaVu Sans Mono", monospace;
 }
 
