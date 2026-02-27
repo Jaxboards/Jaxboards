@@ -163,7 +163,7 @@ a {
   border: 1px solid #000;
 }
 
-@media only screen and (min-width: 600px) {
+@media only screen and (width >= 600px) {
   .sidebar {
     box-shadow: #124 -5px 5px 5px;
     line-height: 20px;
@@ -174,9 +174,11 @@ a {
     float: left;
     border: 1px solid #000;
   }
+
   .right {
     margin-left: 200px;
   }
+
   .box {
     margin-left: 10px;
     margin-right: 10px;
@@ -274,7 +276,7 @@ a {
 }
 
 .box {
-  margin: 20px 0 0 0;
+  margin: 20px 0 0;
   border: 1px solid #000;
   box-shadow: #124 -5px 5px 5px;
 
