@@ -1,12 +1,14 @@
 <div class="contacts">
     {% for friend in friends %}
-        <a href="{{ url('profile', { id: friend.id }) }}" title="Contact">
+        <a
+            href="{{ url('profile', { id: friend.id }) }}"
+            class="user{{ friend.id }} mgroup{{ friend.groupID }} {{ friend.class }}"
+            title="Contact"
+        >
             <div class="contact">
-                <div class="avatar">
-                    {% include "avatar.html.twig" with { avatar: friend.avatar } %}
-                </div>
+                {% include "avatar.html.twig" with { avatar: friend.avatar } %}
                 <div class="name">
-                    {% include "user-link.html.twig" with { user: friend } only %}
+                    {{- friend.displayName -}}
                 </div>
             </div>
         </a>
