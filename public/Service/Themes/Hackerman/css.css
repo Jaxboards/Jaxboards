@@ -117,7 +117,6 @@ textarea {
 }
 
 #ucppage {
-  background: var(--black-bg-transparent);
   border-left: 1px solid var(--black);
 
   & h2 {
