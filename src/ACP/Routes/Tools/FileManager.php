@@ -50,7 +50,7 @@ final readonly class FileManager
                     $page .= $this->fileSystem->unlink($uploadFilePath)
                         ? $this->page->success('File deleted')
                         : $this->page->error("Error deleting file, maybe it's already been "
-                        . 'deleted? Removed from DB');
+                            . 'deleted? Removed from DB');
                 }
 
                 $file->delete();
@@ -103,7 +103,7 @@ final readonly class FileManager
             $fileURL = in_array($ext, Jax::IMAGE_EXTENSIONS, true)
                 ? $this->domainDefinitions->getBoardPathUrl()
                 . $this->fileSystem->pathJoin('/Uploads', "{$file->hash}.{$ext}")
-                : "../download?id={$file->id}";
+                : "/download?id={$file->id}";
 
             $table .= $this->page->render('tools/file-manager-row.html', [
                 'downloads' => $file->downloads,
