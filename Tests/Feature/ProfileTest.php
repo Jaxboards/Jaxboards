@@ -218,7 +218,7 @@ final class ProfileTest extends FeatureTestCase
 
         $page = $this->go('/profile/1/friends');
 
-        DOMAssert::assertSelectEquals('.contacts .contact .user1', 'Admin', 1, $page);
+        DOMAssert::assertSelectEquals('.contacts .user1 .name', 'Admin', 1, $page);
     }
 
     public function testViewUserProfileAbout(): void
