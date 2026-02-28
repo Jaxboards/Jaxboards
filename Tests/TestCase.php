@@ -92,7 +92,6 @@ abstract class TestCase extends PHPUnitTestCase
             'shoutbox_num' => 10,
             'timetoidle' => 300,
             'timetologout' => 900,
-            'usedisplayname' => 1,
             ...$config,
         ]));
     }
