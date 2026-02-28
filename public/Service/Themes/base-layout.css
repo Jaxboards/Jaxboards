@@ -536,39 +536,38 @@ a {
   & .leftbar {
     float: left;
     width: 200px;
-  }
 
-  & .leftbar .username {
-    padding: 0.5em;
-    font-weight: bold;
-  }
+    & .username {
+      padding: 0.5em;
+      font-weight: bold;
 
-  & .username .moderate {
-    visibility: visible;
-  }
-
-  & .leftbar .avatar {
-    margin-top: 20px;
-    text-align: center;
-  }
-
-  & .leftbar .usertitle {
-    font-size: 1rem;
-    margin: 1px;
-    text-align: center;
-  }
-
-  & .infobox {
-    margin: 20px 5px 10px;
-    padding: 5px;
-
-    & .content {
-      font-size: 1rem;
+      .moderate {
+        visibility: visible;
+      }
     }
 
-    & div {
+    & .avatar {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    & .usertitle {
       font-size: 1rem;
-      margin: 5px;
+      margin: 1px;
+      text-align: center;
+    }
+    & .infobox {
+      margin: 20px 5px 10px;
+      padding: 5px;
+
+      & .content {
+        font-size: 1rem;
+      }
+
+      & div {
+        font-size: 1rem;
+        margin: 5px;
+      }
     }
   }
 
