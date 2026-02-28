@@ -50,7 +50,7 @@ final readonly class FileManager
                     $page .= $this->fileSystem->unlink($uploadFilePath)
                         ? $this->page->success('File deleted')
                         : $this->page->error("Error deleting file, maybe it's already been "
-                            . 'deleted? Removed from DB');
+                        . 'deleted? Removed from DB');
                 }
 
                 $file->delete();
