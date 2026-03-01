@@ -47,9 +47,11 @@ export default class CollapseBox extends Component<HTMLDivElement> {
   }
 
   get isOpen() {
-    return !(globalThis.sessionStorage.getItem("collapsed") ?? "")
-      .split(",")
-      .includes(this.boxID);
+    return this.boxID
+      ? !(globalThis.sessionStorage.getItem("collapsed") ?? "")
+          .split(",")
+          .includes(this.boxID)
+      : true;
   }
 
   set isOpen(isOpen: boolean) {
