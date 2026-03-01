@@ -202,8 +202,8 @@ final class Post implements Route
             $modelsPost->author
             && (
                 $modelsPost->newtopic !== 0
-                ? $this->user->getGroup()?->canEditTopics
-                : $this->user->getGroup()?->canEditPosts
+                    ? $this->user->getGroup()?->canEditTopics
+                    : $this->user->getGroup()?->canEditPosts
             )
             && $modelsPost->author === $this->user->get()->id
         ) {
@@ -479,7 +479,9 @@ final class Post implements Route
             $this->page->command('closewindow', '#qreply');
 
             // Clear inline form if exists
-            $this->page->command('update', '#topic-reply .content', $this->template->render('topic/reply-form', ['topic' => $topic]));
+            $this->page->command('update', '#topic-reply .content', $this->template->render('topic/reply-form', [
+                'topic' => $topic,
+            ]));
 
             $this->page->command('refreshdata');
         } else {
