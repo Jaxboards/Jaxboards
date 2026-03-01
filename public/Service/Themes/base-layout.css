@@ -1686,42 +1686,42 @@ a {
   &.pm {
     background-position: 0 -224px;
   }
-}
 
-.skype {
-  background-position: 0 -32px;
-}
+  &.skype {
+    background-position: 0 -32px;
+  }
 
-.googlechat {
-  background-position: 0 -64px;
-}
+  &.googlechat {
+    background-position: 0 -64px;
+  }
 
-.aim {
-  background-position: 0 -96px;
-}
+  &.aim {
+    background-position: 0 -96px;
+  }
 
-.yim {
-  background-position: 0 -128px;
-}
+  &.yim {
+    background-position: 0 -128px;
+  }
 
-.steam {
-  background-position: 0 -160px;
-}
+  &.steam {
+    background-position: 0 -160px;
+  }
 
-.twitter {
-  background-position: 0 -192px;
-}
+  &.twitter {
+    background-position: 0 -192px;
+  }
 
-.discord {
-  background-position: 0 -256px;
-}
+  &.discord {
+    background-position: 0 -256px;
+  }
 
-.youtube {
-  background-position: 0 -298px;
-}
+  &.youtube {
+    background-position: 0 -298px;
+  }
 
-.bluesky {
-  background-position: 0 -320px;
+  &.bluesky {
+    background-position: 0 -320px;
+  }
 }
 
 /* Social icons */
