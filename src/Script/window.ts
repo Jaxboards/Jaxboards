@@ -103,6 +103,7 @@ class Window {
 
     new Drag()
       .autoZ()
+      .noChildActivation()
       .boundingBox(
         0,
         0,
@@ -111,7 +112,8 @@ class Window {
       )
       .apply(
         windowContainer,
-        windowContainer.querySelector<HTMLDivElement>(".title") || undefined,
+        windowContainer.querySelector<HTMLDivElement>(".titletext") ||
+          undefined,
       );
 
     return windowContainer;
