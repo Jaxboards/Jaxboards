@@ -148,7 +148,7 @@ a {
 
   & input[type="text"] {
     padding: 5px;
-    width: 95%;
+    width: calc(100% - 20px);
     border: none;
   }
 
