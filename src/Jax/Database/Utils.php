@@ -415,14 +415,14 @@ final readonly class Utils implements Adapter
         $topic->lastPostDate = $this->database->datetime();
         $topic->fid = 1;
         $topic->author = 1;
-        $topic->summary = " Now, it's only a matter of time";
+        $topic->summary = "Now, it's only a matter of time";
         $topic->op = 1;
         $topic->insert();
 
         $shout = new Shout();
         $shout->uid = 1;
         $shout->date = $this->database->datetime();
-        $shout->shout = 'Welcome to jaxboards!';
+        $shout->shout = '[url=/confetti]Welcome to jaxboards![/url]';
         $shout->insert();
     }
 }
