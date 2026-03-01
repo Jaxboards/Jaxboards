@@ -152,11 +152,11 @@ final class Topic implements Route
     {
         return (
             $memberIds !== []
-                ? Lodash::keyBy(
-                    Member::selectMany(Database::WHERE_ID_IN, array_unique($memberIds, SORT_REGULAR)),
-                    static fn(Member $member): int => $member->id,
-                )
-                : []
+            ? Lodash::keyBy(
+                Member::selectMany(Database::WHERE_ID_IN, array_unique($memberIds, SORT_REGULAR)),
+                static fn(Member $member): int => $member->id,
+            )
+            : []
         );
     }
 
@@ -187,7 +187,7 @@ final class Topic implements Route
                 'id' => $forum?->id,
                 'slug' => $this->textFormatting->slugify($forum?->title),
             ]) =>
-                $forum->title ?? '',
+            $forum->title ?? '',
             $this->router->url('topic', [
                 'id' => $modelsTopic->id,
                 'slug' => $this->textFormatting->slugify($modelsTopic->title),
@@ -229,7 +229,7 @@ final class Topic implements Route
             'content' => $this->postsIntoOutput($modelsTopic),
             'canCreateTopic' => $forumPerms['start'],
             'canReply' =>
-                $forumPerms['reply'] && (!$modelsTopic->locked || $this->user->getGroup()?->canOverrideLockedTopics),
+            $forumPerms['reply'] && (!$modelsTopic->locked || $this->user->getGroup()?->canOverrideLockedTopics),
             'pages' => $pagelist,
             'poll' => $poll,
             'usersInTopic' => $usersInTopic,
@@ -362,6 +362,7 @@ final class Topic implements Route
             'content' => $this->template->render('topic/reply-form', [
                 'topic' => $modelsTopic,
                 'text' => $prefilled,
+                'width' => 390,
             ]),
             'id' => 'qreply',
             'resize' => '.quickreply',

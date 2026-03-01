@@ -37,6 +37,8 @@
     </div>
 </div>
 
+{% include "topic/inline-reply-form.html.twig" with { topic } %}
+
 {% include "topic/users-online.html.twig" with { users: usersInTopic } %}
 
 <div class="pages-bottom pages">

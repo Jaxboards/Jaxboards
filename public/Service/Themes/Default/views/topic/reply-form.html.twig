@@ -2,7 +2,7 @@
     <form method="post" action="{{ url('post') }}" data-ajax-form="true">
         <input type="hidden" name="how" value="qreply">
         <input type="hidden" name="tid" value="{{ topic.id }}">
-        <div class="quickreply" style="width:390px">
+        <div class="quickreply" style="{% if width %}width:{{ width }}px{% endif %}">
             <textarea name="postdata" title="Post Text" class="bbcode-editor" autofocus>{{ text }}</textarea>
         </div>
         <div class="submitbutton">
