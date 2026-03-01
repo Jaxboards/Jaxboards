@@ -3,7 +3,7 @@
 import { animate, dehighlight } from "../animation";
 import { addIdleClock } from "../components/idle-clock";
 import { getCoordinates } from "../dom";
-import createSnow from "../eggs/snow";
+import createSnow, { stopSnow } from "../eggs/snow";
 import gracefulDegrade from "../graceful-degrade";
 import { messageReceived } from "../instant-messaging-window";
 import Sound from "../sound";
@@ -239,6 +239,7 @@ export default {
   },
   confetti(count: number) {
     createSnow(count, true);
+    setTimeout(stopSnow, 20_000);
   },
   setoffline(userIds: string) {
     const statusers = document.querySelector<HTMLSpanElement>("#statusers");

@@ -115,6 +115,11 @@ function generateSnowCSS(snowDensity = 200, useColors = false) {
   addCSS(rule);
 }
 
+export function stopSnow() {
+  document.querySelector("#snow")?.remove();
+  document.querySelector("#snow-css")?.remove();
+}
+
 // Load the rules and execute after the DOM loads
 export default function createSnow(snowflakesCount = 200, useColors = false) {
   generateSnowCSS(snowflakesCount, useColors);
