@@ -1676,7 +1676,7 @@ a {
 .contact {
   background: url("/Service/Themes/Default/icons/contact.png") no-repeat;
   padding-left: 20px;
-  min-height: 16px;
+  line-height: 16px;
 
   &:hover {
     text-decoration: none;
