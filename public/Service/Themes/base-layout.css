@@ -185,10 +185,12 @@ a {
 
   .content {
     display: flex;
+    flex-wrap: wrap;
   }
 
   & .leftbar {
     min-width: 170px;
+    flex: 1;
 
     & a {
       display: block;
@@ -235,8 +237,9 @@ a {
 }
 
 #ucppage {
-  flex: 1;
+  flex: 4;
   padding: 20px;
+  min-width: 300px;
 
   & h2 {
     font-size: 2rem;
