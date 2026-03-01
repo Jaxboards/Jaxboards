@@ -31,6 +31,7 @@ body {
     display: block;
     text-align: left;
     overflow: hidden;
+    line-height: 0;
 
     & a {
       background: url("wysiwygbar.png");
