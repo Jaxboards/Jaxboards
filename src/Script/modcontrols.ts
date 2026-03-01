@@ -58,7 +58,7 @@ export default class ModControls {
                 value="moveto">
             <input type="hidden" name="id" value="${id}">
             <input type="submit" value="Yes">
-            <input type="submit" name="cancel" value="Cancel" onclick="this.form.submitButton=this">
+            <input type="submit" name="cancel" value="Cancel">
             </form>`,
     );
   }
@@ -131,9 +131,7 @@ export default class ModControls {
             ${postOptions}
             ${spacing}
             <input type="submit" value="Go">
-            <input
-                name="cancel" type="submit"
-                onclick="this.form.submitButton=this;" value="Cancel">
+            <input name="cancel" type="submit" value="Cancel">
         </form>`;
 
     this.renderModControls(html);

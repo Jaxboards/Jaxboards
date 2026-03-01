@@ -3,7 +3,7 @@
 import register, { Component } from "../component";
 
 export type HTMLFormWithSubmit = HTMLFormElement & {
-  submitButton: HTMLButtonElement;
+  submitButton: HTMLButtonElement | HTMLInputElement;
 };
 
 export default class Form extends Component<HTMLFormWithSubmit> {
@@ -20,6 +20,20 @@ export default class Form extends Component<HTMLFormWithSubmit> {
   constructor(element: HTMLFormWithSubmit) {
     super(element);
     this.resetOnSubmit = element.dataset.ajaxForm === "resetOnSubmit";
+    element.addEventListener("click", (event) => {
+      const { target } = event;
+      if (
+        !(
+          target instanceof HTMLInputElement ||
+          target instanceof HTMLButtonElement
+        ) ||
+        target.type !== "submit"
+      ) {
+        return;
+      }
+
+      element.submitButton = target;
+    });
     element.addEventListener("submit", (event) => {
       event.preventDefault();
       this.submitForm();
