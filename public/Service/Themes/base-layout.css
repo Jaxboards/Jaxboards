@@ -85,7 +85,6 @@ a {
     }
 
     & .controls {
-      cursor: pointer;
       font-size: smaller;
 
       & div {
