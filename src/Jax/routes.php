@@ -13,6 +13,7 @@ use Jax\Routes\Confetti;
 use Jax\Routes\Contacts;
 use Jax\Routes\Download;
 use Jax\Routes\Earthbound;
+use Jax\Routes\Fatality;
 use Jax\Routes\Forum;
 use Jax\Routes\Katamari;
 use Jax\Routes\LogReg;
@@ -42,6 +43,7 @@ function routes(Router $router): void
     $router->get('category', '/', BoardIndex::class);
     $router->get('contacts', '/contacts', Contacts::class);
     $router->get('download', '/download', Download::class);
+    $router->get('fatality', '/fatality', Fatality::class);
     $router->get('index', '/', BoardIndex::class);
     $router->get('members', '/members', Members::class);
     $router->get('modcontrols', '/modcontrols/{do}', ModControls::class);
