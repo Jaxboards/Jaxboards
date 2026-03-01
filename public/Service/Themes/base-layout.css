@@ -69,22 +69,29 @@ a {
   position: fixed;
 
   & .title {
-    padding: 5px 20px;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
     cursor: move;
     text-align: center;
     border-radius: 10px 10px 0 0;
-  }
 
-  & .title .controls {
-    cursor: pointer;
-    position: absolute;
-    top: 4px;
-    right: 2px;
-    font-size: smaller;
+    & .titletext {
+      flex: 1;
+      max-width: 600px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
 
-    & div {
-      display: inline-block;
-      padding: 0 5px;
+    & .controls {
+      cursor: pointer;
+      font-size: smaller;
+
+      & div {
+        display: inline-block;
+        padding: 0 5px;
+      }
     }
   }
 

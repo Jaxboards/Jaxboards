@@ -58,7 +58,7 @@ class Window {
     const windowContainer = toDOM<HTMLDivElement>(`
       <div id="${this.id || ""}" class="window ${this.className}">
         <div class="title">
-          ${this.title}
+          <span class="titletext">${this.title}</span>
           <div class="controls">
             ${this.minimizable ? `<button data-action="minimize">-</button>` : ""}
             <button data-action="close" data-shortcut="Escape">X</button>
@@ -103,7 +103,6 @@ class Window {
 
     new Drag()
       .autoZ()
-      .noChildActivation()
       .boundingBox(
         0,
         0,
