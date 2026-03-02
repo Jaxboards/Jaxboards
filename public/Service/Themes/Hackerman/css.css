@@ -532,12 +532,8 @@ textarea {
     border: 1px solid var(--black);
   }
 
-  & table {
-    background: var(--purple);
-  }
-
   & .bar {
-    background: linear-gradient(0deg, var(--black), #111);
+    background: var(--heading);
   }
 }
 

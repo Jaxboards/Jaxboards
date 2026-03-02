@@ -625,7 +625,7 @@ textarea {
   }
 
   & .bar {
-    background: url("img/pollbar1.png");
+    background: linear-gradient(to bottom, #5180e1, #355d7b);
     border: 1px solid #1234b4;
   }
 }
