@@ -6,15 +6,11 @@ import Stream from "./RUN/stream";
 import Sound from "./sound";
 import { onDOMReady, supportsEmoji, updateDates } from "./util";
 
-const useJSLinks = 2;
-
 export class AppState {
   stream: Stream = new Stream();
 
   onAppReady() {
-    if (useJSLinks) {
-      gracefulDegrade(document.documentElement);
-    }
+    gracefulDegrade(document.documentElement);
 
     // Add snow for Christmas
     const today = new Date();
