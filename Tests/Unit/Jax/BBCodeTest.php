@@ -146,7 +146,9 @@ final class BBCodeTest extends UnitTestCase
                 '<a href="https://example.com">https://example.com</a>',
             ],
             [
-                '[url]https://example.com[/url]',
+                '[url]
+                    https://example.com
+                [/url]',
                 '<a href="https://example.com">https://example.com</a>',
             ],
             [
@@ -154,8 +156,12 @@ final class BBCodeTest extends UnitTestCase
                 '<a href="https://example.com">Example</a>',
             ],
             [
-                '[url=https://example.com]Example[/url]',
-                '<a href="https://example.com">Example</a>',
+                '[url=https://example.com]
+                    Example
+                [/url]',
+                '<a href="https://example.com">
+                    Example
+                </a>',
             ],
             [
                 '[url=/katamari]Katamari[/url]',
