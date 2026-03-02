@@ -88,12 +88,10 @@ final class BBCode
     public function getURLs(string $text): array
     {
         $urls = [];
-        foreach (
-            [
-                $this->inlineBBCodes['url'],
-                $this->inlineBBCodes['urlWithLink'],
-            ] as $regex
-        ) {
+        foreach ([
+            $this->inlineBBCodes['url'],
+            $this->inlineBBCodes['urlWithLink'],
+        ] as $regex) {
             preg_match_all($regex, $text, $matches);
             $urls = array_merge($matches['url'], $urls);
         }
@@ -255,14 +253,14 @@ final class BBCode
             'italic' => '*$1*',
             'list' => '$2',
             'quote' => static fn(array $match) => '> '
-                . str_replace(
-                    [
-                        "\r\n",
-                        "\n",
-                    ],
-                    PHP_EOL . '> ',
-                    $match[2],
-                ),
+            . str_replace(
+                [
+                    "\r\n",
+                    "\n",
+                ],
+                PHP_EOL . '> ',
+                $match[2],
+            ),
             'size' => '$3',
             'spoiler' => '||$1||',
             'strikethrough' => '~~$2~~',
