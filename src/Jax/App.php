@@ -48,7 +48,7 @@ final readonly class App
 
     public function render(): string
     {
-        header('Cache-Control: no-cache, must-revalidate');
+        header('Cache-Control: no-store, must-revalidate');
 
         if (!$this->config->hasInstalled()) {
             $this->router->redirect('./Service/install.php');
@@ -188,9 +188,9 @@ final readonly class App
         $this->page->append(
             'SCRIPT',
             '<script src="'
-            . $this->router->getRootURL()
-            . "/assets/app.js?{$timestamp}\" defer></script>"
-            . '<script src="https://kit.fontawesome.com/69affb3f61.js" crossorigin="anonymous"></script>',
+                . $this->router->getRootURL()
+                . "/assets/app.js?{$timestamp}\" defer></script>"
+                . '<script src="https://kit.fontawesome.com/69affb3f61.js" crossorigin="anonymous"></script>',
         );
 
         $this->page->append('LOGO', $this->template->render('global/logo', [
@@ -253,11 +253,11 @@ final readonly class App
         $this->page->append(
             'FOOTER',
             '<div class="footer">'
-            . "<a href=\"https://jaxboards.upgraded.click\">Jaxboards</a> {$version}! "
-            // Removed the defunct URL
-            . '&copy; 2007-'
-            . gmdate('Y')
-            . '</div>',
+                . "<a href=\"https://jaxboards.upgraded.click\">Jaxboards</a> {$version}! "
+                // Removed the defunct URL
+                . '&copy; 2007-'
+                . gmdate('Y')
+                . '</div>',
         );
     }
 
