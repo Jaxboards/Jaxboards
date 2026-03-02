@@ -3,10 +3,16 @@ import Commands from "./commands";
 
 const UPDATE_INTERVAL = 5000;
 
+enum RequestType {
+  UPDATING = 1,
+  ACTING = 2,
+  DIRECTLINK = 3,
+}
+
 export default class Stream {
   private readonly commands: typeof Commands;
 
-  private timeout?: number;
+  private timeout?: ReturnType<typeof setTimeout>;
 
   constructor() {
     this.commands = Commands;
@@ -16,8 +22,12 @@ export default class Stream {
     return `${document.location.pathname}${document.location.search}`;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  handleRequestData(url: string, cmds: any[], requestType = 1) {
+  handleRequestData(
+    url: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    cmds: any[],
+    requestType = RequestType.UPDATING,
+  ) {
     let preventNavigation = false;
     cmds.forEach(([cmd, ...args]: [string, ...unknown[]]) => {
       if (cmd === "preventNavigation") {
@@ -28,7 +38,7 @@ export default class Stream {
       }
     });
 
-    if (requestType >= 2) {
+    if (requestType >= RequestType.UPDATING) {
       if (!preventNavigation && url !== this.currentURL) {
         globalThis.history.pushState({ lastURL: url }, "", url);
         // pushstate is not a real browser event unfortunately, so I have to trigger it myself
@@ -38,7 +48,7 @@ export default class Stream {
     this.pollData();
   }
 
-  location(path: string, requestType = 2) {
+  location(path: string, requestType = RequestType.ACTING) {
     void this.load(path, { requestType });
   }
 
@@ -47,7 +57,7 @@ export default class Stream {
     {
       body,
       method = "POST",
-      requestType = 1,
+      requestType = RequestType.UPDATING,
     }: {
       body?: URLSearchParams;
       method?: string;
@@ -74,6 +84,11 @@ export default class Stream {
         "An unrecoverable error has occurred.<br>Please try again later.",
       );
     } catch (_) {
+      // don't show errors for no-user-action update requests
+      if (requestType === RequestType.UPDATING) {
+        return;
+      }
+
       if (!navigator.onLine) {
         toast.error("You appear to be offline.");
       } else {
@@ -96,6 +111,6 @@ export default class Stream {
   }
 
   updatePage() {
-    this.location(this.currentURL, 3);
+    this.location(this.currentURL, RequestType.DIRECTLINK);
   }
 }
