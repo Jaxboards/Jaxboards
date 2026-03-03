@@ -449,12 +449,12 @@ a {
   font-style: italic;
 }
 
-.sbhistory .shout .delete {
-  margin-right: 10px;
-}
-
 .sbhistory {
   padding: 10px;
+
+  & .shout .delete {
+    margin-left: 10px;
+  }
 }
 
 /* Contacts List */
@@ -652,20 +652,6 @@ a {
         max-width: 50px;
         max-height: 50px;
       }
-    }
-  }
-}
-
-@media only screen and (width <= 600px) {
-  .userprofile {
-    & .leftbar {
-      width: auto;
-      float: none;
-      margin-bottom: 10px;
-    }
-
-    & .rightbar {
-      margin: 0;
     }
   }
 }
@@ -1800,5 +1786,35 @@ a {
   & label {
     margin: 10px;
     display: inline-block;
+  }
+}
+
+/* Small screen (mobile) overrides */
+@media only screen and (width <=600px) {
+  .userprofile {
+    & .leftbar {
+      width: auto;
+      float: none;
+      margin-bottom: 10px;
+    }
+
+    & .rightbar {
+      margin: 0;
+    }
+  }
+
+  #intopic {
+    .userdata {
+      width: 100px;
+
+      .avatar img {
+        max-width: 100px;
+        max-height: 100px;
+      }
+    }
+
+    .userstats {
+      margin: 0;
+    }
   }
 }
