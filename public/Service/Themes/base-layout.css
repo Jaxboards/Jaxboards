@@ -1237,6 +1237,12 @@ a {
   float: right;
 }
 
+#topic-reply {
+  .content {
+    padding: 10px;
+  }
+}
+
 .topic-reply-form textarea {
   width: 100%;
   height: 200px;
