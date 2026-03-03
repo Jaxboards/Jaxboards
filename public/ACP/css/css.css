@@ -283,7 +283,7 @@ a {
   margin: 20px 0 0;
   border: 1px solid #000;
   box-shadow: #124 -5px 5px 5px;
-  background: url("../img/acp-box-content.png") top repeat-x #e2e2e2;
+  background: #e2e2e2;
 
   & .header {
     background: linear-gradient(#1b63b6, #192c44);
