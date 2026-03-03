@@ -157,17 +157,15 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     }
 
     const cs = getComputedStyle(element);
-    if (cs) {
-      this.doc.head.append(
-        Object.assign(this.doc.createElement("style"), {
-          textContent: `body {
-            font-family: ${cs.fontFamily};
-            background-color: ${cs.backgroundColor};
-            color: ${cs.color};
-          }`,
-        }),
-      );
-    }
+    this.doc.head.append(
+      Object.assign(this.doc.createElement("style"), {
+        textContent: `body {
+          font-family: ${cs.fontFamily};
+          background-color: ${cs.backgroundColor};
+          color: ${cs.color};
+        }`,
+      }),
+    );
 
     this.doc.designMode = "on";
 
