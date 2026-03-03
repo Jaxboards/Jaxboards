@@ -62,6 +62,11 @@ final class Nav
         private readonly Request $request,
     ) {}
 
+    public function getCategories()
+    {
+        return $this->categories;
+    }
+
     public function render(): void
     {
         $this->page->append('nav', $this->page->render('nav.html', [

@@ -1,0 +1,16 @@
+<div style="padding:10px;display:grid;grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));gap: 10px;">
+  {% include "content-box.html.twig" with {
+      title: 'Welcome to the ACP!',
+      content: 'Here you\'l find everything you need to manage and customize your forum. You can navigate using the dropdown above, or the links below.',
+      class: 'full-row'
+  } %}
+  {% for category, links in categories %}
+    {% include "content-box.html.twig" with {
+      title: category,
+      content: include('sidebar-links.html.twig', {
+        'category': category,
+        'menu': links,
+      })
+    } %}
+  {% endfor %}
+</div>

@@ -1,10 +1,4 @@
 <div class="sidebar">
   <a href="?" class="icons home" title="ACP Home">ACP Home</a>
-  <ul>
-    {% for do, title in menu %}
-      <li>
-        <a href="/ACP/{{ category }}/{{ do }}">{{ title }}</a>
-      </li>
-    {% endfor %}
-  </ul>
+  {% include "sidebar-links.html.twig" with { category, menu } %}
 </div>
