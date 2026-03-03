@@ -9,12 +9,14 @@
   --background-color: #fff;
   --text-color: #000;
   --link-color: #00f;
+  --input-background-color: #fff;
 }
 
 /* dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
     --background-color: #1b1f23;
+    --input-background-color: #24292e;
     --text-color: #fff;
     --link-color: #71b7fb;
   }
@@ -61,6 +63,8 @@ input[type="text"] {
 input[type="text"],
 textarea,
 select {
+  background: var(--input-background-color);
+  color: var(--text-color);
   border: 1px solid #aad;
 }
 
