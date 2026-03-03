@@ -62,7 +62,7 @@ final class Nav
         private readonly Request $request,
     ) {}
 
-    public function getCategories()
+    public function getCategories(): array
     {
         return $this->categories;
     }

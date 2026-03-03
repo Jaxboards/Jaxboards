@@ -18,7 +18,7 @@ final readonly class Index implements Route
     public function route(array $params): void
     {
         $this->page->append('sidebar', $this->page->render('index', [
-            'categories' => $this->nav->getCategories()
+            'categories' => $this->nav->getCategories(),
         ]));
     }
 }
