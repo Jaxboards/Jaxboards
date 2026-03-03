@@ -6,6 +6,18 @@
   --monospace-code:
     ui-monospace, "Cascadia Code", "Source Code Pro", menlo, consolas,
     "DejaVu Sans Mono", monospace;
+  --background-color: #fff;
+  --text-color: #000;
+  --link-color: #00f;
+}
+
+/* dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #111;
+    --text-color: #fff;
+    --link-color: #55f;
+  }
 }
 
 html {
@@ -14,6 +26,7 @@ html {
 }
 
 body {
+  color: var(--text-color);
   margin: 0;
   padding: 0;
   font-size: 1.2rem;
@@ -58,10 +71,10 @@ label {
 }
 
 a {
-  color: #00f;
+  color: var(--link-color);
 
   &:visited {
-    color: #00f;
+    color: var(--link-color);
   }
 }
 
@@ -160,7 +173,7 @@ a {
 
 .sidebar {
   box-shadow: #124 -5px 5px 5px;
-  background-color: #eee;
+  background-color: var(--background-color);
   margin: 20px 0;
   line-height: 20px;
   padding: 10px;
@@ -174,7 +187,8 @@ a {
     padding: 10px;
     margin: 40px 10px;
     width: 169px;
-    background: url("../img/acp-sidebar.png") right repeat-y #eee;
+    background: linear-gradient(to left, #222 0%, var(--background-color) 20%)
+      right repeat-y #eee;
     float: left;
     border: 1px solid #000;
   }
@@ -247,7 +261,7 @@ a {
   .sticky-heading {
     padding-left: 150px;
     width: 100%;
-    background: #fff;
+    background: var(--background-color);
     position: sticky;
     top: 0;
   }
@@ -283,7 +297,7 @@ a {
   margin: 20px 0 0;
   border: 1px solid #000;
   box-shadow: #124 -5px 5px 5px;
-  background: #fff;
+  background: var(--background-color);
 
   & .header {
     background: linear-gradient(#1b63b6, #192c44);
