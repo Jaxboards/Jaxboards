@@ -164,6 +164,8 @@ export default class Editor extends Component<HTMLTextAreaElement> {
           font-family: ${cs.fontFamily};
           background-color: ${cs.backgroundColor};
           color: ${cs.color};
+          margin: 0;
+          padding: ${cs.padding};
         }`,
       }),
     );
