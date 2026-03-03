@@ -157,11 +157,16 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     }
 
     const cs = getComputedStyle(element);
-    const body = this.doc.getElementsByTagName("body")[0];
-    if (body && cs) {
-      body.style.backgroundColor = cs.backgroundColor;
-      body.style.color = cs.color;
-      body.style.borderColor = "#FFF";
+    if (cs) {
+      this.doc.head.append(
+        Object.assign(this.doc.createElement("style"), {
+          textContent: `body {
+            font-family: ${cs.fontFamily};
+            background-color: ${cs.backgroundColor};
+            color: ${cs.color};
+          }`,
+        }),
+      );
     }
 
     this.doc.designMode = "on";

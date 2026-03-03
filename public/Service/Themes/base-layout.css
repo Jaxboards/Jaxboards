@@ -31,6 +31,10 @@ img {
   }
 }
 
+textarea {
+  font: inherit;
+}
+
 /* Member/Group Specific */
 a {
   &.birthday::before {
