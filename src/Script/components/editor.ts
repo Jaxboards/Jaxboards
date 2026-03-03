@@ -157,7 +157,10 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     }
 
     const cs = getComputedStyle(element);
-    this.iframe.style.border = cs.border;
+    Object.assign(this.iframe.style, {
+      border: cs.border,
+      margin: cs.margin,
+    });
     this.doc.head.append(
       Object.assign(this.doc.createElement("style"), {
         textContent: `body {
