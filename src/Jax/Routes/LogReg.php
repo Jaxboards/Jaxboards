@@ -23,7 +23,6 @@ use Jax\User;
 use Override;
 use SensitiveParameter;
 
-use function base64_encode;
 use function curl_exec;
 use function curl_init;
 use function curl_setopt;
@@ -32,7 +31,6 @@ use function http_build_query;
 use function is_string;
 use function json_decode;
 use function mb_strlen;
-use function openssl_random_pseudo_bytes;
 use function password_hash;
 use function preg_match;
 use function rawurlencode;
