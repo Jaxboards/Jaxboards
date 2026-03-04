@@ -32,114 +32,117 @@ body {
     text-align: left;
     overflow: hidden;
     line-height: 0;
+    padding-left: 1px;
 
     & a {
       background: url("wysiwygbar.png");
       height: 24px;
       display: inline-block;
       cursor: pointer;
-    }
+      margin-left: -1px;
 
-    & a:hover {
-      background-position-y: -24px;
+      &:hover {
+        background-position-y: -24px;
+      }
     }
 
     & .fontface {
       vertical-align: top;
       height: 24px;
+      margin-left: -1px;
     }
 
     & .bold {
-      width: 32px;
+      width: 33px;
     }
 
     & .italic {
-      width: 33px;
+      width: 34px;
       background-position: -32px 0;
     }
 
     & .underline {
-      width: 35px;
+      width: 36px;
       background-position: -65px 0;
     }
 
     & .strikethrough {
-      width: 30px;
+      width: 31px;
       background-position: -100px 0;
     }
 
     & .forecolor {
-      width: 31px;
+      width: 32px;
       background-position: -130px 0;
     }
 
     & .backcolor {
-      width: 32px;
+      width: 33px;
       background-position: -161px 0;
     }
 
     & .insertimage {
-      width: 29px;
+      width: 30px;
       background-position: -193px 0;
     }
 
     & .createlink {
-      width: 28px;
+      width: 29px;
       background-position: -222px 0;
     }
 
     & .c_email {
-      width: 27px;
+      width: 28px;
       background-position: -250px 0;
     }
 
     & .justifyleft {
-      width: 26px;
+      width: 27px;
       background-position: -277px 0;
     }
 
     & .justifycenter {
-      width: 27px;
+      width: 28px;
       background-position: -303px 0;
     }
 
     & .justifyright {
-      width: 26px;
+      width: 27px;
       background-position: -330px 0;
     }
 
     & .c_youtube {
-      width: 28px;
+      width: 29px;
       background-position: -356px 0;
     }
 
     & .c_code {
-      width: 26px;
+      width: 27px;
       background-position: -384px 0;
     }
 
     & .c_quote {
-      width: 25px;
+      width: 26px;
       background-position: -410px 0;
     }
 
     & .c_spoiler {
-      width: 29px;
+      width: 30px;
       background-position: -435px 0;
     }
 
     & .insertorderedlist {
-      width: 28px;
+      width: 29px;
       background-position: -464px 0;
     }
 
     & .insertunorderedlist {
-      width: 28px;
+      width: 29px;
       background-position: -492px 0;
     }
 
     & .c_smileys {
-      width: 29px;
+      width: 30px;
       background-position: -520px 0;
     }
 
