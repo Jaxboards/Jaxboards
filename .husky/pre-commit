@@ -1,4 +1,5 @@
 # Perform syntax/semantic check to make sure PHP is compilable
 composer lint -- -s &&
 bun format &&
-composer format
+composer format &&
+git diff --name-only --staged | xargs git add .
