@@ -57,8 +57,8 @@ final class WebhooksTest extends UnitTestCase
             ->method('setOpt')
             ->willReturnCallback(function (int $option, mixed $value): void {
                 match ($option) {
-                    CURLOPT_CUSTOMREQUEST => $this->assertEquals($value, 'POST'),
-                    CURLOPT_POSTFIELDS => $this->assertEquals($value, json_encode([
+                    CURLOPT_CUSTOMREQUEST => $this->assertEquals('POST', $value),
+                    CURLOPT_POSTFIELDS => $this->assertEquals(json_encode([
                         'username' => 'Sean',
                         'avatar_url' => 'avatar url',
                         'content' => <<<'MARKDOWN'
@@ -66,8 +66,8 @@ final class WebhooksTest extends UnitTestCase
 
                             post content
                             MARKDOWN,
-                    ])),
-                    CURLOPT_RETURNTRANSFER => $this->assertEquals($value, true),
+                    ]), $value),
+                    CURLOPT_RETURNTRANSFER => $this->assertEquals(true, $value),
                 };
             });
 

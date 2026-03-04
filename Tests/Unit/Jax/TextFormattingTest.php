@@ -121,16 +121,16 @@ final class TextFormattingTest extends UnitTestCase
     public function testTextOnly(): void
     {
         static::assertSame(
-            $this->textFormatting->textOnly('[b][i][u][quote=Sean]content[/quote][/u][/i][/b]'),
             'content',
+            $this->textFormatting->textOnly('[b][i][u][quote=Sean]content[/quote][/u][/i][/b]'),
         );
     }
 
     public function testVideoify(): void
     {
         static::assertSame(
-            $this->textFormatting->videoify('check out this video https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
             'check out this video [video]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/video]',
+            $this->textFormatting->videoify('check out this video https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
         );
     }
 }

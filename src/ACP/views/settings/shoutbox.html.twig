@@ -2,13 +2,26 @@
   <label for="sbe">
     Shoutbox enabled:
   </label>
-  <input {{ shoutbox_checked }} id="sbe" type="checkbox" name="sbe" class="switch yn" title="Shoutbox Enabled Toggle">
+  <input
+    id="sbe"
+    type="checkbox"
+    name="sbe"
+    class="switch yn"
+    title="Shoutbox Enabled Toggle"
+    {% if shoutbox %}checked{% endif %}
+  >
   <br>
   <label for="sbava">
     Shoutbox avatars:
   </label>
-  <input {{ shoutbox_avatar_checked }} type="checkbox" id="sbava" name="sbava" class="switch yn"
-    title="Shoutbox Avatars Toggle">
+  <input
+    type="checkbox"
+    id="sbava"
+    name="sbava"
+    class="switch yn"
+    title="Shoutbox Avatars Toggle"
+    {% if shoutboxava %}checked{% endif %}
+  >
   <br>
   <label for="sbnum">
     Shouts to show:

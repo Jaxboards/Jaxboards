@@ -19,9 +19,20 @@
     {{ delete }}
   </td>
   <td>
-    <input {{ hidden_checked }} name="hidden[{{ id }}]" type="checkbox" class="switch yn" />
+    <input
+      name="hidden[{{ id }}]"
+      type="checkbox"
+      class="switch yn"
+      {% if skin.hidden %}checked{% endif %}
+    >
   </td>
   <td>
-    <input {{ default_checked }} type="radio" name="default" title="Set as default skin" value="{{ id }}">
+    <input
+      type="radio"
+      name="default"
+      title="Set as default skin"
+      value="{{ id }}"
+      {% if skin.default %}checked{% endif %}
+    >
   </td>
 </tr>

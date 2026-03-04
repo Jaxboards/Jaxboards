@@ -1,1 +1,7 @@
-<input name="groups[{{ id }}][{{ name }}]" {{ checked }} {{ global }} type="checkbox" class="switch yn">
+<input
+  name="groups[{{ id }}][{{ name }}]"
+  {% if checked %}checked{% endif %}
+  {% if global %}onchange="globaltoggle(this.parentNode.parentNode,this.checked);"{% endif %}
+  type="checkbox"
+  class="switch yn"
+>

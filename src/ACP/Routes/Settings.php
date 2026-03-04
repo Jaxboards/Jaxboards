@@ -94,12 +94,12 @@ final readonly class Settings implements Route
         );
 
         $this->page->addContentBox('Board Online/Offline', $this->page->render('settings/boardname-board-offline.html', [
-            'board_offline_checked' => $this->page->checked(!$this->config->getSetting('boardoffline')),
-            'board_offline_text' => $this->textFormatting->blockhtml($this->config->getSetting('offlinetext') ?? ''),
+            'boardoffline' => $this->config->getSetting('boardoffline'),
+            'offlinetext' => $this->config->getSetting('offlinetext'),
         ]));
 
         $this->page->addContentBox('Birthdays', $this->page->render('settings/birthday.html', [
-            'checked' => $this->page->checked($this->config->getSetting('birthdays') !== 0),
+            'birthdays' => $this->config->getSetting('birthdays'),
         ]));
 
         $this->page->addContentBox('HCaptcha Setup', $this->page->render('settings/hcaptcha.html', [
@@ -215,8 +215,8 @@ final readonly class Settings implements Route
         }
 
         $page .= $this->page->render('settings/shoutbox.html', [
-            'shoutbox_avatar_checked' => $this->page->checked((bool) $this->config->getSetting('shoutboxava')),
-            'shoutbox_checked' => $this->page->checked((bool) $this->config->getSetting('shoutbox')),
+            'shoutboxava' => $this->config->getSetting('shoutboxava'),
+            'shoutbox' => $this->config->getSetting('shoutbox'),
             'show_shouts' => $this->config->getSetting('shoutbox_num'),
         ]);
         $this->page->addContentBox('Shoutbox', $page);

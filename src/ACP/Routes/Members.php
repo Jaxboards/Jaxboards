@@ -515,7 +515,7 @@ final readonly class Members implements Route
         }
 
         $page = $this->page->render('members/validation.html', [
-            'checked' => $this->page->checked((bool) $this->config->getSetting('membervalidation')),
+            'membervalidation' => $this->config->getSetting('membervalidation'),
         ]);
         $this->page->addContentBox('Enable Member Validation', $page);
 

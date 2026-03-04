@@ -1,6 +1,11 @@
 <label>
     Show Birthday Icon
-    <input {{ checked }} type="checkbox" class="switch yn" name="bicon">
+    <input
+      type="checkbox"
+      class="switch yn"
+      name="bicon"
+      {% if birthdays %}checked{% endif %}
+    >
 </label>
 <br>
 <input type="submit" value="Save" name="submit">

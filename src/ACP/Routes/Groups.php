@@ -245,7 +245,7 @@ final class Groups implements Route
                 $groupColumns = '';
                 foreach ($groups as $groupId => $group) {
                     $groupColumns .= $this->page->render('groups/show-permissions-permission-row-group-column.html', [
-                        'checked' => $this->page->checked((bool) $group->{$field}),
+                        'checked' => (bool) $group->{$field},
                         'groupID' => $groupId,
                         'permission' => $field,
                     ]);

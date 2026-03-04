@@ -355,12 +355,12 @@ final class Forums implements Route
 
         $page .= $this->page->render('forums/create-forum.html', [
             'description' => $forum ? $this->textFormatting->blockhtml($forum->subtitle) : '',
-            'count' => $this->page->checked(!$forum?->nocount),
+            'count' => !$forum?->nocount,
             'order_by_options' => $orderByOptions,
             'redirect_url' => $forum ? $this->textFormatting->blockhtml($forum->redirect) : '',
             'subforum_options' => $subforumOptions,
             'title' => $forum ? $this->textFormatting->blockhtml($forum->title) : '',
-            'trashcan' => $this->page->checked((bool) $forum?->trashcan),
+            'trashcan' => $forum?->trashcan,
         ]);
 
         if ($forum?->mods) {
@@ -378,7 +378,7 @@ final class Forums implements Route
 
         $moderators = $this->page->render('forums/create-forum-moderators.html', [
             'mod_list' => $modList,
-            'showLedBy' => $this->page->checked((bool) $forum?->showLedBy),
+            'showLedBy' => $forum?->showLedBy,
         ]);
 
         $forumperms = $this->page->render('forums/create-forum-permissions.html', [
@@ -713,8 +713,8 @@ final class Forums implements Route
     private function checkbox(int|string $checkId, string $name, bool|int $checked): string
     {
         return $this->page->render('forums/create-forum-permissions-row-checkbox.html', [
-            'checked' => $this->page->checked((bool) $checked),
-            'global' => $name === 'global' ? 'onchange="globaltoggle(this.parentNode.parentNode,this.checked);"' : '',
+            'checked' => (bool) $checked,
+            'global' => $name === 'global',
             'id' => $checkId,
             'name' => $name,
         ]);

@@ -293,8 +293,9 @@ final readonly class Themes implements Route
             }
 
             $skinsHTML .= $this->page->render('themes/show-skin-index-css-row.html', [
+                'skin' => $skin,
                 'custom' => $skin->custom ? $this->page->render('themes/show-skin-index-css-row-custom.html') : '',
-                'default_checked' => $this->page->checked($skin->default === 1),
+                'default' => $skin->default === 1,
                 'default_option' => $skin->custom
                     ? ''
                     : $this->page->render('select-option.html', [
@@ -306,7 +307,6 @@ final readonly class Themes implements Route
                     ? $this->page->render('themes/show-skin-index-css-row-delete.html', [
                         'id' => $skin->id,
                     ]) : '',
-                'hidden_checked' => $this->page->checked($skin->hidden === 1),
                 'id' => $skin->id,
                 'title' => $skin->title,
                 'view_or_edit' => $skin->custom ? 'Edit' : 'View',

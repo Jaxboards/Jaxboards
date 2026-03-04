@@ -1,7 +1,12 @@
 <form method="post">
   <label style="width:140px;">
     Require Validation:
-    <input {{ checked }} name="v_enable" type="checkbox" class="switch yn">
+    <input
+      name="v_enable"
+      type="checkbox"
+      class="switch yn"
+      {% if membervalidation %}checked{% endif %}
+    >
   </label>
   <br>
   <input type="submit" name="submit1" value="Save">

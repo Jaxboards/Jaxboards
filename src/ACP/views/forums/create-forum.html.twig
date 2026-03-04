@@ -1,63 +1,69 @@
 <form method="post">
-    <table class="settings">
-        <tr>
-            <th scope="row">
-                Forum Title:
-            </th>
-            <td>
-                <input type="text" name="title" title="Forum Title" value="{{ title }}">
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">
-                Description:
-            </th>
-            <td>
-                <textarea name="description" title="Forum Description">{{ description }}</textarea>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">
-                Redirect URL:
-            </th>
-            <td>
-                <input type="text" name="redirect" title="Redirect URL" value="{{ redirect_url }}">
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">
-                Show Subforums:
-            </th>
-            <td>
-                <select name="showSubForums" title="Show Subforums Toggle">
-                    {{ subforum_options }}
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">
-                Order Topics By:
-            </th>
-            <td>
-                <select name="orderby" title="How to Order Topic List">
-                    {{ order_by_options }}
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">
-                Posts count towards post count?
-            </th>
-            <td>
-                <input {{ count }} type="checkbox" class="switch yn" name="count" title="Post Count Toggle">
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">
-                Trashcan?
-            </th>
-            <td>
-                <input {{ trashcan }} type="checkbox" class="switch yn" name="trashcan" title="Trashcan Toggle" />
-            </td>
-        </tr>
-    </table>
+  <table class="settings">
+    <tr>
+      <th scope="row">
+        Forum Title:
+      </th>
+      <td>
+        <input type="text" name="title" title="Forum Title" value="{{ title }}">
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">
+        Description:
+      </th>
+      <td>
+        <textarea name="description" title="Forum Description">{{ description }}</textarea>
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">
+        Redirect URL:
+      </th>
+      <td>
+        <input type="text" name="redirect" title="Redirect URL" value="{{ redirect_url }}">
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">
+        Show Subforums:
+      </th>
+      <td>
+        <select name="showSubForums" title="Show Subforums Toggle">
+          {{ subforum_options }}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">
+        Order Topics By:
+      </th>
+      <td>
+        <select name="orderby" title="How to Order Topic List">
+          {{ order_by_options }}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">
+        Posts count towards post count?
+      </th>
+      <td>
+        <input
+          type="checkbox"
+          class="switch yn"
+          name="count"
+          title="Post Count Toggle"
+          {% if count %}checked{% endif %}
+        >
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">
+        Trashcan?
+      </th>
+      <td>
+        <input type="checkbox" class="switch yn" name="trashcan" title="Trashcan Toggle" {% if trashcan %}checked{% endif %} />
+      </td>
+    </tr>
+  </table>

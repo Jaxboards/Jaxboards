@@ -44,11 +44,6 @@ final class Page
         $this->parts[$partName] .= $content;
     }
 
-    public function checked(bool $checked): string
-    {
-        return $checked ? ' checked="checked"' : '';
-    }
-
     public function addContentBox(string $title, string $content): void
     {
         $this->append('content', $this->render('content-box.html', [

@@ -243,8 +243,8 @@ final readonly class Posting implements Route
         $reactionsettings = $this->config->getSetting('reactions');
 
         $page2 .= $this->page->render('posting/post-rating-settings.html', [
-            'ratings_anonymous' => $this->page->checked(($reactionsettings & 2) !== 0),
-            'ratings_enabled' => $this->page->checked(($reactionsettings & 1) !== 0),
+            'ratings_anonymous' => ($reactionsettings & 2) !== 0,
+            'ratings_enabled' => ($reactionsettings & 1) !== 0,
         ]);
         $table = $this->page->render('posting/post-rating-heading.html');
         if ($niblets === []) {
