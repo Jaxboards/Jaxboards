@@ -218,16 +218,13 @@ final class LogReg implements Route
                 }
 
                 $this->session->setPHPSessionValue('uid', $this->user->get()->id);
-                $loginToken = base64_encode(openssl_random_pseudo_bytes(128));
 
-                $token = new Token();
-                $token->expires = $this->database->datetime(Carbon::now('UTC')->addMonth()->getTimestamp());
-                $token->token = $loginToken;
-                $token->type = 'login';
-                $token->uid = $this->user->get()->id;
-                $token->insert();
+                $token = Token::create([
+                    'uid' => $this->user->get()->id,
+                    'type' => 'login',
+                ]);
 
-                $this->request->setCookie('utoken', $loginToken, Carbon::now('UTC')->addMonth()->getTimestamp());
+                $this->request->setCookie('utoken', $token->token, Carbon::now('UTC')->addMonth()->getTimestamp());
                 $this->session->clean($this->user->get()->id);
                 $this->session->set('uid', $this->user->get()->id);
                 if ($this->registering) {
@@ -360,20 +357,16 @@ final class LogReg implements Route
                     $page .= $this->template->render('error', ['message' => $error]);
                 } else {
                     // Generate token.
-                    $forgotpasswordtoken = base64_encode(openssl_random_pseudo_bytes(128));
-
-                    $token = new Token();
-                    $token->expires = $this->database->datetime(Carbon::now('UTC')->getTimestamp() + (3600 * 24));
-                    $token->token = $forgotpasswordtoken;
-                    $token->type = 'forgotpassword';
-                    $token->uid = $member->id;
-                    $token->insert();
+                    $token = Token::create([
+                        'uid' => $member->id,
+                        'type' => 'forgotpassword',
+                    ]);
 
                     $link =
                         $this->router->getRootURL()
                         . $this->router->url('forgotPassword', [
                             'uid' => $member->id,
-                            'tokenId' => rawurlencode($forgotpasswordtoken),
+                            'tokenId' => rawurlencode($token->token),
                         ]);
                     $mailResult = $this->mailer->mail($member->email, 'Recover Your Password!', <<<HTML
                         You have received this email because a password

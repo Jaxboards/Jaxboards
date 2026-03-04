@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Models;
 
+use Carbon\Carbon;
 use Jax\Attributes\Column;
 use Jax\Attributes\ForeignKey;
 use Jax\Attributes\Key;
@@ -28,4 +29,13 @@ final class Token extends Model
     #[Column(name: 'expires', type: 'datetime', nullable: false)]
     #[Key]
     public string $expires = '';
+
+    public static function create(array $properties): Token
+    {
+        $token = new self($properties);
+        $token->expires = self::$database->datetime(Carbon::now('UTC')->addMonth()->getTimestamp());
+        $token->token = base64_encode(openssl_random_pseudo_bytes(128));
+        $token->insert();
+        return $token;
+    }
 }

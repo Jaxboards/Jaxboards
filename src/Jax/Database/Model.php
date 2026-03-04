@@ -27,7 +27,7 @@ abstract class Model
 {
     public const string TABLE = '';
 
-    private static Database $database;
+    protected static Database $database;
 
     private bool $fromDatabase = false;
 
