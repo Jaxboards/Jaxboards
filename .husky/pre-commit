@@ -2,4 +2,4 @@
 composer lint -- -s &&
 bun format &&
 composer format &&
-git diff --name-only --staged | xargs git add .
+git diff --name-only --staged | xargs git add
