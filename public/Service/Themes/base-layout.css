@@ -316,6 +316,7 @@ a {
 
       &:nth-child(2) {
         text-align: center;
+        min-width: 50px;
       }
 
       &:nth-child(3) {
@@ -416,11 +417,6 @@ a {
 }
 
 .shout {
-  & img {
-    max-height: 150px;
-    max-width: 150px;
-  }
-
   & .delete {
     margin-right: 10px;
     display: none;
@@ -478,10 +474,6 @@ a {
     min-height: 32px;
     padding: 5px;
 
-    &:hover .status {
-      white-space: normal;
-    }
-
     & .name {
       grid-area: name;
     }
@@ -498,6 +490,10 @@ a {
       overflow: hidden;
       font-size: 1.2rem;
     }
+
+    &:hover .status {
+      white-space: normal;
+    }
   }
 }
 
@@ -505,10 +501,10 @@ a {
 .contact-card {
   & .content {
     display: flex;
-  }
 
-  & .content a {
-    font-size: 1.4rem;
+    & a {
+      font-size: 1.4rem;
+    }
   }
 
   & .right {
@@ -529,10 +525,10 @@ a {
   & .contact_details {
     font-size: 1.2rem;
     margin-top: 20px;
-  }
 
-  & .contact_details a:hover {
-    text-decoration: none;
+    & a:hover {
+      text-decoration: none;
+    }
   }
 }
 
@@ -764,7 +760,7 @@ a {
 #logo {
   z-index: 1;
   flex: 1;
-  margin: 20px 40px;
+  margin-left: 40px;
   align-self: center;
 
   & img {
@@ -779,17 +775,9 @@ a {
   position: relative;
   z-index: 1;
 
-  & form {
-    margin: 0;
-    font-size: 1.6rem;
-
-    & input {
-      width: 200px;
-    }
-
-    & input[type="submit"] {
-      width: auto;
-    }
+  .user,
+  .pass {
+    width: 200px;
   }
 
   & .welcome {
@@ -1034,10 +1022,6 @@ a {
   margin: auto;
   border-collapse: collapse;
 
-  & .topic-post-row {
-    clear: both;
-  }
-
   & td {
     vertical-align: top;
   }
@@ -1133,10 +1117,10 @@ a {
 
     & .form {
       display: none;
-    }
 
-    & .form img {
-      opacity: 0.5;
+      & img {
+        opacity: 0.5;
+      }
     }
 
     & a:hover img {
@@ -1144,12 +1128,14 @@ a {
     }
   }
 
-  & .topic-post-row:hover .postrating .showrating {
-    display: none;
-  }
+  & .topic-post-row:hover .postrating {
+    & .showrating {
+      display: none;
+    }
 
-  & .topic-post-row:hover .postrating .form {
-    display: block;
+    & .form {
+      display: block;
+    }
   }
 
   & .opengraph {
@@ -1756,11 +1742,11 @@ a {
   & div {
     padding: 5px;
     cursor: pointer;
-  }
 
-  & div:hover,
-  & div.selected {
-    border-style: solid none;
+    &:hover,
+    &.selected {
+      border-style: solid none;
+    }
   }
 }
 
