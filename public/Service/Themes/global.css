@@ -56,6 +56,9 @@ body {
       vertical-align: top;
       height: 24px;
       margin-left: -1px;
+      width: 150px;
+      max-width: 200px;
+      flex-grow: 1;
     }
 
     & .bold {
