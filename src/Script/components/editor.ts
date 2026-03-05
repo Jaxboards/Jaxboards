@@ -319,13 +319,17 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     if (fontFace) {
       fontFace.addEventListener("input", (evt) => {
         const value = fontFace.value;
+        if (!value) {
+          this.editbarCommand(evt, "removeformat");
+          return;
+        }
+
         if (value.startsWith("heading_")) {
-          this.editbarCommand(
-            evt as MouseEvent,
-            "heading",
-            value.replace("heading_", "h"),
-          );
-        } else if (value) {
+          this.editbarCommand(evt, "heading", value.replace("heading_", "h"));
+          return;
+        }
+
+        if (value) {
           this.editbarCommand(evt as MouseEvent, "fontname", value);
         }
       });
@@ -341,7 +345,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     return editbar;
   }
 
-  editbarCommand(event: MouseEvent, cmd: string, cmdValue?: string) {
+  editbarCommand(event: Event, cmd: string, cmdValue?: string) {
     event.preventDefault();
     const target = event.target;
 
@@ -666,6 +670,16 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         if (Browser.chrome) {
           execCommandArgs[0] = "formatBlock";
           execCommandArgs[2] = `<${arg}>`;
+        }
+        break;
+      }
+
+      // Browsers have a "removeformat" command but it is unreliable and does not remove inserted HTML
+      // so I've made it _really_ clear
+      case "removeformat": {
+        bbcode = selection;
+        if (Browser.chrome) {
+          this.doc?.execCommand("formatBlock", false, "<div>");
         }
         break;
       }
