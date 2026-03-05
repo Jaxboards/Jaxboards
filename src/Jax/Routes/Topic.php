@@ -360,6 +360,7 @@ final class Topic implements Route
 
         $this->page->command('window', [
             'content' => $this->template->render('topic/reply-form', [
+                'autofocus' => true,
                 'topic' => $modelsTopic,
                 'text' => $prefilled,
                 'width' => 390,

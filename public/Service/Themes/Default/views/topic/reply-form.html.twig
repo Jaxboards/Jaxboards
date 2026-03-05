@@ -3,7 +3,7 @@
         <input type="hidden" name="how" value="qreply">
         <input type="hidden" name="tid" value="{{ topic.id }}">
         <div class="quickreply" style="{% if width %}width:{{ width }}px{% endif %}">
-            <textarea name="postdata" title="Post Text" class="bbcode-editor" autofocus>{{ text }}</textarea>
+            <textarea name="postdata" title="Post Text" class="bbcode-editor" {% if autofocus %}autofocus{% endif %}>{{ text }}</textarea>
         </div>
         <div class="submitbutton">
             <input type="submit" name="submit" title="Submit your post" value="Post">
