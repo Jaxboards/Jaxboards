@@ -283,32 +283,32 @@ export default class Editor extends Component<HTMLTextAreaElement> {
           <option value="heading_6" style="font-weight:bold;font-size: 0.67em">Heading 6</option>
         </optgroup>
       </select>`,
-      `<a class="bold" title="Bold"></a>`,
-      `<a class="italic" title="Italic"></a>`,
-      `<a class="underline" title="Underline"></a>`,
-      `<a class="strikethrough" title="Strike-Through"></a>`,
-      `<a class="forecolor" title="Foreground Color"></a>`,
-      `<a class="backcolor" title="Background Color"></a>`,
-      `<a class="c_smileys" title="Insert Emoticon"></a>`,
-      `<a class="insertimage" title="Insert Image"></a>`,
-      `<a class="createlink" title="Insert Link"></a>`,
-      `<a class="c_email" title="Insert Email"></a>`,
-      `<a class="justifyleft" title="Align Left"></a>`,
-      `<a class="justifycenter" title="Center"></a>`,
-      `<a class="justifyright" title="Align Right"></a>`,
-      `<a class="c_youtube" title="Insert video from any of your favorite video services!"></a>`,
-      `<a class="c_code" title="Insert code"></a>`,
-      `<a class="c_quote" title="Insert Quote"></a>`,
-      `<a class="c_spoiler" title="Insert Spoiler"></a>`,
-      `<a class="insertorderedlist" title="Create Ordered List"></a>`,
-      `<a class="insertunorderedlist" title="Create Unordered List"></a>`,
-      `<a class="c_switcheditmode" title="Switch editor mode"></a>`,
+      `<button type="button" class="bold" title="Bold"></button>`,
+      `<button type="button" class="italic" title="Italic"></button>`,
+      `<button type="button" class="underline" title="Underline"></button>`,
+      `<button type="button" class="strikethrough" title="Strike-Through"></button>`,
+      `<button type="button" class="forecolor" title="Foreground Color"></button>`,
+      `<button type="button" class="backcolor" title="Background Color"></button>`,
+      `<button type="button" class="c_smileys" title="Insert Emoticon"></button>`,
+      `<button type="button" class="insertimage" title="Insert Image"></button>`,
+      `<button type="button" class="createlink" title="Insert Link"></button>`,
+      `<button type="button" class="c_email" title="Insert Email"></button>`,
+      `<button type="button" class="justifyleft" title="Align Left"></button>`,
+      `<button type="button" class="justifycenter" title="Center"></button>`,
+      `<button type="button" class="justifyright" title="Align Right"></button>`,
+      `<button type="button" class="c_youtube" title="Insert video from any of your favorite video services!"></button>`,
+      `<button type="button" class="c_code" title="Insert code"></button>`,
+      `<button type="button" class="c_quote" title="Insert Quote"></button>`,
+      `<button type="button" class="c_spoiler" title="Insert Spoiler"></button>`,
+      `<button type="button" class="insertorderedlist" title="Create Ordered List"></button>`,
+      `<button type="button" class="insertunorderedlist" title="Create Unordered List"></button>`,
+      `<button type="button" class="c_switcheditmode" title="Switch editor mode">${this.htmlMode ? "HTML" : "BBCode"}</button>`,
     ].join("");
 
     editbar.addEventListener("click", (evt) => {
       if (
         evt.target instanceof HTMLElement &&
-        evt.target.matches(".editbar a")
+        evt.target.matches(".editbar button")
       ) {
         this.editbarCommand(evt, evt.target.className);
       }
@@ -726,5 +726,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
       iframe.style.display = "none";
     }
     this.htmlMode = htmlMode;
+    const modeButton = this.editbar?.querySelector(".c_switcheditmode");
+    if (modeButton) modeButton.innerHTML = this.htmlMode ? "HTML" : "BBCode";
   }
 }

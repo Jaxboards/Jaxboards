@@ -34,7 +34,11 @@ body {
     line-height: 0;
     padding-left: 1px;
 
-    & a {
+    & button {
+      border: none;
+      margin: 0;
+      padding: 0;
+
       background: url("wysiwygbar.png");
       height: 24px;
       display: inline-block;
@@ -147,8 +151,10 @@ body {
     }
 
     & .c_switcheditmode {
-      width: 29px;
+      padding-left: 29px;
       background-position: -549px 0;
+      border-right: 1px solid #777;
+      float: right;
     }
   }
 }
