@@ -25,6 +25,7 @@ final readonly class Report implements Route
         'inappropriate' => 'Inappropriate Content',
         'needs_to_move' => 'Topic needs to be moved',
         'needs_to_pin' => 'Topic needs to be pinned',
+        'other' => 'Other',
     ];
 
     public function __construct(
