@@ -363,7 +363,7 @@ final class Topic implements Route
                 'autofocus' => true,
                 'topic' => $modelsTopic,
                 'text' => $prefilled,
-                'width' => 390,
+                'width' => 420,
             ]),
             'id' => 'qreply',
             'resize' => '.quickreply',
