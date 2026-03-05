@@ -7,9 +7,10 @@
   --text-color: #004;
   --link-color: #1d71cf;
   --blue-border: #99f;
-  --barely-blue: #f6f6ff;
-  --light-blue: #e0e0ff;
   --medium-blue: #ccf;
+  --light-blue: #e0e0ff;
+  --faint-blue: #eef;
+  --barely-blue: #f6f6ff;
   --shade: linear-gradient(to bottom, rgb(0 0 0 / 0%), rgb(0 0 0 / 5%));
   --header: linear-gradient(to bottom, #424242, #010101);
 }
@@ -106,7 +107,7 @@ textarea {
 .immenu,
 .emotewin {
   border: 1px solid var(--black);
-  background: #eef;
+  background: var(--faint-blue);
 }
 
 /* User Control Panel */
@@ -172,7 +173,7 @@ textarea {
     & td {
       border: 1px solid var(--blue-border);
       border-style: solid none;
-      background: #eef;
+      background: var(--faint-blue);
     }
 
     & tr:hover td {
@@ -186,13 +187,13 @@ textarea {
   }
 
   & .composeform {
-    background: #eef;
+    background: var(--faint-blue);
     border: 1px solid #669;
   }
 
   & .messageview {
     border: 1px solid var(--black);
-    background: #eef;
+    background: var(--faint-blue);
   }
 
   & .message {
@@ -218,12 +219,12 @@ textarea {
 }
 
 .shouts {
-  background: #eef;
+  background: var(--faint-blue);
   border-right: 1px solid var(--blue-border);
 }
 
 .shout {
-  background: #eef;
+  background: var(--faint-blue);
 
   &.highlight {
     background: #ff0;
@@ -276,7 +277,7 @@ textarea {
   }
 
   & .leftbar .username {
-    background: #eef;
+    background: var(--faint-blue);
     border-bottom: 1px solid var(--blue-border);
   }
 
@@ -447,7 +448,7 @@ textarea {
 
 /* Breadcrumbs */
 #path {
-  background: #eef;
+  background: var(--faint-blue);
   border: 1px solid var(--blue-border);
   border-style: solid none;
 
@@ -557,7 +558,7 @@ textarea {
   }
 
   & .username {
-    background: #eef;
+    background: var(--faint-blue);
     border-bottom: 1px solid var(--blue-border);
   }
 
@@ -583,7 +584,7 @@ textarea {
 
   & .opengraph {
     border: 1px solid #192c44;
-    background: #eef;
+    background: var(--faint-blue);
   }
 
   & .userstats {
@@ -593,7 +594,7 @@ textarea {
 }
 
 .postrating_list {
-  background: #eef;
+  background: var(--faint-blue);
   border: 1px solid var(--blue-border);
 
   & ul {
@@ -603,7 +604,7 @@ textarea {
 
 #poll {
   & .content {
-    background: #eef;
+    background: var(--faint-blue);
   }
 
   & .choice {
@@ -633,7 +634,7 @@ textarea {
 /* New Topic Form */
 .topicform {
   border: 1px solid var(--black);
-  background: #eef;
+  background: var(--faint-blue);
 }
 
 #polloptions {
@@ -643,7 +644,7 @@ textarea {
 
 /* New Post Form */
 .postform {
-  background: #eef;
+  background: var(--faint-blue);
 }
 
 /* Search */
@@ -768,7 +769,7 @@ textarea {
 /* AutoComplete */
 #autocomplete {
   border: 1px solid var(--black);
-  background: #eef;
+  background: var(--faint-blue);
 
   & div:hover,
   & div.selected {
