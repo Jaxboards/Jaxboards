@@ -64,6 +64,7 @@ final readonly class Report implements Route
         $report->reportDate = $this->database->datetime();
         $report->insert();
 
+        $this->page->command('preventNavigation');
         $this->page->command('closewindow', "#report{$pid}");
 
         if ($report->id === 0) {
