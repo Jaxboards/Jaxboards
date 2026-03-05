@@ -34,7 +34,6 @@ body {
   & .editbar {
     display: flex;
     flex-wrap: wrap;
-
     line-height: 0;
     padding-left: 1px;
 
