@@ -302,6 +302,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
       `<button type="button" class="c_spoiler" title="Insert Spoiler"></button>`,
       `<button type="button" class="insertorderedlist" title="Create Ordered List"></button>`,
       `<button type="button" class="insertunorderedlist" title="Create Unordered List"></button>`,
+      `<div class="flex-grow"></div>`,
       `<button type="button" class="c_switcheditmode" title="Switch editor mode">${this.htmlMode ? "HTML" : "BBCode"}</button>`,
     ].join("");
 
