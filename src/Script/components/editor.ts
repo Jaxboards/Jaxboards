@@ -160,6 +160,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     Object.assign(this.iframe.style, {
       border: cs.border,
       margin: cs.margin,
+      height: `${element.offsetHeight}px`,
     });
     this.doc.head.append(
       Object.assign(this.doc.createElement("style"), {
@@ -176,8 +177,6 @@ export default class Editor extends Component<HTMLTextAreaElement> {
     this.doc.designMode = "on";
 
     this.editbar = this.buildEditBar();
-
-    iframe.style.height = `${element.clientHeight}px`;
 
     element.before(this.editbar);
 
