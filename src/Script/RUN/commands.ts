@@ -2,7 +2,7 @@
 
 import { animate, dehighlight } from "../animation";
 import { addIdleClock } from "../components/idle-clock";
-import { getCoordinates } from "../dom";
+import { getCoordinates, toDOM } from "../dom";
 import createSnow, { stopSnow } from "../eggs/snow";
 import gracefulDegrade from "../graceful-degrade";
 import { messageReceived } from "../instant-messaging-window";
@@ -105,12 +105,12 @@ export default {
   appendrows(selector: string, rowHTML: string) {
     const table = document.querySelector<HTMLTableElement>(selector);
     if (!table) return;
-    const span = document.createElement("span");
-    span.innerHTML = `<table>${rowHTML}</table>`;
-    const vtbody = span.getElementsByTagName("tbody")[0];
-    // table=table.getElementsByTagName('tbody')[0],
-    gracefulDegrade(vtbody);
-    table.appendChild(vtbody);
+    const dom = toDOM<HTMLTableElement>(`<table>${rowHTML}</table>`);
+    const vtbody = dom.querySelector("tbody");
+    if (vtbody) {
+      gracefulDegrade(vtbody);
+      table.appendChild(vtbody);
+    }
   },
   location(path: string) {
     if (["?", "/"].includes(path.charAt(0))) {
@@ -129,9 +129,7 @@ export default {
     const shouts = Array.from(
       document.querySelectorAll<HTMLDivElement>("#shoutbox .shout"),
     );
-    const span = document.createElement("span");
-    span.innerHTML = message;
-    const div = span.firstElementChild as HTMLDivElement;
+    const div = toDOM<HTMLDivElement>(message);
     if (!div) return;
     shouts[0].parentNode?.insertBefore(div, shouts[0]);
     while (shouts.length > globalSettings.shoutLimit - 1) {
@@ -146,9 +144,7 @@ export default {
   tick(html: string) {
     const ticker = document.querySelector("#ticker");
     if (!ticker) return;
-    let tick = document.createElement("div");
-    tick.innerHTML = html;
-    tick = tick.firstElementChild as HTMLDivElement;
+    const tick = toDOM<HTMLDivElement>(html);
 
     ticker.insertBefore(tick, ticker.firstChild);
     const ticks = Array.from(ticker.querySelectorAll<HTMLDivElement>(".tick"));
