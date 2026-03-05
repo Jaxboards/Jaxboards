@@ -288,19 +288,18 @@ export default class Editor extends Component<HTMLTextAreaElement> {
       `<button type="button" class="strikethrough" title="Strike-Through"></button>`,
       `<button type="button" class="forecolor" title="Foreground Color"></button>`,
       `<button type="button" class="backcolor" title="Background Color"></button>`,
-      `<button type="button" class="c_smileys" title="Insert Emoticon"></button>`,
-      `<button type="button" class="insertimage" title="Insert Image"></button>`,
-      `<button type="button" class="createlink" title="Insert Link"></button>`,
-      `<button type="button" class="c_email" title="Insert Email"></button>`,
       `<button type="button" class="justifyleft" title="Align Left"></button>`,
       `<button type="button" class="justifycenter" title="Center"></button>`,
       `<button type="button" class="justifyright" title="Align Right"></button>`,
+      `<button type="button" class="insertorderedlist" title="Create Ordered List"></button>`,
+      `<button type="button" class="insertunorderedlist" title="Create Unordered List"></button>`,
+      `<button type="button" class="createlink" title="Insert Link"></button>`,
+      `<button type="button" class="insertimage" title="Insert Image"></button>`,
+      `<button type="button" class="c_smileys" title="Insert Emoticon"></button>`,
       `<button type="button" class="c_youtube" title="Insert video from any of your favorite video services!"></button>`,
       `<button type="button" class="c_code" title="Insert code"></button>`,
       `<button type="button" class="c_quote" title="Insert Quote"></button>`,
       `<button type="button" class="c_spoiler" title="Insert Spoiler"></button>`,
-      `<button type="button" class="insertorderedlist" title="Create Ordered List"></button>`,
-      `<button type="button" class="insertunorderedlist" title="Create Unordered List"></button>`,
       `<div class="flex-grow"></div>`,
       `<button type="button" class="c_switcheditmode" title="Switch editor mode">${this.htmlMode ? "HTML" : "BBCode"}</button>`,
     ].join("");
@@ -330,7 +329,7 @@ export default class Editor extends Component<HTMLTextAreaElement> {
         }
 
         if (value) {
-          this.editbarCommand(evt as MouseEvent, "fontname", value);
+          this.editbarCommand(evt, "fontname", value);
         }
       });
       for (const group of Object.keys(webSafeFonts)) {
@@ -590,18 +589,6 @@ export default class Editor extends Component<HTMLTextAreaElement> {
 
         bbcode = `[url=${link}]${selection}[/url]`;
         execCommandArgs[2] = link;
-        break;
-      }
-
-      case "c_email": {
-        let email = prompt("Email:") || "";
-        if (!email) return;
-
-        email = `mailto:${email}`;
-
-        bbcode = `[url=${email}]${selection}[/url]`;
-        execCommandArgs[0] = "createlink";
-        execCommandArgs[2] = email;
         break;
       }
 
