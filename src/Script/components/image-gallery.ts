@@ -1,4 +1,5 @@
 import register, { Component } from "../component";
+import { toDOM } from "../dom";
 
 export default class ImageGallery extends Component<HTMLDivElement> {
   index: number;
@@ -18,27 +19,26 @@ export default class ImageGallery extends Component<HTMLDivElement> {
   constructor(element: HTMLDivElement) {
     super(element);
 
-    const controls = document.createElement("div");
-    const next = document.createElement("button");
-    const prev = document.createElement("button");
+    const controls = toDOM<HTMLDivElement>(`<div>
+      <button type="button" data-action="prev">Prev &laquo;</button>
+      <button type="button" data-action="next">Next &raquo;</button>
+    </div>`);
+    controls.addEventListener("click", (event) => {
+      if (event.target instanceof HTMLButtonElement) {
+        const { action } = event.target.dataset;
+        if (action === "next") {
+          this.showNext();
+        } else {
+          this.showPrev();
+        }
+      }
+    });
+
     this.index = 0;
     this.images = element.querySelectorAll("img");
     this.max = Math.max(this.images.length, 1);
 
-    next.innerHTML = "Next &raquo;";
-    next.addEventListener("click", () => {
-      this.showNext();
-    });
-
-    prev.innerHTML = "Prev &laquo;";
-    prev.addEventListener("click", () => {
-      this.showPrev();
-    });
-
     this.update();
-    controls.appendChild(prev);
-    controls.appendChild(document.createTextNode(" "));
-    controls.appendChild(next);
     element.appendChild(controls);
   }
 
