@@ -78,6 +78,7 @@ final class Shoutbox implements Module
                 $this->displayShoutbox();
                 return;
             }
+
             $this->showAllShouts();
         }
 
