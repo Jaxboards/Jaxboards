@@ -29,6 +29,135 @@ type UserOnline = {
   uid: number;
 };
 
+const dom = {
+  addclass(selector: string, className: string) {
+    const el = document.querySelector(selector);
+    if (el) {
+      el.classList.add(className);
+    }
+  },
+  enable(selector: string) {
+    const el = document.querySelector<HTMLButtonElement>(`#${selector}`);
+    if (el) {
+      el.disabled = false;
+    }
+  },
+  loadscript(src: string) {
+    document.body.appendChild(
+      Object.assign(document.createElement("script"), { src }),
+    );
+  },
+  removeel(selector: string) {
+    const el = document.querySelector(selector);
+    if (el) el.remove();
+  },
+  setAttribute(selector: string, name: string, value: string) {
+    const element = document.querySelector(selector);
+    if (!element) return;
+    if (value === "") {
+      element.removeAttribute(name);
+    } else {
+      element.setAttribute(name, value);
+    }
+  },
+  script(script: string) {
+    (0, eval)(script);
+  },
+  update(sel: string, html: string, shouldHighlight: string) {
+    let selector = sel;
+    const paths = Array.from(document.querySelectorAll<HTMLElement>(".path"));
+    if (selector === "path" && paths.length > 1) {
+      paths.forEach((path) => {
+        path.innerHTML = html;
+        gracefulDegrade(path);
+      });
+      return;
+    }
+    if (!/^\W/.test(selector)) {
+      selector = `#${selector}`;
+    }
+    const el = document.querySelector<HTMLElement>(selector);
+    if (!el) return;
+    el.innerHTML = html;
+
+    const autofocusElement = el.querySelector<HTMLElement>("[autofocus]");
+    if (autofocusElement) {
+      autofocusElement.focus();
+    }
+    if (shouldHighlight) {
+      dehighlight(el);
+    }
+    gracefulDegrade(el);
+  },
+};
+
+const eggs = {
+  snow(count: number) {
+    createSnow(count);
+  },
+  confetti(count: number) {
+    createSnow(count, true);
+    setTimeout(stopSnow, 20_000);
+  },
+};
+
+const instantMessaging = {
+  im(
+    fromId: number,
+    fromName: string,
+    message: string,
+    fromMe: number,
+    timestamp: number,
+  ) {
+    messageReceived({ fromId, fromName, message, fromMe, timestamp });
+  },
+  imtoggleoffline(a: string) {
+    document.querySelector(`#im_${a}`)?.classList.add("offline");
+  },
+};
+
+const inbox = {
+  newmessage(message: string, fromMID: number) {
+    let notification = document.querySelector<HTMLDivElement>("#notification");
+    const num = document.querySelector<HTMLAnchorElement>("#num-messages");
+    if (num) num.innerHTML = `${Number.parseInt(num.innerHTML, 10) + 1}`;
+    if (!notification) {
+      notification = document.createElement("div");
+      notification.id = "notification";
+      document.body.appendChild(notification);
+    }
+    notification.style.display = "";
+    notification.className = "newmessage";
+    notification.addEventListener("click", () => {
+      notification.style.display = "none";
+      RUN.stream.location(`/ucp/inbox?view=${fromMID}`, 3);
+    });
+    notification.innerHTML = message;
+  },
+};
+
+const navigation = {
+  back() {
+    globalThis.history.back();
+  },
+  location(path: string) {
+    if (["?", "/"].includes(path.charAt(0))) {
+      RUN.stream.location(path);
+      return;
+    }
+    document.location = path;
+  },
+  refreshdata() {
+    RUN.stream.pollData(true);
+  },
+  reload(timeout = 0) {
+    setTimeout(() => globalThis.location.reload(), timeout);
+  },
+  title(title: string) {
+    document.title = title;
+  },
+};
+
 const shoutbox = {
   addshout(message: string) {
     const shouts = Array.from(
@@ -72,80 +201,7 @@ const shoutbox = {
   },
 };
 
-/**
- * These are all of the possible commands
- * that the server can send to the client.
- */
-export default {
-  ...shoutbox,
-  loadscript(src: string) {
-    document.body.appendChild(
-      Object.assign(document.createElement("script"), { src }),
-    );
-  },
-  script(script: string) {
-    (0, eval)(script);
-  },
-  error(message: string) {
-    toast.error(message);
-  },
-  success(message: string) {
-    toast.success(message);
-  },
-  reload(timeout = 0) {
-    setTimeout(() => globalThis.location.reload(), timeout);
-  },
-  refreshdata() {
-    RUN.stream.pollData(true);
-  },
-  addclass(selector: string, className: string) {
-    const el = document.querySelector(selector);
-    if (el) {
-      el.classList.add(className);
-    }
-  },
-  title(title: string) {
-    document.title = title;
-  },
-  update(sel: string, html: string, shouldHighlight: string) {
-    let selector = sel;
-    const paths = Array.from(document.querySelectorAll<HTMLElement>(".path"));
-    if (selector === "path" && paths.length > 1) {
-      paths.forEach((path) => {
-        path.innerHTML = html;
-        gracefulDegrade(path);
-      });
-      return;
-    }
-    if (!/^\W/.test(selector)) {
-      selector = `#${selector}`;
-    }
-    const el = document.querySelector<HTMLElement>(selector);
-    if (!el) return;
-    el.innerHTML = html;
-
-    const autofocusElement = el.querySelector<HTMLElement>("[autofocus]");
-    if (autofocusElement) {
-      autofocusElement.focus();
-    }
-    if (shouldHighlight) {
-      dehighlight(el);
-    }
-    gracefulDegrade(el);
-  },
-  removeel(selector: string) {
-    const el = document.querySelector(selector);
-    if (el) el.remove();
-  },
-  back() {
-    globalThis.history.back();
-  },
-  setstatus(className: string) {
-    const status = document.querySelector("#status");
-    if (status) {
-      status.className = className;
-    }
-  },
+const topicView = {
   appendrows(selector: string, rowHTML: string) {
     const table = document.querySelector<HTMLTableElement>(selector);
     if (!table) return;
@@ -156,63 +212,57 @@ export default {
       table.appendChild(vtbody);
     }
   },
-  location(path: string) {
-    if (["?", "/"].includes(path.charAt(0))) {
-      RUN.stream.location(path);
-      return;
+  listrating(postId: number, html: string) {
+    let prdiv = document.querySelector<HTMLDivElement>(`#postrating_${postId}`);
+    let c;
+    if (prdiv) {
+      if (prdiv.style.display !== "none") {
+        animate(prdiv, [{ height: "200px" }, { height: "0px" }], 300).then(
+          (el) => (el.style.display = "none"),
+        );
+        return;
+      }
+      prdiv.style.display = "block";
+    } else {
+      prdiv = document.createElement("div");
+      prdiv.className = "postrating_list";
+      prdiv.id = `postrating_${postId}`;
+      const postRating = document.querySelector<HTMLDivElement>(
+        `#pid_${postId} .postrating`,
+      );
+      if (!postRating) {
+        return;
+      }
+      c = getCoordinates(postRating);
+      prdiv.style.top = `${c.yh}px`;
+      prdiv.style.left = `${c.x}px`;
+      document.querySelector<HTMLDivElement>("#page")?.appendChild(prdiv);
     }
-    document.location = path;
+    prdiv.innerHTML = html;
+    animate(prdiv, [{ height: "0px" }, { height: "200px" }], 300);
   },
-  enable(selector: string) {
-    const el = document.querySelector<HTMLButtonElement>(`#${selector}`);
-    if (el) {
-      el.disabled = false;
+  async scrollToPost(postId: number) {
+    const el = document.getElementById(`pid_${postId}`);
+    if (!el) {
+      return false;
+    }
+    await onImagesLoaded(Array.from(document.querySelectorAll("#page img")));
+    const pos = getCoordinates(el);
+    globalThis.scrollTo({ top: pos.y });
+    return true;
+  },
+  updateqreply(content: string) {
+    const qreply = document.querySelector("#qreply");
+    const textarea = qreply?.querySelector("textarea");
+    if (textarea) {
+      textarea.focus();
+      textarea.value += content;
+      textarea.dispatchEvent(new Event("input"));
     }
   },
-  tick(html: string) {
-    const ticker = document.querySelector("#ticker");
-    if (!ticker) return;
-    const tick = toDOM<HTMLDivElement>(html);
+};
 
-    ticker.insertBefore(tick, ticker.firstChild);
-    const ticks = Array.from(ticker.querySelectorAll<HTMLDivElement>(".tick"));
-    for (let x = 100; x < ticks.length; x += 100) {
-      ticks[x].remove();
-    }
-  },
-  im(
-    fromId: number,
-    fromName: string,
-    message: string,
-    fromMe: number,
-    timestamp: number,
-  ) {
-    messageReceived({ fromId, fromName, message, fromMe, timestamp });
-  },
-  imtoggleoffline(a: string) {
-    document.querySelector(`#im_${a}`)?.classList.add("offline");
-  },
-  window(options: WindowOptions) {
-    const existingWindowContent = options.id
-      ? document.querySelector<HTMLDivElement>(`#${options.id} .content`)
-      : undefined;
-
-    if (existingWindowContent) {
-      existingWindowContent.innerHTML = options.content + "";
-      return;
-    }
-
-    const win = new Window(options);
-    gracefulDegrade(win.render());
-  },
-  closewindow(windowSelector: string) {
-    const el = document.querySelector<HTMLElement>(
-      windowSelector + " [data-action=close]",
-    );
-    if (el) {
-      el.click();
-    }
-  },
+const usersOnline = {
   onlinelist(users: UserOnline[]) {
     const statusers = document.querySelector<HTMLSpanElement>("#statusers");
     if (!statusers) {
@@ -258,13 +308,7 @@ export default {
       } else statusers.appendChild(link);
     });
   },
-  snow(count: number) {
-    createSnow(count);
-  },
-  confetti(count: number) {
-    createSnow(count, true);
-    setTimeout(stopSnow, 20_000);
-  },
+
   setoffline(userIds: string) {
     const statusers = document.querySelector<HTMLSpanElement>("#statusers");
     const ids = userIds.split(",");
@@ -277,73 +321,76 @@ export default {
       }
     });
   },
+};
 
-  async scrollToPost(postId: number) {
-    const el = document.getElementById(`pid_${postId}`);
-    if (!el) {
-      return false;
+const windows = {
+  window(options: WindowOptions) {
+    const existingWindowContent = options.id
+      ? document.querySelector<HTMLDivElement>(`#${options.id} .content`)
+      : undefined;
+
+    if (existingWindowContent) {
+      existingWindowContent.innerHTML = options.content + "";
+      return;
     }
-    await onImagesLoaded(Array.from(document.querySelectorAll("#page img")));
-    const pos = getCoordinates(el);
-    globalThis.scrollTo({ top: pos.y });
-    return true;
+
+    const win = new Window(options);
+    gracefulDegrade(win.render());
   },
-  updateqreply(content: string) {
-    const qreply = document.querySelector("#qreply");
-    const textarea = qreply?.querySelector("textarea");
-    if (textarea) {
-      textarea.focus();
-      textarea.value += content;
-      textarea.dispatchEvent(new Event("input"));
+  closewindow(windowSelector: string) {
+    const el = document.querySelector<HTMLElement>(
+      windowSelector + " [data-action=close]",
+    );
+    if (el) {
+      el.click();
     }
   },
-  newmessage(message: string, fromMID: number) {
-    let notification = document.querySelector<HTMLDivElement>("#notification");
-    const num = document.querySelector<HTMLAnchorElement>("#num-messages");
-    if (num) num.innerHTML = `${Number.parseInt(num.innerHTML, 10) + 1}`;
-    if (!notification) {
-      notification = document.createElement("div");
-      notification.id = "notification";
-      document.body.appendChild(notification);
-    }
-    notification.style.display = "";
-    notification.className = "newmessage";
-    notification.addEventListener("click", () => {
-      notification.style.display = "none";
-      RUN.stream.location(`/ucp/inbox?view=${fromMID}`, 3);
-    });
-    notification.innerHTML = message;
-  },
+};
+
+const sounds = {
   playsound(name: string) {
     Sound.loadAndPlay(name);
   },
-  listrating(postId: number, html: string) {
-    let prdiv = document.querySelector<HTMLDivElement>(`#postrating_${postId}`);
-    let c;
-    if (prdiv) {
-      if (prdiv.style.display !== "none") {
-        animate(prdiv, [{ height: "200px" }, { height: "0px" }], 300).then(
-          (el) => (el.style.display = "none"),
-        );
-        return;
-      }
-      prdiv.style.display = "block";
-    } else {
-      prdiv = document.createElement("div");
-      prdiv.className = "postrating_list";
-      prdiv.id = `postrating_${postId}`;
-      const postRating = document.querySelector<HTMLDivElement>(
-        `#pid_${postId} .postrating`,
-      );
-      if (!postRating) {
-        return;
-      }
-      c = getCoordinates(postRating);
-      prdiv.style.top = `${c.yh}px`;
-      prdiv.style.left = `${c.x}px`;
-      document.querySelector<HTMLDivElement>("#page")?.appendChild(prdiv);
+};
+
+const ticker = {
+  tick(html: string) {
+    const ticker = document.querySelector("#ticker");
+    if (!ticker) return;
+    const tick = toDOM<HTMLDivElement>(html);
+
+    ticker.insertBefore(tick, ticker.firstChild);
+    const ticks = Array.from(ticker.querySelectorAll<HTMLDivElement>(".tick"));
+    for (let x = 100; x < ticks.length; x += 100) {
+      ticks[x].remove();
     }
-    prdiv.innerHTML = html;
-    animate(prdiv, [{ height: "0px" }, { height: "200px" }], 300);
   },
+};
+
+const toasts = {
+  error(message: string) {
+    toast.error(message);
+  },
+  success(message: string) {
+    toast.success(message);
+  },
+};
+
+/**
+ * These are all of the possible commands
+ * that the server can send to the client.
+ */
+export default {
+  ...dom,
+  ...eggs,
+  ...inbox,
+  ...instantMessaging,
+  ...navigation,
+  ...shoutbox,
+  ...sounds,
+  ...ticker,
+  ...toasts,
+  ...topicView,
+  ...usersOnline,
+  ...windows,
 };

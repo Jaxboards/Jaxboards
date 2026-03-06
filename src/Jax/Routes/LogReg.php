@@ -279,7 +279,12 @@ final class LogReg implements Route
 
         $this->session->applyChanges();
 
-        $this->page->command('setstatus', $this->session->get()->hide !== 0 ? 'invisible' : 'online');
+        $this->page->command(
+            'setAttribute',
+            '#status',
+            'class',
+            $this->session->get()->hide !== 0 ? 'invisible' : 'online',
+        );
         $this->page->command('preventNavigation');
     }
 
