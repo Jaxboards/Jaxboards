@@ -91,7 +91,9 @@ final class Topic implements Route
         $quickReply = $this->request->both('qreply') !== null;
 
         $topic = ModelsTopic::selectOne($tid);
-        $forumPerms = $topic !== null ? $this->fetchForumPermissions($topic) : [];
+        $forum = Forum::selectOne($topic->fid);
+        $category = $forum !== null ? Category::selectOne($forum->category) : null;
+        $forumPerms = $topic !== null ? $this->fetchForumPermissions($topic, $forum) : [];
 
         if (!$topic || !$forumPerms['read']) {
             $this->router->redirect('index');
@@ -100,6 +102,20 @@ final class Topic implements Route
         }
 
         $this->session->act('vt' . $tid);
+
+        // Fix this to work with subforums.
+        $this->page->setBreadCrumbs([
+            $this->router->url('category', ['id' => $category?->id]) => $category->title ?? '',
+            $this->router->url('forum', [
+                'id' => $forum?->id,
+                'slug' => $this->textFormatting->slugify($forum?->title),
+            ]) =>
+                $forum->title ?? '',
+            $this->router->url('topic', [
+                'id' => $topic->id,
+                'slug' => $this->textFormatting->slugify($topic->title),
+            ]) => $this->textFormatting->wordFilter($topic->title),
+        ]);
 
         if ($this->request->both('votepoll') !== null) {
             $this->poll->vote($topic);
@@ -119,7 +135,7 @@ final class Topic implements Route
             $listRating !== 0 => $this->reactions->listReactions($listRating),
             $this->request->isJSUpdate() => $this->update($topic),
             $this->request->both('fmt') === 'RSS' => $this->viewRSS($topic),
-            default => $this->viewTopic($topic),
+            default => $this->viewTopic($forum, $topic),
         };
     }
 
@@ -160,7 +176,7 @@ final class Topic implements Route
         );
     }
 
-    private function viewTopic(ModelsTopic $modelsTopic): void
+    private function viewTopic(Forum $forum, ModelsTopic $modelsTopic): void
     {
         if (
             !$this->user->isGuest()
@@ -177,22 +193,6 @@ final class Topic implements Route
             'description' => $modelsTopic->subtitle,
         ]);
         $this->session->set('locationVerbose', "In topic '" . $topicTitle . "'");
-
-        $forum = Forum::selectOne($modelsTopic->fid);
-        $category = $forum !== null ? Category::selectOne($forum->category) : null;
-        // Fix this to work with subforums.
-        $this->page->setBreadCrumbs([
-            $this->router->url('category', ['id' => $category?->id]) => $category->title ?? '',
-            $this->router->url('forum', [
-                'id' => $forum?->id,
-                'slug' => $this->textFormatting->slugify($forum?->title),
-            ]) =>
-                $forum->title ?? '',
-            $this->router->url('topic', [
-                'id' => $modelsTopic->id,
-                'slug' => $this->textFormatting->slugify($modelsTopic->title),
-            ]) => $this->textFormatting->wordFilter($modelsTopic->title),
-        ]);
 
         // Generate pages.
         $postCount = Post::count('WHERE `tid`=?', $modelsTopic->id);
