@@ -64,7 +64,6 @@ final class Shoutbox implements Module
             return;
         }
 
-        $shoutboxDelete = (int) $this->request->both('shoutbox_delete');
         $shoutboxShout = trim($this->request->asString->post('shoutbox_shout') ?? '');
 
         if ($shoutboxShout !== '') {
@@ -72,18 +71,19 @@ final class Shoutbox implements Module
         }
 
         if ($this->request->both('module') === 'shoutbox') {
-            $this->page->command('preventNavigation');
+            $shoutboxDelete = (int) $this->request->both('shoutbox_delete');
             $collapse = (bool) $this->request->asString->both('collapse');
-            if ($collapse) {
-                $this->displayShoutbox();
-                return;
-            }
 
-            $this->showAllShouts();
+            $this->page->command('preventNavigation');
+
+            match (true) {
+                $shoutboxDelete !== 0 => $this->deleteShout($shoutboxDelete),
+                $collapse => $this->displayShoutbox(),
+                default => $this->showAllShouts(),
+            };
         }
 
         match (true) {
-            $shoutboxDelete !== 0 => $this->deleteShout($shoutboxDelete),
             $this->request->isJSAccess() => $this->updateShoutbox(),
             default => $this->displayShoutbox(),
         };
@@ -268,7 +268,6 @@ final class Shoutbox implements Module
             return;
         }
 
-        $this->page->command('preventNavigation');
         $this->database->delete('shouts', Database::WHERE_ID_EQUALS, $delete);
     }
 
