@@ -47,6 +47,7 @@ final class BBCode
         'color' => '/\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[\/color\]/Usi',
         'font' => '/\[font=[\'"]?([^\]]+?)[\'"]?\](.*)\[\/font\]/Usi',
         'italic' => '/\[i\](.*)\[\/i\]/Usi',
+        'rainbow' => '/\[rainbow\](.*)\[\/rainbow\]/Usi',
         'spoiler' => '/\[spoiler\](.*)\[\/spoiler\]/Usi',
         'strikethrough' => '/\[(s|del|strike)\](.*)\[\/\1\]/Usi',
         'underline' => '/\[u\](.*)\[\/u\]/Usi',
@@ -212,7 +213,8 @@ final class BBCode
             'header' => '<h$1>$2</h$1>',
             'image' => '<img src="$2" title="$1" alt="$1" class="bbcodeimg">',
             'italic' => '<em>$1</em>',
-            'spoiler' => '<button type="button" class="spoilertext as-text">$1</button>',
+            'rainbow' => '<span class="bbcode rainbow">$1</span>',
+            'spoiler' => '<button type="button" class="bbcode spoilertext as-text">$1</button>',
             'strikethrough' => '<del>$2</del>',
             'underline' => '<span style="text-decoration:underline">$1</span>',
             // Consider adding nofollow if admin approval of new accounts is not enabled
@@ -362,7 +364,7 @@ final class BBCode
     {
         $quotee = $match[1] !== '' ? "<div class='quotee'>{$match[1]}</div>" : '';
 
-        return "<div class='quote'>{$quotee}{$match[2]}</div>";
+        return "<div class='bbcode quote'>{$quotee}{$match[2]}</div>";
     }
 
     /**

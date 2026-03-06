@@ -224,140 +224,170 @@ body {
   }
 }
 
-.checkerboard {
-  user-select: none;
+.bbcode {
+  &.checkerboard {
+    user-select: none;
 
-  & th,
-  & td {
-    width: 30px;
-    height: 30px;
-    text-align: center;
-    vertical-align: middle;
-    line-height: 30px;
-  }
-
-  & td {
-    font-size: 30px;
-  }
-
-  & tr:nth-child(2n) {
-    td:nth-child(2n) {
-      background-color: tan;
+    & th,
+    & td {
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 30px;
     }
 
-    td:nth-child(2n + 1) {
-      background-color: brown;
+    & td {
+      font-size: 30px;
+    }
+
+    & tr:nth-child(2n) {
+      td:nth-child(2n) {
+        background-color: tan;
+      }
+
+      td:nth-child(2n + 1) {
+        background-color: brown;
+      }
+    }
+
+    & tr:nth-child(2n + 1) {
+      td:nth-child(2n) {
+        background-color: brown;
+      }
+
+      td:nth-child(2n + 1) {
+        background-color: tan;
+      }
+    }
+
+    .piece {
+      cursor: pointer;
+    }
+
+    &.chess .piece {
+      &.danger {
+        &::before {
+          content: "💧";
+          font-size: 10px;
+          position: absolute;
+          top: 0;
+          right: 0;
+          line-height: 10px;
+        }
+
+        &[data-piece="k" i] {
+          animation: shake-x 50ms alternate linear infinite;
+
+          &::before {
+            content: "‼️";
+          }
+        }
+      }
+
+      &.white {
+        color: white;
+        -webkit-text-stroke: 1px #222;
+      }
+
+      &.black {
+        color: black;
+      }
+    }
+
+    &.checkers .piece {
+      font-size: 20px;
     }
   }
 
-  & tr:nth-child(2n + 1) {
-    td:nth-child(2n) {
-      background-color: brown;
+  &.othello {
+    background: #009045;
+    border-collapse: collapse;
+    border: 10px inset #000;
+
+    td {
+      border: 2px solid #00dc69 !important;
+      height: 30px;
+      width: 30px;
     }
 
-    td:nth-child(2n + 1) {
-      background-color: tan;
-    }
-  }
+    tfoot {
+      background: linear-gradient(transparent, #000);
+      padding: 5px;
+      color: white;
 
-  .piece {
-    cursor: pointer;
-  }
-}
-
-.checkerboard.chess .piece {
-  &.danger {
-    &::before {
-      content: "💧";
-      font-size: 10px;
-      position: absolute;
-      top: 0;
-      right: 0;
-      line-height: 10px;
+      & td {
+        vertical-align: middle !important;
+        text-align: center;
+      }
     }
 
-    &[data-piece="k" i] {
-      animation: shake-x 50ms alternate linear infinite;
+    .piece {
+      height: 100%;
+      width: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: all 1s;
+
+      &.white {
+        transform: rotateY(180deg);
+      }
+
+      &,
+      &::before,
+      &::after {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 100%;
+      }
+
+      &::before,
+      &::after {
+        position: absolute;
+        inset: 0;
+        content: "";
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+      }
 
       &::before {
-        content: "‼️";
+        background: black;
+      }
+
+      &::after {
+        background: white;
+        transform: rotateY(180deg);
       }
     }
   }
 
-  &.white {
-    color: white;
-    -webkit-text-stroke: 1px #222;
-  }
-
-  &.black {
-    color: black;
+  &.rainbow {
+    animation: scrollBackground-rainbow linear infinite 2s;
+    font-weight: bold;
+    background-clip: text;
+    color: transparent;
+    background-image: linear-gradient(
+      to right,
+      red,
+      orange,
+      yellow,
+      green,
+      blue,
+      indigo,
+      violet
+    );
+    background-size: 200% auto;
   }
 }
 
-.checkerboard.checkers .piece {
-  font-size: 20px;
-}
-
-.othello {
-  background: #009045;
-  border-collapse: collapse;
-  border: 10px inset #000;
-
-  td {
-    border: 2px solid #00dc69 !important;
-    height: 30px;
-    width: 30px;
+@keyframes scrollBackground-rainbow {
+  from {
+    background-position: 0 0;
   }
 
-  tfoot {
-    background: linear-gradient(transparent, #000);
-    padding: 5px;
-    color: white;
-
-    & td {
-      vertical-align: middle !important;
-      text-align: center;
-    }
-  }
-
-  .piece {
-    height: 100%;
-    width: 100%;
-    position: relative;
-    transform-style: preserve-3d;
-    transition: all 1s;
-
-    &.white {
-      transform: rotateY(180deg);
-    }
-
-    &,
-    &::before,
-    &::after {
-      display: block;
-      width: 100%;
-      height: 100%;
-      border-radius: 100%;
-    }
-
-    &::before,
-    &::after {
-      position: absolute;
-      inset: 0;
-      content: "";
-      transform-style: preserve-3d;
-      backface-visibility: hidden;
-    }
-
-    &::before {
-      background: black;
-    }
-
-    &::after {
-      background: white;
-      transform: rotateY(180deg);
-    }
+  to {
+    background-position: 200% 0;
   }
 }
 

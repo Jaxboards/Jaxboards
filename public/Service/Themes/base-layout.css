@@ -1625,35 +1625,38 @@ a {
 }
 
 /* BBcodes */
-.quote {
-  background: url("/Service/Themes/Default/icons/quote.png") top right no-repeat;
-  padding: 10px;
-
-  & .quotee {
-    margin: -10px 0 10px -5px;
-    font-weight: bold;
-  }
-}
-
-.code {
-  padding: 10px;
-  font-family: var(--monospace-code);
-  font-size: 1.2rem;
-  line-height: 1.5rem;
-  white-space: preserve;
-}
-
-.spoilertext {
-  display: inline-block;
-
-  & * {
-    visibility: hidden;
+.bbcode {
+  &.code {
+    padding: 10px;
+    font-family: var(--monospace-code);
+    font-size: 1.2rem;
+    line-height: 1.5rem;
+    white-space: preserve;
   }
 
-  &:hover,
-  &.spoiled {
+  &.quote {
+    background: url("/Service/Themes/Default/icons/quote.png") top right
+      no-repeat;
+    padding: 10px;
+
+    & .quotee {
+      margin: -10px 0 10px -5px;
+      font-weight: bold;
+    }
+  }
+
+  &.spoilertext {
+    display: inline-block;
+
     & * {
-      visibility: visible;
+      visibility: hidden;
+    }
+
+    &:hover,
+    &.spoiled {
+      & * {
+        visibility: visible;
+      }
     }
   }
 }

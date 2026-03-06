@@ -165,7 +165,7 @@ final class Games
         $whiteScore = mb_substr_count($board, 'w');
         $blackScore = mb_substr_count($board, 'b');
 
-        return "<{$table} class=\"othello\" data-move-number=\"{$moveNumber}\">
+        return "<{$table} class=\"bbcode othello\" data-move-number=\"{$moveNumber}\">
             <tbody>{$board}</tbody>
             <tfoot>
                 <td colspan=\"4\">White: <span class=\"score-white\">{$whiteScore}</span></td>
@@ -206,6 +206,6 @@ final class Games
 
         $table = 'table';
 
-        return "<{$table} data-move-number='{$moveNumber}' class='checkerboard {$game}'>{$board}</table>";
+        return "<{$table} data-move-number='{$moveNumber}' class='bbcode checkerboard {$game}'>{$board}</table>";
     }
 }
