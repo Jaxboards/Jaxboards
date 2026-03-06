@@ -166,7 +166,7 @@ const shoutbox = {
     const div = toDOM<HTMLDivElement>(message);
     if (!div) return;
     shouts[0].parentNode?.insertBefore(div, shouts[0]);
-    while (shouts.length > globalSettings.shoutLimit - 1) {
+    if (shouts.length > globalSettings.shoutLimit - 1) {
       shouts.pop()?.remove();
     }
     dehighlight(div);
