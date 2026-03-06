@@ -72,6 +72,12 @@ final class Shoutbox implements Module
         }
 
         if ($this->request->both('module') === 'shoutbox') {
+            $this->page->command('preventNavigation');
+            $collapse = (bool) $this->request->asString->both('collapse');
+            if ($collapse) {
+                $this->displayShoutbox();
+                return;
+            }
             $this->showAllShouts();
         }
 
@@ -126,6 +132,13 @@ final class Shoutbox implements Module
         $this->session->addVar('sb_id', $shouts[0]->id);
 
         $soundShout = $this->user->get()->soundShout !== 0 ? 1 : 0;
+
+        $title = $this->template->render('shoutbox/title');
+
+        if ($this->request->isJSAccess()) {
+            $this->page->command('expandShoutbox', $title, $shoutHTML);
+            return;
+        }
 
         $this->page->append(
             'SHOUTBOX',
@@ -204,9 +217,6 @@ final class Shoutbox implements Module
             $pages .= '</span>';
         }
 
-        $this->page->setBreadCrumbs([
-            $this->router->url('shoutbox') => 'Shoutbox History',
-        ]);
         if ($this->request->isJSUpdate()) {
             return;
         }
@@ -220,12 +230,24 @@ final class Shoutbox implements Module
             $shoutHTML .= $this->formatShout($shout, $membersById[$shout->uid] ?? null);
         }
 
-        $page = $this->template->render('global/box', [
-            'title' => 'Shoutbox' . $pages,
-            'content' => '<div class="sbhistory">' . $shoutHTML . '</div>',
-        ]);
-        $this->page->command('update', 'page', $page);
-        $this->page->append('PAGE', $page);
+        $title = 'Shoutbox' . $pages;
+
+        if ($this->request->isJSAccess()) {
+            $this->page->command(
+                'expandShoutbox',
+                $title . ' &middot; <a href="?module=shoutbox&collapse=true">Collapse History</a>',
+                $shoutHTML,
+            );
+        } else {
+            $this->page->setBreadCrumbs([
+                $this->router->url('shoutbox') => 'Shoutbox History',
+            ]);
+            $page = $this->template->render('global/box', [
+                'title' => $title,
+                'content' => '<div class="sbhistory">' . $shoutHTML . '</div>',
+            ]);
+            $this->page->append('PAGE', $page);
+        }
     }
 
     public function deleteShout(int $delete): void

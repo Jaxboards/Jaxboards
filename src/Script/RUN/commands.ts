@@ -29,11 +29,55 @@ type UserOnline = {
   uid: number;
 };
 
+const shoutbox = {
+  addshout(message: string) {
+    const shouts = Array.from(
+      document.querySelectorAll<HTMLDivElement>("#shoutbox .shout"),
+    );
+    const div = toDOM<HTMLDivElement>(message);
+    if (!div) return;
+    shouts[0].parentNode?.insertBefore(div, shouts[0]);
+    while (shouts.length > globalSettings.shoutLimit - 1) {
+      shouts.pop()?.remove();
+    }
+    dehighlight(div);
+    if (globalSettings.soundShout) {
+      Sound.play("blip");
+    }
+    gracefulDegrade(div);
+  },
+  async expandShoutbox(title: string, shoutHTML: string) {
+    const shoutboxTitle =
+      document.querySelector<HTMLDivElement>("#shoutbox .title");
+    const shoutboxShouts =
+      document.querySelector<HTMLDivElement>("#shoutbox .shouts");
+
+    if (!shoutboxTitle || !shoutboxShouts) return;
+
+    shoutboxTitle.innerHTML = title;
+    gracefulDegrade(shoutboxTitle);
+
+    const offsetHeight = `${shoutboxShouts.offsetHeight}px`;
+    Object.assign(shoutboxShouts.style, {
+      overflow: "hidden",
+    });
+    shoutboxShouts.innerHTML = shoutHTML;
+    gracefulDegrade(shoutboxShouts);
+
+    await animate(shoutboxShouts, [
+      { height: offsetHeight },
+      { height: `${shoutboxShouts.scrollHeight}px` },
+    ]);
+    shoutboxShouts.removeAttribute("style");
+  },
+};
+
 /**
  * These are all of the possible commands
  * that the server can send to the client.
  */
 export default {
+  ...shoutbox,
   loadscript(src: string) {
     document.body.appendChild(
       Object.assign(document.createElement("script"), { src }),
@@ -124,22 +168,6 @@ export default {
     if (el) {
       el.disabled = false;
     }
-  },
-  addshout(message: string) {
-    const shouts = Array.from(
-      document.querySelectorAll<HTMLDivElement>("#shoutbox .shout"),
-    );
-    const div = toDOM<HTMLDivElement>(message);
-    if (!div) return;
-    shouts[0].parentNode?.insertBefore(div, shouts[0]);
-    while (shouts.length > globalSettings.shoutLimit - 1) {
-      shouts.pop()?.remove();
-    }
-    dehighlight(div);
-    if (globalSettings.soundShout) {
-      Sound.play("blip");
-    }
-    gracefulDegrade(div);
   },
   tick(html: string) {
     const ticker = document.querySelector("#ticker");
