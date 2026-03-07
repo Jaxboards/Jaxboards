@@ -7,7 +7,6 @@ import DatePicker from "./date-picker";
 import Editor from "./editor";
 import Form from "./form";
 import IdleClock from "./idle-clock";
-import ImageGallery from "./image-gallery";
 import ImageResizer from "./image-resizer";
 import Link from "./link";
 import MediaPlayer from "./media-player";
@@ -27,7 +26,6 @@ export default [
   Editor,
   Form,
   IdleClock,
-  ImageGallery,
   ImageResizer,
   Link,
   MediaPlayer,
