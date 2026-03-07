@@ -184,7 +184,7 @@ final class BBCodeTest extends UnitTestCase
             ),
             [
                 '[spoiler]hidden text[/spoiler]',
-                '<button type="button" class="spoilertext as-text">hidden text</button>',
+                '<button type="button" class="bbcode spoilertext as-text">hidden text</button>',
             ],
             [
                 implode(PHP_EOL, [
@@ -197,11 +197,11 @@ final class BBCodeTest extends UnitTestCase
             ],
             [
                 '[quote]quoted text[/quote]',
-                "<div class='quote'>quoted text</div>",
+                "<div class='bbcode quote'>quoted text</div>",
             ],
             [
                 '[quote=Sean]quoted text[/quote]',
-                "<div class='quote'><div class='quotee'>Sean</div>quoted text</div>",
+                "<div class='bbcode quote'><div class='quotee'>Sean</div>quoted text</div>",
             ],
             [
                 '[video]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/video]',
