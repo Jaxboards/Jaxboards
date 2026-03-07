@@ -363,7 +363,7 @@ body {
   }
 
   &.rainbow {
-    animation: scrollBackground-rainbow linear infinite 2s;
+    animation: scroll-background-rainbow linear infinite 2s;
     font-weight: bold;
     background-clip: text;
     color: transparent;
@@ -381,7 +381,7 @@ body {
   }
 }
 
-@keyframes scrollBackground-rainbow {
+@keyframes scroll-background-rainbow {
   from {
     background-position: 0 0;
   }
