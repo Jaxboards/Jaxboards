@@ -10,11 +10,11 @@
         </div>
         <div class="content">
             <span id="statusers" class="topicstatusers">
-                {% for user in users %}
-                    {% if user.isBot %}
+                {%- for user in users -%}
+                    {%- if user.isBot -%}
                         <a class="user{{ user.uid }}">{{user.name}}</a>
-                    {% else %}
-                        {% include "user-link.html.twig" with {
+                    {%- else -%}
+                        {%- include "user-link.html.twig" with {
                             user: {
                                 id: user.uid,
                                 groupID: user.groupID,
@@ -25,9 +25,9 @@
                                 ),
                                 displayName: user.name
                             }
-                        } %}
-                    {% endif %}
-                {% endfor %}
+                        } -%}
+                    {%- endif -%}
+                {%- endfor -%}
             </span>
         </div>
         <div class="content_bottom">

@@ -61,9 +61,9 @@ final class BBCode
     private array $blockBBCodes = [
         'align' => '/\[align=(center|left|right)\](.*)\[\/align\]/Usi',
         'attachment' => '/\[attachment\](\d+)\[\/attachment\]/',
-        'code' => '/\[code(=\w+)?\](.*?)\[\/code\]/is',
         'checkers' => '/\[checkers\](.*?)\[\/checkers\]/is',
         'chess' => '/\[chess\](.*?)\[\/chess\]/is',
+        'code' => '/\[code(=\w+)?\](.*?)\[\/code\]/is',
         'header' => '/\[h([1-6])\](.*)\[\/h\1\]/Usi',
         'image' => '/\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[\/img\]/Ui',
         'list' => '/\[(ul|ol)\](.*)\[\/\1\]/Usi',
