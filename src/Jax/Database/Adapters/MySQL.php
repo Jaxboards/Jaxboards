@@ -27,8 +27,8 @@ final readonly class MySQL implements Adapter
     #[Override]
     public function createTableQueryFromModel(Model $model): string
     {
-        $table = $model::TABLE;
-        $tableQuoted = $this->database->ftable($table);
+        $table = $this->database->getPrefix() . $model::TABLE;
+        $tableQuoted = $this->database->quoteIdentifier($table);
         $reflectionClass = new ReflectionClass($model::class);
 
         $fields = [];
