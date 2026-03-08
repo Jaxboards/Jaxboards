@@ -9,6 +9,8 @@ use function array_merge;
 
 final class Config
 {
+    private string $boardConfigPath;
+
     /**
      * @param null|array<mixed> $boardConfig
      */
@@ -17,7 +19,9 @@ final class Config
         private readonly DomainDefinitions $domainDefinitions,
         private readonly FileSystem $fileSystem,
         private ?array $boardConfig = null,
-    ) {}
+    ) {
+        $this->boardConfigPath = $this->fileSystem->pathJoin($this->domainDefinitions->getBoardPath(), '/config.php');
+    }
 
     /**
      * @return array<string,mixed>
@@ -38,10 +42,8 @@ final class Config
 
         $boardConfig = [];
 
-        $boardConfigPath = $this->fileSystem->pathJoin($this->domainDefinitions->getBoardPath(), '/config.php');
-
-        if ($this->fileSystem->getFileInfo($boardConfigPath)->isFile()) {
-            $boardConfig = require_once $this->fileSystem->pathFromRoot($boardConfigPath);
+        if ($this->isBoardFound()) {
+            $boardConfig = require_once $this->fileSystem->pathFromRoot($this->boardConfigPath);
         }
 
         $this->boardConfig = $boardConfig;
@@ -58,6 +60,11 @@ final class Config
         }
 
         return null;
+    }
+
+    public function isBoardFound()
+    {
+        return $this->fileSystem->getFileInfo($this->boardConfigPath)->isFile();
     }
 
     public function hasInstalled(): bool

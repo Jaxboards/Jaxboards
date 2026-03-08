@@ -36,11 +36,6 @@ final class DomainDefinitions
         $this->prefix = $this->getPrefix($host);
     }
 
-    public function isBoardFound(): bool
-    {
-        return (bool) $this->prefix;
-    }
-
     public function getBoardURL(): string
     {
         return $this->boardURL;

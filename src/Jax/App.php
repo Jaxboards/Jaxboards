@@ -31,7 +31,6 @@ final readonly class App
         private Container $container,
         private Date $date,
         private DebugLog $debugLog,
-        private DomainDefinitions $domainDefinitions,
         private FileSystem $fileSystem,
         private IPAddress $ipAddress,
         private Page $page,
@@ -54,7 +53,7 @@ final readonly class App
             $this->router->redirect('./Service/install.php');
         }
 
-        if (!$this->domainDefinitions->isBoardFound()) {
+        if (!$this->config->isBoardFound()) {
             return 'board not found';
         }
 
