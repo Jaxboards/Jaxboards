@@ -9,7 +9,7 @@ use function array_merge;
 
 final class Config
 {
-    private string $boardConfigPath;
+    private readonly string $boardConfigPath;
 
     /**
      * @param null|array<mixed> $boardConfig
@@ -62,7 +62,7 @@ final class Config
         return null;
     }
 
-    public function isBoardFound()
+    public function isBoardFound(): bool
     {
         return $this->fileSystem->getFileInfo($this->boardConfigPath)->isFile();
     }
