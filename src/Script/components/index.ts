@@ -9,7 +9,6 @@ import Form from "./form";
 import IdleClock from "./idle-clock";
 import ImageResizer from "./image-resizer";
 import Link from "./link";
-import MediaPlayer from "./media-player";
 import Othello from "./othello";
 import PageList from "./page-list";
 import Spoiler from "./spoiler";
@@ -28,7 +27,6 @@ export default [
   IdleClock,
   ImageResizer,
   Link,
-  MediaPlayer,
   Othello,
   PageList,
   Spoiler,
