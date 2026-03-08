@@ -146,7 +146,7 @@ final readonly class ServiceSignup
         $member->pass = password_hash($password, PASSWORD_DEFAULT);
         $member->insert();
 
-        $this->fileSystem->copyDirectory('src/Service/blueprint', 'boards/' . $boardURLLowercase);
+        $this->fileSystem->copyDirectory('src/Service/blueprint', 'public/boards/' . $boardURLLowercase);
 
         $redirect = 'https://' . $boardURL . '.' . $this->serviceConfig->getSetting('domain');
         header("Location: {$redirect}");
