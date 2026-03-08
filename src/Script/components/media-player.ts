@@ -15,22 +15,21 @@ export default class MediaPlayer extends Component<HTMLDivElement> {
 
     const popoutLink = element.querySelector<HTMLAnchorElement>("a.popout");
     const inlineLink = element.querySelector<HTMLAnchorElement>("a.inline");
-    const movie = element.querySelector<HTMLDivElement>(".movie");
+    const embed = element.querySelector<HTMLDivElement>(".embed");
 
-    if (!movie) return;
+    if (!embed) return;
 
     popoutLink?.addEventListener("click", (event) => {
       event.preventDefault();
       const win = new Window({
         title: popoutLink.href,
-        content: movie.innerHTML,
+        content: embed.innerHTML,
       });
       win.render();
     });
 
     inlineLink?.addEventListener("click", (event) => {
       event.preventDefault();
-      movie.style.display = "block";
     });
   }
 }
