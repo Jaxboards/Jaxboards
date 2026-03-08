@@ -42,7 +42,7 @@ final class Config
 
         $boardConfig = [];
 
-        if ($this->isBoardFound()) {
+        if ($this->fileSystem->getFileInfo($this->boardConfigPath)->isFile()) {
             $boardConfig = require_once $this->fileSystem->pathFromRoot($this->boardConfigPath);
         }
 
@@ -64,7 +64,7 @@ final class Config
 
     public function isBoardFound(): bool
     {
-        return $this->fileSystem->getFileInfo($this->boardConfigPath)->isFile();
+        return $this->getBoardConfig() !== [];
     }
 
     public function hasInstalled(): bool
