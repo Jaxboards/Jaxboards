@@ -48,7 +48,7 @@ CREATE TABLE `jaxboards_members` (
     PRIMARY KEY (`id`),
     KEY `groupID` (`groupID`),
     KEY `displayName` (`displayName`),
-    CONSTRAINT `members_fk_groupID`
+    CONSTRAINT `jaxboards_members_fk_groupID`
         FOREIGN KEY (`groupID`)
         REFERENCES `jaxboards_member_groups` (`id`)
         ON DELETE SET NULL
