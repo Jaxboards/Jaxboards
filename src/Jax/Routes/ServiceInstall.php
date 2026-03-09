@@ -229,7 +229,7 @@ final readonly class ServiceInstall
                 $this->database->insert('directory', [
                     'boardname' => $board,
                     'date' => $this->database->datetime(),
-                    'referral' => $this->request->asString->both('r') ?? '',
+                    'referral' => $this->request->asString->both('r'),
                     'registrarEmail' => $adminEmail,
                     'registrarIP' => $this->ipAddress->asBinary(),
                 ]);
