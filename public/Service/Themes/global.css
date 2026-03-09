@@ -39,6 +39,7 @@ body {
     flex-wrap: wrap;
     line-height: 0;
     padding-left: 1px;
+    font-size: smaller;
 
     & button {
       border: none;
