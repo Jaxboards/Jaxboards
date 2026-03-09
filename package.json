@@ -37,9 +37,9 @@
     "lint": "bun run eslint && bun run stylelint",
     "postinstall": "composer-runner -- install",
     "format": "prettier --write \"**/*.{htm{,l},{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,graphql}\"",
-    "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\" --ignore-path .gitignore",
-    "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\" --ignore-path .gitignore",
-    "stylelint-report": "stylelint \"./**/*.{c,sa,sc,le}ss\" --formatter json --output-file reports/css/stylelint-report.json --ignore-path .gitignore",
+    "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
+    "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
+    "stylelint-report": "stylelint \"./**/*.{c,sa,sc,le}ss\" --formatter json --output-file reports/css/stylelint-report.json",
     "prepare": "husky",
     "test": "bun test --coverage --coverage-reporter=lcov --coverage-dir=reports/js/coverage",
     "typecheck": "tsc --noEmit"

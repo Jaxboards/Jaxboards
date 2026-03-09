@@ -12,6 +12,7 @@
 .far,
 .fas {
   --_fa-family: var(--fa-family, var(--fa-style-family, "Font Awesome 7 Free"));
+
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   display: var(--fa-display, inline-block);
@@ -36,7 +37,7 @@
   .fa-brands,
   .fa-classic,
   .fa
-):before {
+)::before {
   content: var(--fa) / "";
 }
 
@@ -50,7 +51,7 @@
     .fa-brands,
     .fa-classic,
     .fa
-  ):before {
+  )::before {
     content: var(--fa);
   }
 }
@@ -329,7 +330,7 @@
     transform: scale(1) translateY(0);
   }
 
-  to {
+  100% {
     transform: scale(1) translateY(0);
   }
 }
@@ -342,7 +343,7 @@
 
 @keyframes fa-beat-fade {
   0%,
-  to {
+  100% {
     opacity: var(--fa-beat-fade-opacity, 0.4);
     transform: scale(1);
   }
@@ -400,7 +401,7 @@
   }
 
   40%,
-  to {
+  100% {
     transform: rotate(0deg);
   }
 }
@@ -410,7 +411,7 @@
     transform: rotate(0deg);
   }
 
-  to {
+  100% {
     transform: rotate(1turn);
   }
 }
@@ -456,6 +457,7 @@
 .fa-stack-1x,
 .fa-stack-2x {
   --fa-width: 100%;
+
   inset: 0;
   position: absolute;
   text-align: center;
@@ -6742,7 +6744,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(./fa-brands-400.woff2);
+  src: url("./fa-brands-400.woff2");
 }
 
 .fa-brands,
@@ -8999,7 +9001,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(./fa-regular-400.woff2);
+  src: url("./fa-regular-400.woff2");
 }
 
 .far {
@@ -9023,7 +9025,7 @@
   font-style: normal;
   font-weight: 900;
   font-display: swap;
-  src: url(./fa-solid-900.woff2);
+  src: url("./fa-solid-900.woff2");
 }
 
 .fas {
@@ -9043,39 +9045,39 @@
   font-family: "Font Awesome 5 Brands";
   font-display: swap;
   font-weight: 400;
-  src: url(./fa-brands-400.woff2) format("woff2");
+  src: url("./fa-brands-400.woff2") format("woff2");
 }
 
 @font-face {
   font-family: "Font Awesome 5 Free";
   font-display: swap;
   font-weight: 900;
-  src: url(./fa-solid-900.woff2) format("woff2");
+  src: url("./fa-solid-900.woff2") format("woff2");
 }
 
 @font-face {
   font-family: "Font Awesome 5 Free";
   font-display: swap;
   font-weight: 400;
-  src: url(./fa-regular-400.woff2) format("woff2");
+  src: url("./fa-regular-400.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "FontAwesome";
+  font-family: FontAwesome;
   font-display: swap;
-  src: url(./fa-solid-900.woff2) format("woff2");
+  src: url("./fa-solid-900.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "FontAwesome";
+  font-family: FontAwesome;
   font-display: swap;
-  src: url(./fa-brands-400.woff2) format("woff2");
+  src: url("./fa-brands-400.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "FontAwesome";
+  font-family: FontAwesome;
   font-display: swap;
-  src: url(./fa-regular-400.woff2) format("woff2");
+  src: url("./fa-regular-400.woff2") format("woff2");
   unicode-range:
     u+f003, u+f006, u+f014, u+f016-f017, u+f01a-f01b, u+f01d, u+f022, u+f03e,
     u+f044, u+f046, u+f05c-f05d, u+f06e, u+f070, u+f087-f088, u+f08a, u+f094,
@@ -9089,9 +9091,9 @@
 }
 
 @font-face {
-  font-family: "FontAwesome";
+  font-family: FontAwesome;
   font-display: swap;
-  src: url(./fa-v4compatibility.woff2) format("woff2");
+  src: url("./fa-v4compatibility.woff2") format("woff2");
   unicode-range:
     u+f041, u+f047, u+f065-f066, u+f07d-f07e, u+f080, u+f08b, u+f08e, u+f090,
     u+f09a, u+f0ac, u+f0ae, u+f0b2, u+f0d0, u+f0d6, u+f0e4, u+f0ec, u+f10a-f10b,
