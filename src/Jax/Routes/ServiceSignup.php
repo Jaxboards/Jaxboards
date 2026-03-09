@@ -69,10 +69,6 @@ final readonly class ServiceSignup
 
     private function signup(): string
     {
-        if ($this->request->post('post') !== null) {
-            header('Location: https://test.' . $this->serviceConfig->getSetting('domain'));
-        }
-
         $username = $this->request->asString->post('username');
         $password = $this->request->asString->post('password');
         $email = $this->request->asString->post('email');

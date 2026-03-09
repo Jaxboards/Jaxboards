@@ -190,8 +190,7 @@ final readonly class App
         );
 
         $this->page->append('LOGO', $this->template->render('global/logo', [
-            'logoURL' => $this->config->getSetting('logourl')
-                ?: $this->router->getRootURL() . '/Service/Themes/Default/img/logo.png',
+            'logoURL' => $this->config->getSetting('logourl'),
         ]));
         $this->page->append('NAVIGATION', $this->template->render('global/navigation', [
             'perms' => $this->user->getGroup(),
