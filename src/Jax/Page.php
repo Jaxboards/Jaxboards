@@ -214,6 +214,13 @@ final class Page
                     href="{$globalCSS}?{$globalCSSMtime}"
                     onload="this.onload=null;this.rel='stylesheet'"
                 >
+                <link
+                    rel="preload"
+                    as="style"
+                    type="text/css"
+                    href="/assets/fonts/all.min.css"
+                    onload="this.onload=null;this.rel='stylesheet'"
+                >
                 <link rel="stylesheet" type="text/css" href="{$themeUrl}">
             HTML);
 
