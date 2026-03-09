@@ -178,7 +178,7 @@ final class BBCodeTest extends UnitTestCase
             ...array_map(
                 static fn(int $num): array => [
                     "[h{$num}]Header {$num}[/h{$num}]",
-                    "<h{$num}>Header {$num}</h{$num}>",
+                    "<h{$num} class=\"bbcode\">Header {$num}</h{$num}>",
                 ],
                 range(1, 6),
             ),

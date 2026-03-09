@@ -210,7 +210,7 @@ final class BBCode
             'bold' => '<strong>$1</strong>',
             'color' => '<span style="color:$1">$2</span>',
             'font' => '<span style="font-family:$1">$2</span>',
-            'header' => '<h$1>$2</h$1>',
+            'header' => '<h$1 class="bbcode">$2</h$1>',
             'image' => '<img src="$2" title="$1" alt="$1" class="bbcodeimg">',
             'italic' => '<em>$1</em>',
             'rainbow' => '<span class="bbcode rainbow">$1</span>',

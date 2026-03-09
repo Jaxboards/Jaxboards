@@ -202,7 +202,6 @@ a {
     }
 
     & h2 {
-      margin: 0;
       font-size: 1.6rem;
       padding: 3px;
     }
@@ -246,6 +245,8 @@ a {
   min-width: 300px;
 
   & h2 {
+    margin: 0.5em 0;
+    font-weight: bold;
     font-size: 2rem;
   }
 

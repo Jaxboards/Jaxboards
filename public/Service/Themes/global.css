@@ -5,7 +5,6 @@
   overflow-wrap: anywhere;
   word-break: normal;
   font-size: 100%;
-  font: inherit;
 }
 
 body {
@@ -383,6 +382,40 @@ body {
     );
     background-size: 200% auto;
   }
+}
+
+h1.bbcode,
+h2.bbcode,
+h3.bbcode,
+h4.bbcode,
+h5.bbcode,
+h6.bbcode {
+  margin: 0.5em 0;
+  font-weight: bold;
+}
+
+h1.bbcode {
+  font-size: 3.2rem;
+}
+
+h2.bbcode {
+  font-size: 2.4rem;
+}
+
+h3.bbcode {
+  font-size: 1.8rem;
+}
+
+h4.bbcode {
+  font-size: 1.6rem;
+}
+
+h5.bbcode {
+  font-size: 1.2rem;
+}
+
+h6.bbcode {
+  font-size: 1rem;
 }
 
 @keyframes scroll-background-rainbow {
