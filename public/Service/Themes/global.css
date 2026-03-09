@@ -1,15 +1,18 @@
 /* global reset */
-html,
-body {
-  margin: 0;
-  padding: 0;
-}
-
 * {
+  margin: 0;
   box-sizing: border-box;
   overflow-wrap: anywhere;
   word-break: normal;
+  font-size: 100%;
+  font: inherit;
 }
+
+body {
+  line-height: 1;
+}
+
+/* end reset */
 
 .as-text {
   background: none;
