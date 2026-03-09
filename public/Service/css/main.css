@@ -86,7 +86,6 @@ body {
 #content {
   background: url("../img/pagebg.png") top repeat-x #152b49;
   padding-top: 10px;
-
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
 }
