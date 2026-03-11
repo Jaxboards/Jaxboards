@@ -140,9 +140,10 @@ final class IPAddress
             return false;
         }
 
-        $banlistCount = Banlist::count('WHERE `ipAddress`=?', $binaryIp);
+        // $banlistCount = Banlist::count('WHERE `ipAddress`=?', $binaryIp);
 
-        return $banlistCount > 0;
+        // return $banlistCount > 0;
+        return false;
     }
 
     /**
