@@ -52,7 +52,6 @@ final class Session
         private readonly IPAddress $ipAddress,
         private readonly Database $database,
         private readonly Request $request,
-        private readonly User $user,
         private ?array $session = null,
     ) {
         ini_set('session.cookie_secure', '1');
@@ -309,12 +308,6 @@ final class Session
         $session->lastAction = $actionTime;
         $session->lastUpdate = $actionTime;
         $session->useragent = $this->request->getUserAgent() ?? '';
-
-        $uid = $this->user->get()->id;
-        if ($uid !== 0) {
-            $session->uid = $uid;
-        }
-
         $session->insert();
 
         $this->modelsSession = $session;
