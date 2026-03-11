@@ -210,7 +210,13 @@ final class LogReg implements Route
 
             $this->user->login($member->id ?? null, $password);
 
-            if (!$this->user->isGuest()) {
+            if ($this->user->isGuest()) {
+                $this->page->append('PAGE', $this->template->render('error', [
+                    'message' => 'Incorrect username/password',
+                ]));
+                $this->page->command('error', 'Incorrect username/password');
+                $this->page->command('preventNavigation');
+            } else {
                 if ($this->request->post('popup') !== null) {
                     $this->page->command('closewindow', '#loginform');
                 }
@@ -236,11 +242,6 @@ final class LogReg implements Route
 
                     return;
                 }
-            } else {
-                $this->page->append('PAGE', $this->template->render('error', [
-                    'message' => 'Incorrect username/password',
-                ]));
-                $this->page->command('error', 'Incorrect username/password');
             }
 
             $this->session->erase('location');
