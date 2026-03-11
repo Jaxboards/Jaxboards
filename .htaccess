@@ -1,2 +1,7 @@
 RewriteEngine on
+
+RewriteCond %{HTTP_HOST} !^www\. [NC]
 RewriteRule ^(.*)$ /public/$1 [L,QSA]
+
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteRule ^(.*)$ /public/Service/$1 [L,QSA]
