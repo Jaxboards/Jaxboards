@@ -227,6 +227,7 @@ final class LogReg implements Route
                 $this->session->set('uid', $this->user->get()->id);
                 if ($this->registering) {
                     $this->router->redirect('index');
+                    $this->page->command('reload', 500);
                 } elseif ($this->request->isJSAccess()) {
                     $this->page->command('preventNavigation');
                     $this->page->command('reload');
