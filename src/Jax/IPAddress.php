@@ -130,6 +130,7 @@ final class IPAddress
         if (!$ipAddress) {
             $ipAddress = self::getIp();
         }
+
         self::asBinary($ipAddress);
 
         // $banlistCount = Banlist::count('WHERE `ipAddress`=?', $binaryIp);
