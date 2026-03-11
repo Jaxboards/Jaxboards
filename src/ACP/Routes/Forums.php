@@ -183,7 +183,7 @@ final class Forums implements Route
             $html .= $this->page->render('forums/order-forums-tree-item.html', [
                 'class' => implode(' ', [
                     'nofirstlevel',
-                    $highlight && $forumId === $highlight ? 'highlight' : '',
+                    $highlight && $forumId === $highlight ? 'success' : '',
                 ]),
                 'content' => $subforums !== [] ? $this->printForumTree($subforums, $forums, $highlight) : '',
                 'id' => $forumId,
