@@ -96,6 +96,9 @@ final readonly class App
         // Prefetch user data
         $this->user->login($userId);
 
+        // Always keep session user ID consistent
+        $this->session->set('uid', $this->user->get()->id);
+
         // Fix ip if necessary.
         if (
             !$this->user->isGuest()
