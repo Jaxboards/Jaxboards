@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use Jax\Models\Service\Banlist;
-
 use function array_any;
 use function array_filter;
 use function array_search;
@@ -132,13 +130,7 @@ final class IPAddress
         if (!$ipAddress) {
             $ipAddress = self::getIp();
         }
-
-        $binaryIp = self::asBinary($ipAddress);
-
-        if (!$binaryIp) {
-            // IP is somehow invalid so just assume they aren't banned
-            return false;
-        }
+        self::asBinary($ipAddress);
 
         // $banlistCount = Banlist::count('WHERE `ipAddress`=?', $binaryIp);
 
