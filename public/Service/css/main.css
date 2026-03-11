@@ -40,7 +40,8 @@ body {
 
 #bar {
   margin: 0 -10px;
-  background: url("../homepagebar.png");
+  background: url("../homepagebar.png") -250px 0;
+
   height: 32px;
   border-bottom: 1px solid #555;
 
@@ -48,29 +49,23 @@ body {
     display: inline-block;
     height: 32px;
     text-indent: -1000px;
-
-    &:hover {
-      background: url("../homepagebar.png");
-    }
+    background: url("../homepagebar.png");
 
     &:focus {
       outline: none;
     }
 
+    &:hover {
+      background-position-y: bottom;
+    }
+
     &.support {
       width: 118px;
-
-      &:hover {
-        background-position: left bottom;
-      }
     }
 
     &.test {
       width: 94px;
-
-      &:hover {
-        background-position: -118px bottom;
-      }
+      background-position-x: -118px;
     }
 
     &.resource {
