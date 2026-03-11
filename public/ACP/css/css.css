@@ -23,7 +23,8 @@
 }
 
 html {
-  font-size: 62.5%; /* set 1rem to 10px */
+  font-size: 62.5%;
+  /* set 1rem to 10px */
   text-size-adjust: none;
 }
 
@@ -184,7 +185,7 @@ a {
   border: 1px solid #000;
 }
 
-@media only screen and (width >= 600px) {
+@media only screen and (width >=600px) {
   .sidebar {
     box-shadow: #124 -5px 5px 5px;
     line-height: 20px;
@@ -354,11 +355,6 @@ a {
     height: 10px;
   }
 
-  & .highlight {
-    background: #eef;
-    border: 1px solid #ccf;
-  }
-
   & a.icons {
     visibility: hidden;
   }
@@ -391,7 +387,7 @@ a {
 #autocomplete {
   position: absolute;
   border: 1px solid #000;
-  background: #eef;
+  background: var(--input-background-color);
   text-align: left;
 
   & div {

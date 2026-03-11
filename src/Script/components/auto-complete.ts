@@ -123,14 +123,11 @@ export default class AutoComplete extends Component<HTMLInputElement> {
   async doSearch() {
     const resultsContainer = this.getResultsContainer();
 
-    const relativePath = /ACP/.test(document.location.toString()) ? "../" : "";
     const searchTerm = encodeURIComponent(this.element.value);
 
     const queryParams = `term=${searchTerm}`;
 
-    const res = await fetch(
-      `${relativePath}/api/${this.method}?${queryParams}`,
-    );
+    const res = await fetch(`/api/${this.method}?${queryParams}`);
     if (!res.ok) {
       return;
     }
