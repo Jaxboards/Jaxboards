@@ -98,8 +98,9 @@ final readonly class App
 
         // Always keep session user ID consistent
         $uid = $this->user->get()->id;
-        if ($uid !== 0) {
+        if ($uid !== 0 && $uid !== $this->session->get()->uid) {
             $this->session->set('uid', $this->user->get()->id);
+            $this->session->applyChanges();
         }
 
         // Fix ip if necessary.
