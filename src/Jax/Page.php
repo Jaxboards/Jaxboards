@@ -279,7 +279,7 @@ final class Page
     private function getPageTitle(): string
     {
         return (
-            ($this->config->getSetting('boardname') ?: 'JaxBoards')
+            ($this->config->getSetting('boardname') ?: 'Jaxboards')
             . ($this->pageTitle !== '' ? ' -> ' . $this->pageTitle : '')
         );
     }

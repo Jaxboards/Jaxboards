@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * JaxBoards default config file. This is loaded on install, so don't delete
+ * Jaxboards default config file. This is loaded on install, so don't delete
  * this until you've installed Jaxboards!
  *
  * PHP Version 5.3.7

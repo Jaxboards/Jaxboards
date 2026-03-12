@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Service signup file, for users to create their own JaxBoards forum.
+ * Service signup file, for users to create their own Jaxboards forum.
  *
  * PHP Version 8
  *

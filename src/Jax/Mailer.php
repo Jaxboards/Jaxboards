@@ -18,7 +18,7 @@ final readonly class Mailer
 
     public function mail(string $email, string $topic, string $message): bool
     {
-        $boardname = $this->config->getSetting('boardname') ?: 'JaxBoards';
+        $boardname = $this->config->getSetting('boardname') ?: 'Jaxboards';
         $boardurl = $this->router->getRootURL();
         $boardlink = "<a href='{$boardurl}'>{$boardname}</a>";
 

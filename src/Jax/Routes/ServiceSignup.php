@@ -26,7 +26,7 @@ use const FILTER_VALIDATE_EMAIL;
 use const PASSWORD_DEFAULT;
 
 /**
- * Service signup file, for users to create their own JaxBoards forum.
+ * Service signup file, for users to create their own Jaxboards forum.
  *
  * PHP Version 8
  *
