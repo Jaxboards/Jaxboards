@@ -251,8 +251,7 @@ final readonly class App
         $this->page->append(
             'FOOTER',
             '<div class="footer">'
-            . "<a href=\"https://jaxboards.upgraded.click\">Jaxboards</a> {$version}! "
-            // Removed the defunct URL
+            . "<a href=\"https://www.jaxboards.net\">Jaxboards</a> {$version} "
             . '&copy; 2007-'
             . gmdate('Y')
             . '</div>',
