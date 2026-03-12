@@ -72,6 +72,7 @@ final readonly class BotDetector
         'UptimeRobot' => 'UptimeRobot',
         'W3C_Validator' => 'W3C Validator',
         'WhatsApp' => 'WhatsApp',
+        'WhatPulse' => 'WhatPulse',
         'Y!J-WSC' => 'Yahoo Japan',
         'yahoo! slurp' => 'Yahoo',
         'YandexBot' => 'Yandex',
