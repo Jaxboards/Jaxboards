@@ -227,6 +227,11 @@ body {
 }
 
 .bbcode {
+  &.youtube iframe {
+    height: calc(0.5625 * min(560px, 60vw));
+    width: min(560px, 60vw);
+  }
+
   &.checkerboard {
     user-select: none;
 
