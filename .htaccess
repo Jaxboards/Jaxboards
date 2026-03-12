@@ -1,10 +1,5 @@
 RewriteEngine on
 
-# Redirect from HTTP to HTTPS
-RewriteEngine On
-RewriteCond %{HTTPS} off
-RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-
 # Redirect from root/www to service page
 RewriteCond %{HTTP_HOST} ^www\. [NC]
 RewriteRule ^(.*)$ /public/Service/$1 [L,QSA]
