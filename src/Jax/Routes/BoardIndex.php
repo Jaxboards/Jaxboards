@@ -17,6 +17,7 @@ use Jax\Models\Member;
 use Jax\Models\Stats;
 use Jax\Page;
 use Jax\Request;
+use Jax\Router;
 use Jax\Session;
 use Jax\Template;
 use Jax\User;
@@ -57,6 +58,7 @@ final class BoardIndex implements Route
         private readonly Date $date,
         private readonly Page $page,
         private readonly Request $request,
+        private readonly Router $router,
         private readonly Session $session,
         private readonly Template $template,
         private readonly User $user,
@@ -75,10 +77,10 @@ final class BoardIndex implements Route
 
     private function markEverythingRead(): void
     {
-        $this->page->command('preventNavigation');
         $this->session->set('forumsread', '{}');
         $this->session->set('topicsread', '{}');
         $this->session->set('readDate', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
+        $this->router->redirect('index');
     }
 
     /**
