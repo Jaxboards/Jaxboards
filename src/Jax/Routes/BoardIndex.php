@@ -80,6 +80,7 @@ final class BoardIndex implements Route
         $this->session->set('forumsread', '{}');
         $this->session->set('topicsread', '{}');
         $this->session->set('readDate', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
+
         $this->router->redirect('index');
     }
 
