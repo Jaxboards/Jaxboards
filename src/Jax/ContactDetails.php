@@ -21,7 +21,6 @@ final class ContactDetails
         'bluesky' => 'https://bsky.app/profile/%s.bsky.social',
         'discord' => 'discord://-/users/%s',
         'googlechat' => 'gchat:chat?jid=%s',
-        'gtalk' => 'gchat:chat?jid=%s',
         'msn' => 'msnim:chat?contact=%s',
         'skype' => 'skype:%s',
         'steam' => 'https://steamcommunity.com/id/%s',
