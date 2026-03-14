@@ -43,7 +43,6 @@ function routes(Router $router): void
     $router->get('category', '/', BoardIndex::class);
     $router->get('contacts', '/contacts', Contacts::class);
     $router->get('download', '/download', Download::class);
-    $router->get('fatality', '/fatality', Fatality::class);
     $router->get('index', '/', BoardIndex::class);
     $router->get('members', '/members', Members::class);
     $router->get('modcontrols', '/modcontrols/{do}', ModControls::class);
@@ -61,6 +60,7 @@ function routes(Router $router): void
     $router->get('asteroids', '/asteroids', Asteroids::class);
     $router->get('confetti', '/confetti/{count}', Confetti::class);
     $router->get('earthbound', '/earthbound', Earthbound::class);
+    $router->get('fatality', '/fatality', Fatality::class);
     $router->get('katamari', '/katamari', Katamari::class);
     $router->get('nope', '/nope', Nope::class);
     $router->get('rainbow', '/rainbow', Rainbow::class);
