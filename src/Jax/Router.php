@@ -145,6 +145,14 @@ final class Router
     }
 
     /**
+     * Returns a public URL to an asset
+     */
+    public function getStaticAsset(string $assetPath): string
+    {
+        return $this->domainDefinitions->getStaticAsset($assetPath);
+    }
+
+    /**
      * Add a new potential route.
      */
     public function get(string $name, string $path, string $classString): void

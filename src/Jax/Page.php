@@ -188,22 +188,17 @@ final class Page
         );
         $cssFile = $this->fileSystem->pathJoin($themePath, 'css.css');
 
-        $themeUrl = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardURL() : '') . '/' . $cssFile;
-
         // Custom theme found but files not there, also fallback to default
         if (!$this->fileSystem->getFileInfo($cssFile)->isFile()) {
             $themePath = $this->domainDefinitions->getDefaultThemePath();
             $cssFile = $this->fileSystem->pathJoin($themePath, 'css.css');
-            $themeUrl = $this->router->getRootURL() . '/' . $cssFile;
         }
 
         $this->template->setThemePath($themePath);
 
-        // Add cache busting
-        $themeUrl = str_replace('/public', '', $themeUrl) . '?' . $this->fileSystem->getFileInfo($cssFile)->getMTime();
+        $themeUrl = $this->router->getStaticAsset(str_replace('public/', '', $cssFile));
 
-        $globalCSS = '/Service/Themes/global.css';
-        $globalCSSMtime = $this->fileSystem->getFileInfo('/public/' . $globalCSS)->getMTime();
+        $globalCSS = $this->router->getStaticAsset('/Service/Themes/global.css');
 
         // Load CSS
         $this->append('CSS', <<<HTML
@@ -211,7 +206,7 @@ final class Page
                     rel="preload"
                     as="style"
                     type="text/css"
-                    href="{$globalCSS}?{$globalCSSMtime}"
+                    href="{$globalCSS}"
                     onload="this.onload=null;this.rel='stylesheet'"
                 >
                 <link

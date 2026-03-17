@@ -190,12 +190,9 @@ final readonly class App
 
     private function renderBaseHTML(): void
     {
-        $timestamp = $this->fileSystem->getFileInfo('public/assets/app.js')->getMTime();
         $this->page->append(
             'SCRIPT',
-            '<script type="module" src="'
-            . $this->router->getRootURL()
-            . "/assets/app.js?{$timestamp}\" defer></script>",
+            '<script type="module" src="' . $this->router->getStaticAsset('assets/app.js') . '" defer></script>',
         );
 
         $this->page->append('LOGO', $this->template->render('global/logo', [

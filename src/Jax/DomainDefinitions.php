@@ -14,6 +14,8 @@ use function str_replace;
  * Figures out what board we're talking about if it's a service,
  * but regardless defines some important paths.
  *
+ * TODO: @sejohnson merge this class with Router since they really want to be together
+ *
  * @see https://github.com/jaxboards/jaxboards Jaxboards Github Repo
  */
 final class DomainDefinitions
@@ -49,6 +51,13 @@ final class DomainDefinitions
     public function getServiceThemePath(): string
     {
         return 'public/Service/Themes';
+    }
+
+    public function getStaticAsset(string $assetPath): string
+    {
+        $assetPath = $this->fileSystem->pathJoin('public/', $assetPath);
+        $timestamp = $this->fileSystem->getFileInfo($assetPath)->getMTime();
+        return str_replace('public/', '/', $assetPath) . "?{$timestamp}";
     }
 
     public function getBoardPath(): string

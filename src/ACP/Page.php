@@ -56,10 +56,9 @@ final class Page
     {
         $data = $this->parts;
 
-        $rootURL = $this->router->getRootURL();
-        $data['css_url'] = $rootURL . '/ACP/css/css.css';
-        $data['themes_css_url'] = $rootURL . '/ACP/css/themes.css';
-        $data['admin_js_url'] = $rootURL . '/assets/acp.js';
+        $data['css_url'] = $this->router->getStaticAsset('/ACP/css/css.css');
+        $data['themes_css_url'] = $this->router->getStaticAsset('/ACP/css/themes.css');
+        $data['admin_js_url'] = $this->router->getStaticAsset('/assets/acp.js');
 
         echo $this->render('admin.html', $data);
     }
