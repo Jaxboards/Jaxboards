@@ -193,7 +193,9 @@ final readonly class App
         $timestamp = $this->fileSystem->getFileInfo('public/assets/app.js')->getMTime();
         $this->page->append(
             'SCRIPT',
-            '<script src="' . $this->router->getRootURL() . "/assets/app.js?{$timestamp}\" defer></script>",
+            '<script type="module" src="'
+            . $this->router->getRootURL()
+            . "/assets/app.js?{$timestamp}\" defer></script>",
         );
 
         $this->page->append('LOGO', $this->template->render('global/logo', [
