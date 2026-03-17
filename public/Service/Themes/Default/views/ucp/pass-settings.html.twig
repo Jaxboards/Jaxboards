@@ -6,13 +6,13 @@
     <label for="curpass">
         Current Password:
     </label>
-    <input type="password" name="curpass" id="curpass">
+    <input type="password" name="curpass" id="curpass" autocomplete="current-password">
     <br>
     <br>
     <label for="newpass1">
         New Password:
     </label>
-    <input type="password" name="newpass1" id="newpass1">
+    <input type="password" name="newpass1" id="newpass1" autocomplete="new-password">
     <input name="showpass" onChange="
         document.querySelector('#newpass1').type=this.checked?'text':'password';
         document.querySelector('#confirmpass').style.display=this.checked?'none':'';
@@ -23,7 +23,7 @@
         <label for="newpass2">
             Confirm:
         </label>
-        <input type="password" name="newpass2" id="newpass2">
+        <input type="password" name="newpass2" id="newpass2" autocomplete="new-password">
     </div>
     <br>
     <input type="Submit">
