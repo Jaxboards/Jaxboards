@@ -239,7 +239,7 @@ final class Topic implements Route
         ++$modelsTopic->views;
         $modelsTopic->update();
 
-        if ($this->request->isJSAccess()) {
+        if ($this->request->isJSNewLocation()) {
             $this->page->command('update', 'page', $page);
             if ($this->request->both('pid') !== null) {
                 $this->page->command('scrollToPost', $this->request->both('pid'));
