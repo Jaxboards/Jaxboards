@@ -20,8 +20,6 @@ use function str_replace;
  */
 final class DomainDefinitions
 {
-    private string $boardURL = '';
-
     private readonly string $prefix;
 
     public function __construct(
@@ -29,18 +27,9 @@ final class DomainDefinitions
         private readonly ServiceConfig $serviceConfig,
         Request $request,
     ) {
-        // Figure out url.
-        $host = $request->server('SERVER_NAME') ?? (string) $this->serviceConfig->getSetting('domain');
-
-        // Build the url.
-        $this->boardURL = 'https://' . $host;
-
-        $this->prefix = $this->getPrefix($host);
-    }
-
-    public function getBoardURL(): string
-    {
-        return $this->boardURL;
+        $this->prefix = $this->getPrefix(
+            $request->server('SERVER_NAME') ?? (string) $this->serviceConfig->getSetting('domain'),
+        );
     }
 
     public function getDefaultThemePath(): string

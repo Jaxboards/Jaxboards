@@ -36,6 +36,7 @@ final class Router
         private readonly Container $container,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly Session $session,
+        private readonly ServiceConfig $serviceConfig,
     ) {}
 
     /**
@@ -141,7 +142,10 @@ final class Router
      */
     public function getRootURL(): string
     {
-        return $this->domainDefinitions->getBoardURL();
+        return (
+            'https://'
+            . ($this->request->server('SERVER_NAME') ?? (string) $this->serviceConfig->getSetting('domain'))
+        );
     }
 
     /**
