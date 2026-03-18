@@ -19,7 +19,7 @@ use Jax\Database\Model;
 use Jax\Database\Utils as DatabaseUtils;
 use Jax\Date;
 use Jax\DebugLog;
-use Jax\DomainDefinitions;
+use Jax\FilePaths;
 use Jax\FileSystem;
 use Jax\GeoLocate;
 use Jax\Hooks;
@@ -71,7 +71,7 @@ use function json_encode;
 #[CoversClass(DatabaseUtils::class)]
 #[CoversClass(Date::class)]
 #[CoversClass(DebugLog::class)]
-#[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FilePaths::class)]
 #[CoversClass(FileSystem::class)]
 #[CoversClass(ForeignKey::class)]
 #[CoversClass(Forum::class)]

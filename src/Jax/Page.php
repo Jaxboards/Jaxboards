@@ -52,7 +52,7 @@ final class Page
 
     public function __construct(
         private readonly Config $config,
-        private readonly DomainDefinitions $domainDefinitions,
+        private readonly FilePaths $FilePaths,
         private readonly FileSystem $fileSystem,
         private readonly Request $request,
         private readonly Router $router,
@@ -181,16 +181,14 @@ final class Page
         }
 
         $themePath = $this->fileSystem->pathJoin(
-            $skin->custom !== 0
-                ? $this->domainDefinitions->getBoardPath('Themes')
-                : $this->domainDefinitions->getServiceThemePath(),
+            $skin->custom !== 0 ? $this->FilePaths->getBoardPath('Themes') : $this->FilePaths->getServiceThemePath(),
             $skin->title,
         );
         $cssFile = $this->fileSystem->pathJoin($themePath, 'css.css');
 
         // Custom theme found but files not there, also fallback to default
         if (!$this->fileSystem->getFileInfo($cssFile)->isFile()) {
-            $themePath = $this->domainDefinitions->getDefaultThemePath();
+            $themePath = $this->FilePaths->getDefaultThemePath();
             $cssFile = $this->fileSystem->pathJoin($themePath, 'css.css');
         }
 
@@ -221,12 +219,12 @@ final class Page
 
         // Load Wrapper
         $skinWrapper = $skin->wrapper !== ''
-            ? $this->domainDefinitions->getBoardPath('Wrappers/' . $skin->wrapper . '.html')
+            ? $this->FilePaths->getBoardPath('Wrappers/' . $skin->wrapper . '.html')
             : '';
         $this->template->load(
             $skinWrapper && $this->fileSystem->getFileInfo($skinWrapper)->isFile()
                 ? $skinWrapper
-                : $this->domainDefinitions->getDefaultThemePath() . '/wrapper.html',
+                : $this->FilePaths->getDefaultThemePath() . '/wrapper.html',
         );
     }
 

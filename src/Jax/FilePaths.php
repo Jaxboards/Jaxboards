@@ -11,14 +11,10 @@ use function preg_match;
 use function str_replace;
 
 /**
- * Figures out what board we're talking about if it's a service,
- * but regardless defines some important paths.
- *
- * TODO: @sejohnson merge this class with Router since they really want to be together
- *
- * @see https://github.com/jaxboards/jaxboards Jaxboards Github Repo
+ * Helper class to generate paths to files on the filesystem.
+ * Knows where to find files for specific board instances in service mode.
  */
-final readonly class DomainDefinitions
+final readonly class FilePaths
 {
     private string $prefix;
 

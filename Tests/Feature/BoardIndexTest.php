@@ -19,7 +19,7 @@ use Jax\Database\Model;
 use Jax\Database\Utils as DatabaseUtils;
 use Jax\Date;
 use Jax\DebugLog;
-use Jax\DomainDefinitions;
+use Jax\FilePaths;
 use Jax\FileSystem;
 use Jax\Hooks;
 use Jax\IPAddress;
@@ -62,7 +62,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(DatabaseUtils::class)]
 #[CoversClass(Date::class)]
 #[CoversClass(DebugLog::class)]
-#[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FilePaths::class)]
 #[CoversClass(ForeignKey::class)]
 #[CoversClass(BoardIndex::class)]
 #[CoversClass(IPAddress::class)]

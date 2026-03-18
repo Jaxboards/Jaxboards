@@ -9,7 +9,7 @@ use Jax\BBCode\Games;
 use Jax\Database\Database;
 use Jax\Database\Model;
 use Jax\DebugLog;
-use Jax\DomainDefinitions;
+use Jax\FilePaths;
 use Jax\FileSystem;
 use Jax\Request;
 use Jax\RequestStringGetter;
@@ -36,7 +36,7 @@ use const PHP_EOL;
 #[CoversClass(Games::class)]
 #[CoversClass(Database::class)]
 #[CoversClass(DebugLog::class)]
-#[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FilePaths::class)]
 #[CoversClass(FileSystem::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(Request::class)]

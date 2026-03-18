@@ -10,7 +10,7 @@ use Jax\Config;
 use Jax\Constants\Groups;
 use Jax\Database\Database;
 use Jax\Database\Model;
-use Jax\DomainDefinitions;
+use Jax\FilePaths;
 use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Jax;
@@ -33,7 +33,7 @@ use function base64_decode;
 #[CoversClass(Column::class)]
 #[CoversClass(Config::class)]
 #[CoversClass(Database::class)]
-#[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FilePaths::class)]
 #[CoversClass(FileSystem::class)]
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]

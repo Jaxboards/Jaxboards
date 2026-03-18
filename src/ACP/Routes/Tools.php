@@ -9,7 +9,7 @@ use ACP\Routes\Tools\FileManager;
 use Jax\Database\Database;
 use Jax\Database\Model;
 use Jax\Database\Utils as DatabaseUtils;
-use Jax\DomainDefinitions;
+use Jax\FilePaths;
 use Jax\FileSystem;
 use Jax\Interfaces\Route;
 use Jax\Request;
@@ -36,7 +36,7 @@ final readonly class Tools implements Route
     public function __construct(
         private Database $database,
         private DatabaseUtils $databaseUtils,
-        private DomainDefinitions $domainDefinitions,
+        private FilePaths $FilePaths,
         private FileSystem $fileSystem,
         private Page $page,
         private Request $request,
@@ -120,7 +120,7 @@ final readonly class Tools implements Route
 
         $tempFile = tempnam(sys_get_temp_dir(), $this->database->getPrefix());
 
-        $boardPath = $this->fileSystem->pathFromRoot($this->domainDefinitions->getBoardPath(''));
+        $boardPath = $this->fileSystem->pathFromRoot($this->FilePaths->getBoardPath(''));
 
         $zipArchive = new ZipArchive();
         $zipArchive->open($tempFile, ZipArchive::OVERWRITE);

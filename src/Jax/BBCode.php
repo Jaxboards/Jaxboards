@@ -75,7 +75,7 @@ final class BBCode
     ];
 
     public function __construct(
-        private readonly DomainDefinitions $domainDefinitions,
+        private readonly FilePaths $FilePaths,
         private readonly Games $games,
         private readonly FileSystem $fileSystem,
         private readonly Template $template,
@@ -332,7 +332,7 @@ final class BBCode
         $ext = $this->fileSystem->getFileInfo($file->name)->getExtension();
 
         return $this->template->render('bbcode/attachment', [
-            'attachmentURL' => $this->domainDefinitions->getBoardStaticAsset('Uploads', $file->hash . '.' . $ext),
+            'attachmentURL' => $this->FilePaths->getBoardStaticAsset('Uploads', $file->hash . '.' . $ext),
             'file' => $file,
             'isImage' => in_array($ext, Jax::IMAGE_EXTENSIONS, true),
         ]);

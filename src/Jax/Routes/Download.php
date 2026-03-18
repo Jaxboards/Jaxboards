@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Routes;
 
-use Jax\DomainDefinitions;
+use Jax\FilePaths;
 use Jax\FileSystem;
 use Jax\Interfaces\Route;
 use Jax\Models\File;
@@ -21,7 +21,7 @@ use function mb_strtolower;
 final readonly class Download implements Route
 {
     public function __construct(
-        private DomainDefinitions $domainDefinitions,
+        private FilePaths $FilePaths,
         private FileSystem $fileSystem,
         private Request $request,
     ) {}
@@ -52,7 +52,7 @@ final readonly class Download implements Route
             $filePath .= '.' . $ext;
         }
 
-        $filePath = $this->domainDefinitions->getBoardPath('Uploads/' . $filePath);
+        $filePath = $this->FilePaths->getBoardPath('Uploads/' . $filePath);
         if ($this->fileSystem->getFileInfo($filePath)->isFile()) {
             header("Content-Disposition: attachment; filename=\"{$file->name}\";");
             echo $this->fileSystem->getContents($filePath);

@@ -18,7 +18,7 @@ use Jax\Database\Model;
 use Jax\Database\Utils as DatabaseUtils;
 use Jax\Date;
 use Jax\DebugLog;
-use Jax\DomainDefinitions;
+use Jax\FilePaths;
 use Jax\FileSystem;
 use Jax\ForumTree;
 use Jax\Hooks;
@@ -61,7 +61,7 @@ use Tests\FeatureTestCase;
 #[CoversClass(SQLite::class)]
 #[CoversClass(Date::class)]
 #[CoversClass(DebugLog::class)]
-#[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FilePaths::class)]
 #[CoversClass(FileSystem::class)]
 #[CoversClass(ForumTree::class)]
 #[CoversClass(IPAddress::class)]

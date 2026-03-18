@@ -15,7 +15,7 @@ use Jax\Database\Database;
 use Jax\Database\Model;
 use Jax\Database\Utils as DatabaseUtils;
 use Jax\DebugLog;
-use Jax\DomainDefinitions;
+use Jax\FilePaths;
 use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Jax;
@@ -49,7 +49,7 @@ use function DI\autowire;
 #[CoversClass(DatabaseUtils::class)]
 #[CoversClass(SQLite::class)]
 #[CoversClass(DebugLog::class)]
-#[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FilePaths::class)]
 #[CoversClass(FileSystem::class)]
 #[CoversClass(IPAddress::class)]
 #[CoversClass(Jax::class)]

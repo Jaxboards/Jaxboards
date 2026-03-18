@@ -6,7 +6,7 @@ namespace ACP\Routes;
 
 use ACP\Page;
 use Jax\Database\Database;
-use Jax\DomainDefinitions;
+use Jax\FilePaths;
 use Jax\FileSystem;
 use Jax\Interfaces\Route;
 use Jax\Models\Skin;
@@ -30,14 +30,14 @@ final readonly class Themes implements Route
 
     public function __construct(
         private Database $database,
-        private DomainDefinitions $domainDefinitions,
+        private FilePaths $FilePaths,
         private FileSystem $fileSystem,
         private Request $request,
         private Page $page,
         private TextFormatting $textFormatting,
     ) {
-        $this->wrappersPath = $this->domainDefinitions->getBoardPath('Wrappers');
-        $this->themesPath = $this->domainDefinitions->getBoardPath('Themes');
+        $this->wrappersPath = $this->FilePaths->getBoardPath('Wrappers');
+        $this->themesPath = $this->FilePaths->getBoardPath('Themes');
     }
 
     #[Override]
@@ -104,7 +104,7 @@ final readonly class Themes implements Route
             $this->fileSystem->putContents(
                 $newWrapperPath,
                 $this->fileSystem->getContents($this->fileSystem->pathJoin(
-                    $this->domainDefinitions->getDefaultThemePath(),
+                    $this->FilePaths->getDefaultThemePath(),
                     'wrapper.html',
                 )),
             ) === false
@@ -359,7 +359,7 @@ final readonly class Themes implements Route
             $this->page->render('themes/edit-css.html', [
                 'content' => $this->textFormatting->blockhtml(
                     $this->fileSystem->getContents(
-                        ($skin->custom !== 0 ? $this->themesPath : $this->domainDefinitions->getServiceThemePath())
+                        ($skin->custom !== 0 ? $this->themesPath : $this->FilePaths->getServiceThemePath())
                         . "/{$skin->title}/css.css",
                     ) ?: '',
                 ),
@@ -417,7 +417,7 @@ final readonly class Themes implements Route
 
         $this->fileSystem->mkdir($newThemePath, 0o777, true);
         $this->fileSystem->copy(
-            $this->fileSystem->pathjoin($this->domainDefinitions->getDefaultThemePath(), 'css.css'),
+            $this->fileSystem->pathjoin($this->FilePaths->getDefaultThemePath(), 'css.css'),
             $this->fileSystem->pathjoin($newThemePath, 'css.css'),
         );
 

@@ -9,7 +9,7 @@ use Carbon\Carbon;
 use Jax\Config;
 use Jax\Constants\Groups;
 use Jax\Database\Database;
-use Jax\DomainDefinitions;
+use Jax\FilePaths;
 use Jax\FileSystem;
 use Jax\Interfaces\Route;
 use Jax\IPAddress;
@@ -36,7 +36,7 @@ final readonly class Members implements Route
     public function __construct(
         private Config $config,
         private Database $database,
-        private DomainDefinitions $domainDefinitions,
+        private FilePaths $FilePaths,
         private FileSystem $fileSystem,
         private IPAddress $ipAddress,
         private Page $page,
@@ -451,7 +451,7 @@ final readonly class Members implements Route
     private function ipBans(): void
     {
         $ipBans = $this->request->asString->post('ipbans');
-        $bannedIpsPath = $this->domainDefinitions->getBoardPath('bannedips.txt');
+        $bannedIpsPath = $this->FilePaths->getBoardPath('bannedips.txt');
         if ($ipBans !== null) {
             $this->fileSystem->putContents($bannedIpsPath, $ipBans);
         }

@@ -7,7 +7,7 @@ namespace Tests\Unit\Jax;
 use Jax\Config;
 use Jax\Database\Database;
 use Jax\Database\Model;
-use Jax\DomainDefinitions;
+use Jax\FilePaths;
 use Jax\FileSystem;
 use Jax\IPAddress;
 use Jax\Request;
@@ -22,7 +22,7 @@ use Tests\UnitTestCase;
  */
 #[CoversClass(Config::class)]
 #[CoversClass(Database::class)]
-#[CoversClass(DomainDefinitions::class)]
+#[CoversClass(FilePaths::class)]
 #[CoversClass(FileSystem::class)]
 #[CoversClass(Model::class)]
 #[CoversClass(Request::class)]
