@@ -161,7 +161,7 @@ final readonly class FileSystem
     public function glob(string $pattern, int $flags = 0): array
     {
         return array_map(
-            fn(string $path): string => mb_substr($path, mb_strlen($this->root)),
+            fn(string $path): string => ltrim(mb_substr($path, mb_strlen($this->root)), '/'),
             glob($this->pathFromRoot($pattern), $flags) ?: [],
         );
     }
