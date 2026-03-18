@@ -24,7 +24,7 @@ use function preg_match_all;
 final readonly class FileManager
 {
     public function __construct(
-        private FilePaths $FilePaths,
+        private FilePaths $filePaths,
         private Database $database,
         private FileSystem $fileSystem,
         private Page $page,
@@ -44,7 +44,7 @@ final readonly class FileManager
                     $file->hash .= '.' . $ext;
                 }
 
-                $uploadFilePath = $this->FilePaths->getBoardPath('Uploads/' . $file->hash);
+                $uploadFilePath = $this->filePaths->getBoardPath('Uploads/' . $file->hash);
 
                 if ($this->fileSystem->getFileInfo($uploadFilePath)->isWritable()) {
                     $page .= $this->fileSystem->unlink($uploadFilePath)
@@ -101,7 +101,7 @@ final readonly class FileManager
         foreach ($files as $file) {
             $ext = $this->fileSystem->getFileInfo($file->name)->getExtension();
             $fileURL = in_array($ext, Jax::IMAGE_EXTENSIONS, true)
-                ? $this->FilePaths->getBoardStaticAsset('Uploads', "{$file->hash}.{$ext}")
+                ? $this->filePaths->getBoardStaticAsset('Uploads', "{$file->hash}.{$ext}")
                 : "/download?id={$file->id}";
 
             $table .= $this->page->render('tools/file-manager-row.html', [

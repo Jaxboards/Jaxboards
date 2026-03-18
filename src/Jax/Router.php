@@ -34,7 +34,7 @@ final class Router
     public function __construct(
         private readonly Request $request,
         private readonly Container $container,
-        private readonly FilePaths $FilePaths,
+        private readonly FilePaths $filePaths,
         private readonly Session $session,
         private readonly ServiceConfig $serviceConfig,
     ) {}
@@ -153,7 +153,7 @@ final class Router
      */
     public function getStaticAsset(string $assetPath): string
     {
-        return $this->FilePaths->getStaticAsset($assetPath);
+        return $this->filePaths->getStaticAsset($assetPath);
     }
 
     /**

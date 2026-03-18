@@ -30,14 +30,14 @@ final readonly class Themes implements Route
 
     public function __construct(
         private Database $database,
-        private FilePaths $FilePaths,
+        private FilePaths $filePaths,
         private FileSystem $fileSystem,
         private Request $request,
         private Page $page,
         private TextFormatting $textFormatting,
     ) {
-        $this->wrappersPath = $this->FilePaths->getBoardPath('Wrappers');
-        $this->themesPath = $this->FilePaths->getBoardPath('Themes');
+        $this->wrappersPath = $this->filePaths->getBoardPath('Wrappers');
+        $this->themesPath = $this->filePaths->getBoardPath('Themes');
     }
 
     #[Override]
@@ -104,7 +104,7 @@ final readonly class Themes implements Route
             $this->fileSystem->putContents(
                 $newWrapperPath,
                 $this->fileSystem->getContents($this->fileSystem->pathJoin(
-                    $this->FilePaths->getDefaultThemePath(),
+                    $this->filePaths->getDefaultThemePath(),
                     'wrapper.html',
                 )),
             ) === false
@@ -359,7 +359,7 @@ final readonly class Themes implements Route
             $this->page->render('themes/edit-css.html', [
                 'content' => $this->textFormatting->blockhtml(
                     $this->fileSystem->getContents(
-                        ($skin->custom !== 0 ? $this->themesPath : $this->FilePaths->getServiceThemePath())
+                        ($skin->custom !== 0 ? $this->themesPath : $this->filePaths->getServiceThemePath())
                         . "/{$skin->title}/css.css",
                     ) ?: '',
                 ),
@@ -417,7 +417,7 @@ final readonly class Themes implements Route
 
         $this->fileSystem->mkdir($newThemePath, 0o777, true);
         $this->fileSystem->copy(
-            $this->fileSystem->pathjoin($this->FilePaths->getDefaultThemePath(), 'css.css'),
+            $this->fileSystem->pathjoin($this->filePaths->getDefaultThemePath(), 'css.css'),
             $this->fileSystem->pathjoin($newThemePath, 'css.css'),
         );
 

@@ -34,7 +34,7 @@ use const JSON_THROW_ON_ERROR;
 final readonly class API implements Route
 {
     public function __construct(
-        private FilePaths $FilePaths,
+        private FilePaths $filePaths,
         private FileSystem $fileSystem,
         private IPAddress $ipAddress,
         private Page $page,
@@ -79,7 +79,7 @@ final readonly class API implements Route
 
         $imageExtension = in_array($ext, Jax::IMAGE_EXTENSIONS, true) ? ".{$ext}" : null;
 
-        $filePath = $this->FilePaths->getBoardPath('Uploads', $hash . $imageExtension);
+        $filePath = $this->filePaths->getBoardPath('Uploads', $hash . $imageExtension);
 
         if (!$this->fileSystem->getFileInfo($filePath)->isFile()) {
             move_uploaded_file($fileobj['tmp_name'], $this->fileSystem->pathFromRoot($filePath));

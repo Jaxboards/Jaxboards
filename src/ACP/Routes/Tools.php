@@ -36,7 +36,7 @@ final readonly class Tools implements Route
     public function __construct(
         private Database $database,
         private DatabaseUtils $databaseUtils,
-        private FilePaths $FilePaths,
+        private FilePaths $filePaths,
         private FileSystem $fileSystem,
         private Page $page,
         private Request $request,
@@ -120,7 +120,7 @@ final readonly class Tools implements Route
 
         $tempFile = tempnam(sys_get_temp_dir(), $this->database->getPrefix());
 
-        $boardPath = $this->fileSystem->pathFromRoot($this->FilePaths->getBoardPath(''));
+        $boardPath = $this->fileSystem->pathFromRoot($this->filePaths->getBoardPath(''));
 
         $zipArchive = new ZipArchive();
         $zipArchive->open($tempFile, ZipArchive::OVERWRITE);

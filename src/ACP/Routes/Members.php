@@ -36,7 +36,7 @@ final readonly class Members implements Route
     public function __construct(
         private Config $config,
         private Database $database,
-        private FilePaths $FilePaths,
+        private FilePaths $filePaths,
         private FileSystem $fileSystem,
         private IPAddress $ipAddress,
         private Page $page,
@@ -451,7 +451,7 @@ final readonly class Members implements Route
     private function ipBans(): void
     {
         $ipBans = $this->request->asString->post('ipbans');
-        $bannedIpsPath = $this->FilePaths->getBoardPath('bannedips.txt');
+        $bannedIpsPath = $this->filePaths->getBoardPath('bannedips.txt');
         if ($ipBans !== null) {
             $this->fileSystem->putContents($bannedIpsPath, $ipBans);
         }

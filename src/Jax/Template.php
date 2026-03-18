@@ -40,11 +40,11 @@ final class Template
 
     public function __construct(
         private readonly Container $container,
-        private readonly FilePaths $FilePaths,
+        private readonly FilePaths $filePaths,
         private readonly FileSystem $fileSystem,
     ) {
         $this->initializeTwig();
-        $this->setThemePath($this->FilePaths->getDefaultThemePath());
+        $this->setThemePath($this->filePaths->getDefaultThemePath());
     }
 
     /**
@@ -119,7 +119,7 @@ final class Template
         $paths = array_filter(
             [
                 $this->fileSystem->pathJoin($themePath, 'views'),
-                $this->fileSystem->pathJoin($this->FilePaths->getDefaultThemePath(), 'views'),
+                $this->fileSystem->pathJoin($this->filePaths->getDefaultThemePath(), 'views'),
             ],
             fn(string $dir): bool => $this->fileSystem->getFileInfo($dir)->isDir(),
         );

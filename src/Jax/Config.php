@@ -16,11 +16,11 @@ final class Config
      */
     public function __construct(
         private readonly ServiceConfig $serviceConfig,
-        private readonly FilePaths $FilePaths,
+        private readonly FilePaths $filePaths,
         private readonly FileSystem $fileSystem,
         private ?array $boardConfig = null,
     ) {
-        $this->boardConfigPath = $this->FilePaths->getBoardPath('config.php');
+        $this->boardConfigPath = $this->filePaths->getBoardPath('config.php');
     }
 
     /**
@@ -82,7 +82,7 @@ final class Config
         $this->boardConfig = array_merge($this->boardConfig ?? [], $data);
 
         $this->fileSystem->putContents(
-            $this->FilePaths->getBoardPath('config.php'),
+            $this->filePaths->getBoardPath('config.php'),
             $this->serviceConfig->configFileContents($this->boardConfig),
         );
     }

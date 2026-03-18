@@ -21,7 +21,7 @@ use function mb_strtolower;
 final readonly class Download implements Route
 {
     public function __construct(
-        private FilePaths $FilePaths,
+        private FilePaths $filePaths,
         private FileSystem $fileSystem,
         private Request $request,
     ) {}
@@ -52,7 +52,7 @@ final readonly class Download implements Route
             $filePath .= '.' . $ext;
         }
 
-        $filePath = $this->FilePaths->getBoardPath('Uploads/' . $filePath);
+        $filePath = $this->filePaths->getBoardPath('Uploads/' . $filePath);
         if ($this->fileSystem->getFileInfo($filePath)->isFile()) {
             header("Content-Disposition: attachment; filename=\"{$file->name}\";");
             echo $this->fileSystem->getContents($filePath);
