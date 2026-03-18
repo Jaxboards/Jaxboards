@@ -27,7 +27,6 @@ use function preg_replace;
 use function rename;
 use function rmdir;
 use function round;
-use function str_ends_with;
 use function str_replace;
 use function trim;
 use function unlink;
