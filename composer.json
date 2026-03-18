@@ -12,7 +12,7 @@
       "Emoticons\\": "public/assets/emoticons",
       "Jax\\": "src/Jax",
       "Tools\\": "src/Tools",
-      "Tests\\": "Tests"
+      "Tests\\": "src/Tests"
     }
   },
   "config": {
