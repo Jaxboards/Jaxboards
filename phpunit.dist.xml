@@ -7,7 +7,7 @@
   beStrictAboutCoverageMetadata="true"
   beStrictAboutOutputDuringTests="true"
   beStrictAboutTestsThatDoNotTestAnything="true"
-  bootstrap="Tests/bootstrap.php"
+  bootstrap="src/Tests/bootstrap.php"
   colors="true"
   columns="max"
   cacheDirectory=".cache/.phpunit.cache"
@@ -47,13 +47,13 @@
       <file>index.php</file>
     </include>
     <exclude>
-      <directory suffix=".php">Tests/</directory>
+      <directory suffix=".php">src/Tests</directory>
     </exclude>
   </source>
 
   <testsuites>
     <testsuite name="Jax">
-      <directory>Tests</directory>
+      <directory>src/Tests</directory>
     </testsuite>
   </testsuites>
 </phpunit>

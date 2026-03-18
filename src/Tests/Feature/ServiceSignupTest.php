@@ -105,7 +105,10 @@ final class ServiceSignupTest extends FeatureTestCase
         // Assert that the boards directory is set up
         $this->stubFileSystem('mock');
         $fileSystem = $this->container->get(FileSystem::class);
-        $fileSystem->expects($this->once())->method('copyDirectory')->with('src/Service/blueprint', 'public/boards/boardname');
+        $fileSystem
+            ->expects($this->once())
+            ->method('copyDirectory')
+            ->with('src/Service/blueprint', 'public/boards/boardname');
 
         $page = $this->go(
             new Request(post: [

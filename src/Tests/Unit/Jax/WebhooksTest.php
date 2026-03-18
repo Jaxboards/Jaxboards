@@ -58,15 +58,18 @@ final class WebhooksTest extends UnitTestCase
             ->willReturnCallback(function (int $option, mixed $value): void {
                 match ($option) {
                     CURLOPT_CUSTOMREQUEST => $this->assertEquals('POST', $value),
-                    CURLOPT_POSTFIELDS => $this->assertEquals(json_encode([
-                        'username' => 'Sean',
-                        'avatar_url' => 'avatar url',
-                        'content' => <<<'MARKDOWN'
-                            [topic title](<https://example.com/topic/0?findpost=0>)
+                    CURLOPT_POSTFIELDS => $this->assertEquals(
+                        json_encode([
+                            'username' => 'Sean',
+                            'avatar_url' => 'avatar url',
+                            'content' => <<<'MARKDOWN'
+                                [topic title](<https://example.com/topic/0?findpost=0>)
 
-                            post content
-                            MARKDOWN,
-                    ]), $value),
+                                post content
+                                MARKDOWN,
+                        ]),
+                        $value,
+                    ),
                     CURLOPT_RETURNTRANSFER => $this->assertEquals(true, $value),
                 };
             });
