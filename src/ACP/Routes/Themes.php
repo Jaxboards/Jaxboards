@@ -26,8 +26,6 @@ final readonly class Themes implements Route
 {
     private string $wrappersPath;
 
-    private string $boardPath;
-
     private string $themesPath;
 
     public function __construct(
@@ -38,9 +36,8 @@ final readonly class Themes implements Route
         private Page $page,
         private TextFormatting $textFormatting,
     ) {
-        $this->boardPath = $this->domainDefinitions->getBoardPath();
-        $this->wrappersPath = $this->boardPath . '/Wrappers/';
-        $this->themesPath = $this->boardPath . '/Themes/';
+        $this->wrappersPath = $this->domainDefinitions->getBoardPath('Wrappers');
+        $this->themesPath = $this->domainDefinitions->getBoardPath('Themes');
     }
 
     #[Override]

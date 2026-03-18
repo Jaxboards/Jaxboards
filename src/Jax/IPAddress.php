@@ -144,7 +144,7 @@ final class IPAddress
      */
     private function loadBannedIps(): array
     {
-        $bannedIPsPath = $this->domainDefinitions->getBoardPath() . '/bannedips.txt';
+        $bannedIPsPath = $this->domainDefinitions->getBoardPath('bannedips.txt');
         if ($this->fileSystem->getFileInfo($bannedIPsPath)->isFile()) {
             return array_filter(
                 $this->fileSystem->getLines($bannedIPsPath) ?: [],
@@ -159,7 +159,7 @@ final class IPAddress
     private function writeBannedIps(): void
     {
         $this->fileSystem->putContents(
-            $this->domainDefinitions->getBoardPath() . '/bannedips.txt',
+            $this->domainDefinitions->getBoardPath('bannedips.txt'),
             implode(PHP_EOL, $this->ipBanCache),
         );
     }

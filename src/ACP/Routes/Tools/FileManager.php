@@ -44,7 +44,7 @@ final readonly class FileManager
                     $file->hash .= '.' . $ext;
                 }
 
-                $uploadFilePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash;
+                $uploadFilePath = $this->domainDefinitions->getBoardPath('Uploads/' . $file->hash);
 
                 if ($this->fileSystem->getFileInfo($uploadFilePath)->isWritable()) {
                     $page .= $this->fileSystem->unlink($uploadFilePath)
@@ -101,8 +101,7 @@ final readonly class FileManager
         foreach ($files as $file) {
             $ext = $this->fileSystem->getFileInfo($file->name)->getExtension();
             $fileURL = in_array($ext, Jax::IMAGE_EXTENSIONS, true)
-                ? $this->domainDefinitions->getBoardPathUrl()
-                . $this->fileSystem->pathJoin('/Uploads', "{$file->hash}.{$ext}")
+                ? $this->domainDefinitions->getBoardStaticAsset('Uploads', "{$file->hash}.{$ext}")
                 : "/download?id={$file->id}";
 
             $table .= $this->page->render('tools/file-manager-row.html', [

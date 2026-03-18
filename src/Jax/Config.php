@@ -20,7 +20,7 @@ final class Config
         private readonly FileSystem $fileSystem,
         private ?array $boardConfig = null,
     ) {
-        $this->boardConfigPath = $this->fileSystem->pathJoin($this->domainDefinitions->getBoardPath(), '/config.php');
+        $this->boardConfigPath = $this->domainDefinitions->getBoardPath('config.php');
     }
 
     /**
@@ -82,7 +82,7 @@ final class Config
         $this->boardConfig = array_merge($this->boardConfig ?? [], $data);
 
         $this->fileSystem->putContents(
-            $this->domainDefinitions->getBoardPath() . '/config.php',
+            $this->domainDefinitions->getBoardPath('config.php'),
             $this->serviceConfig->configFileContents($this->boardConfig),
         );
     }

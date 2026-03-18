@@ -120,7 +120,7 @@ final readonly class Tools implements Route
 
         $tempFile = tempnam(sys_get_temp_dir(), $this->database->getPrefix());
 
-        $boardPath = $this->fileSystem->pathFromRoot($this->domainDefinitions->getBoardPath());
+        $boardPath = $this->fileSystem->pathFromRoot($this->domainDefinitions->getBoardPath(''));
 
         $zipArchive = new ZipArchive();
         $zipArchive->open($tempFile, ZipArchive::OVERWRITE);

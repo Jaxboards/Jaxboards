@@ -451,7 +451,7 @@ final readonly class Members implements Route
     private function ipBans(): void
     {
         $ipBans = $this->request->asString->post('ipbans');
-        $bannedIpsPath = $this->domainDefinitions->getBoardPath() . '/bannedips.txt';
+        $bannedIpsPath = $this->domainDefinitions->getBoardPath('bannedips.txt');
         if ($ipBans !== null) {
             $this->fileSystem->putContents($bannedIpsPath, $ipBans);
         }

@@ -74,16 +74,15 @@ final readonly class API implements Route
 
         $size = (int) filesize($fileobj['tmp_name']);
         $hash = hash_file('sha1', $fileobj['tmp_name']) ?: 'hash_error';
-        $uploadPath = $this->domainDefinitions->getBoardPath() . '/Uploads/';
 
         $ext = $this->fileSystem->getFileInfo($fileobj['name'])->getExtension();
 
         $imageExtension = in_array($ext, Jax::IMAGE_EXTENSIONS, true) ? ".{$ext}" : null;
 
-        $filePath = $uploadPath . $hash . $imageExtension;
+        $filePath = $this->domainDefinitions->getBoardPath('Uploads', $hash . $imageExtension);
 
         if (!$this->fileSystem->getFileInfo($filePath)->isFile()) {
-            move_uploaded_file($fileobj['tmp_name'], $filePath);
+            move_uploaded_file($fileobj['tmp_name'], $this->fileSystem->pathFromRoot($filePath));
 
             $file = new File();
             $file->hash = $hash;

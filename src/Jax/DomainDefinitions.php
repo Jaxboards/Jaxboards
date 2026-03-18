@@ -53,21 +53,30 @@ final class DomainDefinitions
         return 'public/Service/Themes';
     }
 
-    public function getStaticAsset(string $assetPath): string
+    /**
+     * Returns the path to a public static asset
+     */
+    public function getStaticAsset(string ...$paths): string
     {
-        $assetPath = $this->fileSystem->pathJoin('public/', $assetPath);
+        $assetPath = $this->fileSystem->pathJoin('public/', ...$paths);
         $timestamp = $this->fileSystem->getFileInfo($assetPath)->getMTime();
         return str_replace('public/', '/', $assetPath) . "?{$timestamp}";
     }
 
-    public function getBoardPath(): string
+    /**
+     * Gets a file path for a specific board instance
+     */
+    public function getBoardPath(string ...$paths): string
     {
-        return $this->fileSystem->pathJoin('public/boards', $this->prefix);
+        return $this->fileSystem->pathJoin('public/boards', $this->prefix, ...$paths);
     }
 
-    public function getBoardPathUrl(): string
+    /**
+     * Returns a static asset for a specific board instance
+     */
+    public function getBoardStaticAsset(string ...$paths): string
     {
-        return $this->boardURL . '/' . $this->fileSystem->pathJoin('boards', $this->prefix);
+        return str_replace('public/', '/', $this->getBoardPath(...$paths));
     }
 
     /**

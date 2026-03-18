@@ -182,7 +182,7 @@ final class Page
 
         $themePath = $this->fileSystem->pathJoin(
             $skin->custom !== 0
-                ? $this->domainDefinitions->getBoardPath() . '/Themes'
+                ? $this->domainDefinitions->getBoardPath('Themes')
                 : $this->domainDefinitions->getServiceThemePath(),
             $skin->title,
         );
@@ -221,7 +221,7 @@ final class Page
 
         // Load Wrapper
         $skinWrapper = $skin->wrapper !== ''
-            ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin->wrapper . '.html'
+            ? $this->domainDefinitions->getBoardPath('Wrappers/' . $skin->wrapper . '.html')
             : '';
         $this->template->load(
             $skinWrapper && $this->fileSystem->getFileInfo($skinWrapper)->isFile()
