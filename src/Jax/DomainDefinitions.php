@@ -18,13 +18,13 @@ use function str_replace;
  *
  * @see https://github.com/jaxboards/jaxboards Jaxboards Github Repo
  */
-final class DomainDefinitions
+final readonly class DomainDefinitions
 {
-    private readonly string $prefix;
+    private string $prefix;
 
     public function __construct(
-        private readonly FileSystem $fileSystem,
-        private readonly ServiceConfig $serviceConfig,
+        private FileSystem $fileSystem,
+        private ServiceConfig $serviceConfig,
         Request $request,
     ) {
         $this->prefix = $this->getPrefix(
