@@ -414,7 +414,7 @@ a {
   padding: 3px;
   font-size: 1.4rem;
   flex: 1;
-  min-width: 50vw;
+  min-width: 50%;
 }
 
 .shout {
