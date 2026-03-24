@@ -16,7 +16,7 @@ body {
 }
 
 #container {
-  width: 1024px;
+  max-width: 1024px;
   margin: auto;
   border: 1px solid #000;
   margin-top: 10px;
@@ -81,7 +81,7 @@ body {
   background: url("../img/pagebg.png") top repeat-x #152b49;
   padding-top: 10px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 }
 
 .box {
@@ -90,6 +90,11 @@ body {
   border: 1px solid #ccf;
 
   &.large {
+    & .content {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
     grid-column: 1 / -1;
   }
 
