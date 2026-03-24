@@ -81,7 +81,7 @@ body {
   background: url("../img/pagebg.png") top repeat-x #152b49;
   padding-top: 10px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
 .box {
