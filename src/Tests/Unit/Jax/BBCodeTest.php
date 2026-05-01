@@ -197,11 +197,11 @@ final class BBCodeTest extends UnitTestCase
             ],
             [
                 '[quote]quoted text[/quote]',
-                "<div class='bbcode quote'>quoted text</div>",
+                "<blockquote class='bbcode quote'>quoted text</blockquote>",
             ],
             [
                 '[quote=Sean]quoted text[/quote]',
-                "<div class='bbcode quote'><div class='quotee'>Sean</div>quoted text</div>",
+                "<blockquote class='bbcode quote'><div class='quotee'>Sean</div>quoted text</blockquote>",
             ],
             [
                 '[video]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/video]',

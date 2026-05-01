@@ -364,7 +364,7 @@ final class BBCode
     {
         $quotee = $match[1] !== '' ? "<div class='quotee'>{$match[1]}</div>" : '';
 
-        return "<div class='bbcode quote'>{$quotee}{$match[2]}</div>";
+        return "<blockquote class='bbcode quote'>{$quotee}{$match[2]}</blockquote>";
     }
 
     /**
