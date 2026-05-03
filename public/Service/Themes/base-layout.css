@@ -1648,6 +1648,8 @@ a {
 
   &.spoilertext {
     display: inline-block;
+    font: inherit;
+    text-align: inherit;
 
     & * {
       visibility: hidden;
