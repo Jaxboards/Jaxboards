@@ -29,6 +29,7 @@ final readonly class BotDetector
         'ChatGLM-Spider' => 'ChatGLM',
         'ChatGPT-User' => 'ChatGPT',
         'ClaudeBot' => 'ClaudeBot',
+        'Claude-SearchBot' => 'Claude-SearchBot',
         'DataForSeoBot' => 'DataForSeo',
         'Discordbot' => 'Discord',
         'DotBot' => 'DotBot',
