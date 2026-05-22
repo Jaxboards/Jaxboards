@@ -11,13 +11,13 @@ const pieceUnicode: Record<string, string> = {
   B: "♝",
   Q: "♛",
   K: "♚",
-  P: "♟",
+  P: "♟︎",
   r: "♜",
   n: "♞",
   b: "♝",
   q: "♛",
   k: "♚",
-  p: "♟",
+  p: "♟︎",
 };
 
 export default class Chess extends Component<HTMLTableElement> {
