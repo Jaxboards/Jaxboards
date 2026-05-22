@@ -46,7 +46,7 @@ final class Games
             'B' => '♝',
             'Q' => '♛',
             'K' => '♚',
-            'P' => '♟',
+            'P' => '♟︎',
         ];
         $black = [
             'r' => '♜',
@@ -54,7 +54,7 @@ final class Games
             'b' => '♝',
             'q' => '♛',
             'k' => '♚',
-            'p' => '♟',
+            'p' => '♟︎',
         ];
 
         $characters = [...$white, ...$black];
