@@ -22,7 +22,7 @@
     "typescript-eslint": "^8.53.0"
   },
   "engines": {
-    "composer": "2.9.8"
+    "composer": "2.10.1"
   },
   "license": "MIT",
   "private": true,

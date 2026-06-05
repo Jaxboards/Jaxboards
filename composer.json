@@ -19,7 +19,7 @@
     "classmap-authoritative": true,
     "optimize-autoloader": true,
     "platform": {
-      "composer": "2.9.8",
+      "composer": "2.10.1",
       "php": "8.4.16"
     },
     "allow-plugins": {
@@ -40,7 +40,7 @@
     "spatie/phpunit-snapshot-assertions": "^5.3"
   },
   "require": {
-    "composer": "2.9.8",
+    "composer": "2.10.1",
     "ext-mbstring": "*",
     "ext-openssl": "*",
     "ext-zip": "*",
