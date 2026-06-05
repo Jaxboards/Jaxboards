@@ -25,6 +25,7 @@ use Jax\Routes\Post;
 use Jax\Routes\Rainbow;
 use Jax\Routes\Report;
 use Jax\Routes\Search;
+use Jax\Routes\Sinistar;
 use Jax\Routes\Snow;
 use Jax\Routes\Solitaire;
 use Jax\Routes\Spin;
@@ -52,6 +53,7 @@ function routes(Router $router): void
     $router->get('profile', '/profile/{id}/{page}', UserProfile::class);
     $router->get('report', '/report', Report::class);
     $router->get('search', '/search', Search::class);
+    $router->get('sinistar', '/sinistar', Sinistar::class);
     $router->get('ticker', '/ticker', Ticker::class);
     $router->get('topic', '/topic/{id}/{slug}', Topic::class);
     $router->get('ucp', '/ucp/{what}', UCP::class);
