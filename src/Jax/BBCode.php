@@ -50,6 +50,8 @@ final class BBCode
         'rainbow' => '/\[rainbow\](.*)\[\/rainbow\]/Usi',
         'spoiler' => '/\[spoiler\](.*)\[\/spoiler\]/Usi',
         'strikethrough' => '/\[(s|del|strike)\](.*)\[\/\1\]/Usi',
+        'subscript' => '/\[sub\](.*)\[\/sub\]/Usi',
+        'superscript' => '/\[sup\](.*)\[\/sup\]/Usi',
         'underline' => '/\[u\](.*)\[\/u\]/Usi',
         'url' => '/\[url\]\s*?(?P<url>(?:[?\/]|https?|ftp|mailto:).*)\s*?\[\/url\]/Usi',
         'urlWithLink' => '/\[url=(?P<url>(?:[?\/]|https?|ftp|mailto:)[^\]]+)\](.+)\[\/url\]/Usi',
@@ -216,6 +218,8 @@ final class BBCode
             'rainbow' => '<span class="bbcode rainbow">$1</span>',
             'spoiler' => '<button type="button" class="bbcode spoilertext as-text">$1</button>',
             'strikethrough' => '<del>$2</del>',
+            'subscript' => '<sub>$1</sub>',
+            'superscript' => '<sup>$1</sup>',
             'underline' => '<span style="text-decoration:underline">$1</span>',
             // Consider adding nofollow if admin approval of new accounts is not enabled
             'url' => '<a href="$1">$1</a>',

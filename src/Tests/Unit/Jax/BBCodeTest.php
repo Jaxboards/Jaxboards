@@ -118,6 +118,14 @@ final class BBCodeTest extends UnitTestCase
                 '<del>text</del>',
             ],
             [
+                '[sup]superscript[/sup]',
+                '<sup>superscript</sup>',
+            ],
+            [
+                '[sub]subscript[/sub]',
+                '<sub>subscript</sub>',
+            ],
+            [
                 '[color=red]red text[/color]',
                 '<span style="color:red">red text</span>',
             ],
