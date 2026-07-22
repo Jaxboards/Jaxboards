@@ -65,6 +65,7 @@ final readonly class BotDetector
         'SemrushBot' => 'Semrush',
         'SERankingBacklinksBot' => 'SERankingBacklinksBot',
         'SeznamBot' => 'Seznam',
+        'SleepBot' => 'SleepBot',
         'Sogou web spider' => 'Sogou',
         'Teoma' => 'Ask.com',
         'TikTokSpider' => 'TikTok',
