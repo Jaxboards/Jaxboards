@@ -1,4 +1,7 @@
-<div class="shout action" title="{{ timestamp }}">
+<div class="shout action" data-timestamp="{{ timestamp }}">
+    {%- if avatarsEnabled -%}
+        {% include "avatar.html.twig" with { avatar: user.avatar } %}
+    {%- endif -%}
     ***{%- include 'user-link.html.twig' with { user } only %}
     {{ shout.shout|slice(4)|theWorksInline }}
     {%- if canDelete -%}
