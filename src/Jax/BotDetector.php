@@ -79,6 +79,7 @@ final readonly class BotDetector
         'yahoo! slurp' => 'Yahoo',
         'YandexBot' => 'Yandex',
         'YandexRenderResourcesBot' => 'YandexRenders',
+        'YouBot' => 'YouBot',
     ];
 
     public function __construct(
