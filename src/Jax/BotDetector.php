@@ -11,6 +11,7 @@ final readonly class BotDetector
 {
     public const array BOTS = [
         'AhrefsBot' => 'Ahrefs',
+        'AIWebIndex' => 'Lyrenth',
         'AliyunSecBot' => 'AliyunSecBot',
         'Amazonbot' => 'Amazon',
         'Amzn-User' => 'Amazon',
@@ -56,11 +57,13 @@ final readonly class BotDetector
 
         'mj12bot' => 'Majestic',
         'MojeekBot' => 'Mojeek',
+        'NavCrawl' => 'NavCrawl',
         'OAI-SearchBot' => 'OpenAI',
         'ows.eu' => 'Owler',
         'PerplexityBot' => 'Perplexity',
         'PetalBot' => 'PetalBot',
         'Qwantbot' => 'Qwant',
+        'Reflectionbot' => 'Reflectionbot',
         'scrapedia' => 'ByteDance-ImageSpider',
         'SemrushBot' => 'Semrush',
         'SERankingBacklinksBot' => 'SERankingBacklinksBot',
