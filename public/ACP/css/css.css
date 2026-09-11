@@ -355,14 +355,6 @@ a {
     margin-left: -20px;
     height: 10px;
   }
-
-  & a.icons {
-    visibility: hidden;
-  }
-
-  & li:hover > a.icons {
-    visibility: visible;
-  }
 }
 
 .success {
