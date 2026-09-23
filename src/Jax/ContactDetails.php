@@ -47,7 +47,7 @@ final class ContactDetails
             $contactFields,
             static function (array $links, $field) use ($contactFieldPrefix, $member): array {
                 $type = mb_strtolower(mb_substr($field, mb_strlen($contactFieldPrefix)));
-                $username = $member->{$field};
+                $username = (string) $member->{$field};
                 if ($type === 'bluesky' && !str_contains($username, '.')) {
                     $username .= '.bsky.social';
                 }
