@@ -48,12 +48,10 @@ final class ContactDetails
             static function (array $links, $field) use ($contactFieldPrefix, $member): array {
                 $type = mb_strtolower(mb_substr($field, mb_strlen($contactFieldPrefix)));
                 $username = $member->{$field};
-                if (
-                    $type === 'bluesky'
-                    && !str_contains($username, '.')
-                ) {
+                if ($type === 'bluesky' && !str_contains($username, '.')) {
                     $username .= '.bsky.social';
                 }
+
                 $href = sprintf(self::CONTACT_URLS[$type], $username);
                 $links[$type] = (object) ['href' => $href, 'username' => $username];
 
