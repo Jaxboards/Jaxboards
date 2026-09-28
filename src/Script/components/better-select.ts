@@ -1,3 +1,5 @@
+import { toDOM } from "../dom";
+
 export default class BetterSelect extends HTMLElement {
   // This is accessed by the browser to mark this as a form element
   // do not remove
@@ -17,6 +19,8 @@ export default class BetterSelect extends HTMLElement {
 
   hiddenFormField: HTMLInputElement;
 
+  controlsId: string;
+
   value: string;
 
   static hydrate() {
@@ -31,18 +35,31 @@ export default class BetterSelect extends HTMLElement {
   constructor() {
     super();
 
-    this.value = this.getAttribute("value") ?? "";
     this.shadow = this.attachShadow({ mode: "open" });
+
+    // inherit stylesheets from parent
+    this.shadow.innerHTML = [...document.styleSheets]
+      .map(
+        (sheet) =>
+          `<link rel="stylesheet" type="text/css" href="${sheet.href}">`,
+      )
+      .join("");
+
     this.internals = this.attachInternals();
-    this.search = document.createElement("input");
 
-    this.results = document.createElement("div");
+    this.value = this.getAttribute("value") ?? "";
+    this.controlsId = `id-${Math.random()}`;
+
+    this.search = toDOM<HTMLInputElement>(
+      `<input type="text" autocomplete="off" role="combobox" aria-controls="${this.controlsId}" aria-activedescendant>`,
+    );
+
+    this.results = toDOM(`<div id="${this.controlsId}" role="listbox">`);
+
     // This form field becomes the output
-    this.hiddenFormField = Object.assign(document.createElement("input"), {
-      type: "hidden",
-      name: this.getAttribute("name"),
-    });
-
+    this.hiddenFormField = toDOM<HTMLInputElement>(
+      `<input type="hidden" name="${this.getAttribute("name")}">`,
+    );
     this.leaveHandler = (event) => {
       this.results.classList.toggle(
         "open",
@@ -69,7 +86,6 @@ export default class BetterSelect extends HTMLElement {
     const { shadow, results, search } = this;
     results.className = "results";
 
-    search.autocomplete = "off";
     search.addEventListener("focus", () =>
       results.classList.toggle("open", true),
     );
@@ -99,14 +115,6 @@ export default class BetterSelect extends HTMLElement {
     shadow.appendChild(results);
     this.renderOptions();
     shadow.adoptedStyleSheets = [this.stylesheet()];
-
-    // ARIA stuff for a11y
-    search.setAttribute("role", "combobox");
-    search.setAttribute("aria-activedescendant", "");
-    results.setAttribute("role", "listbox");
-    const controlsId = `id-${Math.random()}`;
-    results.setAttribute("id", controlsId);
-    search.setAttribute("aria-controls", controlsId);
   }
 
   close() {
