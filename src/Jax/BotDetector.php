@@ -46,6 +46,7 @@ final readonly class BotDetector
         'ia_archiver' => 'Internet Archive Alexa',
         'IbouBot' => 'IbouBot',
         'ImagesiftBot' => 'Imagesift',
+        'KeenableBot' => 'Keenable',
         'linkdexbot' => 'Linkdex',
         'Mail.RU_Bot' => 'Mail.RU',
 
