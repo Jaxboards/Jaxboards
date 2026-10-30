@@ -1,5 +1,8 @@
 [install]
 linker = "isolated"
 
+[fmt]
+ignorePatterns = ["src/Tests/**/__snapshots__/*"]
+
 [test]
 preload = ["./src/Script/happydom.ts"]
