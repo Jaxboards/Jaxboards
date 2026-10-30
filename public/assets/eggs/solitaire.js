@@ -26,15 +26,11 @@ function solitaireGame(solitaireGameId) {
     deal: {
       pile: {
         el: null,
-        cards: [
-          /* 0, 1, ... */
-        ],
+        cards: [/* 0, 1, ... */],
       },
       deal: {
         el: null,
-        cards: [
-          /* 0, 1, ... */
-        ],
+        cards: [/* 0, 1, ... */],
       },
     },
     // finish deck
@@ -54,9 +50,7 @@ function solitaireGame(solitaireGameId) {
       index: -1,
       capture: false,
       container: {
-        cards: [
-          /* 0, 1, ... */
-        ],
+        cards: [/* 0, 1, ... */],
       },
       target: null,
       origin: {},

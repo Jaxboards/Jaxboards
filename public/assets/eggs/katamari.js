@@ -695,7 +695,7 @@
             if (e) {
               if (i) {
                 for (f in a) if (c.apply(a[f], e) === !1) break;
-              } else for (; g < h; ) if (c.apply(a[g++], e) === !1) break;
+              } else for (; g < h;) if (c.apply(a[g++], e) === !1) break;
             } else if (i) {
               for (f in a) if (c.call(a[f], f, a[f]) === !1) break;
             } else
@@ -1697,7 +1697,7 @@
       if (a[d.expando]) return a;
       var e = a;
       a = d.Event(e);
-      for (var f = this.props.length, g; f; )
+      for (var f = this.props.length, g; f;)
         ((g = this.props[--f]), (a[g] = e[g]));
       (a.target || (a.target = a.srcElement || c),
         a.target.nodeType === 3 && (a.target = a.target.parentNode),
@@ -5433,7 +5433,7 @@ function PlayerBall(parentNode, stickyNodes, ballOpts, sounds) {
       att,
       numAttachedVisible = 0;
     drawBall();
-    for (i = attached.length; --i >= 0; ) {
+    for (i = attached.length; --i >= 0;) {
       att = attached[i];
       if (att.removeR < radius) {
         attached.splice(i, 1).map(onAttachedRemoved);
