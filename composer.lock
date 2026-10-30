@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0a2f139c532781c93471a75b0fefa187",
+    "content-hash": "c000343dc949a5e8e017c67c9e2f38c8",
     "packages": [
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -2117,7 +2117,8 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-11T14:48:56+00:00"
+            "time": "2026-02-11T14:48:56+00:00",
+            "published-time": "2026-02-11T14:49:09+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -4883,7 +4884,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "composer": "2.10.3",
+        "composer": "2.11.1",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "ext-zip": "*",
@@ -4895,8 +4896,8 @@
     },
     "platform-dev": {},
     "platform-overrides": {
-        "composer": "2.10.3",
+        "composer": "2.11.1",
         "php": "8.4.16"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.11.0"
 }
