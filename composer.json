@@ -1,18 +1,18 @@
 {
-  "name": "jaxboards\/jaxboards",
+  "name": "jaxboards/jaxboards",
   "description": "Realtime forum",
   "license": "MIT",
   "autoload": {
     "files": [
-      "src\/ACP\/routes.php",
-      "src\/Jax\/routes.php"
+      "src/ACP/routes.php",
+      "src/Jax/routes.php"
     ],
     "psr-4": {
-      "ACP\\": "src\/ACP",
-      "Emoticons\\": "public\/assets\/emoticons",
-      "Jax\\": "src\/Jax",
-      "Tools\\": "src\/Tools",
-      "Tests\\": "src\/Tests"
+      "ACP\\": "src/ACP",
+      "Emoticons\\": "public/assets/emoticons",
+      "Jax\\": "src/Jax",
+      "Tools\\": "src/Tools",
+      "Tests\\": "src/Tests"
     }
   },
   "config": {
@@ -23,47 +23,47 @@
       "php": "8.4.16"
     },
     "allow-plugins": {
-      "carthage-software\/mago": true
+      "carthage-software/mago": true
     }
   },
   "minimum-stability": "stable",
   "prefer-stable": true,
   "require-dev": {
-    "brianium\/paratest": "^7.16",
-    "carthage-software\/mago": "^1.8.0",
-    "dg\/bypass-finals": "^1.9",
-    "joeymckenzie\/nasastan": "^0.1.2",
-    "phpunit\/phpunit": "^12.5",
-    "phpunit\/phpunit-dom-assertions": "^3.7",
-    "rector\/rector": "^2.3",
-    "seanjohnson08\/mysqlite": "dev-main@dev",
-    "spatie\/phpunit-snapshot-assertions": "^5.3"
+    "brianium/paratest": "^7.16",
+    "carthage-software/mago": "^1.8.0",
+    "dg/bypass-finals": "^1.9",
+    "joeymckenzie/nasastan": "^0.1.2",
+    "phpunit/phpunit": "^12.5",
+    "phpunit/phpunit-dom-assertions": "^3.7",
+    "rector/rector": "^2.3",
+    "seanjohnson08/mysqlite": "dev-main@dev",
+    "spatie/phpunit-snapshot-assertions": "^5.3"
   },
   "require": {
     "composer": "2.11.1",
     "ext-mbstring": "*",
     "ext-openssl": "*",
     "ext-zip": "*",
-    "geoip2\/geoip2": "^3.3",
+    "geoip2/geoip2": "^3.3",
     "lib-curl": "*",
     "lib-curl-openssl": "*",
     "lib-openssl": "*",
     "lib-zip-libzip": "*",
-    "nesbot\/carbon": "^3.11",
+    "nesbot/carbon": "^3.11",
     "php": "^8.4",
-    "php-curl-class\/php-curl-class": "^12.0",
-    "php-di\/php-di": "^7.1",
-    "symfony\/polyfill-php85": "^1.33",
-    "twig\/twig": "^3.23"
+    "php-curl-class/php-curl-class": "^12.0",
+    "php-di/php-di": "^7.1",
+    "symfony/polyfill-php85": "^1.33",
+    "twig/twig": "^3.23"
   },
   "scripts": {
     "autofix": "mago lint --fix && rector",
     "analyze": "mago analyze",
     "lint": "mago lint",
-    "ci-lint": "php .\/cli mago-to-sonar",
+    "ci-lint": "php ./cli mago-to-sonar",
     "clean": "rm -rf .cache",
     "format": "mago format",
-    "migrations": "php .\/cli migrate",
+    "migrations": "php ./cli migrate",
     "rector": "rector",
     "test:update-snapshots": [
       "@putenv UPDATE_SNAPSHOTS=true",
