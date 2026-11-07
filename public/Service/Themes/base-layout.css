@@ -135,8 +135,8 @@ a {
 .im {
   & .ims {
     padding: 5px;
-    width: 200px;
-    height: 100px;
+    width: 300px;
+    height: 150px;
     overflow: auto;
   }
 
