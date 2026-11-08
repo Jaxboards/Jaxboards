@@ -39,7 +39,7 @@ function routes(Router $router): void
 {
     $router->get('', '/', BoardIndex::class);
     $router->get('api', '/api/{method}', API::class);
-    $router->get('badges', '/badges', Badges::class);
+    $router->get('badges', '/badges/{id}', Badges::class);
     $router->get('calendar', '/calendar', Calendar::class);
     $router->get('category', '/', BoardIndex::class);
     $router->get('contacts', '/contacts', Contacts::class);

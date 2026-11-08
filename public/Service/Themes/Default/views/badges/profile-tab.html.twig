@@ -4,7 +4,7 @@
         {% set badgeAssociation = row.badgeAssociation %}
         <section class="badge">
             <div class="badge-image">
-                <a href="{{ url('badges', { badgeId: badge.id }) }}" title="View all users with this badge">
+                <a href="{{ url('badges', { id: badge.id }) }}" title="View all users with this badge">
                     <img src='{{ badge.imagePath }}' title='{{ badge.badgeTitle }}' alt="{{ badge.badgeTitle }}">
                 </a>
             </div>

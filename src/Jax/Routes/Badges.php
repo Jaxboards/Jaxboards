@@ -35,8 +35,9 @@ final readonly class Badges implements Route
     #[Override]
     public function route($params): void
     {
-        $badgeId = (int) $this->request->asString->get('badgeId');
+        $badgeId = (int) ($params['id'] ?? 0);
         if ($badgeId === 0) {
+            $this->router->redirect('');
             return;
         }
 
