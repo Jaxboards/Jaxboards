@@ -2,7 +2,11 @@
 linker = "isolated"
 
 [fmt]
-ignorePatterns = ["src/Tests/**/__snapshots__/*"]
+ignorePatterns = [
+  "src/Tests/**/__snapshots__/*",
+  "package.json",
+  "composer.json",
+]
 
 [test]
 preload = ["./src/Script/happydom.ts"]
