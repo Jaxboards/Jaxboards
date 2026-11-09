@@ -69,7 +69,8 @@ final class BoardIndex implements Route
     public function route($params): void
     {
         match (true) {
-            $this->request->both('markread') !== null => $this->markEverythingRead(),
+            $this->request->both('markread') !== null => $this->markEverythingRead()
+                && $this->router->redirect('index'),
             $this->request->isJSUpdate() => $this->update(),
             default => $this->viewBoardIndex(),
         };
@@ -80,8 +81,6 @@ final class BoardIndex implements Route
         $this->session->set('forumsread', '{}');
         $this->session->set('topicsread', '{}');
         $this->session->set('readDate', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
-
-        $this->router->redirect('index');
     }
 
     /**
@@ -124,6 +123,12 @@ final class BoardIndex implements Route
 
         $categories = Category::selectMany('ORDER BY `order`,`title` ASC');
         $categoryHTML = [];
+
+        // If all index forums are read, mark the whole board as read
+        if (array_all($forums, $this->isForumRead(...))) {
+            $this->markEverythingRead();
+        }
+
         foreach ($categories as $category) {
             if (!array_key_exists($category->id, $forumsByCatID)) {
                 continue;
