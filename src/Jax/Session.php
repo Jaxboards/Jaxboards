@@ -194,9 +194,6 @@ final class Session
             );
             // Delete all expired tokens as well while we're here...
             $this->database->delete('tokens', 'WHERE `expires`<=?', $this->database->datetime());
-            if ($lastAction) {
-                $this->set('readDate', $lastAction['lastAction']);
-            }
         }
 
         $yesterday = mktime(0, 0, 0) ?: 0;

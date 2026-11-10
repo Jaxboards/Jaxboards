@@ -40,6 +40,9 @@ final class Member extends Model
     #[Column(name: 'posts', type: 'int', default: 0, nullable: false, unsigned: true)]
     public int $posts = 0;
 
+    #[Column(name: 'readDate', type: 'datetime')]
+    public ?string $readDate = null;
+
     /**
      * Profile information
      */
