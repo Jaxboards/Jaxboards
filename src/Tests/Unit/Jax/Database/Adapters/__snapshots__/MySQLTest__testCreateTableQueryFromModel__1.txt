@@ -6,6 +6,7 @@ CREATE TABLE `jaxboards_members` (
     `ip` binary(16) NOT NULL DEFAULT '',
     `lastVisit` datetime,
     `posts` int unsigned NOT NULL DEFAULT '0',
+    `readDate` datetime,
     `about` text NOT NULL DEFAULT '',
     `avatar` varchar(255) NOT NULL DEFAULT '',
     `birthdate` date,
