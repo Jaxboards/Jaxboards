@@ -385,7 +385,7 @@ final class Forum implements Route
             $timestamp
             <= (
                 max($this->topicsRead[$topic->id], $forumReadTime)
-                ?: $this->session->get()->readDate ?: $this->user->get()->lastVisit
+                ?: $this->user->get()->readDate ?: $this->user->get()->lastVisit
             )
         );
     }
@@ -403,7 +403,7 @@ final class Forum implements Route
         return (
             $this->date->datetimeAsTimestamp($modelsForum->lastPostDate)
             <= (
-                $this->forumsRead[$modelsForum->id] ?? null ?: $this->date->datetimeAsTimestamp($this->session->get()->readDate) ?: $this->date->datetimeAsTimestamp($this->user->get()->lastVisit)
+                $this->forumsRead[$modelsForum->id] ?? null ?: $this->date->datetimeAsTimestamp($this->user->get()->readDate) ?: $this->date->datetimeAsTimestamp($this->user->get()->lastVisit)
             )
         );
     }

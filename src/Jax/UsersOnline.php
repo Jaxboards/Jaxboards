@@ -135,7 +135,7 @@ final class UsersOnline
             $userOnline->locationVerbose = $session->locationVerbose;
             $userOnline->name = ($session->hide ? '* ' : '') . $name;
             $userOnline->profileURL = $session->isBot ? null : $this->router->url('profile', ['id' => $uid]);
-            $userOnline->readDate = $this->date->datetimeAsTimestamp($session->readDate);
+            $userOnline->readDate = $this->date->datetimeAsTimestamp($member->readDate);
             $userOnline->status = $session->lastAction < $this->idleTimestamp ? 'idle' : 'active';
             $userOnline->uid = $uid;
 

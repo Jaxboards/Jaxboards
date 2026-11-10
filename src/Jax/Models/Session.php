@@ -62,9 +62,6 @@ final class Session extends Model
     #[Column(name: 'topicsread', type: 'json', default: '{}', nullable: false)]
     public string $topicsread = '{}';
 
-    #[Column(name: 'readDate', type: 'datetime')]
-    public ?string $readDate = null;
-
     #[Column(name: 'hide', type: 'bool')]
     public int $hide = 0;
 }

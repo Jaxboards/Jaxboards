@@ -80,7 +80,7 @@ final class BoardIndex implements Route
     {
         $this->session->set('forumsread', '{}');
         $this->session->set('topicsread', '{}');
-        $this->session->set('readDate', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
+        $this->user->set('readDate', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
         return true;
     }
 
@@ -353,7 +353,7 @@ final class BoardIndex implements Route
         return (
             $this->date->datetimeAsTimestamp($forum->lastPostDate) < max(
                 $this->forumsread[$forum->id],
-                $this->date->datetimeAsTimestamp($this->session->get()->readDate),
+                $this->date->datetimeAsTimestamp($this->user->get()->readDate),
                 $this->date->datetimeAsTimestamp($this->user->get()->lastVisit),
             )
         );
