@@ -35,6 +35,7 @@ final readonly class BotDetector
         'Discordbot' => 'Discord',
         'DotBot' => 'DotBot',
         'DuckDuckBot' => 'DuckDuckGo',
+        'ElevenlabsCrawler' => 'Elevenlabs',
         'Expanse' => 'Expanse',
         'expo-research-bot' => 'ExpoResearch',
         'facebookexternalhit' => 'Facebook',
