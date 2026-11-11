@@ -112,13 +112,25 @@ final readonly class ComposerVersion implements CLIRoute
         ksort($composerData['require']);
         ksort($composerData['require-dev']);
 
-        $this->fileSystem->putContents('composer.json', json_encode($composerData, JSON_PRETTY_PRINT));
+        $this->putJSON('composer.json', $composerData);
 
         $packageData = $this->getPackageJSON();
 
         $packageData['engines']['composer'] = $version;
         ksort($packageData['engines']);
 
-        $this->fileSystem->putContents('package.json', json_encode($packageData, JSON_PRETTY_PRINT));
+        $this->putJSON('package.json', $packageData);
+    }
+
+    private function putJSON(string $filename, mixed $data)
+    {
+        $this->fileSystem->putContents(
+            $filename,
+            preg_replace_callback(
+                '/^    +/m',
+                fn($match) => str_repeat('  ', strlen($match[0]) / 4),
+                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL
+            )
+        );
     }
 }
