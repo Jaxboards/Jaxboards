@@ -122,15 +122,12 @@ final readonly class ComposerVersion implements CLIRoute
         $this->putJSON('package.json', $packageData);
     }
 
-    private function putJSON(string $filename, mixed $data)
+    private function putJSON(string $filename, mixed $data): void
     {
-        $this->fileSystem->putContents(
-            $filename,
-            preg_replace_callback(
-                '/^    +/m',
-                fn($match) => str_repeat('  ', strlen($match[0]) / 4),
-                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL
-            )
-        );
+        $this->fileSystem->putContents($filename, preg_replace_callback(
+            '/^    +/m',
+            static fn($match) => str_repeat('  ', mb_strlen($match[0]) / 4),
+            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL,
+        ));
     }
 }
