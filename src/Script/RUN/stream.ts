@@ -81,7 +81,7 @@ export default class Stream {
       }
       // server error
       toast.error(
-        "An unrecoverable error has occurred.<br>Please try again later.",
+        "Error: Disconnected from server.<br>Try refreshing the page, or wait a few minutes.",
       );
     } catch (_) {
       // don't show errors for no-user-action update requests
